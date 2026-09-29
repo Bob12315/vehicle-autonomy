@@ -4,13 +4,7 @@ overrides:
     request_message_intervals: true
     data_source: real
     active_source: real
-    # eth0: 192.168.10.15/24; flight controller: 192.168.10.14.
-    # Host is the local UDP bind address, not the flight controller address.
-    real:
-      connection_type: eth
-      eth_mode: udpin
-      eth_host: "0.0.0.0"
-      eth_port: 15001
+    real: {connection_type: eth, eth_mode: udpin, eth_host: "0.0.0.0", eth_port: 15001} # eth0: 192.168.10.15/24; controller: 192.168.10.14; host is local bind address.
     attitude_udp_enabled: true
     attitude_udp_rate_hz: 80
   yolo:
@@ -21,20 +15,5 @@ overrides:
     camera_fps: 30
     camera_fourcc: "MJPG"
     inference_workers: 2
-    virtual_nadir:
-      enabled: true
-      yaw_reference_mode: "lock_on_start"
-      camera:
-        width: 640
-        height: 480
-        # 2.8 mm lens, 85-degree diagonal FOV; approximate, not calibrated.
-        fov_x_deg: 72.487673
-        fov_y_deg: 57.603876
-        approximate_calibration: true
-      output:
-        width: 640
-        height: 480
-        fov_x_deg: 72.487673
-        fov_y_deg: 57.603876
-executor:
-  send_commands: false
+    virtual_nadir: {enabled: true, yaw_reference_mode: lock_on_start, camera: {width: 640, height: 480, fov_x_deg: 72.487673, fov_y_deg: 57.603876, approximate_calibration: true}, output: {width: 640, height: 480, fov_x_deg: 72.487673, fov_y_deg: 57.603876}}
+executor: {send_commands: false}

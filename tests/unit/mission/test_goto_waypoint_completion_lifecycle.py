@@ -88,6 +88,13 @@ def test_goto_reaches_target_and_releases_active_action() -> None:
             _context(now=index * 0.5), link_manager=None, send_commands=False
         )
 
+    assert status["state"] == "running"
+    assert service.last_result is not None
+    assert service.last_result["reason"] == "waypoint_settling"
+    status = service.tick(
+        _context(now=2.5), link_manager=None, send_commands=False
+    )
+
     assert service.last_result is not None
     assert service.last_result["reason"] == "waypoint_reached"
     assert status["state"] == "succeeded"
