@@ -1,0 +1,1 @@
+"""Sensor adapters belong here."""

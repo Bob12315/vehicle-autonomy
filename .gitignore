@@ -7,31 +7,13 @@ __pycache__/
 .ruff_cache/
 
 *.log
-
-*.pt
-*.onnx
-*.engine
-
-*.avi
-*.mp4
-*.mov
-*.tlog
-*.tlog.*
-*.ulg
-*.bag
-*.mavlink
 *.bin
 
-logs/
-yolo_app/logs/
-
-# IDE internal state
+# Local developer state
 .reasonix/
 reasonix.toml
+legacy/cuadc_2026/eeprom.bin
 
-# Personal notes
-action调试.md
-
-# Local runtime state: SITL EEPROM, MAVLink logs, blackbox data, and videos.
+# The new runtime stores generated state here when adapters are added.
 runtime/*
 !runtime/.gitkeep

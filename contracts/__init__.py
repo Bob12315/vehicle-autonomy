@@ -1,0 +1,1 @@
+"""Vehicle independent framework contracts."""
