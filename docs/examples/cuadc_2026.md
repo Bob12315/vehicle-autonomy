@@ -1,6 +1,6 @@
 # CUADC 2026：历史来源与 Example Application
 
-**状态：Current Application 到 Frozen Target Architecture 的概念映射。** 本文不宣称这些目标插件或 Profile 已按 V1 目录实现。
+**状态：Current Application 与已落地应用组合的映射。** `applications/cuadc_2026/` 已集中声明现有组合与正式 Mission 模板；比赛算法、配置和生产控制链仍沿用当前实现，详见 [P8 记录](../migration/p8_cuadc_application_framework.md)。
 
 当前仓库源于 CUADC 2026 多旋翼侦察与救援应用，包含 ArduPilot、RK3588、USB 下视相机、YOLO/RKNN、Competition Field 与 rescue Mission。它是框架的一个具体实例，不能代表框架的全部 Vehicle、Sensor 或 Deployment。
 
@@ -26,4 +26,4 @@ Environment: cuadc_2026
 Mission:    rescue_2026
 ```
 
-这是未来组合模型的说明，当前源码仍有模块耦合和比赛专用逻辑，详见[当前状态](../migration/current_state.md)。
+上述组合现由 `CUADC_2026_PROFILE` 明确记录。它是当前应用的资产映射，仍有模块耦合和比赛专用逻辑，详见[当前状态](../migration/current_state.md)。

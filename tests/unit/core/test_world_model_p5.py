@@ -11,6 +11,7 @@ from application.core.snapshot_collector import SnapshotCollector, SnapshotColle
 from application.core.state_store import RuntimeInputStore
 from application.runner import SystemRunner
 from application.world_projection import environment_reference_from_field
+from environments.cuadc_2026 import environment_snapshot_from_field
 from contracts.core.common import freeze_json
 from contracts.core.input_state import FusionSnapshot, FusionState, FreshnessState
 from contracts.core.time import CoreTime
@@ -91,13 +92,16 @@ def test_world_snapshot_combines_normalized_inputs_and_fences_stale_target() -> 
 def test_core_input_publishes_world_from_same_cut_and_action_reads_it() -> None:
     now, vehicle, perception, health, field = sample_inputs()
     collector = SnapshotCollector(SnapshotCollectorPorts(
-        Port(vehicle), Port(perception), Port(field), Port(None), Fusion(), Port(health)),
+        Port(vehicle), Port(perception), Port(field), Port(None), Fusion(), Port(health),
+        Port(environment_snapshot_from_field(field))),
         RuntimeInputStore(),
     )
     cycle = CoreTime(now.monotonic_ns + 100, now.utc, now.clock_domain_id)
     snapshot = collector.capture_and_publish(cycle)
     assert snapshot.world.vehicle is snapshot.vehicle
     assert snapshot.world.perception is snapshot.perception
+    assert snapshot.world.environment.profile.profile_id == "cuadc_2026"
+    assert snapshot.world.environment_reference.version.revision == field.version.revision
     assert snapshot.world.targets[0].track_id == 9
     context = LegacyActionModuleAdapter._context(SimpleNamespace(snapshot=snapshot))
     assert context["target"]["track_id"] == 9

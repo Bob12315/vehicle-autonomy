@@ -3,6 +3,7 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException, Request
 
 from missions.engine import MissionActionStep
+from applications.cuadc_2026.profile import CUADC_2026_PROFILE
 from web_ui.context import WebContext
 from web_ui.dto import (
     ActionMissionConfigureAndStartRequest,
@@ -29,7 +30,7 @@ def build_router(ctx: WebContext) -> APIRouter:
         for name, label in ACTION_MISSION_TEMPLATE_NAMES.items():
             data = load_action_mission_template(name)
             result.append({"name": name, "label": label,
-                           "path": f"config/action_missions/{name}.json",
+                           "path": CUADC_2026_PROFILE.template(name).relative_path,
                            "description": str(data.get("description") or ""),
                            "step_count": len(data.get("steps") or [])})
         return {"ok": True, "templates": result}

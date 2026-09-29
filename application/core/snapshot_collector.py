@@ -17,14 +17,14 @@ from contracts.core.input_state import (
     SendGateSnapshot,
 )
 from contracts.core.time import CoreTime
+from contracts.environment import EnvironmentSnapshot
 from contracts.platform.common import ResourceVersion, SchemaVersion
 from contracts.platform.common import ClockStamp
 from contracts.platform.field import FieldReferenceSnapshot
 from contracts.platform.perception import PerceptionFrameSnapshot, PerceptionHealthSnapshot
 from contracts.platform.vehicle_state import VehicleStateSnapshot
-from application.world_projection import environment_reference_from_snapshot
-from environments.cuadc_2026 import environment_snapshot_from_field
 from world_model import WorldModel
+from world_model.projection import environment_reference_from_snapshot
 
 from .state_store import RuntimeInputStore
 
@@ -37,6 +37,7 @@ class SnapshotCollectorPorts:
     send_gate: "SnapshotPort"
     fusion: FusionComputePort
     perception_health: "SnapshotPort | None" = None
+    environment: "SnapshotPort | None" = None
 
 
 class SnapshotPort(Protocol):
@@ -83,8 +84,10 @@ class SnapshotCollector(RuntimeInputPublisherPort):
                 else perception_freshness.reason_code or "unavailable",
                 0,
             )
-        environment = (environment_snapshot_from_field(field)
-                       if isinstance(field, FieldReferenceSnapshot) else None)
+        candidate_environment = (self._read(self._ports.environment)
+                                 if self._ports.environment is not None else None)
+        environment = (candidate_environment
+                       if isinstance(candidate_environment, EnvironmentSnapshot) else None)
         world = self._world_model.publish(
             captured_at=ClockStamp(now.utc, now.monotonic_ns, now.clock_domain_id),
             vehicle=vehicle if isinstance(vehicle, VehicleStateSnapshot) else None,

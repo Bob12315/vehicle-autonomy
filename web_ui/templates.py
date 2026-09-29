@@ -6,20 +6,19 @@ import json
 from fastapi import HTTPException
 
 from app.config import ROOT_DIR
+from applications.cuadc_2026.profile import CUADC_2026_PROFILE
 
 
 ACTION_MISSION_TEMPLATE_DIR = ROOT_DIR / "config" / "action_missions"
 ACTION_MISSION_TEMPLATE_NAMES = {
-    "drop_two_targets": "投放任务 v2",
-    "recon_gps": "GPS 侦察任务 v2",
-    "rescue_2026_full_auto": "完整流程 v2",
+    item.name: item.label for item in CUADC_2026_PROFILE.mission_templates
 }
 
 
 def load_action_mission_template(name: str) -> dict:
     if name not in ACTION_MISSION_TEMPLATE_NAMES:
         raise HTTPException(status_code=404, detail="unknown action mission template")
-    path = (ACTION_MISSION_TEMPLATE_DIR / f"{name}.json").resolve()
+    path = CUADC_2026_PROFILE.template_path(name, ROOT_DIR).resolve()
     template_dir = ACTION_MISSION_TEMPLATE_DIR.resolve()
     if path.parent != template_dir or path.suffix != ".json":
         raise HTTPException(status_code=404, detail="unknown action mission template")

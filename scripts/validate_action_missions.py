@@ -14,12 +14,12 @@ from missions.common.actions.action_lab import (
     action_definition,
     create_action_lab_registry,
 )
+from applications.cuadc_2026.profile import CUADC_2026_PROFILE
 from missions.engine import MissionBlackboard
 
 DEFAULT_TEMPLATE_PATHS = [
-    ROOT / "config/action_missions/drop_two_targets.json",
-    ROOT / "config/action_missions/recon_gps.json",
-    ROOT / "config/action_missions/rescue_2026_full_auto.json",
+    CUADC_2026_PROFILE.template_path(item.name, ROOT)
+    for item in CUADC_2026_PROFILE.mission_templates
 ]
 ALLOWED_FAILURE_ACTIONS = {"fail", "retry_current", "retry_current_then_jump_to", "jump_to", "continue"}
 

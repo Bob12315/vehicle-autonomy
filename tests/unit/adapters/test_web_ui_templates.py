@@ -64,7 +64,11 @@ def test_start_uses_the_editor_mission_revision() -> None:
 
 
 def test_web_template_catalog_is_not_in_server_lifecycle() -> None:
+    from applications.cuadc_2026 import CUADC_2026_PROFILE
+    from web_ui.templates import ACTION_MISSION_TEMPLATE_NAMES
+
     server = (ROOT / "web_ui/server.py").read_text()
-    templates = (ROOT / "web_ui/templates.py").read_text()
     assert "drop_two_targets" not in server
-    assert "drop_two_targets" in templates
+    assert ACTION_MISSION_TEMPLATE_NAMES == {
+        item.name: item.label for item in CUADC_2026_PROFILE.mission_templates
+    }

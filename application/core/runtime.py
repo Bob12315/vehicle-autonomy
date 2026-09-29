@@ -53,6 +53,7 @@ def build_core_runtime(
     vehicle_translate: Callable[[Effect], VehicleCommand],
     safety: SafetyEvaluator,
     cadence_hz: float = 20.0,
+    environment: SnapshotPort | None = None,
 ) -> CoreRuntime:
     """Build one isolated stable-core owner graph with SEND hard-defaulted off."""
     fence = CoreExecutionFenceAuthority(source, link_session_id, send_enabled=False)
@@ -60,7 +61,8 @@ def build_core_runtime(
     input_store = RuntimeInputStore()
     cycle_store = CoreCycleStore()
     collector = SnapshotCollector(
-        SnapshotCollectorPorts(vehicle_state, perception, field_reference, send_state, fusion),
+        SnapshotCollectorPorts(vehicle_state, perception, field_reference, send_state, fusion,
+                               environment=environment),
         input_store,
     )
     coordinator = RunCoordinator(

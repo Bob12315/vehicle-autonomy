@@ -29,7 +29,8 @@ from field.service import FieldService
 from field.profile_service import ReadOnlyFieldProfileRepository
 from web_ui.status_adapter import WebStatusService
 from app.bootstrap import ServiceManager
-from application.vehicle_composition import compose_actions, create_registry
+from applications.cuadc_2026.composition import compose_actions, create_registry
+from applications.cuadc_2026.profile import CUADC_2026_PROFILE
 from application.world_projection import environment_reference_from_snapshot
 from environments import EnvironmentCatalog, static_profiles
 from environments.cuadc_2026 import CuadcEnvironment
@@ -131,6 +132,7 @@ class SystemRunner:
             record_event=self._record_event,
         )
         self.vehicle_plugin = MultirotorPlugin(self.services.state_port.snapshot)
+        self.application_profile = CUADC_2026_PROFILE
         self.action_definitions = compose_actions(self.vehicle_plugin)
         self.action_lab_specs = [definition.web_spec() for definition in self.action_definitions]
         self.action_lab_enabled = True
@@ -250,7 +252,8 @@ class SystemRunner:
                 perception, scene = self.services.get_perception_frame(now)
                 perception_status = self.services.perception_status(now)
                 vehicle_snapshot = self.services.get_vehicle_snapshot()
-                environment = self.environment_catalog.snapshot("cuadc_2026")
+                environment = self.environment_catalog.snapshot(
+                    self.application_profile.environment_profile_id)
                 self.world_model.publish(
                     captured_at=ClockStamp(datetime.fromtimestamp(now, timezone.utc),
                                            time.monotonic_ns(), "app"),

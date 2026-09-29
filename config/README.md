@@ -2,6 +2,8 @@
 
 **Current Implementation：** 本文只记录现有 CUADC 配置，不是框架的通用 Profile Schema。V1 目标组合见[Deployment / Gateway](../docs/platform/deployment_gateway.md)。
 
+当前应用的部署、车辆、环境、Action 和正式 Mission 模板清单由 `applications/cuadc_2026/profile.py` 与 `composition.py` 声明；下列文件仍是实际生效配置，不在应用包中保存副本。
+
 程序直接读取 `config/` 下的生效配置。修改实机参数前应保存当前版本，并始终保持
 `config/app.yaml` 中 `executor.send_commands: false`，直到完成干跑和 SITL 验证。
 

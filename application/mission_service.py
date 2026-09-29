@@ -5,7 +5,7 @@ from typing import Any
 
 from execution.authorization import RunAuthorization
 from execution.policy import action_requires_run_authorization
-from application.vehicle_composition import unsupported_action_reason
+from applications.cuadc_2026.composition import unsupported_action_reason
 from missions.common.actions.result import ActionResult
 from missions.engine import MissionActionStep, MissionOrchestrator
 
