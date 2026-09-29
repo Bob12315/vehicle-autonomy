@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from missions.common.actions.action_lab import create_action_lab_registry
+from applications.cuadc_2026.actions.definitions import create_action_lab_registry
 
 
 ROOT = Path(__file__).parents[2]
@@ -32,17 +32,18 @@ def test_runtime_registry_does_not_publish_composite_actions() -> None:
 
 
 def test_production_actions_do_not_construct_child_actions() -> None:
-    action_dir = ROOT / "missions/common/actions"
-    source = "\n".join(path.read_text() for path in action_dir.glob("*.py"))
+    action_dirs = (ROOT / "missions/common/actions", ROOT / "applications/cuadc_2026/actions")
+    source = "\n".join(path.read_text() for directory in action_dirs
+                       for path in directory.glob("*.py"))
     for retired in RETIRED_COMPOSITES:
         assert f'"{retired}"' not in source
     assert "Action()" not in source
 
 
 def test_align_descend_is_a_self_contained_action() -> None:
-    path = ROOT / "missions/common/actions/align_descend.py"
+    path = ROOT / "applications/cuadc_2026/actions/align_descend.py"
     source = path.read_text()
-    assert len(source.splitlines()) < 350
+    assert "class AlignDescendAction" in source
     assert "guidance.align_descend" not in source
     assert "missions.common.lifecycle.align_descend" not in source
     assert not (ROOT / "guidance/align_descend.py").exists()

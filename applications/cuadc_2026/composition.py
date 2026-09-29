@@ -39,7 +39,7 @@ def compose_actions(
 def create_registry(definitions: tuple[ActionDefinition, ...]) -> ActionRegistry:
     registry = ActionRegistry()
     for definition in definitions:
-        registry.register(definition.name, definition.factory)
+        registry.register(definition.name, definition.factory, definition=definition)
     return registry
 
 

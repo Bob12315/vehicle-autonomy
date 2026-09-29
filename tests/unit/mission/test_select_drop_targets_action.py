@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import pytest
 
-from missions.common.actions.action_lab import create_action_lab_registry
+from applications.cuadc_2026.actions.definitions import create_action_lab_registry
 from missions.common.actions.runner import ActionRunner
-from missions.common.actions.select_drop_targets import SelectDropTargetsAction
+from applications.cuadc_2026.actions.select_drop_targets import SelectDropTargetsAction
 
 
 def _select(objects, **params):

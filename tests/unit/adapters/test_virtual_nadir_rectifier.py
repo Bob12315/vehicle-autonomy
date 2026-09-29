@@ -9,7 +9,7 @@ import pytest
 cv2 = pytest.importorskip("cv2")
 
 from yolo_app.attitude_history import AttitudeMatch, quaternion_from_euler_zyx
-from yolo_app.config import (
+from perception.yolo_rknn.config import (
     CameraCalibrationConfig,
     VirtualNadirAttitudeConfig,
     VirtualNadirConfig,

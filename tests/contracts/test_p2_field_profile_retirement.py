@@ -2,8 +2,8 @@ from pathlib import Path
 
 import pytest
 
-from field.profile import FieldProfileValidationError, load_field_profile_json, parse_field_profile
-from field.profile_service import FieldProfileService
+from environments.cuadc_2026.field.profile import FieldProfileValidationError, load_field_profile_json, parse_field_profile
+from environments.cuadc_2026.field.profile_service import FieldProfileService
 from app.config import build_arg_parser, load_app_config
 from application.runner import SystemRunner
 

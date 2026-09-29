@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from missions.common.actions.change_speed import ChangeSpeedAction
+from vehicles.multirotor.actions.change_speed import ChangeSpeedAction
 
 
 def test_change_ground_speed_emits_once_and_completes() -> None:

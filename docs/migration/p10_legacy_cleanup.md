@@ -13,3 +13,7 @@
 `python scripts/validate_stable_core.py --strict` 当前报告七项阻塞：五个旧文件仍在、production catalog 仍注册兼容 Action、旧 Mission 后台 tick owner 仍在。普通架构边界检查通过，只证明当前隔离规则，不代表已完成生产切换。`executor.send_commands: false`、系统 SEND 与 Action 双门控、唯一 writer、连续命令 stop/zero 和 stale 清理均保持原样。
 
 下次删除前应先完成生产 owner 切换，逐项查找代码、测试、工具和配置消费者，运行相关及全量回归，再按计划顺序删除。P10 本轮没有删除仍在使用的路径，也不把离线候选 Core 测试视为生产接管证明。
+
+## 后续迁移进展
+
+按[可复用实现迁移](reusable_detail_migration.md)完成 Action、Field、Perception、Camera 的 owner 搬迁后，仓库内旧导入消费者已改用新路径，原 Action/Field/YOLO 兼容模块已删除；全量离线测试 `769 passed`。旧 ActionRunner 的定义由注册表提供，候选 Core Catalog 不再隐式读取 CUADC 定义。上表保留当时的审计证据；**生产 Runtime、`LegacyActionModuleAdapter`、legacy writer 配置和 Web 兼容用例仍在使用**，严格生产切换门禁尚未通过。

@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from execution.dispatcher import ActionDispatcher
-from missions.common.actions.takeoff import TakeoffAction
+from vehicles.multirotor.actions.takeoff import TakeoffAction
 
 
 # ---------------------------------------------------------------------------

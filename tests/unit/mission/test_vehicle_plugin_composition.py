@@ -11,7 +11,7 @@ from application.vehicle_composition import (
 from contracts.vehicle import VehicleCapabilities
 from contracts.core.effects import Takeoff as TakeoffEffect
 from contracts.platform.vehicle_commands import Takeoff as TakeoffCommand
-from missions.common.actions.action_lab import action_definitions
+from applications.cuadc_2026.actions.definitions import action_definitions
 from missions.engine import MissionActionStep
 from missions.core.mission_compiler import MissionCompiler
 from missions.core.production_catalog import create_production_catalog
@@ -26,7 +26,7 @@ def _runner():
 def test_multirotor_plugin_owns_only_vehicle_actions_and_preserves_registry() -> None:
     plugin = MultirotorPlugin()
     assert {item.name for item in plugin.actions} == {"takeoff", "land", "change_speed"}
-    assert "missions.common.actions.action_lab" not in (
+    assert "applications.cuadc_2026.actions.definitions" not in (
         Path(__file__).resolve().parents[3] / "vehicles/multirotor/plugin.py"
     ).read_text()
     definitions = compose_actions(plugin)

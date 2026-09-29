@@ -5,8 +5,8 @@ import json
 import pytest
 
 from execution.dispatcher import ActionDispatcher
-from missions.common.actions import payload_release as payload_release_module
-from missions.common.actions.payload_release import PayloadReleaseAction
+from applications.cuadc_2026.actions import payload_release as payload_release_module
+from applications.cuadc_2026.actions.payload_release import PayloadReleaseAction
 
 
 def _params(**overrides):

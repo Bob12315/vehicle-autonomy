@@ -4,7 +4,7 @@ import pytest
 
 from contracts.action import ActionResult
 from contracts.effects import FlightCommand
-from missions.common.actions.action_lab import action_definitions, create_action_lab_registry
+from applications.cuadc_2026.actions.definitions import action_definitions, create_action_lab_registry
 from missions.common.actions.base import ActionModule
 from missions.common.actions.runner import ActionRunner
 

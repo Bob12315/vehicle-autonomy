@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 from execution.policy import ACTION_DISPATCH_POLICY
-from missions.common.actions.action_lab import (
+from applications.cuadc_2026.actions.definitions import (
     action_definitions,
     action_lab_specs,
     create_action_lab_registry,

@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import json
 import pytest
-from yolo_app.models import CurrentTarget, DetectionObject, Track
-from yolo_app.target_manager import build_scene_detections
+from perception.yolo_rknn.models import CurrentTarget, DetectionObject, Track
+from perception.yolo_rknn.target_manager import build_scene_detections
 from yolo_app.udp_publisher import UdpPublisher
 
 

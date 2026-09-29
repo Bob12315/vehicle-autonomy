@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import pytest
-from missions.common.actions.gps_target_lock import GpsTargetLockAction
+from applications.cuadc_2026.actions.gps_target_lock import GpsTargetLockAction
 from missions.common.actions.result import ActionResult
 
 

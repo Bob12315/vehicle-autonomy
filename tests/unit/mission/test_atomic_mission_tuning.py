@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from missions.common.actions.action_lab import action_definitions, action_lab_specs
+from applications.cuadc_2026.actions.definitions import action_definitions, action_lab_specs
 
 ROOT = Path(__file__).parents[3]
 

@@ -5,13 +5,13 @@ from dataclasses import fields, replace
 
 import pytest
 
-from field.calibration import RuntimeFieldBindingCandidate
-from field.context import RuntimeContextBuilder
-from field.coordinates import field_to_gps, gps_to_field_from_origin
-from field.geometry import build_runtime_field_geometry
-from field.models import FieldReference, HeadingSource, OriginSource
-from field.profile_service import FieldProfileService
-from field.service import FieldService
+from environments.cuadc_2026.field.calibration import RuntimeFieldBindingCandidate
+from applications.cuadc_2026.runtime_context import RuntimeContextBuilder
+from environments.cuadc_2026.field.coordinates import field_to_gps, gps_to_field_from_origin
+from environments.cuadc_2026.field.geometry import build_runtime_field_geometry
+from environments.cuadc_2026.field.models import FieldReference, HeadingSource, OriginSource
+from environments.cuadc_2026.field.profile_service import FieldProfileService
+from applications.cuadc_2026.field_service import FieldService
 
 
 def _candidate() -> RuntimeFieldBindingCandidate:

@@ -3,13 +3,15 @@ from pathlib import Path
 
 from missions.core.mission_compiler import MissionCompiler
 from missions.core.production_catalog import create_production_catalog
+from applications.cuadc_2026.composition import compose_actions
+from vehicles.multirotor.plugin import MultirotorPlugin
 
 
 ROOT = Path(__file__).resolve().parents[3]
 
 
 def test_all_formal_v2_missions_compile_deterministically_to_v3() -> None:
-    catalog = create_production_catalog()
+    catalog = create_production_catalog(compose_actions(MultirotorPlugin()))
     compiler = MissionCompiler(catalog.definitions)
     for path in sorted((ROOT / "config" / "action_missions").glob("*.json")):
         document = json.loads(path.read_text(encoding="utf-8"))

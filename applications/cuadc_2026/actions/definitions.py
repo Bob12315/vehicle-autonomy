@@ -109,7 +109,7 @@ def action_definition(name: str) -> ActionDefinition:
 def create_action_lab_registry() -> ActionRegistry:
     registry = ActionRegistry()
     for definition in _DEFINITIONS:
-        registry.register(definition.name, definition.factory)
+        registry.register(definition.name, definition.factory, definition=definition)
     return registry
 
 

@@ -29,14 +29,15 @@ def main() -> None:
         leaked = imports(path) - {"__future__", "abc", "collections", "contracts", "copy", "dataclasses", "datetime", "enum", "hashlib", "json", "math", "time", "typing", "uuid"}
         if leaked:
             errors.append(f"contracts dependency leak {path.relative_to(ROOT)}: {sorted(leaked)}")
-    core = py_files("fusion") + py_files("missions/common/actions")
+    action_files = py_files("missions/common/actions") + py_files("applications/cuadc_2026/actions")
+    core = py_files("fusion") + action_files
     forbidden_core = {"fastapi", "uvicorn", "pymavlink", "cv2", "rknnlite"}
     for path in core:
         leaked = imports(path) & forbidden_core
         if leaked:
             errors.append(f"core import leak {path.relative_to(ROOT)}: {sorted(leaked)}")
 
-    for path in py_files("missions/common/actions"):
+    for path in action_files:
         content = path.read_text(encoding="utf-8")
         imported = imports(path)
         telemetry_import_allowed = (
@@ -87,12 +88,24 @@ def main() -> None:
         "survey_area.py", "recon_inspect_target.py", "recon_descend_observe.py",
         "visual_land.py",
     }
-    present = {path.name for path in py_files("missions/common/actions")}
+    present = {path.name for path in action_files}
     if present & retired_composites:
         errors.append(f"retired composite Actions present: {sorted(present & retired_composites)}")
-    for path in py_files("missions/common/actions"):
+    for path in action_files:
         if "Action()" in path.read_text(encoding="utf-8"):
             errors.append(f"nested Action construction {path.relative_to(ROOT)}")
+
+    migrated_actions = {
+        "action_lab.py", "align_descend.py", "goto_waypoint.py", "gps_capture_view.py",
+        "gps_fuse_views.py", "gps_target_lock.py", "payload_release.py",
+        "select_drop_targets.py", "target_lock.py", "takeoff.py", "land.py",
+        "change_speed.py",
+    }
+    old_actions = {path.name for path in py_files("missions/common/actions")}
+    if old_actions & migrated_actions:
+        errors.append(f"migrated Action compatibility modules restored: {sorted(old_actions & migrated_actions)}")
+    if py_files("field"):
+        errors.append("retired top-level field Python package restored")
 
     for directory in ("app", "application", "contracts", "execution", "field", "fusion",
                       "guidance", "missions", "observability", "tools", "web_ui", "yolo_app"):

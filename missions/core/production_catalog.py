@@ -13,7 +13,6 @@ from contracts.core.action import (
 from contracts.core.common import ActionContractFingerprint, ActionDefinitionId
 from contracts.core.effects import EffectKind
 from contracts.platform.common import SchemaVersion
-from missions.common.actions.action_lab import action_definitions
 
 from .action_catalog import ActionRegistrationCatalog
 from .codecs import FrozenJsonCodec
@@ -48,10 +47,10 @@ _NATIVE_ONE_SHOT = {
 
 
 def create_production_catalog(
-    definitions=None,
+    definitions,
 ) -> ActionRegistrationCatalog:
     registrations = []
-    for legacy in action_definitions() if definitions is None else definitions:
+    for legacy in definitions:
         schema_text = json.dumps(legacy.parameter_schema, sort_keys=True, separators=(",", ":"))
         fingerprint = ActionContractFingerprint(hashlib.sha256(
             f"{legacy.name}:v1:{schema_text}".encode("utf-8")

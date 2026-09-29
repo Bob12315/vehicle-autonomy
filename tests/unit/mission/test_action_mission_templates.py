@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from missions.common.actions.action_lab import create_action_lab_registry
+from applications.cuadc_2026.actions.definitions import create_action_lab_registry
 from missions.engine import MissionActionStep
 from scripts.validate_action_missions import DEFAULT_TEMPLATE_PATHS, validate_templates
 

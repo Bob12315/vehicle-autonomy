@@ -5,7 +5,7 @@ import math
 import pytest
 
 from contracts.effects import ConditionYaw, FlightCommand
-from missions.common.actions.align_descend import AlignDescendAction
+from applications.cuadc_2026.actions.align_descend import AlignDescendAction
 
 
 def _context(
@@ -197,7 +197,7 @@ def test_final_altitude_stays_latched_through_a_small_height_rebound() -> None:
 def test_final_altitude_holds_zero_velocity_for_the_configured_settle_time(monkeypatch) -> None:
     action = AlignDescendAction()
     clock = iter((100.0, 100.1, 100.2, 100.3, 100.4, 100.6, 100.7, 100.8, 100.9, 101.0))
-    monkeypatch.setattr("missions.common.actions.align_descend.time.monotonic", lambda: next(clock))
+    monkeypatch.setattr("applications.cuadc_2026.actions.align_descend.time.monotonic", lambda: next(clock))
     action.start({
         "target_altitude_m": 1.2,
         "final_settle_time_s": 0.5,
@@ -262,7 +262,7 @@ def test_final_altitude_uses_the_finer_velocity_limits() -> None:
 def test_bounded_integral_increases_persistent_close_range_correction(monkeypatch) -> None:
     action = AlignDescendAction()
     clock = iter((100.0, 100.0, 100.2, 100.2, 100.4, 100.4))
-    monkeypatch.setattr("missions.common.actions.align_descend.time.monotonic", lambda: next(clock))
+    monkeypatch.setattr("applications.cuadc_2026.actions.align_descend.time.monotonic", lambda: next(clock))
     action.start({
         "target_altitude_m": 1.2,
         "kp_forward": 0.6,

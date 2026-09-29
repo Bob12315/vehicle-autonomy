@@ -331,8 +331,8 @@ def test_release_payload_not_called_by_payload_release_action() -> None:
         os.path.dirname(__file__),
         "..",
         "..",
-        "missions",
-        "common",
+        "applications",
+        "cuadc_2026",
         "actions",
         "payload_release.py",
     )

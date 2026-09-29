@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import math
 
-from missions.common.actions.goto_waypoint import GotoWaypointAction
+from applications.cuadc_2026.actions.goto_waypoint import GotoWaypointAction
 
 
 def _context() -> dict:

@@ -1,5 +1,7 @@
 from datetime import datetime, timezone
 
+from applications.cuadc_2026.composition import compose_actions
+
 from contracts.core.action import (
     ActionState,
     ActionTickContext,
@@ -31,6 +33,7 @@ from contracts.core.time import CoreTime
 from contracts.platform.common import ActionInstanceId, ResourceVersion, SchemaVersion
 from missions.core.action_runner import ActionRunner
 from missions.core.production_catalog import create_production_catalog
+from vehicles.multirotor.plugin import MultirotorPlugin
 
 
 def _context(feedback=()):
@@ -50,7 +53,7 @@ def _context(feedback=()):
 
 def test_native_land_waits_for_normalized_feedback_before_success() -> None:
     registration = next(
-        item for item in create_production_catalog().all()
+        item for item in create_production_catalog(compose_actions(MultirotorPlugin())).all()
         if item.definition.name == "land"
     )
     runner = ActionRunner()

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from missions.common.actions.land import LandAction
+from vehicles.multirotor.actions.land import LandAction
 
 
 def test_land_start_uses_default_params() -> None:

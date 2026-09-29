@@ -7,10 +7,10 @@ import numpy as np
 import pytest
 
 from contracts.sensors import CameraFrame, CameraPort, PointCloudFrame
-from yolo_app.camera_adapter import VideoSourceCameraAdapter, camera_frame_to_bgr
-from yolo_app.models import FramePacket
-from yolo_app.models import Track
-from yolo_app.perception_pipeline import YoloPerceptionPipeline
+from sensors.camera.camera_adapter import VideoSourceCameraAdapter, camera_frame_to_bgr
+from perception.yolo_rknn.models import FramePacket
+from perception.yolo_rknn.models import Track
+from perception.yolo_rknn.perception_pipeline import YoloPerceptionPipeline
 from yolo_app.udp_publisher import UdpPublisher
 
 

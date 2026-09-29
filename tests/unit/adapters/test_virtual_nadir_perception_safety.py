@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from types import SimpleNamespace
 
-from yolo_app.models import CommandMessage, Track
-from yolo_app.target_manager import TargetManager
+from perception.yolo_rknn.models import CommandMessage, Track
+from perception.yolo_rknn.target_manager import TargetManager
 
 
 def test_target_manager_invalidate_immediately_clears_lock_and_lost_grace() -> None:

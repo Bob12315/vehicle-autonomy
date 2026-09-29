@@ -8,8 +8,8 @@ import pytest
 
 pytest.importorskip("cv2")
 
-from yolo_app.rknn_detector import Detection, RknnDetector, letterbox, postprocess
-from yolo_app.tracker_runner import TrackerRunner, _IoUTracker, _filter_detections_by_valid_mask
+from perception.yolo_rknn.rknn_detector import Detection, RknnDetector, letterbox, postprocess
+from perception.yolo_rknn.tracker_runner import TrackerRunner, _IoUTracker, _filter_detections_by_valid_mask
 
 
 def _empty_outputs():

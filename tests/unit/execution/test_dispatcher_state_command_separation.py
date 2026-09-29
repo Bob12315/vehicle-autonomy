@@ -7,7 +7,7 @@ import pytest
 from contracts.effects import FlightCommand
 from execution.authorization import RunAuthorization
 from execution.dispatcher import ActionDispatcher
-from missions.common.actions.align_descend import AlignDescendAction
+from applications.cuadc_2026.actions.align_descend import AlignDescendAction
 
 
 class _StatePort:

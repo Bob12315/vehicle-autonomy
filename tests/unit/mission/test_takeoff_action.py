@@ -4,7 +4,7 @@ import math
 
 import pytest
 
-from missions.common.actions.takeoff import TakeoffAction
+from vehicles.multirotor.actions.takeoff import TakeoffAction
 
 
 FIELD_HEADING = {
@@ -88,7 +88,7 @@ def test_takeoff_wait_altitude_until_target_reached() -> None:
 
 def test_takeoff_settles_for_configured_time_before_completion(monkeypatch) -> None:
     clock = [0.0]
-    monkeypatch.setattr("missions.common.actions.takeoff.time.monotonic", lambda: clock[0])
+    monkeypatch.setattr("vehicles.multirotor.actions.takeoff.time.monotonic", lambda: clock[0])
     action = TakeoffAction()
     action.start({"altitude_m": 3.0, "yaw_mode": "hold", "settle_time_s": 2.0})
     _advance_to_wait(action)
@@ -153,7 +153,7 @@ def test_takeoff_times_out_after_max_updates() -> None:
 
 def test_takeoff_duration_starts_after_takeoff_effect(monkeypatch) -> None:
     clock = [0.0]
-    monkeypatch.setattr("missions.common.actions.takeoff.time.monotonic", lambda: clock[0])
+    monkeypatch.setattr("vehicles.multirotor.actions.takeoff.time.monotonic", lambda: clock[0])
     action = TakeoffAction()
     action.start({"max_updates": 20, "max_duration_s": 1.0, "yaw_mode": "hold"})
     action.update({})
@@ -266,7 +266,7 @@ def test_explicit_takeoff_yaw_does_not_require_field_heading() -> None:
 
 def test_takeoff_yaw_alignment_times_out(monkeypatch) -> None:
     clock = [0.0]
-    monkeypatch.setattr("missions.common.actions.takeoff.time.monotonic", lambda: clock[0])
+    monkeypatch.setattr("vehicles.multirotor.actions.takeoff.time.monotonic", lambda: clock[0])
     action = TakeoffAction()
     action.start({"altitude_m": 3.0, "yaw_timeout_s": 1.0})
     _advance_to_wait(action)

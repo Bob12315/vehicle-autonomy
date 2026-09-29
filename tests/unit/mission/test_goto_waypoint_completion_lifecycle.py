@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from application.action_runtime import ActionRuntimeService
 from execution.dispatcher import ActionDispatcher
-from missions.common.actions.action_lab import create_action_lab_registry
+from applications.cuadc_2026.actions.definitions import create_action_lab_registry
 from missions.common.actions.base import ActionModule
-from missions.common.actions.goto_waypoint import GotoWaypointAction
+from applications.cuadc_2026.actions.goto_waypoint import GotoWaypointAction
 from missions.common.actions.registry import ActionRegistry
 from missions.common.actions.result import ActionResult
 from missions.common.actions.runner import ActionRunner

@@ -4,7 +4,7 @@ import json
 
 import pytest
 
-from missions.common.actions.target_lock import TargetLockAction
+from applications.cuadc_2026.actions.target_lock import TargetLockAction
 
 
 def _params(**overrides: object) -> dict[str, object]:
@@ -441,7 +441,7 @@ def test_output_is_plain_dict_and_json_serializable() -> None:
 
 
 def test_skip_if_invalid_target_true_skips_on_valid_false():
-    from missions.common.actions.target_lock import TargetLockAction
+    from applications.cuadc_2026.actions.target_lock import TargetLockAction
     action = TargetLockAction()
     action.start({
         "target": {"valid": False, "local_x": 1.0, "local_y": 2.0},
@@ -454,7 +454,7 @@ def test_skip_if_invalid_target_true_skips_on_valid_false():
 
 
 def test_skip_if_invalid_target_true_skips_on_target_none():
-    from missions.common.actions.target_lock import TargetLockAction
+    from applications.cuadc_2026.actions.target_lock import TargetLockAction
     action = TargetLockAction()
     action.start({
         "target": None,
@@ -466,7 +466,7 @@ def test_skip_if_invalid_target_true_skips_on_target_none():
 
 
 def test_skip_if_invalid_target_true_skips_on_local_x_none():
-    from missions.common.actions.target_lock import TargetLockAction
+    from applications.cuadc_2026.actions.target_lock import TargetLockAction
     action = TargetLockAction()
     action.start({
         "target": {"local_x": None, "local_y": 2.0},
@@ -478,7 +478,7 @@ def test_skip_if_invalid_target_true_skips_on_local_x_none():
 
 
 def test_skip_if_invalid_target_true_skips_on_local_x_nan():
-    from missions.common.actions.target_lock import TargetLockAction
+    from applications.cuadc_2026.actions.target_lock import TargetLockAction
     action = TargetLockAction()
     action.start({
         "target": {"local_x": float("nan"), "local_y": 2.0},
@@ -490,7 +490,7 @@ def test_skip_if_invalid_target_true_skips_on_local_x_nan():
 
 
 def test_skip_if_invalid_target_false_still_raises():
-    from missions.common.actions.target_lock import TargetLockAction
+    from applications.cuadc_2026.actions.target_lock import TargetLockAction
     import pytest
     action = TargetLockAction()
     with pytest.raises(ValueError):

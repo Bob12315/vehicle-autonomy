@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from yolo_app.config import load_config
+from perception.yolo_rknn.config import load_config
 
 
 def _config() -> dict[str, object]:

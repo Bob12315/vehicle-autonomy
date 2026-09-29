@@ -17,7 +17,7 @@ Vehicle Adapter 负责“这句话对这辆车意味着什么”；Protocol 负�
 
 ## P3 当前落点
 
-`vehicles/multirotor/actions/` 持有 `takeoff`、`land`、`change_speed` 的实际实现；旧 `missions/common/actions/` 路径仅作兼容导入。`MultirotorPlugin.actions` 提供这三个定义，`application.vehicle_composition` 在 `SystemRunner` 装配时合并它们与 CUADC Application Actions。当前没有独立的通用 Core Action；11 个现有 Action 均有车辆或应用语义。
+`vehicles/multirotor/actions/` 持有 `takeoff`、`land`、`change_speed` 的实际实现；旧 `missions/common/actions/` 兼容导入已删除。`MultirotorPlugin.actions` 提供这三个定义，`applications.cuadc_2026.composition` 在 `SystemRunner` 装配时合并它们与 CUADC Application Actions。当前没有独立的通用 Core Action；11 个现有 Action 均有车辆或应用语义。
 
 `VehicleCapabilities` 是静态支持集合，不代表当前连接、定位或硬件健康；运行时健康由 `vehicles/multirotor/state/health.py` 根据既有快照映射。Mission / Action Lab 在运行授权和首个 Action 前按能力拒绝不支持的 Action；候选 Core 的 `MissionCompiler` 也提供同一校验钩子。它们不取代 SEND 双门控、ActionSafetyPipeline 或 v2 CommandBroker 的最终裁决。
 

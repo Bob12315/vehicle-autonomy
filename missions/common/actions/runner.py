@@ -52,11 +52,7 @@ class ActionRunner:
                     detail={"action_name": action_name, "error": str(exc)},
                 )
             )
-        try:
-            from .action_lab import action_definition
-            definition = action_definition(action_name)
-        except KeyError:
-            definition = None
+        definition = self.registry.definition(action_name)
         try:
             normalized_params = definition.merge_and_validate_params(params) if definition else dict(params or {})
         except Exception as exc:
@@ -121,8 +117,9 @@ class ActionRunner:
             )
         if not result.failed:
             try:
-                from .action_lab import action_definition
-                definition = action_definition(self.action_name or "")
+                definition = self.registry.definition(self.action_name or "")
+                if definition is None:
+                    raise KeyError(self.action_name)
                 definition.validate_output(result.output)
                 unauthorized = next((effect.action_type for effect in result.effects if effect.action_type not in definition.allowed_effect_types), None)
                 if unauthorized is not None:
