@@ -6,8 +6,8 @@ jobs:
   framework:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with: {python-version: '3.10'}
       - run: python -m compileall -q app application contracts core
       - run: python -m unittest discover -s tests -v
