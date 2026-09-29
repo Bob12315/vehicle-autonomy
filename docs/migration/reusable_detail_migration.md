@@ -19,3 +19,19 @@ VideoSource、CameraPort adapter、UDP GStreamer helper 与原始 `FramePacket` 
 Action Registry 随注册项保存定义，旧 ActionRunner 不再读取 CUADC 全局定义表；候选 Core Catalog 要求组合入口显式传入定义。仓库内调用方已切换后，删除了旧 Action、Field、YOLO 实现的兼容文件和多旋翼 Action 旧导入。全量 `769 passed`。这不代表旧 Mission/Action Runtime 可删：生产入口仍由 `SystemRunner` 驱动，候选 Core 的完整生产装配、安全出口和 Web 用例切换仍需单独验证。飞控和服务器真实场景也未接入。
 
 进一步删除了仅转发导入的 `application.vehicle_composition`、`execution.translators`、`telemetry_link.telemetry_parser` 与 `telemetry_link.mavlink_state_adapter`；调用方现直接使用 CUADC composition、多旋翼翻译/状态模块。Typed EffectDispatcher 必须由组合入口注入车辆翻译器，不再隐式选多旋翼。全量回归保持 `769 passed`。
+
+## 仍在使用的旧源码与切换门槛
+
+本次已经删除仓库调用方切换后不用的 Action、Field、YOLO、Fusion、Camera、Guidance 与转发模块。以下文件仍被当前生产链调用，不能仅因为候选 Core 的离线测试通过就删除：
+
+| 活跃旧源码 | 当前消费者与替换门槛 |
+| --- | --- |
+| `application/action_runtime.py`、`missions/common/actions/runner.py` | `SystemRunner` 的 Action 生命周期仍经过 `ActionRuntimeService`；需由 Core RunCoordinator 接管 Action 启停、结果、超时、失败与取消。 |
+| `execution/dispatcher.py`、`application/send_state.py` | 当前系统 SEND、Action send-actions、Safety Pipeline 与写入授权仍依赖它们；需证明 Core fence、typed dispatcher 与 broker 授权/取消具有同等约束。 |
+| `missions/engine.py` | `MissionApplicationService` 仍维护旧 Mission 状态并由 `SystemRunner` 后台 tick；需把 Web Mission 用例、编译、调度和状态投影接到 Core owner。 |
+| `missions/core/legacy_action_adapter.py` | 生产候选 Catalog 仍给多数 Action 注册兼容 adapter；需逐个移植为原生 Core Action 并验证现有 Mission JSON 的输入、Effect、结果和退出屏障。 |
+| `telemetry_link/` 的兼容连接/写入层 | `LinkManager` 仍持有生产 link lifecycle 与 CommandBroker writer；协议、传输和车辆状态映射必须先完成消费者切换及唯一 writer 验证。 |
+
+当前 Core 安全策略的默认 BODY 速度上限为 `3.0 m/s`，载荷白名单仅为通道 9 的 PWM 1100/1900；现行 `config/safety.yaml` 将水平 BODY 速度限制在 `0.4 m/s`、垂直限制在 `0.35 m/s`，载荷允许通道 8/9 各自范围。两者尚不等价。Core 切入生产前必须从现行配置构造同等或更严格的 Safety Policy，验证连续 BODY_NED stop/zero、stale 清理、双 SEND 门控和 broker 代际取消。不得为通过严格检查而直接删掉旧链。
+
+`build_core_runtime()` 目前只由离线测试组装；`app/main.py` 仍创建 `SystemRunner`。Core 的 `VehicleCommandPort` 与 `CoreExecutionFenceAuthority` 尚未在真实 `LinkManager`/CommandBroker 会话中绑定，WebServices 仍暴露旧 Mission 用例。严格门禁 `python scripts/validate_stable_core.py --strict` 因这些生产切换工作而失败。飞控、服务器和真实场景接入按用户安排留在后续阶段；当前完成的是可复用源码的 owner 搬迁及已确认无调用方文件的清理。

@@ -106,6 +106,10 @@ def main() -> None:
         errors.append(f"migrated Action compatibility modules restored: {sorted(old_actions & migrated_actions)}")
     if py_files("field"):
         errors.append("retired top-level field Python package restored")
+    if py_files("fusion"):
+        errors.append("retired top-level fusion Python package restored")
+    if (ROOT / "guidance/gps_derived_enu_fusion.py").exists():
+        errors.append("CUADC GPS fusion restored under generic guidance")
 
     for directory in ("app", "application", "contracts", "execution", "field", "perception",
                       "guidance", "missions", "observability", "tools", "web_ui", "yolo_app"):

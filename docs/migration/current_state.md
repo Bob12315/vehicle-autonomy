@@ -2,7 +2,7 @@
 
 **状态：Current Implementation，非 V1 目标架构。** 本文记录本轮文档重构时可从仓库识别的主要事实；后续改代码前仍须核对当时源码、配置与测试。V1 冻结架构见[总览](../architecture/overview.md)。
 
-仓库仍大量来自 CUADC 2026 多旋翼救援项目：`config/action_missions/` 中有比赛 Mission 模板，`environments/cuadc_2026/field/`、`applications/cuadc_2026/` 与 `config/field_profiles/` 含 Competition Field 语义，`perception/yolo_rknn/` 使用 RKNNLite / RK3588 路线，`telemetry_link/` 以 ArduPilot / MAVLink 为主要现有后端。Web UI、Action、Fusion 与安全策略也有该应用的参数和词汇。它们是现有实现，不是通用 V1 框架的永久限制。
+仓库仍大量来自 CUADC 2026 多旋翼救援项目：`config/action_missions/` 中有比赛 Mission 模板，`environments/cuadc_2026/field/`、`applications/cuadc_2026/` 与 `config/field_profiles/` 含 Competition Field 语义，`perception/yolo_rknn/` 使用 RKNNLite / RK3588 路线，`telemetry_link/` 以 ArduPilot / MAVLink 为主要现有后端。`perception/fusion/` 已接收旧顶层融合实现，CUADC 场地相关 GPS 融合已归应用层。Web UI、Action、Fusion 与安全策略也有该应用的参数和词汇。它们是现有实现，不是通用 V1 框架的永久限制。
 
 ## 当前可保留的资产
 
