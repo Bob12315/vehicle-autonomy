@@ -33,6 +33,7 @@ def test_multirotor_plugin_owns_only_vehicle_actions_and_preserves_registry() ->
     assert {item.name for item in definitions} == {item.name for item in action_definitions()}
     registry = create_registry(definitions)
     assert registry.get("takeoff").__module__ == "vehicles.multirotor.actions.takeoff"
+    assert registry.get("goto_waypoint").__module__ == "applications.cuadc_2026.actions.goto_waypoint"
     assert set(registry.list()) == {item.name for item in definitions}
     assert isinstance(plugin.translate_effect(TakeoffEffect(3.0)), TakeoffCommand)
     with pytest.raises(ValueError, match="duplicate"):

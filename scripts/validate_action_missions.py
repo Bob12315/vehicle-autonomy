@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from missions.common.actions.action_lab import (
+from applications.cuadc_2026.actions.definitions import (
     action_definition,
     create_action_lab_registry,
 )

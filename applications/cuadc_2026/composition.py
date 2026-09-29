@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from contracts.vehicle import VehicleCapabilities, VehiclePlugin
-from missions.common.actions.action_lab import action_definitions
+from .actions.definitions import action_definitions
 from missions.common.actions.registry import ActionRegistry
 from missions.definitions import ActionDefinition
 from .profile import CUADC_2026_PROFILE
