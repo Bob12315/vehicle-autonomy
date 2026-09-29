@@ -15,6 +15,7 @@ from field.calibration_session import CalibrationSession
 from field.context import RuntimeContextBuilder
 from field.calibration_transaction import FieldCalibrationTransactionAdapter
 from contracts.platform.field import CalibrationMode, CalibrationStart, GpsObservation
+from contracts.platform.field import FieldReferenceSnapshot
 import uuid
 
 
@@ -36,6 +37,9 @@ class FieldService:
     @property
     def reference(self):
         return self._svc.reference
+
+    def reference_snapshot(self) -> FieldReferenceSnapshot:
+        return self._svc.snapshot()
 
     def status(self) -> dict[str, object]:
         state = self._svc.status()

@@ -18,8 +18,12 @@ from contracts.core.input_state import (
 )
 from contracts.core.time import CoreTime
 from contracts.platform.common import ResourceVersion, SchemaVersion
-from contracts.platform.perception import PerceptionFrameSnapshot
+from contracts.platform.common import ClockStamp
+from contracts.platform.field import FieldReferenceSnapshot
+from contracts.platform.perception import PerceptionFrameSnapshot, PerceptionHealthSnapshot
 from contracts.platform.vehicle_state import VehicleStateSnapshot
+from application.world_projection import environment_reference_from_field
+from world_model import WorldModel
 
 from .state_store import RuntimeInputStore
 
@@ -31,6 +35,7 @@ class SnapshotCollectorPorts:
     field_reference: "SnapshotPort"
     send_gate: "SnapshotPort"
     fusion: FusionComputePort
+    perception_health: "SnapshotPort | None" = None
 
 
 class SnapshotPort(Protocol):
@@ -43,6 +48,7 @@ class SnapshotCollector(RuntimeInputPublisherPort):
         self._store = store
         self._generation_id = uuid.uuid4().hex
         self._revision = 0
+        self._world_model = WorldModel()
 
     @staticmethod
     def _read(port: SnapshotPort) -> object | None:
@@ -63,6 +69,28 @@ class SnapshotCollector(RuntimeInputPublisherPort):
         except Exception:
             fusion = FusionSnapshot(FusionState.INVALID, None, None, None, None, "fusion_failed")
 
+        vehicle_freshness = self._freshness(vehicle, now)
+        perception_freshness = self._freshness(perception, now)
+        health = (self._read(self._ports.perception_health)
+                  if self._ports.perception_health is not None else None)
+        if not isinstance(health, PerceptionHealthSnapshot):
+            health = PerceptionHealthSnapshot(
+                perception is not None and perception_freshness.state is FreshnessState.FRESH,
+                perception.process_session_id if isinstance(perception, PerceptionFrameSnapshot) else None,
+                None if perception_freshness.age_ns is None else perception_freshness.age_ns / 1e9,
+                "ok" if perception is not None and perception_freshness.state is FreshnessState.FRESH
+                else perception_freshness.reason_code or "unavailable",
+                0,
+            )
+        world = self._world_model.publish(
+            captured_at=ClockStamp(now.utc, now.monotonic_ns, now.clock_domain_id),
+            vehicle=vehicle if isinstance(vehicle, VehicleStateSnapshot) else None,
+            perception=perception if isinstance(perception, PerceptionFrameSnapshot) else None,
+            perception_health=health,
+            environment_reference=environment_reference_from_field(
+                field if isinstance(field, FieldReferenceSnapshot) else None),
+        )
+
         self._revision += 1
         ref = InputSnapshotRef(
             InputSnapshotId(uuid.uuid4().hex),
@@ -73,13 +101,14 @@ class SnapshotCollector(RuntimeInputPublisherPort):
             ref,
             now,
             vehicle,
-            self._freshness(vehicle, now),
+            vehicle_freshness,
             perception,
-            self._freshness(perception, now),
+            perception_freshness,
             field,
             ComponentFreshness(FreshnessState.FRESH if field is not None else FreshnessState.UNAVAILABLE, None),
             fusion,
             send_gate,
+            world,
         )
         self._store.publish(snapshot)
         return snapshot
@@ -101,6 +130,8 @@ class SnapshotCollector(RuntimeInputPublisherPort):
             age_ns = now.monotonic_ns - value.received_at_monotonic_ns
             if age_ns < 0:
                 return ComponentFreshness(FreshnessState.INVALID, None, "future_perception_frame")
+            if age_ns > 2_000_000_000:
+                return ComponentFreshness(FreshnessState.STALE, age_ns, "stale_perception_frame")
             return ComponentFreshness(
                 FreshnessState.FRESH,
                 age_ns,

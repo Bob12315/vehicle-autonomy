@@ -112,7 +112,8 @@ class LegacyActionModuleAdapter:
     def _context(context: ActionTickContext) -> dict[str, object]:
         fusion_payload = thaw_json(context.snapshot.fusion.payload)
         output = dict(fusion_payload) if isinstance(fusion_payload, dict) else {}
-        vehicle = context.snapshot.vehicle
+        world = context.snapshot.world
+        vehicle = world.vehicle if world is not None else context.snapshot.vehicle
         if vehicle is not None:
             output.setdefault("drone", {
                 "armed": vehicle.armed,
@@ -132,9 +133,10 @@ class LegacyActionModuleAdapter:
         if field is not None:
             output.setdefault("field_heading_confirmed", bool(field.is_confirmed and field.is_frozen))
             output.setdefault("field_heading_yaw_rad", field.field_heading_yaw_rad)
-        perception = context.snapshot.perception
+        perception = world.perception if world is not None else context.snapshot.perception
         if perception is not None:
-            target = perception.target
+            target = (perception.target if world is None or world.health.perception_usable
+                      else None)
             output.setdefault("target", {} if target is None else {
                 "target_valid": True,
                 "track_id": target.track_id,

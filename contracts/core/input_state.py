@@ -17,6 +17,7 @@ from contracts.platform.vehicle_state import VehicleStateSnapshot
 
 from .common import CoreCycleId, FrozenJson, InputSnapshotId, SchedulerSessionId
 from .time import CoreTime
+from .world import WorldSnapshot
 
 
 class FreshnessState(str, Enum):
@@ -99,14 +100,16 @@ class RuntimeInputSnapshot:
     send_gate: SendGateSnapshot
     # Optional, deeply immutable projections for future World/System/Run ports.
     # Producers publish all projections as one versioned cut before an Action tick.
-    world: FrozenJson = None
+    world: WorldSnapshot | None = None
     system: FrozenJson = None
     run: FrozenJson = None
 
     def __post_init__(self) -> None:
         from .common import freeze_json
 
-        for name in ("world", "system", "run"):
+        if self.world is not None and not isinstance(self.world, WorldSnapshot):
+            raise TypeError("world must be a WorldSnapshot")
+        for name in ("system", "run"):
             value = getattr(self, name)
             if freeze_json(value) != value:
                 raise TypeError(f"{name} must be deeply immutable JSON")

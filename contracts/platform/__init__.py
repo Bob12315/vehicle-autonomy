@@ -26,7 +26,8 @@ from .common import (
     to_json_value,
 )
 from .perception import (
-    PerceptionFrameSnapshot, VisionCommandEnvelope, VisionCommandStatus,
+    PerceptionFrameSnapshot, PerceptionPort, PerceptionResult,
+    VisionCommandEnvelope, VisionCommandStatus,
     VisionSubmissionReceipt,
 )
 from .vehicle_commands import VehicleCommandEnvelope, CommandStatusSnapshot, CancellationReceipt
@@ -59,6 +60,8 @@ __all__ = [
     "CancellationReceipt",
     "CommandStatusSnapshot",
     "PerceptionFrameSnapshot",
+    "PerceptionPort",
+    "PerceptionResult",
     "VehicleCommandEnvelope",
     "VehicleStateSnapshot",
     "VisionCommandEnvelope",

@@ -14,12 +14,14 @@ from typing import Mapping
 
 from app.config import AppConfig, ROOT_DIR, load_telemetry_config
 from execution.dispatcher import ActionDispatcher
+from fusion.models import SceneDetections
 from application.vehicle_projection import project_legacy_vehicle_frame
 from application.command_observer import CommandCompletionObserver
 from application.action_runtime import ActionRuntimeService
 from observability.blackbox import BlackboxRecorder
 from observability.event_publisher import IsolatedEventPublisher, LegacyRecentEventSink
 from contracts.platform.common import SchemaVersion
+from contracts.platform.common import ClockStamp
 from contracts.platform.observability import OperationalEvent
 from contracts.platform.field import GpsObservation
 from field.context import RuntimeContextBuilder
@@ -28,6 +30,8 @@ from field.profile_service import ReadOnlyFieldProfileRepository
 from web_ui.status_adapter import WebStatusService
 from app.bootstrap import ServiceManager
 from application.vehicle_composition import compose_actions, create_registry
+from application.world_projection import environment_reference_from_field
+from world_model import WorldModel
 from vehicles.multirotor.plugin import MultirotorPlugin
 from missions.common.actions.runner import ActionRunner
 from application.send_state import SystemSendState
@@ -100,6 +104,7 @@ class SystemRunner:
         self.stop_event = stop_event or threading.Event()
         self.logger = logging.getLogger(self.__class__.__name__)
         self.services = ServiceManager(config, self.stop_event)
+        self.world_model = WorldModel()
         self.mission_enabled = False
         self.blackbox = BlackboxRecorder(config.blackbox)
         self.controller_switches = SystemSendState(config.start_send_commands)
@@ -240,6 +245,15 @@ class SystemRunner:
                 perception, scene = self.services.get_perception_frame(now)
                 perception_status = self.services.perception_status(now)
                 vehicle_snapshot = self.services.get_vehicle_snapshot()
+                self.world_model.publish(
+                    captured_at=ClockStamp(datetime.fromtimestamp(now, timezone.utc),
+                                           time.monotonic_ns(), "app"),
+                    vehicle=vehicle_snapshot,
+                    perception=self.services.get_perception_platform_snapshot(),
+                    perception_health=self.services.get_perception_health(),
+                    environment_reference=environment_reference_from_field(
+                        self.field_service.reference_snapshot()),
+                )
                 for envelope, command_status in self.services.command_port.observation_candidates():
                     self.command_observer.observe(envelope, command_status, vehicle_snapshot)
                 drone, gimbal, link = project_legacy_vehicle_frame(vehicle_snapshot)
@@ -431,7 +445,31 @@ class SystemRunner:
 
     def action_lab_context(self) -> dict[str, object]:
         snapshot = self.state_store.read()
-        return self.runtime_context_builder.build_action_context(snapshot)
+        world = self.world_model.snapshot()
+        world_age_ns = None if world is None else time.monotonic_ns() - world.captured_at.monotonic_ns
+        world_current = world_age_ns is not None and 0 <= world_age_ns <= 2_000_000_000
+        if world is not None and not world_current:
+            snapshot = dict(snapshot)
+            drone = dict(snapshot.get("drone", {}) or {})
+            drone.update(stale=True, control_allowed=False)
+            snapshot["drone"] = drone
+        elif world is not None and world.vehicle is not None:
+            drone, gimbal, link = project_legacy_vehicle_frame(world.vehicle)
+            snapshot = dict(snapshot)
+            snapshot["drone"] = asdict(drone)
+            snapshot["gimbal"] = asdict(gimbal)
+            snapshot["link"] = asdict(link) if link is not None else {}
+        if world is not None and (
+            not world_current or (world.perception is not None and not world.health.perception_usable)
+        ):
+            snapshot = dict(snapshot)
+            perception = dict(snapshot.get("perception", {}) or {})
+            perception.update(target_valid=False, tracking_state="lost", ex=0.0, ey=0.0)
+            snapshot["perception"] = perception
+            snapshot["scene"] = asdict(SceneDetections(timestamp=time.time()))
+        context = self.runtime_context_builder.build_action_context(snapshot)
+        context["world_snapshot"] = world
+        return context
 
     # ------------------------------------------------------------------
     # Field Reference API handlers — schema-v3 runtime GPS only

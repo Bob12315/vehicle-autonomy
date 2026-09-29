@@ -28,6 +28,23 @@ class PerceptionTarget:
     center_y_px: float
 
 
+@dataclass(frozen=True, slots=True)
+class PerceptionResult:
+    """Source-neutral result for one captured camera frame."""
+
+    frame_id: int
+    captured_at: ClockStamp
+    image_width_px: int
+    image_height_px: int
+    target: PerceptionTarget | None
+    detections: tuple[Detection, ...]
+    producer_status: str = "ok"
+
+    def __post_init__(self) -> None:
+        if self.frame_id < 0 or self.image_width_px <= 0 or self.image_height_px <= 0:
+            raise ValueError("invalid perception result frame")
+
+
 class RecordingState(str, Enum):
     IDLE = "IDLE"
     START_REQUESTED = "START_REQUESTED"
@@ -62,6 +79,11 @@ class PerceptionFrameSnapshot:
     recording_frames: int = 0
     recording_error: str | None = None
     recording_expires_at_monotonic_ns: int | None = None
+
+    @property
+    def process_session_id(self) -> str:
+        """Source-neutral name; the stored legacy field remains for compatibility."""
+        return self.yolo_process_session_id
 
 
 @dataclass(frozen=True, slots=True)

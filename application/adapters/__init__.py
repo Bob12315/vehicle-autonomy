@@ -1,0 +1,1 @@
+"""Application-boundary compatibility adapters."""

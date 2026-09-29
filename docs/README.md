@@ -22,6 +22,6 @@ Vehicle Autonomy Framework 面向多种自主移动平台。**V1 Frozen Target A
 
 ## Current Implementation / Migration Work
 
-[V1 重构执行计划](migration/refactor_plan_v1.md)是 P0–P11 的阶段基线。[当前状态](migration/current_state.md)概述现有源码；P1 的[源码映射](migration/current_code_map.md)、[依赖审计](migration/dependency_audit.md)和[安全基线](migration/safety_baseline.md)提供源码证据。P2 的[Core 公共类型盘点](migration/p2_01_core_common_types.md)与[Typed Effect 边界盘点](migration/p2_02_effect_boundary.md)记录已有 Contract、生产兼容链及延后项；[P2/P3 验收记录](migration/p2_p3_acceptance.md)说明 Runtime Input、静态依赖、Multirotor Plugin、Action 组合与能力预检的实现和限制。[迁移原则](migration/migration_principles.md)约束迁移方法。[CUADC 2026 示例](examples/cuadc_2026.md)说明历史应用如何映射到目标架构。
+[V1 重构执行计划](migration/refactor_plan_v1.md)是 P0–P11 的阶段基线。[当前状态](migration/current_state.md)概述现有源码；P1 的[源码映射](migration/current_code_map.md)、[依赖审计](migration/dependency_audit.md)和[安全基线](migration/safety_baseline.md)提供源码证据。P2 的[Core 公共类型盘点](migration/p2_01_core_common_types.md)与[Typed Effect 边界盘点](migration/p2_02_effect_boundary.md)记录已有 Contract、生产兼容链及延后项；[P2/P3 验收记录](migration/p2_p3_acceptance.md)、[P4 Protocol / Transport](migration/p4_protocol_transport.md)和[P5 Sensors / Perception / World Model](migration/p5_sensors_perception_world.md)记录已实施的迁移边界及兼容债务。[迁移原则](migration/migration_principles.md)约束迁移方法。[CUADC 2026 示例](examples/cuadc_2026.md)说明历史应用如何映射到目标架构。
 
 如果文档中的目标与当前代码不同，新增设计遵守冻结架构；修复当前运行问题时还必须保护实际 Safety 行为，并先核对源码。迁移需要单独实施与验证。

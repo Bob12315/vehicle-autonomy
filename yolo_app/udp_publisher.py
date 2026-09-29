@@ -5,6 +5,10 @@ import socket
 import time
 import uuid
 from datetime import datetime, timezone
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .perception_pipeline import PipelineResult
 
 try:
     from .models import CurrentTarget, SceneDetections
@@ -79,6 +83,17 @@ class UdpPublisher:
         if len(payload) > self.max_datagram_bytes:
             raise ValueError("perception datagram exceeds max_datagram_bytes")
         self.sock.sendto(payload, self.addr)
+
+    def publish_result(self, result: PipelineResult, recorder_status: object | None = None) -> None:
+        """Compatibility projection from typed pipeline result to existing UDP schema."""
+        perception = result.perception
+        if (perception.frame_id != result.target.frame_id
+                or perception.frame_id != result.scene.frame_id
+                or perception.image_width_px != result.scene.image_width
+                or perception.image_height_px != result.scene.image_height):
+            raise ValueError("pipeline result frames do not match")
+        self.publish(result.target, result.scene, recorder_status,
+                     perception.captured_at.monotonic_ns)
 
     def _send(self, data: dict[str, object]) -> None:
         payload = json.dumps(data, ensure_ascii=False, separators=(",", ":")).encode("utf-8")

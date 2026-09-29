@@ -19,11 +19,10 @@ try:
     from .config import load_config
     from .mjpeg_stream import MjpegStream
     from .raw_frame_recorder import RawFrameRecorder
-    from .target_manager import TargetManager, build_scene_detections
-    from .tracker_runner import TrackerRunner
+    from .perception_pipeline import YoloPerceptionPipeline
     from .udp_publisher import UdpPublisher
     from .utils import ensure_parent_dir
-    from .video_source import VideoSource
+    from .camera_adapter import VideoSourceCameraAdapter, camera_frame_to_bgr
     from .virtual_nadir import VirtualNadirRectifier, build_debug_comparison
 except ImportError:
     from attitude_history import AttitudeHistory
@@ -33,11 +32,10 @@ except ImportError:
     from config import load_config
     from mjpeg_stream import MjpegStream
     from raw_frame_recorder import RawFrameRecorder
-    from target_manager import TargetManager, build_scene_detections
-    from tracker_runner import TrackerRunner
+    from perception_pipeline import YoloPerceptionPipeline
     from udp_publisher import UdpPublisher
     from utils import ensure_parent_dir
-    from video_source import VideoSource
+    from camera_adapter import VideoSourceCameraAdapter, camera_frame_to_bgr
     from virtual_nadir import VirtualNadirRectifier, build_debug_comparison
 
 
@@ -76,7 +74,7 @@ def main() -> int:
             f"calibration={calibration_label}",
             flush=True,
         )
-    video_source = VideoSource(
+    camera = VideoSourceCameraAdapter(
         cfg.source,
         camera_width=cfg.camera_width,
         camera_height=cfg.camera_height,
@@ -84,8 +82,7 @@ def main() -> int:
         camera_fourcc=cfg.camera_fourcc,
         latest_frame=cfg.latest_frame,
     )
-    tracker = TrackerRunner(cfg)
-    target_manager = TargetManager(cfg)
+    pipeline = YoloPerceptionPipeline(cfg)
     udp_publisher = UdpPublisher(cfg.udp_ip, cfg.udp_port,
         max_datagram_bytes=cfg.max_datagram_bytes, max_detections=cfg.max_detections)
     command_receiver = CommandReceiver(cfg.command_ip, cfg.command_port, enabled=cfg.command_enabled,
@@ -120,19 +117,19 @@ def main() -> int:
         source_finished = False
         while pending_frames or not source_finished:
             while not source_finished and len(pending_frames) < cfg.inference_workers:
-                packet = video_source.read()
+                packet = camera.read()
                 if packet is None:
                     source_finished = True
                     break
 
-                raw_frame = packet.frame
+                raw_frame = camera_frame_to_bgr(packet)
                 frame = raw_frame
                 rectification = None
                 attitude = None
                 if rectifier is not None and attitude_history is not None:
                     attitude_cfg = cfg.virtual_nadir.attitude
                     attitude = attitude_history.lookup(
-                        packet.captured_at_monotonic_ns,
+                        packet.captured_at.monotonic_ns,
                         max_sample_distance_ms=attitude_cfg.max_sample_distance_ms,
                         max_bracket_span_ms=attitude_cfg.max_bracket_span_ms,
                         future_wait_ms=attitude_cfg.future_wait_ms,
@@ -151,14 +148,13 @@ def main() -> int:
                     for pending in pending_frames:
                         ticket = pending[4]
                         if ticket is not None:
-                            tracker.cancel(ticket)
+                            pipeline.cancel(ticket)
                     pending_frames.clear()
-                    tracker.reset()
-                    target_manager.invalidate()
+                    pipeline.reset()
                     ticket = None
                 else:
                     valid_mask = None if rectification is None else rectification.valid_mask
-                    ticket = tracker.submit(frame, valid_mask=valid_mask)
+                    ticket = pipeline.submit(frame, valid_mask=valid_mask)
                 pending_frames.append((packet, raw_frame, frame, rectification, ticket, attitude))
                 if invalid:
                     break
@@ -169,13 +165,12 @@ def main() -> int:
             image_height, image_width = frame.shape[:2]
 
             if ticket is None:
-                tracker.reset()
-                target_manager.invalidate()
+                pipeline.reset()
                 tracks = []
                 inference_metrics = {"preprocess": 0.0, "npu": 0.0, "postprocess": 0.0}
             else:
-                tracks = tracker.complete(ticket)
-                inference_metrics = tracker.last_metrics_ms
+                tracks = pipeline.complete(ticket)
+                inference_metrics = pipeline.last_metrics_ms
             frame_count += 1
             fps = frame_count / max(time.perf_counter() - start_time, 1e-9)
             # Producer and consumer run on the same board.  Use the monotonic
@@ -183,7 +178,7 @@ def main() -> int:
             # fake video latency.
             frame_age_ms = max(
                 0.0,
-                (time.monotonic_ns() - packet.captured_at_monotonic_ns) / 1_000_000.0,
+                (time.monotonic_ns() - packet.captured_at.monotonic_ns) / 1_000_000.0,
             )
             commands = command_receiver.poll()
             for command in commands:
@@ -191,7 +186,7 @@ def main() -> int:
                     recorder_status = raw_recorder.status()
                     command_receiver.complete(command, applied=False,
                         result_state="EXPIRED", reason_code="command_expired",
-                        locked_track_id=getattr(target_manager, "locked_track_id", None),
+                        locked_track_id=pipeline.locked_track_id,
                         recording_state=recorder_status.state,
                         recorder_boot_id=recorder_status.recorder_boot_id,
                         recorder_session_id=recorder_status.recorder_session_id,
@@ -214,23 +209,22 @@ def main() -> int:
                         for pending in pending_frames:
                             pending_ticket = pending[4]
                             if pending_ticket is not None:
-                                tracker.cancel(pending_ticket)
+                                pipeline.cancel(pending_ticket)
                         pending_frames.clear()
-                        tracker.reset()
-                        target_manager.invalidate()
+                        pipeline.reset()
                         tracks = []
                         inference_metrics = {"preprocess": 0.0, "npu": 0.0, "postprocess": 0.0}
                         reset_reason = "virtual_nadir_reset"
                 elif command.action in {"recording_start", "recording_stop"}:
                     raw_recorder.handle_command(command.action, raw_frame.shape)
                 else:
-                    applied = target_manager.apply_command(command, tracks)
+                    applied = pipeline.apply_command(command, tracks)
                 recorder_status = raw_recorder.status()
                 applied = applied and not bool(recorder_status.error)
                 command_receiver.complete(
                     command,
                     applied=applied,
-                    locked_track_id=getattr(target_manager, "locked_track_id", None),
+                    locked_track_id=pipeline.locked_track_id,
                     recording_state=recorder_status.state,
                     recorder_boot_id=recorder_status.recorder_boot_id,
                     recorder_session_id=recorder_status.recorder_session_id,
@@ -240,22 +234,10 @@ def main() -> int:
                     reason_code=reset_reason,
                 )
 
-            current_target = target_manager.update(
-                tracks=tracks,
-                image_width=image_width,
-                image_height=image_height,
-                frame_id=packet.frame_id,
-                timestamp=packet.timestamp,
-            )
-            scene = build_scene_detections(
-                tracks=tracks,
-                image_width=image_width,
-                image_height=image_height,
-                frame_id=packet.frame_id,
-                timestamp=packet.timestamp,
-            )
-            udp_publisher.publish(current_target, scene, raw_recorder.status(),
-                                  packet.captured_at_monotonic_ns)
+            result = pipeline.finish(tracks, packet, image_width=image_width,
+                                     image_height=image_height)
+            current_target, scene = result.target, result.scene
+            udp_publisher.publish_result(result, raw_recorder.status())
             raw_recorder.write(raw_frame)
 
             if cfg.show or cfg.save_video or web_stream is not None:
@@ -263,7 +245,7 @@ def main() -> int:
                     frame=frame,
                     tracks=tracks,
                     current_target=current_target,
-                    locked_track_id=target_manager.locked_track_id,
+                    locked_track_id=pipeline.locked_track_id,
                     fps=fps,
                     frame_age_ms=frame_age_ms,
                     wait_frame_ms=packet.wait_frame_ms,
@@ -286,7 +268,7 @@ def main() -> int:
                     web_stream.publish(annotated)
                 if cfg.save_video:
                     if writer is None:
-                        fps = video_source.cap.get(cv2.CAP_PROP_FPS)
+                        fps = camera.capture.get(cv2.CAP_PROP_FPS) if camera.capture is not None else cfg.camera_fps
                         writer = build_video_writer(cfg.save_path, fps, image_width, image_height)
                     writer.write(annotated)
             if frame_count == 1 or frame_count % 60 == 0:
@@ -319,8 +301,8 @@ def main() -> int:
     except KeyboardInterrupt:
         pass
     finally:
-        video_source.release()
-        tracker.release()
+        camera.close()
+        pipeline.release()
         udp_publisher.close()
         command_receiver.close()
         if attitude_receiver is not None:

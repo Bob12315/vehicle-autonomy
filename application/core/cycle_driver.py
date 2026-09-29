@@ -39,7 +39,7 @@ class CoreCycleDriver:
         plan = self._coordinator.advance(snapshot, correlation, now)
         cancel_receipts = tuple(self._cancel_port.cancel(request) for request in plan.cancellations)
         dispatch_receipts = []
-        vehicle = snapshot.vehicle
+        vehicle = snapshot.world.vehicle if snapshot.world is not None else snapshot.vehicle
         source = vehicle.source if vehicle is not None else plan.run_snapshot.target_source if plan.run_snapshot else "real"
         session = vehicle.link_session_id if vehicle is not None else "unavailable"
         for attempt in plan.dispatch_attempts:
@@ -47,7 +47,10 @@ class CoreCycleDriver:
                 snapshot.ref, snapshot.send_gate.enabled, source, session,
                 "v1", now,
             )
-            yolo_session = None if snapshot.perception is None else snapshot.perception.yolo_process_session_id
+            perception = snapshot.world.perception if snapshot.world is not None else snapshot.perception
+            if snapshot.world is not None and not snapshot.world.health.perception_usable:
+                perception = None
+            yolo_session = None if perception is None else perception.process_session_id
             dispatch_receipts.append(self._dispatcher.dispatch(
                 attempt, context, yolo_process_session_id=yolo_session,
             ))

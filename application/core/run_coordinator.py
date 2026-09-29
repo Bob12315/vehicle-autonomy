@@ -505,7 +505,7 @@ class RunCoordinator:
     def _execution_context_changed(self, snapshot) -> bool:
         if self._lease is None:
             return False
-        vehicle = snapshot.vehicle
+        vehicle = snapshot.world.vehicle if snapshot.world is not None else snapshot.vehicle
         if vehicle is not None:
             if vehicle.source != self._lease.source:
                 return True
@@ -519,12 +519,16 @@ class RunCoordinator:
         vehicle_effect = any(kind is not EffectKind.SET_VISION_TARGET for kind in kinds)
         if vehicle_effect and not snapshot.send_gate.enabled:
             return "send_disabled"
-        vehicle = snapshot.vehicle
+        vehicle = snapshot.world.vehicle if snapshot.world is not None else snapshot.vehicle
         if vehicle_effect and (
             vehicle is None or vehicle.source != target_source
             or not vehicle.connected or vehicle.stale or not vehicle.control_allowed
         ):
             return "vehicle_source_unavailable"
-        if EffectKind.SET_VISION_TARGET in kinds and snapshot.perception is None:
+        perception_available = (
+            snapshot.world.health.perception_usable if snapshot.world is not None
+            else snapshot.perception is not None
+        )
+        if EffectKind.SET_VISION_TARGET in kinds and not perception_available:
             return "perception_unavailable"
         return None
