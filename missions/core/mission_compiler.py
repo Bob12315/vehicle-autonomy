@@ -81,6 +81,11 @@ class MissionCompiler:
 
     def _compile_value(self, value: object) -> object:
         if isinstance(value, str) and value.startswith("$"):
+            if value.startswith("$environment."):
+                parts = value[1:].split(".")
+                if len(parts) not in {3, 4} or parts[1] != "locations" or not parts[2] or (len(parts) == 4 and parts[3] not in {"x", "y", "altitude_m", "frame"}):
+                    raise ValueError(f"unsupported environment reference: {value}")
+                return {"$environment": parts[2:]}
             parts = value[1:].split(".")
             path: list[str | int] = []
             for part in parts[1:]:

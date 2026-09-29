@@ -30,7 +30,9 @@ from field.profile_service import ReadOnlyFieldProfileRepository
 from web_ui.status_adapter import WebStatusService
 from app.bootstrap import ServiceManager
 from application.vehicle_composition import compose_actions, create_registry
-from application.world_projection import environment_reference_from_field
+from application.world_projection import environment_reference_from_snapshot
+from environments import EnvironmentCatalog, static_profiles
+from environments.cuadc_2026 import CuadcEnvironment
 from world_model import WorldModel
 from vehicles.multirotor.plugin import MultirotorPlugin
 from missions.common.actions.runner import ActionRunner
@@ -142,6 +144,9 @@ class SystemRunner:
             runtime_context_builder=self.runtime_context_builder,
             profile_repository=self.field_profile_repository,
         )
+        self.environment_catalog = EnvironmentCatalog(
+            (*static_profiles(), CuadcEnvironment(self.field_service.reference_snapshot))
+        )
         self.services.set_field_reference_version_port(self.field_service._svc)
         self.field_service._svc.subscribe_version_change(
             lambda _version, reason: self.services.command_port.cancel_stale_field_commands(reason)
@@ -245,14 +250,15 @@ class SystemRunner:
                 perception, scene = self.services.get_perception_frame(now)
                 perception_status = self.services.perception_status(now)
                 vehicle_snapshot = self.services.get_vehicle_snapshot()
+                environment = self.environment_catalog.snapshot("cuadc_2026")
                 self.world_model.publish(
                     captured_at=ClockStamp(datetime.fromtimestamp(now, timezone.utc),
                                            time.monotonic_ns(), "app"),
                     vehicle=vehicle_snapshot,
                     perception=self.services.get_perception_platform_snapshot(),
                     perception_health=self.services.get_perception_health(),
-                    environment_reference=environment_reference_from_field(
-                        self.field_service.reference_snapshot()),
+                    environment_reference=environment_reference_from_snapshot(environment),
+                    environment=environment,
                 )
                 for envelope, command_status in self.services.command_port.observation_candidates():
                     self.command_observer.observe(envelope, command_status, vehicle_snapshot)

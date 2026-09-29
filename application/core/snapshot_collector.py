@@ -22,7 +22,8 @@ from contracts.platform.common import ClockStamp
 from contracts.platform.field import FieldReferenceSnapshot
 from contracts.platform.perception import PerceptionFrameSnapshot, PerceptionHealthSnapshot
 from contracts.platform.vehicle_state import VehicleStateSnapshot
-from application.world_projection import environment_reference_from_field
+from application.world_projection import environment_reference_from_snapshot
+from environments.cuadc_2026 import environment_snapshot_from_field
 from world_model import WorldModel
 
 from .state_store import RuntimeInputStore
@@ -82,13 +83,15 @@ class SnapshotCollector(RuntimeInputPublisherPort):
                 else perception_freshness.reason_code or "unavailable",
                 0,
             )
+        environment = (environment_snapshot_from_field(field)
+                       if isinstance(field, FieldReferenceSnapshot) else None)
         world = self._world_model.publish(
             captured_at=ClockStamp(now.utc, now.monotonic_ns, now.clock_domain_id),
             vehicle=vehicle if isinstance(vehicle, VehicleStateSnapshot) else None,
             perception=perception if isinstance(perception, PerceptionFrameSnapshot) else None,
             perception_health=health,
-            environment_reference=environment_reference_from_field(
-                field if isinstance(field, FieldReferenceSnapshot) else None),
+            environment_reference=environment_reference_from_snapshot(environment),
+            environment=environment,
         )
 
         self._revision += 1

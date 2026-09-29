@@ -7,6 +7,7 @@ from contracts.platform.common import ClockStamp, SchemaVersion
 from contracts.platform.perception import PerceptionFrameSnapshot, PerceptionHealthSnapshot
 from contracts.platform.vehicle_state import VehicleStateSnapshot
 from contracts.core.world import EnvironmentReference
+from contracts.environment import EnvironmentSnapshot
 
 
 class WorldModel:
@@ -21,7 +22,8 @@ class WorldModel:
                 vehicle: VehicleStateSnapshot | None,
                 perception: PerceptionFrameSnapshot | None,
                 perception_health: PerceptionHealthSnapshot | None = None,
-                environment_reference: EnvironmentReference | None = None) -> WorldSnapshot:
+                environment_reference: EnvironmentReference | None = None,
+                environment: EnvironmentSnapshot | None = None) -> WorldSnapshot:
         vehicle_usable = vehicle is not None and vehicle.connected and not vehicle.stale
         perception_age_ns = (
             None if perception is None else
@@ -76,6 +78,7 @@ class WorldModel:
                 pose, velocity,
                 (perception.target,) if perception_usable and perception.target is not None else (),
                 health,
+                environment,
             )
             self._latest = result
             return result

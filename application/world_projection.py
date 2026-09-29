@@ -3,19 +3,21 @@
 from __future__ import annotations
 
 from contracts.core.world import EnvironmentReference
-from contracts.platform.common import ResourceVersion
-from contracts.platform.field import FieldReferenceSnapshot
+from contracts.environment import EnvironmentSnapshot
+from environments.cuadc_2026 import environment_reference_from_field
 
 
-def environment_reference_from_field(
-    field: FieldReferenceSnapshot | None,
+def environment_reference_from_snapshot(
+    environment: EnvironmentSnapshot | None,
 ) -> EnvironmentReference | None:
-    if field is None:
+    if environment is None:
         return None
+    reference = environment.reference
     return EnvironmentReference(
-        ResourceVersion(field.version.generation_id, field.version.revision),
-        field.is_confirmed,
-        field.origin_lat,
-        field.origin_lon,
-        field.field_heading_yaw_rad,
+        environment.version, reference.confirmed,
+        reference.origin_latitude_deg, reference.origin_longitude_deg,
+        reference.heading_yaw_rad,
     )
+
+
+__all__ = ["environment_reference_from_field", "environment_reference_from_snapshot"]

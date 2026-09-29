@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Protocol
 
+from contracts.environment import EnvironmentSnapshot
 from contracts.platform.common import ClockStamp, ResourceVersion, SchemaVersion
 from contracts.platform.perception import PerceptionFrameSnapshot, PerceptionHealthSnapshot, PerceptionTarget
 from contracts.platform.vehicle_state import VehicleStateSnapshot
@@ -58,6 +59,7 @@ class WorldSnapshot:
     velocity: WorldVelocity | None
     targets: tuple[PerceptionTarget, ...]
     health: WorldHealth
+    environment: EnvironmentSnapshot | None = None
 
     def __post_init__(self) -> None:
         if self.sequence <= 0:

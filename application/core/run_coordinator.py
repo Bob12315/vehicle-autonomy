@@ -382,12 +382,20 @@ class RunCoordinator:
                 if preflight_reason is not None:
                     self._run.transition(RunState.FAILED, now, reason_code=preflight_reason)
                     continue
+                try:
+                    resolved_params = resolve_compiled_parameters(
+                        intent.resolved_parameters, self._mission_blackboard,
+                        snapshot.world.environment if snapshot.world is not None else None,
+                    )
+                except (KeyError, ValueError, TypeError):
+                    self._run.transition(RunState.FAILED, now, reason_code="mission_reference_unavailable")
+                    continue
                 self._runner.clear_terminal()
                 action_id = ActionInstanceId(uuid.uuid4().hex)
                 self._issue_authority(self._run.snapshot.token.run_id, action_id, registration, snapshot, now)
                 action_snapshot, emissions = self._runner.start(
                     action_id, registration,
-                    resolve_compiled_parameters(intent.resolved_parameters, self._mission_blackboard),
+                    resolved_params,
                     ActionTickContext(correlation, now, snapshot),
                 )
                 self._mission.child_started(context, intent.step_token, action_id)

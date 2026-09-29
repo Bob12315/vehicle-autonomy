@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from contracts.core.common import FrozenJson, FrozenObject, freeze_json, thaw_json
 from contracts.core.mission import BlackboardRefExpr
 from contracts.core.time import CoreTime
+from contracts.environment import EnvironmentSnapshot
 from contracts.platform.common import ResourceVersion
 
 
@@ -51,12 +52,25 @@ class BlackboardSnapshot:
         return value
 
 
-def resolve_compiled_parameters(value: FrozenJson, blackboard: BlackboardSnapshot) -> FrozenJson:
+def resolve_compiled_parameters(
+    value: FrozenJson, blackboard: BlackboardSnapshot,
+    environment: EnvironmentSnapshot | None = None,
+) -> FrozenJson:
     """Resolve compiler-owned expression tags outside Coordinator/control code."""
     raw = thaw_json(value)
 
     def resolve(item):
         if isinstance(item, dict):
+            if set(item) == {"$environment"}:
+                path = item["$environment"]
+                if environment is None or not isinstance(path, list) or not path:
+                    raise KeyError("environment_unavailable")
+                if environment.reference.frame == "field" and not environment.reference.confirmed:
+                    raise KeyError("environment_reference_unconfirmed")
+                location = environment.location(str(path[0]))
+                projected = {"frame": location.frame, "x": location.x, "y": location.y,
+                             "altitude_m": location.altitude_m}
+                return projected if len(path) == 1 else projected[str(path[1])]
             if set(item) == {"$blackboard", "path"}:
                 expression = BlackboardRefExpr(str(item["$blackboard"]), tuple(item["path"]))
                 return thaw_json(blackboard.resolve(expression))
