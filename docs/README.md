@@ -1,28 +1,27 @@
-# 文档索引
+# 文档入口
 
-`docs/` 只按读者分为三个一级目录：新手、开发者和 AI。历史设计计划、重构快照和旧
-mission/stage/terminal UI 文档通过 Git 历史追溯，不再与当前教程混放。
+Vehicle Autonomy Framework 面向多种自主移动平台。**V1 Frozen Target Architecture** 是后续设计、代码迁移与 Coding Agent 的架构依据；`Current Implementation` 是尚未完全迁移的源码事实；`Migration Work` 是将来逐边界实施的工作。架构图不等于完成状态。
 
-## 新手
+## 阅读顺序
 
-按顺序阅读 [beginner/01_preface.md](beginner/01_preface.md) 到
-[beginner/05_flight_test.md](beginner/05_flight_test.md)：
+1. [根 README](../README.md)：项目定位与现状。
+2. [架构总览](architecture/overview.md)：控制链、状态链和模块关系。
+3. [架构原则](architecture/principles.md)：永久不变量。
+4. [依赖规则](architecture/dependency_rules.md)：修改源码时的边界红线。
+5. [当前状态](migration/current_state.md)：当前实际实现与缺口。
+6. 按任务阅读以下专题。Coding Agent 还须阅读 [AGENTS.md](../AGENTS.md)。
 
-1. [前言](beginner/01_preface.md)
-2. [配置清单（含完整 BOM 表）](beginner/02_hardware_bom.md)
-3. [RK3588 环境配置](beginner/03_rk3588_setup.md)
-4. [SITL 测试](beginner/04_sitl_test.md)
-5. [实飞测试](beginner/05_flight_test.md)
+## Frozen Architecture
 
-## 开发者
+| 主题 | 文档 |
+| --- | --- |
+| 总体与数据流 | [总览](architecture/overview.md) · [数据流](architecture/data_flow.md) · [目标目录](architecture/target_structure.md) |
+| Core | [Mission / Action](core/mission_action.md) · [Execution / Safety](core/execution_safety.md) · [World Model](core/world_model.md) |
+| Platform | [Vehicle Plugin](platform/vehicle_plugin.md) · [Sensors / Perception](platform/sensors_perception.md) · [Protocol / Transport](platform/protocol_transport.md) · [Environment](platform/environment.md) · [Deployment / Gateway](platform/deployment_gateway.md) |
+| Intelligence | [权限边界](intelligence/boundaries.md) |
 
-[developer/README.md](developer/README.md) 汇总比赛任务、配置、坐标系、Field Reference、
-安全边界和 Telemetry Link 接口。
+## Current Implementation / Migration Work
 
-## AI
+[V1 重构执行计划](migration/refactor_plan_v1.md)是 P0–P11 的阶段基线。[当前状态](migration/current_state.md)概述现有源码；P1 的[源码映射](migration/current_code_map.md)、[依赖审计](migration/dependency_audit.md)和[安全基线](migration/safety_baseline.md)提供源码证据。P2 的[Core 公共类型盘点](migration/p2_01_core_common_types.md)与[Typed Effect 边界盘点](migration/p2_02_effect_boundary.md)记录已有 Contract、生产兼容链及延后项；[P2/P3 验收记录](migration/p2_p3_acceptance.md)说明 Runtime Input、静态依赖、Multirotor Plugin、Action 组合与能力预检的实现和限制。[迁移原则](migration/migration_principles.md)约束迁移方法。[CUADC 2026 示例](examples/cuadc_2026.md)说明历史应用如何映射到目标架构。
 
-[ai/README.md](ai/README.md) 是 AI 文档总入口，并把当前程序说明、改造计划、证据记录和执行指南
-分开导航。
-
-当前实现发生冲突时，以根目录 `AGENTS.md`、
-[ai/architecture/current_architecture.md](ai/architecture/current_architecture.md)、实际代码和配置为准。
+如果文档中的目标与当前代码不同，新增设计遵守冻结架构；修复当前运行问题时还必须保护实际 Safety 行为，并先核对源码。迁移需要单独实施与验证。

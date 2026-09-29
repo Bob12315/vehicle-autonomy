@@ -1,5 +1,7 @@
 # telemetry_link
 
+**Current Implementation：** 本文描述现有 MAVLink 适配模块，不是 V1 Vehicle / Protocol / Transport 的目标分层规范。目标边界见[Protocol / Transport](../docs/platform/protocol_transport.md)，实际链路见[当前状态](../docs/migration/current_state.md)。
+
 `telemetry_link/` 是 MAVLink 数传通讯适配层。它负责连接飞控、接收状态、缓存最新 telemetry、管理命令队列，并把上层提交的控制命令或动作命令发送到当前 active source。
 
 它可以被 `app/` 嵌入使用，也可以通过 `python -m telemetry_link.main` 独立运行，用于单独调试 SITL、真机链路、云台反馈和 MAVLink 命令。
@@ -35,7 +37,7 @@ Serial / UDP / TCP / ETH
 ```
 
 ```text
-ActionDispatcher / Web UI
+ActionRuntimeService → ActionDispatcher → ActionSafetyPipeline
   -> LinkManager
   -> CommandQueue
   -> CommandSender
@@ -64,7 +66,7 @@ ActionDispatcher / Web UI
 
 ## 公开接口
 
-上层模块只应通过 `LinkManager` 使用 telemetry：
+当前 adapter 的公开读取接口由 `LinkManager` 提供；车控发送仍须经现有 Execution / Safety 链：
 
 ```python
 from telemetry_link.link_manager import LinkManager
@@ -99,7 +101,7 @@ manager.takeoff(altitude_m=5.0)
 manager.land()
 ```
 
-完整接口契约见 [../docs/ai/architecture/interfaces.md](../docs/ai/architecture/interfaces.md)。
+这些调用仅说明当前 adapter 的接口。上层车控必须经过现有 Execution / Safety 发送链，未来仍须遵守[唯一控制出口](../docs/core/execution_safety.md)。
 
 ## 状态模型
 
@@ -107,7 +109,7 @@ manager.land()
 - `GimbalState`：云台 yaw、pitch、roll、反馈来源和有效性。
 - `LinkStatus`：连接状态、重连状态、最近收发时间和目标 system/component。
 
-状态字段单位和语义以 [../docs/ai/architecture/interfaces.md](../docs/ai/architecture/interfaces.md) 为准。
+状态字段单位和语义以当前 `models.py`、`telemetry_parser.py` 及调用处为准；未来统一状态模型见[World Model 目标边界](../docs/core/world_model.md)。
 
 ## 命令模型
 

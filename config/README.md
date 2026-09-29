@@ -1,5 +1,7 @@
 # 比赛系统配置
 
+**Current Implementation：** 本文只记录现有 CUADC 配置，不是框架的通用 Profile Schema。V1 目标组合见[Deployment / Gateway](../docs/platform/deployment_gateway.md)。
+
 程序直接读取 `config/` 下的生效配置。修改实机参数前应保存当前版本，并始终保持
 `config/app.yaml` 中 `executor.send_commands: false`，直到完成干跑和 SITL 验证。
 
@@ -39,8 +41,7 @@ validator 只检查模板结构和引用，不代表通过 SITL 或实飞验证�
 - `competition_runtime.json`：唯一受支持的比赛/SITL 场地初始化模板；输入 forward
   marker GPS，并在起飞点采样动态原点。
 
-场地绑定完成前不得实发 FIELD 航点。详细契约见
-`docs/developer/field_origin_heading.md`。
+场地绑定完成前不得实发 FIELD 航点。该规则属于当前实现；具体条件以 `field/`、Execution Safety 与相关测试为准。V1 中该场地属于[Environment 示例](../docs/examples/cuadc_2026.md)。
 
 ## RK3588 Profiles
 

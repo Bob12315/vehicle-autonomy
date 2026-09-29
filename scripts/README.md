@@ -2,6 +2,8 @@
 
 运维和开发辅助脚本。
 
+**Current Implementation：** 本文只说明现有脚本，不定义 V1 目标架构。架构入口见[文档索引](../docs/README.md)。
+
 ## 目录
 
 | 路径 | 用途 |
@@ -50,7 +52,7 @@ bash scripts/install/install_yolo_env.sh
 重复执行 `pip install -r`。根目录旧 `requirements-app.txt`、`requirements-dev.txt` 和
 `requirements-yolo.txt` 已删除。
 
-完整说明见 [RK3588 环境配置](../docs/beginner/03_rk3588_setup.md)。
+这些脚本属于当前 RK3588 部署实现；其架构定位见[当前状态](../docs/migration/current_state.md)。具体用法以脚本参数和现有配置为准。
 
 ## 部署
 
