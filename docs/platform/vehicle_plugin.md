@@ -1,6 +1,6 @@
 # Vehicle Plugin 与 VehicleCapabilities
 
-**状态：V1 冻结目标；P3 已建立 Multirotor Plugin 和生产 Action 组合。** 其他车辆目前没有真实控制实现。`contracts/vehicle/` 提供能力、健康状态与插件协议，并复用现有 `contracts.platform.ports` 的 VehicleStatePort / VehicleCommandPort，避免引入第二套命令协议。
+**状态：V1 冻结目标；P3 已建立 Multirotor Plugin 和生产 Action 组合，P9 已建立离线 FakeRover。** 其他车辆目前没有真实控制实现。`contracts/vehicle/` 提供能力、健康状态与插件协议，并复用现有 `contracts.platform.ports` 的 VehicleStatePort / VehicleCommandPort，避免引入第二套命令协议。
 
 Vehicle Plugin 封装车辆专有语义：VehicleCapabilities、VehicleState mapping、车辆专用 Action、车辆专用 Safety 约束、Vehicle command translation、车辆配置和 health 语义。通用 Core 通过 Vehicle Contract 使用这些能力，不根据 `vehicle_type` 在核心代码中分支。通用 Safety 仍有最终裁决权；车辆专用 Safety 只能补充约束，不能绕过裁决。
 
