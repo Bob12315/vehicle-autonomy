@@ -1,6 +1,6 @@
 # V1 目标目录结构
 
-**状态：Frozen Target Architecture。** 以下是后续迁移的目标组织方式，**不表示当前仓库已创建或实现这些目录**。本轮不为目标结构预建空 Python package。当前实际目录见[当前状态](../migration/current_state.md)。
+**状态：Frozen Target Architecture。** 以下是后续迁移的目标组织方式，**不表示当前仓库已创建或实现所有目录**。P11 只预留了 `contracts/intelligence/` 和 `intelligence/` 空包，其他目录以[当前状态](../migration/current_state.md)为准。
 
 ```text
 vehicle-autonomy-framework/

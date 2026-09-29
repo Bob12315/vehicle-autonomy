@@ -105,6 +105,34 @@ def main() -> None:
         if {"pymavlink", "telemetry_link"} & imports(path) or "LinkManager" in content:
             errors.append(f"YOLO telemetry/control violation {path.relative_to(ROOT)}")
 
+    intelligence_forbidden = (
+        "app", "application", "execution", "gateway", "infrastructure",
+        "protocols", "telemetry_link", "vehicles", "pymavlink", "serial",
+        "socket", "contracts.core.effects", "contracts.core.execution",
+        "contracts.platform", "contracts.ports", "contracts.vehicle",
+    )
+    for path in py_files("contracts/intelligence") + py_files("intelligence"):
+        source = path.read_text(encoding="utf-8")
+        tree = ast.parse(source, filename=str(path))
+        names = [alias.name for node in ast.walk(tree) if isinstance(node, ast.Import)
+                 for alias in node.names]
+        names += [node.module for node in ast.walk(tree)
+                  if isinstance(node, ast.ImportFrom) and node.module]
+        leaked = sorted(name for name in names if any(
+            name == prefix or name.startswith(prefix + ".")
+            for prefix in intelligence_forbidden
+        ))
+        uses_command_port = any(
+            (isinstance(node, ast.Name) and node.id == "VehicleCommandPort")
+            or (isinstance(node, ast.Attribute) and node.attr == "VehicleCommandPort")
+            or (isinstance(node, ast.ImportFrom) and any(
+                alias.name == "VehicleCommandPort" for alias in node.names
+            ))
+            for node in ast.walk(tree)
+        )
+        if leaked or uses_command_port:
+            errors.append(f"Intelligence command boundary violation {path.relative_to(ROOT)}: {leaked}")
+
     app_config = (ROOT / "config/app.yaml").read_text(encoding="utf-8")
     if "send_commands: false" not in app_config:
         errors.append("config/app.yaml must default executor.send_commands to false")
