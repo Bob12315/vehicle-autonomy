@@ -1,1 +1,1 @@
-"""Multirotor state mapping is provided by telemetry_link adapters until P4."""
+"""Multirotor state interpretation and VehicleState projection."""

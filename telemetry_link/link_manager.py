@@ -12,7 +12,7 @@ try:
     from .attitude_udp_publisher import AttitudeUdpPublisher
     from .command_queue import CommandQueue
     from .command_sender import CommandSender
-    from .config import EndpointConfig, TelemetryConfig
+    from .config import EndpointConfig, TelemetryConfig, resolve_vehicle_link
     from .frames import BODY_NED, LOCAL_NED
     from .mavlink_client import MavlinkClient
     from .models import ActionCommand, ActionType, ControlCommand, ControlType, DroneState, GimbalRateCommand, GimbalState, LinkStatus
@@ -29,7 +29,7 @@ except ImportError:  # pragma: no cover - supports direct script execution
     from attitude_udp_publisher import AttitudeUdpPublisher
     from command_queue import CommandQueue
     from command_sender import CommandSender
-    from config import EndpointConfig, TelemetryConfig
+    from config import EndpointConfig, TelemetryConfig, resolve_vehicle_link
     from frames import BODY_NED, LOCAL_NED
     from mavlink_client import MavlinkClient
     from models import ActionCommand, ActionType, ControlCommand, ControlType, DroneState, GimbalRateCommand, GimbalState, LinkStatus
@@ -147,7 +147,13 @@ class SourceRuntime:
                         connected=True, reconnecting=False, last_rx_time=bootstrap_now,
                         last_heartbeat_time=bootstrap_now, status_text="connected",
                     )
-                if self.cfg.v2_writer_enabled:
+                if self.cfg.diagnostic_read_only:
+                    self.receiver = TelemetryReceiver(
+                        self.client, self.state_cache, self.cfg, self.worker_stop_event,
+                        receiver_generation, None, self.name, self.attitude_publisher,
+                    )
+                    self.receiver.start()
+                elif self.cfg.v2_writer_enabled:
                     self.sender = CommandSender(
                         self.client, self.command_queue, self.state_cache, self.cfg,
                         self.worker_stop_event, propagate_errors=True,
@@ -366,13 +372,20 @@ class LinkManager:
         )
         for source_name in enabled_sources:
             endpoint = cfg.real if source_name == "real" else cfg.sitl
+            # Composition resolves source/protocol/transport once per source.
+            profile = resolve_vehicle_link(endpoint)
+            if profile.protocol != "mavlink":
+                raise ValueError(f"unsupported vehicle protocol: {profile.protocol}")
+            client = MavlinkClient(endpoint)
+            if hasattr(client, "link_profile"):
+                client.link_profile = profile
             self.runtimes[source_name] = SourceRuntime(
                 name=source_name,
                 endpoint=endpoint,
                 cfg=cfg,
                 state_cache=StateCache(cfg.heartbeat_timeout_sec, cfg.rx_timeout_sec),
                 command_queue=CommandQueue(),
-                client=MavlinkClient(endpoint),
+                client=client,
                 stop_event=threading.Event(),
                 worker_stop_event=threading.Event(),
                 field_version_matches=self._field_version_matches,

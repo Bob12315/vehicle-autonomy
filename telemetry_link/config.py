@@ -8,6 +8,8 @@ from typing import Any
 
 import yaml
 
+from infrastructure.transports import TransportKind, TransportSpec
+
 ROOT_DIR = Path(__file__).resolve().parent.parent
 DEFAULT_CONFIG_PATH = ROOT_DIR / "config" / "telemetry.yaml"
 
@@ -26,6 +28,40 @@ class EndpointConfig:
     eth_mode: str
     eth_host: str
     eth_port: int
+
+
+@dataclass(frozen=True, slots=True)
+class VehicleLinkProfile:
+    """Normalized source/protocol/transport model for legacy telemetry YAML."""
+
+    source: str
+    protocol: str
+    transport: TransportSpec
+
+
+def resolve_vehicle_link(endpoint: EndpointConfig) -> VehicleLinkProfile:
+    kind = endpoint.connection_type
+    if kind == "serial":
+        transport = TransportSpec(TransportKind.SERIAL, device=endpoint.serial_port,
+                                  baudrate=endpoint.baudrate)
+    elif kind == "udp":
+        transport = TransportSpec(TransportKind.UDP, host=endpoint.udp_host,
+                                  port=endpoint.udp_port, udp_mode=endpoint.udp_mode)
+    elif kind == "tcp":
+        transport = TransportSpec(TransportKind.TCP, host=endpoint.tcp_host,
+                                  port=endpoint.tcp_port)
+    elif kind == "eth":
+        if endpoint.eth_mode == "tcp":
+            transport = TransportSpec(TransportKind.TCP, host=endpoint.eth_host,
+                                      port=endpoint.eth_port)
+        elif endpoint.eth_mode in {"udpin", "udpout"}:
+            transport = TransportSpec(TransportKind.UDP, host=endpoint.eth_host,
+                                      port=endpoint.eth_port, udp_mode=endpoint.eth_mode)
+        else:
+            raise ValueError(f"unsupported eth_mode: {endpoint.eth_mode}")
+    else:
+        raise ValueError(f"unsupported connection_type: {kind}")
+    return VehicleLinkProfile(endpoint.name, "mavlink", transport)
 
 
 @dataclass(slots=True)
@@ -61,6 +97,7 @@ class TelemetryConfig:
     attitude_udp_ip: str = "127.0.0.1"
     attitude_udp_port: int = 5011
     attitude_udp_rate_hz: float = 30.0
+    diagnostic_read_only: bool = False
 
 
 def _to_bool(value: Any) -> bool:
@@ -240,6 +277,8 @@ def _build_config(merged: dict[str, Any]) -> TelemetryConfig:
         attitude_udp_ip=attitude_udp_ip,
         attitude_udp_port=attitude_udp_port,
         attitude_udp_rate_hz=attitude_udp_rate_hz,
+        diagnostic_read_only=_require_yaml_bool(
+            merged.get("diagnostic_read_only", False), "diagnostic_read_only"),
     )
 
 
@@ -247,9 +286,9 @@ def load_config_file(path: str | Path) -> TelemetryConfig:
     return _build_config(_load_yaml(str(path)))
 
 
-def load_config() -> TelemetryConfig:
+def load_config(argv: list[str] | None = None) -> TelemetryConfig:
     parser = build_arg_parser()
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     merged = _load_yaml(args.config)
     _merge_cli_overrides(merged, args)
     return _build_config(merged)

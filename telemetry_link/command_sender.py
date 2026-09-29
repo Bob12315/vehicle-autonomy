@@ -6,7 +6,7 @@ import threading
 import time
 
 from pymavlink import mavutil
-from pymavlink.dialects.v20 import ardupilotmega
+from protocols.mavlink.codec import send_command_long, send_message_interval_request, send_set_servo
 
 try:
     from .command_queue import CommandQueue
@@ -645,19 +645,7 @@ class CommandSender(threading.Thread):
             float(command.params["channel"]),
             float(command.params["pwm"]),
         )
-        self._command_long(
-            master,
-            mavutil.mavlink.MAV_CMD_DO_SET_SERVO,
-            [
-                float(command.params["channel"]),
-                float(command.params["pwm"]),
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-            ],
-        )
+        send_set_servo(master, int(command.params["channel"]), int(command.params["pwm"]))
 
     def _send_set_relay(self, master, command: ActionCommand) -> None:
         self._command_long(
@@ -706,40 +694,10 @@ class CommandSender(threading.Thread):
         master.set_mode(mapping[mode])
 
     def _command_long(self, master, command: int, params: list[float]) -> None:
-        master.mav.command_long_send(
-            master.target_system,
-            master.target_component,
-            int(command),
-            0,
-            float(params[0]),
-            float(params[1]),
-            float(params[2]),
-            float(params[3]),
-            float(params[4]),
-            float(params[5]),
-            float(params[6]),
-        )
+        send_command_long(master, command, params)
 
     def _send_message_interval_request(self, master, message_name: str, rate_hz: float) -> None:
-        message_id = getattr(mavutil.mavlink, f"MAVLINK_MSG_ID_{message_name}", None)
-        if message_id is None:
-            message_id = getattr(ardupilotmega, f"MAVLINK_MSG_ID_{message_name}", None)
-        if message_id is None:
-            raise ValueError(f"unknown MAVLink message name: {message_name}")
-        interval_us = int(1e6 / rate_hz) if rate_hz > 0 else -1
-        master.mav.command_long_send(
-            master.target_system,
-            master.target_component,
-            mavutil.mavlink.MAV_CMD_SET_MESSAGE_INTERVAL,
-            0,
-            message_id,
-            interval_us,
-            0,
-            0,
-            0,
-            0,
-            0,
-        )
+        send_message_interval_request(master, message_name, rate_hz)
 
     def _send_gimbal_angle(
         self,

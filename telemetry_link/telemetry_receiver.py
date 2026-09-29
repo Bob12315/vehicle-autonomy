@@ -4,36 +4,25 @@ import logging
 import threading
 import time
 
-from pymavlink import mavutil
+from protocols.mavlink.ack import decode_command_ack
+from protocols.mavlink.heartbeat import is_autopilot_heartbeat
+from protocols.mavlink.messages import decode_landed_state, message_type
+from vehicles.multirotor.state.mavlink_fields import (
+    control_allowed_for_mode, decode_copter_mode, global_position_is_valid,
+    heartbeat_is_armed, parse_gimbal_device_attitude_status,
+    parse_mount_status, parse_sys_status_values,
+)
 
 try:
     from .attitude_udp_publisher import AttitudeSample, AttitudeUdpPublisher
     from .config import TelemetryConfig
     from .mavlink_client import MavlinkClient
     from .state_cache import StateCache
-    from .telemetry_parser import (
-        control_allowed_for_mode,
-        decode_copter_mode,
-        global_position_is_valid,
-        heartbeat_is_armed,
-        parse_gimbal_device_attitude_status,
-        parse_mount_status,
-        parse_sys_status_values,
-    )
 except ImportError:  # pragma: no cover - supports direct script execution
     from attitude_udp_publisher import AttitudeSample, AttitudeUdpPublisher
     from config import TelemetryConfig
     from mavlink_client import MavlinkClient
     from state_cache import StateCache
-    from telemetry_parser import (
-        control_allowed_for_mode,
-        decode_copter_mode,
-        global_position_is_valid,
-        heartbeat_is_armed,
-        parse_gimbal_device_attitude_status,
-        parse_mount_status,
-        parse_sys_status_values,
-    )
 
 
 class TelemetryReceiver(threading.Thread):
@@ -84,7 +73,7 @@ class TelemetryReceiver(threading.Thread):
                     continue
 
                 now = time.time()
-                msg_type = message.get_type()
+                msg_type = message_type(message)
                 self.state_cache.update_link(last_rx_time=now)
                 self.state_cache.update_state(last_message_type=msg_type)
                 self._handle_message(msg_type, message, now)
@@ -113,15 +102,16 @@ class TelemetryReceiver(threading.Thread):
     def _handle_message(self, msg_type: str, message, now: float) -> None:
         if msg_type == "COMMAND_ACK" and self.ack_router is not None:
             publication = self.state_cache.atomic_publication(now)
+            ack = decode_command_ack(message)
             self.ack_router.observe(
                 link_session_id=str(publication["session_id"]),
-                mav_command=int(message.command),
-                source_system=int(message.get_srcSystem()),
-                source_component=int(message.get_srcComponent()),
-                result=int(message.result),
-                progress=None if getattr(message, "progress", None) is None else int(message.progress),
-                target_system=int(getattr(message, "target_system", 0) or 0),
-                target_component=int(getattr(message, "target_component", 0) or 0),
+                mav_command=ack.mav_command,
+                source_system=ack.source_system,
+                source_component=ack.source_component,
+                result=ack.result,
+                progress=ack.progress,
+                target_system=ack.target_system,
+                target_component=ack.target_component,
             )
             return
         if msg_type == "HEARTBEAT":
@@ -174,10 +164,8 @@ class TelemetryReceiver(threading.Thread):
             return
 
         if msg_type == "EXTENDED_SYS_STATE":
-            landed_state = int(getattr(message, "landed_state", 0))
-            landed = landed_state == mavutil.mavlink.MAV_LANDED_STATE_ON_GROUND
-            in_air = landed_state == mavutil.mavlink.MAV_LANDED_STATE_IN_AIR
-            self.state_cache.update_drone_state(landed=landed, in_air=in_air)
+            landed = decode_landed_state(message)
+            self.state_cache.update_drone_state(landed=landed.on_ground, in_air=landed.in_air)
             return
 
         if msg_type == "GLOBAL_POSITION_INT":
@@ -290,9 +278,7 @@ class TelemetryReceiver(threading.Thread):
             return
 
     def _is_autopilot_heartbeat(self, message) -> bool:
-        autopilot = int(getattr(message, "autopilot", mavutil.mavlink.MAV_AUTOPILOT_INVALID))
-        mav_type = int(getattr(message, "type", mavutil.mavlink.MAV_TYPE_GCS))
-        return autopilot != mavutil.mavlink.MAV_AUTOPILOT_INVALID and mav_type != mavutil.mavlink.MAV_TYPE_GCS
+        return is_autopilot_heartbeat(message)
 
     def _parse_gimbal_device_attitude(self, message) -> tuple[float, float, float, bool]:
         q = [float(v) for v in getattr(message, "q", [])]

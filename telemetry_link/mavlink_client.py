@@ -4,21 +4,21 @@ import logging
 import time
 from typing import Any, Callable
 
-from pymavlink import mavutil
+from protocols.mavlink.connection import open_pymavlink_connection
+from protocols.mavlink.heartbeat import is_autopilot_heartbeat
+from vehicles.multirotor.state.mavlink_fields import (
+    control_allowed_for_mode, decode_copter_mode, heartbeat_is_armed,
+)
 
 try:
-    from .config import EndpointConfig
+    from .config import EndpointConfig, resolve_vehicle_link
 except ImportError:  # pragma: no cover - supports direct script execution
-    from config import EndpointConfig
+    from config import EndpointConfig, resolve_vehicle_link
 
 
 def open_mavlink_connection(url: str, baud: int | None = None):
-    """Open a MAVLink connection, adding baud only for local serial devices."""
-    if url.startswith("/dev/"):
-        if baud is None:
-            return mavutil.mavlink_connection(url)
-        return mavutil.mavlink_connection(url, baud=int(baud))
-    return mavutil.mavlink_connection(url)
+    """Compatibility hook retained for existing telemetry integrations."""
+    return open_pymavlink_connection(url, baud)
 
 
 class MavlinkClient:
@@ -34,28 +34,13 @@ class MavlinkClient:
         self.connection_string = ""
         self.is_sitl = endpoint.name == "sitl"
         self.bootstrap_heartbeat: Any | None = None
+        self.link_profile = resolve_vehicle_link(endpoint)
 
     def connect(self) -> None:
         self.bootstrap_heartbeat = None
-        if self.endpoint.connection_type == "serial":
-            connection_string = self.endpoint.serial_port
-            baud = self.endpoint.baudrate
-        elif self.endpoint.connection_type == "udp":
-            connection_string = f"{self.endpoint.udp_mode}:{self.endpoint.udp_host}:{self.endpoint.udp_port}"
-            baud = None
-        elif self.endpoint.connection_type == "tcp":
-            connection_string = f"tcp:{self.endpoint.tcp_host}:{self.endpoint.tcp_port}"
-            baud = None
-        elif self.endpoint.connection_type == "eth":
-            if self.endpoint.eth_mode == "tcp":
-                connection_string = f"tcp:{self.endpoint.eth_host}:{self.endpoint.eth_port}"
-            elif self.endpoint.eth_mode in {"udpin", "udpout"}:
-                connection_string = f"{self.endpoint.eth_mode}:{self.endpoint.eth_host}:{self.endpoint.eth_port}"
-            else:
-                raise ValueError(f"unsupported eth_mode: {self.endpoint.eth_mode}")
-            baud = None
-        else:
-            raise ValueError(f"unsupported connection_type: {self.endpoint.connection_type}")
+        link = self.link_profile
+        connection_string = link.transport.endpoint
+        baud = link.transport.baudrate
 
         self.connection_string = connection_string
         self.logger.info(
@@ -119,23 +104,15 @@ class MavlinkClient:
         heartbeat = self.bootstrap_heartbeat
         if heartbeat is None:
             return None
-        mode_map = {
-            0: "STABILIZE", 1: "ACRO", 2: "ALT_HOLD", 3: "AUTO", 4: "GUIDED",
-            5: "LOITER", 6: "RTL", 7: "CIRCLE", 9: "LAND", 17: "BRAKE",
-            20: "GUIDED_NOGPS", 21: "SMART_RTL",
-        }
-        mode = mode_map.get(int(getattr(heartbeat, "custom_mode", 0)),
-                            f"MODE_{int(getattr(heartbeat, 'custom_mode', 0))}")
+        mode = decode_copter_mode(int(getattr(heartbeat, "custom_mode", 0)))
         return {
-            "armed": bool(int(getattr(heartbeat, "base_mode", 0)) & 128),
+            "armed": heartbeat_is_armed(int(getattr(heartbeat, "base_mode", 0))),
             "mode": mode,
-            "control_allowed": mode in {"GUIDED", "GUIDED_NOGPS", "OFFBOARD"},
+            "control_allowed": control_allowed_for_mode(mode),
         }
 
     def _is_autopilot_heartbeat(self, message) -> bool:
-        autopilot = int(getattr(message, "autopilot", mavutil.mavlink.MAV_AUTOPILOT_INVALID))
-        mav_type = int(getattr(message, "type", mavutil.mavlink.MAV_TYPE_GCS))
-        return autopilot != mavutil.mavlink.MAV_AUTOPILOT_INVALID and mav_type != mavutil.mavlink.MAV_TYPE_GCS
+        return is_autopilot_heartbeat(message)
 
     def recv_message(self, timeout: float = 0.1):
         if self.master is None:

@@ -1,6 +1,7 @@
 """Development-only telemetry text diagnostic tool; not an operator entrypoint."""
 from __future__ import annotations
 
+import argparse
 import logging
 import signal
 import sys
@@ -19,8 +20,29 @@ from telemetry_link.state_publisher import StatePublisher
 from telemetry_link.utils import setup_logging
 
 
-def main() -> int:
-    cfg = load_config()
+def dispatch_diagnostic_command(manager: LinkManager, command: str, logger: logging.Logger,
+                                *, allow_send: bool):
+    if not allow_send:
+        from telemetry_link.command_dispatcher import CommandResult
+        return CommandResult(False, "read-only diagnostic: restart with --allow-send to issue commands")
+    return dispatch_text_command(manager, command, logger)
+
+
+def diagnostic_config(argv: list[str] | None = None):
+    parser = argparse.ArgumentParser(description="Development telemetry diagnostic")
+    parser.add_argument("--allow-send", action="store_true",
+                        help="explicitly enable diagnostic command writes")
+    args, telemetry_args = parser.parse_known_args(argv)
+    cfg = load_config(telemetry_args)
+    cfg.diagnostic_read_only = not args.allow_send
+    if cfg.diagnostic_read_only:
+        cfg.request_message_intervals = False
+        cfg.attitude_udp_enabled = False
+    return cfg, args.allow_send
+
+
+def main(argv: list[str] | None = None) -> int:
+    cfg, allow_send = diagnostic_config(argv)
     ui_log_file = str(ROOT_DIR / "runtime" / "logs" / "telemetry_link" / "telemetry_link_ui.log") if cfg.ui_enabled else None
     setup_logging(cfg.log_level, ui_log_file)
     logger = logging.getLogger("telemetry_link")
@@ -35,7 +57,8 @@ def main() -> int:
                 time.sleep(0.1)
                 continue
             command = line.strip()
-            result = dispatch_text_command(manager, command, logger)
+            result = dispatch_diagnostic_command(manager, command, logger,
+                                                 allow_send=allow_send)
             if not result.ok:
                 logger.warning(result.message)
 

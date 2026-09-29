@@ -78,7 +78,7 @@ class VehicleStateAdapter:
                 gimbal_yaw_rad=None, gimbal_pitch_rad=None, gimbal_roll_rad=None,
                 gimbal_valid=False, gimbal_age_s=None,
             )
-        from .mavlink_state_adapter import MavlinkVehicleStateAdapter
+        from vehicles.multirotor.state.mavlink_adapter import MavlinkVehicleStateAdapter
         return MavlinkVehicleStateAdapter(link.get_state_cache, link.get_active_source).snapshot(source)
 
     def wait_next(self, *, after_session_id: str, after_sequence: int,
@@ -86,7 +86,7 @@ class VehicleStateAdapter:
         link = self._link()
         if link is None:
             raise RuntimeError("telemetry_state_unavailable")
-        from .mavlink_state_adapter import MavlinkVehicleStateAdapter
+        from vehicles.multirotor.state.mavlink_adapter import MavlinkVehicleStateAdapter
         return MavlinkVehicleStateAdapter(link.get_state_cache, link.get_active_source).wait_next(
             after_session_id=after_session_id,
             after_sequence=after_sequence,
