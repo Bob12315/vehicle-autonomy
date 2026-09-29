@@ -16,6 +16,15 @@ def test_frozen_json_is_deep_immutable_and_canonical() -> None:
     assert hash(frozen)
 
 
+def test_frozen_object_rejects_mutable_values_at_direct_construction() -> None:
+    with pytest.raises(TypeError, match="items must be tuples"):
+        FrozenObject([("items", 1)])  # type: ignore[arg-type]
+    with pytest.raises(TypeError, match="deeply immutable"):
+        FrozenObject((("items", [1]),))
+    with pytest.raises(TypeError, match="deeply immutable"):
+        FrozenObject((("items", ({"value": 1},)),))
+
+
 @pytest.mark.parametrize("value", [float("nan"), float("inf"), {1: "bad"}, b"bad"])
 def test_frozen_json_rejects_undefined_values(value) -> None:
     with pytest.raises((TypeError, ValueError)):

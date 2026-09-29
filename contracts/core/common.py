@@ -47,11 +47,18 @@ class FrozenObject(Mapping[str, object]):
     items_tuple: tuple[tuple[str, object], ...]
 
     def __post_init__(self) -> None:
+        if not isinstance(self.items_tuple, tuple) or any(
+            not isinstance(item, tuple) or len(item) != 2 for item in self.items_tuple
+        ):
+            raise TypeError("frozen object items must be tuples")
         keys = tuple(key for key, _ in self.items_tuple)
-        if any(not key for key in keys) or len(keys) != len(set(keys)):
+        if any(not isinstance(key, str) or not key for key in keys) or len(keys) != len(set(keys)):
             raise ValueError("frozen object keys must be unique non-empty strings")
         if keys != tuple(sorted(keys)):
             raise ValueError("frozen object keys must be in canonical order")
+        for _, value in self.items_tuple:
+            if freeze_json(value) != value:
+                raise TypeError("frozen object values must be deeply immutable JSON")
 
     def __getitem__(self, key: str) -> object:
         for candidate, value in self.items_tuple:

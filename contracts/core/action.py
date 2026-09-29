@@ -12,7 +12,7 @@ from .common import (
     EffectId,
     FrozenJson,
 )
-from .effects import Effect, EffectKind
+from .effects import EffectKind, TypedEffect
 from .input_state import CycleCorrelation, InputSnapshotRef, RuntimeInputSnapshot
 from .time import CoreTime
 
@@ -150,7 +150,7 @@ class ActionTickContext:
 @dataclass(frozen=True, slots=True)
 class EffectEmission:
     local_token: str
-    effect: Effect
+    effect: TypedEffect
 
     def __post_init__(self) -> None:
         if not self.local_token:

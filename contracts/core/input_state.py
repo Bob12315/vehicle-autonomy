@@ -97,6 +97,19 @@ class RuntimeInputSnapshot:
     field_freshness: ComponentFreshness
     fusion: FusionSnapshot
     send_gate: SendGateSnapshot
+    # Optional, deeply immutable projections for future World/System/Run ports.
+    # Producers publish all projections as one versioned cut before an Action tick.
+    world: FrozenJson = None
+    system: FrozenJson = None
+    run: FrozenJson = None
+
+    def __post_init__(self) -> None:
+        from .common import freeze_json
+
+        for name in ("world", "system", "run"):
+            value = getattr(self, name)
+            if freeze_json(value) != value:
+                raise TypeError(f"{name} must be deeply immutable JSON")
 
 
 @dataclass(frozen=True, slots=True)

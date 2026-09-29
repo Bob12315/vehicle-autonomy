@@ -3,9 +3,20 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import Enum
 import math
-from typing import TypeAlias
+from typing import Protocol, TypeAlias
 
 from contracts.platform.field import ReferenceVersion
+
+
+class TypedEffect(Protocol):
+    """Domain effect payload accepted by the canonical Action→Execution envelope.
+
+    The current closed Effect union below remains the candidate dispatcher's
+    compatibility set. Adding a payload here does not grant dispatch authority.
+    """
+
+    @property
+    def kind(self) -> str: ...
 
 
 class EffectKind(str, Enum):

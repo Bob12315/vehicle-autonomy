@@ -17,7 +17,7 @@ from contracts.platform.common import (
 
 from .action import ActionContractRef
 from .common import DispatchReceiptId, EffectId, FrozenJson, IdempotencyKey
-from .effects import Effect, EffectKind
+from .effects import Effect, EffectKind, TypedEffect
 from .input_state import InputSnapshotRef
 from .time import CoreTime
 
@@ -50,6 +50,8 @@ class ExecutionLease:
 
 @dataclass(frozen=True, slots=True)
 class EffectEnvelope:
+    """Canonical Action→Execution request with run, action and snapshot provenance."""
+
     effect_id: EffectId
     idempotency_key: IdempotencyKey
     run_id: RunId
@@ -57,7 +59,7 @@ class EffectEnvelope:
     action_instance_id: ActionInstanceId
     emission_sequence: int
     local_token: str
-    effect: Effect
+    effect: TypedEffect
     emitted_input_ref: InputSnapshotRef
 
 

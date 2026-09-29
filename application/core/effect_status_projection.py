@@ -81,13 +81,6 @@ class PlatformEffectStatusProjection(EffectStatusProjectionPort):
             CompletionState.SESSION_LOST: EffectCompletionFeedbackState.FAILED,
         }[status.completion_state]
         version = status.resource_version or ResourceVersion("vehicle-command-status", status.revision)
-        revision = {
-            VisionResultState.ACCEPTED: 1,
-            VisionResultState.IN_PROGRESS: 2,
-            VisionResultState.APPLIED: 3,
-            VisionResultState.REJECTED: 3,
-            VisionResultState.EXPIRED: 3,
-        }[status.state]
         lifecycle = EffectLifecycleFeedback(
             admission, transport, ack, completion, status.ack_progress, version, now,
         )
@@ -97,6 +90,13 @@ class PlatformEffectStatusProjection(EffectStatusProjectionPort):
         status = self._vision_status.status(query.platform_command_id)
         failed = status.state in {VisionResultState.REJECTED, VisionResultState.EXPIRED}
         completed = status.state is VisionResultState.APPLIED
+        revision = {
+            VisionResultState.ACCEPTED: 1,
+            VisionResultState.IN_PROGRESS: 2,
+            VisionResultState.APPLIED: 3,
+            VisionResultState.REJECTED: 3,
+            VisionResultState.EXPIRED: 3,
+        }[status.state]
         lifecycle = EffectLifecycleFeedback(
             EffectAdmissionFeedbackState.REJECTED if failed else EffectAdmissionFeedbackState.ACCEPTED,
             EffectTransportFeedbackState.NOT_APPLICABLE,

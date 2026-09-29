@@ -89,13 +89,20 @@ class SnapshotCollector(RuntimeInputPublisherPort):
         if value is None:
             return ComponentFreshness(FreshnessState.UNAVAILABLE, None, "unavailable")
         if isinstance(value, VehicleStateSnapshot):
-            age_ns = max(0, now.monotonic_ns - value.captured_at.monotonic_ns)
+            if value.captured_at.clock_domain_id != now.clock_domain_id:
+                return ComponentFreshness(FreshnessState.INVALID, None, "clock_domain_mismatch")
+            age_ns = now.monotonic_ns - value.captured_at.monotonic_ns
+            if age_ns < 0:
+                return ComponentFreshness(FreshnessState.INVALID, None, "future_vehicle_snapshot")
             if value.stale:
                 return ComponentFreshness(FreshnessState.STALE, age_ns, "stale")
             return ComponentFreshness(FreshnessState.FRESH, age_ns)
         if isinstance(value, PerceptionFrameSnapshot):
+            age_ns = now.monotonic_ns - value.received_at_monotonic_ns
+            if age_ns < 0:
+                return ComponentFreshness(FreshnessState.INVALID, None, "future_perception_frame")
             return ComponentFreshness(
                 FreshnessState.FRESH,
-                max(0, now.monotonic_ns - value.received_at_monotonic_ns),
+                age_ns,
             )
         return ComponentFreshness(FreshnessState.FRESH, None)
