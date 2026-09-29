@@ -4,7 +4,7 @@ from __future__ import annotations
 from dataclasses import asdict
 from typing import Any
 
-from guidance.gps_derived_enu_fusion import GpsDerivedEnuFusion, GpsFusionConfig
+from applications.cuadc_2026.gps_derived_enu_fusion import GpsDerivedEnuFusion, GpsFusionConfig
 from guidance.target_projection import GpsRawEstimate
 
 from missions.common.actions.base import ActionModule

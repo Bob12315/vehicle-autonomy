@@ -4,7 +4,7 @@ import pytest
 
 from applications.cuadc_2026.actions.gps_capture_view import GpsCaptureViewAction
 from applications.cuadc_2026.actions.gps_fuse_views import _output_item
-from guidance.gps_derived_enu_fusion import GpsDerivedEnuFusion, GpsFusionConfig, GpsLocalizedObject
+from applications.cuadc_2026.gps_derived_enu_fusion import GpsDerivedEnuFusion, GpsFusionConfig, GpsLocalizedObject
 from guidance.target_projection import GpsProjectionCamera, GpsRawEstimate, GpsTargetProjector
 
 
