@@ -1,5 +1,9 @@
 # V1 framework boundary
 
+This page describes the **implemented root**. The reusable framework's full
+target responsibilities and dependency rules are in [Vehicle Autonomy Framework
+V1: target architecture](framework_v1.md).
+
 The root is a new, hardware disconnected framework. Its implemented path is:
 
 ```text
