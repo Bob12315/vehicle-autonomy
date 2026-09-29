@@ -4,6 +4,8 @@
 
 场地的模型、Profile、坐标变换、几何和纯校准计算迁入 `environments/cuadc_2026/field/`。当前 FieldService 仍管理校准会话和运行时状态，生产调用点直接使用新位置的纯模块；旧 `field.*` 模块仍作同一模块对象的兼容导入。Profile JSON、运行时数据路径和场地数值未改变。
 
+运行时场地层进一步拆分：`_reference_store`、Profile 仓库与目标解析归 Environment；`FieldService`、校准会话/事务和 Action 上下文归 CUADC Application。默认 Profile 搜索路径仍指向仓库下的 `config/field_profiles` 与 `runtime/field_profiles`，Web 和生产 Runner 已改用新 owner。
+
 RKNN 检测器、跟踪、目标管理、类型和 Pipeline 迁入 `perception/yolo_rknn/`；`yolo_app/main.py` 继续负责当前进程的相机、UDP、录制与 Web 预览组装。旧 `yolo_app` 模块路径保留兼容导入。推理仍只使用 RK3588 的 RKNNLite / `.rknn`，没有增加 x86、CUDA 或 PyTorch 推理路径。
 
 VideoSource、CameraPort adapter、UDP GStreamer helper 与原始 `FramePacket` 迁入 `sensors/camera/`。Perception 对旧 `FramePacket` 的导出保持同一类型对象；`yolo_app` 两种启动形式和 helper 直接脚本入口均通过导入/帮助检查。真实 USB/UDP 摄像头仍需设备环境验收。

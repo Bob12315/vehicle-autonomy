@@ -24,9 +24,9 @@ from contracts.platform.common import SchemaVersion
 from contracts.platform.common import ClockStamp
 from contracts.platform.observability import OperationalEvent
 from contracts.platform.field import GpsObservation
-from field.context import RuntimeContextBuilder
-from field.service import FieldService
-from field.profile_service import ReadOnlyFieldProfileRepository
+from applications.cuadc_2026.runtime_context import RuntimeContextBuilder
+from applications.cuadc_2026.field_service import FieldService
+from environments.cuadc_2026.field.profile_service import ReadOnlyFieldProfileRepository
 from web_ui.status_adapter import WebStatusService
 from app.bootstrap import ServiceManager
 from applications.cuadc_2026.composition import compose_actions, create_registry
