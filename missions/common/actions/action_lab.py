@@ -3,49 +3,19 @@ from __future__ import annotations
 
 from contracts.core.action import ExitBarrier
 from missions.definitions import ActionDefinition
+from missions.action_definition_builder import _definition
+from vehicles.multirotor.actions.definitions import MULTIROTOR_ACTION_DEFINITIONS
 
 from .align_descend import AlignDescendAction
-from .change_speed import ChangeSpeedAction
 from .goto_waypoint import GotoWaypointAction
 from .gps_capture_view import GpsCaptureViewAction
 from .gps_fuse_views import GpsFuseViewsAction
 from .gps_target_lock import GpsTargetLockAction
-from .land import LandAction
 from .payload_release import PayloadReleaseAction
 from .registry import ActionRegistry
 from .select_drop_targets import SelectDropTargetsAction
-from .takeoff import TakeoffAction
 from .target_lock import TargetLockAction
 
-
-def _definition(
-    name: str,
-    factory,
-    description: str,
-    defaults: dict | None = None,
-    *,
-    properties: dict | None = None,
-    required_inputs: tuple[str, ...] = (),
-    output_properties: dict | None = None,
-    parameter_aliases: dict[str, tuple[str, ...]] | None = None,
-    parameter_schema_extra: dict | None = None,
-    effects: tuple[str, ...] = (),
-    exit_barrier: ExitBarrier = ExitBarrier.NONE,
-) -> ActionDefinition:
-    return ActionDefinition(
-        name=name,
-        revision="v1",
-        factory=factory,
-        label=name.replace("_", " ").title(),
-        description=description,
-        default_params=dict(defaults or {}),
-        parameter_schema={"type": "object", "properties": dict(properties or {}), "additionalProperties": False, **dict(parameter_schema_extra or {})},
-        required_inputs=required_inputs,
-        output_schema={"type": "object", "properties": dict(output_properties or {}), "additionalProperties": False},
-        parameter_aliases=dict(parameter_aliases or {}),
-        allowed_effect_types=effects,
-        exit_barrier=exit_barrier,
-    )
 
 
 _NUMBER = {"type": "number"}
@@ -100,16 +70,7 @@ _SERVO_OUTPUT = {"type": "object", "required": ["channel", "release_pwm", "hold_
     "hold_pwm": {"type": "integer", "minimum": 500, "maximum": 2500},
 }, "additionalProperties": False}
 _DEFINITIONS = (
-    _definition("takeoff", TakeoffAction, "Arm, issue TAKEOFF, then lock the FIELD-centre heading during the climb.",
-                {"mode": "GUIDED", "altitude_m": 4.5, "altitude_tolerance_m": 0.35, "require_armed": True, "max_updates": 150, "max_duration_s": 45, "yaw_mode": "field_heading", "takeoff_yaw_deg": None, "yaw_tolerance_deg": 5.0, "yaw_min_hold_updates": 2, "yaw_timeout_s": 12.0, "yaw_speed_deg_s": 20.0, "settle_time_s": 1.0, "priority": 2, "arm_priority": 1, "mode_priority": 2},
-                properties={"mode": {"type": "string", "enum": ["GUIDED"]}, "altitude_m": {"type": "number", "exclusiveMinimum": 0}, "target_alt_m": {"type": "number", "exclusiveMinimum": 0}, "altitude_tolerance_m": {"type": "number", "exclusiveMinimum": 0}, "max_updates": {"type": "integer", "minimum": 1}, "max_duration_s": {"type": ["number", "null"], "exclusiveMinimum": 0}, "yaw_mode": {"type": "string", "enum": ["field_heading", "hold"]}, "takeoff_yaw_deg": {"type": ["number", "null"]}, "field_yaw_deg": _NUMBER, "yaw_deg": _NUMBER, "yaw_tolerance_deg": {"type": "number", "exclusiveMinimum": 0, "maximum": 180}, "yaw_min_hold_updates": {"type": "integer", "minimum": 1}, "yaw_timeout_s": {"type": "number", "exclusiveMinimum": 0}, "yaw_speed_deg_s": {"type": "number", "exclusiveMinimum": 0}, "settle_time_s": {"type": "number", "minimum": 0}, "require_armed": _BOOLEAN, "priority": _INTEGER, "arm_priority": _INTEGER, "mode_priority": _INTEGER, "key": _STRING},
-                parameter_aliases={"altitude_m": ("target_alt_m",), "field_yaw_deg": ("yaw_deg",)},
-                required_inputs=("drone.mode", "drone.armed", "drone.relative_altitude", "field_heading_yaw_rad"), effects=("set_mode", "arm", "takeoff", "condition_yaw")),
-    _definition("land", LandAction, "Land through the execution safety gates.",
-                {"max_updates": 300, "priority": 2},
-                properties={"land_altitude_threshold_m": {"type": "number", "minimum": 0}, "max_updates": {"type": "integer", "minimum": 1}, "priority": _INTEGER, "key": _STRING}, required_inputs=("drone",), effects=("land",)),
-    _definition("change_speed", ChangeSpeedAction, "Set the flight-controller speed target.", {"speed_mps": 1.0, "speed_type": "ground", "priority": 4, "key": "drop_speed_1mps"},
-                properties={"speed_mps": {"type": "number", "exclusiveMinimum": 0}, "speed_type": {"type": "string", "enum": ["ground", "air", "climb", "descent"]}, "priority": _INTEGER, "key": _STRING}, effects=("change_speed",)),
+    *MULTIROTOR_ACTION_DEFINITIONS,
     _definition("goto_waypoint", GotoWaypointAction, "Convert a FIELD target to GPS while facing FIELD +Y by default.",
                 {"field_x_m": 0, "field_y_m": 32.5, "altitude_m": 4.5, "waypoint_mode": "field", "target_frame": "global", "yaw_mode": "field_heading", "field_yaw_deg": 0, "tolerance_xy_m": 0.30, "tolerance_z_m": 0.30, "min_hold_updates": 4, "require_velocity_valid": True, "max_horizontal_speed_mps": 0.25, "max_vertical_speed_mps": 0.15, "position_hysteresis_xy_m": 0.20, "position_hysteresis_z_m": 0.10, "horizontal_speed_hysteresis_mps": 0.10, "vertical_speed_hysteresis_mps": 0.05, "reached_updates_decrement": 1, "control_reject_max_updates": 3, "control_reject_timeout_s": 1.0, "max_duration_s": 180.0, "settle_time_s": 1.0, "priority": 5, "key": "goto_drop_center_4_5m"},
                 properties={"field_x_m": _NUMBER, "field_y_m": _NUMBER, "x": _NUMBER, "y": _NUMBER, "lat": {"type": ["number", "null"], "minimum": -90, "maximum": 90}, "lon": {"type": ["number", "null"], "minimum": -180, "maximum": 180}, "altitude_m": {"type": "number", "exclusiveMinimum": 0}, "field_yaw_deg": _NUMBER, "yaw_deg": _NUMBER, "target": _TARGET, "target_valid": _BOOLEAN, "skip_if_invalid_target": _BOOLEAN, "tolerance_xy_m": {"type": "number", "exclusiveMinimum": 0}, "tolerance_z_m": {"type": "number", "exclusiveMinimum": 0}, "min_hold_updates": {"type": "integer", "minimum": 1}, "require_velocity_valid": _BOOLEAN, "max_horizontal_speed_mps": {"type": "number", "minimum": 0}, "max_vertical_speed_mps": {"type": "number", "minimum": 0}, "position_hysteresis_xy_m": {"type": "number", "minimum": 0}, "position_hysteresis_z_m": {"type": "number", "minimum": 0}, "horizontal_speed_hysteresis_mps": {"type": "number", "minimum": 0}, "vertical_speed_hysteresis_mps": {"type": "number", "minimum": 0}, "reached_updates_decrement": {"type": "integer", "minimum": 0}, "control_reject_max_updates": {"type": "integer", "minimum": 1}, "control_reject_timeout_s": {"type": "number", "exclusiveMinimum": 0}, "max_duration_s": {"type": "number", "exclusiveMinimum": 0}, "settle_time_s": {"type": "number", "minimum": 0}, "priority": _INTEGER, "key": _STRING, "waypoint_mode": {"type": "string", "enum": ["field", "absolute"]}, "target_frame": {"type": "string", "enum": ["global"]}, "yaw_mode": {"type": "string", "enum": ["field_heading", "hold"]}},

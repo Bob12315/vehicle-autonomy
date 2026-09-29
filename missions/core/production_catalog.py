@@ -47,9 +47,11 @@ _NATIVE_ONE_SHOT = {
 }
 
 
-def create_production_catalog() -> ActionRegistrationCatalog:
+def create_production_catalog(
+    definitions=None,
+) -> ActionRegistrationCatalog:
     registrations = []
-    for legacy in action_definitions():
+    for legacy in action_definitions() if definitions is None else definitions:
         schema_text = json.dumps(legacy.parameter_schema, sort_keys=True, separators=(",", ":"))
         fingerprint = ActionContractFingerprint(hashlib.sha256(
             f"{legacy.name}:v1:{schema_text}".encode("utf-8")

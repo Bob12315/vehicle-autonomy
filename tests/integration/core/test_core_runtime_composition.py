@@ -1,10 +1,13 @@
 from datetime import datetime, timezone
 
 from application.core.runtime import build_core_runtime
+from application.vehicle_composition import compose_actions
 from contracts.core.common import freeze_json
 from contracts.core.input_state import FusionSnapshot, FusionState
 from contracts.core.time import CoreTime, ManualCoreClock
 from contracts.platform.common import LinkSessionId
+from missions.core.production_catalog import create_production_catalog
+from vehicles.multirotor.plugin import MultirotorPlugin
 
 
 class _Snapshot:
@@ -38,11 +41,15 @@ class _VisionCommands:
 
 def test_core_runtime_composes_one_idle_cycle_without_external_io() -> None:
     clock = ManualCoreClock(CoreTime(1, datetime(2026, 1, 1, tzinfo=timezone.utc), "test"))
+    vehicle = MultirotorPlugin()
     runtime = build_core_runtime(
         source="sitl", link_session_id=LinkSessionId("session"),
         vehicle_state=_Snapshot(), perception=_Snapshot(), field_reference=_Snapshot(),
         fusion=_Fusion(), vehicle_commands=_VehicleCommands(), vision_commands=_VisionCommands(),
         clock=clock,
+        action_catalog=create_production_catalog(compose_actions(vehicle)),
+        vehicle_translate=vehicle.translate_effect,
+        safety=vehicle.safety_policy(),
     )
     assert runtime.send_state.snapshot().enabled is False
     cycle = runtime.scheduler.run_one_cycle_for_test()

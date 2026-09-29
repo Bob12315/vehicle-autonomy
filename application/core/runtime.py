@@ -2,14 +2,17 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import uuid
+from typing import Callable
 
 from contracts.core.common import SchedulerSessionId
 from contracts.core.time import CoreClock
 from contracts.platform.common import LinkSessionId, SourceId
 from contracts.platform.ports import VehicleCommandPort, VisionCommandPort
+from contracts.core.effects import Effect
+from contracts.core.execution import SafetyEvaluator
+from contracts.platform.vehicle_commands import VehicleCommand
 from execution.dispatcher_v2 import EffectDispatcher
-from execution.safety_policy import SafetyPolicy, SafetyPolicyConfig
-from missions.core.production_catalog import create_production_catalog
+from missions.core.action_catalog import ActionRegistrationCatalog
 
 from .cycle_driver import CoreCycleDriver
 from .effect_delivery import EffectDeliveryTracker
@@ -46,8 +49,10 @@ def build_core_runtime(
     vehicle_commands: VehicleCommandPort,
     vision_commands: VisionCommandPort,
     clock: CoreClock,
+    action_catalog: ActionRegistrationCatalog,
+    vehicle_translate: Callable[[Effect], VehicleCommand],
+    safety: SafetyEvaluator,
     cadence_hz: float = 20.0,
-    safety_config: SafetyPolicyConfig = SafetyPolicyConfig(),
 ) -> CoreRuntime:
     """Build one isolated stable-core owner graph with SEND hard-defaulted off."""
     fence = CoreExecutionFenceAuthority(source, link_session_id, send_enabled=False)
@@ -59,10 +64,11 @@ def build_core_runtime(
         input_store,
     )
     coordinator = RunCoordinator(
-        create_production_catalog(), fence, EffectDeliveryTracker(),
+        action_catalog, fence, EffectDeliveryTracker(),
     )
     dispatcher = EffectDispatcher(
-        vehicle_commands, vision_commands, SafetyPolicy(safety_config), fence,
+        vehicle_commands, vision_commands, safety, fence,
+        vehicle_translate=vehicle_translate,
     )
     status_projection = PlatformEffectStatusProjection(vehicle_commands, vision_commands)
     cadence_ns = int(1_000_000_000 / cadence_hz)

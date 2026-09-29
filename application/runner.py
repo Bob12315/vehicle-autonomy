@@ -27,7 +27,8 @@ from field.service import FieldService
 from field.profile_service import ReadOnlyFieldProfileRepository
 from web_ui.status_adapter import WebStatusService
 from app.bootstrap import ServiceManager
-from missions.common.actions.action_lab import action_lab_specs, create_action_lab_registry
+from application.vehicle_composition import compose_actions, create_registry
+from vehicles.multirotor.plugin import MultirotorPlugin
 from missions.common.actions.runner import ActionRunner
 from application.send_state import SystemSendState
 
@@ -122,7 +123,9 @@ class SystemRunner:
             get_mission_orchestrator=lambda: self.mission_service.action_mission_orchestrator,
             record_event=self._record_event,
         )
-        self.action_lab_specs = action_lab_specs()
+        self.vehicle_plugin = MultirotorPlugin(self.services.state_port.snapshot)
+        self.action_definitions = compose_actions(self.vehicle_plugin)
+        self.action_lab_specs = [definition.web_spec() for definition in self.action_definitions]
         self.action_lab_enabled = True
         self.action_runtime_lock = threading.RLock()
         self.runtime_context_builder = RuntimeContextBuilder(logger=self.logger)
@@ -161,7 +164,7 @@ class SystemRunner:
             get_latest_drop_workflow_result=lambda: self.result_service.get("drop_workflow"),
         )
         self.action_runtime = ActionRuntimeService(
-            runner=ActionRunner(create_action_lab_registry()),
+            runner=ActionRunner(create_registry(self.action_definitions)),
             dispatcher=ActionDispatcher(
                 logger=self.logger,
                 yolo_client=YoloCommandClient(

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import uuid
+from typing import Callable
 
 from contracts.core.common import DispatchReceiptId
 from contracts.core.effects import GlobalPositionTarget, LocalPositionTarget, SetVisionTarget
@@ -10,15 +11,17 @@ from contracts.core.execution import (
     EffectDispatchAttempt,
     SafetyContext,
     SafetyDisposition,
+    SafetyEvaluator,
 )
 from contracts.platform.common import ClockStamp, ExecutionFenceQueryPort, SchemaVersion
 from contracts.platform.ports import VehicleCommandPort, VisionCommandPort
 from contracts.platform.perception import SetTargetLock, VisionCommandEnvelope, VisionResultState
 from contracts.platform.vehicle_commands import COMMAND_POLICY, VehicleCommandEnvelope
+from contracts.platform.vehicle_commands import VehicleCommand
+from contracts.core.effects import Effect
 
 from .capability_policy import authorize_effect
 from .effect_registry import EFFECT_REGISTRY, EffectRoute
-from .safety_policy import SafetyPolicy
 from .translators import translate_vehicle_effect
 
 
@@ -26,11 +29,13 @@ class EffectDispatcher:
     """The single typed submit pipeline: gate -> safety -> translate -> Port."""
 
     def __init__(self, vehicle_commands: VehicleCommandPort, vision_commands: VisionCommandPort,
-                 safety: SafetyPolicy, fence_query: ExecutionFenceQueryPort | None = None) -> None:
+                 safety: SafetyEvaluator, fence_query: ExecutionFenceQueryPort | None = None,
+                 vehicle_translate: Callable[[Effect], VehicleCommand] = translate_vehicle_effect) -> None:
         self._vehicle_commands = vehicle_commands
         self._vision_commands = vision_commands
         self._safety = safety
         self._fence_query = fence_query
+        self._vehicle_translate = vehicle_translate
 
     def dispatch(
         self,
@@ -63,7 +68,7 @@ class EffectDispatcher:
         rule = EFFECT_REGISTRY[decision.effective.kind]
         try:
             if rule.route is EffectRoute.VEHICLE:
-                payload = translate_vehicle_effect(decision.effective)
+                payload = self._vehicle_translate(decision.effective)
                 ack_policy, completion_policy = COMMAND_POLICY[payload.kind]
                 now_ns = attempt.now.monotonic_ns
                 command_id = str(attempt.envelope.effect_id)

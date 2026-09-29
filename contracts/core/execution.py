@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
+from typing import Protocol
 
 from contracts.platform.common import (
     ActionInstanceId,
@@ -97,6 +98,10 @@ class SafetyDecision:
     effective: Effect | None
     reason_code: str | None
     diagnostics: FrozenJson
+
+
+class SafetyEvaluator(Protocol):
+    def evaluate(self, effect: Effect, context: SafetyContext) -> SafetyDecision: ...
 
 
 class DispatchState(str, Enum):

@@ -5,6 +5,7 @@ from typing import Any
 
 from execution.authorization import RunAuthorization
 from execution.policy import action_requires_run_authorization
+from application.vehicle_composition import unsupported_action_reason
 from missions.common.actions.result import ActionResult
 from missions.engine import MissionActionStep, MissionOrchestrator
 
@@ -100,6 +101,9 @@ class MissionApplicationService:
         target_source: str | None = None,
     ):
         with self.action_runtime_lock:
+            reason = self._unsupported_action_reason(action_name)
+            if reason is not None:
+                return ActionResult(failed=True, reason=reason)
             requires_authorization = action_requires_run_authorization(action_name)
             if requires_authorization and not authorize:
                 self.action_runtime.dispatcher.clear_authorization("run_start_not_authorized")
@@ -210,6 +214,10 @@ class MissionApplicationService:
         if self.action_mission_orchestrator is None:
             return self.action_mission_status_payload()
         with self.action_runtime_lock:
+            for step in self.action_mission_orchestrator.steps:
+                reason = self._unsupported_action_reason(step.name)
+                if reason is not None:
+                    return self._reject_action_mission_start(reason)
             self.latest_drop_localization_result = {}
             self.latest_recon_localization_result = {}
             self.latest_drop_workflow_result = {}
@@ -245,6 +253,13 @@ class MissionApplicationService:
             if payload["running"]:
                 self._start_action_mission_recording()
             return payload
+
+    def _unsupported_action_reason(self, name: str) -> str | None:
+        definitions = getattr(self._host, "action_definitions", None)
+        plugin = getattr(self._host, "vehicle_plugin", None)
+        if definitions is None or plugin is None:
+            return None  # Compatibility with small service test doubles.
+        return unsupported_action_reason(name, definitions, plugin.capabilities)
 
     def _action_mission_field_requirements(self) -> dict[str, bool]:
         requirements = {"needs_gps": False}

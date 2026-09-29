@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from typing import Callable
 
 from contracts.core.action import ExitBarrier
 from contracts.core.common import MissionDefinitionId, StepId, freeze_json
@@ -19,8 +20,14 @@ from .action_catalog import ActionDefinitionCatalog
 
 
 class MissionCompiler:
-    def __init__(self, catalog: ActionDefinitionCatalog) -> None:
+    def __init__(
+        self,
+        catalog: ActionDefinitionCatalog,
+        *,
+        unsupported_action_reason: Callable[[str], str | None] | None = None,
+    ) -> None:
         self._catalog = catalog
+        self._unsupported_action_reason = unsupported_action_reason
 
     def compile(self, document: dict[str, object]) -> MissionDefinition:
         if document.get("version") != 2:
@@ -44,6 +51,10 @@ class MissionCompiler:
             definition = self._catalog.get(action_name)
             if definition is None:
                 raise ValueError(f"unknown Action: {action_name}")
+            if self._unsupported_action_reason is not None:
+                reason = self._unsupported_action_reason(action_name)
+                if reason is not None:
+                    raise ValueError(reason)
             label = str(item.get("label") or f"step_{index}")
             params = item.get("params") or {}
             if not isinstance(params, dict):
