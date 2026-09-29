@@ -6,4 +6,6 @@
 
 RKNN 检测器、跟踪、目标管理、类型和 Pipeline 迁入 `perception/yolo_rknn/`；`yolo_app/main.py` 继续负责当前进程的相机、UDP、录制与 Web 预览组装。旧 `yolo_app` 模块路径保留兼容导入。推理仍只使用 RK3588 的 RKNNLite / `.rknn`，没有增加 x86、CUDA 或 PyTorch 推理路径。
 
+VideoSource、CameraPort adapter、UDP GStreamer helper 与原始 `FramePacket` 迁入 `sensors/camera/`。Perception 对旧 `FramePacket` 的导出保持同一类型对象；`yolo_app` 两种启动形式和 helper 直接脚本入口均通过导入/帮助检查。真实 USB/UDP 摄像头仍需设备环境验收。
+
 后续每组遵循同一门禁：新 owner 持有唯一实现，生产调用方使用新路径，离线回归核对行为，旧路径无代码/测试/工具调用方后再删除。不能因文件已搬迁就认定旧 Runtime 可删。生产 Mission/Action owner、飞控和服务器验证仍另行处理。

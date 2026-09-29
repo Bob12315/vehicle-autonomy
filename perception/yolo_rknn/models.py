@@ -3,6 +3,8 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass, field
 from typing import Any
 
+from sensors.camera.frame_packet import FramePacket
+
 
 @dataclass(slots=True)
 class Track:
@@ -132,18 +134,6 @@ class CommandMessage:
     reply_addr: tuple[str, int] | None = None
     v2: bool = False
     expires_at_monotonic_ns: int | None = None
-
-
-@dataclass(slots=True)
-class FramePacket:
-    frame: Any
-    frame_id: int
-    timestamp: float
-    captured_at_monotonic_ns: int = 0
-    # Time spent by the consumer waiting for a fresh frame.  For a UDP source
-    # this is deliberately separate from the producer's GStreamer read/decode.
-    wait_frame_ms: float = 0.0
-    source_read_ms: float = 0.0
 
 
 def _normalize_error(value: float, extent: int) -> float:

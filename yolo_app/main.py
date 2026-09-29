@@ -27,7 +27,7 @@ try:
     from perception.yolo_rknn.perception_pipeline import YoloPerceptionPipeline
     from .udp_publisher import UdpPublisher
     from perception.yolo_rknn.utils import ensure_parent_dir
-    from .camera_adapter import VideoSourceCameraAdapter, camera_frame_to_bgr
+    from sensors.camera.camera_adapter import VideoSourceCameraAdapter, camera_frame_to_bgr
     from .virtual_nadir import VirtualNadirRectifier, build_debug_comparison
 except ImportError:
     from attitude_history import AttitudeHistory
@@ -40,7 +40,7 @@ except ImportError:
     from perception.yolo_rknn.perception_pipeline import YoloPerceptionPipeline
     from udp_publisher import UdpPublisher
     from perception.yolo_rknn.utils import ensure_parent_dir
-    from camera_adapter import VideoSourceCameraAdapter, camera_frame_to_bgr
+    from sensors.camera.camera_adapter import VideoSourceCameraAdapter, camera_frame_to_bgr
     from virtual_nadir import VirtualNadirRectifier, build_debug_comparison
 
 
