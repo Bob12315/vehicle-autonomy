@@ -4,8 +4,8 @@ import logging
 import threading
 
 from app.config import AppConfig
-from fusion.fusion_manager import FusionManager
-from fusion.models import FusionConfig, PerceptionTarget, SceneDetections
+from perception.fusion.fusion_manager import FusionManager
+from perception.fusion.models import FusionConfig, PerceptionTarget, SceneDetections
 from telemetry_link.link_manager import LinkManager
 from telemetry_link.models import DroneState, GimbalState, LinkStatus
 from telemetry_link.config import TelemetryConfig

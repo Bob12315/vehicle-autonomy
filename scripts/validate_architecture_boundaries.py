@@ -30,7 +30,7 @@ def main() -> None:
         if leaked:
             errors.append(f"contracts dependency leak {path.relative_to(ROOT)}: {sorted(leaked)}")
     action_files = py_files("missions/common/actions") + py_files("applications/cuadc_2026/actions")
-    core = py_files("fusion") + action_files
+    core = py_files("perception/fusion") + action_files
     forbidden_core = {"fastapi", "uvicorn", "pymavlink", "cv2", "rknnlite"}
     for path in core:
         leaked = imports(path) & forbidden_core
@@ -48,7 +48,7 @@ def main() -> None:
         if "pymavlink" in imported or ("telemetry_link" in imported and not telemetry_import_allowed) or "LinkManager" in content:
             errors.append(f"Action boundary violation {path.relative_to(ROOT)}")
 
-    for path in py_files("app") + py_files("web_ui") + py_files("fusion"):
+    for path in py_files("app") + py_files("web_ui") + py_files("perception/fusion"):
         content = path.read_text(encoding="utf-8")
         if "pymavlink" in imports(path):
             errors.append(f"pymavlink ownership violation {path.relative_to(ROOT)}")
@@ -67,7 +67,7 @@ def main() -> None:
         if imports(path) & {"app", "application", "web_ui", "telemetry_link"}:
             errors.append(f"field dependency violation {path.relative_to(ROOT)}")
 
-    for path in py_files("fusion"):
+    for path in py_files("perception/fusion"):
         if "telemetry_link" in imports(path):
             errors.append(f"fusion concrete telemetry dependency {path.relative_to(ROOT)}")
 
@@ -107,7 +107,7 @@ def main() -> None:
     if py_files("field"):
         errors.append("retired top-level field Python package restored")
 
-    for directory in ("app", "application", "contracts", "execution", "field", "fusion",
+    for directory in ("app", "application", "contracts", "execution", "field", "perception",
                       "guidance", "missions", "observability", "tools", "web_ui", "yolo_app"):
         for path in py_files(directory):
             if "pymavlink" in imports(path):

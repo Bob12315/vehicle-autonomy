@@ -7,7 +7,7 @@ from pathlib import Path
 CORE_ROOT = Path(__file__).resolve().parents[3] / "contracts" / "core"
 REPO_ROOT = CORE_ROOT.parents[1]
 FORBIDDEN_ROOTS = {
-    "app", "application", "execution", "field", "fusion", "missions",
+    "app", "application", "execution", "field", "fusion", "missions", "perception", "sensors",
     "telemetry_link", "vehicles", "web_ui", "yolo_app", "pymavlink",
     "fastapi", "rknnlite", "rknn", "serial", "socket",
 }

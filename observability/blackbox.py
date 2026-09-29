@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Any
 
 from app.config import BlackboxConfig
-from fusion.models import FusedState, PerceptionTarget
+from perception.fusion.models import FusedState, PerceptionTarget
 from telemetry_link.models import DroneState, GimbalState, LinkStatus
 
 

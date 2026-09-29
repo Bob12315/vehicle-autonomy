@@ -4,8 +4,8 @@ import math
 
 import pytest
 
-from fusion.fusion_manager import FusionManager
-from fusion.models import FusionConfig, PerceptionTarget, SceneDetections, SceneObject
+from perception.fusion.fusion_manager import FusionManager
+from perception.fusion.models import FusionConfig, PerceptionTarget, SceneDetections, SceneObject
 from telemetry_link.models import DroneState, GimbalState
 
 

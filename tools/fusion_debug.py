@@ -21,8 +21,8 @@ if str(ROOT_DIR) not in sys.path:
 
 from telemetry_link.models import DroneState, GimbalState
 
-from fusion.fusion_manager import FusionManager
-from fusion.models import FusionConfig, PerceptionTarget
+from perception.fusion.fusion_manager import FusionManager
+from perception.fusion.models import FusionConfig, PerceptionTarget
 
 
 def build_arg_parser() -> argparse.ArgumentParser:

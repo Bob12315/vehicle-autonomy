@@ -10,6 +10,8 @@ RKNN 检测器、跟踪、目标管理、类型和 Pipeline 迁入 `perception/y
 
 VideoSource、CameraPort adapter、UDP GStreamer helper 与原始 `FramePacket` 迁入 `sensors/camera/`。Perception 对旧 `FramePacket` 的导出保持同一类型对象；`yolo_app` 两种启动形式和 helper 直接脚本入口均通过导入/帮助检查。真实 USB/UDP 摄像头仍需设备环境验收。
 
+目标、机体和云台观测的融合模型、规则及 `FusionManager` 迁入 `perception/fusion/`。生产 bootstrap、应用状态与诊断工具已切换导入，旧顶层 `fusion/` 实现删除；融合计算和输出类型不变。
+
 迁移回归时还修正了两项长期存在的验收差异：`rk3588-real` Profile 缩为 19 行，渲染后的配置散列保持一致；`goto_waypoint` 生命周期测试现在验证当前定义中的 1 秒 settle 后完成，不改 Action 默认值或 Mission 参数。全量离线测试现为 `769 passed`，架构边界与 Stable Core 普通检查通过。严格生产切换检查仍有阻塞项。
 
 Action Registry 随注册项保存定义，旧 ActionRunner 不再读取 CUADC 全局定义表；候选 Core Catalog 要求组合入口显式传入定义。仓库内调用方已切换后，删除了旧 Action、Field、YOLO 实现的兼容文件和多旋翼 Action 旧导入。全量 `769 passed`。这不代表旧 Mission/Action Runtime 可删：生产入口仍由 `SystemRunner` 驱动，候选 Core 的完整生产装配、安全出口和 Web 用例切换仍需单独验证。飞控和服务器真实场景也未接入。

@@ -12,7 +12,7 @@ from typing import Any
 from application.perception_session import PerceptionSessionGate
 from contracts.perception_protocol import PERCEPTION_SCHEMA_VERSION
 from contracts.platform.perception import PerceptionHealthSnapshot
-from fusion.models import PerceptionTarget, SceneDetections, SceneObject
+from perception.fusion.models import PerceptionTarget, SceneDetections, SceneObject
 
 
 class YoloUdpReceiver(threading.Thread):

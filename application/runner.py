@@ -14,7 +14,7 @@ from typing import Mapping
 
 from app.config import AppConfig, ROOT_DIR, load_telemetry_config
 from execution.dispatcher import ActionDispatcher
-from fusion.models import SceneDetections
+from perception.fusion.models import SceneDetections
 from application.vehicle_projection import project_legacy_vehicle_frame
 from application.command_observer import CommandCompletionObserver
 from application.action_runtime import ActionRuntimeService
