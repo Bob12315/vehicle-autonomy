@@ -25,7 +25,7 @@
 
 生产 `MavlinkClient` 目前仍通过 `pymavlink.mavlink_connection` 打开连接，pymavlink 同时拥有字节传输和帧解析。新 `ByteTransport` 实现是明确的底层契约，**尚未接入生产 MAVLink 字节流**；不能声称已实现 raw-byte parser 或任意协议的即插即用。未来接入时需要替换 `protocols/mavlink/connection.py` 的兼容封装，同时维持 broker 的唯一车辆命令 writer。
 
-`CommandSender` 仍保留若干 MAVLink `SET_POSITION_TARGET_*`、gimbal 和 legacy queue 编码；通用 `COMMAND_LONG`、`SET_SERVO`、消息频率请求已委托 `protocols/mavlink/codec.py`。`TelemetryReceiver` 仍按 MAVLink 消息类型填充 StateCache；ACK 字段和 landed-state 解码已移到协议层，车辆状态语义和 DTO 投影移到 Multirotor 层。旧 `telemetry_link/telemetry_parser.py`、`mavlink_state_adapter.py` 是 re-export facade。待所有生产消费者、协议编码和状态映射都迁走并通过测试后，才能大幅缩减 `telemetry_link/`。
+`CommandSender` 仍保留若干 MAVLink `SET_POSITION_TARGET_*`、gimbal 和 legacy queue 编码；通用 `COMMAND_LONG`、`SET_SERVO`、消息频率请求已委托 `protocols/mavlink/codec.py`。`TelemetryReceiver` 仍按 MAVLink 消息类型填充 StateCache；ACK 字段和 landed-state 解码已移到协议层，车辆状态语义和 DTO 投影移到 Multirotor 层。P4 时的 `telemetry_link/telemetry_parser.py`、`mavlink_state_adapter.py` re-export facade 已在后续调用方切换后删除。生产 `telemetry_link/` 其余生命周期与 writer 仍在使用，不能整体删除。
 
 启动时消息频率设置是链路协议初始化请求，在 broker worker 启动前由 `SourceRuntime` 通过当前 sender 直发，并使用 ACK quarantine。它不是 Mission/Action 车辆命令，但仍是物理写入例外；见 [P4 writer audit](p4_writer_audit.md)。后续若收敛为同一物理写入队列，必须保留 ACK quarantine 与初始化顺序。
 

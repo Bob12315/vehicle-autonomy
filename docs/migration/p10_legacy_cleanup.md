@@ -16,4 +16,4 @@
 
 ## 后续迁移进展
 
-按[可复用实现迁移](reusable_detail_migration.md)完成 Action、Field、Perception、Camera 的 owner 搬迁后，仓库内旧导入消费者已改用新路径，原 Action/Field/YOLO 兼容模块已删除；全量离线测试 `769 passed`。旧 ActionRunner 的定义由注册表提供，候选 Core Catalog 不再隐式读取 CUADC 定义。上表保留当时的审计证据；**生产 Runtime、`LegacyActionModuleAdapter`、legacy writer 配置和 Web 兼容用例仍在使用**，严格生产切换门禁尚未通过。
+按[可复用实现迁移](reusable_detail_migration.md)完成 Action、Field、Perception、Camera 的 owner 搬迁后，仓库内旧导入消费者已改用新路径，原 Action/Field/YOLO 兼容模块与部分 composition/telemetry 转发 facade 已删除；全量离线测试 `769 passed`。旧 ActionRunner 的定义由注册表提供，候选 Core Catalog 不再隐式读取 CUADC 定义。上表保留当时的审计证据；**生产 Runtime、`LegacyActionModuleAdapter`、legacy writer 配置和 Web 兼容用例仍在使用**，严格生产切换门禁尚未通过。

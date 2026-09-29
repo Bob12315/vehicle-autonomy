@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from telemetry_link.mavlink_state_adapter import MavlinkVehicleStateAdapter
+from vehicles.multirotor.state.mavlink_adapter import MavlinkVehicleStateAdapter
 from telemetry_link.state_cache import StateCache
 
 

@@ -5,7 +5,7 @@ import pytest
 
 from app.config import build_arg_parser, load_app_config
 from application.runner import SystemRunner
-from application.vehicle_composition import (
+from applications.cuadc_2026.composition import (
     capability_validator, compose_actions, create_registry, unsupported_action_reason,
 )
 from contracts.vehicle import VehicleCapabilities

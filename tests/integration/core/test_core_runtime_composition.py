@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 
 from application.core.runtime import build_core_runtime
-from application.vehicle_composition import compose_actions
+from applications.cuadc_2026.composition import compose_actions
 from contracts.core.common import freeze_json
 from contracts.core.input_state import FusionSnapshot, FusionState
 from contracts.core.time import CoreTime, ManualCoreClock

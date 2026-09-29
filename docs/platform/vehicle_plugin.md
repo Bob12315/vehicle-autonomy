@@ -21,6 +21,6 @@ Vehicle Adapter 负责“这句话对这辆车意味着什么”；Protocol 负�
 
 `VehicleCapabilities` 是静态支持集合，不代表当前连接、定位或硬件健康；运行时健康由 `vehicles/multirotor/state/health.py` 根据既有快照映射。Mission / Action Lab 在运行授权和首个 Action 前按能力拒绝不支持的 Action；候选 Core 的 `MissionCompiler` 也提供同一校验钩子。它们不取代 SEND 双门控、ActionSafetyPipeline 或 v2 CommandBroker 的最终裁决。
 
-`vehicles/multirotor/commands/translator.py` 和 `safety/policy.py` 持有候选 Core 当前使用的车辆命令翻译与车辆约束；`execution` 旧路径是兼容导入。候选 Core 组合入口必须显式注入 ActionCatalog、车辆翻译器与安全策略，不在 Core 中选择车辆类型。
+`vehicles/multirotor/commands/translator.py` 和 `safety/policy.py` 持有候选 Core 当前使用的车辆命令翻译与车辆约束；`execution` 旧翻译导入路径已删除。候选 Core 组合入口必须显式注入 ActionCatalog、车辆翻译器与安全策略，不在 Core 中选择车辆类型。
 
 P4 才会拆分 `telemetry_link` 中的协议与传输。当前生产 Multirotor 继续复用现有 `VehicleStateAdapter`、`VehicleCommandAdapter`、`LinkManager`、ActionSafetyPipeline 与单 writer `CommandBroker`，没有另起控制路径。候选 Core owner 仍未接管生产入口。

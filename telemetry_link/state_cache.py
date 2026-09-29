@@ -7,10 +7,10 @@ from dataclasses import replace
 
 try:
     from .models import DroneState, GimbalState, LinkStatus
-    from .telemetry_parser import control_allowed_for_mode, global_position_is_valid
+    from vehicles.multirotor.state.mavlink_fields import control_allowed_for_mode, global_position_is_valid
 except ImportError:  # pragma: no cover - supports direct script execution
     from models import DroneState, GimbalState, LinkStatus
-    from telemetry_parser import control_allowed_for_mode, global_position_is_valid
+    from vehicles.multirotor.state.mavlink_fields import control_allowed_for_mode, global_position_is_valid
 
 
 class StateCache:

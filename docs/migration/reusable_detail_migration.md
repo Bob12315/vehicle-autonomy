@@ -13,3 +13,5 @@ VideoSource、CameraPort adapter、UDP GStreamer helper 与原始 `FramePacket` 
 迁移回归时还修正了两项长期存在的验收差异：`rk3588-real` Profile 缩为 19 行，渲染后的配置散列保持一致；`goto_waypoint` 生命周期测试现在验证当前定义中的 1 秒 settle 后完成，不改 Action 默认值或 Mission 参数。全量离线测试现为 `769 passed`，架构边界与 Stable Core 普通检查通过。严格生产切换检查仍有阻塞项。
 
 Action Registry 随注册项保存定义，旧 ActionRunner 不再读取 CUADC 全局定义表；候选 Core Catalog 要求组合入口显式传入定义。仓库内调用方已切换后，删除了旧 Action、Field、YOLO 实现的兼容文件和多旋翼 Action 旧导入。全量 `769 passed`。这不代表旧 Mission/Action Runtime 可删：生产入口仍由 `SystemRunner` 驱动，候选 Core 的完整生产装配、安全出口和 Web 用例切换仍需单独验证。飞控和服务器真实场景也未接入。
+
+进一步删除了仅转发导入的 `application.vehicle_composition`、`execution.translators`、`telemetry_link.telemetry_parser` 与 `telemetry_link.mavlink_state_adapter`；调用方现直接使用 CUADC composition、多旋翼翻译/状态模块。Typed EffectDispatcher 必须由组合入口注入车辆翻译器，不再隐式选多旋翼。全量回归保持 `769 passed`。

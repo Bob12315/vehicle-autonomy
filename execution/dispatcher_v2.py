@@ -22,7 +22,6 @@ from contracts.core.effects import Effect
 
 from .capability_policy import authorize_effect
 from .effect_registry import EFFECT_REGISTRY, EffectRoute
-from .translators import translate_vehicle_effect
 
 
 class EffectDispatcher:
@@ -30,7 +29,7 @@ class EffectDispatcher:
 
     def __init__(self, vehicle_commands: VehicleCommandPort, vision_commands: VisionCommandPort,
                  safety: SafetyEvaluator, fence_query: ExecutionFenceQueryPort | None = None,
-                 vehicle_translate: Callable[[Effect], VehicleCommand] = translate_vehicle_effect) -> None:
+                 *, vehicle_translate: Callable[[Effect], VehicleCommand]) -> None:
         self._vehicle_commands = vehicle_commands
         self._vision_commands = vision_commands
         self._safety = safety
