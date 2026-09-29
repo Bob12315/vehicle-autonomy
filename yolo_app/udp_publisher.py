@@ -8,12 +8,12 @@ from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .perception_pipeline import PipelineResult
+    from perception.yolo_rknn.perception_pipeline import PipelineResult
 
 try:
-    from .models import CurrentTarget, SceneDetections
+    from perception.yolo_rknn.models import CurrentTarget, SceneDetections
 except ImportError:
-    from models import CurrentTarget, SceneDetections
+    from perception.yolo_rknn.models import CurrentTarget, SceneDetections
 
 
 class UdpPublisher:

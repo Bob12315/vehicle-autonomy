@@ -5,6 +5,11 @@ import sys
 import time
 from collections import deque
 
+if not __package__:  # Preserve direct-script launch after moving Perception modules.
+    from pathlib import Path
+
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
 # Some conda-packaged OpenCV builds use the Qt backend but do not bundle fonts.
 # Point Qt to a common system font directory before importing cv2 to suppress warnings.
 os.environ.setdefault("QT_QPA_FONTDIR", "/usr/share/fonts/truetype/dejavu")
@@ -16,12 +21,12 @@ try:
     from .attitude_receiver import AttitudeReceiver
     from .annotator import Annotator
     from .command_receiver import CommandReceiver
-    from .config import load_config
+    from perception.yolo_rknn.config import load_config
     from .mjpeg_stream import MjpegStream
     from .raw_frame_recorder import RawFrameRecorder
-    from .perception_pipeline import YoloPerceptionPipeline
+    from perception.yolo_rknn.perception_pipeline import YoloPerceptionPipeline
     from .udp_publisher import UdpPublisher
-    from .utils import ensure_parent_dir
+    from perception.yolo_rknn.utils import ensure_parent_dir
     from .camera_adapter import VideoSourceCameraAdapter, camera_frame_to_bgr
     from .virtual_nadir import VirtualNadirRectifier, build_debug_comparison
 except ImportError:
@@ -29,12 +34,12 @@ except ImportError:
     from attitude_receiver import AttitudeReceiver
     from annotator import Annotator
     from command_receiver import CommandReceiver
-    from config import load_config
+    from perception.yolo_rknn.config import load_config
     from mjpeg_stream import MjpegStream
     from raw_frame_recorder import RawFrameRecorder
-    from perception_pipeline import YoloPerceptionPipeline
+    from perception.yolo_rknn.perception_pipeline import YoloPerceptionPipeline
     from udp_publisher import UdpPublisher
-    from utils import ensure_parent_dir
+    from perception.yolo_rknn.utils import ensure_parent_dir
     from camera_adapter import VideoSourceCameraAdapter, camera_frame_to_bgr
     from virtual_nadir import VirtualNadirRectifier, build_debug_comparison
 

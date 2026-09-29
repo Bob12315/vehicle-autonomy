@@ -1,18 +1,6 @@
-from __future__ import annotations
+"""Compatibility import for the RKNN Perception implementation."""
 
-from pathlib import Path
+import sys as _sys
+from importlib import import_module as _import_module
 
-
-def ensure_parent_dir(path: str) -> None:
-    Path(path).expanduser().resolve().parent.mkdir(parents=True, exist_ok=True)
-
-
-def normalize_error(center: float, size: int) -> float:
-    if size <= 0:
-        return 0.0
-    half = size / 2.0
-    return (center - half) / half
-
-
-def is_camera_source(source: str) -> bool:
-    return source.startswith("/dev/video") or source.isdigit()
+_sys.modules[__name__] = _import_module("perception.yolo_rknn.utils")

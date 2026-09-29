@@ -11,9 +11,9 @@ import cv2
 import numpy as np
 
 try:
-    from .models import FramePacket
+    from perception.yolo_rknn.models import FramePacket
 except ImportError:
-    from models import FramePacket
+    from perception.yolo_rknn.models import FramePacket
 
 
 class VideoSource:

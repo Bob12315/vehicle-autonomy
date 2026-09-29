@@ -3,11 +3,11 @@ from __future__ import annotations
 import cv2
 
 try:
-    from .config import AppConfig
-    from .models import CurrentTarget, Track
+    from perception.yolo_rknn.config import AppConfig
+    from perception.yolo_rknn.models import CurrentTarget, Track
 except ImportError:
-    from config import AppConfig
-    from models import CurrentTarget, Track
+    from perception.yolo_rknn.config import AppConfig
+    from perception.yolo_rknn.models import CurrentTarget, Track
 
 
 class Annotator:

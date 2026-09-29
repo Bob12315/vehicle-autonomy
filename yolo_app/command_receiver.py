@@ -8,9 +8,9 @@ from collections import OrderedDict
 from contracts.perception_protocol import COMMAND_SCHEMA_VERSION
 
 try:
-    from .models import CommandMessage
+    from perception.yolo_rknn.models import CommandMessage
 except ImportError:
-    from models import CommandMessage
+    from perception.yolo_rknn.models import CommandMessage
 
 
 class CommandReceiver:

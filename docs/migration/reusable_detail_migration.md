@@ -4,4 +4,6 @@
 
 场地的模型、Profile、坐标变换、几何和纯校准计算迁入 `environments/cuadc_2026/field/`。当前 FieldService 仍管理校准会话和运行时状态，生产调用点直接使用新位置的纯模块；旧 `field.*` 模块仍作同一模块对象的兼容导入。Profile JSON、运行时数据路径和场地数值未改变。
 
+RKNN 检测器、跟踪、目标管理、类型和 Pipeline 迁入 `perception/yolo_rknn/`；`yolo_app/main.py` 继续负责当前进程的相机、UDP、录制与 Web 预览组装。旧 `yolo_app` 模块路径保留兼容导入。推理仍只使用 RK3588 的 RKNNLite / `.rknn`，没有增加 x86、CUDA 或 PyTorch 推理路径。
+
 后续每组遵循同一门禁：新 owner 持有唯一实现，生产调用方使用新路径，离线回归核对行为，旧路径无代码/测试/工具调用方后再删除。不能因文件已搬迁就认定旧 Runtime 可删。生产 Mission/Action owner、飞控和服务器验证仍另行处理。
