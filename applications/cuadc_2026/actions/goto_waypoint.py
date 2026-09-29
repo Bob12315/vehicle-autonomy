@@ -5,8 +5,8 @@ import time
 from typing import Any
 
 from contracts.frames import GLOBAL_RELATIVE_ALT_INT
-from field.coordinates import field_to_gps
-from field.models import FieldReference, FieldReferenceError
+from environments.cuadc_2026.field.coordinates import field_to_gps
+from environments.cuadc_2026.field.models import FieldReference, FieldReferenceError
 
 from missions.common.actions.base import ActionModule
 from missions.common.actions.result import ActionResult

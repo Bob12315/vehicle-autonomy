@@ -7,9 +7,9 @@ from copy import deepcopy
 from dataclasses import replace
 from typing import Any, Mapping
 
-from field.profile import FieldProfile, validate_field_profile
+from environments.cuadc_2026.field.profile import FieldProfile, validate_field_profile
 from field.profile_service import ReadOnlyFieldProfileRepository
-from field.models import validate_wgs84_lat_lon
+from environments.cuadc_2026.field.models import validate_wgs84_lat_lon
 from field._reference_store import _ReferenceStore
 from field.calibration_session import CalibrationSession
 from field.context import RuntimeContextBuilder

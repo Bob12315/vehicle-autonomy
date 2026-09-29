@@ -3,8 +3,8 @@ from __future__ import annotations
 import logging
 import math
 import time
-from field.coordinates import gps_to_field_from_origin
-from field.models import FieldReference
+from environments.cuadc_2026.field.coordinates import gps_to_field_from_origin
+from environments.cuadc_2026.field.models import FieldReference
 from contracts.platform.field import CalibrationSummary, FieldReferenceSnapshot, ReferenceVersion
 
 

@@ -203,7 +203,7 @@ class GpsDerivedEnuFusion:
     def _gps_to_enu(self, lat: float, lon: float) -> Tuple[float, float]:
         """Convert GPS lat/lon to east/north metres relative to origin.
         Uses gps_enu_deltas for cross-dateline correctness."""
-        from field.models import gps_enu_deltas  # noqa: PLC0415
+        from environments.cuadc_2026.field.models import gps_enu_deltas  # noqa: PLC0415
         d_north, d_east = gps_enu_deltas(
             self.origin_lat, self.origin_lon, lat, lon
         )
@@ -212,7 +212,7 @@ class GpsDerivedEnuFusion:
     def _enu_to_gps(self, east_m: float, north_m: float) -> Tuple[float, float]:
         """Convert east/north metres relative to origin back to GPS.
         Uses field_to_gps_from_origin with heading=0 (east=x, north=y)."""
-        from field.coordinates import field_to_gps_from_origin  # noqa: PLC0415
+        from environments.cuadc_2026.field.coordinates import field_to_gps_from_origin  # noqa: PLC0415
         gps = field_to_gps_from_origin(
             field_x_m=east_m,
             field_y_m=north_m,

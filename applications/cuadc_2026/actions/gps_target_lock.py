@@ -6,7 +6,7 @@ import math
 from dataclasses import dataclass
 from typing import Any
 
-from field.models import gps_enu_deltas
+from environments.cuadc_2026.field.models import gps_enu_deltas
 from guidance.target_projection import GpsProjectionCamera, GpsTargetProjector
 
 from missions.common.actions.base import ActionModule
