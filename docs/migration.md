@@ -1,5 +1,8 @@
 # Historical application and future migration
 
+The staged migration order, acceptance gates, and progress log are in
+[the reusable framework migration plan](migration_plan.md).
+
 `legacy/cuadc_2026/` contains the previous repository tree, including the
 production `SystemRunner`, Action Mission implementation, Web UI, telemetry
 link, RKNN application, configuration, tests, scripts, and historical docs.

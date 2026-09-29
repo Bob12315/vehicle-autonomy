@@ -15,4 +15,4 @@ python -m app.main status
 python -m unittest discover -s tests -v
 ```
 
-[当前实现边界](docs/architecture.md)记录已有能力与限制。[历史程序及迁移原则](docs/migration.md)说明 `legacy/cuadc_2026/`：它完整保存旧应用的代码、配置、测试和资源，供后续逐项评估复用；新根目录不导入该目录。
+[当前实现边界](docs/architecture.md)记录已有能力与限制。[迁移计划与记录](docs/migration_plan.md)给出从合同、状态链到控制与设备接入的阶段顺序。[历史程序说明](docs/migration.md)介绍 `legacy/cuadc_2026/`：它完整保存旧应用的代码、配置、测试和资源，供后续逐项评估复用；新根目录不导入该目录。
