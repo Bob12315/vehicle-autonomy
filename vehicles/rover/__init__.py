@@ -1,0 +1,1 @@
+"""Rover-specific vehicle adapters."""

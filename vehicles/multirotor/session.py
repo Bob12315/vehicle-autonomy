@@ -1,4 +1,4 @@
-"""Explicit ArduCopter link composition; no connection is opened here."""
+"""Explicit ArduPilot link composition; no connection is opened here."""
 
 from __future__ import annotations
 
@@ -12,6 +12,7 @@ from contracts.vehicle.models import VehicleStateSnapshot
 from core.control_authority import ControlAuthority
 from infrastructure.transports.bytes import ByteTransport
 from protocols.mavlink.codec import MavlinkCodec
+from protocols.mavlink import constants as mavlink
 
 from .mavlink_port import ArduPilotCommandPort
 from .mavlink_state import ArduPilotTelemetryState
@@ -29,21 +30,26 @@ class ArduPilotSession:
                  authority: ControlAuthority, commands: ArduPilotCommandPort,
                  state_factory: Callable[[LinkSessionId], ArduPilotTelemetryState],
                  link_timeout_ns: int,
+                 expected_vehicle_type: int,
                  captured_at: Callable[[object, TimePoint], TimePoint | None] | None = None) -> None:
         if isinstance(link_timeout_ns, bool) or not isinstance(link_timeout_ns, int) or link_timeout_ns <= 0:
             raise ValueError("link timeout must be positive nanoseconds")
         if not commands.uses(authority=authority, transport=transport, codec=codec):
             raise ValueError("session and command writer must share authority, transport and codec")
+        if isinstance(expected_vehicle_type, bool) or not isinstance(expected_vehicle_type, int) or not 0 <= expected_vehicle_type <= 255:
+            raise ValueError("expected MAVLink vehicle type is required")
         self._transport = transport
         self._codec = codec
         self._authority = authority
         self._commands = commands
         self._state_factory = state_factory
         self._link_timeout_ns = link_timeout_ns
+        self._expected_vehicle_type = expected_vehicle_type
         self._captured_at = captured_at
         self._session_id: LinkSessionId | None = None
         self._state: ArduPilotTelemetryState | None = None
         self._last_heartbeat: TimePoint | None = None
+        self.last_rejected_vehicle_type: int | None = None
 
     @property
     def session_id(self) -> LinkSessionId | None:
@@ -66,6 +72,11 @@ class ArduPilotSession:
             ):
                 continue
             if message.get_type() == "HEARTBEAT":
+                if (message.autopilot != mavlink.AUTOPILOT_ARDUPILOT
+                        or message.type != self._expected_vehicle_type):
+                    self.last_rejected_vehicle_type = int(message.type)
+                    self._disconnect(received_at)
+                    continue
                 if self._session_id is None:
                     self._session_id = LinkSessionId(uuid4().hex)
                     self._state = self._state_factory(self._session_id)

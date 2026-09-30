@@ -18,6 +18,7 @@ from core.vehicle_execution import VehicleExecution
 from core.vehicle_safety import SafetyLimits, VehicleSafetyPolicy
 from infrastructure.transports.bytes import TcpByteTransport
 from protocols.mavlink.codec import MavlinkCodec
+from protocols.mavlink.constants import TYPE_QUADROTOR
 from vehicles.multirotor.ardupilot_commands import ArduPilotCommandTranslator
 from vehicles.multirotor.mavlink_port import ArduPilotCommandPort
 from vehicles.multirotor.mavlink_state import ArduPilotTelemetryState
@@ -48,6 +49,7 @@ def main() -> int:
     session = ArduPilotSession(
         transport=transport, codec=codec, authority=authority, commands=port,
         link_timeout_ns=5_000_000_000,
+        expected_vehicle_type=TYPE_QUADROTOR,
         state_factory=lambda session_id: ArduPilotTelemetryState(
             vehicle_id="sitl-copter", generation_id=str(session_id), link_session_id=session_id,
             source_system=1, source_component=1, max_sample_skew_ns=500_000_000,

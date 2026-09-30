@@ -1,4 +1,4 @@
-"""Single fenced ArduCopter writer over an injected byte transport."""
+"""Single fenced ArduPilot writer over an injected byte transport."""
 
 from __future__ import annotations
 

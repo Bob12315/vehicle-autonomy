@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import ast
 from datetime import datetime, timezone
+import os
 from pathlib import Path
+import pty
 import socket
 import unittest
 
@@ -26,12 +28,14 @@ from core.control_authority import ControlAuthority, ControlLease
 from core.vehicle_execution import StopState, VehicleExecution
 from core.vehicle_safety import SafetyLimits, VehicleSafetyPolicy
 from deployment.copter_cycle import CopterCycleDriver
-from infrastructure.transports.bytes import TcpByteTransport
+from infrastructure.transports.bytes import SerialByteTransport, TcpByteTransport
 from protocols.mavlink.codec import MavlinkCodec
+from protocols.mavlink.constants import TYPE_GROUND_ROVER, TYPE_QUADROTOR
 from vehicles.multirotor.ardupilot_commands import ArduPilotCommandTranslator
 from vehicles.multirotor.mavlink_port import ArduPilotCommandPort
 from vehicles.multirotor.mavlink_state import ArduPilotTelemetryState
 from vehicles.multirotor.session import ArduPilotSession
+from vehicles.rover.diagnostic import RoverHoldDiagnosticTranslator
 
 
 def at(ns: int) -> TimePoint:
@@ -98,6 +102,7 @@ class P5MavlinkTests(unittest.TestCase):
         self.session = ArduPilotSession(
             transport=self.transport, codec=self.codec, authority=self.authority,
             commands=self.port, link_timeout_ns=50,
+            expected_vehicle_type=TYPE_QUADROTOR,
             state_factory=lambda session_id: ArduPilotTelemetryState(
                 vehicle_id="copter", generation_id=str(session_id), link_session_id=session_id,
                 source_system=1, source_component=1, max_sample_skew_ns=5,
@@ -108,9 +113,9 @@ class P5MavlinkTests(unittest.TestCase):
         self.ids = iter(f"cmd-{n}" for n in range(100))
         self.execution = VehicleExecution(self.port, self.authority, policy(), lambda: next(self.ids))
 
-    def heartbeat(self, *, armed=False, mode=4, sender=None):
+    def heartbeat(self, *, armed=False, mode=4, sender=None, vehicle_type=TYPE_QUADROTOR):
         maker = sender or self.sender
-        return maker.heartbeat_encode(2, 3, 128 if armed else 0, mode, 4).pack(maker)
+        return maker.heartbeat_encode(vehicle_type, 3, 128 if armed else 0, mode, 4).pack(maker)
 
     def ack(self, command, result=0, *, sender=None):
         maker = sender or self.sender
@@ -150,6 +155,18 @@ class P5MavlinkTests(unittest.TestCase):
         self.transport.incoming.append(self.heartbeat(armed=True))
         self.session.poll(at(105))
         self.assertEqual(self.port.status(receipt.command_id).phase, CommandPhase.COMPLETED)
+
+    def test_copter_session_rejects_rover_heartbeat(self):
+        self.transport.incoming.append(self.heartbeat(vehicle_type=TYPE_GROUND_ROVER))
+        self.session.poll(at(100))
+        self.assertIsNone(self.session.session_id)
+        self.assertIsNone(self.authority.link_session_id)
+        self.assertEqual(self.session.last_rejected_vehicle_type, TYPE_GROUND_ROVER)
+        self.authority.grant(ControlLease("lease", "run", "action", at(200)), at(100))
+        self.authority.set_system_send(True)
+        self.authority.set_action_send(True)
+        self.assertEqual(self.execution.dispatch(effect(1, ArmEffect()), world(), at(101)).reason, "link_disconnected")
+        self.assertEqual(self.transport.writes, [])
 
     def test_coordinate_translation_and_rejection(self):
         self.connect()
@@ -274,10 +291,12 @@ class P5MavlinkTests(unittest.TestCase):
             ArduPilotSession(
                 transport=MemoryTransport(), codec=self.codec, authority=self.authority,
                 commands=self.port, link_timeout_ns=50, state_factory=lambda session_id: self.session._state,
+                expected_vehicle_type=TYPE_QUADROTOR,
             )
         session = ArduPilotSession(
             transport=self.transport, codec=self.codec, authority=self.authority,
             commands=self.port, link_timeout_ns=50,
+            expected_vehicle_type=TYPE_QUADROTOR,
             state_factory=lambda session_id: ArduPilotTelemetryState(
                 vehicle_id="copter", generation_id=str(session_id), link_session_id=session_id,
                 source_system=1, source_component=1, max_sample_skew_ns=5,
@@ -303,6 +322,28 @@ class P5MavlinkTests(unittest.TestCase):
                 transport.write(b"x")
         finally:
             right.close()
+
+    def test_serial_transport_pty_and_rover_diagnostic_scope(self):
+        master, slave = pty.openpty()
+        try:
+            path = os.ttyname(slave)
+            transport = SerialByteTransport.connect(path, timeout_s=0.05)
+            transport.write(b"abc")
+            self.assertEqual(os.read(master, 3), b"abc")
+            os.write(master, b"def")
+            self.assertEqual(transport.read(3), b"def")
+            self.assertFalse(hasattr(transport, "submit"))
+            transport.close()
+            with self.assertRaises(ConnectionError):
+                transport.write(b"x")
+        finally:
+            os.close(master)
+            os.close(slave)
+        rover = RoverHoldDiagnosticTranslator()
+        self.assertEqual(rover.translate(ModeCommand("HOLD")).params[1], 4)
+        for command in (ArmCommand(), TakeoffCommand(1), ModeCommand("GUIDED")):
+            with self.subTest(command=type(command).__name__), self.assertRaises(ValueError):
+                rover.translate(command)
 
     def test_only_vehicle_port_calls_byte_transport_write(self):
         root = Path(__file__).resolve().parents[1]

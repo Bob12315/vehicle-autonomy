@@ -1,2 +1,3 @@
-# Optional ArduCopter MAVLink plugin; tested with this installed version.
+# Optional P5 MAVLink and serial transports; tested with these installed versions.
 pymavlink==2.4.49
+pyserial==3.5

@@ -17,6 +17,9 @@ Typed Effect -> offline VehicleExecution -> system SEND + Action SEND
 
 Explicit ArduCopter composition -> VehicleExecution -> ArduPilotCommandPort
                              -> MAVLink codec -> TCP byte transport -> local SITL
+
+Explicit Rover HOLD diagnostic -> VehicleExecution -> ArduPilotCommandPort
+                              -> MAVLink codec -> serial byte transport -> USB controller
 ```
 
 `contracts/` contains shared, vehicle independent data and ports, including the
@@ -30,9 +33,14 @@ contains only the new status CLI. `sensors/`, `vehicles/`, `localization/`, and
 and a World Model that publishes immutable snapshots. `vehicles/multirotor/`
 normalizes received ArduPilot telemetry and translates approved commands;
 `protocols/mavlink/` packs/parses messages; `infrastructure/transports/` owns
-only byte I/O. The P5 `ArduPilotCommandPort` is the sole writer in this explicit
-composition. It holds the authority lock across the final fence and transport
-write, and the session receiver handles heartbeat, ACK and state observations.
+only TCP/serial byte I/O. The P5 `ArduPilotCommandPort` is the sole writer in
+these explicit compositions. It holds the authority lock across the final
+fence and transport write, and the session receiver handles heartbeat, ACK and
+state observations.
+`ArduPilotSession` requires an expected MAVLink vehicle type and ArduPilot
+autopilot heartbeat before granting a link session. The USB diagnostic exposes
+only a Rover HOLD-to-HOLD request through a narrow translator; it does not
+make the Copter command mapping valid for Rover.
 `deployment/CopterCycleDriver` connects receive, P4 deadman, and queue drain
 when explicitly scheduled by a caller; the CLI does not schedule it.
 
@@ -60,7 +68,9 @@ unconfirmed. The root CLI wires no command port or production vehicle link.
 P5 maps StopMotion to zero velocity and yaw rate in the active stream frame;
 only a later fresh zero-motion state sample marks it complete. Link timeout
 creates a new session and fences queued commands; uncertain transport writes
-and missing ACKs remain `UNKNOWN`. The local SITL smoke test exercised a
-single unarmed GUIDED mode request and ACK. Physical stopping, capture-time
-calibration, and real-device behavior have not been validated; the CLI still
-does not open a vehicle link.
+and missing ACKs remain `UNKNOWN`. The local Copter SITL smoke test exercised a
+single unarmed GUIDED mode request and ACK. A separate USB Rover controller
+diagnostic received HOLD ACK and a later matching heartbeat while disarmed.
+The USB state publication uses receive time as a diagnostic proxy; source
+capture time is unknown. Physical stopping, motion, link-loss behavior and
+Copter hardware have not been validated; the CLI still does not open a vehicle link.
