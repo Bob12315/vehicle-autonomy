@@ -1,0 +1,2 @@
+# Optional ArduCopter MAVLink plugin; tested with this installed version.
+pymavlink==2.4.49

@@ -3,7 +3,7 @@
 **状态：FROZEN V1.0**
 **冻结日期：2026-09-30**
 
-> **实施状态：P1 合同层、P2 离线状态链、P3 决策链及 P4 假端口控制边界已实现。** 新根目录已有 Typed Effect、版本化快照、Transform 求解器和 `submit/cancel/status` 窄端口；P4 Execution 只接假命令端口，真实设备连接与生产 writer 仍属后续阶段。冻结语义不变；实际范围与测试见 [迁移计划](migration_plan.md)，总体职责见 [V1 目标架构](framework_v1.md)。
+> **实施状态：P1 至 P4 已实现，P5 ArduCopter 软件组合已通过离线与本机 SITL 验证。** 新根目录已有 Typed Effect、版本化快照、Transform 求解器和 `submit/cancel/status` 窄端口；P5 仅在显式组合后使用受控 MAVLink writer，真实设备仍待验收。冻结语义不变；实际范围与测试见 [迁移计划](migration_plan.md)，总体职责见 [V1 目标架构](framework_v1.md)。
 
 本文冻结 Vehicle Autonomy Framework V1 的基础合同。后续 Sensor、Perception、Localization、World Model、Mission、Planning、Guidance、Execution、Vehicle Plugin、Protocol 和 Transport 均建立在本文定义的语义之上。
 

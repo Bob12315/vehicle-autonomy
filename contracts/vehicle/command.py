@@ -133,6 +133,7 @@ class CommandPhase(str, Enum):
     COMPLETED = "COMPLETED"
     CANCELLED = "CANCELLED"
     REJECTED = "REJECTED"
+    UNKNOWN = "UNKNOWN"  # transport write or ACK timed out; physical outcome unresolved
 
 
 @dataclass(frozen=True, slots=True)

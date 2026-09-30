@@ -1,6 +1,6 @@
 # 可复用框架迁移计划与记录
 
-> **状态：P0 至 P4 已完成离线阶段；P5 尚未开始。** 本文记录从 `legacy/cuadc_2026/` 提取可复用能力的顺序、验收门槛与阶段进度。目标职责以 [V1 目标架构](framework_v1.md) 为准；[当前实现边界](architecture.md)描述根目录已有能力。本文中的源文件只是候选素材，不表示已决定复制或已在新框架运行。
+> **状态：P0 至 P4 已完成；P5 的 ArduCopter 软件组合已通过离线与本机 SITL 验证，实机待验收。** 本文记录从 `legacy/cuadc_2026/` 提取可复用能力的顺序、验收门槛与阶段进度。目标职责以 [V1 目标架构](framework_v1.md) 为准；[当前实现边界](architecture.md)描述根目录已有能力。本文中的源文件只是候选素材，不表示已决定复制或已在新框架运行。
 
 ## 目标与策略
 
@@ -39,7 +39,7 @@
 | 2. 状态链 | 假 Sensor/Vehicle 输入、标准化观测、可选的纯感知或定位算法、World Model 发布 | 不接真实命令端口；时间戳、坐标、过期/缺失状态可测试；高级消费者只读统一快照 | **已完成：离线假输入链**，见下方 P2 记录 |
 | 3. Mission/Action | Schema、能力预检、编译、运行生命周期、取消、结果、Typed Effect，以及按需接入 Planning/Guidance | 未注册或不支持的 Action 被拒；失败、重试、取消和退出行为有测试；Action、Planning、Guidance 均不直接发送车辆命令 | **已完成：离线决策链**，见下方 P3 记录 |
 | 4. 控制安全边界 | 授权生命周期、Execution 分派、Safety、命令回执与取消/停止语义 | 默认 SEND 关闭；双门控、TTL、撤销、代际、deadman、stop/zero、断链及唯一 writer 在假端口测试中成立 | **已完成：离线假端口边界**，见下方 P4 记录 |
-| 5. 插件与设备组合 | 所需 Vehicle Plugin、Protocol/Transport、Sensor Adapter、Deployment 组合 | 先离线与仿真验证；真实设备能力只在设备验收后声明；生产写入仍只有一个受控出口 | 待开始 |
+| 5. 插件与设备组合 | 所需 Vehicle Plugin、Protocol/Transport、Sensor Adapter、Deployment 组合 | 先离线与仿真验证；真实设备能力只在设备验收后声明；生产写入仍只有一个受控出口 | **已完成：ArduCopter/TCP 软件组合与本机 SITL 冒烟；实机待验收**，见下方 P5 记录 |
 
 ### 阶段 0：建立可核对的迁移清单
 
@@ -104,6 +104,14 @@ P0 已按 `contracts/`、`telemetry_link` 的 state/frame/time、依赖这些合
 
 只为实际需要的组合添加 Vehicle Plugin、协议编解码、Transport 和 Sensor Adapter。协议语义与字节传输分离；车辆状态映射及命令翻译属于插件/适配器。先做离线和仿真测试，再按设备环境验收真实连接。RKNN、Web、server/hybrid 和具体应用分别作为可选后续工作，不因目标架构列出目录就视为必须迁移。
 
+**P5 实际实现（2026-09-30）：** 延续 P3 的 ArduPilot/Copter 假设，只实现此组合。`ArduPilotCommandTranslator` 将批准的 Arm、Disarm、Takeoff、Land、Mode、`odom` ENU Pose/Velocity、`base_link` FLU Velocity 与 StopMotion 映射为明确的 Copter/MAVLink 指令；不支持的 Mode、Frame、roll/pitch 目标和非 yaw 角速度均拒绝。`MavlinkCodec` 独立负责 MAVLink 2 字节编解码，`TcpByteTransport` 独立负责显式 TCP 连接与读写。`ArduPilotCommandPort` 是唯一字节 writer，在同一 `ControlAuthority` 锁内完成最终 Lease/SEND/代际/会话/期限检查与写入。`ArduPilotSession` 从目标 system/component 心跳建立新 LinkSession、处理 ACK/状态、超时断链并清空旧会话；它不会自行开启 TCP 连接或 SEND。`CopterCycleDriver` 在调用方的周期调度下依次接收、执行 P4 deadman 和写一个排队命令；调用方必须保证周期短于配置的 deadman。状态继续由既有 `ArduPilotTelemetryState` 适配，可信采集时间必须由调用方提供；缺省无采集时间时不发布车辆状态。
+
+**回执与停止：** 队列接受、实际调用字节写入、`COMMAND_ACK` 与后续状态观测是独立阶段。TCP 写入结果不确定或 ACK 超时时为 `UNKNOWN`，阻止同类命令在该会话重发造成歧义；负面 ACK 为 `REJECTED`。StopMotion 变为活动流坐标系中的零速度/零 yaw rate；只有写入后的新鲜零运动采样才能成为 `COMPLETED`，断链或无采样保持未确认。该软件语义遵循 [MAVLink 命令 ACK 规范](https://mavlink.io/en/services/command.html)及 [ArduCopter Guided 指令说明](https://ardupilot.org/dev/docs/copter-commands-in-guided-mode.html)。飞控侧 stop/zero 的物理效果仍未实机证明。
+
+**验证与能力边界：** 内存传输测试覆盖默认关闭、唯一 writer 与字节内容、ENU/NED 和 FLU/FRD 映射、拒绝路径、ACK 来源过滤、状态完成、deadman 零速、撤销、断链、未知写入及 ACK 超时。另在本机 ArduCopter SITL 的 `127.0.0.1:5760` 执行 `PYTHONPATH=. python tests/manual_p5_sitl.py --allow-send`：未解锁飞控收到唯一 `GUIDED` 模式请求并返回 `ACKNOWLEDGED`，脚本随后关闭连接和 SEND；没有起飞、移动或实机连接。模式 `GUIDED=4` 由显式插件映射提供，和 [ArduCopter 模式定义](https://ardupilot.org/dev/docs/apmcopter-adding-a-new-flight-mode.html)一致。根目录 CLI 没有组合发送链；真实串口/UDP、设备时间同步、物理 stop、失联行为、真实飞控/机型验收、其他 Vehicle/Sensor 插件及 Deployment 仍未实现，也不宣称实机飞行能力。旧系统的双后端、调试发送捷径和比赛 payload 未迁入。
+
+**P5 测试记录：** `/usr/bin/time -p python -m unittest discover -s tests -v`：59 passed、0 failed、0 skipped，测试运行 0.205 s、墙钟 0.33 s；新增 10 项 P5 测试，P4 以前 49 项均通过。`python -m compileall -q app application contracts core deployment infrastructure protocols vehicles tests` 和 `git diff --check` 通过。`rg -n '^(from|import) (legacy|telemetry_link|pymavlink|protocols|vehicles|infrastructure)' contracts core application app` 无匹配，退出码 1；`pymavlink` 导入限于 `protocols/mavlink/`。`/usr/bin/time -p env PYTHONPATH=. python tests/manual_p5_sitl.py --allow-send`：1 次 `PASS`、0 failed、0 skipped，墙钟 1.02 s，结果为 `ACKNOWLEDGED, armed=False`；SITL 随后关闭。开发中因旧 P1 根目录测试禁止任何 `pymavlink` 导入而有 1 项新引入失败，已将规则收窄为只允许协议包导入；P5 测试初次运行还因测试夹具使用普通字符串 FrameId 导致 6 项错误，修正后通过。没有既有 baseline failure。未修改归档树，故未运行旧树测试。
+
 ## 候选代码的初步归属
 
 下表是阶段 0 的**待审候选**，不是复制清单。最终决定要依据源代码依赖、行为和测试逐项确认。
@@ -147,3 +155,4 @@ P0 已按 `contracts/`、`telemetry_link` 的 state/frame/time、依赖这些合
 | 2026-09-30 | P3 离线决策链与 Transform | 已验证 | 32 项根目录测试通过；实现与未接入边界见上方 P3 记录；提交 SHA 见本阶段 Git 提交 |
 | 2026-09-30 | ArduPilot 只读消息状态适配 | 已验证离线映射；待设备验证 | 5 项新增适配测试含真实 `pymavlink` 消息对象；不接物理链路/命令链；结果和提交见本阶段记录 |
 | 2026-09-30 | P4 控制安全边界 | 已验证离线假端口 | 49 项根目录测试通过；授权、Safety、出队 fence、回执和停止范围及 P5 限制见上方 P4 记录；提交 SHA 见本阶段 Git 提交 |
+| 2026-09-30 | P5 ArduCopter/TCP 插件组合 | 已验证离线及本机 SITL；实机待验收 | 59 项根目录测试及本机 SITL `GUIDED` ACK 通过；范围和限制见上方 P5 记录；提交 SHA 见本阶段 Git 提交 |

@@ -4,7 +4,7 @@ This page describes the **implemented root**. The reusable framework's full
 target responsibilities and dependency rules are in [Vehicle Autonomy Framework
 V1: target architecture](framework_v1.md).
 
-The root is a new, hardware disconnected framework. Its implemented path is:
+The root has no automatically opened hardware connection. Its implemented path is:
 
 ```text
 Application -> Mission compilation -> typed Action runtime -> Effect requests
@@ -15,7 +15,8 @@ Fake Sensor + Fake Vehicle -> OfflineStateChain -> WorldModel -> WorldReader
 Typed Effect -> offline VehicleExecution -> system SEND + Action SEND
              -> ControlAuthority + SafetyPolicy -> FakeVehicleCommandPort
 
-Future production vehicle connection -> Vehicle plugin -> Protocol -> Transport
+Explicit ArduCopter composition -> VehicleExecution -> ArduPilotCommandPort
+                             -> MAVLink codec -> TCP byte transport -> local SITL
 ```
 
 `contracts/` contains shared, vehicle independent data and ports, including the
@@ -26,18 +27,22 @@ the P4 offline control boundary, and the older demonstration Execution
 gateway. `application/` exposes use cases without a hardware port. `app/`
 contains only the new status CLI. `sensors/`, `vehicles/`, `localization/`, and
 `world_model/` contain P2 offline fake sources, a pure reported-pose projection,
-and a World Model that publishes immutable snapshots. `protocols/mavlink/` and
-`vehicles/multirotor/` additionally normalize received ArduPilot telemetry
-messages through a read-only adapter; they contain no opened device link or
-command writer.
+and a World Model that publishes immutable snapshots. `vehicles/multirotor/`
+normalizes received ArduPilot telemetry and translates approved commands;
+`protocols/mavlink/` packs/parses messages; `infrastructure/transports/` owns
+only byte I/O. The P5 `ArduPilotCommandPort` is the sole writer in this explicit
+composition. It holds the authority lock across the final fence and transport
+write, and the session receiver handles heartbeat, ACK and state observations.
+`deployment/CopterCycleDriver` connects receive, P4 deadman, and queue drain
+when explicitly scheduled by a caller; the CLI does not schedule it.
 
 Core never imports a concrete vehicle, protocol, transport, CUADC application,
 or `legacy/`. Mission validates registered Actions, typed parameters and vehicle
 capabilities; it does not issue commands. Actions receive only a WorldSnapshot
 and parameters and emit unapproved Effect requests.
-The P1 `VehicleCommandPort` is used only by the P4 offline Execution component
-with an injected fake port. The older demonstration gateway still uses its old
-Effect submission interface.
+The P1 `VehicleCommandPort` is used by P4/P5 `VehicleExecution`, with either
+the fake port or the ArduCopter port injected. The older demonstration gateway
+still uses its old Effect submission interface.
 P2 state producers and `WorldModel` have no vehicle command port. The World
 Model computes freshness from captured/received/published monotonic facts in
 one clock domain, omits stale or unknown inputs from the adopted snapshot, and
@@ -52,5 +57,10 @@ session immediately before simulated transmission. Continuous commands have
 a caller driven deadman and explicit StopMotion request. Accepted, transmitted,
 ACK, and observed completion remain distinct; a disconnected stop is
 unconfirmed. The root CLI wires no command port or production vehicle link.
-Physical stop/zero behavior and link lifecycle still require device specific
-implementation and validation in P5.
+P5 maps StopMotion to zero velocity and yaw rate in the active stream frame;
+only a later fresh zero-motion state sample marks it complete. Link timeout
+creates a new session and fences queued commands; uncertain transport writes
+and missing ACKs remain `UNKNOWN`. The local SITL smoke test exercised a
+single unarmed GUIDED mode request and ACK. Physical stopping, capture-time
+calibration, and real-device behavior have not been validated; the CLI still
+does not open a vehicle link.

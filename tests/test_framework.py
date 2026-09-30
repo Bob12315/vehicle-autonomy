@@ -98,10 +98,9 @@ class FrameworkTests(unittest.TestCase):
                         imports.extend(alias.name for alias in node.names)
                     elif isinstance(node, ast.ImportFrom) and node.module:
                         imports.append(node.module)
-                self.assertFalse(
-                    any(name.split(".")[0] in {"legacy", "telemetry_link", "pymavlink"} for name in imports),
-                    str(path),
-                )
+                self.assertFalse(any(name.split(".")[0] in {"legacy", "telemetry_link"} for name in imports), str(path))
+                if not path.is_relative_to(root / "protocols" / "mavlink"):
+                    self.assertFalse(any(name.split(".")[0] == "pymavlink" for name in imports), str(path))
                 if directory in {"contracts", "core"}:
                     self.assertFalse(any(name.split(".")[0] == "protocols" for name in imports), str(path))
 

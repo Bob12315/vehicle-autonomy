@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import timedelta
 from enum import Enum
 from typing import Callable
 
@@ -87,7 +88,9 @@ class VehicleExecution:
             elif isinstance(envelope.effect, StopMotionEffect):
                 stop = self.stop_stream(envelope.effect.stream_id, now, requested_by=envelope)
                 result = DispatchResult(
-                    None if stop.command_id is None else CommandReceipt(stop.command_id, CommandPhase.ACCEPTED),
+                    None if stop.command_id is None else CommandReceipt(
+                        stop.command_id, self._commands.status(stop.command_id).phase,
+                    ),
                     stop.reason,
                 )
             else:
@@ -157,7 +160,11 @@ class VehicleExecution:
             )
             if deadline_ns <= now.monotonic_ns:
                 return StopResult(stream_id, StopState.UNCONFIRMED, reason="stop_deadline_expired")
-            deadline = TimePoint(deadline_ns, now.utc, now.clock_domain_id)
+            deadline = TimePoint(
+                deadline_ns,
+                now.utc + timedelta(microseconds=(deadline_ns - now.monotonic_ns) // 1000),
+                now.clock_domain_id,
+            )
             origin = requested_by or stream.envelope
             stop_effect = EffectEnvelope(
                 SchemaVersion(1, 0),
@@ -166,9 +173,9 @@ class VehicleExecution:
                 now, deadline, StopMotionEffect(stream_id),
             )
             receipt = self._commands.submit(self._make_command(stop_effect, now))
+            stream.stop_command_id = receipt.command_id
             if receipt.phase is not CommandPhase.ACCEPTED:
                 return StopResult(stream_id, StopState.UNCONFIRMED, receipt.command_id, "port_rejected")
-            stream.stop_command_id = receipt.command_id
             return StopResult(stream_id, StopState.ACCEPTED, receipt.command_id)
 
     def stop_status(self, stream_id: str) -> StopResult:

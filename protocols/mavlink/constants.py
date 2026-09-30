@@ -1,0 +1,13 @@
+"""MAVLink constants confined to the protocol package."""
+
+from pymavlink.dialects.v20 import ardupilotmega as _mavlink
+
+FRAME_LOCAL_NED = _mavlink.MAV_FRAME_LOCAL_NED
+FRAME_BODY_NED = _mavlink.MAV_FRAME_BODY_NED
+CMD_ARM_DISARM = _mavlink.MAV_CMD_COMPONENT_ARM_DISARM
+CMD_TAKEOFF = _mavlink.MAV_CMD_NAV_TAKEOFF
+CMD_LAND = _mavlink.MAV_CMD_NAV_LAND
+CMD_SET_MODE = _mavlink.MAV_CMD_DO_SET_MODE
+MODE_CUSTOM_ENABLED = _mavlink.MAV_MODE_FLAG_CUSTOM_MODE_ENABLED
+RESULT_ACCEPTED = _mavlink.MAV_RESULT_ACCEPTED
+RESULT_IN_PROGRESS = _mavlink.MAV_RESULT_IN_PROGRESS
