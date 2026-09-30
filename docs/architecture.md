@@ -24,8 +24,10 @@ and the guarded demonstration Execution
 boundary. `application/` exposes use cases without a hardware port. `app/`
 contains only the new status CLI. `sensors/`, `vehicles/`, `localization/`, and
 `world_model/` contain P2 offline fake sources, a pure reported-pose projection,
-and a World Model that publishes immutable snapshots. They contain no device
-connection.
+and a World Model that publishes immutable snapshots. `protocols/mavlink/` and
+`vehicles/multirotor/` additionally normalize received ArduPilot telemetry
+messages through a read-only adapter; they contain no opened device link or
+command writer.
 
 Core never imports a concrete vehicle, protocol, transport, CUADC application,
 or `legacy/`. Mission validates registered Actions, typed parameters and vehicle

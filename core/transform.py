@@ -36,12 +36,22 @@ def _multiply(a: Quaternion, b: Quaternion) -> Quaternion:
     )
 
 
+def multiply_quaternions(a: Quaternion, b: Quaternion) -> Quaternion:
+    """Compose unit rotations in x/y/z/w Hamilton order."""
+    return _multiply(a, b)
+
+
 def _rotate(q: Quaternion, v: Vector3) -> Vector3:
     axis = Vector3(q.x, q.y, q.z)
     t = _cross(axis, v)
     t = Vector3(2 * t.x, 2 * t.y, 2 * t.z)
     u = _cross(axis, t)
     return Vector3(v.x + q.w * t.x + u.x, v.y + q.w * t.y + u.y, v.z + q.w * t.z + u.z)
+
+
+def rotate_vector(q: Quaternion, v: Vector3) -> Vector3:
+    """Rotate a free vector without translation."""
+    return _rotate(q, v)
 
 
 def _inverse(value: Transform3) -> Transform3:

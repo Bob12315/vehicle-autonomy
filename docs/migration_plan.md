@@ -86,6 +86,8 @@ P0 已按 `contracts/`、`telemetry_link` 的 state/frame/time、依赖这些合
 
 **验证与边界：** `/usr/bin/time -p python -m unittest discover -s tests -v`：32 passed、0 failed、0 skipped，测试 0.044 s，墙钟 0.12 s。新增 8 项 P3 与 3 项 Transform 测试，覆盖编译拒绝、运行结果、重试、取消与 stop 请求、退出异常、效果白名单、静态/动态 Frame 和失败路径；原 21 项通过。`python -m compileall -q contracts core application world_model tests` 通过。P3 不分派 Effect、不持有 `VehicleCommandPort`，也不实现 P4 授权、Safety、队列、回执和连续命令物理停止；离线退出屏障完成不等于车辆已停止。真实设备适配与物理验证仍按设备阶段单独记录。
 
+**附加只读设备状态适配（ArduPilot 假设）：** 用户要求继续处理真实设备适配，但未给出设备型号；根据旧仓库的 ArduPilot/MAVLink 遥测链，先实现 `protocols/mavlink/telemetry.py` 对真实 parsed message 形状的接收侧解码，及 `vehicles/multirotor/mavlink_state.py` 到 P1 `VehicleStateSnapshot` 的规范化。NED 位置/速度转换为 ENU，FRD/NED 姿态与角速度转换为 FLU/ENU；保留独立采集、接收、发布时间，并只在位置/姿态采样差处于显式上限内组合 Pose/Twist。GPS fix、协议缺失值、心跳时效、来源 system/component 与 LinkState 分开处理。调用方必须提供可信的 `captured_at` 与 `received_at`；飞控 boot time 未被冒充为本机单调时间。适配器可作为 P2 `VehicleStatePort` 输入，但没有打开物理连接、`pymavlink` writer 或命令提交方法。旧 `MavlinkClient` 含 `send_raw_message`，故未迁入。此项是**已验证的消息到状态适配**，不是实机连接或设备验收；具体设备若非 ArduPilot，需按实际协议调整。P4 安全边界及 P5 设备组合门槛仍未完成。`/usr/bin/time -p python -m unittest discover -s tests -v`：37 passed、0 failed、0 skipped，测试 0.143 s、墙钟 0.24 s，其中 5 项新适配测试覆盖实际 `pymavlink` 消息对象、坐标与缺失值；编译检查通过，生产包未导入 `legacy`、`telemetry_link` 或 `pymavlink`。
+
 ### 阶段 4：证明控制边界
 
 先在假 `VehicleCommandPort` 上实现并测试授权、Safety、排队、回执、取消和停止。对照旧配置与行为审核数值限制和 payload 白名单，不能只比较接口名称。分别记录 accepted、transmitted、ACK 和 state-observed completion；断链时不得把 stop 请求写成 stop 已送达。此阶段完成前保持根目录无生产车辆连接。
@@ -135,3 +137,4 @@ P0 已按 `contracts/`、`telemetry_link` 的 state/frame/time、依赖这些合
 | 2026-09-30 | P1 基础合同 | 已完成合同层 | 14 项根目录测试通过；实现、兼容范围和后续边界见上方 P1 记录；提交 SHA 见本阶段 Git 提交 |
 | 2026-09-30 | P2 离线状态链 | 已验证 | 21 项根目录测试通过；实现、旧代码判断与未接入边界见上方 P2 记录；提交 SHA 见本阶段 Git 提交 |
 | 2026-09-30 | P3 离线决策链与 Transform | 已验证 | 32 项根目录测试通过；实现与未接入边界见上方 P3 记录；提交 SHA 见本阶段 Git 提交 |
+| 2026-09-30 | ArduPilot 只读消息状态适配 | 已验证离线映射；待设备验证 | 5 项新增适配测试含真实 `pymavlink` 消息对象；不接物理链路/命令链；结果和提交见本阶段记录 |
