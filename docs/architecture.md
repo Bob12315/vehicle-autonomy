@@ -18,6 +18,9 @@ Typed Effect -> offline VehicleExecution -> system SEND + Action SEND
 Explicit ArduCopter composition -> VehicleExecution -> ArduPilotCommandPort
                              -> MAVLink codec -> TCP byte transport -> local SITL
 
+Explicit Copter STABILIZE diagnostic -> VehicleExecution -> ArduPilotCommandPort
+                                    -> MAVLink codec -> serial byte transport -> USB controller
+
 Explicit Rover HOLD diagnostic -> VehicleExecution -> ArduPilotCommandPort
                               -> MAVLink codec -> serial byte transport -> USB controller
 ```
@@ -38,9 +41,9 @@ these explicit compositions. It holds the authority lock across the final
 fence and transport write, and the session receiver handles heartbeat, ACK and
 state observations.
 `ArduPilotSession` requires an expected MAVLink vehicle type and ArduPilot
-autopilot heartbeat before granting a link session. The USB diagnostic exposes
-only a Rover HOLD-to-HOLD request through a narrow translator; it does not
-make the Copter command mapping valid for Rover.
+autopilot heartbeat before granting a link session. Separate narrow USB
+diagnostics expose only Rover HOLD-to-HOLD or Copter STABILIZE-to-STABILIZE;
+neither exposes arm, takeoff, or motion.
 `deployment/CopterCycleDriver` connects receive, P4 deadman, and queue drain
 when explicitly scheduled by a caller; the CLI does not schedule it.
 
@@ -71,6 +74,9 @@ creates a new session and fences queued commands; uncertain transport writes
 and missing ACKs remain `UNKNOWN`. The local Copter SITL smoke test exercised a
 single unarmed GUIDED mode request and ACK. A separate USB Rover controller
 diagnostic received HOLD ACK and a later matching heartbeat while disarmed.
+A Copter USB controller diagnostic received STABILIZE ACK and a later matching
+heartbeat while disarmed. The controller also reports a frame class/type
+pre-arm error, so this result is not flight readiness.
 The USB state publication uses receive time as a diagnostic proxy; source
 capture time is unknown. Physical stopping, motion, link-loss behavior and
-Copter hardware have not been validated; the CLI still does not open a vehicle link.
+Copter motion have not been validated; the CLI still does not open a vehicle link.

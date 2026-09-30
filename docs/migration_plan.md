@@ -1,6 +1,6 @@
 # 可复用框架迁移计划与记录
 
-> **状态：P0 至 P4 已完成；P5 的 ArduCopter 软件组合已通过离线与本机 SITL 验证，USB Rover 飞控完成受限 HOLD 诊断；整车实机待验收。** 本文记录从 `legacy/cuadc_2026/` 提取可复用能力的顺序、验收门槛与阶段进度。目标职责以 [V1 目标架构](framework_v1.md) 为准；[当前实现边界](architecture.md)描述根目录已有能力。本文中的源文件只是候选素材，不表示已决定复制或已在新框架运行。
+> **状态：P0 至 P4 已完成；P5 的 ArduCopter 软件组合已通过离线、本机 SITL 与 Copter USB 飞控受限模式诊断；整车实机待验收。** 本文记录从 `legacy/cuadc_2026/` 提取可复用能力的顺序、验收门槛与阶段进度。目标职责以 [V1 目标架构](framework_v1.md) 为准；[当前实现边界](architecture.md)描述根目录已有能力。本文中的源文件只是候选素材，不表示已决定复制或已在新框架运行。
 
 ## 目标与策略
 
@@ -39,7 +39,7 @@
 | 2. 状态链 | 假 Sensor/Vehicle 输入、标准化观测、可选的纯感知或定位算法、World Model 发布 | 不接真实命令端口；时间戳、坐标、过期/缺失状态可测试；高级消费者只读统一快照 | **已完成：离线假输入链**，见下方 P2 记录 |
 | 3. Mission/Action | Schema、能力预检、编译、运行生命周期、取消、结果、Typed Effect，以及按需接入 Planning/Guidance | 未注册或不支持的 Action 被拒；失败、重试、取消和退出行为有测试；Action、Planning、Guidance 均不直接发送车辆命令 | **已完成：离线决策链**，见下方 P3 记录 |
 | 4. 控制安全边界 | 授权生命周期、Execution 分派、Safety、命令回执与取消/停止语义 | 默认 SEND 关闭；双门控、TTL、撤销、代际、deadman、stop/zero、断链及唯一 writer 在假端口测试中成立 | **已完成：离线假端口边界**，见下方 P4 记录 |
-| 5. 插件与设备组合 | 所需 Vehicle Plugin、Protocol/Transport、Sensor Adapter、Deployment 组合 | 先离线与仿真验证；真实设备能力只在设备验收后声明；生产写入仍只有一个受控出口 | **部分完成：ArduCopter/TCP 软件组合与本机 SITL；USB Rover 飞控 HOLD 诊断；整车实机待验收**，见下方 P5 记录 |
+| 5. 插件与设备组合 | 所需 Vehicle Plugin、Protocol/Transport、Sensor Adapter、Deployment 组合 | 先离线与仿真验证；真实设备能力只在设备验收后声明；生产写入仍只有一个受控出口 | **部分完成：ArduCopter/TCP 软件组合、本机 SITL、Copter 与 Rover USB 模式诊断；整车实机待验收**，见下方 P5 记录 |
 
 ### 阶段 0：建立可核对的迁移清单
 
@@ -116,6 +116,10 @@ P0 已按 `contracts/`、`telemetry_link` 的 state/frame/time、依赖这些合
 
 **USB 测试记录与剩余边界：** `/usr/bin/time -p python -m unittest discover -s tests -v`：61 passed、0 failed、0 skipped，测试运行 0.256 s、墙钟 0.41 s；相对已提交 P5 的 59 项新增 2 项测试，覆盖 Copter 会话拒绝 Rover 心跳及串口伪终端/诊断翻译器。`python -m compileall -q app application contracts core deployment infrastructure protocols vehicles tests` 和 `git diff --check` 通过。`rg -n '^(from|import) (legacy|telemetry_link|pymavlink|protocols|vehicles|infrastructure)' contracts core application app` 无匹配（退出码 1）。`/usr/bin/time -p env PYTHONPATH=. python tests/manual_p5_rover_usb.py --port /dev/ttyACM0 --allow-send`：1 次 `PASS`、0 failed、0 skipped，墙钟 1.33 s，结果为 `COMPLETED, armed=False`。没有既有 baseline failure 或未修复的新失败。未修改归档树，未运行旧树测试。Copter 实机、Rover 完整运动插件、设备时间同步、物理 stop/失联效果、整车部署和生产车辆连接均未验收；CLI 未接 USB 命令链。
 
+**P5 Copter USB 飞控补充验收（2026-10-01）：** 同一 MicoAir743v2 重新连接后出现在 `/dev/ttyACM1`；只读心跳报告 ArduPilot、`MAV_TYPE_QUADROTOR=2`、未解锁、`custom_mode=0`，对应 [ArduCopter `STABILIZE=0`](https://github.com/ArduPilot/ardupilot/blob/master/ArduCopter/mode.h)。飞控持续报告 `PreArm: Motors: Check frame class and type`。新增仅允许 STABILIZE 模式请求的 Copter USB 诊断翻译器及显式脚本；脚本检查 Copter 心跳、原本未解锁且已处于 STABILIZE，再经 `VehicleExecution`、Safety、Lease、双 SEND、唯一 `ArduPilotCommandPort` 发送一次 STABILIZE 同模式请求。收到 ACK，后续心跳仍报告 STABILIZE、未解锁，命令为 `COMPLETED`；关闭 SEND 与串口。未改机架参数、解锁或请求运动，PreArm 错误尚未处理，不声称飞行准备完成。
+
+**Copter USB 测试记录与边界：** `/usr/bin/time -p python -m unittest discover -s tests -v`：62 passed、0 failed、0 skipped，测试运行 0.229 s、墙钟 0.37 s；新增 1 项测试覆盖 Copter USB 诊断只允许 STABILIZE，拒绝 Arm、Takeoff、GUIDED。`python -m compileall -q app application contracts core deployment infrastructure protocols vehicles tests` 与 `git diff --check` 通过；`rg -n '^(from|import) (legacy|telemetry_link|pymavlink|protocols|vehicles|infrastructure)' contracts core application app` 无匹配（退出码 1）。`/usr/bin/time -p env PYTHONPATH=. python tests/manual_p5_copter_usb.py --port /dev/ttyACM1 --allow-send`：1 次 `PASS`、0 failed、0 skipped，墙钟 1.51 s，结果为 `COMPLETED, armed=False`。没有既有 baseline failure 或新引入的测试失败。未改归档树，未运行旧树测试。该结果只覆盖单一未解锁模式请求的 USB 链路、ACK 与状态；真实机架配置、飞行、运动指令、物理 stop、失联保护、源端时间同步和整车部署均未验收。根目录 CLI 仍未接发送链。
+
 ## 候选代码的初步归属
 
 下表是阶段 0 的**待审候选**，不是复制清单。最终决定要依据源代码依赖、行为和测试逐项确认。
@@ -161,3 +165,4 @@ P0 已按 `contracts/`、`telemetry_link` 的 state/frame/time、依赖这些合
 | 2026-09-30 | P4 控制安全边界 | 已验证离线假端口 | 49 项根目录测试通过；授权、Safety、出队 fence、回执和停止范围及 P5 限制见上方 P4 记录；提交 SHA 见本阶段 Git 提交 |
 | 2026-09-30 | P5 ArduCopter/TCP 插件组合 | 已验证离线及本机 SITL；实机待验收 | 59 项根目录测试及本机 SITL `GUIDED` ACK 通过；范围和限制见上方 P5 记录；提交 SHA 见本阶段 Git 提交 |
 | 2026-10-01 | P5 USB Rover 飞控补充验收 | HOLD 命令诊断通过；整车待验收 | 61 项根目录测试及未解锁 USB Rover HOLD ACK/心跳完成通过；Copter 机型 fence 和串口传输见上方记录；提交 SHA 见本阶段 Git 提交 |
+| 2026-10-01 | P5 Copter USB 飞控补充验收 | STABILIZE 命令诊断通过；整车待验收 | 62 项根目录测试及未解锁 USB Copter STABILIZE ACK/心跳完成通过；PreArm 机架错误与剩余边界见上方记录；提交 SHA 见本阶段 Git 提交 |

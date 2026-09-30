@@ -32,6 +32,7 @@ from infrastructure.transports.bytes import SerialByteTransport, TcpByteTranspor
 from protocols.mavlink.codec import MavlinkCodec
 from protocols.mavlink.constants import TYPE_GROUND_ROVER, TYPE_QUADROTOR
 from vehicles.multirotor.ardupilot_commands import ArduPilotCommandTranslator
+from vehicles.multirotor.diagnostic import CopterStabilizeDiagnosticTranslator
 from vehicles.multirotor.mavlink_port import ArduPilotCommandPort
 from vehicles.multirotor.mavlink_state import ArduPilotTelemetryState
 from vehicles.multirotor.session import ArduPilotSession
@@ -344,6 +345,13 @@ class P5MavlinkTests(unittest.TestCase):
         for command in (ArmCommand(), TakeoffCommand(1), ModeCommand("GUIDED")):
             with self.subTest(command=type(command).__name__), self.assertRaises(ValueError):
                 rover.translate(command)
+
+    def test_copter_usb_diagnostic_allows_only_stabilize(self):
+        copter = CopterStabilizeDiagnosticTranslator()
+        self.assertEqual(copter.translate(ModeCommand("STABILIZE")).params[1], 0)
+        for command in (ArmCommand(), TakeoffCommand(1), ModeCommand("GUIDED")):
+            with self.subTest(command=type(command).__name__), self.assertRaises(ValueError):
+                copter.translate(command)
 
     def test_only_vehicle_port_calls_byte_transport_write(self):
         root = Path(__file__).resolve().parents[1]
