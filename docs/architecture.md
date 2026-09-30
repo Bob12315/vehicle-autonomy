@@ -78,5 +78,7 @@ A Copter USB controller diagnostic received STABILIZE ACK and a later matching
 heartbeat while disarmed. The controller also reports a frame class/type
 pre-arm error, so this result is not flight readiness.
 The USB state publication uses receive time as a diagnostic proxy; source
-capture time is unknown. Physical stopping, motion, link-loss behavior and
-Copter motion have not been validated; the CLI still does not open a vehicle link.
+capture time is unknown. Physical stopping, Copter motion, and link-loss
+behavior have not been validated; the CLI still does not open a vehicle link.
+Heartbeat-based VehicleHealth does not establish sensor calibration or arming
+readiness.

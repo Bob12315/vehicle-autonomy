@@ -21,4 +21,6 @@ USB 飞控诊断须显式运行 `PYTHONPATH=. python tests/manual_p5_rover_usb.p
 
 Copter USB 诊断使用 `PYTHONPATH=. python tests/manual_p5_copter_usb.py --port /dev/ttyACM1 --allow-send`（连接路径可能改变，优先使用对应 `/dev/serial/by-id/...`）。脚本仅接受 ArduPilot 四旋翼心跳，要求飞控未解锁且已在 STABILIZE 模式，只发送一次 STABILIZE 同模式请求并检查 ACK 与后续状态。它不提供解锁或运动请求；USB 控制器通过不等于整车飞行或停止验收。
 
+当前裸飞控的 `FRAME_CLASS=0`（未定义），持续报告机架类别/类型预解锁错误。机架参数须按实际装配选择，且改变后需重启；目前未为裸飞控指定一个假定机架，也未关闭预解锁检查。USB 遥测检查见[迁移记录](docs/migration_plan.md)。
+
 [当前实现边界](docs/architecture.md)记录已有能力与限制。[迁移计划与记录](docs/migration_plan.md)给出从合同、状态链到控制与设备接入的阶段顺序。[历史程序说明](docs/migration.md)介绍 `legacy/cuadc_2026/`：它完整保存旧应用的代码、配置、测试和资源，供后续逐项评估复用；新根目录不导入该目录。
