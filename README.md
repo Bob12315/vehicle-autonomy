@@ -6,7 +6,7 @@ Vehicle Autonomy Framework 是面向多旋翼、无人车、固定翼、VTOL 及
 
 ## 当前实现
 
-根目录目前提供车辆无关的 Mission 与 Action 合同、Action 注册和 Mission 校验，以及 P1 基础合同：时间/坐标、观测、车辆自报状态、定位、版本化 `WorldSnapshot`、Typed Effect、VehicleCommand 和窄端口。P2 新增假 Sensor/Vehicle 输入、纯自报位姿定位投影和离线 World Model 状态链，能发布只读、版本化、带新鲜度与输入依赖的快照。现有 Execution 仍是旧 Effect 的演示边界，尚未接入新命令合同。**尚无**生产车辆适配器、Mission 调度器、Web UI、相机进程、飞控连接或服务器部署。当前 CLI 只提供状态查询。
+根目录目前提供 P1 基础合同、P2 离线 World Model 状态链，以及 P3 Typed Action/Mission 编译与运行生命周期。通用 TransformTree 求解静态/动态 Frame 关系。P3 Runtime 只产生 Effect 请求，不发送命令；现有 Execution 仍是旧 Effect 的演示边界，尚未接入新命令合同。**尚无**生产车辆适配器、Web UI、相机进程、飞控连接或服务器部署。当前 CLI 只提供状态查询。
 
 车辆发送默认关闭。现有演示 Execution 必须同时获得系统 SEND、Action SEND 和显式 `SafetyPolicy` 允许，才能提交到它的旧 Effect 测试端口；P1 `VehicleCommandPort` 尚未由该网关使用。根目录 CLI 未装配真实端口或策略。现有接口不能据此宣称已支持实机飞行。
 

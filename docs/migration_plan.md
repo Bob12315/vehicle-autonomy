@@ -1,6 +1,6 @@
 # 可复用框架迁移计划与记录
 
-> **状态：P0、P1 与 P2 离线状态链已完成；P3 尚未开始。** 本文记录从 `legacy/cuadc_2026/` 提取可复用能力的顺序、验收门槛与阶段进度。目标职责以 [V1 目标架构](framework_v1.md) 为准；[当前实现边界](architecture.md)描述根目录已有能力。本文中的源文件只是候选素材，不表示已决定复制或已在新框架运行。
+> **状态：P0 至 P3 已完成离线阶段；P4 尚未开始。** 本文记录从 `legacy/cuadc_2026/` 提取可复用能力的顺序、验收门槛与阶段进度。目标职责以 [V1 目标架构](framework_v1.md) 为准；[当前实现边界](architecture.md)描述根目录已有能力。本文中的源文件只是候选素材，不表示已决定复制或已在新框架运行。
 
 ## 目标与策略
 
@@ -37,7 +37,7 @@
 | 0. 基线与候选清单 | 根目录与旧系统现状、候选模块的依赖和安全审计 | 每个候选有归属、调用方、外部依赖、配置、测试和“迁/改写/保留”判断；记录实际运行的基线测试 | **已完成：限定范围 P0 文档审计**，见[基线](migration/p0_baseline.md)与[候选清单](migration/p0_inventory.md) |
 | 1. 基础合同 | 时间、坐标、来源、有效性、Observation、VehicleState、WorldSnapshot、Typed Effect 及必要端口 | 类型语义明确；序列化与不变量测试通过；Core 无具体设备或业务依赖 | **已完成：合同层**，见下方 P1 记录；未接运行链 |
 | 2. 状态链 | 假 Sensor/Vehicle 输入、标准化观测、可选的纯感知或定位算法、World Model 发布 | 不接真实命令端口；时间戳、坐标、过期/缺失状态可测试；高级消费者只读统一快照 | **已完成：离线假输入链**，见下方 P2 记录 |
-| 3. Mission/Action | Schema、能力预检、编译、运行生命周期、取消、结果、Typed Effect，以及按需接入 Planning/Guidance | 未注册或不支持的 Action 被拒；失败、重试、取消和退出行为有测试；Action、Planning、Guidance 均不直接发送车辆命令 | 待开始 |
+| 3. Mission/Action | Schema、能力预检、编译、运行生命周期、取消、结果、Typed Effect，以及按需接入 Planning/Guidance | 未注册或不支持的 Action 被拒；失败、重试、取消和退出行为有测试；Action、Planning、Guidance 均不直接发送车辆命令 | **已完成：离线决策链**，见下方 P3 记录 |
 | 4. 控制安全边界 | 授权生命周期、Execution 分派、Safety、命令回执与取消/停止语义 | 默认 SEND 关闭；双门控、TTL、撤销、代际、deadman、stop/zero、断链及唯一 writer 在假端口测试中成立 | 待开始 |
 | 5. 插件与设备组合 | 所需 Vehicle Plugin、Protocol/Transport、Sensor Adapter、Deployment 组合 | 先离线与仿真验证；真实设备能力只在设备验收后声明；生产写入仍只有一个受控出口 | 待开始 |
 
@@ -79,6 +79,12 @@ P0 已按 `contracts/`、`telemetry_link` 的 state/frame/time、依赖这些合
 ### 阶段 3：构建决策链
 
 在现有 Action 注册和 Mission 校验之上，逐步加入 Schema、编译、调度、结果、失败、取消及退出屏障。先迁不要求真实车辆的 Action 以验证生命周期；需要路径或运动目标的 Action 再通过合同接入 Planning/Guidance。车辆或业务 Action 留在各自插件/应用。旧候选 Core 和旧生产 Runtime 的职责需要核对后选取，避免同时维护两套 Mission owner。
+
+**P3 实际实现：** 在现有 `ActionRegistry` 和 `MissionValidator` 上增加 typed 注册与编译，不引入第二套 Mission owner。冻结 dataclass 参数用显式类型检查和深度不可变校验；编译前拒绝未注册 Action、重复步骤、参数不匹配及缺少车辆能力。`MissionRuntime` 从 `WorldQueryPort` 每 tick 读取一版新鲜快照，管理 Action 尝试、结果、失败策略、重试、取消和退出屏障。Action 仅返回 `EffectEnvelope` 请求；未声明的 Effect 不会输出。退出失败时运行保持 `EXITING`，不得推进下一步。通用 `world.summary` Action 不使用设备或车辆命令。
+
+**Transform 补充：** `TransformTree` 是与设备无关的统一 Frame 求解器。它支持静态链、动态时间样本和有界插值、反向/多边组合，以及点、自由向量、Pose、Twist 转换。动态查询拒绝时钟域不匹配、缺失区间、超限间隔与外推；注册拒绝多路径/环路。Vector3 默认作为自由向量，位置使用显式 `transform_point()`。未加入 MAVLink 的 NED/FRD 语义，协议轴转换留在设备适配边界。
+
+**验证与边界：** `/usr/bin/time -p python -m unittest discover -s tests -v`：32 passed、0 failed、0 skipped，测试 0.044 s，墙钟 0.12 s。新增 8 项 P3 与 3 项 Transform 测试，覆盖编译拒绝、运行结果、重试、取消与 stop 请求、退出异常、效果白名单、静态/动态 Frame 和失败路径；原 21 项通过。`python -m compileall -q contracts core application world_model tests` 通过。P3 不分派 Effect、不持有 `VehicleCommandPort`，也不实现 P4 授权、Safety、队列、回执和连续命令物理停止；离线退出屏障完成不等于车辆已停止。真实设备适配与物理验证仍按设备阶段单独记录。
 
 ### 阶段 4：证明控制边界
 
@@ -128,3 +134,4 @@ P0 已按 `contracts/`、`telemetry_link` 的 state/frame/time、依赖这些合
 | 2026-09-30 | P0 基线与候选清单（限定范围） | 已完成 | [基线与 173 项旧测试、4 项根目录测试](migration/p0_baseline.md)，[候选归属及 `application/core` 依赖表](migration/p0_inventory.md) |
 | 2026-09-30 | P1 基础合同 | 已完成合同层 | 14 项根目录测试通过；实现、兼容范围和后续边界见上方 P1 记录；提交 SHA 见本阶段 Git 提交 |
 | 2026-09-30 | P2 离线状态链 | 已验证 | 21 项根目录测试通过；实现、旧代码判断与未接入边界见上方 P2 记录；提交 SHA 见本阶段 Git 提交 |
+| 2026-09-30 | P3 离线决策链与 Transform | 已验证 | 32 项根目录测试通过；实现与未接入边界见上方 P3 记录；提交 SHA 见本阶段 Git 提交 |
