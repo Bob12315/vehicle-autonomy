@@ -18,7 +18,7 @@ The legacy tree is a substantial operational application, not just a library. It
 
 ## 2. Environment
 
-The active Python environment has, among many system packages, `pymavlink==2.4.49`, `numpy==2.5.2`, `opencv-python==5.0.0.93`, `PyYAML==6.0.3`, `pyserial==3.5`, and `requests==2.31.0`. The root has no dependency manifest. `pytest` is absent from the active Python environment; an existing isolated pytest executable at `/home/level6/agent-bridge/.venv/bin/pytest` was used for legacy tests, with the legacy root and active environment site-packages on `PYTHONPATH`. There is no legacy requirements file in the inspected tree. The legacy app also reads YAML configuration and runtime files; the inspected test group used fakes and did not open a vehicle link.
+The active Python environment has, among many system packages, `pymavlink==2.4.49`, `numpy==2.5.2`, `opencv-python==5.0.0.93`, `PyYAML==6.0.3`, `pyserial==3.5`, and `requests==2.31.0`. The new root has no dependency manifest; the archived application has dependency profiles under [`legacy/cuadc_2026/requirements/`](../../legacy/cuadc_2026/requirements/README.md). `pytest` is absent from the active Python environment; an existing isolated pytest executable at `/home/level6/agent-bridge/.venv/bin/pytest` was used for legacy tests, with the legacy root and active environment site-packages on `PYTHONPATH`. The legacy app also reads YAML configuration and runtime files; the inspected test group used fakes and did not open a vehicle link.
 
 ## 3. Current main architecture facts
 
@@ -44,6 +44,18 @@ The active Python environment has, among many system packages, `pymavlink==2.4.4
 | `PYTHONPATH=/home/level6/vehicle-autonomy-framework/legacy/cuadc_2026:/home/level6/venv-ardupilot/lib/python3.12/site-packages /home/level6/agent-bridge/.venv/bin/pytest -q tests/contracts/test_contracts.py tests/contracts/test_action_contract_v1.py tests/contracts/test_vehicle_command_contract.py tests/contracts/test_platform_common.py tests/contracts/core/test_common_contracts.py tests/contracts/core/test_effect_boundary.py tests/unit/core/test_stable_core_models.py tests/unit/adapters/test_vehicle_state_snapshot.py tests/integration/test_telemetry_link.py tests/integration/test_telemetry_link_interfaces.py tests/unit/adapters/test_command_broker.py tests/unit/execution/test_p0_safety_pipeline.py tests/unit/execution/test_dispatcher_state_command_separation.py tests/unit/core/test_execution_fence_authority.py tests/integration/core/test_core_runtime_composition.py` (run from `legacy/cuadc_2026/`) | 138 passed, 0 failed, 0 skipped | 1.49 s (pytest-reported) |
 
 The legacy run directly covers contracts and IDs/versioning, effects, vehicle commands, snapshots/state adapter, telemetry link/broker, Execution safety/fence, and Core runtime composition. It is a focused P0 set, not the entire archived test suite.
+
+### P0 completion verification
+
+The scoped audit was completed after checking additional tests cited by the [candidate inventory](p0_inventory.md). All additional groups below were run from `legacy/cuadc_2026/` with the same `PYTHONPATH` and pytest executable shown in the baseline command above:
+
+| Additional test files | Result |
+|---|---:|
+| `tests/contracts/core/test_dependency_boundary.py`, `tests/contracts/test_perception_platform_contract.py`, `tests/unit/core/test_runtime_input_boundary.py`, `tests/unit/core/test_core_scheduler.py`, `tests/unit/core/test_world_model_p5.py`, `tests/unit/adapters/test_v2_mavlink_backend.py` | 25 passed |
+| `tests/unit/core/test_effect_status_projection.py`, `tests/unit/core/test_run_aggregate.py`, `tests/unit/core/test_run_io_aggregate.py`, `tests/unit/core/test_system_control_aggregate.py`, `tests/integration/core/test_core_run_lifecycle.py` | 8 passed |
+| `tests/unit/adapters/test_link_control_port.py` | 2 passed |
+
+The baseline legacy group was rerun with **138 passed**, and the new-root `python -m unittest discover -s tests -q` returned **4 passed**. These are four separate legacy runs totaling **173 passed** in the selected P0 groups, not a claim that the entire archive passes now. No vehicle connection or source modification was involved.
 
 ### Known failures
 
