@@ -54,7 +54,7 @@
 
 ### 阶段 1：先统一合同
 
-检查根目录现有 `Effect(operation: str, parameters)` 和最小 `WorldSnapshot` 是否足以承载下一阶段；按真实用例增加类型与约束，不直接复制旧 `contracts/`。先固定单位、坐标系、时钟域、来源、质量和失效含义，再让适配器使用合同。车辆能力描述与运行时许可分开；合同不能暗含 SEND 授权。
+以 [V1 基础合同冻结规范](foundation_contracts_v1.md) 为阶段 1 的语义依据，对照根目录现有 `Effect(operation: str, parameters)`、最小 `WorldSnapshot` 和 `VehicleCommandPort.submit(effect)`，逐项记录并消除差异；不直接复制旧 `contracts/`。先落实单位、坐标系、时钟域、来源、质量和失效含义，再让适配器使用合同。车辆能力描述与运行时许可分开；合同不能暗含 SEND 授权。规范中的基础语义如需修改，应记录无法由 Adapter 或迁移层解决的具体问题。
 
 ### 阶段 2：构建状态链
 
