@@ -32,7 +32,10 @@ from infrastructure.transports.bytes import SerialByteTransport, TcpByteTranspor
 from protocols.mavlink.codec import MavlinkCodec
 from protocols.mavlink.constants import TYPE_GROUND_ROVER, TYPE_QUADROTOR
 from vehicles.multirotor.ardupilot_commands import ArduPilotCommandTranslator
-from vehicles.multirotor.diagnostic import CopterStabilizeDiagnosticTranslator
+from vehicles.multirotor.diagnostic import (
+    CopterBenchArmDiagnosticTranslator, CopterBenchModeDiagnosticTranslator,
+    CopterStabilizeDiagnosticTranslator,
+)
 from vehicles.multirotor.mavlink_port import ArduPilotCommandPort
 from vehicles.multirotor.mavlink_state import ArduPilotTelemetryState
 from vehicles.multirotor.session import ArduPilotSession
@@ -352,6 +355,23 @@ class P5MavlinkTests(unittest.TestCase):
         for command in (ArmCommand(), TakeoffCommand(1), ModeCommand("GUIDED")):
             with self.subTest(command=type(command).__name__), self.assertRaises(ValueError):
                 copter.translate(command)
+
+    def test_copter_bench_diagnostic_limits_arm_and_disarm_scope(self):
+        bench = CopterBenchArmDiagnosticTranslator()
+        self.assertEqual(bench.translate(ArmCommand()).params[0], 1)
+        self.assertEqual(bench.translate(DisarmCommand()).params[0], 0)
+        self.assertEqual(bench.translate(ModeCommand("STABILIZE")).params[1], 0)
+        for command in (TakeoffCommand(1), ModeCommand("GUIDED")):
+            with self.subTest(command=type(command).__name__), self.assertRaises(ValueError):
+                bench.translate(command)
+
+    def test_copter_mode_bench_limits_round_trip_scope(self):
+        bench = CopterBenchModeDiagnosticTranslator()
+        self.assertEqual(bench.translate(ModeCommand("STABILIZE")).params[1], 0)
+        self.assertEqual(bench.translate(ModeCommand("ACRO")).params[1], 1)
+        for command in (ArmCommand(), TakeoffCommand(1), ModeCommand("GUIDED")):
+            with self.subTest(command=type(command).__name__), self.assertRaises(ValueError):
+                bench.translate(command)
 
     def test_only_vehicle_port_calls_byte_transport_write(self):
         root = Path(__file__).resolve().parents[1]

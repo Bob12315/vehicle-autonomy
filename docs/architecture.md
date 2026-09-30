@@ -21,6 +21,9 @@ Explicit ArduCopter composition -> VehicleExecution -> ArduPilotCommandPort
 Explicit Copter STABILIZE diagnostic -> VehicleExecution -> ArduPilotCommandPort
                                     -> MAVLink codec -> serial byte transport -> USB controller
 
+Explicit bare Copter bench diagnostics -> VehicleExecution -> ArduPilotCommandPort
+                                       -> MAVLink codec -> serial byte transport -> USB controller
+
 Explicit Rover HOLD diagnostic -> VehicleExecution -> ArduPilotCommandPort
                               -> MAVLink codec -> serial byte transport -> USB controller
 ```
@@ -43,7 +46,8 @@ state observations.
 `ArduPilotSession` requires an expected MAVLink vehicle type and ArduPilot
 autopilot heartbeat before granting a link session. Separate narrow USB
 diagnostics expose only Rover HOLD-to-HOLD or Copter STABILIZE-to-STABILIZE;
-neither exposes arm, takeoff, or motion.
+neither exposes arm, takeoff, or motion. Separate bare-controller bench
+translators limit requests to STABILIZE/ACRO modes or Arm/Disarm/STABILIZE.
 `deployment/CopterCycleDriver` connects receive, P4 deadman, and queue drain
 when explicitly scheduled by a caller; the CLI does not schedule it.
 
@@ -82,3 +86,7 @@ capture time is unknown. Physical stopping, Copter motion, and link-loss
 behavior have not been validated; the CLI still does not open a vehicle link.
 Heartbeat-based VehicleHealth does not establish sensor calibration or arming
 readiness.
+With a temporary Quad X frame configuration, the USB Copter completed a
+disarmed STABILIZE/ACRO/STABILIZE round trip. Its pre-arm checks rejected Arm;
+an explicit Disarm was confirmed. The original undefined frame configuration
+was restored and reboot verified. No physical output or flight was tested.

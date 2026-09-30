@@ -1,6 +1,6 @@
 # 可复用框架迁移计划与记录
 
-> **状态：P0 至 P4 已完成；P5 的 ArduCopter 软件组合已通过离线、本机 SITL 与 Copter USB 飞控受限模式诊断；整车实机待验收。** 本文记录从 `legacy/cuadc_2026/` 提取可复用能力的顺序、验收门槛与阶段进度。目标职责以 [V1 目标架构](framework_v1.md) 为准；[当前实现边界](architecture.md)描述根目录已有能力。本文中的源文件只是候选素材，不表示已决定复制或已在新框架运行。
+> **状态：P0 至 P4 已完成；P5 的 ArduCopter 软件组合已通过离线、本机 SITL、Copter USB 受限模式诊断和裸飞控台架 Arm 拒绝/Disarm 验证；整车实机待验收。** 本文记录从 `legacy/cuadc_2026/` 提取可复用能力的顺序、验收门槛与阶段进度。目标职责以 [V1 目标架构](framework_v1.md) 为准；[当前实现边界](architecture.md)描述根目录已有能力。本文中的源文件只是候选素材，不表示已决定复制或已在新框架运行。
 
 ## 目标与策略
 
@@ -39,7 +39,7 @@
 | 2. 状态链 | 假 Sensor/Vehicle 输入、标准化观测、可选的纯感知或定位算法、World Model 发布 | 不接真实命令端口；时间戳、坐标、过期/缺失状态可测试；高级消费者只读统一快照 | **已完成：离线假输入链**，见下方 P2 记录 |
 | 3. Mission/Action | Schema、能力预检、编译、运行生命周期、取消、结果、Typed Effect，以及按需接入 Planning/Guidance | 未注册或不支持的 Action 被拒；失败、重试、取消和退出行为有测试；Action、Planning、Guidance 均不直接发送车辆命令 | **已完成：离线决策链**，见下方 P3 记录 |
 | 4. 控制安全边界 | 授权生命周期、Execution 分派、Safety、命令回执与取消/停止语义 | 默认 SEND 关闭；双门控、TTL、撤销、代际、deadman、stop/zero、断链及唯一 writer 在假端口测试中成立 | **已完成：离线假端口边界**，见下方 P4 记录 |
-| 5. 插件与设备组合 | 所需 Vehicle Plugin、Protocol/Transport、Sensor Adapter、Deployment 组合 | 先离线与仿真验证；真实设备能力只在设备验收后声明；生产写入仍只有一个受控出口 | **部分完成：ArduCopter/TCP 软件组合、本机 SITL、Copter 与 Rover USB 模式诊断；整车实机待验收**，见下方 P5 记录 |
+| 5. 插件与设备组合 | 所需 Vehicle Plugin、Protocol/Transport、Sensor Adapter、Deployment 组合 | 先离线与仿真验证；真实设备能力只在设备验收后声明；生产写入仍只有一个受控出口 | **部分完成：ArduCopter/TCP、本机 SITL、Copter/Rover USB 模式诊断及裸飞控受控台架；整车实机待验收**，见下方 P5 记录 |
 
 ### 阶段 0：建立可核对的迁移清单
 
@@ -124,6 +124,10 @@ P0 已按 `contracts/`、`telemetry_link` 的 state/frame/time、依赖这些合
 
 **本轮复核：** `/usr/bin/time -p python -m unittest discover -s tests -v`：62 passed、0 failed、0 skipped，测试运行 0.223 s、墙钟 0.37 s；`python -m compileall -q app application contracts core deployment infrastructure protocols vehicles tests` 与 `git diff --check` 通过。`rg -n '^(from|import) (legacy|telemetry_link|pymavlink|protocols|vehicles|infrastructure)' contracts core application app` 无匹配（退出码 1）。`/usr/bin/time -p env PYTHONPATH=. python tests/manual_p5_copter_usb.py --port /dev/serial/by-id/usb-ArduPilot_MicoAir743v2_260029000C51333238373537-if00 --allow-send`：1 次 `PASS`、0 failed、0 skipped，墙钟 1.11 s，结果为 `COMPLETED, armed=False`。最后重新查询仍为 `FRAME_CLASS=0`、`FRAME_TYPE=1`、Copter STABILIZE、未解锁。没有既有 baseline failure 或新引入失败。未修改归档树，故未运行旧树测试。
 
+**P5 裸飞控临时机架台架验收（2026-10-01）：** 用户明确允许修改新装固件飞控的参数并完成必要台架测试。按 [ArduPilot 机架参数表](https://ardupilot.org/copter/docs/parameters.html)，在先读回 Copter/STABILIZE/未解锁及 `FRAME_CLASS=0` 后，临时设 `FRAME_CLASS=1`（Quad），保留原 `FRAME_TYPE=1`（X），读回确认并按 [MAVLink 重启命令](https://mavlink.io/en/messages/common.html)重启。飞控在重启后仍未解锁，`FRAME_CLASS=1` 持久化，`ARMING_SKIPCHK=0` 保持启用检查，原机架报错消失。为实际 USB 验收增加两个显式台架脚本与窄翻译器，均经 `VehicleExecution`、显式 Safety/Lease、双 SEND 和单一 `ArduPilotCommandPort` 写入：其一将未解锁模式 `STABILIZE → ACRO → STABILIZE`，两次 ACK 和后续心跳均证实 `COMPLETED`，全程未解锁；其二发一次 Arm 请求，飞控回 `mav_result_4`（`MAV_RESULT_FAILED`），保持未解锁，随后显式 Disarm 获 ACK 与未解锁心跳确认。Arm 拒绝时飞控列出 `3D Accel calibration needed`、`Compass not calibrated`、`Battery 1 low voltage failsafe`、`RC not found`；另报 `Failed to create log directory /APM/LOGS : ENOSPC`。读回 `LOG_BACKEND_TYPE=1`（文件日志），该板有 [MicroSD 卡槽](https://ardupilot.org/copter/docs/common-MicoAir743v2.html)，日志错误的实际存储原因尚未核实。没有关闭预解锁检查、伪造传感器或发起起飞/运动。台架后把 `FRAME_CLASS` 恢复为原值 0，重启并复核 `FRAME_CLASS=0`、`FRAME_TYPE=1`、`ARMING_SKIPCHK=0`、`LOG_BACKEND_TYPE=1`、Copter/STABILIZE/未解锁，原机架报错按预期重现。两个参数维护与重启操作在独占 USB 维护连接执行，根目录生产命令链和 CLI 未增加旁路 writer。
+
+**台架测试记录与范围：** `python -m unittest discover -s tests -p test_p5_mavlink.py -v`：15 passed、0 failed、0 skipped，测试运行 0.035 s，新增 2 项翻译器范围测试；`/usr/bin/time -p python -m unittest discover -s tests -v`：64 passed、0 failed、0 skipped，测试运行 0.222 s、墙钟 0.36 s。`python -m compileall -q app application contracts core deployment infrastructure protocols vehicles tests`、`git diff --check` 通过；`rg -n '^(from|import) (legacy|telemetry_link|pymavlink|protocols|vehicles|infrastructure)' contracts core application app` 无匹配（退出码 1）。`/usr/bin/time -p env PYTHONPATH=. python tests/manual_p5_copter_bench_mode.py --port /dev/serial/by-id/usb-ArduPilot_MicoAir743v2_260029000C51333238373537-if00 --allow-mode-roundtrip`：1 次 `PASS`、0 failed、0 skipped，墙钟 2.13 s；`/usr/bin/time -p env PYTHONPATH=. python tests/manual_p5_copter_bench_arm.py --port /dev/serial/by-id/usb-ArduPilot_MicoAir743v2_260029000C51333238373537-if00 --bare-controller --allow-arm-bench`：最终 1 次 `PASS`、0 failed、0 skipped，墙钟 2.10 s，Arm 被拒、Disarm 完成；前一次诊断仅验证拒绝，墙钟 1.31 s。没有既有 baseline failure 或新引入测试失败；归档树未修改，未运行旧树测试。此裸飞控无法验证成功解锁、真实电池/GPS/RC、执行器输出、飞行、物理 stop 或失联保护；这些须在实际整机装配、校准、日志存储修复和单独安全验收后进行。台架结果只证明本机 USB 命令链、模式转换、飞控预解锁拒绝和 Disarm 回执。
+
 ## 候选代码的初步归属
 
 下表是阶段 0 的**待审候选**，不是复制清单。最终决定要依据源代码依赖、行为和测试逐项确认。
@@ -171,3 +175,4 @@ P0 已按 `contracts/`、`telemetry_link` 的 state/frame/time、依赖这些合
 | 2026-10-01 | P5 USB Rover 飞控补充验收 | HOLD 命令诊断通过；整车待验收 | 61 项根目录测试及未解锁 USB Rover HOLD ACK/心跳完成通过；Copter 机型 fence 和串口传输见上方记录；提交 SHA 见本阶段 Git 提交 |
 | 2026-10-01 | P5 Copter USB 飞控补充验收 | STABILIZE 命令诊断通过；整车待验收 | 62 项根目录测试及未解锁 USB Copter STABILIZE ACK/心跳完成通过；PreArm 机架错误与剩余边界见上方记录；提交 SHA 见本阶段 Git 提交 |
 | 2026-10-01 | P5 裸飞控状态检查 | 参数与单次遥测已读取；机架配置未定义 | 7 项单次遥测请求被接受；GPS fix=0，电池读数不可信，未解锁；未修改设备配置 |
+| 2026-10-01 | P5 临时机架台架验收 | 模式往返、Arm 拒绝、Disarm 通过；原参数已恢复 | 64 项根目录测试；双 SEND/Safety/唯一 writer 的 USB 台架结果与剩余整机边界见上方记录 |
