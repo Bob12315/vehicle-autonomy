@@ -1,6 +1,6 @@
 # 可复用框架迁移计划与记录
 
-> **状态：P0 至 P3 已完成离线阶段；P4 尚未开始。** 本文记录从 `legacy/cuadc_2026/` 提取可复用能力的顺序、验收门槛与阶段进度。目标职责以 [V1 目标架构](framework_v1.md) 为准；[当前实现边界](architecture.md)描述根目录已有能力。本文中的源文件只是候选素材，不表示已决定复制或已在新框架运行。
+> **状态：P0 至 P4 已完成离线阶段；P5 尚未开始。** 本文记录从 `legacy/cuadc_2026/` 提取可复用能力的顺序、验收门槛与阶段进度。目标职责以 [V1 目标架构](framework_v1.md) 为准；[当前实现边界](architecture.md)描述根目录已有能力。本文中的源文件只是候选素材，不表示已决定复制或已在新框架运行。
 
 ## 目标与策略
 
@@ -38,7 +38,7 @@
 | 1. 基础合同 | 时间、坐标、来源、有效性、Observation、VehicleState、WorldSnapshot、Typed Effect 及必要端口 | 类型语义明确；序列化与不变量测试通过；Core 无具体设备或业务依赖 | **已完成：合同层**，见下方 P1 记录；未接运行链 |
 | 2. 状态链 | 假 Sensor/Vehicle 输入、标准化观测、可选的纯感知或定位算法、World Model 发布 | 不接真实命令端口；时间戳、坐标、过期/缺失状态可测试；高级消费者只读统一快照 | **已完成：离线假输入链**，见下方 P2 记录 |
 | 3. Mission/Action | Schema、能力预检、编译、运行生命周期、取消、结果、Typed Effect，以及按需接入 Planning/Guidance | 未注册或不支持的 Action 被拒；失败、重试、取消和退出行为有测试；Action、Planning、Guidance 均不直接发送车辆命令 | **已完成：离线决策链**，见下方 P3 记录 |
-| 4. 控制安全边界 | 授权生命周期、Execution 分派、Safety、命令回执与取消/停止语义 | 默认 SEND 关闭；双门控、TTL、撤销、代际、deadman、stop/zero、断链及唯一 writer 在假端口测试中成立 | 待开始 |
+| 4. 控制安全边界 | 授权生命周期、Execution 分派、Safety、命令回执与取消/停止语义 | 默认 SEND 关闭；双门控、TTL、撤销、代际、deadman、stop/zero、断链及唯一 writer 在假端口测试中成立 | **已完成：离线假端口边界**，见下方 P4 记录 |
 | 5. 插件与设备组合 | 所需 Vehicle Plugin、Protocol/Transport、Sensor Adapter、Deployment 组合 | 先离线与仿真验证；真实设备能力只在设备验收后声明；生产写入仍只有一个受控出口 | 待开始 |
 
 ### 阶段 0：建立可核对的迁移清单
@@ -92,6 +92,14 @@ P0 已按 `contracts/`、`telemetry_link` 的 state/frame/time、依赖这些合
 
 先在假 `VehicleCommandPort` 上实现并测试授权、Safety、排队、回执、取消和停止。对照旧配置与行为审核数值限制和 payload 白名单，不能只比较接口名称。分别记录 accepted、transmitted、ACK 和 state-observed completion；断链时不得把 stop 请求写成 stop 已送达。此阶段完成前保持根目录无生产车辆连接。
 
+**P4 实际实现（2026-09-30）：** `ControlAuthority` 管理单一有效 Run/Action Lease、失效时刻、双 SEND（默认 false）、授权与 SEND 代际及当前链路会话。授予新 Lease 默认关闭 Action SEND；撤销、切换门控或会话使排队旧命令在出队时失效。`VehicleExecution` 是根目录 V1 `VehicleCommandPort.submit/cancel/status` 的唯一 Core 调用方，接收 Typed `EffectEnvelope`，按作用域、时间、显式 `VehicleSafetyPolicy` 和链路会话分派到独立 `VehicleCommandEnvelope`。同一 Effect ID 不能复用不同内容，连续目标刷新会取消旧排队目标。无策略时无法构造执行组件。
+
+**Safety 与停止：** `SafetyLimits` 必须显式注入，没有通用飞行数值默认值。策略拒绝无效/过期/超长 TTL、跨时钟域、旧 World/Vehicle 状态、无效质量、未允许的 Mode/Frame、越界高度/地理围栏和超速 Twist。Stop 可绕过旧状态阻止条件，但仍需有效授权、双 SEND 和链路。由调用方定期 `tick` 驱动 deadman；超时先取消旧目标，再提交 `StopMotionCommand`。假端口将其记为模拟的零运动写入。断链或授权关闭时只记未确认停止，不声称已发送；ACK 与状态观测完成分别推进，只有后者标记 `CONFIRMED`。立即关闭 SEND 可能导致 stop 无法送达，因此真实系统必须在设备接入前设计受控停止/撤销顺序与失联保护；此离线实现不宣称物理停车。
+
+**旧配置判断与边界：** 审阅归档 `execution/safety_config.py` 的请求 TTL、分轴速度、上下高度、Frame/Mode allowlist、deadman 及 payload servo 白名单。旧值和 NED/FRD frame 常量属于特定多旋翼/比赛配置，未复制到通用 Core；P4 以显式 SI、FrameId、局部矩形围栏配置表达适用的通用规则。V1 尚无 payload Effect，因此不添加伪通用 servo/投放命令；具体 payload、分轴速度、下降率、动态围栏、设备能力和失联动作应由后续具体 Vehicle/Safety 配置审核。`FakeVehicleCommandPort` 只模拟唯一写入检查点，真实 Vehicle/Protocol/Transport writer、物理零速/停止、链路状态生产和设备验收仍属于 P5。旧演示 `ExecutionGateway` 保持兼容且未接 V1 命令链；根目录 CLI 没有装配车辆发送路径。
+
+**P4 验证：** `/usr/bin/time -p python -m unittest discover -s tests -v`：49 passed、0 failed、0 skipped，测试运行 0.160 s，墙钟 0.26 s；其中 P4 新增 12 项，覆盖默认关闭、Lease/作用域、Safety、TTL/时钟、代际/会话出队检查、断线重连同会话 ID 仍禁止旧队列、回执阶段、取消、deadman、模拟 stop/zero、断链未确认和 V1 端口归属。开发中出现 1 项拒绝原因优先级失败及 1 项旧网关文案导致的静态测试误报，均已修正；P0-P3 的 37 项既有测试全部通过，没有 baseline failure。`python -m compileall -q contracts core application tests` 通过。`rg -n '^(from|import) (legacy|pymavlink|telemetry_link|protocols|vehicles|infrastructure)' contracts core application` 无匹配，退出码 1；根目录依赖测试通过。未修改归档树，故未运行旧树测试。
+
 ### 阶段 5：按需接入设备
 
 只为实际需要的组合添加 Vehicle Plugin、协议编解码、Transport 和 Sensor Adapter。协议语义与字节传输分离；车辆状态映射及命令翻译属于插件/适配器。先做离线和仿真测试，再按设备环境验收真实连接。RKNN、Web、server/hybrid 和具体应用分别作为可选后续工作，不因目标架构列出目录就视为必须迁移。
@@ -138,3 +146,4 @@ P0 已按 `contracts/`、`telemetry_link` 的 state/frame/time、依赖这些合
 | 2026-09-30 | P2 离线状态链 | 已验证 | 21 项根目录测试通过；实现、旧代码判断与未接入边界见上方 P2 记录；提交 SHA 见本阶段 Git 提交 |
 | 2026-09-30 | P3 离线决策链与 Transform | 已验证 | 32 项根目录测试通过；实现与未接入边界见上方 P3 记录；提交 SHA 见本阶段 Git 提交 |
 | 2026-09-30 | ArduPilot 只读消息状态适配 | 已验证离线映射；待设备验证 | 5 项新增适配测试含真实 `pymavlink` 消息对象；不接物理链路/命令链；结果和提交见本阶段记录 |
+| 2026-09-30 | P4 控制安全边界 | 已验证离线假端口 | 49 项根目录测试通过；授权、Safety、出队 fence、回执和停止范围及 P5 限制见上方 P4 记录；提交 SHA 见本阶段 Git 提交 |

@@ -6,9 +6,9 @@ Vehicle Autonomy Framework 是面向多旋翼、无人车、固定翼、VTOL 及
 
 ## 当前实现
 
-根目录目前提供 P1 基础合同、P2 离线 World Model 状态链，以及 P3 Typed Action/Mission 编译与运行生命周期。通用 TransformTree 求解静态/动态 Frame 关系。另有只读 ArduPilot/MAVLink parsed message 到标准 VehicleState 的适配代码，尚未接物理链路。P3 Runtime 只产生 Effect 请求，不发送命令；现有 Execution 仍是旧 Effect 的演示边界，尚未接入新命令合同。**尚无**经过设备验收的生产车辆连接、Web UI、相机进程、飞控连接或服务器部署。当前 CLI 只提供状态查询。
+根目录目前提供 P1 基础合同、P2 离线 World Model 状态链、P3 Typed Action/Mission 决策链及 P4 假端口控制边界。通用 TransformTree 求解静态/动态 Frame 关系。另有只读 ArduPilot/MAVLink parsed message 到标准 VehicleState 的适配代码，尚未接物理链路。P3 Runtime 只产生 Effect 请求；P4 Execution 可在显式授权、双 SEND 与 Safety 检查后向假命令端口提交，测试排队、撤销、deadman 和停止状态。**尚无**经过设备验收的生产车辆连接、Web UI、相机进程、飞控连接或服务器部署。当前 CLI 只提供状态查询。
 
-车辆发送默认关闭。现有演示 Execution 必须同时获得系统 SEND、Action SEND 和显式 `SafetyPolicy` 允许，才能提交到它的旧 Effect 测试端口；P1 `VehicleCommandPort` 尚未由该网关使用。根目录 CLI 未装配真实端口或策略。现有接口不能据此宣称已支持实机飞行。
+车辆发送默认关闭。P4 离线 Execution 需要系统 SEND、Action SEND、有效 Lease、活跃会话和显式 `VehicleSafetyPolicy`；假端口在模拟写入前重新检查代际、会话和期限。断链时停止结果保持未确认。旧演示网关仍使用旧 Effect 测试端口。根目录 CLI 未装配真实端口或策略，不能据此宣称已支持实机飞行。
 
 ```bash
 python -m app.main status
