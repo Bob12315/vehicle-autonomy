@@ -5,7 +5,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Protocol
 
-from contracts.core.models import Effect
+from contracts.core.primitives import CommandId
+from .command import (
+    CancelCommandRequest, CommandReceipt, CommandStatus, VehicleCommandEnvelope,
+)
+from .models import VehicleStateSnapshot
 
 
 @dataclass(frozen=True)
@@ -14,5 +18,16 @@ class VehicleCapabilities:
 
 
 class VehicleCommandPort(Protocol):
-    def submit(self, effect: Effect) -> None:
-        """Submit one previously authorized and safety checked effect."""
+    def submit(self, command: VehicleCommandEnvelope) -> CommandReceipt:
+        """Submit a command approved by a later Execution boundary."""
+
+    def cancel(self, request: CancelCommandRequest) -> CommandStatus:
+        """Request cancellation; a reply does not imply physical stop."""
+
+    def status(self, command_id: CommandId) -> CommandStatus | None:
+        """Read the known submission phase, if any."""
+
+
+class VehicleStatePort(Protocol):
+    def snapshot(self) -> VehicleStateSnapshot | None:
+        """Read the latest vehicle-reported state without control authority."""

@@ -1,5 +1,5 @@
 """Vehicle capabilities and command port contract."""
 
-from .ports import VehicleCapabilities, VehicleCommandPort
+from .ports import VehicleCapabilities, VehicleCommandPort, VehicleStatePort
 
-__all__ = ["VehicleCapabilities", "VehicleCommandPort"]
+__all__ = ["VehicleCapabilities", "VehicleCommandPort", "VehicleStatePort"]

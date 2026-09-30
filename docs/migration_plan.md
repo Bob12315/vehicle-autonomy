@@ -1,6 +1,6 @@
 # 可复用框架迁移计划与记录
 
-> **状态：P0 限定范围的基线与候选清单已完成；P1 代码迁移未开始。** 本文记录从 `legacy/cuadc_2026/` 提取可复用能力的顺序、验收门槛与阶段进度。目标职责以 [V1 目标架构](framework_v1.md) 为准；[当前实现边界](architecture.md)描述根目录已有能力。本文中的源文件只是候选素材，不表示已决定复制或已在新框架运行。
+> **状态：P0 基线与 P1 基础合同已完成；P2 尚未开始。** 本文记录从 `legacy/cuadc_2026/` 提取可复用能力的顺序、验收门槛与阶段进度。目标职责以 [V1 目标架构](framework_v1.md) 为准；[当前实现边界](architecture.md)描述根目录已有能力。本文中的源文件只是候选素材，不表示已决定复制或已在新框架运行。
 
 ## 目标与策略
 
@@ -35,7 +35,7 @@
 | 阶段 | 交付物 | 完成门槛 | 进度 |
 | --- | --- | --- | --- |
 | 0. 基线与候选清单 | 根目录与旧系统现状、候选模块的依赖和安全审计 | 每个候选有归属、调用方、外部依赖、配置、测试和“迁/改写/保留”判断；记录实际运行的基线测试 | **已完成：限定范围 P0 文档审计**，见[基线](migration/p0_baseline.md)与[候选清单](migration/p0_inventory.md) |
-| 1. 基础合同 | 时间、坐标、来源、有效性、Observation、VehicleState、WorldSnapshot、Typed Effect 及必要端口 | 类型语义明确；序列化与不变量测试通过；Core 无具体设备或业务依赖 | 待开始 |
+| 1. 基础合同 | 时间、坐标、来源、有效性、Observation、VehicleState、WorldSnapshot、Typed Effect 及必要端口 | 类型语义明确；序列化与不变量测试通过；Core 无具体设备或业务依赖 | **已完成：合同层**，见下方 P1 记录；未接运行链 |
 | 2. 状态链 | 假 Sensor/Vehicle 输入、标准化观测、可选的纯感知或定位算法、World Model 发布 | 不接真实命令端口；时间戳、坐标、过期/缺失状态可测试；高级消费者只读统一快照 | 待开始 |
 | 3. Mission/Action | Schema、能力预检、编译、运行生命周期、取消、结果、Typed Effect，以及按需接入 Planning/Guidance | 未注册或不支持的 Action 被拒；失败、重试、取消和退出行为有测试；Action、Planning、Guidance 均不直接发送车辆命令 | 待开始 |
 | 4. 控制安全边界 | 授权生命周期、Execution 分派、Safety、命令回执与取消/停止语义 | 默认 SEND 关闭；双门控、TTL、撤销、代际、deadman、stop/zero、断链及唯一 writer 在假端口测试中成立 | 待开始 |
@@ -57,6 +57,12 @@ P0 已按 `contracts/`、`telemetry_link` 的 state/frame/time、依赖这些合
 ### 阶段 1：先统一合同
 
 以 [V1 基础合同冻结规范](foundation_contracts_v1.md) 为阶段 1 的语义依据，对照根目录现有 `Effect(operation: str, parameters)`、最小 `WorldSnapshot` 和 `VehicleCommandPort.submit(effect)`，逐项记录并消除差异；不直接复制旧 `contracts/`。先落实单位、坐标系、时钟域、来源、质量和失效含义，再让适配器使用合同。车辆能力描述与运行时许可分开；合同不能暗含 SEND 授权。规范中的基础语义如需修改，应记录无法由 Adapter 或迁移层解决的具体问题。
+
+**P1 实际实现（2026-09-30）：** 新根目录新增经过校验的 ID、`SchemaVersion`、`ResourceVersion`、`FrozenJson`、`TimePoint`/三类时间事实、`FrameId` 与 SI 几何、`Stamped`、质量/新鲜度、Typed `Observation`、车辆自报 `VehicleStateSnapshot`、独立 `LocalizationEstimate` 和独立 `LinkStateSnapshot`。`WorldSnapshot` 现在不可变、版本化，含车辆/定位、资源引用、固定新鲜度与输入版本依赖。新增请求型 Typed Vehicle Effect 与 `EffectEnvelope`，以及分离的 `VehicleCommandEnvelope`、命令状态/取消值和 `submit/cancel/status` 窄端口；车辆状态查询、定位查询、世界查询、Transform Resolver 均为只读/纯接口。合同仅依赖 Python 标准库和同层合同。
+
+**兼容与边界：** 旧根目录 `Effect(operation, parameters)` 和演示用 `ExecutionGateway` 仍服务原有 Mission/Action 测试；其端口注解明确为旧 Effect 提交接口，并未把 Typed Effect 或 VehicleCommand 接入现有发送路径。该演示网关尚不能满足完整 Authorization、取消、deadman 等控制要求，不能视为 V1 命令执行实现。Transform 仅有值类型与 `TransformResolver` 端口，没有静态/动态求解器、NED/ENU 或 FRD/FLU 适配器；具体 Observation Data、世界对象及状态生产者需在后续状态链阶段增加。原旧系统的 `source=real/sitl/test`、动态 `age_s`、FIELD、协议坐标和 `control_allowed` 均未进入新基础状态合同。冻结规范无变更；旧数据差异保留给后续 Adapter。
+
+**P1 验证：** `/usr/bin/time -p python -m unittest discover -s tests -v`：14 passed、0 failed、0 skipped，测试运行 0.018 s，墙钟 0.10 s。覆盖身份/版本、FrozenJson 与 JSON 序列化、时钟域和无效时间、几何/Frame、Typed Observation、状态/定位/世界的不可变性与版本依赖、Effect/Command 分离、端口方法集合及原有双 SEND 测试。`python -m compileall -q contracts core tests`：通过。使用 `rg` 检查根目录 Python import：未发现 `legacy`、`pymavlink`、`telemetry_link` 或协议层导入；根目录依赖测试也通过。P0 的 4 项根目录测试本次全部通过；没有新引入失败，也没有需归因的既有 baseline failure。未修改归档树，故未运行旧树测试。
 
 ### 阶段 2：构建状态链
 
@@ -111,4 +117,5 @@ P0 已按 `contracts/`、`telemetry_link` 的 state/frame/time、依赖这些合
 | 日期 | 阶段 / 能力 | 状态 | 证据与提交 |
 | --- | --- | --- | --- |
 | 2026-09-30 | 迁移计划文档 | 已建立 | 本文；尚未开始代码迁移 |
-| 2026-09-30 | P0 基线与候选清单（限定范围） | 已完成 | [基线与 173 项旧测试、4 项根目录测试](migration/p0_baseline.md)，[候选归属及 `application/core` 依赖表](migration/p0_inventory.md)；P1 未开始 |
+| 2026-09-30 | P0 基线与候选清单（限定范围） | 已完成 | [基线与 173 项旧测试、4 项根目录测试](migration/p0_baseline.md)，[候选归属及 `application/core` 依赖表](migration/p0_inventory.md) |
+| 2026-09-30 | P1 基础合同 | 已完成合同层 | 14 项根目录测试通过；实现、兼容范围和后续边界见上方 P1 记录；提交 SHA 见本阶段 Git 提交 |

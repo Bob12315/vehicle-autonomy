@@ -3,7 +3,7 @@
 **状态：FROZEN V1.0**
 **冻结日期：2026-09-30**
 
-> **实施状态：目标合同，尚未由新根目录完整实现。** 当前代码仅有最小 `Effect`、`WorldSnapshot` 和 `VehicleCommandPort`，其形状与本规范中的 Typed Effect、版本化快照及 `submit/cancel/status` 窄端口存在差异。实施顺序见 [迁移计划](migration_plan.md)，总体职责见 [V1 目标架构](framework_v1.md)。
+> **实施状态：P1 合同层已实现，运行链尚未接入。** 新根目录已有 Typed Effect、版本化快照及 `submit/cancel/status` 窄端口；Transform 求解器、状态生产者与 Execution 接入仍属后续阶段。冻结语义不变；实际范围与测试见 [迁移计划](migration_plan.md)，总体职责见 [V1 目标架构](framework_v1.md)。
 
 本文冻结 Vehicle Autonomy Framework V1 的基础合同。后续 Sensor、Perception、Localization、World Model、Mission、Planning、Guidance、Execution、Vehicle Plugin、Protocol 和 Transport 均建立在本文定义的语义之上。
 

@@ -3,11 +3,14 @@
 from __future__ import annotations
 
 import ast
+from datetime import datetime, timezone
 from pathlib import Path
 import unittest
 
 from application.service import FrameworkService
 from contracts.core.models import ActionDefinition, ActionStep, Effect, MissionDefinition
+from contracts.core.primitives import ResourceVersion, SchemaVersion
+from contracts.core.time import TimePoint
 from contracts.vehicle.ports import VehicleCapabilities
 from contracts.world.models import WorldSnapshot
 from core.action_registry import ActionRegistry
@@ -69,7 +72,7 @@ class FrameworkTests(unittest.TestCase):
         safety = _Safety(True)
         execution = ExecutionGateway(commands, safety)
         effect = Effect("sample")
-        snapshot = WorldSnapshot(1)
+        snapshot = WorldSnapshot(SchemaVersion(1, 0), "snapshot-1", ResourceVersion("world", 1), TimePoint(1, datetime(2026, 1, 1, tzinfo=timezone.utc), "test"))
         self.assertFalse(execution.submit(effect, snapshot))
         self.assertFalse(execution.submit(effect, snapshot, SendGate(system_enabled=True)))
         self.assertFalse(execution.submit(effect, snapshot, SendGate(action_enabled=True)))
@@ -99,6 +102,8 @@ class FrameworkTests(unittest.TestCase):
                     any(name.split(".")[0] in {"legacy", "telemetry_link", "pymavlink"} for name in imports),
                     str(path),
                 )
+                if directory in {"contracts", "core"}:
+                    self.assertFalse(any(name.split(".")[0] == "protocols" for name in imports), str(path))
 
 
 if __name__ == "__main__":
