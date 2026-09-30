@@ -1,6 +1,6 @@
 # 可复用框架迁移计划与记录
 
-> **状态：P0 基线与 P1 基础合同已完成；P2 尚未开始。** 本文记录从 `legacy/cuadc_2026/` 提取可复用能力的顺序、验收门槛与阶段进度。目标职责以 [V1 目标架构](framework_v1.md) 为准；[当前实现边界](architecture.md)描述根目录已有能力。本文中的源文件只是候选素材，不表示已决定复制或已在新框架运行。
+> **状态：P0、P1 与 P2 离线状态链已完成；P3 尚未开始。** 本文记录从 `legacy/cuadc_2026/` 提取可复用能力的顺序、验收门槛与阶段进度。目标职责以 [V1 目标架构](framework_v1.md) 为准；[当前实现边界](architecture.md)描述根目录已有能力。本文中的源文件只是候选素材，不表示已决定复制或已在新框架运行。
 
 ## 目标与策略
 
@@ -36,7 +36,7 @@
 | --- | --- | --- | --- |
 | 0. 基线与候选清单 | 根目录与旧系统现状、候选模块的依赖和安全审计 | 每个候选有归属、调用方、外部依赖、配置、测试和“迁/改写/保留”判断；记录实际运行的基线测试 | **已完成：限定范围 P0 文档审计**，见[基线](migration/p0_baseline.md)与[候选清单](migration/p0_inventory.md) |
 | 1. 基础合同 | 时间、坐标、来源、有效性、Observation、VehicleState、WorldSnapshot、Typed Effect 及必要端口 | 类型语义明确；序列化与不变量测试通过；Core 无具体设备或业务依赖 | **已完成：合同层**，见下方 P1 记录；未接运行链 |
-| 2. 状态链 | 假 Sensor/Vehicle 输入、标准化观测、可选的纯感知或定位算法、World Model 发布 | 不接真实命令端口；时间戳、坐标、过期/缺失状态可测试；高级消费者只读统一快照 | 待开始 |
+| 2. 状态链 | 假 Sensor/Vehicle 输入、标准化观测、可选的纯感知或定位算法、World Model 发布 | 不接真实命令端口；时间戳、坐标、过期/缺失状态可测试；高级消费者只读统一快照 | **已完成：离线假输入链**，见下方 P2 记录 |
 | 3. Mission/Action | Schema、能力预检、编译、运行生命周期、取消、结果、Typed Effect，以及按需接入 Planning/Guidance | 未注册或不支持的 Action 被拒；失败、重试、取消和退出行为有测试；Action、Planning、Guidance 均不直接发送车辆命令 | 待开始 |
 | 4. 控制安全边界 | 授权生命周期、Execution 分派、Safety、命令回执与取消/停止语义 | 默认 SEND 关闭；双门控、TTL、撤销、代际、deadman、stop/zero、断链及唯一 writer 在假端口测试中成立 | 待开始 |
 | 5. 插件与设备组合 | 所需 Vehicle Plugin、Protocol/Transport、Sensor Adapter、Deployment 组合 | 先离线与仿真验证；真实设备能力只在设备验收后声明；生产写入仍只有一个受控出口 | 待开始 |
@@ -67,6 +67,14 @@ P0 已按 `contracts/`、`telemetry_link` 的 state/frame/time、依赖这些合
 ### 阶段 2：构建状态链
 
 先用文件、假相机或假车辆状态发布器验证 Sensor/Vehicle → Observation → World Model。可复用的纯投影、定位、融合算法逐个审核并适配新输入；相机视场角、场地朝向、类别集合等旧默认值不得偷偷成为通用默认。WorldSnapshot 对过期和未知数据作显式表达。
+
+**P2 实际实现（2026-09-30）：** `FakeDetectionSensor` 产生带 `producer_id`、序号、采集/接收时间、Frame 与质量的 `Observation[DetectedObject]`；`FakeVehicleStateSource` 发布版本化的车辆自报状态并提供只读 `snapshot()`。纯 `ReportedPoseLocalization` 将飞控自报位姿显式投影为独立 `LocalizationEstimate`。`OfflineStateChain` 通过只读车辆端口、定位估计器和 Typed Observation 装配离线流程；消费者只取得 `WorldReader.snapshot()`。`WorldModel` 以锁保护一次发布切面，输出不可变、递增版本的 `WorldSnapshot`，并记录车辆、定位、观测输入的版本依赖。检测目标保留原始 `frame_id`，不暗中将 camera、odom 与 map 坐标混算。
+
+**失效语义：** 发布时根据相同 `clock_domain_id` 的 monotonic 时间计算固定新鲜度；车辆/定位的发布及 Stamped 采集时间、观测的采集及接收时间均参与检查。超过注入的纳秒 TTL 为 `STALE`；缺失、未来时间或不同 clock domain 为 `UNKNOWN`。不可用、无效质量及非新鲜输入不会成为快照中的当前车辆、定位或对象，但仍保留已有输入版本依赖；质量与新鲜度各自判断。状态源明确变为缺失时下一版快照立即清除车辆及该投影定位。`WorldModel` 拒绝回退的状态版本/发布时间、复用版本但改变内容、倒退的观测序号及同域倒置的时间事实。
+
+**旧实现判断与剩余边界：** 审核了归档 `world_model/service.py`、`projection.py` 和 `application/core/snapshot_collector.py`。其单次发布切面值得保留，但它们直接依赖旧 platform/perception DTO、NED 标量、比赛 Environment/Field 及混入 SEND 的运行快照，因此 P2 按新合同重写，未复制旧模块。当前检测由假源直接构造，不声称相机或感知模型接入；没有地图、Environment、Transform 求解器、跨 Frame 变换、真实车辆/传感器适配器或设备连接。旧系统基于接收时间和固定 2 秒的感知新鲜度规则没有带入 Core；P2 使用显式、注入的 TTL 与采集时间。状态链没有车辆命令端口，P3/P4 的 Mission/Action 与控制行为均未开始。
+
+**P2 验证：** `/usr/bin/time -p python -m unittest discover -s tests -v`：21 passed、0 failed、0 skipped；测试运行 0.026 s，墙钟 0.10 s。新增 7 项覆盖端到端离线组合、时间/Frame/来源与序列化、缺失/过期/未来/跨域、质量独立、版本回退、只读查询、无控制字段及无命令端口依赖；P1 原有 14 项全部通过。`python -m compileall -q application contracts localization sensors vehicles world_model tests` 通过。根目录 Python import 搜索未发现 `legacy`、`pymavlink`、`telemetry_link` 或 `protocols` 导入；依赖测试通过。无失败需归因于既有 baseline 或新问题。未修改归档树，故未运行旧树测试。
 
 ### 阶段 3：构建决策链
 
@@ -119,3 +127,4 @@ P0 已按 `contracts/`、`telemetry_link` 的 state/frame/time、依赖这些合
 | 2026-09-30 | 迁移计划文档 | 已建立 | 本文；尚未开始代码迁移 |
 | 2026-09-30 | P0 基线与候选清单（限定范围） | 已完成 | [基线与 173 项旧测试、4 项根目录测试](migration/p0_baseline.md)，[候选归属及 `application/core` 依赖表](migration/p0_inventory.md) |
 | 2026-09-30 | P1 基础合同 | 已完成合同层 | 14 项根目录测试通过；实现、兼容范围和后续边界见上方 P1 记录；提交 SHA 见本阶段 Git 提交 |
+| 2026-09-30 | P2 离线状态链 | 已验证 | 21 项根目录测试通过；实现、旧代码判断与未接入边界见上方 P2 记录；提交 SHA 见本阶段 Git 提交 |
