@@ -79,6 +79,12 @@ class P6SitlRuntimeTests(unittest.TestCase):
         self.clock.advance()
         return runtime
 
+    def test_start_without_heartbeat_reports_missing_state(self):
+        runtime = SitlRuntime(self.profile, transport=self.transport, clock=self.clock)
+        with self.assertRaisesRegex(RuntimeError, "fresh SITL vehicle state required"):
+            runtime.start_mission()
+        runtime.shutdown()
+
     def test_ack_and_later_unarmed_mode_state_required_for_success(self):
         runtime = self.make_runtime()
         self.assertEqual(runtime.cycle()["status"], "RUNNING")

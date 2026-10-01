@@ -165,7 +165,7 @@ class SitlRuntime:
         if self._closed or self._fault is not None or (self._runtime is not None and
                 self._runtime.view().status in (RunStatus.RUNNING, RunStatus.EXITING)):
             raise RuntimeError("runtime closed, faulted or Mission already running")
-        if self._restart_session_required == self._session.session_id:
+        if self._restart_session_required is not None and self._restart_session_required == self._session.session_id:
             raise RuntimeError("in-flight cancelled mode requires a new link session")
         snapshot = self._world.snapshot()
         if snapshot is None or snapshot.vehicle is None or self._session.session_id is None:

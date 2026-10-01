@@ -71,6 +71,12 @@ class VehicleExecution:
         self._streams: dict[str, _Stream] = {}
         self._effect_results: dict[str, tuple[EffectEnvelope, DispatchResult]] = {}
 
+    def active_stream_ids(self) -> tuple[str, ...]:
+        """Expose active motion streams for bounded runtime shutdown."""
+        return tuple(stream_id for stream_id, stream in self._streams.items()
+                     if stream.stop_command_id is None
+                     or self.stop_status(stream_id).state is not StopState.CONFIRMED)
+
     def dispatch(self, envelope: EffectEnvelope, world: WorldSnapshot, now: TimePoint) -> DispatchResult:
         if not isinstance(envelope, EffectEnvelope) or not isinstance(world, WorldSnapshot) or not isinstance(now, TimePoint):
             raise TypeError("typed Effect, WorldSnapshot and TimePoint required")

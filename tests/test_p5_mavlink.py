@@ -160,6 +160,23 @@ class P5MavlinkTests(unittest.TestCase):
         self.session.poll(at(105))
         self.assertEqual(self.port.status(receipt.command_id).phase, CommandPhase.COMPLETED)
 
+    def test_link_timeout_revokes_both_sends_and_old_lease(self):
+        self.connect()
+        old_session = self.session.session_id
+        self.now_ns = 101
+        queued = self.execution.dispatch(effect(1, ArmEffect()), world(), at(101)).receipt
+        self.session.tick(at(160))
+        self.assertFalse(self.authority.system_send)
+        self.assertFalse(self.authority.action_send)
+        self.assertIsNone(self.authority.lease)
+        self.assertEqual(self.port.status(queued.command_id).phase, CommandPhase.REJECTED)
+        self.transport.incoming.append(self.heartbeat())
+        self.session.poll(at(161))
+        self.assertNotEqual(self.session.session_id, old_session)
+        self.assertEqual(self.execution.dispatch(effect(2, ArmEffect()), world(), at(162)).reason,
+                         "system_send_disabled")
+        self.assertEqual(self.transport.writes, [])
+
     def test_copter_session_rejects_rover_heartbeat(self):
         self.transport.incoming.append(self.heartbeat(vehicle_type=TYPE_GROUND_ROVER))
         self.session.poll(at(100))

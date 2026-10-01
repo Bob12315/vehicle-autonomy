@@ -122,6 +122,12 @@ class ArduPilotSession:
         return None if self._state is None else self._state.snapshot()
 
     def _disconnect(self, now: TimePoint) -> None:
+        # Link loss invalidates a run's authority, not just its command queue.
+        # A later heartbeat may establish a new session, but cannot revive the
+        # previous SEND gates or Action lease.
+        self._authority.set_system_send(False)
+        self._authority.set_action_send(False)
+        self._authority.revoke()
         self._authority.set_link_session(None)
         self._commands.reset_session(now)
         self._session_id = None
