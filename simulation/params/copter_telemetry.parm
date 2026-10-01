@@ -3,3 +3,7 @@
 # The ArduPilot frame defaults are loaded separately by the simulation launcher.
 MAV1_POSITION 10
 MAV1_EXTRA1 10
+# Keep autonomous RTL within the simulation's 10 m altitude Safety envelope.
+# This ArduPilot revision expresses RTL altitude in metres.
+RTL_ALT_M 2
+RTL_ALT_FINAL_M 0

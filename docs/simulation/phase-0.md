@@ -1,9 +1,9 @@
 # Phase 0 environment audit (2026-10-01)
 
-Status: **partial**. The Copter Gazebo/SITL link, telemetry path, and existing
-controlled `GUIDED → Arm → Disarm` task were exercised. Body motion has not yet
-been commanded or checked against Gazebo truth, so the Phase 0 exit gate and
-Simulation Complete remain open.
+Status: **Copter gate closed; Rover model pending**. The Copter Gazebo/SITL
+link, telemetry path, controlled task, and body motion were exercised. Phase 3
+records two full motion runs with independent Gazebo truth. The target Rover
+world remains absent, so Simulation Complete remains open.
 
 ## Baseline and versions
 
@@ -67,17 +67,14 @@ earlier read-only message counts are in
 
 ## Open gates and next checks
 
-- No Takeoff or other motion request exists in the P6 task. Gazebo body
-  movement and telemetry/truth alignment remain unverified. Phase 3 must
-  command motion through Execution and compare new Gazebo pose samples with
-  VehicleState before this Phase 0 gate can be closed.
+- The P6 task itself has no motion request. The separate common-runtime Phase 3
+  scenario closed the Copter body-motion and telemetry/truth check; see
+  `docs/simulation/phase-3.md` and its retained run artifacts.
 - The Rover SITL binary now exists; the target two-drive-wheel plus two-rear-
   caster Gazebo model/world is absent. Phase 4/5 must establish it and test
   physical motion. The full preflight remains red until then.
-- A separate probe exposed a P6 startup bug when no session exists:
-  `start_mission()` compares two `None` session values and raises an
-  irrelevant "in-flight cancelled mode" error. This is recorded for Phase 2;
-  it did not affect the successful run after a fresh heartbeat.
+- A separate probe exposed a P6 startup bug when no session exists; Phase 2
+  corrected the comparison and added a regression test.
 - The successful task reported `sitl_version=null` because this revision did
   not emit a matching version status text. The binary and Git SHA above are
   the local version evidence.

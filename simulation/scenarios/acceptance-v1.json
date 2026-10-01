@@ -8,9 +8,20 @@
     "goto_max_horizontal_error_m": 0.75,
     "goto_timeout_s": 45,
     "velocity_enu_mps": [0.5, 0.0, 0.0],
+    "velocity_segment_s": 3.0,
+    "velocity_min_displacement_m": 0.6,
+    "velocity_speed_min_mps": 0.25,
+    "velocity_speed_max_mps": 0.75,
+    "positive_yaw_rate_rad_s": 0.35,
+    "yaw_segment_s": 3.0,
+    "yaw_min_rotation_rad": 0.5,
+    "body_forward_min_projection_m": 0.6,
     "stop_max_horizontal_speed_mps": 0.15,
     "stop_stable_s": 2.0,
-    "stop_timeout_s": 8
+    "stop_timeout_s": 8,
+    "rtl_timeout_s": 45,
+    "rtl_home_error_m": 0.75,
+    "land_timeout_s": 25
   },
   "rover": {
     "forward_body_mps": 0.5,

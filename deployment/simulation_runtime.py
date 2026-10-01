@@ -96,6 +96,10 @@ class SimulationRuntime:
     def session_id(self) -> str | None:
         return None if self._session is None or self._session.session_id is None else str(self._session.session_id)
 
+    def world_snapshot(self):
+        """Return the immutable framework snapshot; no Gazebo truth enters here."""
+        return self._world.snapshot()
+
     def connect(self) -> None:
         """Open one new TCP/codec/session epoch with SEND disabled."""
         if self._closed or self._transport is not None:
