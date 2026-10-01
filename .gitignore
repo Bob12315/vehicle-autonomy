@@ -17,3 +17,6 @@ legacy/cuadc_2026/eeprom.bin
 # The new runtime stores generated state here when adapters are added.
 runtime/*
 !runtime/.gitkeep
+!runtime/__init__.py
+!runtime/sitl.py
+!runtime/sitl.toml

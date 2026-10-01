@@ -27,7 +27,8 @@ class ArduPilotCommandPort:
 
     def __init__(self, *, authority: ControlAuthority, transport: ByteTransport,
                  codec: MavlinkCodec, translator: ArduPilotCommandTranslator,
-                 now: Callable[[], TimePoint], stop_speed_tolerance: float = 0.05) -> None:
+                 now: Callable[[], TimePoint], stop_speed_tolerance: float = 0.05,
+                 write_guard: Callable[[VehicleCommandEnvelope], str | None] | None = None) -> None:
         if not isinstance(authority, ControlAuthority) or not isinstance(codec, MavlinkCodec) or not isinstance(translator, ArduPilotCommandTranslator):
             raise TypeError("authority, codec and translator are required")
         if not callable(now) or not 0 <= stop_speed_tolerance < 1:
@@ -38,6 +39,7 @@ class ArduPilotCommandPort:
         self._translator = translator
         self._now = now
         self._stop_speed_tolerance = stop_speed_tolerance
+        self._write_guard = write_guard
         self._commands: dict[CommandId, VehicleCommandEnvelope] = {}
         self._statuses: dict[CommandId, CommandStatus] = {}
         self._keys: dict[IdempotencyKey, CommandId] = {}
@@ -126,6 +128,8 @@ class ArduPilotCommandPort:
                 self._queue.remove(command_id)
                 command = self._commands[command_id]
                 reason = self._authority.write_reason(command, now)
+                if reason is None and self._write_guard is not None:
+                    reason = self._write_guard(command)
                 if reason is not None:
                     self.reasons[command_id] = reason
                     phase = CommandPhase.REJECTED

@@ -55,6 +55,10 @@ class ArduPilotSession:
     def session_id(self) -> LinkSessionId | None:
         return self._session_id
 
+    @property
+    def last_heartbeat_received_at(self) -> TimePoint | None:
+        return self._last_heartbeat
+
     def poll(self, received_at: TimePoint) -> tuple[object, ...]:
         self.tick(received_at)
         try:
