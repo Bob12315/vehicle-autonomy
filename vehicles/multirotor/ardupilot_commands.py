@@ -15,6 +15,8 @@ from protocols.mavlink import constants as mavlink
 class ArduPilotCommandTranslator:
     """Only the documented Copter command subset; unknown frames/modes fail closed."""
 
+    vehicle_kind = "copter"
+
     def __init__(self, *, mode_ids: dict[str, int]) -> None:
         if not mode_ids or any(
             not isinstance(name, str) or not name.strip() or isinstance(value, bool)

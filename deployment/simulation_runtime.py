@@ -27,9 +27,10 @@ from vehicles.multirotor.ardupilot_commands import ArduPilotCommandTranslator
 from vehicles.multirotor.mavlink_port import ArduPilotCommandPort
 from vehicles.multirotor.mavlink_state import ArduPilotTelemetryState
 from vehicles.multirotor.session import ArduPilotSession
+from vehicles.rover.mavlink_state import RoverTelemetryState
 from world_model import FreshnessLimits, WorldModel
 
-from .simulation_safety import SimulationSafetyPolicy
+from .simulation_safety import RoverSimulationSafetyPolicy, SimulationSafetyPolicy
 
 
 def _later(point: TimePoint, ns: int) -> TimePoint:
@@ -58,6 +59,8 @@ class SimulationRuntime:
             raise TypeError("validated SimulationProfile required")
         if not isinstance(translator, ArduPilotCommandTranslator):
             raise TypeError("vehicle translator required")
+        if translator.vehicle_kind != profile.kind:
+            raise ValueError("translator and vehicle profile must match")
         self.profile = profile
         self.clock = clock or (lambda: TimePoint(time.monotonic_ns(), datetime.now(timezone.utc),
                                                  profile.clock_domain_id))
@@ -119,7 +122,7 @@ class SimulationRuntime:
             transport=transport, codec=codec, authority=self.authority,
             commands=port, link_timeout_ns=self.profile.link_timeout_ns,
             expected_vehicle_type=self.profile.mav_type,
-            state_factory=lambda session_id: ArduPilotTelemetryState(
+            state_factory=lambda session_id: (RoverTelemetryState if self.profile.kind == "rover" else ArduPilotTelemetryState)(
                 vehicle_id=self.profile.vehicle_id, generation_id=str(session_id),
                 link_session_id=session_id, source_system=1, source_component=1,
                 max_sample_skew_ns=500_000_000,
@@ -128,9 +131,10 @@ class SimulationRuntime:
             captured_at=lambda message, received: received,
         )
         self._transport, self._port, self._session = transport, port, session
+        safety_class = RoverSimulationSafetyPolicy if self.profile.kind == "rover" else SimulationSafetyPolicy
         self._execution = VehicleExecution(port, self.authority,
-                                           SimulationSafetyPolicy(self.profile.safety,
-                                                                  motion_mode_id=self.profile.mode_ids["GUIDED"]),
+                                           safety_class(self.profile.safety,
+                                                        motion_mode_id=self.profile.mode_ids["GUIDED"]),
                                            lambda: f"command:{uuid4().hex}")
         self._world = self._new_world()
         self._last_cycle = None
@@ -221,8 +225,8 @@ class SimulationRuntime:
         self._last_cycle = now
         try:
             messages = self._session.poll(now)
-        except (OSError, ConnectionError) as exc:
-            self._close_link(f"transport_disconnected:{type(exc).__name__}")
+        except (OSError, ConnectionError, ValueError) as exc:
+            self._close_link(f"receive_fault:{type(exc).__name__}")
             return SimulationCycle(0, None, None, False, self._fault)
         now = self.clock()
         if self._session.session_id is not None:

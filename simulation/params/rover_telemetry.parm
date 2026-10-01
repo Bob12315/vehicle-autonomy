@@ -1,0 +1,3 @@
+# MAVLink channel 1 feeds fresh position and attitude to the framework.
+MAV1_POSITION 10
+MAV1_EXTRA1 10
