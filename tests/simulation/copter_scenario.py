@@ -319,25 +319,28 @@ def run(run_dir: Path, *, goto: bool = False, full: bool = False) -> dict:
                 summary["steps"]["body-forward"]["heading_projection_m"] = projection
                 if projection < scenario["body_forward_min_projection_m"]:
                     raise RuntimeError("forward body command did not follow vehicle heading")
+                cancel_requested = time.monotonic()
+                deadline = cancel_requested + scenario["stop_timeout_s"]
                 stops = runtime.end_run()
                 summary["steps"]["cancel"] = {"stops": stops}
                 if stops.get("body-forward") != "CONFIRMED":
                     raise RuntimeError(f"Cancel did not confirm Stop: {stops}")
                 stable_since = None
-                deadline = time.monotonic() + scenario["stop_timeout_s"]
                 while time.monotonic() < deadline:
                     cycle()
                     speed = oracle.recent_speed_mps()
                     stable_since = (stable_since or time.monotonic()) if speed is not None and speed <= scenario["stop_max_horizontal_speed_mps"] else None
                     if stable_since is not None and time.monotonic() - stable_since >= scenario["stop_stable_s"]:
+                        summary["steps"]["cancel"]["elapsed_from_request_s"] = time.monotonic() - cancel_requested
                         break
                 else:
                     raise TimeoutError("Cancel did not physically stop")
                 runtime.begin_run(allow_send=True)
+                rtl_requested = time.monotonic()
+                deadline = rtl_requested + scenario["rtl_timeout_s"]
                 status = command("rtl", ModeEffect("RTL"))
                 if status["phase"] != "COMPLETED":
                     raise RuntimeError(f"RTL mode failed: {status}")
-                deadline = time.monotonic() + scenario["rtl_timeout_s"]
                 while time.monotonic() < deadline:
                     state, truth = cycle()
                     if state is None or truth is None:
@@ -346,7 +349,8 @@ def run(run_dir: Path, *, goto: bool = False, full: bool = False) -> dict:
                                           truth.y_m - origin_truth.y_m)
                     summary["steps"]["rtl_truth"] = {"home_error_m": distance,
                         "height_m": truth.z_m - origin_truth_z,
-                        "armed": state.operation.armed}
+                        "armed": state.operation.armed,
+                        "elapsed_from_request_s": time.monotonic() - rtl_requested}
                     if (distance <= scenario["rtl_home_error_m"] and truth.z_m <= origin_truth_z + .2
                             and not state.operation.armed):
                         break

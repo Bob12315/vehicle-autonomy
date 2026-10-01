@@ -11,6 +11,7 @@ import signal
 import socket
 import subprocess
 import time
+from uuid import uuid4
 import xml.etree.ElementTree as ET
 
 from runtime.simulation_profile import SimulationProfile
@@ -55,7 +56,7 @@ class OwnedSimulation:
         self.instance = choose_instance()
         self.port = 5760 + 10 * self.instance
         self.json_port = 9002 + 10 * self.instance
-        self.world = f"{kind}_{run_dir.name.replace('-', '_')}"
+        self.world = f"{kind}_{uuid4().hex[:12]}"
         self.model = "iris_with_gimbal" if kind == "copter" else "target_rover"
         self.profile = replace(SimulationProfile.load(ROOT / f"simulation/profiles/{kind}.toml"), port=self.port)
         self.processes = []
@@ -99,11 +100,12 @@ class OwnedSimulation:
         env = dict(os.environ)
         env["GZ_SIM_RESOURCE_PATH"] = ":".join([str(ROOT / "simulation/models"),
             str(PLUGIN / "models"), str(PLUGIN / "worlds"), env.get("GZ_SIM_RESOURCE_PATH", "")])
-        env["GZ_SIM_SYSTEM_PLUGIN_PATH"] = str(PLUGIN / "build") + ":" + env.get("GZ_SIM_SYSTEM_PLUGIN_PATH", "")
+        env["GZ_SIM_SYSTEM_PLUGIN_PATH"] = env.get("VAF_SIMULATION_PLUGIN_DIR", str(PLUGIN / "build")) + ":" + env.get("GZ_SIM_SYSTEM_PLUGIN_PATH", "")
         process = subprocess.Popen(command, cwd=cwd or ROOT, env=env, stdout=handle,
                                    stderr=subprocess.STDOUT, start_new_session=True)
         record = {"name": name, "command": command, "pid": process.pid, "pgid": process.pid,
                   "log": str(logfile), "exit_code": None}
+        record["start_ticks"] = Path(f"/proc/{process.pid}/stat").read_text().rsplit(")", 1)[1].split()[19]
         self.processes.append((process, handle, record))
         self.manifest["processes"].append(record)
         self._save()
@@ -116,7 +118,7 @@ class OwnedSimulation:
     def start_sitl(self, suffix=""):
         state_dir = self.run_dir / ("sitl_state" + suffix)
         state_dir.mkdir()
-        binary = ARDUPILOT / "build/sitl/bin" / ("arducopter" if self.kind == "copter" else "ardurover")
+        binary = Path(os.environ.get("VAF_SIMULATION_SITL_BIN_DIR", str(ARDUPILOT / "build/sitl/bin"))) / ("arducopter" if self.kind == "copter" else "ardurover")
         # Direct binary launch avoids sim_vehicle's instance-zero kill_tasks().
         self.sitl = self.start_process("sitl" + suffix, [str(binary), "--model", "JSON", "--speedup", "1",
             "--defaults", ",".join(map(str, self.params)), "--sim-address=127.0.0.1",
@@ -160,10 +162,18 @@ class OwnedSimulation:
             if not record.get("stopped"):
                 self.stop_process(process)
         self.manifest["ended_at"] = datetime.now(timezone.utc).isoformat()
+        remaining = []
+        for process, _, record in self.processes:
+            try:
+                os.killpg(process.pid, 0)
+            except ProcessLookupError:
+                continue
+            remaining.append(record["pgid"])
+        self.manifest["remaining_process_groups"] = remaining
         self.manifest["ports_released"] = all(available(p) for p in (self.port, self.port + 2, self.port + 3)) and available(self.json_port, socket.SOCK_DGRAM)
         self._save()
-        if not self.manifest["ports_released"]:
-            raise RuntimeError("owned simulation ports not released")
+        if not self.manifest["ports_released"] or remaining:
+            raise RuntimeError("owned simulation processes or ports not released")
 
 
 def install_signal_cleanup():

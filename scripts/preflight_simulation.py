@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import importlib.metadata
 import json
+import os
 from pathlib import Path
 import shutil
 import socket
@@ -37,7 +38,10 @@ def free_port(port: int, kind: int) -> bool:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--phase0", action="store_true", help="run only the Phase 0 baseline checks")
+    parser.add_argument("--isolated", action="store_true", help="check a free isolated instance instead of fixed ports")
     args = parser.parse_args()
+    binary_dir = Path(os.environ.get("VAF_SIMULATION_SITL_BIN_DIR", str(ARDUPILOT / "build/sitl/bin")))
+    plugin_dir = Path(os.environ.get("VAF_SIMULATION_PLUGIN_DIR", str(GAZEBO_PLUGIN / "build")))
     checks: dict[str, object] = {}
     for name in ("gz", "ss", "python"):
         checks[f"tool_{name}"] = shutil.which(name) is not None
@@ -47,9 +51,9 @@ def main() -> int:
         except importlib.metadata.PackageNotFoundError:
             checks[f"python_{name}"] = None
     files = {
-        "copter_binary": ARDUPILOT / "build/sitl/bin/arducopter",
-        "rover_binary": ARDUPILOT / "build/sitl/bin/ardurover",
-        "gazebo_plugin": GAZEBO_PLUGIN / "build/libArduPilotPlugin.so",
+        "copter_binary": binary_dir / "arducopter",
+        "rover_binary": binary_dir / "ardurover",
+        "gazebo_plugin": plugin_dir / "libArduPilotPlugin.so",
         "copter_world": GAZEBO_PLUGIN / "worlds/iris_runway.sdf",
         "rover_world": ROOT / "simulation/worlds/rover_runway.sdf",
         "rover_model": ROOT / "simulation/models/target_rover/model.sdf",
@@ -71,6 +75,11 @@ def main() -> int:
                 "tcp_5760_free", "tcp_5762_free", "udp_9002_free"}
     if not args.phase0:
         required.update({"rover_world", "rover_model", "rover_telemetry_params"})
+    if args.isolated:
+        from tests.simulation.launch import choose_instance
+        checks["isolated_instance"] = choose_instance()
+        required.difference_update({"tcp_5760_free", "tcp_5762_free", "udp_9002_free"})
+        required.add("isolated_instance")
     passed = all(bool(checks[name]) for name in required)
     print(json.dumps({"passed": passed, "phase0": args.phase0, "checks": checks}, indent=2, sort_keys=True))
     return 0 if passed else 1

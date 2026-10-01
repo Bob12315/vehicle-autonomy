@@ -124,8 +124,8 @@ def run(run_dir: Path, kind: str) -> dict:
         summary["faults"]["duplicate"] = {"passed": True, "tx": 1}
         command("arm", ArmEffect())
         if kind == "copter":
-            command("takeoff", TakeoffEffect(1.5), expected=("ACKNOWLEDGED",))
             deadline = time.monotonic() + limits["takeoff_timeout_s"]
+            command("takeoff", TakeoffEffect(1.5), expected=("ACKNOWLEDGED",))
             while time.monotonic() < deadline:
                 state, truth, _ = cycle()
                 if (truth is not None and state is not None and state.reported_pose is not None
@@ -162,9 +162,10 @@ def run(run_dir: Path, kind: str) -> dict:
                 raise AssertionError("fault scenario exceeded physical fence")
             return {"displacement_m": displacement, "last_effect": f"{name}-{count}"}
 
-        def truth_stop(*, connected=True, timeout=8):
-            deadline = time.monotonic() + timeout
+        def truth_stop(*, connected=True, timeout=8, deadline=None):
+            deadline = time.monotonic() + timeout if deadline is None else deadline
             stable = None
+            speed = yaw_rate = None
             while time.monotonic() < deadline:
                 if connected:
                     cycle()
@@ -177,12 +178,14 @@ def run(run_dir: Path, kind: str) -> dict:
                     and speed is not None and speed <= limits["stop_max_horizontal_speed_mps"]
                     and yaw_rate is not None and abs(yaw_rate) < .12)
                 stable = (stable or time.monotonic()) if within else None
-                if stable is not None and time.monotonic() - stable >= limits["stop_stable_s"]:
+                if (stable is not None and time.monotonic() - stable >= limits["stop_stable_s"]
+                        and time.monotonic() <= deadline):
                     return {"speed_mps": speed, "yaw_rate_rad_s": yaw_rate}
             raise TimeoutError(f"physical Stop failed: {speed}, {yaw_rate}")
 
         evidence = moving("deadman")
-        deadline = time.monotonic() + limits["stop_timeout_s"]
+        deadman_started = time.monotonic()
+        deadline = deadman_started + limits["stop_timeout_s"]
         while time.monotonic() < deadline:
             cycle()
             if runtime._execution.stop_status("deadman").state.value == "CONFIRMED":
@@ -195,23 +198,32 @@ def run(run_dir: Path, kind: str) -> dict:
         delay = (zero["host_ns"] - last_motion["host_ns"]) / 1e9
         if abs(zero.get("vx", 1)) > 1e-9 or not .8 <= delay <= 1.3:
             raise AssertionError(f"deadman TX deadline wrong: {delay}")
-        summary["faults"]["deadman"] = {"passed": True, **evidence, "zero_after_s": delay, **truth_stop()}
+        stopped = truth_stop(deadline=deadline)
+        summary["faults"]["deadman"] = {"passed": True, **evidence, "zero_after_s": delay, **stopped,
+            "elapsed_from_refresh_end_s": time.monotonic() - deadman_started}
 
         evidence = moving("cancel")
+        requested = time.monotonic()
+        stop_deadline = requested + limits["stop_timeout_s"]
         stops = runtime.end_run()
         if stops != {"cancel": "CONFIRMED"}:
             raise AssertionError(f"Cancel outcome: {stops}")
         if runtime.authority.system_send or runtime.authority.action_send:
             raise AssertionError("Cancel retained SEND")
-        summary["faults"]["cancel"] = {"passed": True, **evidence, "stops": stops, **truth_stop()}
+        stopped = truth_stop(deadline=stop_deadline)
+        summary["faults"]["cancel"] = {"passed": True, **evidence, "stops": stops, **stopped,
+            "elapsed_from_request_s": time.monotonic() - requested}
         runtime.begin_run(allow_send=True)
 
         evidence = moving("shutdown")
+        requested = time.monotonic()
+        stop_deadline = requested + limits["stop_timeout_s"]
         stops = runtime.shutdown()
         if stops != {"shutdown": "CONFIRMED"}:
             raise AssertionError(f"shutdown outcome: {stops}")
+        stopped = truth_stop(connected=False, deadline=stop_deadline)
         summary["faults"]["shutdown_during_motion"] = {"passed": True, **evidence, "stops": stops,
-                                                        **truth_stop(connected=False)}
+            **stopped, "elapsed_from_request_s": time.monotonic() - requested}
 
         # Restart an actual Runtime process, and deliver an actual SIGTERM
         # while its typed velocity stream is moving the Gazebo vehicle.
@@ -231,13 +243,16 @@ def run(run_dir: Path, kind: str) -> dict:
             time.sleep(.1)
         else:
             raise TimeoutError("Runtime process did not physically move")
+        requested = time.monotonic()
+        stop_deadline = requested + limits["stop_timeout_s"]
         os.kill(worker.pid, signal.SIGTERM)
-        worker.wait(timeout=10)
+        worker.wait(timeout=limits["stop_timeout_s"])
         owned.stop_process(worker)
         report = json.loads(worker_report.read_text())
         if worker.returncode != 0 or not report["passed"] or not report.get("signal_received"):
             raise AssertionError(f"SIGTERM worker failed: {report.get('error')}")
-        stopped = truth_stop(connected=False)
+        stopped = truth_stop(connected=False, deadline=stop_deadline)
+        signal_stop_elapsed = time.monotonic() - requested
         readonly_report = run_dir / "runtime-process-restart.json"
         count = len(proxy.tx())
         readonly = owned.start_process("runtime_readonly", worker_args[:-2] + [str(readonly_report)])
@@ -247,7 +262,8 @@ def run(run_dir: Path, kind: str) -> dict:
         if (readonly.returncode != 0 or not restarted["passed"] or restarted["initial_send"]
                 or restarted["initial_lease"] is not None or len(proxy.tx()) != count):
             raise AssertionError("restarted Runtime process retained authority or sent commands")
-        summary["faults"]["signal_shutdown"] = {"passed": True, "signal": "SIGTERM", "stops": report["stops"], **stopped}
+        summary["faults"]["signal_shutdown"] = {"passed": True, "signal": "SIGTERM", "stops": report["stops"], **stopped,
+            "elapsed_from_signal_s": signal_stop_elapsed}
         summary["faults"]["runtime_process_restart"] = {"passed": True, "new_pid": readonly.pid,
             "old_pid": worker.pid, "send": False, "lease": None, "new_tx": 0}
         runtime = new_runtime()
@@ -324,8 +340,8 @@ def run(run_dir: Path, kind: str) -> dict:
         summary["faults"]["telemetry_stale"] = {"passed": True, "covered_by": "long_disconnect"}
 
         if kind == "copter":
-            command("land-before-restart", LandEffect(), expected=("ACKNOWLEDGED",))
             deadline = time.monotonic() + limits["land_timeout_s"]
+            command("land-before-restart", LandEffect(), expected=("ACKNOWLEDGED",))
             while time.monotonic() < deadline:
                 state, truth, _ = cycle()
                 if state and not state.operation.armed and truth and truth.z_m <= origin.z_m + .2:

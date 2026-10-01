@@ -22,12 +22,14 @@ def run(run_dir: Path, *, gazebo: bool = False, full: bool = False) -> dict:
     owned = OwnedSimulation(run_dir, "rover")
     runtime = None
     trajectory = (run_dir / "trajectory.jsonl").open("w")
+    events = (run_dir / "runtime.jsonl").open("w")
     summary = {"passed": False, "run_dir": str(run_dir), "steps": {}}
     try:
         owned.start()
         oracle = GazeboTruthOracle(owned.world, owned.model)
         profile = owned.profile
-        runtime = SimulationRuntime(profile, translator=ArduRoverCommandTranslator(mode_ids=profile.mode_ids))
+        runtime = SimulationRuntime(profile, translator=ArduRoverCommandTranslator(mode_ids=profile.mode_ids),
+            event_sink=lambda event: (events.write(json.dumps(event) + "\n"), events.flush()))
         runtime.connect()
         warmup_deadline = time.monotonic() + profile.warmup_ns / 1e9
         message_counts = {}
@@ -141,12 +143,14 @@ def run(run_dir: Path, *, gazebo: bool = False, full: bool = False) -> dict:
                 return (angle + math.pi) % (2 * math.pi) - math.pi
 
             def stop_and_confirm(name, stream):
+                requested = time.monotonic()
+                deadline = requested + scenario["stop_timeout_s"]
                 status = command(name + "-stop", StopMotionEffect(stream),
                                  timeout=scenario["stop_timeout_s"])
                 if status["phase"] != "COMPLETED":
                     raise RuntimeError(f"{name} Stop not telemetry confirmed")
                 stable_since = None
-                deadline = time.monotonic() + scenario["stop_timeout_s"]
+                speed = yaw_rate = None
                 while time.monotonic() < deadline:
                     state = cycle()
                     truth = oracle.latest()
@@ -158,9 +162,10 @@ def run(run_dir: Path, *, gazebo: bool = False, full: bool = False) -> dict:
                               and speed <= scenario["stop_max_horizontal_speed_mps"]
                               and abs(yaw_rate) <= .12)
                     stable_since = (stable_since or time.monotonic()) if within else None
-                    if stable_since is not None and time.monotonic() - stable_since >= scenario["stop_stable_s"]:
+                    if (stable_since is not None and time.monotonic() - stable_since >= scenario["stop_stable_s"]
+                            and time.monotonic() <= deadline):
                         summary["steps"][name + "-stop-truth"] = {"speed_mps": speed,
-                                                                    "yaw_rate_rad_s": yaw_rate}
+                            "yaw_rate_rad_s": yaw_rate, "elapsed_from_request_s": time.monotonic() - requested}
                         return
                 raise TimeoutError(f"{name} Gazebo Stop not stable: speed={speed}, yaw_rate={yaw_rate}")
 
@@ -285,6 +290,7 @@ def run(run_dir: Path, *, gazebo: bool = False, full: bool = False) -> dict:
         except Exception as exc:
             summary["cleanup_error"] = f"{type(exc).__name__}: {exc}"
         trajectory.close()
+        events.close()
         (run_dir / "summary.json").write_text(json.dumps(summary, indent=2))
     return summary
 
