@@ -1,6 +1,6 @@
 # 可复用框架迁移计划与记录
 
-> **状态：P0 至 P4 已完成；P5 的 ArduCopter 软件组合已通过离线、本机 SITL、Copter USB 受限模式诊断和裸飞控台架 Arm 拒绝/Disarm 验证，整车实机待验收；P6 持续运行组合已规划、尚未实施。** 本文记录从 `legacy/cuadc_2026/` 提取可复用能力的顺序、验收门槛与阶段进度。目标职责以 [V1 目标架构](framework_v1.md) 为准；[当前实现边界](architecture.md)描述根目录已有能力。本文中的源文件只是候选素材，不表示已决定复制或已在新框架运行。
+> **状态：P0 至 P4 已完成；P5 的 ArduCopter 软件组合已通过离线、本机 SITL、Copter USB 受限模式诊断和裸飞控台架 Arm 拒绝/Disarm 验证，整车实机待验收；P6 localhost SITL 持续运行组合已验证。** 本文记录从 `legacy/cuadc_2026/` 提取可复用能力的顺序、验收门槛与阶段进度。目标职责以 [V1 目标架构](framework_v1.md) 为准；[当前实现边界](architecture.md)描述根目录已有能力。本文中的源文件只是候选素材，不表示已决定复制或已在新框架运行。
 
 ## 目标与策略
 
@@ -40,7 +40,7 @@
 | 3. Mission/Action | Schema、能力预检、编译、运行生命周期、取消、结果、Typed Effect，以及按需接入 Planning/Guidance | 未注册或不支持的 Action 被拒；失败、重试、取消和退出行为有测试；Action、Planning、Guidance 均不直接发送车辆命令 | **已完成：离线决策链**，见下方 P3 记录 |
 | 4. 控制安全边界 | 授权生命周期、Execution 分派、Safety、命令回执与取消/停止语义 | 默认 SEND 关闭；双门控、TTL、撤销、代际、deadman、stop/zero、断链及唯一 writer 在假端口测试中成立 | **已完成：离线假端口边界**，见下方 P4 记录 |
 | 5. 插件与设备组合 | 所需 Vehicle Plugin、Protocol/Transport、Sensor Adapter、Deployment 组合 | 先离线与仿真验证；真实设备能力只在设备验收后声明；生产写入仍只有一个受控出口 | **部分完成：ArduCopter/TCP、本机 SITL、Copter/Rover USB 模式诊断及裸飞控受控台架；整车实机待验收**，见下方 P5 记录 |
-| 6. 首个持续运行组合 | ArduCopter/localhost SITL 的配置、Application 用例、运行协调器、生命周期与端到端验证 | 未解锁模式 Mission 经 SITL 遥测生成的 WorldSnapshot、Typed Effect、双 SEND/Safety/唯一 writer 到 ACK 与新状态；默认 SEND 关闭，故障与退出结果可复现 | **计划中，尚未实施**；见 [P6 实施计划](p6_runtime_integration_plan.md) |
+| 6. 首个持续运行组合 | ArduCopter/localhost SITL 的配置、Application 用例、运行协调器、生命周期与端到端验证 | 未解锁模式 Mission 经 SITL 遥测生成的 WorldSnapshot、Typed Effect、双 SEND/Safety/唯一 writer 到 ACK 与新状态；默认 SEND 关闭，故障与退出结果可复现 | **localhost SITL 范围已验证**；见 [P6 实施与验收](p6_runtime_integration_plan.md) |
 
 ### 阶段 0：建立可核对的迁移清单
 

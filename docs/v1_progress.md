@@ -29,7 +29,7 @@
 | Mapping | **0%** | 仅有包占位。 | 无地图生产、版本管理和向 World Model 发布；按场景需要建设。 |
 | Environment | **0%** | 仅有包占位。 | 无场景坐标基准、命名位置、静态地图或环境围栏适配；按首个任务需要建设。 |
 | World Model | **75%** | [WorldModel](../world_model/service.py)可发布版本化只读快照，现已在 P6 SITL 进程中持续接收飞控状态并发布。 | 尚不接地图/Environment，不做跨 Frame 变换；真实设备采集时间未验收。 |
-| 状态链组合 | **50%** | [OfflineStateChain](../application/state_chain.py)把假输入/车辆状态、定位与 World Model 接成离线发布链。 | 尚无真实传感器和设备状态持续采集、调度及与 Mission/Execution 共用的运行组合。 |
+| 状态链组合 | **75%** | [SitlRuntime](../deployment/sitl_runtime.py)持续接收 SITL 飞控状态并经 World Model 向 Mission 发布快照；离线及本机 SITL 验收通过。 | 无真实传感器、生产设备时间映射或其他车辆组合。 |
 
 ## 2. 决策链
 
@@ -46,7 +46,7 @@
 
 | 部分 | 进度 | 已完成的证据 | 尚未完成 |
 | --- | ---: | --- | --- |
-| Execution | **75%** | [VehicleExecution](../core/vehicle_execution.py)接收 Typed Effect，提交标准命令，处理幂等、取消、deadman 和 stop 状态；经离线、SITL 和受限 USB 命令链测试。 | Mission 产出的 Effect 尚未由正式系统持续分派；`tick()` 依赖调用方周期调度，物理停止未验收。 |
+| Execution | **75%** | [VehicleExecution](../core/vehicle_execution.py)已在 P6 周期中接收 Mission Effect 并经双 SEND/Safety/唯一 writer 分派；幂等、deadman 和 stop 有 P4/P5 测试。 | 物理停止与运动任务未验收；P6 模式任务没有活动运动流。 |
 | 非车辆 Effect | **0%** | 当前 V1 [Effect 类型](../contracts/effects/vehicle.py)与新 Execution 仅覆盖车辆命令。 | 若首个组合需要拍照、保存文件或其他副作用，须定义各自合同和受控端口，并由 Execution 分派。 |
 | Authorization | **75%** | [ControlAuthority](../core/control_authority.py)默认关闭双 SEND，管理 Lease、代际、撤销和会话；写前在唯一 writer 处复核。 | 尚无生产控制源仲裁、操作配置及整车场景验收。 |
 | Safety | **75%** | [VehicleSafetyPolicy](../core/vehicle_safety.py)要求显式限值，检查 TTL、时钟/状态新鲜度、Mode/Frame、高度、矩形围栏与速度；受限设备命令经过此边界。 | 车辆专用限制、下降率/分轴规则、实际失联动作及物理 stop 仍需按首个车辆审核和验收；软件检查通过不等于飞行安全验收。 |
@@ -67,7 +67,7 @@
 | Gateway | **0%** | 仅有包占位。 | 无远程接入、链路监视和本地失联处置；只有远程部署需要。 |
 | Web UI | **0%** | 仅有包占位。 | 无界面或 Web API；不是首个无 Web 组合的必需条件。 |
 | 独立运行配置 | **100%（P6 SITL 范围）** | [严格 TOML profile](../runtime/sitl.toml)指定 loopback、机型、周期、时钟和显式 Safety；配置不含 SEND 开关。 | 仅覆盖本机 SITL；无可发送的 onboard profile。 |
-| 自动化测试与验收 | **75%** | 根目录已有合同、离线状态/决策/控制、MAVLink 的单元测试；另有本机 SITL 与受限 USB/台架手动记录。 | 缺正式运行组合的端到端测试、失联/stop 的完整仿真验收及整车设备验收。 |
+| 自动化测试与验收 | **75%** | 75 项根目录测试覆盖合同、离线状态/决策/控制、MAVLink 及 P6 故障注入；本机 SITL 端到端模式任务通过。 | 缺运动/失联 stop 的完整仿真及整车设备验收。 |
 
 ## 5. 还差什么才能称为“完整系统”
 

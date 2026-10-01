@@ -4,7 +4,7 @@
 
 ## 1. 分析与范围决定
 
-现有 [OfflineStateChain](../application/state_chain.py)能发布 WorldSnapshot，[MissionRuntime](../core/mission_runtime.py)能产生 Typed Effect，[VehicleExecution](../core/vehicle_execution.py)和 [ArduPilotSession](../vehicles/multirotor/session.py)能受控提交并观察命令；但 [CLI](../app/main.py)只提供 `status`，没有进程把这些部分持续接起来。[CopterCycleDriver](../deployment/copter_cycle.py)也须由调用方定期触发。因此，当前先做纵向运行组合，比增加新的 Perception、Planning 或 Web 模块更直接。
+制定计划时，[OfflineStateChain](../application/state_chain.py)已能发布 WorldSnapshot，[MissionRuntime](../core/mission_runtime.py)已能产生 Typed Effect，[VehicleExecution](../core/vehicle_execution.py)和 [ArduPilotSession](../vehicles/multirotor/session.py)已能受控提交并观察命令；当时 [CLI](../app/main.py)只提供 `status`，还没有进程持续连接这些部分。[CopterCycleDriver](../deployment/copter_cycle.py)也须由调用方定期触发。P6 因此先完成纵向运行组合。
 
 本计划暂定的首个组合为：**ArduCopter + MAVLink/TCP + 飞控自身状态 + World Model + 一个 Typed Mission + localhost SITL + 单进程**。实施前在 P6.0 核对实际需求并固定此范围；变更目标组合时同步调整验收项。没有外部 Sensor、地图、AI、Web 或比赛任务。验收 Mission 仅在**未解锁**状态请求一个明确允许的模式，并等待 ACK 与后续状态确认；不包含 Arm、Takeoff、Land 或运动目标。仅用 ModeEffect 测试时没有活动运动流，不能把“发送 StopMotion”写作必经步骤。
 
