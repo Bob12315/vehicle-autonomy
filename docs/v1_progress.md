@@ -1,6 +1,6 @@
 # Vehicle Autonomy Framework V1：模块进度与未完成项
 
-> 审计日期：2026-10-01。基线提交：`f0021a93668603f4a27b6931ca0c1e188d5d994f`。本文审计新框架根目录；`legacy/cuadc_2026/` 中的历史实现不计入新框架进度。目标职责见 [V1 目标架构](framework_v1.md)，已经验证的阶段范围见 [迁移计划](migration_plan.md)。
+> 复核日期：2026-10-01。复核基线提交：`bc7cbbf11565203de61deb8a6f8bfd0a9d163e76`。本文审计新框架根目录；`legacy/cuadc_2026/` 中的历史实现不计入新框架进度。目标职责见 [V1 目标架构](framework_v1.md)，已经验证的阶段范围见 [迁移计划](migration_plan.md)。
 
 ## 进度口径
 
@@ -14,7 +14,7 @@
 | 75% | 已进入仿真或受限设备链验证，仍缺所声称使用环境的完整验收。 |
 | 100% | 已完成该行写明的明确范围及相应验收；不代表所有未来插件和场景都实现。 |
 
-**阶段进度：** P0 是限定范围的基线审计；P1–P4 已完成各自阶段门槛。P5 已完成 ArduCopter 软件组合、本机 SITL 和受限 USB/裸飞控台架验证。P6 已完成 localhost SITL 持续运行模式任务，其后的独立 SITL 解锁/上锁任务也已验证。**整车实机验收未完成**。阶段状态不是整个系统的加权完成率。
+**阶段进度：** P0 是限定范围的基线审计；P1–P4 已完成各自阶段门槛。P5 已完成 ArduCopter 软件组合、本机 SITL 和受限 USB/裸飞控台架验证。P6 已完成 localhost SITL 持续运行模式任务，其后的独立 SITL 解锁/上锁任务也已验证。**整车实机验收未完成，当前暂缓真实飞控接入。** 阶段状态不是整个系统的加权完成率。
 
 ## 1. 基础语义与状态链
 
@@ -69,19 +69,20 @@
 | 独立运行配置 | **100%（P6 SITL 范围）** | [严格 TOML profile](../runtime/sitl.toml)指定 loopback、机型、周期、时钟和显式 Safety；配置不含 SEND 开关。 | 仅覆盖本机 SITL；无可发送的 onboard profile。 |
 | 自动化测试与验收 | **75%** | 81 项根目录测试覆盖合同、离线状态/决策/控制、MAVLink、P6 故障注入和 SITL 解锁任务清理；本机 SITL 两种端到端任务通过。 | 缺运动/失联 stop 的完整仿真及整车设备验收。 |
 
-## 5. 还差什么才能称为“完整系统”
+## 5. P6 完成后的工作范围
 
-先确定一个**首个支持组合**（车辆、传感器、任务和部署形态），再依据该组合验收；不需要先实现上表所有按需模块。目前最直接的路线是现有 ArduCopter/MAVLink 能力，但是否采用它由实际项目需求决定。
+[P6 实施与验收](p6_runtime_integration_plan.md)已证明 localhost ArduCopter SITL 中状态、Mission、Effect、Execution、ACK 和新状态构成持续运行闭环。独立的[解锁/上锁 SITL 任务](sitl_arm_mission.md)进一步验证了受限的三步任务；这仍只是仿真能力。当前决定**暂缓真实飞控接入**：P5 的整车设备验收保持未完成，不建设可发送的 onboard profile，也不把 SITL 的接收时间代理视为真实采集时间。
 
-P6 的工程顺序和完成证据见 [P6：首个持续运行组合实施计划](p6_runtime_integration_plan.md)。上述上调只对应 localhost ArduCopter SITL 的未解锁模式任务；不推断实机或运动能力。
+当前可继续的软件工作按实际业务需要推进：
 
-1. **接通正式运行闭环：** 在 `app`/`application`/`deployment` 中组合可信状态采集、World Model、Typed Mission、Effect 分派、Execution 与命令回执；实现周期调度、关闭、取消、失败和停止流程，并保持双 SEND 默认关闭。
-2. **补齐首个组合的真实输入和能力：** 确定采集时间来源、时钟域/Frame、车辆状态质量；只实现任务所需的 Sensor、Action、Environment、Planning 等，不把空包当作支持。
-3. **完成仿真端到端验收：** 用所选 Mission 验证状态→决策→命令→ACK/状态观察，覆盖取消、过期、断链、连续命令 stop/zero 与重连旧命令隔离。
-4. **按声称的设备能力完成实机验收：** 若要声明整车可用，需在实际装配、校准及安全配置后验证运动、执行器、物理停止、失联处置和日志。当前 USB/裸板记录只证明受限模式请求、预解锁拒绝与 Disarm 回执。
+1. **确定首个非比赛业务 Mission：** 明确输入、输出、所需车辆能力和完成判据；现有 `SitlRuntime` 的模式/解锁步骤仍是固定诊断任务，不是通用任务目录。
+2. **将运行组合扩展为可装配任务：** 在 Application 合同下接收经过预检的 Typed Mission 和 Action 注册，不让业务模块持有车辆端口；保持双 SEND 默认关闭、唯一 writer、结果回流和单进程生命周期语义。
+3. **按任务需要增加模块与 SITL 验收：** 只实现所选任务确实依赖的 Sensor、Environment、Planning、Guidance 或非车辆 Effect。若任务包含运动流，先在假端口和 SITL 中验收取消、deadman、stop/zero 与断链后的未确认结果；模式/解锁任务的通过不能替代这些测试。
+
+真实飞控重新纳入范围时，再单独制定设备时间同步、机架/传感器校准、日志、物理运动、停止和失联保护的验收计划。当前不据此提高表中 Vehicle、Safety 或 Transport 的成熟度。
 
 ## 验证边界
 
-SITL 解锁任务更新时根目录执行 `python -m unittest discover -s tests -q`：**81 项通过**；`python -m app.main status` 仍返回 `mission_scheduler=unwired`、`vehicle_connection=unwired`、`send_commands=false`，表示默认入口不连接车辆。本机 SITL 模式及解锁/上锁端到端验收见[记录](sitl_arm_mission.md)；这些结果不能替代整车实机运动、物理停止或服务器部署验收。
+本次复核执行 `python -m unittest discover -s tests -q`：**81 项通过**；`python -m app.main status` 仍返回 `mission_scheduler=unwired`、`vehicle_connection=unwired`、`send_commands=false`，表示默认入口不连接车辆。本机 SITL 模式及解锁/上锁端到端验收见[记录](sitl_arm_mission.md)；这些结果不能替代整车实机运动、物理停止或服务器部署验收。
 
 更新本文时应同时更新基线提交、运行测试、模块证据和未完成项。若某模块只因新增文件而没有达到更高档位的验证要求，进度分档不应上调。

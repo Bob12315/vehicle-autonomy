@@ -1,6 +1,6 @@
 # 可复用框架迁移计划与记录
 
-> **状态：P0 至 P4 已完成；P5 的 ArduCopter 软件组合已通过离线、本机 SITL、Copter USB 受限模式诊断和裸飞控台架 Arm 拒绝/Disarm 验证，整车实机待验收；P6 localhost SITL 持续运行组合及独立解锁/上锁任务已验证。** 本文记录从 `legacy/cuadc_2026/` 提取可复用能力的顺序、验收门槛与阶段进度。目标职责以 [V1 目标架构](framework_v1.md) 为准；[当前实现边界](architecture.md)描述根目录已有能力。本文中的源文件只是候选素材，不表示已决定复制或已在新框架运行。
+> **状态：P0 至 P4 已完成；P5 的 ArduCopter 软件组合已通过离线、本机 SITL、Copter USB 受限模式诊断和裸飞控台架 Arm 拒绝/Disarm 验证，整车实机待验收且当前暂缓真实飞控接入；P6 localhost SITL 持续运行组合及独立解锁/上锁任务已验证。** 本文记录从 `legacy/cuadc_2026/` 提取可复用能力的顺序、验收门槛与阶段进度。目标职责以 [V1 目标架构](framework_v1.md) 为准；[当前实现边界](architecture.md)描述根目录已有能力。本文中的源文件只是候选素材，不表示已决定复制或已在新框架运行。
 
 ## 目标与策略
 
@@ -39,7 +39,7 @@
 | 2. 状态链 | 假 Sensor/Vehicle 输入、标准化观测、可选的纯感知或定位算法、World Model 发布 | 不接真实命令端口；时间戳、坐标、过期/缺失状态可测试；高级消费者只读统一快照 | **已完成：离线假输入链**，见下方 P2 记录 |
 | 3. Mission/Action | Schema、能力预检、编译、运行生命周期、取消、结果、Typed Effect，以及按需接入 Planning/Guidance | 未注册或不支持的 Action 被拒；失败、重试、取消和退出行为有测试；Action、Planning、Guidance 均不直接发送车辆命令 | **已完成：离线决策链**，见下方 P3 记录 |
 | 4. 控制安全边界 | 授权生命周期、Execution 分派、Safety、命令回执与取消/停止语义 | 默认 SEND 关闭；双门控、TTL、撤销、代际、deadman、stop/zero、断链及唯一 writer 在假端口测试中成立 | **已完成：离线假端口边界**，见下方 P4 记录 |
-| 5. 插件与设备组合 | 所需 Vehicle Plugin、Protocol/Transport、Sensor Adapter、Deployment 组合 | 先离线与仿真验证；真实设备能力只在设备验收后声明；生产写入仍只有一个受控出口 | **部分完成：ArduCopter/TCP、本机 SITL、Copter/Rover USB 模式诊断及裸飞控受控台架；整车实机待验收**，见下方 P5 记录 |
+| 5. 插件与设备组合 | 所需 Vehicle Plugin、Protocol/Transport、Sensor Adapter、Deployment 组合 | 先离线与仿真验证；真实设备能力只在设备验收后声明；生产写入仍只有一个受控出口 | **部分完成：ArduCopter/TCP、本机 SITL、Copter/Rover USB 模式诊断及裸飞控受控台架；整车实机待验收（当前暂缓）**，见下方 P5 记录 |
 | 6. 首个持续运行组合 | ArduCopter/localhost SITL 的配置、Application 用例、运行协调器、生命周期与端到端验证 | 未解锁模式 Mission 经 SITL 遥测生成的 WorldSnapshot、Typed Effect、双 SEND/Safety/唯一 writer 到 ACK 与新状态；默认 SEND 关闭，故障与退出结果可复现 | **localhost SITL 范围已验证**；见 [P6 实施与验收](p6_runtime_integration_plan.md) |
 
 ### 阶段 0：建立可核对的迁移清单
@@ -132,6 +132,8 @@ P0 已按 `contracts/`、`telemetry_link` 的 state/frame/time、依赖这些合
 ### 阶段 6：首个持续运行组合（已验证的 localhost SITL 范围）
 
 P6 已在 **localhost ArduCopter SITL** 接通状态发布、Typed Mission、Effect、Execution、授权/Safety、唯一 writer 与结果回流，建立可启动、可取消、可关闭的单进程运行组合。首个验收任务仅在未解锁状态请求受限模式；不将 Arm、起飞或运动纳入 P6。结果反馈、运行周期、异常退出、断链隔离及时间戳边界的实施证据见 [P6 实施与验收记录](p6_runtime_integration_plan.md#6-p6-实施与验收记录2026-10-01)。P5 的整车实机待验收状态不因 P6 完成而改变。
+
+**当前安排（2026-10-01）：** P6 已完成，另有独立的 SITL 解锁/上锁任务验收；真实飞控接入暂缓，P5 整车验收保留为未完成，不继续扩展物理连接或 onboard 发送入口。软件后续工作以[进度文档中的 P6 后工作范围](v1_progress.md#5-p6-完成后的工作范围)为准；重新启动设备验收时另行记录目标机体、真实采集时间和物理停止/失联证据。
 
 ## 候选代码的初步归属
 

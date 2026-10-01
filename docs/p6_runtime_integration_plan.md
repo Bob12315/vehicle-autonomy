@@ -66,3 +66,5 @@ P6 完成时，至少留下以下可复现证据：
 可复现命令：先启动本机 ArduCopter SITL TCP 5760，再执行 `tests/manual_p6_sitl.sh runtime/sitl.toml 'ArduCopter V4.8.0-dev (b5fbe265)'`。本次本机二进制内含版本字符串 `ArduCopter V4.8.0-dev (b5fbe265)`；操作者报告的版本在日志中标记为 `version_source=operator`，不是飞控遥测证明。实际运行得到单个 Effect 的 `REQUESTED → ACCEPTED → TRANSMITTED → ACKNOWLEDGED → COMPLETED`，最终 `SUCCEEDED`，WorldSnapshot 修订号 14，车辆质量 `VALID`、新鲜度 `FRESH`，未解锁。相同 SITL 上运行 `python -m app.main run-sitl`（无 `--allow-send`）得到 `system_send_disabled`、最终 `FAILED`，没有命令写入。`python -m unittest discover -s tests -q`：75 项通过；`python -m compileall -q app application contracts core deployment runtime vehicles tests` 和 `git diff --check` 通过。离线测试覆盖取消后新 Run、在途取消隔离、拒绝、未知写入、断链重连、状态过期、Effect 过期、周期延误、最终模式写入限制。没有修改归档树。
 
 P6 **不包含**真实机体解锁/起飞、物理 stop、真实设备时间同步、onboard/server/hybrid 部署、Camera/LiDAR、Perception、复杂 Localization、Mapping、Planning、Guidance、Intelligence、Gateway、Web、固定翼或 VTOL。P6 之后先评审首个实际业务 Mission，再按它所需的输入和算法扩展。若要声明整车生产支持，仍须完成 P5 所列机架、校准、真实时间、运动、失联保护、日志和物理停止的独立设备验收。
+
+**后续范围决定（2026-10-01）：** 真实飞控接入暂缓。P6 的 localhost SITL 验收状态保持已完成，P5 整车设备验收保持未完成；近期软件工作见[模块进度文档](v1_progress.md#5-p6-完成后的工作范围)。
