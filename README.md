@@ -17,6 +17,8 @@ python -m unittest discover -s tests -v
 
 P6 的配置为 [runtime/sitl.toml](runtime/sitl.toml)，仅接受数值 loopback 地址和 ArduCopter 四旋翼。先单独启动本机 ArduCopter SITL 的 TCP 5760 端口，再运行 `python -m app.main run-sitl --config runtime/sitl.toml --allow-send`。省略 `--allow-send` 会连接并发布状态，但 ModeEffect 被授权边界拒绝，且不会写出车辆命令。可用 `tests/manual_p6_sitl.sh runtime/sitl.toml '<SITL 版本>'` 验收 ACK 与新心跳状态；版本参数由操作者报告，日志标明来源。P6 只请求一次未解锁 `GUIDED` 模式，不发解锁、起飞、运动或 StopMotion。
 
+另有独立的 **SITL 解锁验收任务**：`python -m app.main run-sitl-arm --allow-send --allow-arm` 使用 [解锁专用 profile](runtime/sitl_arm.toml)，依次确认 `GUIDED`、Arm 和 Disarm，最终回到未解锁。全新本机 SITL 的验证命令、拒绝记录、取消及未知结果边界见 [SITL 解锁任务验收](docs/sitl_arm_mission.md)。该入口只允许 loopback SITL；不提供起飞或运动命令。
+
 ArduCopter 插件使用 [requirements-p5.txt](requirements-p5.txt) 中的可选依赖。本机 SITL 验证需先自行启动 ArduCopter 的 TCP 5760 端口，再显式运行 `PYTHONPATH=. python tests/manual_p5_sitl.py --allow-send`；脚本仅连接 `127.0.0.1`，确认未解锁后请求 `GUIDED` 模式并等待 ACK。它不会执行起飞或实机连接。
 
 USB 飞控诊断须显式运行 `PYTHONPATH=. python tests/manual_p5_rover_usb.py --port /dev/ttyACM0 --allow-send`（实际设备路径可用 `/dev/serial/by-id/...`）。脚本仅接受 ArduPilot Rover 心跳，要求飞控已处于未解锁的 HOLD 模式，经过同一 Execution/双 SEND/Safety/唯一 writer 链发送一次 HOLD 请求，并等待 ACK 与后续状态。该诊断不提供解锁、运动或参数修改能力；这不等于 Copter 实机或整车运动验收。

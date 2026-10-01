@@ -14,7 +14,7 @@
 | 75% | 已进入仿真或受限设备链验证，仍缺所声称使用环境的完整验收。 |
 | 100% | 已完成该行写明的明确范围及相应验收；不代表所有未来插件和场景都实现。 |
 
-**阶段进度：** P0 是限定范围的基线审计；P1–P4 已完成各自阶段门槛。P5 已完成 ArduCopter 软件组合、本机 SITL 和受限 USB/裸飞控台架验证。P6 已完成限定范围的 localhost SITL 持续运行模式任务，**整车实机验收未完成**。阶段状态不是整个系统的加权完成率。
+**阶段进度：** P0 是限定范围的基线审计；P1–P4 已完成各自阶段门槛。P5 已完成 ArduCopter 软件组合、本机 SITL 和受限 USB/裸飞控台架验证。P6 已完成 localhost SITL 持续运行模式任务，其后的独立 SITL 解锁/上锁任务也已验证。**整车实机验收未完成**。阶段状态不是整个系统的加权完成率。
 
 ## 1. 基础语义与状态链
 
@@ -50,7 +50,7 @@
 | 非车辆 Effect | **0%** | 当前 V1 [Effect 类型](../contracts/effects/vehicle.py)与新 Execution 仅覆盖车辆命令。 | 若首个组合需要拍照、保存文件或其他副作用，须定义各自合同和受控端口，并由 Execution 分派。 |
 | Authorization | **75%** | [ControlAuthority](../core/control_authority.py)默认关闭双 SEND，管理 Lease、代际、撤销和会话；写前在唯一 writer 处复核。 | 尚无生产控制源仲裁、操作配置及整车场景验收。 |
 | Safety | **75%** | [VehicleSafetyPolicy](../core/vehicle_safety.py)要求显式限值，检查 TTL、时钟/状态新鲜度、Mode/Frame、高度、矩形围栏与速度；受限设备命令经过此边界。 | 车辆专用限制、下降率/分轴规则、实际失联动作及物理 stop 仍需按首个车辆审核和验收；软件检查通过不等于飞行安全验收。 |
-| ArduCopter Vehicle Plugin | **75%** | [命令翻译](../vehicles/multirotor/ardupilot_commands.py)、[唯一 writer](../vehicles/multirotor/mavlink_port.py)、[会话](../vehicles/multirotor/session.py)和只读状态适配已实现；SITL 及 USB 台架记录见[迁移计划](migration_plan.md#阶段-5按需接入设备)。 | 未完成实际机架的解锁、运动、执行器输出、物理停止及失联效果验收；台架记录显示测试后已把 `FRAME_CLASS` 恢复为原值 0。 |
+| ArduCopter Vehicle Plugin | **75%** | [命令翻译](../vehicles/multirotor/ardupilot_commands.py)、[唯一 writer](../vehicles/multirotor/mavlink_port.py)、[会话](../vehicles/multirotor/session.py)和只读状态适配已实现；本机 SITL 模式/解锁/上锁链及 USB 台架受限诊断有记录。 | 未完成实际机架的解锁、运动、执行器输出、物理停止及失联效果验收；台架记录显示测试后已把 `FRAME_CLASS` 恢复为原值 0。 |
 | Rover Vehicle Plugin | **25%** | 有仅允许 HOLD 请求的[受限诊断](../vehicles/rover/diagnostic.py)，USB 未解锁 ACK/状态已验证。 | 无 Rover 运动能力、完整状态/命令插件或整车验收。 |
 | 其他 Vehicle Plugin | **0%** | 固定翼、VTOL 等无实现。 | 仅在选择相应机型时开发；不应计作当前 ArduCopter 组合的阻塞项。 |
 | MAVLink Protocol | **75%** | [MAVLink 2 codec](../protocols/mavlink/codec.py)与[遥测解码](../protocols/mavlink/telemetry.py)覆盖当前 ArduPilot 子集；SITL/USB 受限链已验证。 | 不是 MAVLink 全量实现；首个整车组合所需的运动与异常协议路径仍待验收。 |
@@ -61,13 +61,13 @@
 | 部分 | 进度 | 已完成的证据 | 尚未完成 |
 | --- | ---: | --- | --- |
 | Application 用例 | **75%** | [MissionService](../application/mission_service.py)提供启动、取消、查询与关闭用例；P6 离线闭环已验证。 | 无外部 API、操作者控制源仲裁或其他业务 Mission。 |
-| 具体 Applications / Missions | **0%** | 业务包仅占位；旧比赛任务仍在 `legacy/`。 | 尚未选择首个非比赛任务、配置、Action 和 Mission；需先定具体组合。 |
-| App 进程入口 | **75%** | [CLI](../app/main.py)显式 `run-sitl` 可启动 localhost SITL 单进程，默认双 SEND 关闭；Ctrl+C 进入取消和关闭。 | 无 onboard/server 入口或生产车辆连接。 |
+| 具体 Applications / Missions | **25%** | 本机 SITL 有独立的模式任务及[解锁/上锁验收任务](sitl_arm_mission.md)，均为受限诊断 Mission。 | 无首个实际业务 Mission；旧比赛任务仍在 `legacy/`。 |
+| App 进程入口 | **75%** | [CLI](../app/main.py)显式 `run-sitl` 和 `run-sitl-arm` 可启动 localhost SITL 单进程；解锁入口需要双重显式开关。 | 无 onboard/server 入口或生产车辆连接。 |
 | Deployment | **75%** | [SitlRuntime](../deployment/sitl_runtime.py)负责周期、状态发布、Mission 推进、结果汇集及故障撤权；本机 SITL 验收通过。 | 不支持真实设备时间同步、物理停止或生产重连。 |
 | Gateway | **0%** | 仅有包占位。 | 无远程接入、链路监视和本地失联处置；只有远程部署需要。 |
 | Web UI | **0%** | 仅有包占位。 | 无界面或 Web API；不是首个无 Web 组合的必需条件。 |
 | 独立运行配置 | **100%（P6 SITL 范围）** | [严格 TOML profile](../runtime/sitl.toml)指定 loopback、机型、周期、时钟和显式 Safety；配置不含 SEND 开关。 | 仅覆盖本机 SITL；无可发送的 onboard profile。 |
-| 自动化测试与验收 | **75%** | 75 项根目录测试覆盖合同、离线状态/决策/控制、MAVLink 及 P6 故障注入；本机 SITL 端到端模式任务通过。 | 缺运动/失联 stop 的完整仿真及整车设备验收。 |
+| 自动化测试与验收 | **75%** | 81 项根目录测试覆盖合同、离线状态/决策/控制、MAVLink、P6 故障注入和 SITL 解锁任务清理；本机 SITL 两种端到端任务通过。 | 缺运动/失联 stop 的完整仿真及整车设备验收。 |
 
 ## 5. 还差什么才能称为“完整系统”
 
@@ -82,6 +82,6 @@ P6 的工程顺序和完成证据见 [P6：首个持续运行组合实施计划]
 
 ## 验证边界
 
-P6 更新时根目录执行 `python -m unittest discover -s tests -q`：**75 项通过**；`python -m app.main status` 仍返回 `mission_scheduler=unwired`、`vehicle_connection=unwired`、`send_commands=false`，表示默认入口不连接车辆。另有本机 SITL 端到端验收；这些结果不能替代整车实机运动、物理停止或服务器部署验收。
+SITL 解锁任务更新时根目录执行 `python -m unittest discover -s tests -q`：**81 项通过**；`python -m app.main status` 仍返回 `mission_scheduler=unwired`、`vehicle_connection=unwired`、`send_commands=false`，表示默认入口不连接车辆。本机 SITL 模式及解锁/上锁端到端验收见[记录](sitl_arm_mission.md)；这些结果不能替代整车实机运动、物理停止或服务器部署验收。
 
 更新本文时应同时更新基线提交、运行测试、模块证据和未完成项。若某模块只因新增文件而没有达到更高档位的验证要求，进度分档不应上调。

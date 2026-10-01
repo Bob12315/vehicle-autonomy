@@ -37,7 +37,8 @@ typed effect, and vehicle command contracts. `core/`
 implements Action registration, Mission compilation/runtime, TransformTree,
 the P4 offline control boundary, and the older demonstration Execution
 gateway. `application/` exposes use cases without a hardware port. `app/`
-contains only the new status CLI. `sensors/`, `vehicles/`, `localization/`, and
+contains the disconnected status CLI and explicit loopback SITL entries.
+`sensors/`, `vehicles/`, `localization/`, and
 `world_model/` contain P2 offline fake sources, a pure reported-pose projection,
 and a World Model that publishes immutable snapshots. `vehicles/multirotor/`
 normalizes received ArduPilot telemetry and translates approved commands;
@@ -62,6 +63,15 @@ mode. The Action sees read-only results and succeeds only after ACK plus a
 later heartbeat and a fresh WorldSnapshot reporting the target mode. `status`
 still opens no connection; both SEND gates default to false, and `run-sitl`
 requires `--allow-send` to authorize one Mission lease.
+The separate `run-sitl-arm` entry requires both `--allow-send` and `--allow-arm`
+before connecting. Its three-step Mission confirms GUIDED mode, Arm, and
+Disarm in order. Each step receives a newly scoped lease. The final SITL
+translator accepts only Mode, Arm, and Disarm; a write guard checks the
+disarmed target mode before Arm and an armed state before Disarm. On an armed
+failure or cancellation, the coordinator attempts one fenced Disarm with a
+bounded confirmation wait. Link loss and unknown Arm outcomes are reported
+unconfirmed. This is simulation-only evidence, not real vehicle arming or
+physical stop validation.
 
 Core never imports a concrete vehicle, protocol, transport, CUADC application,
 or `legacy/`. Mission validates registered Actions, typed parameters and vehicle

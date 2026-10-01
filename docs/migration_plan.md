@@ -1,6 +1,6 @@
 # 可复用框架迁移计划与记录
 
-> **状态：P0 至 P4 已完成；P5 的 ArduCopter 软件组合已通过离线、本机 SITL、Copter USB 受限模式诊断和裸飞控台架 Arm 拒绝/Disarm 验证，整车实机待验收；P6 localhost SITL 持续运行组合已验证。** 本文记录从 `legacy/cuadc_2026/` 提取可复用能力的顺序、验收门槛与阶段进度。目标职责以 [V1 目标架构](framework_v1.md) 为准；[当前实现边界](architecture.md)描述根目录已有能力。本文中的源文件只是候选素材，不表示已决定复制或已在新框架运行。
+> **状态：P0 至 P4 已完成；P5 的 ArduCopter 软件组合已通过离线、本机 SITL、Copter USB 受限模式诊断和裸飞控台架 Arm 拒绝/Disarm 验证，整车实机待验收；P6 localhost SITL 持续运行组合及独立解锁/上锁任务已验证。** 本文记录从 `legacy/cuadc_2026/` 提取可复用能力的顺序、验收门槛与阶段进度。目标职责以 [V1 目标架构](framework_v1.md) 为准；[当前实现边界](architecture.md)描述根目录已有能力。本文中的源文件只是候选素材，不表示已决定复制或已在新框架运行。
 
 ## 目标与策略
 
@@ -182,3 +182,4 @@ P6 已在 **localhost ArduCopter SITL** 接通状态发布、Typed Mission、Eff
 | 2026-10-01 | P5 裸飞控状态检查 | 参数与单次遥测已读取；机架配置未定义 | 7 项单次遥测请求被接受；GPS fix=0，电池读数不可信，未解锁；未修改设备配置 |
 | 2026-10-01 | P5 临时机架台架验收 | 模式往返、Arm 拒绝、Disarm 通过；原参数已恢复 | 64 项根目录测试；双 SEND/Safety/唯一 writer 的 USB 台架结果与剩余整机边界见上方记录 |
 | 2026-10-01 | P6 首个持续运行组合 | localhost SITL 模式任务已验证；整车实机待验收 | 75 项根目录测试通过；本机 ArduCopter V4.8.0-dev (b5fbe265) 的单次未解锁 GUIDED 任务经 ACK 和后续状态完成；[实施与验收](p6_runtime_integration_plan.md#6-p6-实施与验收记录2026-10-01) |
+| 2026-10-01 | 独立 SITL 解锁/上锁任务 | localhost 仿真已验证；整车实机待验收 | 81 项根目录测试；全新 ArduCopter V4.8.0-dev (b5fbe265) 首次任务经 GUIDED、Arm、Disarm 的 ACK 与后续状态完成，最终未解锁；[范围与拒绝记录](sitl_arm_mission.md) |
