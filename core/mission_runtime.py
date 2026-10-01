@@ -7,7 +7,7 @@ from enum import Enum
 
 from contracts.core.primitives import RunId, SchemaVersion
 from contracts.core.time import TimePoint
-from contracts.decision import ActionDecision, ActionOutcome, ExitDecision, ExitReason, FailurePolicy
+from contracts.decision import ActionDecision, ActionOutcome, EffectResult, ExitDecision, ExitReason, FailurePolicy
 from contracts.effects.vehicle import EffectEnvelope, VehicleEffect
 from contracts.world.ports import WorldQueryPort
 from .mission import CompiledMission, CompiledStep
@@ -63,6 +63,14 @@ class MissionRuntime:
         self._results: list[StepResult] = []
         self._effect_sequence = 0
         self._error: str | None = None
+        self._emitted: dict[str, str] = {}
+        self._effect_results: dict[str, EffectResult] = {}
+
+    def record_effect_result(self, result: EffectResult) -> None:
+        """Accept read-only command progress for an Effect emitted by this run."""
+        if not isinstance(result, EffectResult) or self._emitted.get(result.effect_id) != result.action_instance_id:
+            raise ValueError("result does not belong to this Mission run")
+        self._effect_results[result.effect_id] = result
 
     def _step(self) -> CompiledStep | None:
         return self._compiled.steps[self._index] if self._index < len(self._compiled.steps) else None
@@ -74,6 +82,9 @@ class MissionRuntime:
             self._attempt, effects, tuple(self._results), self._error,
         )
 
+    def view(self) -> RunUpdate:
+        return self._view()
+
     def cancel(self) -> RunUpdate:
         if self._status in (RunStatus.SUCCEEDED, RunStatus.FAILED, RunStatus.CANCELLED):
             return self._view()
@@ -83,6 +94,14 @@ class MissionRuntime:
         else:
             self._pending = (ExitReason.CANCELLED, None, None)
             self._status = RunStatus.EXITING
+        return self._view()
+
+    def abort(self, reason: str) -> RunUpdate:
+        """Fail closed when the outer runtime cannot safely advance an exit barrier."""
+        if self._status not in (RunStatus.SUCCEEDED, RunStatus.FAILED, RunStatus.CANCELLED):
+            self._status = RunStatus.FAILED
+            self._error = reason
+            self._instance = None
         return self._view()
 
     def _envelopes(self, effects: tuple[VehicleEffect, ...], now: TimePoint) -> tuple[EffectEnvelope, ...]:
@@ -98,11 +117,13 @@ class MissionRuntime:
                 now.monotonic_ns + step.registration.spec.effect_ttl_ns,
                 now.utc, now.clock_domain_id,
             )
-            envelopes.append(EffectEnvelope(
+            envelope = EffectEnvelope(
                 SchemaVersion(1, 0), f"{self._run_id}:effect:{self._effect_sequence}",
                 self._run_id, f"{self._run_id}:{step.step.step_id}:{self._attempt}",
                 now, deadline, effect,
-            ))
+            )
+            self._emitted[str(envelope.effect_id)] = str(envelope.action_instance_id)
+            envelopes.append(envelope)
         return tuple(envelopes)
 
     def _finish(self, reason: ExitReason, result: object, error: str | None) -> None:
@@ -165,7 +186,13 @@ class MissionRuntime:
                 self._finish(ExitReason.FAILED, None, f"Action start failed: {exc}")
                 return self._view()
         try:
-            decision = self._instance.tick(snapshot)
+            if hasattr(self._instance, "tick_with_results"):
+                action_id = f"{self._run_id}:{step.step.step_id}:{self._attempt}"
+                results = tuple(result for result in self._effect_results.values()
+                                if result.action_instance_id == action_id)
+                decision = self._instance.tick_with_results(snapshot, results)
+            else:
+                decision = self._instance.tick(snapshot)
             if not isinstance(decision, ActionDecision):
                 raise TypeError("Action tick must return ActionDecision")
             envelopes = self._envelopes(decision.effects, now)

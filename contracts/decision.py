@@ -89,6 +89,31 @@ class ActionOutcome(str, Enum):
     FAILED = "FAILED"
 
 
+class EffectPhase(str, Enum):
+    REQUESTED = "REQUESTED"
+    ACCEPTED = "ACCEPTED"
+    TRANSMITTED = "TRANSMITTED"
+    ACKNOWLEDGED = "ACKNOWLEDGED"
+    COMPLETED = "COMPLETED"
+    REJECTED = "REJECTED"
+    UNKNOWN = "UNKNOWN"
+    CANCELLED = "CANCELLED"
+
+
+@dataclass(frozen=True, slots=True)
+class EffectResult:
+    effect_id: str
+    action_instance_id: str
+    phase: EffectPhase
+    command_id: str | None = None
+    link_session_id: str | None = None
+    reason: str | None = None
+
+    def __post_init__(self) -> None:
+        if not self.effect_id or not self.action_instance_id or not isinstance(self.phase, EffectPhase):
+            raise ValueError("effect result requires IDs and a phase")
+
+
 class ExitReason(str, Enum):
     SUCCEEDED = "SUCCEEDED"
     FAILED = "FAILED"
