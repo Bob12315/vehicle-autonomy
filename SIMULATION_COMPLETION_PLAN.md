@@ -1,6 +1,6 @@
 # Vehicle Autonomy Framework V1 — Simulation Complete 实施计划
 
-状态：待执行。审计日期：2026-10-01。本文只规划仿真基础车辆控制；本轮未实现以下阶段，也未进行 Gazebo 运动验收。
+状态：**Simulation Complete — PASS**。完成审计日期：2026-10-02。Phase 0–8 及全部 mandatory gates 已通过，见 [完成审计](docs/simulation/completion-audit.md)。本轮只完成 ArduCopter/Rover 基础车辆仿真；真实硬件及第 0 节排除项仍未验收/实现。以下保留原执行计划和实施前审计基线，不把历史缺口描述当作当前状态。
 
 ## 0. 执行边界与完成定义
 

@@ -21,6 +21,10 @@ Explicit ArduCopter composition -> VehicleExecution -> ArduPilotCommandPort
 Explicit P6 run-sitl -> loopback TCP receive -> WorldModel -> typed Mode Action
                      -> Effect result feedback -> VehicleExecution -> same sole writer
 
+Explicit dual-vehicle SimulationRuntime -> VehicleExecution + Safety/Authority
+    -> Copter/Rover translator -> same MAVLink writer -> TCP -> SITL -> Gazebo
+Gazebo truth -> read-only test Oracle (no production control input)
+
 Explicit Copter STABILIZE diagnostic -> VehicleExecution -> ArduPilotCommandPort
                                     -> MAVLink codec -> serial byte transport -> USB controller
 
@@ -104,12 +108,44 @@ A Copter USB controller diagnostic received STABILIZE ACK and a later matching
 heartbeat while disarmed. The controller also reports a frame class/type
 pre-arm error, so this result is not flight readiness.
 The USB state publication uses receive time as a diagnostic proxy; source
-capture time is unknown. Physical stopping, Copter motion, and link-loss
-behavior have not been validated. P6 likewise uses a loopback-only receive-time
-proxy and does not establish real-device capture timing or physical stop.
+capture time is unknown. Those USB diagnostics do not validate real physical stopping, motion or
+link-loss behavior. The narrow P6 runtime still uses a loopback receive-time
+proxy. The shared simulation runtime separately maps source boot time per
+epoch and validates Copter/Rover motion and faults against Gazebo truth;
+real-device capture timing and physical stopping remain unvalidated.
 Heartbeat-based VehicleHealth does not establish sensor calibration or arming
 readiness.
 With a temporary Quad X frame configuration, the USB Copter completed a
 disarmed STABILIZE/ACRO/STABILIZE round trip. Its pre-arm checks rejected Arm;
 an explicit Disarm was confirmed. The original undefined frame configuration
 was restored and reboot verified. No physical output or flight was tested.
+
+## Dual-vehicle simulation composition
+
+`deployment/SimulationRuntime` shares Execution, Authority, codec, session and
+the sole command port between Copter and Rover. Vehicle differences are the
+injected translator, reported-state adapter, profile and explicit safety
+policy. Rover projects MAVLink GPS global origin/state into bounded local ENU
+and rejects flight effects and sideways/vertical body motion. Root packages
+do not import archived modules. No vehicle connection opens on import.
+
+Callers explicitly connect, schedule at 10 Hz and begin a run. Both SEND gates
+and lease default disabled; `allow_send` explicitly grants one scoped run.
+Source boot timestamps are mapped to host monotonic time only for the pinned
+localhost speed-one composition. Repeats/delay preserve sample age; clock
+regression/skew, stale state, link loss, missed cycles and uncertain writes
+close the link and revoke authority. Reconnect creates a fresh codec/session/
+world epoch and requires a new authorized run; no old queue is replayed.
+
+Stop/deadman/cancel/shutdown request zero velocity through the same writer and
+require a later state to confirm it. Physical test success additionally needs
+fresh independent Gazebo truth under the original speed/time bounds. At link
+loss physical Stop is UNCONFIRMED. Takeoff/Land ACK receipts alone do not
+complete a physical action; the test scenario verifies height/ground/final
+state. This composition certifies no real hardware, server or RKNN backend.
+
+`./scripts/test_simulation_v1.sh` builds in a fresh owned output directory and
+runs both vehicles plus faults, with bounded stage deadlines, unique world
+names and unused matching ports. It retains process/command/state/truth
+manifests and fails on missing evidence or cleanup failure. See
+[simulation usage](simulation/README.md) and [completion audit](simulation/completion-audit.md).

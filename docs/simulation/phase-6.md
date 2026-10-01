@@ -113,3 +113,8 @@ software cannot prove that a zero setpoint reached the vehicle; the report
 therefore says **UNCONFIRMED** even if ArduPilot independently stops. No real
 hardware, serial port or archived CUADC tree is changed. One-command repeated
 regression and the final completion audit remain Phases 7 and 8.
+
+Phase 7 subsequently strengthened Stop/Cancel/shutdown timing to one deadline
+from the request through telemetry and stable truth, without changing the
+original numerical bounds. Its third complete suite passed these stricter
+checks; see [Phase 7](phase-7.md).

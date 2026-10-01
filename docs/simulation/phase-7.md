@@ -1,7 +1,7 @@
 # Phase 7 single-command regression (2026-10-02)
 
 Status: **three full suites passed**; stricter request-to-truth deadlines
-passed in the third. Final completion audit remains open.
+passed in the third. Final completion audit subsequently passed; see [Phase 8](phase-8.md).
 
 Entry: `./scripts/test_simulation_v1.sh`. It builds both SITL vehicles and the
 Gazebo plugin in an owned output directory, performs isolated-port preflight,

@@ -1,7 +1,7 @@
 # V1 simulation scope and acceptance contract
 
 Status: command scope and numeric targets fixed on 2026-10-01; physical
-acceptance is **unverified**. Profiles are
+acceptance subsequently passed in Phases 3/5/6/7; final audit passed; see [completion audit](completion-audit.md). Profiles are
 [`simulation/profiles/copter.toml`](../../simulation/profiles/copter.toml),
 [`simulation/profiles/rover.toml`](../../simulation/profiles/rover.toml), and
 [`acceptance-v1.json`](../../simulation/scenarios/acceptance-v1.json).
@@ -27,9 +27,9 @@ Rover Goto is **in the mandatory scenario**, since this ArduPilot revision's
 `Rover/GCS_MAVLink_Rover.cpp` handles `SET_POSITION_TARGET_LOCAL_NED` position
 targets in Guided mode and calls `ModeGuided::set_desired_location`. The
 [official Rover Guided command documentation](https://software.ardupilot.org/dev/docs/mavlink-rover-commands.html)
-also specifies local position and velocity targets. A live Rover/Gazebo
-protocol trial and physical arrival remain open; a static handler is not an
-acceptance result.
+also specifies local position and velocity targets. The live Rover/Gazebo
+protocol trial and physical arrival passed in Phases 4/5 and repeated full
+regression; a static handler alone was not accepted as success.
 
 ## Control, frame, and time rules
 
@@ -43,11 +43,11 @@ acceptance result.
   ENU yaw is counterclockwise; positive NED yaw/turn rate is clockwise.
   The test Oracle will measure the initial Gazebo model rotation and SITL
   local origin rather than assuming they coincide.
-- Effect creation/deadline, lease, receive proxy, state publication, and
-  freshness use one host monotonic clock domain. SITL boot time and Gazebo
-  simulation time are recorded separately and never compared directly with
-  host monotonic values. Unknown capture time is represented in this
-  simulation as a loopback receive-time proxy, not a hardware claim.
+- Effect creation/deadline, lease, receive, state publication and freshness
+  use one host monotonic clock domain. Phase 6 maps source boot time into
+  that domain per speed-one localhost epoch; delayed/repeated samples keep
+  their source age. Gazebo simulation time is Oracle metadata and is never
+  directly compared with host time. This is not hardware synchronization.
 - Motion admission requires a fresh vehicle pose and twist after warmup;
   heartbeat alone establishes link/operation state but not localization.
   Future, delayed, stale, and wrong-domain state must fail closed.
@@ -66,7 +66,7 @@ travel at least 1.0 m in each requested forward/reverse direction, rotate at
 least 45° in each requested turn direction, then stay below 0.10 m/s for 2 s
 after Stop. Stop timeout is 8 s for both. Takeoff timeout is 30 s; Goto is
 45 s. These values are candidate limits taken from the execution plan and
-frozen before motion testing; they have not been measured as achieved.
+frozen before motion testing; they subsequently passed physical acceptance without relaxation.
 
 Each physical assertion needs a new command result, a new VehicleState, a
 new independent Gazebo truth sample, and a bounded elapsed host time. Truth
@@ -79,9 +79,9 @@ Rover's required `SafetyLimits` altitude fields describe a narrow ground
 height band and do **not** authorize Takeoff; the Rover plugin must reject
 Takeoff and Land. Its planar geofence and speed limits remain active.
 
-## Open Phase 1 trial
+## Phase 1 trial closure
 
 Rover's source and official documentation establish local Goto support, so
-Goto stays mandatory. The live Guided protocol trial needs the target
-Rover Gazebo model and Phase 4 translator. It is recorded as an open
-acceptance item rather than an unsupported feature.
+Goto stays mandatory. The Phase 4 translator/protocol trial and
+Phase 5 target-model truth runs closed the live arrival gate. Goto remains
+mandatory in every full Rover regression. See [Phase 5](phase-5.md).
