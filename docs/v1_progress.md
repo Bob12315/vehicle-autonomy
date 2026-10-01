@@ -14,7 +14,7 @@
 | 75% | 已进入仿真或受限设备链验证，仍缺所声称使用环境的完整验收。 |
 | 100% | 已完成该行写明的明确范围及相应验收；不代表所有未来插件和场景都实现。 |
 
-**阶段进度：** P0 是限定范围的基线审计；P1 基础合同、P2 离线状态链、P3 离线决策链、P4 离线控制边界均已完成各自阶段门槛。P5 已完成 ArduCopter 软件组合、本机 SITL 和受限 USB/裸飞控台架验证，**整车实机验收未完成**。[阶段表](migration_plan.md#阶段与验收)中的完成状态不应被换算成“整个系统完成五分之六”。
+**阶段进度：** P0 是限定范围的基线审计；P1–P4 已完成各自阶段门槛。P5 已完成 ArduCopter 软件组合、本机 SITL 和受限 USB/裸飞控台架验证。P6 已完成限定范围的 localhost SITL 持续运行模式任务，**整车实机验收未完成**。阶段状态不是整个系统的加权完成率。
 
 ## 1. 基础语义与状态链
 
@@ -28,15 +28,15 @@
 | Localization | **25%** | [自报位姿投影](../localization/reported.py)可从 VehicleState 生成独立定位结果。 | 无真实定位或融合算法及其质量验证；当前投影不等于 GPS/VIO/SLAM。 |
 | Mapping | **0%** | 仅有包占位。 | 无地图生产、版本管理和向 World Model 发布；按场景需要建设。 |
 | Environment | **0%** | 仅有包占位。 | 无场景坐标基准、命名位置、静态地图或环境围栏适配；按首个任务需要建设。 |
-| World Model | **50%** | [WorldModel](../world_model/service.py)可合并车辆、定位和 DetectedObject，发布只读不可变快照，处理版本、新鲜度、缺失、未来时间和跨时钟域输入；已有[离线测试](../tests/test_p2_state_chain.py)。 | 尚不接地图/Environment，不做跨 Frame 变换；未在正式进程中持续运行。 |
+| World Model | **75%** | [WorldModel](../world_model/service.py)可发布版本化只读快照，现已在 P6 SITL 进程中持续接收飞控状态并发布。 | 尚不接地图/Environment，不做跨 Frame 变换；真实设备采集时间未验收。 |
 | 状态链组合 | **50%** | [OfflineStateChain](../application/state_chain.py)把假输入/车辆状态、定位与 World Model 接成离线发布链。 | 尚无真实传感器和设备状态持续采集、调度及与 Mission/Execution 共用的运行组合。 |
 
 ## 2. 决策链
 
 | 部分 | 进度 | 已完成的证据 | 尚未完成 |
 | --- | ---: | --- | --- |
-| Action | **50%** | [注册器](../core/action_registry.py)、[类型与参数规范](../contracts/decision.py)、Effect 白名单及[示例 Action](../core/actions.py)已通过离线测试。 | 无首个车辆/业务组合所需的具体 Action；输入/输出及 Safety 元数据和任务到设备的集成验收仍需按具体能力补齐。 |
-| Mission | **50%** | [编译预检](../core/mission.py)与[MissionRuntime](../core/mission_runtime.py)支持线性步骤、重试、失败策略、取消、退出屏障及 Typed Effect 请求；见[测试](../tests/test_p3_decision.py)。 | 无正式调度入口、Effect 回执与运行状态闭环；目标文档中的条件/分支尚未实现，可在确有任务需求时加入。 |
+| Action | **75%** | P6 [模式 Action](../core/sitl_mode_action.py)只发一次 ModeEffect，并读结果确认 ACK 后的新未解锁目标模式；离线及 SITL 验收通过。 | 仍无实际业务 Action 或运动任务验收。 |
+| Mission | **75%** | [MissionRuntime](../core/mission_runtime.py)支持 Effect 结果回流；P6 在持续运行进程中完成最小 Typed Mission，拒绝、未知与取消不会变为成功。 | 条件/分支仍按实际任务需求加入；P6 仅为单步 SITL 模式任务。 |
 | Intent / MissionProposal | **0%** | [目标架构](framework_v1.md#3-四类核心数据及其边界)定义了上层目标进入系统的边界，当前无对应的 V1 类型与校验用例。 | 仅在接入操作者提案或 Intelligence 时实现标准提案、校验和转 Mission/Action 的流程。 |
 | Planning | **0%** | 仅有包占位。 | 无路径/轨迹/避障算法；仅在所选 Action 需要规划时实施。 |
 | Guidance | **0%** | 仅有包占位。 | 无从计划/状态到运动目标的算法；仅在所选 Action 需要导引时实施。 |
@@ -60,20 +60,20 @@
 
 | 部分 | 进度 | 已完成的证据 | 尚未完成 |
 | --- | ---: | --- | --- |
-| Application 用例 | **25%** | [FrameworkService](../application/service.py)提供有限的旧 Mission 定义校验；状态链有离线组合。 | 无 V1 Typed Mission 的启动、取消、查询、结果和授权用例接口。 |
+| Application 用例 | **75%** | [MissionService](../application/mission_service.py)提供启动、取消、查询与关闭用例；P6 离线闭环已验证。 | 无外部 API、操作者控制源仲裁或其他业务 Mission。 |
 | 具体 Applications / Missions | **0%** | 业务包仅占位；旧比赛任务仍在 `legacy/`。 | 尚未选择首个非比赛任务、配置、Action 和 Mission；需先定具体组合。 |
-| App 进程入口 | **25%** | [CLI](../app/main.py)仅可查询状态，明确报告车辆连接与 Mission 调度未装配。 | 无连续运行的状态→决策→控制进程、启动/关闭生命周期及故障恢复。 |
-| Deployment | **25%** | [CopterCycleDriver](../deployment/copter_cycle.py)可在调用方触发时组合接收、deadman 和写队列。 | 无实际周期调度、配置注入、onboard 进程和运行验收；server/hybrid 仅在选用时实现。 |
+| App 进程入口 | **75%** | [CLI](../app/main.py)显式 `run-sitl` 可启动 localhost SITL 单进程，默认双 SEND 关闭；Ctrl+C 进入取消和关闭。 | 无 onboard/server 入口或生产车辆连接。 |
+| Deployment | **75%** | [SitlRuntime](../deployment/sitl_runtime.py)负责周期、状态发布、Mission 推进、结果汇集及故障撤权；本机 SITL 验收通过。 | 不支持真实设备时间同步、物理停止或生产重连。 |
 | Gateway | **0%** | 仅有包占位。 | 无远程接入、链路监视和本地失联处置；只有远程部署需要。 |
 | Web UI | **0%** | 仅有包占位。 | 无界面或 Web API；不是首个无 Web 组合的必需条件。 |
-| 独立运行配置 | **0%** | `runtime/` 仅有占位文件，没有可启动的组合配置。 | 首个组合需明确设备、时钟、Safety 限值、周期、权限和运行参数，且不得默认启用 SEND。 |
+| 独立运行配置 | **100%（P6 SITL 范围）** | [严格 TOML profile](../runtime/sitl.toml)指定 loopback、机型、周期、时钟和显式 Safety；配置不含 SEND 开关。 | 仅覆盖本机 SITL；无可发送的 onboard profile。 |
 | 自动化测试与验收 | **75%** | 根目录已有合同、离线状态/决策/控制、MAVLink 的单元测试；另有本机 SITL 与受限 USB/台架手动记录。 | 缺正式运行组合的端到端测试、失联/stop 的完整仿真验收及整车设备验收。 |
 
 ## 5. 还差什么才能称为“完整系统”
 
 先确定一个**首个支持组合**（车辆、传感器、任务和部署形态），再依据该组合验收；不需要先实现上表所有按需模块。目前最直接的路线是现有 ArduCopter/MAVLink 能力，但是否采用它由实际项目需求决定。
 
-下一阶段的具体工程顺序见 [P6：首个持续运行组合实施计划](p6_runtime_integration_plan.md)。该计划先验证 localhost ArduCopter SITL 的未解锁模式任务，P6 当前仍处于**计划中**；本表百分比没有因制定计划而上调。
+P6 的工程顺序和完成证据见 [P6：首个持续运行组合实施计划](p6_runtime_integration_plan.md)。上述上调只对应 localhost ArduCopter SITL 的未解锁模式任务；不推断实机或运动能力。
 
 1. **接通正式运行闭环：** 在 `app`/`application`/`deployment` 中组合可信状态采集、World Model、Typed Mission、Effect 分派、Execution 与命令回执；实现周期调度、关闭、取消、失败和停止流程，并保持双 SEND 默认关闭。
 2. **补齐首个组合的真实输入和能力：** 确定采集时间来源、时钟域/Frame、车辆状态质量；只实现任务所需的 Sensor、Action、Environment、Planning 等，不把空包当作支持。
@@ -82,6 +82,6 @@
 
 ## 验证边界
 
-审计时根目录执行 `python -m unittest discover -s tests -q`：**64 项通过**；`python -m app.main status` 返回 `mission_scheduler=unwired`、`vehicle_connection=unwired`、`send_commands=false`。SITL 与 USB/台架结果采用[迁移计划](migration_plan.md#阶段-5按需接入设备)中已有的手动测试记录，本次没有重新连接设备。这些结果不能替代整车实机运动、物理停止或服务器部署验收。
+P6 更新时根目录执行 `python -m unittest discover -s tests -q`：**75 项通过**；`python -m app.main status` 仍返回 `mission_scheduler=unwired`、`vehicle_connection=unwired`、`send_commands=false`，表示默认入口不连接车辆。另有本机 SITL 端到端验收；这些结果不能替代整车实机运动、物理停止或服务器部署验收。
 
 更新本文时应同时更新基线提交、运行测试、模块证据和未完成项。若某模块只因新增文件而没有达到更高档位的验证要求，进度分档不应上调。

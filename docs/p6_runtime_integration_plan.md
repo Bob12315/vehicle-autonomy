@@ -1,6 +1,6 @@
 # P6：首个持续运行组合实施计划
 
-> **状态：计划，尚未实施。** 制定日期：2026-10-01；依据提交 `739e9f5` 的[模块进度审计](v1_progress.md)。本阶段将现有 P1–P5 能力装配为**本机 ArduCopter SITL 单进程组合**。它不关闭 P5 的整车实机验收缺口，也不声明 onboard、服务器或真实飞行支持。
+> **状态：P6 限定范围已实施并通过本机 SITL 验收。** 制定及验收日期：2026-10-01；原计划依据提交 `739e9f5` 的[模块进度审计](v1_progress.md)。本阶段将现有 P1–P5 能力装配为**本机 ArduCopter SITL 单进程组合**。它不关闭 P5 的整车实机验收缺口，也不声明 onboard、服务器或真实飞行支持。
 
 ## 1. 分析与范围决定
 
@@ -51,12 +51,18 @@ P6 SITL 可明确使用**仅限 loopback 仿真**的接收时间代理来验证�
 
 P6 完成时，至少留下以下可复现证据：
 
-- [ ] SITL profile 经 schema 校验；SEND 默认关闭，缺少显式 Safety/Lease 时无法写入。
-- [ ] 一条命令启动单进程并连接**明确配置的本机 SITL**；状态持续发布且版本、时间、Frame、质量可核对。
-- [ ] Typed Mission 的 Action 只发一次受限 ModeEffect；Effect 经 Execution、Authorization、Safety 和唯一 writer；Mission 等待 ACK 加目标模式状态后才成功。
-- [ ] Application 可启动、取消、查询并关闭任务；拒绝、超时和 `UNKNOWN` 作为不同结果呈现。
-- [ ] 断链、重连、旧命令隔离、状态过期、Effect 过期、周期延误和 Ctrl+C 在离线故障测试中有明确结果；P4/P5 已有的活动流 stop/zero 测试持续通过。模式任务不作为运动停止测试；若 P6 新增运动流运行路径，须另做对应 SITL 安全验收。
-- [ ] 结构化日志可关联 Run、Action、Effect、Command、Session；记录配置摘要、SITL 版本、测试命令及测试结果。
-- [ ] 根目录单元测试、离线端到端测试与本机 SITL 端到端测试通过；更新[实现边界](architecture.md)、[进度审计](v1_progress.md)和[迁移记录](migration_plan.md)。
+- [x] SITL profile 经严格 TOML 校验；SEND 默认关闭，缺少显式 Safety/Lease 时无法写入。
+- [x] 一条命令启动单进程并连接**明确配置的本机 SITL**；状态持续发布且版本、时间、Frame、质量可核对。仅有心跳时 Frame 可为 `null`，不会伪造 Pose。
+- [x] Typed Mission 的 Action 只发一次受限 ModeEffect；Effect 经 Execution、Authorization、Safety 和唯一 writer；Mission 等待 ACK 加目标模式状态后才成功。
+- [x] Application 可启动、取消、查询并关闭任务；拒绝、超时和 `UNKNOWN` 作为不同结果呈现。
+- [x] 断链、重连、旧命令隔离、状态过期、Effect 过期、周期延误及取消/关闭有离线故障测试；Ctrl+C 走同一取消/关闭路径。P4/P5 已有的活动流 stop/zero 测试持续通过。模式任务不作为运动停止测试。
+- [x] 结构化日志可关联 Run、Action、Effect、Command、Session；记录配置摘要、操作者报告的 SITL 版本、测试命令及测试结果。
+- [x] 根目录单元测试、离线端到端测试与本机 SITL 端到端测试通过；更新[实现边界](architecture.md)、[进度审计](v1_progress.md)和[迁移记录](migration_plan.md)。
+
+## 6. P6 实施与验收记录（2026-10-01）
+
+`runtime/sitl.toml` 只允许数值 loopback TCP、ArduCopter 四旋翼、单个目标模式及显式 Safety 限值；周期小于 deadman，读超时小于周期。配置不含可永久开启 SEND 的字段。`app.main run-sitl` 是显式入口，`--allow-send` 才为此 Run/Action 授予新 Lease 并开启双 SEND。`SitlModeTranslator` 在最终车辆翻译边界只接受 ModeCommand；唯一 writer 的额外写前 guard 再检查目标模式、未解锁和心跳新鲜度。Action 不持有车辆端口，只读 Effect 结果；`COMPLETED` 与同一轮新鲜未解锁目标模式 WorldSnapshot 同时成立才成功。失联、状态过期和周期延误撤权并阻止重放。取消已传输的模式命令后，同一会话不允许启动第二个模式任务，以免旧 ACK 混同；重连后需重新授权。
+
+可复现命令：先启动本机 ArduCopter SITL TCP 5760，再执行 `tests/manual_p6_sitl.sh runtime/sitl.toml 'ArduCopter V4.8.0-dev (b5fbe265)'`。本次本机二进制内含版本字符串 `ArduCopter V4.8.0-dev (b5fbe265)`；操作者报告的版本在日志中标记为 `version_source=operator`，不是飞控遥测证明。实际运行得到单个 Effect 的 `REQUESTED → ACCEPTED → TRANSMITTED → ACKNOWLEDGED → COMPLETED`，最终 `SUCCEEDED`，WorldSnapshot 修订号 14，车辆质量 `VALID`、新鲜度 `FRESH`，未解锁。相同 SITL 上运行 `python -m app.main run-sitl`（无 `--allow-send`）得到 `system_send_disabled`、最终 `FAILED`，没有命令写入。`python -m unittest discover -s tests -q`：75 项通过；`python -m compileall -q app application contracts core deployment runtime vehicles tests` 和 `git diff --check` 通过。离线测试覆盖取消后新 Run、在途取消隔离、拒绝、未知写入、断链重连、状态过期、Effect 过期、周期延误、最终模式写入限制。没有修改归档树。
 
 P6 **不包含**真实机体解锁/起飞、物理 stop、真实设备时间同步、onboard/server/hybrid 部署、Camera/LiDAR、Perception、复杂 Localization、Mapping、Planning、Guidance、Intelligence、Gateway、Web、固定翼或 VTOL。P6 之后先评审首个实际业务 Mission，再按它所需的输入和算法扩展。若要声明整车生产支持，仍须完成 P5 所列机架、校准、真实时间、运动、失联保护、日志和物理停止的独立设备验收。

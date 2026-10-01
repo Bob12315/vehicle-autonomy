@@ -18,6 +18,9 @@ Typed Effect -> offline VehicleExecution -> system SEND + Action SEND
 Explicit ArduCopter composition -> VehicleExecution -> ArduPilotCommandPort
                              -> MAVLink codec -> TCP byte transport -> local SITL
 
+Explicit P6 run-sitl -> loopback TCP receive -> WorldModel -> typed Mode Action
+                     -> Effect result feedback -> VehicleExecution -> same sole writer
+
 Explicit Copter STABILIZE diagnostic -> VehicleExecution -> ArduPilotCommandPort
                                     -> MAVLink codec -> serial byte transport -> USB controller
 
@@ -50,6 +53,15 @@ neither exposes arm, takeoff, or motion. Separate bare-controller bench
 translators limit requests to STABILIZE/ACRO modes or Arm/Disarm/STABILIZE.
 `deployment/CopterCycleDriver` connects receive, P4 deadman, and queue drain
 when explicitly scheduled by a caller; the CLI does not schedule it.
+`deployment/SitlRuntime` is the P6 single-process scheduler for an explicit
+`run-sitl` CLI invocation. It validates the loopback-only profile before
+connecting, publishes a WorldSnapshot each cycle, runs one unarmed Mode Action,
+and maps Effect IDs to command statuses. A final write guard rechecks the
+disarmed state and freshness; the SITL translator permits only the configured
+mode. The Action sees read-only results and succeeds only after ACK plus a
+later heartbeat and a fresh WorldSnapshot reporting the target mode. `status`
+still opens no connection; both SEND gates default to false, and `run-sitl`
+requires `--allow-send` to authorize one Mission lease.
 
 Core never imports a concrete vehicle, protocol, transport, CUADC application,
 or `legacy/`. Mission validates registered Actions, typed parameters and vehicle
@@ -83,7 +95,8 @@ heartbeat while disarmed. The controller also reports a frame class/type
 pre-arm error, so this result is not flight readiness.
 The USB state publication uses receive time as a diagnostic proxy; source
 capture time is unknown. Physical stopping, Copter motion, and link-loss
-behavior have not been validated; the CLI still does not open a vehicle link.
+behavior have not been validated. P6 likewise uses a loopback-only receive-time
+proxy and does not establish real-device capture timing or physical stop.
 Heartbeat-based VehicleHealth does not establish sensor calibration or arming
 readiness.
 With a temporary Quad X frame configuration, the USB Copter completed a

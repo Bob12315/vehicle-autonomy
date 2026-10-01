@@ -129,9 +129,9 @@ P0 已按 `contracts/`、`telemetry_link` 的 state/frame/time、依赖这些合
 
 **台架测试记录与范围：** `python -m unittest discover -s tests -p test_p5_mavlink.py -v`：15 passed、0 failed、0 skipped，测试运行 0.035 s，新增 2 项翻译器范围测试；`/usr/bin/time -p python -m unittest discover -s tests -v`：64 passed、0 failed、0 skipped，测试运行 0.222 s、墙钟 0.36 s。`python -m compileall -q app application contracts core deployment infrastructure protocols vehicles tests`、`git diff --check` 通过；`rg -n '^(from|import) (legacy|telemetry_link|pymavlink|protocols|vehicles|infrastructure)' contracts core application app` 无匹配（退出码 1）。`/usr/bin/time -p env PYTHONPATH=. python tests/manual_p5_copter_bench_mode.py --port /dev/serial/by-id/usb-ArduPilot_MicoAir743v2_260029000C51333238373537-if00 --allow-mode-roundtrip`：1 次 `PASS`、0 failed、0 skipped，墙钟 2.13 s；`/usr/bin/time -p env PYTHONPATH=. python tests/manual_p5_copter_bench_arm.py --port /dev/serial/by-id/usb-ArduPilot_MicoAir743v2_260029000C51333238373537-if00 --bare-controller --allow-arm-bench`：最终 1 次 `PASS`、0 failed、0 skipped，墙钟 2.10 s，Arm 被拒、Disarm 完成；前一次诊断仅验证拒绝，墙钟 1.31 s。没有既有 baseline failure 或新引入测试失败；归档树未修改，未运行旧树测试。此裸飞控无法验证成功解锁、真实电池/GPS/RC、执行器输出、飞行、物理 stop 或失联保护；这些须在实际整机装配、校准、日志存储修复和单独安全验收后进行。台架结果只证明本机 USB 命令链、模式转换、飞控预解锁拒绝和 Disarm 回执。
 
-### 阶段 6：首个持续运行组合（计划）
+### 阶段 6：首个持续运行组合（已验证的 localhost SITL 范围）
 
-P6 先在 **localhost ArduCopter SITL** 接通状态发布、Typed Mission、Effect、Execution、授权/Safety、唯一 writer 与结果回流，建立可启动、可取消、可关闭的单进程运行组合。首个验收任务仅在未解锁状态请求受限模式；不将 Arm、起飞或运动纳入 P6。结果反馈接口、运行周期、异常退出、断链未确认停止及时间戳边界必须先设计并测试。详细顺序、交付物、验收项和暂缓范围见 [P6 实施计划](p6_runtime_integration_plan.md)。P5 的整车实机待验收状态不因 P6 启动而改变。
+P6 已在 **localhost ArduCopter SITL** 接通状态发布、Typed Mission、Effect、Execution、授权/Safety、唯一 writer 与结果回流，建立可启动、可取消、可关闭的单进程运行组合。首个验收任务仅在未解锁状态请求受限模式；不将 Arm、起飞或运动纳入 P6。结果反馈、运行周期、异常退出、断链隔离及时间戳边界的实施证据见 [P6 实施与验收记录](p6_runtime_integration_plan.md#6-p6-实施与验收记录2026-10-01)。P5 的整车实机待验收状态不因 P6 完成而改变。
 
 ## 候选代码的初步归属
 
@@ -181,4 +181,4 @@ P6 先在 **localhost ArduCopter SITL** 接通状态发布、Typed Mission、Eff
 | 2026-10-01 | P5 Copter USB 飞控补充验收 | STABILIZE 命令诊断通过；整车待验收 | 62 项根目录测试及未解锁 USB Copter STABILIZE ACK/心跳完成通过；PreArm 机架错误与剩余边界见上方记录；提交 SHA 见本阶段 Git 提交 |
 | 2026-10-01 | P5 裸飞控状态检查 | 参数与单次遥测已读取；机架配置未定义 | 7 项单次遥测请求被接受；GPS fix=0，电池读数不可信，未解锁；未修改设备配置 |
 | 2026-10-01 | P5 临时机架台架验收 | 模式往返、Arm 拒绝、Disarm 通过；原参数已恢复 | 64 项根目录测试；双 SEND/Safety/唯一 writer 的 USB 台架结果与剩余整机边界见上方记录 |
-| 2026-10-01 | P6 首个持续运行组合 | 计划中，尚未实施 | [实施顺序与验收清单](p6_runtime_integration_plan.md)；不改变 P5 整车实机待验收结论 |
+| 2026-10-01 | P6 首个持续运行组合 | localhost SITL 模式任务已验证；整车实机待验收 | 75 项根目录测试通过；本机 ArduCopter V4.8.0-dev (b5fbe265) 的单次未解锁 GUIDED 任务经 ACK 和后续状态完成；[实施与验收](p6_runtime_integration_plan.md#6-p6-实施与验收记录2026-10-01) |
