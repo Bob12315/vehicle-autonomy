@@ -1,0 +1,5 @@
+# SITL TCP channel 0: publish the position and attitude needed by VehicleState.
+# Current ArduPilot uses MAV1_* for the first GCS channel (older builds used SR0_*).
+# The ArduPilot frame defaults are loaded separately by the simulation launcher.
+MAV1_POSITION 10
+MAV1_EXTRA1 10
