@@ -28,3 +28,5 @@ Copter USB 诊断使用 `PYTHONPATH=. python tests/manual_p5_copter_usb.py --por
 [当前实现边界](docs/architecture.md)记录已有能力与限制。[迁移计划与记录](docs/migration_plan.md)给出从合同、状态链到控制与设备接入的阶段顺序。[历史程序说明](docs/migration.md)介绍 `legacy/cuadc_2026/`：它完整保存旧应用的代码、配置、测试和资源，供后续逐项评估复用；新根目录不导入该目录。
 
 [V1 模块进度与未完成项](docs/v1_progress.md)按目标架构逐项记录当前成熟度、证据与待验收工作。
+
+[P6 首个持续运行组合实施计划](docs/p6_runtime_integration_plan.md)列出 localhost ArduCopter SITL 的装配顺序和验收门槛；目前仅为计划，未接入根目录 CLI。

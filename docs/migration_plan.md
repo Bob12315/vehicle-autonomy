@@ -1,6 +1,6 @@
 # 可复用框架迁移计划与记录
 
-> **状态：P0 至 P4 已完成；P5 的 ArduCopter 软件组合已通过离线、本机 SITL、Copter USB 受限模式诊断和裸飞控台架 Arm 拒绝/Disarm 验证；整车实机待验收。** 本文记录从 `legacy/cuadc_2026/` 提取可复用能力的顺序、验收门槛与阶段进度。目标职责以 [V1 目标架构](framework_v1.md) 为准；[当前实现边界](architecture.md)描述根目录已有能力。本文中的源文件只是候选素材，不表示已决定复制或已在新框架运行。
+> **状态：P0 至 P4 已完成；P5 的 ArduCopter 软件组合已通过离线、本机 SITL、Copter USB 受限模式诊断和裸飞控台架 Arm 拒绝/Disarm 验证，整车实机待验收；P6 持续运行组合已规划、尚未实施。** 本文记录从 `legacy/cuadc_2026/` 提取可复用能力的顺序、验收门槛与阶段进度。目标职责以 [V1 目标架构](framework_v1.md) 为准；[当前实现边界](architecture.md)描述根目录已有能力。本文中的源文件只是候选素材，不表示已决定复制或已在新框架运行。
 
 ## 目标与策略
 
@@ -40,6 +40,7 @@
 | 3. Mission/Action | Schema、能力预检、编译、运行生命周期、取消、结果、Typed Effect，以及按需接入 Planning/Guidance | 未注册或不支持的 Action 被拒；失败、重试、取消和退出行为有测试；Action、Planning、Guidance 均不直接发送车辆命令 | **已完成：离线决策链**，见下方 P3 记录 |
 | 4. 控制安全边界 | 授权生命周期、Execution 分派、Safety、命令回执与取消/停止语义 | 默认 SEND 关闭；双门控、TTL、撤销、代际、deadman、stop/zero、断链及唯一 writer 在假端口测试中成立 | **已完成：离线假端口边界**，见下方 P4 记录 |
 | 5. 插件与设备组合 | 所需 Vehicle Plugin、Protocol/Transport、Sensor Adapter、Deployment 组合 | 先离线与仿真验证；真实设备能力只在设备验收后声明；生产写入仍只有一个受控出口 | **部分完成：ArduCopter/TCP、本机 SITL、Copter/Rover USB 模式诊断及裸飞控受控台架；整车实机待验收**，见下方 P5 记录 |
+| 6. 首个持续运行组合 | ArduCopter/localhost SITL 的配置、Application 用例、运行协调器、生命周期与端到端验证 | 未解锁模式 Mission 经 SITL 遥测生成的 WorldSnapshot、Typed Effect、双 SEND/Safety/唯一 writer 到 ACK 与新状态；默认 SEND 关闭，故障与退出结果可复现 | **计划中，尚未实施**；见 [P6 实施计划](p6_runtime_integration_plan.md) |
 
 ### 阶段 0：建立可核对的迁移清单
 
@@ -128,6 +129,10 @@ P0 已按 `contracts/`、`telemetry_link` 的 state/frame/time、依赖这些合
 
 **台架测试记录与范围：** `python -m unittest discover -s tests -p test_p5_mavlink.py -v`：15 passed、0 failed、0 skipped，测试运行 0.035 s，新增 2 项翻译器范围测试；`/usr/bin/time -p python -m unittest discover -s tests -v`：64 passed、0 failed、0 skipped，测试运行 0.222 s、墙钟 0.36 s。`python -m compileall -q app application contracts core deployment infrastructure protocols vehicles tests`、`git diff --check` 通过；`rg -n '^(from|import) (legacy|telemetry_link|pymavlink|protocols|vehicles|infrastructure)' contracts core application app` 无匹配（退出码 1）。`/usr/bin/time -p env PYTHONPATH=. python tests/manual_p5_copter_bench_mode.py --port /dev/serial/by-id/usb-ArduPilot_MicoAir743v2_260029000C51333238373537-if00 --allow-mode-roundtrip`：1 次 `PASS`、0 failed、0 skipped，墙钟 2.13 s；`/usr/bin/time -p env PYTHONPATH=. python tests/manual_p5_copter_bench_arm.py --port /dev/serial/by-id/usb-ArduPilot_MicoAir743v2_260029000C51333238373537-if00 --bare-controller --allow-arm-bench`：最终 1 次 `PASS`、0 failed、0 skipped，墙钟 2.10 s，Arm 被拒、Disarm 完成；前一次诊断仅验证拒绝，墙钟 1.31 s。没有既有 baseline failure 或新引入测试失败；归档树未修改，未运行旧树测试。此裸飞控无法验证成功解锁、真实电池/GPS/RC、执行器输出、飞行、物理 stop 或失联保护；这些须在实际整机装配、校准、日志存储修复和单独安全验收后进行。台架结果只证明本机 USB 命令链、模式转换、飞控预解锁拒绝和 Disarm 回执。
 
+### 阶段 6：首个持续运行组合（计划）
+
+P6 先在 **localhost ArduCopter SITL** 接通状态发布、Typed Mission、Effect、Execution、授权/Safety、唯一 writer 与结果回流，建立可启动、可取消、可关闭的单进程运行组合。首个验收任务仅在未解锁状态请求受限模式；不将 Arm、起飞或运动纳入 P6。结果反馈接口、运行周期、异常退出、断链未确认停止及时间戳边界必须先设计并测试。详细顺序、交付物、验收项和暂缓范围见 [P6 实施计划](p6_runtime_integration_plan.md)。P5 的整车实机待验收状态不因 P6 启动而改变。
+
 ## 候选代码的初步归属
 
 下表是阶段 0 的**待审候选**，不是复制清单。最终决定要依据源代码依赖、行为和测试逐项确认。
@@ -176,3 +181,4 @@ P0 已按 `contracts/`、`telemetry_link` 的 state/frame/time、依赖这些合
 | 2026-10-01 | P5 Copter USB 飞控补充验收 | STABILIZE 命令诊断通过；整车待验收 | 62 项根目录测试及未解锁 USB Copter STABILIZE ACK/心跳完成通过；PreArm 机架错误与剩余边界见上方记录；提交 SHA 见本阶段 Git 提交 |
 | 2026-10-01 | P5 裸飞控状态检查 | 参数与单次遥测已读取；机架配置未定义 | 7 项单次遥测请求被接受；GPS fix=0，电池读数不可信，未解锁；未修改设备配置 |
 | 2026-10-01 | P5 临时机架台架验收 | 模式往返、Arm 拒绝、Disarm 通过；原参数已恢复 | 64 项根目录测试；双 SEND/Safety/唯一 writer 的 USB 台架结果与剩余整机边界见上方记录 |
+| 2026-10-01 | P6 首个持续运行组合 | 计划中，尚未实施 | [实施顺序与验收清单](p6_runtime_integration_plan.md)；不改变 P5 整车实机待验收结论 |

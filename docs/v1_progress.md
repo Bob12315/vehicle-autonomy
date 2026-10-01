@@ -73,6 +73,8 @@
 
 先确定一个**首个支持组合**（车辆、传感器、任务和部署形态），再依据该组合验收；不需要先实现上表所有按需模块。目前最直接的路线是现有 ArduCopter/MAVLink 能力，但是否采用它由实际项目需求决定。
 
+下一阶段的具体工程顺序见 [P6：首个持续运行组合实施计划](p6_runtime_integration_plan.md)。该计划先验证 localhost ArduCopter SITL 的未解锁模式任务，P6 当前仍处于**计划中**；本表百分比没有因制定计划而上调。
+
 1. **接通正式运行闭环：** 在 `app`/`application`/`deployment` 中组合可信状态采集、World Model、Typed Mission、Effect 分派、Execution 与命令回执；实现周期调度、关闭、取消、失败和停止流程，并保持双 SEND 默认关闭。
 2. **补齐首个组合的真实输入和能力：** 确定采集时间来源、时钟域/Frame、车辆状态质量；只实现任务所需的 Sensor、Action、Environment、Planning 等，不把空包当作支持。
 3. **完成仿真端到端验收：** 用所选 Mission 验证状态→决策→命令→ACK/状态观察，覆盖取消、过期、断链、连续命令 stop/zero 与重连旧命令隔离。
