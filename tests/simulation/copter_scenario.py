@@ -5,29 +5,16 @@ from __future__ import annotations
 import argparse
 import json
 import math
-import os
 from pathlib import Path
-import signal
-import subprocess
 import time
 from uuid import uuid4
 
 from contracts.core.geometry import Pose3, Quaternion, Twist3, Vector3
 from contracts.effects.vehicle import ArmEffect, LandEffect, ModeEffect, PoseTargetEffect, StopMotionEffect, TakeoffEffect, TwistTargetEffect
 from deployment.simulation_runtime import SimulationRuntime
-from runtime.simulation_profile import SimulationProfile
 from tests.simulation.oracle import GazeboTruthOracle
+from tests.simulation.launch import OwnedSimulation, ROOT, install_signal_cleanup
 from vehicles.multirotor.ardupilot_commands import ArduPilotCommandTranslator
-
-
-ROOT = Path(__file__).resolve().parents[2]
-ARDUPILOT = Path("/home/level6/ardupilot")
-PLUGIN = Path("/home/level6/gz_ws/src/ardupilot_gazebo")
-
-
-def listening() -> bool:
-    output = subprocess.run(["ss", "-ltn"], capture_output=True, text=True, timeout=3).stdout
-    return ":5760 " in output
 
 
 def yaw_only(pose: Pose3) -> Pose3:
@@ -36,56 +23,17 @@ def yaw_only(pose: Pose3) -> Pose3:
     return Pose3(pose.position, Quaternion(0, 0, math.sin(yaw / 2), math.cos(yaw / 2)))
 
 
-class OwnedProcesses:
-    def __init__(self, run_dir: Path) -> None:
-        self.run_dir = run_dir
-        self.processes: list[tuple[str, subprocess.Popen, object]] = []
-
-    def start(self, name: str, command: list[str]) -> None:
-        output = (self.run_dir / f"{name}.log").open("w")
-        process = subprocess.Popen(command, stdout=output, stderr=subprocess.STDOUT,
-                                   start_new_session=True, cwd=ROOT)
-        self.processes.append((name, process, output))
-
-    def close(self) -> None:
-        for _, process, _ in reversed(self.processes):
-            if process.poll() is None:
-                try:
-                    os.killpg(process.pid, signal.SIGTERM)
-                except ProcessLookupError:
-                    pass
-        for _, process, output in reversed(self.processes):
-            try:
-                process.wait(timeout=8)
-            except subprocess.TimeoutExpired:
-                os.killpg(process.pid, signal.SIGKILL)
-                process.wait()
-            output.close()
-
-
 def run(run_dir: Path, *, goto: bool = False, full: bool = False) -> dict:
     run_dir.mkdir(parents=True, exist_ok=False)
-    owned = OwnedProcesses(run_dir)
+    owned = OwnedSimulation(run_dir, "copter")
     runtime = None
     observations = (run_dir / "observations.jsonl").open("w")
     events = (run_dir / "runtime.jsonl").open("w")
     summary = {"passed": False, "steps": {}, "run_dir": str(run_dir)}
     try:
-        owned.start("gazebo", ["gz", "sim", "-s", "-r", "-v3",
-                               str(PLUGIN / "worlds/iris_runway.sdf")])
-        owned.start("sitl", ["python", str(ARDUPILOT / "Tools/autotest/sim_vehicle.py"),
-                             "-v", "ArduCopter", "-f", "gazebo-iris", "--model", "JSON",
-                             "--add-param-file", str(ARDUPILOT / "Tools/autotest/default_params/copter.parm"),
-                             "--add-param-file", str(ARDUPILOT / "Tools/autotest/default_params/gazebo-iris.parm"),
-                             "--add-param-file", str(ROOT / "simulation/params/copter_telemetry.parm"),
-                             "--no-mavproxy", "--no-rebuild", "--use-dir", str(run_dir / "sitl_state")])
-        deadline = time.monotonic() + 40
-        while time.monotonic() < deadline and not listening():
-            time.sleep(.25)
-        if not listening():
-            raise RuntimeError("SITL TCP listener unavailable")
-        oracle = GazeboTruthOracle("iris_runway", "iris_with_gimbal")
-        profile = SimulationProfile.load(ROOT / "simulation/profiles/copter.toml")
+        owned.start()
+        oracle = GazeboTruthOracle(owned.world, owned.model)
+        profile = owned.profile
         scenario = json.loads((ROOT / "simulation/scenarios/acceptance-v1.json").read_text())["copter"]
         runtime = SimulationRuntime(profile,
             translator=ArduPilotCommandTranslator(mode_ids=profile.mode_ids),
@@ -94,6 +42,7 @@ def run(run_dir: Path, *, goto: bool = False, full: bool = False) -> dict:
 
         def cycle() -> tuple[object, object]:
             started = time.monotonic()
+            owned.assert_alive()
             result = runtime.cycle()
             if result.fault is not None:
                 raise RuntimeError(result.fault)
@@ -443,7 +392,10 @@ def run(run_dir: Path, *, goto: bool = False, full: bool = False) -> dict:
                 runtime.shutdown()
             except Exception as exc:
                 summary["shutdown_error"] = f"{type(exc).__name__}: {exc}"
-        owned.close()
+        try:
+            owned.close()
+        except Exception as exc:
+            summary["cleanup_error"] = f"{type(exc).__name__}: {exc}"
         observations.close()
         events.close()
         (run_dir / "summary.json").write_text(json.dumps(summary, indent=2))
@@ -455,10 +407,12 @@ def main() -> int:
     parser.add_argument("--allow-send", action="store_true", help="explicitly authorize local SITL commands")
     parser.add_argument("--goto", action="store_true", help="also verify Hold, local Goto and Stop")
     parser.add_argument("--full", action="store_true", help="also verify velocity, yaw, Cancel and RTL")
+    parser.add_argument("--run-dir", type=Path)
     args = parser.parse_args()
     if not args.allow_send:
         parser.error("--allow-send is required for the takeoff probe")
-    run_dir = ROOT / "artifacts/simulation" / f"copter-scenario-{uuid4().hex[:8]}"
+    install_signal_cleanup()
+    run_dir = args.run_dir or ROOT / "artifacts/simulation" / f"copter-scenario-{uuid4().hex[:8]}"
     summary = run(run_dir, goto=args.goto or args.full, full=args.full)
     print(json.dumps(summary, sort_keys=True))
     return 0 if summary["passed"] and "cleanup_error" not in summary and "shutdown_error" not in summary else 1

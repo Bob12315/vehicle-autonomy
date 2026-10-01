@@ -31,6 +31,7 @@ from vehicles.rover.mavlink_state import RoverTelemetryState
 from world_model import FreshnessLimits, WorldModel
 
 from .simulation_safety import RoverSimulationSafetyPolicy, SimulationSafetyPolicy
+from .simulation_clock import SimulationSourceClock
 
 
 def _later(point: TimePoint, ns: int) -> TimePoint:
@@ -119,6 +120,7 @@ class SimulationRuntime:
                                     translator=self._translator, now=self.clock,
                                     stop_speed_tolerance=0.1 if self.profile.kind == "rover" else 0.05,
                                     write_guard=self._write_guard)
+        capture_clock = SimulationSourceClock()
         session = ArduPilotSession(
             transport=transport, codec=codec, authority=self.authority,
             commands=port, link_timeout_ns=self.profile.link_timeout_ns,
@@ -129,7 +131,7 @@ class SimulationRuntime:
                 max_sample_skew_ns=500_000_000,
                 max_field_age_ns=self.profile.safety.max_snapshot_age_ns,
                 link_timeout_ns=self.profile.link_timeout_ns),
-            captured_at=lambda message, received: received,
+            captured_at=capture_clock.capture,
         )
         self._transport, self._port, self._session = transport, port, session
         safety_class = RoverSimulationSafetyPolicy if self.profile.kind == "rover" else SimulationSafetyPolicy
@@ -217,7 +219,11 @@ class SimulationRuntime:
         now = self.clock()
         if self._last_cycle is not None:
             try:
-                if now.elapsed_ns_since(self._last_cycle) > 2 * self.profile.period_ns:
+                elapsed = now.elapsed_ns_since(self._last_cycle)
+                if elapsed < 0:
+                    self._close_link("cycle_clock_regressed")
+                    return SimulationCycle(0, None, None, False, self._fault)
+                if elapsed > 2 * self.profile.period_ns:
                     self._close_link("cycle_deadline_missed")
                     return SimulationCycle(0, None, None, False, self._fault)
             except ValueError:
@@ -235,14 +241,21 @@ class SimulationRuntime:
         elif self._had_session:
             self._close_link("link_session_lost")
             return SimulationCycle(len(messages), None, None, False, self._fault)
-        self._world.update_vehicle(self._session.snapshot())
-        world = self._world.publish(now)
+        try:
+            self._world.update_vehicle(self._session.snapshot())
+            world = self._world.publish(now)
+        except ValueError as exc:
+            self._close_link(f"world_state_fault:{type(exc).__name__}")
+            return SimulationCycle(len(messages), None, None, False, self._fault)
         if self._run_id is not None and (self._session.session_id is None or world.vehicle is None):
             self._close_link("vehicle_state_or_link_stale")
             return SimulationCycle(len(messages), None, None, False, self._fault)
         self._execution.tick(now)
         written = self._session.write_next(self.clock()) if self._session.session_id is not None else None
         self._record_results()
+        if written is not None and written.phase.value == "UNKNOWN":
+            self._close_link("transport_write_uncertain")
+            return SimulationCycle(len(messages), written, None, False, self._fault)
         for stream_id in tuple(self._active_stream_ids):
             if self._execution.stop_status(stream_id).state is StopState.CONFIRMED:
                 self._active_stream_ids.discard(stream_id)

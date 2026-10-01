@@ -1,11 +1,10 @@
-"""Owned internal Rover SITL protocol probe; Gazebo acceptance is Phase 5."""
+"""Owned Rover SITL/Gazebo protocol and physical acceptance scenario."""
 
 from __future__ import annotations
 
 import argparse
 import json
 import math
-import os
 from pathlib import Path
 import time
 from uuid import uuid4
@@ -13,40 +12,21 @@ from uuid import uuid4
 from contracts.core.geometry import Pose3, Quaternion, Twist3, Vector3
 from contracts.effects.vehicle import ArmEffect, DisarmEffect, ModeEffect, PoseTargetEffect, StopMotionEffect, TwistTargetEffect
 from deployment.simulation_runtime import SimulationRuntime
-from runtime.simulation_profile import SimulationProfile
-from tests.simulation.copter_scenario import ARDUPILOT, OwnedProcesses, ROOT, listening
 from tests.simulation.oracle import GazeboTruthOracle
+from tests.simulation.launch import OwnedSimulation, ROOT, install_signal_cleanup
 from vehicles.rover.ardupilot_commands import ArduRoverCommandTranslator
 
 
 def run(run_dir: Path, *, gazebo: bool = False, full: bool = False) -> dict:
     run_dir.mkdir(parents=True, exist_ok=False)
-    owned = OwnedProcesses(run_dir)
+    owned = OwnedSimulation(run_dir, "rover")
     runtime = None
     trajectory = (run_dir / "trajectory.jsonl").open("w")
     summary = {"passed": False, "run_dir": str(run_dir), "steps": {}}
     try:
-        if listening():
-            raise RuntimeError("SITL TCP port 5760 already occupied")
-        oracle = None
-        if gazebo:
-            resource_path = str(ROOT / "simulation/models") + ":" + os.environ.get("GZ_SIM_RESOURCE_PATH", "")
-            owned.start("gazebo", ["env", "GZ_SIM_RESOURCE_PATH=" + resource_path,
-                "gz", "sim", "-s", "-r", "-v4", str(ROOT / "simulation/worlds/rover_runway.sdf")])
-            oracle = GazeboTruthOracle("rover_runway", "target_rover")
-        owned.start("sitl", ["python", str(ARDUPILOT / "Tools/autotest/sim_vehicle.py"),
-             "-v", "Rover", "-f", "rover-skid", "--no-mavproxy", "--no-rebuild",
-             *(["--model", "JSON"] if gazebo else []),
-             "--add-param-file", str(ARDUPILOT / "Tools/autotest/default_params/rover.parm"),
-             "--add-param-file", str(ARDUPILOT / "Tools/autotest/default_params/rover-skid.parm"),
-             "--add-param-file", str(ROOT / "simulation/params/rover_telemetry.parm"),
-             "--use-dir", str(run_dir / "sitl_state")])
-        ready_deadline = time.monotonic() + 25
-        while time.monotonic() < ready_deadline and not listening():
-            time.sleep(.2)
-        if not listening():
-            raise TimeoutError("Rover SITL listener unavailable")
-        profile = SimulationProfile.load(ROOT / "simulation/profiles/rover.toml")
+        owned.start()
+        oracle = GazeboTruthOracle(owned.world, owned.model)
+        profile = owned.profile
         runtime = SimulationRuntime(profile, translator=ArduRoverCommandTranslator(mode_ids=profile.mode_ids))
         runtime.connect()
         warmup_deadline = time.monotonic() + profile.warmup_ns / 1e9
@@ -67,6 +47,7 @@ def run(run_dir: Path, *, gazebo: bool = False, full: bool = False) -> dict:
 
         def cycle():
             started = time.monotonic()
+            owned.assert_alive()
             result = runtime.cycle()
             if result.fault:
                 raise RuntimeError(result.fault)
@@ -299,7 +280,10 @@ def run(run_dir: Path, *, gazebo: bool = False, full: bool = False) -> dict:
                 runtime.shutdown()
             except Exception as exc:
                 summary["shutdown_error"] = f"{type(exc).__name__}: {exc}"
-        owned.close()
+        try:
+            owned.close()
+        except Exception as exc:
+            summary["cleanup_error"] = f"{type(exc).__name__}: {exc}"
         trajectory.close()
         (run_dir / "summary.json").write_text(json.dumps(summary, indent=2))
     return summary
@@ -310,13 +294,15 @@ def main() -> int:
     parser.add_argument("--allow-send", action="store_true")
     parser.add_argument("--gazebo", action="store_true")
     parser.add_argument("--full", action="store_true")
+    parser.add_argument("--run-dir", type=Path)
     args = parser.parse_args()
     if not args.allow_send:
         parser.error("explicit --allow-send required")
-    summary = run(ROOT / "artifacts/simulation" / f"rover-protocol-{uuid4().hex[:8]}",
+    install_signal_cleanup()
+    summary = run(args.run_dir or ROOT / "artifacts/simulation" / f"rover-protocol-{uuid4().hex[:8]}",
                   gazebo=args.gazebo or args.full, full=args.full)
     print(json.dumps(summary, sort_keys=True))
-    return 0 if summary["passed"] and "shutdown_error" not in summary else 1
+    return 0 if summary["passed"] and "shutdown_error" not in summary and "cleanup_error" not in summary else 1
 
 
 if __name__ == "__main__":

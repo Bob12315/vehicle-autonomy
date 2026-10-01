@@ -69,8 +69,9 @@ class SimulationRuntimeTests(unittest.TestCase):
                                             128 if armed else 0, mode, 4).pack(self.sender)
 
     def state_messages(self):
-        return (self.sender.local_position_ned_encode(0, 0, 0, 0, 0, 0, 0).pack(self.sender)
-                + self.sender.attitude_encode(0, 0, 0, 0, 0, 0, 0).pack(self.sender))
+        boot_ms = self.clock.ns // 1_000_000
+        return (self.sender.local_position_ned_encode(boot_ms, 0, 0, 0, 0, 0, 0).pack(self.sender)
+                + self.sender.attitude_encode(boot_ms, 0, 0, 0, 0, 0, 0).pack(self.sender))
 
     def cycle(self, data=None):
         self.clock.advance()

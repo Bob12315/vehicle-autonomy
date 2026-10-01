@@ -194,6 +194,16 @@ class ArduPilotCommandPort:
                         status = CommandStatus(command_id, CommandPhase.UNKNOWN, now)
                         self._statuses[command_id] = status
                         results.append(status)
+            for command_id, status in tuple(self._statuses.items()):
+                command = self._commands[command_id]
+                if (status.phase is CommandPhase.ACKNOWLEDGED
+                        and isinstance(command.command, (ArmCommand, DisarmCommand, ModeCommand))
+                        and command.deadline.clock_domain_id == now.clock_domain_id
+                        and command.deadline <= now):
+                    self.reasons[command_id] = "state_confirmation_timeout_outcome_unknown"
+                    final = CommandStatus(command_id, CommandPhase.UNKNOWN, now)
+                    self._statuses[command_id] = final
+                    results.append(final)
         return tuple(results)
 
     def observe_heartbeat(self, message: object, received_at: TimePoint) -> tuple[CommandStatus, ...]:
@@ -260,7 +270,7 @@ class ArduPilotCommandPort:
                 if status.phase is CommandPhase.ACCEPTED:
                     self._statuses[command_id] = CommandStatus(command_id, CommandPhase.REJECTED, now)
                     self.reasons[command_id] = "link_session_lost"
-                elif status.phase is CommandPhase.TRANSMITTED:
+                elif status.phase in (CommandPhase.TRANSMITTED, CommandPhase.ACKNOWLEDGED):
                     self._statuses[command_id] = CommandStatus(command_id, CommandPhase.UNKNOWN, now)
                     self.reasons[command_id] = "link_session_lost_outcome_unknown"
             self._queue.clear()
