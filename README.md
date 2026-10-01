@@ -26,3 +26,5 @@ Copter USB 诊断使用 `PYTHONPATH=. python tests/manual_p5_copter_usb.py --por
 裸飞控台架曾临时配置 `FRAME_CLASS=1`、保留 `FRAME_TYPE=1`（四旋翼 X）并重启。通过受控端口验证未解锁的 `STABILIZE → ACRO → STABILIZE`；Arm 请求由飞控预解锁检查拒绝，随后 Disarm 请求获确认。测试结束已恢复 `FRAME_CLASS=0` 并重启复核。复现台架脚本须分别显式运行 `PYTHONPATH=. python tests/manual_p5_copter_bench_mode.py --port /dev/ttyACM0 --allow-mode-roundtrip` 与 `PYTHONPATH=. python tests/manual_p5_copter_bench_arm.py --port /dev/ttyACM0 --bare-controller --allow-arm-bench`；路径随重新连接可能变化，**Arm 脚本仅供确认没有执行器连接的裸飞控使用**。预解锁阻断、日志存储错误和未验收项见[迁移记录](docs/migration_plan.md)。
 
 [当前实现边界](docs/architecture.md)记录已有能力与限制。[迁移计划与记录](docs/migration_plan.md)给出从合同、状态链到控制与设备接入的阶段顺序。[历史程序说明](docs/migration.md)介绍 `legacy/cuadc_2026/`：它完整保存旧应用的代码、配置、测试和资源，供后续逐项评估复用；新根目录不导入该目录。
+
+[V1 模块进度与未完成项](docs/v1_progress.md)按目标架构逐项记录当前成熟度、证据与待验收工作。
