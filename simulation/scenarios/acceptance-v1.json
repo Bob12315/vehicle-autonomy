@@ -29,6 +29,8 @@
     "turn_rate_body_rad_s": 0.35,
     "minimum_translation_m": 1.0,
     "minimum_turn_deg": 45,
+    "translation_timeout_s": 10,
+    "turn_timeout_s": 9,
     "goto_offset_enu_m": [2.0, 0.0],
     "goto_max_horizontal_error_m": 0.75,
     "goto_timeout_s": 45,

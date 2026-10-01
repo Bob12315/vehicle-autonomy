@@ -36,7 +36,7 @@ def free_port(port: int, kind: int) -> bool:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--phase0", action="store_true", help="allow the still missing target Rover model")
+    parser.add_argument("--phase0", action="store_true", help="run only the Phase 0 baseline checks")
     args = parser.parse_args()
     checks: dict[str, object] = {}
     for name in ("gz", "ss", "python"):
@@ -52,6 +52,8 @@ def main() -> int:
         "gazebo_plugin": GAZEBO_PLUGIN / "build/libArduPilotPlugin.so",
         "copter_world": GAZEBO_PLUGIN / "worlds/iris_runway.sdf",
         "rover_world": ROOT / "simulation/worlds/rover_runway.sdf",
+        "rover_model": ROOT / "simulation/models/target_rover/model.sdf",
+        "rover_telemetry_params": ROOT / "simulation/params/rover_telemetry.parm",
         "copter_telemetry_params": ROOT / "simulation/params/copter_telemetry.parm",
     }
     for name, path in files.items():
@@ -68,7 +70,7 @@ def main() -> int:
                 "copter_telemetry_params", "gazebo_version", "plugin_dependencies",
                 "tcp_5760_free", "tcp_5762_free", "udp_9002_free"}
     if not args.phase0:
-        required.add("rover_world")
+        required.update({"rover_world", "rover_model", "rover_telemetry_params"})
     passed = all(bool(checks[name]) for name in required)
     print(json.dumps({"passed": passed, "phase0": args.phase0, "checks": checks}, indent=2, sort_keys=True))
     return 0 if passed else 1

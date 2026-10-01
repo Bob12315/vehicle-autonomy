@@ -10,7 +10,9 @@ Arm, Disarm, and Mode use the common command port. Rover Guided body drive uses
 `SET_POSITION_TARGET_LOCAL_NED` in `BODY_NED`, mask 1479: forward speed in
 `vx`, FLU positive yaw converted to negative NED yaw rate. A zero setpoint
 stops the active drive stream. Goto uses `LOCAL_NED` position, mask 3576,
-with ENU east/north converted to NED east/north fields. The local ArduPilot
+with ENU east/north converted to NED east/north fields. Stop also accepts an
+active local Goto stream and sends a body-frame zero speed/turn-rate setpoint.
+The local ArduPilot
 `Rover/GCS_MAVLink_Rover.cpp` handler accepts these position and velocity plus
 turn-rate combinations in Guided mode. Takeoff/Land, sideways/vertical drive,
 and nonplanar Goto are rejected. The common Runtime/Execution/Authority/port

@@ -117,6 +117,7 @@ class SimulationRuntime:
                              target_system=1, target_component=1)
         port = ArduPilotCommandPort(authority=self.authority, transport=transport, codec=codec,
                                     translator=self._translator, now=self.clock,
+                                    stop_speed_tolerance=0.1 if self.profile.kind == "rover" else 0.05,
                                     write_guard=self._write_guard)
         session = ArduPilotSession(
             transport=transport, codec=codec, authority=self.authority,

@@ -48,7 +48,7 @@ class ArduRoverCommandTranslator(ArduPilotCommandTranslator):
             return LocalSetpoint(mavlink.FRAME_BODY_NED, 1479,
                                  vx=v.x, yaw_rate=-w.z)
         if isinstance(command, StopMotionCommand):
-            if stop_frame != mavlink.FRAME_BODY_NED:
-                raise ValueError("Rover Stop requires an active body drive stream")
+            if stop_frame not in (mavlink.FRAME_BODY_NED, mavlink.FRAME_LOCAL_NED):
+                raise ValueError("Rover Stop requires an active drive or Goto stream")
             return LocalSetpoint(mavlink.FRAME_BODY_NED, 1479)
         raise TypeError("unsupported ArduRover command")
