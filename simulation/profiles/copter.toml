@@ -1,0 +1,35 @@
+[vehicle]
+kind = "copter"
+host = "127.0.0.1"
+port = 5760
+vehicle_id = "simulation-copter"
+clock_domain_id = "host-monotonic-simulation"
+
+[modes]
+GUIDED = 4
+LOITER = 5
+RTL = 6
+LAND = 9
+
+[timing]
+period_ns = 100000000
+link_timeout_ns = 3000000000
+warmup_ns = 45000000000
+effect_ttl_ns = 5000000000
+lease_ns = 90000000000
+
+[safety]
+max_request_ttl_ns = 5000000000
+max_snapshot_age_ns = 3000000000
+deadman_ns = 1000000000
+min_altitude_m = 0.0
+max_altitude_m = 10.0
+max_takeoff_m = 2.0
+max_linear_mps = 1.0
+max_angular_rad_s = 0.5
+allowed_frames = ["odom", "base_link"]
+allowed_modes = ["GUIDED", "LOITER", "RTL", "LAND"]
+min_x_m = -5.0
+max_x_m = 5.0
+min_y_m = -5.0
+max_y_m = 5.0

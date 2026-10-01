@@ -1,0 +1,28 @@
+{
+  "clock": "host monotonic for freshness and deadlines; Gazebo simulation time is oracle metadata",
+  "copter": {
+    "takeoff_height_m": 1.5,
+    "takeoff_max_error_m": 0.35,
+    "takeoff_timeout_s": 30,
+    "goto_offset_enu_m": [2.0, 1.0],
+    "goto_max_horizontal_error_m": 0.75,
+    "goto_timeout_s": 45,
+    "velocity_enu_mps": [0.5, 0.0, 0.0],
+    "stop_max_horizontal_speed_mps": 0.15,
+    "stop_stable_s": 2.0,
+    "stop_timeout_s": 8
+  },
+  "rover": {
+    "forward_body_mps": 0.5,
+    "reverse_body_mps": -0.5,
+    "turn_rate_body_rad_s": 0.35,
+    "minimum_translation_m": 1.0,
+    "minimum_turn_deg": 45,
+    "goto_offset_enu_m": [2.0, 0.0],
+    "goto_max_horizontal_error_m": 0.75,
+    "goto_timeout_s": 45,
+    "stop_max_horizontal_speed_mps": 0.10,
+    "stop_stable_s": 2.0,
+    "stop_timeout_s": 8
+  }
+}
