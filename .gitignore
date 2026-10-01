@@ -20,3 +20,4 @@ runtime/*
 !runtime/__init__.py
 !runtime/sitl.py
 !runtime/sitl.toml
+!runtime/sitl_arm.toml

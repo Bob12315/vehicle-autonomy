@@ -37,6 +37,7 @@ class SitlProfile:
     link_timeout_ns: int
     lease_ns: int
     mission_timeout_ns: int
+    arm_ready_wait_ns: int
     safety: SafetyLimits
 
     @classmethod
@@ -47,7 +48,7 @@ class SitlProfile:
         _keys(sitl, {"host", "port", "clock_domain_id", "vehicle_id", "vehicle_type", "target_system",
                      "target_component", "mode", "mode_id"}, "sitl")
         _keys(timing, {"period_ns", "read_timeout_ns", "link_timeout_ns", "lease_ns",
-                       "mission_timeout_ns"}, "timing")
+                       "mission_timeout_ns", "arm_ready_wait_ns"}, "timing")
         _keys(safety, {"max_request_ttl_ns", "max_snapshot_age_ns", "deadman_ns",
                        "min_altitude_m", "max_altitude_m", "max_takeoff_m", "max_linear_mps",
                        "max_angular_rad_s", "allowed_frames", "allowed_modes", "min_x_m",
@@ -74,6 +75,9 @@ class SitlProfile:
         link = _positive(timing["link_timeout_ns"], "link_timeout_ns")
         lease = _positive(timing["lease_ns"], "lease_ns")
         mission = _positive(timing["mission_timeout_ns"], "mission_timeout_ns")
+        ready_wait = timing["arm_ready_wait_ns"]
+        if type(ready_wait) is not int or ready_wait < 0 or ready_wait >= mission:
+            raise ValueError("arm_ready_wait_ns must be nonnegative and below mission timeout")
         if not (read < period < limits.deadman_ns and period * 2 < limits.max_snapshot_age_ns
                 and link < lease and 5_000_000_000 <= limits.max_request_ttl_ns < mission < lease):
             raise ValueError("timing, freshness, lease and deadman bounds are inconsistent")
@@ -85,4 +89,4 @@ class SitlProfile:
                 raise ValueError(f"invalid {name}")
         return cls(sitl["host"], port, sitl["clock_domain_id"], sitl["vehicle_id"], sitl["vehicle_type"],
                    sitl["target_system"], sitl["target_component"], sitl["mode"],
-                   sitl["mode_id"], period, read, link, lease, mission, limits)
+                   sitl["mode_id"], period, read, link, lease, mission, ready_wait, limits)
