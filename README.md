@@ -45,4 +45,6 @@ Copter USB 诊断使用 `PYTHONPATH=. python tests/manual_p5_copter_usb.py --por
 
 [V1 模块进度与未完成项](docs/v1_progress.md)按目标架构逐项记录当前成熟度、证据与待验收工作。
 
+[基础自主系统实施计划](docs/basic_autonomy_implementation_plan.md)列出车辆仿真完成后的 P9–P17 阶段、依赖与验收门槛；[P9 专项计划](docs/p9_application_runtime_plan.md)细化下一阶段的 Runtime 接口与执行步骤。这些计划不代表相应阶段已实施。
+
 [P6 首个持续运行组合实施计划与验收](docs/p6_runtime_integration_plan.md)记录 localhost ArduCopter SITL 的装配顺序、测试结果和未覆盖范围。
