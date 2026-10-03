@@ -90,3 +90,7 @@
 本次复核执行 `python -m unittest discover -s tests -q`：**125 项通过，0 失败、0 跳过**；`python -m app.main status` 仍返回 `mission_scheduler=unwired`、`vehicle_connection=unwired`、`send_commands=false`，表示默认入口不连接车辆。历史模式/解锁验收见[记录](sitl_arm_mission.md)；本轮两车基础运动及故障真值证据见[仿真审计](simulation/completion-audit.md)。两者均不替代实机运动、物理停止或服务器部署验收。
 
 更新本文时应同时更新基线提交、运行测试、模块证据和未完成项。若某模块只因新增文件而没有达到更高档位的验证要求，进度分档不应上调。
+
+## P9 Application Runtime（2026-10-03）
+
+**PASS**：两车正式 App 进程、受限模式任务、IPC、取消、SIGTERM、重连只读及完整车辆回归。证据见 [P9](autonomy/phase-9.md)。P10–P17 按基础自主计划逐阶段验收，真实硬件仍暂缓。

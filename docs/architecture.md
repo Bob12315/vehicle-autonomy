@@ -149,3 +149,15 @@ runs both vehicles plus faults, with bounded stage deadlines, unique world
 names and unused matching ports. It retains process/command/state/truth
 manifests and fails on missing evidence or cleanup failure. See
 [simulation usage](simulation/README.md) and [completion audit](simulation/completion-audit.md).
+
+## P9 application process
+
+`app.main run` composes a caller-scheduled `SimulationRuntime` and Typed
+`MissionRuntime` in one local loop. Unix-domain IPC exposes only status,
+registered mission start, cancel and shutdown. The `disarmed_mode` catalog
+contains Copter GUIDED and Rover HOLD, and never accepts client-provided
+Effects or authorization. Mission envelopes retain identity, scope and deadline
+through Execution. Leases belong to individual compiled Actions; idle and
+reconnected processes have SEND disabled. Both vehicles passed actual App
+subprocess tests and the original physical/fault suite; see
+[the P9 audit](autonomy/phase-9.md). No real-device or onboard claim follows.

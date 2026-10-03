@@ -79,6 +79,7 @@ class SimulationRuntime:
         self._action_id: str | None = None
         self._effects: dict[str, str | None] = {}
         self._effect_requests: dict[str, VehicleEffect] = {}
+        self._envelopes: dict[str, EffectEnvelope] = {}
         self._dispatch_results: dict[str, DispatchResult] = {}
         self._results: dict[str, dict] = {}
         self._active_stream_ids: set[str] = set()
@@ -99,6 +100,14 @@ class SimulationRuntime:
     @property
     def session_id(self) -> str | None:
         return None if self._session is None or self._session.session_id is None else str(self._session.session_id)
+
+    @property
+    def connected(self) -> bool:
+        return self._transport is not None
+
+    def snapshot(self):
+        """WorldQueryPort view for decision consumers."""
+        return self.world_snapshot()
 
     def world_snapshot(self):
         """Return the immutable framework snapshot; no Gazebo truth enters here."""
@@ -264,7 +273,8 @@ class SimulationRuntime:
                  and state.reported_pose is not None and state.reported_twist is not None)
         return SimulationCycle(len(messages), written, self.session_id, fresh, self._fault)
 
-    def begin_run(self, *, allow_send: bool = False) -> str:
+    def begin_run(self, *, allow_send: bool = False, run_id: str | None = None,
+                  action_id: str | None = None) -> str:
         if self._closed or self._session is None or self._session.session_id is None or self._run_id is not None:
             raise RuntimeError("fresh link and idle runtime required")
         world = self._world.snapshot()
@@ -273,8 +283,8 @@ class SimulationRuntime:
         now = self.clock()
         if not 0 <= now.elapsed_ns_since(world.vehicle.published_at) <= self.profile.safety.max_snapshot_age_ns:
             raise RuntimeError("vehicle state stale")
-        self._run_id = RunId(f"simulation:{uuid4().hex}")
-        self._action_id = f"{self._run_id}:control:1"
+        self._run_id = RunId(run_id or f"simulation:{uuid4().hex}")
+        self._action_id = action_id or f"{self._run_id}:control:1"
         if allow_send:
             self.authority.grant(ControlLease(f"lease:{uuid4().hex}", self._run_id,
                                                self._action_id, _later(now, self.profile.lease_ns)), now)
@@ -295,23 +305,54 @@ class SimulationRuntime:
         envelope = EffectEnvelope(SchemaVersion(1, 0), selected_id,
                                   self._run_id, self._action_id, now,
                                   _later(now, self.profile.effect_ttl_ns), effect)
+        return self.dispatch_envelope(envelope)
+
+    def authorize_action(self, action_id: str, *, allow_send: bool) -> None:
+        """Deployment selects a compiled step; a client cannot create a lease."""
+        if self._run_id is None or self._execution is None or self.session_id is None:
+            raise RuntimeError("active connected run required")
+        if self._execution.active_stream_ids():
+            raise RuntimeError("previous Action stop barrier incomplete")
+        self.authority.set_system_send(False)
+        self.authority.revoke()
+        self._action_id = action_id
+        if allow_send:
+            now = self.clock()
+            self.authority.grant(ControlLease(f"lease:{uuid4().hex}", self._run_id,
+                                             action_id, _later(now, self.profile.lease_ns)), now)
+            self.authority.set_system_send(True)
+            self.authority.set_action_send(True)
+
+    def dispatch_envelope(self, envelope: EffectEnvelope) -> DispatchResult:
+        """Preserve the Mission identity and deadline at the Execution boundary."""
+        if not isinstance(envelope, EffectEnvelope):
+            raise TypeError("typed envelope required")
+        if (self._run_id is None or self._execution is None or self.session_id is None
+                or envelope.run_id != self._run_id or envelope.action_instance_id != self._action_id):
+            return DispatchResult(None, "inactive_mission_scope")
+        selected_id = str(envelope.effect_id)
+        if selected_id in self._envelopes:
+            if self._envelopes[selected_id] != envelope:
+                raise ValueError("effect ID reused for different envelope")
+            return self._dispatch_results[selected_id]
         world = self._world.snapshot()
         if world is None:
-            raise RuntimeError("world state unavailable")
-        result = self._execution.dispatch(envelope, world, now)
-        self._effect_requests[selected_id] = effect
+            return DispatchResult(None, "world_state_unavailable")
+        result = self._execution.dispatch(envelope, world, self.clock())
+        self._envelopes[selected_id] = envelope
+        self._effect_requests[selected_id] = envelope.effect
         self._dispatch_results[selected_id] = result
         command_id = None if result.receipt is None else str(result.receipt.command_id)
-        self._effects[str(envelope.effect_id)] = command_id
+        self._effects[selected_id] = command_id
         from contracts.effects.vehicle import PoseTargetEffect, TwistTargetEffect
-        if result.receipt is not None and isinstance(effect, (PoseTargetEffect, TwistTargetEffect)):
-            self._active_stream_ids.add(effect.stream_id)
-        self._results[str(envelope.effect_id)] = {
+        if result.receipt is not None and isinstance(envelope.effect, (PoseTargetEffect, TwistTargetEffect)):
+            self._active_stream_ids.add(envelope.effect.stream_id)
+        self._results[selected_id] = {
             "phase": "REJECTED" if result.receipt is None else result.receipt.phase.value,
             "command_id": command_id, "reason": result.reason,
         }
-        self._emit("effect_submitted", effect_id=str(envelope.effect_id),
-                   command_id=command_id, reason=result.reason)
+        self._emit("effect_submitted", effect_id=selected_id, action_id=str(envelope.action_instance_id),
+                   deadline_ns=envelope.deadline.monotonic_ns, command_id=command_id, reason=result.reason)
         return result
 
     def effect_status(self, effect_id: str) -> dict | None:

@@ -9,12 +9,40 @@ from pathlib import Path
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Vehicle Autonomy Framework")
-    parser.add_argument("command", choices=("status", "run-sitl", "run-sitl-arm"))
+    parser.add_argument("command", choices=("status", "run-sitl", "run-sitl-arm", "run", "ctl"))
+    parser.add_argument("operation", nargs="?", choices=("status", "start", "cancel", "shutdown"))
+    parser.add_argument("--profile", choices=("copter_sim", "rover_sim"))
+    parser.add_argument("--control-socket")
+    parser.add_argument("--mission")
+    parser.add_argument("--request-id")
     parser.add_argument("--config")
     parser.add_argument("--allow-send", action="store_true")
     parser.add_argument("--allow-arm", action="store_true", help="permit a disarmed localhost SITL arm cycle")
     parser.add_argument("--sitl-version", help="operator reported local SITL binary version for the run log")
-    args = parser.parse_args()
+    args = parser.parse_intermixed_args()
+    if args.command in ("run", "ctl"):
+        if not args.profile or args.allow_arm:
+            parser.error("run/ctl requires --profile and does not accept --allow-arm")
+        from app.control import request, run_application, socket_path
+        from runtime.application_profile import load_profile
+        try:
+            path = args.control_socket or socket_path(args.profile)
+            if args.command == "run":
+                if args.operation or args.mission or args.request_id:
+                    parser.error("run takes no control operation")
+                return run_application(load_profile(args.profile, args.config), profile_name=args.profile,
+                                       allow_send=args.allow_send, path=path)
+            if not args.operation or args.allow_send or args.config:
+                parser.error("ctl requires an operation and cannot configure SEND or vehicle")
+            if (args.operation == "start") != (args.mission is not None):
+                parser.error("only start requires --mission")
+            response = request(path, args.operation, {"mission": args.mission} if args.mission else {},
+                               request_id=args.request_id)
+            print(json.dumps(response, sort_keys=True))
+            return 0 if response["ok"] else 1
+        except (OSError, ValueError, RuntimeError) as exc:
+            print(json.dumps({"ok": False, "error": str(exc)}, sort_keys=True))
+            return 1
     if args.command == "status":
         print(json.dumps({
             "framework": "v1", "vehicle_connection": "unwired",

@@ -1,6 +1,6 @@
 # P9：正式 Application Runtime 实施计划
 
-**状态：待实施。** 制定日期：2026-10-03。本文件是 P9 专项规格；P9–P17 的完整阶段计划见[基础自主系统实施计划](basic_autonomy_implementation_plan.md)。本文的创建不代表 P9 已完成。此前 [Simulation Complete 审计](simulation/completion-audit.md) 已通过，车辆基础控制层按现有仿真范围冻结。P9 只把已有能力装配成可持续运行的**本机仿真应用进程**，不增加车辆命令或真机连接。
+**状态：P9 PASS，验收见 [阶段记录](autonomy/phase-9.md)。** 制定日期：2026-10-03。本文件是 P9 专项规格；P9–P17 的完整阶段计划见[基础自主系统实施计划](basic_autonomy_implementation_plan.md)。本文的创建不代表 P9 已完成。此前 [Simulation Complete 审计](simulation/completion-audit.md) 已通过，车辆基础控制层按现有仿真范围冻结。P9 只把已有能力装配成可持续运行的**本机仿真应用进程**，不增加车辆命令或真机连接。
 
 ## 1. 目标和边界
 
