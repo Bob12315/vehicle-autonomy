@@ -9,6 +9,9 @@ from contracts.core.primitives import RunId, SchemaVersion
 from contracts.core.time import TimePoint
 from contracts.decision import ActionDecision, ActionOutcome, EffectResult, ExitDecision, ExitReason, FailurePolicy
 from contracts.effects.vehicle import EffectEnvelope, VehicleEffect
+from contracts.effects.payload import PayloadEffectEnvelope,ReleasePayloadEffect
+
+DecisionEnvelope = EffectEnvelope | PayloadEffectEnvelope
 from contracts.world.ports import WorldQueryPort
 from .mission import CompiledMission, CompiledStep
 
@@ -36,7 +39,7 @@ class RunUpdate:
     status: RunStatus
     step_id: str | None
     attempt: int
-    effects: tuple[EffectEnvelope, ...]
+    effects: tuple[DecisionEnvelope, ...]
     results: tuple[StepResult, ...]
     error: str | None = None
 
@@ -75,7 +78,7 @@ class MissionRuntime:
     def _step(self) -> CompiledStep | None:
         return self._compiled.steps[self._index] if self._index < len(self._compiled.steps) else None
 
-    def _view(self, effects: tuple[EffectEnvelope, ...] = ()) -> RunUpdate:
+    def _view(self, effects: tuple[DecisionEnvelope, ...] = ()) -> RunUpdate:
         step = self._step()
         return RunUpdate(
             self._run_id, self._status, step.step.step_id if step else None,
@@ -104,7 +107,7 @@ class MissionRuntime:
             self._instance = None
         return self._view()
 
-    def _envelopes(self, effects: tuple[VehicleEffect, ...], now: TimePoint) -> tuple[EffectEnvelope, ...]:
+    def _envelopes(self, effects: tuple[VehicleEffect | ReleasePayloadEffect, ...], now: TimePoint) -> tuple[DecisionEnvelope, ...]:
         step = self._step()
         assert step is not None
         allowed = step.registration.spec.effect_types
@@ -117,7 +120,8 @@ class MissionRuntime:
                 now.monotonic_ns + step.registration.spec.effect_ttl_ns,
                 now.utc, now.clock_domain_id,
             )
-            envelope = EffectEnvelope(
+            kind = PayloadEffectEnvelope if isinstance(effect,ReleasePayloadEffect) else EffectEnvelope
+            envelope = kind(
                 SchemaVersion(1, 0), f"{self._run_id}:effect:{self._effect_sequence}",
                 self._run_id, f"{self._run_id}:{step.step.step_id}:{self._attempt}",
                 now, deadline, effect,

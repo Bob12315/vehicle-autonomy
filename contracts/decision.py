@@ -13,6 +13,9 @@ from contracts.effects.vehicle import (
     StopMotionEffect, TakeoffEffect, TwistTargetEffect, VehicleEffect,
 )
 from contracts.world.models import WorldSnapshot
+from contracts.effects.payload import ReleasePayloadEffect
+
+DecisionEffect = VehicleEffect | ReleasePayloadEffect
 
 
 VEHICLE_EFFECT_TYPES = (
@@ -20,6 +23,7 @@ VEHICLE_EFFECT_TYPES = (
     ModeEffect, PoseTargetEffect, TwistTargetEffect, StopMotionEffect,
 )
 
+DECISION_EFFECT_TYPES = VEHICLE_EFFECT_TYPES + (ReleasePayloadEffect,)
 
 def _matches_type(value: object, annotation: object) -> bool:
     """Check the small, explicit annotation grammar used by Action parameters."""
@@ -69,8 +73,8 @@ class ActionSpec:
             not isinstance(name, str) or not name.strip() for name in self.required_capabilities
         ):
             raise ValueError("required_capabilities must be non-empty names")
-        if not isinstance(self.effect_types, tuple) or any(effect_type not in VEHICLE_EFFECT_TYPES for effect_type in self.effect_types):
-            raise TypeError("effect_types must be registered typed vehicle effects")
+        if not isinstance(self.effect_types, tuple) or any(effect_type not in DECISION_EFFECT_TYPES for effect_type in self.effect_types):
+            raise TypeError("effect_types must be registered typed decision effects")
         if isinstance(self.effect_ttl_ns, bool) or not isinstance(self.effect_ttl_ns, int) or self.effect_ttl_ns <= 0:
             raise ValueError("effect_ttl_ns must be positive")
 
@@ -123,14 +127,14 @@ class ExitReason(str, Enum):
 @dataclass(frozen=True, slots=True)
 class ActionDecision:
     outcome: ActionOutcome
-    effects: tuple[VehicleEffect, ...] = ()
+    effects: tuple[DecisionEffect, ...] = ()
     result: FrozenJson = None
     error: str | None = None
 
     def __post_init__(self) -> None:
         if not isinstance(self.outcome, ActionOutcome):
             raise TypeError("outcome must be ActionOutcome")
-        if not isinstance(self.effects, tuple) or any(not isinstance(effect, VEHICLE_EFFECT_TYPES) for effect in self.effects):
+        if not isinstance(self.effects, tuple) or any(not isinstance(effect, DECISION_EFFECT_TYPES) for effect in self.effects):
             raise TypeError("effects must be typed effect values")
         object.__setattr__(self, "result", freeze_json(self.result))
         if self.outcome is ActionOutcome.RUNNING and (self.result is not None or self.error is not None):
@@ -144,12 +148,12 @@ class ActionDecision:
 @dataclass(frozen=True, slots=True)
 class ExitDecision:
     complete: bool
-    effects: tuple[VehicleEffect, ...] = ()
+    effects: tuple[DecisionEffect, ...] = ()
 
     def __post_init__(self) -> None:
         if not isinstance(self.complete, bool):
             raise TypeError("complete must be bool")
-        if not isinstance(self.effects, tuple) or any(not isinstance(effect, VEHICLE_EFFECT_TYPES) for effect in self.effects):
+        if not isinstance(self.effects, tuple) or any(not isinstance(effect, DECISION_EFFECT_TYPES) for effect in self.effects):
             raise TypeError("exit effects must be typed effect values")
 
 
