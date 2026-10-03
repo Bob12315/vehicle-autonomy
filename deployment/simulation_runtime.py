@@ -118,6 +118,9 @@ class SimulationRuntime:
     def world_epoch(self):
         return self._world.generation_id
 
+    def ingest_observation(self, observation):
+        self._world.ingest_observation(observation)
+
     def set_environment(self, reference):
         self._world.update_environment(reference)
 

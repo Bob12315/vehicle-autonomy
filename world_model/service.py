@@ -52,6 +52,7 @@ class WorldModel:
         self._localization: LocalizationEstimate | None = None
         self._observations: dict[tuple[str, str], Observation[DetectedObject]] = {}
         self._producer_sequences: dict[str, int] = {}
+        self._last_observations = {}
         self._latest: WorldSnapshot[WorldObject] | None = None
         self._revision = 0
         self._transform_dependency = None
@@ -135,6 +136,11 @@ class WorldModel:
             previous = self._producer_sequences.get(producer, -1)
             if observation.sequence < previous:
                 raise ValueError("observation sequence regressed")
+            if observation.sequence == previous:
+                if observation != self._last_observations[producer]:
+                    raise ValueError('observation sequence reused for different data')
+                return
+            self._last_observations[producer] = observation
             self._producer_sequences[producer] = observation.sequence
             self._observations[(producer, str(observation.data.object_id))] = observation
 

@@ -25,7 +25,7 @@ TERMINAL = (RunStatus.SUCCEEDED, RunStatus.FAILED, RunStatus.CANCELLED)
 
 
 class ApplicationRuntime:
-    def __init__(self, profile, *, profile_name: str, allow_send=False, runtime=None, event_sink=None):
+    def __init__(self, profile, *, profile_name: str, allow_send=False, runtime=None, event_sink=None, sensor_config=None):
         self.profile = profile
         self.profile_name = profile_name
         self.allow_send = allow_send
@@ -58,6 +58,12 @@ class ApplicationRuntime:
         self.connected_at_ns = None
         self.task_environment = None
         self.task_name = None
+        self.sensor_calibration = None
+        self.sensor = None
+        self.sensor_epoch = None
+        if sensor_config is not None:
+            from sensors.simulation.objects import ObjectCalibration
+            self.sensor_calibration = ObjectCalibration.load(Path(sensor_config))
 
     def _emit(self, event, **fields):
         self.events({"event": event, "profile": self.profile_name, **fields})
@@ -93,6 +99,17 @@ class ApplicationRuntime:
             if self.environment is None or self.environment.frame_epoch != self.vehicle.world_epoch:
                 self.environment = self._environment_source.bind(self.vehicle.world_epoch)
             self.vehicle.set_environment(self.environment.reference)
+        if self.sensor_calibration is not None:
+            if self.sensor_epoch != self.vehicle.world_epoch:
+                if self.sensor is not None:self.sensor.close()
+                from sensors.simulation.objects import GazeboObjectSource
+                self.sensor = GazeboObjectSource(self.sensor_calibration,self.vehicle.clock().clock_domain_id)
+                self.sensor_epoch = self.vehicle.world_epoch
+            for observation in self.sensor.poll(self.vehicle.clock()):
+                self.vehicle.ingest_observation(observation)
+                self._emit('object_observation',producer=str(observation.producer_id),sequence=observation.sequence,
+                    capture_ns=observation.captured_at.monotonic_ns,receive_ns=observation.received_at.monotonic_ns,
+                    quality=observation.quality.value,frame=str(observation.frame_id),object_id=str(observation.data.object_id))
         result = self.vehicle.cycle()
         if result.fault:
             self.error = result.fault
@@ -183,6 +200,12 @@ class ApplicationRuntime:
                     "transform_epoch": self.vehicle.localization.epoch,
                     "position": [world.localization.pose.value.position.x, world.localization.pose.value.position.y,
                                  world.localization.pose.value.position.z]},
+                "objects": [] if world is None else [{"id":str(obj.object_id),"label":obj.label,
+                    "producer":str(obj.producer_id),"observation":str(obj.source_observation_id),"frame":str(obj.position.frame_id),
+                    "age_ns":now.elapsed_ns_since(obj.position.captured_at),"quality":obj.quality.value,
+                    "confidence":obj.confidence,"position":[obj.position.value.x,obj.position.value.y,obj.position.value.z]} for obj in world.objects],
+                "sensor": None if self.sensor is None else {"kind":"sim_objects","source":self.sensor_calibration.source,
+                    "version":self.sensor_calibration.version,"error":self.sensor.projector.error},
                 "system_send": self.vehicle.authority.system_send,
                 "action_send": self.vehicle.authority.action_send, "task": self.task_status()}
 
@@ -242,6 +265,7 @@ class ApplicationRuntime:
         if self.task and self.task.view().status not in TERMINAL:
             self.task.cancel()
             self.task.abort("shutdown; sent commands cannot be undone")
+        if self.sensor is not None:self.sensor.close();self.sensor=None
         self.stops.update(self.vehicle.shutdown())
         self.state = "STOPPED"
         self._emit("application_stopped", stops=self.stops)
