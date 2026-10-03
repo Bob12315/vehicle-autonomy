@@ -1,0 +1,37 @@
+schema = 1
+name = "basic_route"
+vehicle_kind = "rover"
+failure_policy = "STOP"
+
+[[steps]]
+id = "arm"
+action = "arm"
+timeout_s = 15
+
+[[steps]]
+id = "goto_a"
+action = "goto"
+timeout_s = 45
+target = "A"
+
+[[steps]]
+id = "goto_b"
+action = "goto"
+timeout_s = 45
+target = "B"
+
+[[steps]]
+id = "home"
+action = "return_home"
+timeout_s = 45
+target = "HOME"
+
+[[steps]]
+id = "stop"
+action = "stop"
+timeout_s = 8
+
+[[steps]]
+id = "disarm"
+action = "disarm"
+timeout_s = 15

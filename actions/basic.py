@@ -23,6 +23,16 @@ class BasicParameters:
     duration_ns: int = 2_000_000_000
     timeout_ns: int = 15_000_000_000
 
+    def __post_init__(self):
+        if self.vehicle_kind not in ('copter','rover'):
+            raise ValueError('unsupported kind')
+        if not math.isfinite(self.height_m) or not 0 < self.height_m <= 2:
+            raise ValueError('invalid height')
+        if any(type(value) is not int for value in (self.duration_ns,self.timeout_ns)) or not 0 < self.duration_ns <= self.timeout_ns <= 45_000_000_000:
+            raise ValueError('invalid finite Action deadline')
+        if self.target is not None and self.target.environment != self.environment:
+            raise ValueError('target belongs to another environment')
+
 
 EFFECTS = {
     'arm': (ArmEffect,), 'disarm': (DisarmEffect,),
@@ -126,7 +136,7 @@ class BasicInstance:
 
     def _yaw_request(self, world, error):
         measured=world.localization.twist.value.angular.z
-        return max(-.35,min(.35,.6*error-1.2*measured))
+        return max(-.2,min(.2,.25*error-.5*measured))
 
     def _steady(self, world, bound=None):
         loc = world.localization
@@ -194,7 +204,7 @@ class BasicInstance:
         if self.stage == 'align':
             dx,dy = target.position.x-current.position.x, target.position.y-current.position.y
             error = self._heading_error(current,target)
-            if (abs(error)<=.12 and abs(loc.twist.value.angular.z)<=.1) or math.hypot(dx,dy)<=.45:
+            if (abs(error)<=.25 and abs(loc.twist.value.angular.z)<=.1) or math.hypot(dx,dy)<=.45:
                 self.stage = 'align_stop' if self.touched else 'drive'
                 if not self.touched:
                     self.boundary = len(results)
@@ -248,9 +258,9 @@ class BasicInstance:
                 dx,dy=target.position.x-current.position.x,target.position.y-current.position.y
                 distance=math.hypot(dx,dy)
                 angle=self._heading_error(current,target)
-                speed=min(.4,distance*.5) if abs(angle)<=.25 and distance>.25 else 0
+                speed=min(.35,max(0,distance-.4)*.5)*max(0,math.cos(angle)) if distance>.4 else 0
                 if self.reverse:speed=-speed
-                rate=self._yaw_request(world,angle) if distance>.25 else 0
+                rate=self._yaw_request(world,angle) if distance>.4 else 0
                 effect=TwistTargetEffect('base_link',Twist3(Vector3(speed,0,0),Vector3(0,0,rate)),self.stream)
             else:
                 effect = (TwistTargetEffect('base_link' if self.p.vehicle_kind=='rover' else 'odom',

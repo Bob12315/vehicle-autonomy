@@ -201,7 +201,7 @@ class ApplicationRuntime:
         if name in MISSION_NAMES:
             if self.environment is None or world.environment != self.environment.reference or world.localization is None:
                 raise ValueError("bound environment and fresh localization required")
-            if (self.connected_at_ns is None or self.vehicle.clock().monotonic_ns-self.connected_at_ns < self.profile.warmup_ns):
+            if name != "safe_recovery" and (self.connected_at_ns is None or self.vehicle.clock().monotonic_ns-self.connected_at_ns < self.profile.warmup_ns):
                 raise ValueError("simulation motion warmup incomplete")
             self.environment.validate_origin(world.vehicle)
             plan = build(name, self.profile.kind, self.environment, self.profile.mode_ids["GUIDED"])

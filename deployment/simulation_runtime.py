@@ -239,10 +239,11 @@ class SimulationRuntime:
             self._emit("stream_outcome_unconfirmed", stream_id=stream_id, reason=reason)
         self._emit("link_closed", reason=reason)
 
-    def _record_results(self) -> None:
+    def _record_results(self, selected_effect_id=None) -> None:
         if self._port is None:
             return
-        for effect_id, command_id in self._effects.items():
+        entries = self._effects.items() if selected_effect_id is None else ((selected_effect_id,self._effects.get(selected_effect_id)),)
+        for effect_id, command_id in entries:
             if command_id is None:
                 continue
             status = self._port.status(command_id)
@@ -405,7 +406,7 @@ class SimulationRuntime:
         return result
 
     def effect_status(self, effect_id: str) -> dict | None:
-        self._record_results()
+        self._record_results(effect_id)
         result = self._results.get(effect_id)
         return None if result is None else dict(result)
 

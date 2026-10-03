@@ -49,6 +49,15 @@ class Transport:
 
 
 class SimulationRuntimeTests(unittest.TestCase):
+    def test_result_queries_are_bounded_with_long_mission_history(self):
+        self.runtime.connect()
+        for index in range(200):self.runtime._effects[f'effect:{index}']=f'command:{index}'
+        calls=[]
+        original=self.runtime._port.status
+        self.runtime._port.status=lambda command: (calls.append(command),original(command))[1]
+        for index in range(200):self.runtime.effect_status(f'effect:{index}')
+        self.assertEqual(len(calls),200)
+
     def setUp(self):
         self.clock = Clock()
         self.transports = []

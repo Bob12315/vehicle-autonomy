@@ -57,6 +57,8 @@ class OwnedSimulation:
         self.port = 5760 + 10 * self.instance
         self.json_port = 9002 + 10 * self.instance
         self.world = f"{kind}_{uuid4().hex[:12]}"
+        os.environ["GZ_IP"] = "127.0.0.1"
+        os.environ["GZ_PARTITION"] = "vaf_" + self.world
         self.model = "iris_with_gimbal" if kind == "copter" else "target_rover"
         self.profile = replace(SimulationProfile.load(ROOT / f"simulation/profiles/{kind}.toml"), port=self.port)
         self.processes = []
@@ -66,6 +68,7 @@ class OwnedSimulation:
             "gazebo_version": output(["gz", "sim", "--version"]),
             "world": self.world, "model": self.model, "instance": self.instance,
             "ports": {"tcp": self.port, "json_udp": self.json_port},
+            "gazebo_transport": {"ip": "127.0.0.1", "partition": os.environ["GZ_PARTITION"]},
             "started_at": datetime.now(timezone.utc).isoformat(), "processes": []}
         source_model = (PLUGIN / "models/iris_with_gimbal/model.sdf" if kind == "copter"
                         else ROOT / "simulation/models/target_rover/model.sdf")

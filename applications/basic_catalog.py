@@ -1,9 +1,11 @@
 """Finite application-owned mission recipes; no raw coordinates or ports."""
+from pathlib import Path
+import tomllib
 from actions.basic import BasicParameters
 from contracts.decision import MissionPlan, MissionStep
 from core.sitl_mode_action import SITL_MODE_SPEC, SitlModeParameters
 
-MISSION_NAMES = frozenset({'action_probe','safe_recovery'})
+MISSION_NAMES = frozenset({'action_probe','safe_recovery','basic_route'})
 
 
 def capabilities(kind):
@@ -29,6 +31,20 @@ def build(name, kind, environment, mode_id):
         if (airborne.position.x,airborne.position.y) != (home.position.x,home.position.y):
             raise ValueError('airborne return target does not match configured home')
     steps.append(MissionStep('mode',SITL_MODE_SPEC.name,SitlModeParameters('GUIDED',mode_id)))
+    if name=='basic_route':
+        path=Path(__file__).resolve().parents[1]/f'simulation/missions/{kind}.toml'
+        document=tomllib.loads(path.read_text())
+        if set(document)!={'schema','name','vehicle_kind','failure_policy','steps'} or document['schema']!=1 or document['name']!=name or document['vehicle_kind']!=kind or document['failure_policy']!='STOP':
+            raise ValueError('invalid route schema')
+        for item in document['steps']:
+            if set(item)-{'id','action','target','timeout_s'} or not {'id','action','timeout_s'}<=set(item):
+                raise ValueError('invalid route step')
+            if type(item['timeout_s']) is not int or item['action'] not in ('arm','disarm','takeoff','land','goto','return_home','hold','stop'):
+                raise ValueError('unsupported route Action')
+            if item['action'] in ('goto','return_home','land') and 'target' not in item:
+                raise ValueError('route needs a named target')
+            basic(item['id'],item['action'],item.get('target'),item['timeout_s'])
+        return MissionPlan(name,tuple(steps))
     basic('arm','arm')
     if kind=='copter':basic('takeoff','takeoff',timeout=30)
     basic('goto_a','goto','A',45)

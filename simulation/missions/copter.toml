@@ -1,0 +1,48 @@
+schema = 1
+name = "basic_route"
+vehicle_kind = "copter"
+failure_policy = "STOP"
+
+[[steps]]
+id = "arm"
+action = "arm"
+timeout_s = 15
+
+[[steps]]
+id = "takeoff"
+action = "takeoff"
+timeout_s = 30
+
+[[steps]]
+id = "goto_a"
+action = "goto"
+timeout_s = 45
+target = "A"
+
+[[steps]]
+id = "hold"
+action = "hold"
+timeout_s = 10
+
+[[steps]]
+id = "goto_b"
+action = "goto"
+timeout_s = 45
+target = "B"
+
+[[steps]]
+id = "home"
+action = "return_home"
+timeout_s = 45
+target = "HOME_AIR"
+
+[[steps]]
+id = "land"
+action = "land"
+timeout_s = 25
+target = "HOME"
+
+[[steps]]
+id = "disarm"
+action = "disarm"
+timeout_s = 15
