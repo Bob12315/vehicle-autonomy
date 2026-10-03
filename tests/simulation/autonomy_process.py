@@ -14,7 +14,7 @@ from tests.simulation.launch import ROOT, OwnedSimulation, install_signal_cleanu
 from tests.simulation.oracle import GazeboTruthOracle
 
 
-def run(directory,kind,mission='action_probe',repeats=1,*,objects=False):
+def run(directory,kind,mission='action_probe',repeats=1,*,objects=False,vision_config=None):
     directory.mkdir(parents=True,exist_ok=False)
     owned=OwnedSimulation(directory,kind)
     endpoint=directory/'app.sock'
@@ -22,14 +22,19 @@ def run(directory,kind,mission='action_probe',repeats=1,*,objects=False):
     report={'passed':False,'runs':[]}
     try:
         flags=[]
-        if objects:
+        if objects or vision_config is not None:
             from tests.simulation.object_fixture import add_objects
             sensor_path=add_objects(owned)
-            flags += ['--sim-sensor-config',str(sensor_path)]
+            if vision_config is None:flags += ['--sim-sensor-config',str(sensor_path)]
+            else:
+                flags += ['--recorded-vision-config',str(vision_config)]
+                # Independent manually annotated virtual rig contact point, not detector output.
+                import xml.etree.ElementTree as ET
+                tree=ET.parse(owned.world_path);tree.find("world/model[@name='target_1']/pose").text='2 0.290416666666667 0.05 0 0 0';tree.write(owned.world_path)
         if mission=='cuadc_demo':flags+=['--sim-payload']
         owned.start()
         oracle=GazeboTruthOracle(owned.world,owned.model)
-        target_oracle=GazeboTruthOracle(owned.world,'target_1') if objects else None
+        target_oracle=GazeboTruthOracle(owned.world,'target_1') if objects or vision_config else None
         config=directory/'profile.toml'
         config.write_text((ROOT/f'simulation/profiles/{kind}.toml').read_text().replace('port = 5760',f'port = {owned.port}'))
         environment=Environment.load(ROOT/f'simulation/environments/{kind}.toml')
@@ -158,6 +163,7 @@ def main():
     parser.add_argument('--kind',choices=('copter','rover'),required=True)
     parser.add_argument('--mission',default='action_probe')
     parser.add_argument('--objects',action='store_true')
+    parser.add_argument('--vision-config',type=Path)
     parser.add_argument('--repeats',type=int,choices=(1,2),default=1)
     parser.add_argument('--allow-send',action='store_true')
     parser.add_argument('--run-dir',type=Path)
@@ -165,7 +171,7 @@ def main():
     if not args.allow_send:parser.error('--allow-send required')
     install_signal_cleanup()
     result=run(args.run_dir or ROOT/'artifacts/simulation'/f'autonomy-{args.kind}-{uuid4().hex[:8]}',
-               args.kind,args.mission,args.repeats,objects=args.objects)
+               args.kind,args.mission,args.repeats,objects=args.objects,vision_config=args.vision_config)
     print(json.dumps({'passed':result['passed'],'error':result.get('error'),'runs':len(result['runs'])}))
     return 0 if result['passed'] else 1
 

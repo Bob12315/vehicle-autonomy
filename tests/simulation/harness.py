@@ -126,7 +126,7 @@ def main():
     env['VAF_SIMULATION_PLUGIN_DIR'] = str(plugin_dir)
     runner = StageRunner(run_dir, total_timeout=args.timeout, env=env)
     summary = {'passed': False, 'run_dir': str(run_dir),
-               'started_at': stamp(), 'core_skipped': 0, 'expected_scenarios': 20,
+               'started_at': stamp(), 'core_skipped': 0, 'expected_scenarios': 21,
                'scenarios': [], 'framework_sha': output(['git', 'rev-parse', 'HEAD']),
                'ardupilot_sha': output(['git', 'rev-parse', 'HEAD'], ARDUPILOT),
                'plugin_sha': output(['git', 'rev-parse', 'HEAD'], PLUGIN), 'build_dir': str(build_dir),
@@ -143,6 +143,8 @@ def main():
             ('configure_plugin', ['cmake', '-S', str(PLUGIN), '-B', str(plugin_dir)], ROOT, 120),
             ('build_plugin', ['cmake', '--build', str(plugin_dir), '-j8'], ROOT, 300),
             ('preflight', [sys.executable, str(ROOT / 'scripts/preflight_simulation.py'), '--isolated'], ROOT, 30),
+            ('vision_assets', [sys.executable,str(ROOT/'scripts/prepare_vision_fixture.py')],ROOT,120),
+            ('vision_inference', [sys.executable,'-m','tests.simulation.vision_inference','--run-dir',str(run_dir/'vision_inference')],ROOT,30),
             ('unit', [sys.executable, '-m', 'tests.simulation.harness', '--unit-report', str(run_dir / 'unit.json')], ROOT, 60),
         ]
         if args.inject_failure:
@@ -170,6 +172,7 @@ def main():
             ('cuadc_second', 'tests.simulation.autonomy_process', ['--kind','copter','--allow-send','--mission','cuadc_demo','--objects']),
             ('rover_inspection', 'tests.simulation.autonomy_process', ['--kind','rover','--allow-send','--mission','object_inspection','--objects']),
             ('business_faults', 'tests.simulation.business_faults', ['--kind','copter','--allow-send']),
+            ('visual_business', 'tests.simulation.autonomy_process', ['--kind','copter','--allow-send','--mission','cuadc_demo','--vision-config',str(ROOT/'artifacts/simulation/vision-assets/recording.json')]),
             ('copter_full', 'tests.simulation.copter_scenario', ['--allow-send', '--full']),
             ('copter_land', 'tests.simulation.copter_scenario', ['--allow-send']),
             ('rover_full', 'tests.simulation.rover_protocol', ['--allow-send', '--full']),

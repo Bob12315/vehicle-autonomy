@@ -155,11 +155,11 @@ def request(path, command, payload=None, *, request_id=None):
     return json.loads(result)
 
 
-def run_application(profile, *, profile_name, allow_send, path, sensor_config=None, sim_payload=False):
+def run_application(profile, *, profile_name, allow_send, path, sensor_config=None, vision_config=None, sim_payload=False):
     import signal
     from application.runtime_service import RuntimeService
     from deployment.application_runtime import ApplicationRuntime
-    runtime = ApplicationRuntime(profile, profile_name=profile_name, allow_send=allow_send, sensor_config=sensor_config, sim_payload=sim_payload,
+    runtime = ApplicationRuntime(profile, profile_name=profile_name, allow_send=allow_send, sensor_config=sensor_config, vision_config=vision_config, sim_payload=sim_payload,
         event_sink=lambda event: print(json.dumps(event, sort_keys=True), flush=True))
     server = ControlServer(path, RuntimeService(runtime))
     previous = {}
@@ -178,9 +178,10 @@ def run_application(profile, *, profile_name, allow_send, path, sensor_config=No
             time.sleep(.005)
         final = runtime.shutdown()
         print(json.dumps({"final": final}, sort_keys=True), flush=True)
-        return 1 if any(value == "UNCONFIRMED" for value in runtime.stops.values()) else 0
+        return 1 if runtime.shutdown_error or any(value == "UNCONFIRMED" for value in runtime.stops.values()) else 0
     finally:
-        runtime.shutdown()
-        server.close()
-        for signum, handler in previous.items():
-            signal.signal(signum, handler)
+        try:runtime.shutdown()
+        finally:
+            server.close()
+            for signum, handler in previous.items():
+                signal.signal(signum, handler)

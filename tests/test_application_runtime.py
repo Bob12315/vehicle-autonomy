@@ -20,6 +20,20 @@ class ApplicationRuntimeTests(SimulationRuntimeTests):
         self.transports[-1].incoming.append(data)
         self.app.cycle()
 
+    def test_sensor_shutdown_failure_cannot_prevent_vehicle_fencing(self):
+        self.ready()
+        self.app.start_mission('disarmed_mode')
+        self.app_cycle()
+        class BrokenSensor:
+            def close(self):raise RuntimeError('worker would not stop')
+        self.app.sensor=BrokenSensor()
+        status=self.app.shutdown()
+        self.assertFalse(self.runtime.connected)
+        self.assertFalse(self.runtime.authority.system_send)
+        self.assertIsNone(self.runtime.authority.lease)
+        self.assertEqual(self.transports[-1].writes,[])
+        self.assertEqual(status['shutdown_error'],'sensor_shutdown_unconfirmed:RuntimeError')
+
     def test_mission_preserves_ids_requires_ack_and_new_state(self):
         self.ready()
         task = self.app.start_mission("disarmed_mode")

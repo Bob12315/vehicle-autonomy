@@ -1,0 +1,3 @@
+# Optional CPU YOLOX recorded-image adapter. No Torch/RKNN required.
+numpy>=1.24,<3
+opencv-python-headless>=4.8,<6

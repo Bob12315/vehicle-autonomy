@@ -28,7 +28,7 @@ TERMINAL = (RunStatus.SUCCEEDED, RunStatus.FAILED, RunStatus.CANCELLED)
 
 
 class ApplicationRuntime:
-    def __init__(self, profile, *, profile_name: str, allow_send=False, runtime=None, event_sink=None, sensor_config=None, sim_payload=False):
+    def __init__(self, profile, *, profile_name: str, allow_send=False, runtime=None, event_sink=None, sensor_config=None, vision_config=None, sim_payload=False):
         self.profile = profile
         self.profile_name = profile_name
         self.allow_send = allow_send
@@ -57,12 +57,15 @@ class ApplicationRuntime:
         self.retry_at_ns = 0
         self.retry_delay_ns = 200_000_000
         self.stopping = False
+        self.shutdown_error = None
         self.stops = {}
         self._active_action = None
         self.connected_at_ns = None
         self.task_environment = None
         self.task_name = None
         self.task_configuration_sha256 = None
+        if sensor_config and vision_config:raise ValueError('select exactly one observation input')
+        self.vision_config = None if vision_config is None else Path(vision_config)
         self.payload = None
         self.payload_port = None
         if sim_payload:
@@ -114,11 +117,15 @@ class ApplicationRuntime:
             if self.environment is None or self.environment.frame_epoch != self.vehicle.world_epoch:
                 self.environment = self._environment_source.bind(self.vehicle.world_epoch)
             self.vehicle.set_environment(self.environment.reference)
-        if self.sensor_calibration is not None:
+        if self.sensor_calibration is not None or self.vision_config is not None:
             if self.sensor_epoch != self.vehicle.world_epoch:
                 if self.sensor is not None:self.sensor.close()
-                from sensors.simulation.objects import GazeboObjectSource
-                self.sensor = GazeboObjectSource(self.sensor_calibration,self.vehicle.clock().clock_domain_id)
+                if self.vision_config is not None:
+                    from sensors.camera.recorded import RecordedVisionSource
+                    self.sensor=RecordedVisionSource(self.vision_config,self.vehicle.clock().clock_domain_id)
+                else:
+                    from sensors.simulation.objects import GazeboObjectSource
+                    self.sensor = GazeboObjectSource(self.sensor_calibration,self.vehicle.clock().clock_domain_id)
                 self.sensor_epoch = self.vehicle.world_epoch
             for observation in self.sensor.poll(self.vehicle.clock()):
                 self.vehicle.ingest_observation(observation)
@@ -211,7 +218,7 @@ class ApplicationRuntime:
             except ValueError as exc:origin_error=str(exc)
         return {"profile": self.profile_name, "vehicle_kind": self.profile.kind,
                 "state": self.state, "started_at": self.started_at, "session_id": self.vehicle.session_id,
-                "connected": self.vehicle.connected, "error": self.error,
+                "connected": self.vehicle.connected, "error": self.error,"shutdown_error":self.shutdown_error,
                 "world_version": None if world is None else {"generation": world.version.generation_id,
                     "revision": world.version.revision},
                 "motion_warmup_remaining_ns":None if self.connected_at_ns is None else max(0,self.profile.warmup_ns-(now.monotonic_ns-self.connected_at_ns)),
@@ -239,8 +246,8 @@ class ApplicationRuntime:
                     "producer":str(obj.producer_id),"observation":str(obj.source_observation_id),"frame":str(obj.position.frame_id),
                     "age_ns":now.elapsed_ns_since(obj.position.captured_at),"quality":obj.quality.value,
                     "confidence":obj.confidence,"position":[obj.position.value.x,obj.position.value.y,obj.position.value.z]} for obj in world.objects],
-                "sensor": None if self.sensor is None else {"kind":"sim_objects","source":self.sensor_calibration.source,
-                    "version":self.sensor_calibration.version,"error":self.sensor.projector.error},
+                "sensor": None if self.sensor is None else (dict(self.sensor.health) if self.vision_config is not None else {"kind":"sim_objects","source":self.sensor_calibration.source,
+                    "version":self.sensor_calibration.version,"error":self.sensor.projector.error}),
                 "payload":None if self.payload_port is None else self.payload_port.inventory(),
                 "system_send": self.vehicle.authority.system_send,
                 "action_send": self.vehicle.authority.action_send, "task": self.task_status()}
@@ -310,8 +317,13 @@ class ApplicationRuntime:
         if self.task and self.task.view().status not in TERMINAL:
             self.task.cancel()
             self.task.abort("shutdown; sent commands cannot be undone")
-        if self.sensor is not None:self.sensor.close();self.sensor=None
-        self.stops.update(self.vehicle.shutdown())
+        try:
+            self.stops.update(self.vehicle.shutdown())
+        finally:
+            sensor,self.sensor=self.sensor,None
+            if sensor is not None:
+                try:sensor.close()
+                except Exception as exc:self.shutdown_error=f'sensor_shutdown_unconfirmed:{type(exc).__name__}'
         self.state = "STOPPED"
         self._emit("application_stopped", stops=self.stops)
         return self.get_status()
