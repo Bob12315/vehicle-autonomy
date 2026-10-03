@@ -94,3 +94,7 @@
 ## P9 Application Runtime（2026-10-03）
 
 **PASS**：两车正式 App 进程、受限模式任务、IPC、取消、SIGTERM、重连只读及完整车辆回归。证据见 [P9](autonomy/phase-9.md)。P10–P17 按基础自主计划逐阶段验收，真实硬件仍暂缓。
+
+## P10 在线状态链
+
+**PASS**：同源 Vehicle/Localization/Transform、拒绝外推、有界历史、新会话隔离，两车完整正常/故障回归。见 [P10](autonomy/phase-10.md)。

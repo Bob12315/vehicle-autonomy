@@ -23,3 +23,5 @@ python -m app.main ctl --profile copter_sim shutdown
 不覆盖真实设备、Web/onboard、定位正式链、Environment 或运动 Mission。
 
 最终证据：`artifacts/simulation/suite-6f961663/summary.json`：13 个阶段、7 个场景、136 单元测试、零失败、零跳过，进程组与端口全部清理。额外重跑更新后的两车 App 场景均 PASS（`artifacts/simulation/application-*/summary.json`），包括 fresh Oracle 存在检查。
+
+阶段实现提交：`c80a18b`（包含 Application/CLI/IPC/进程验收）。

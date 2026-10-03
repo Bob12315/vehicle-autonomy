@@ -67,6 +67,10 @@ def run(run_dir, kind):
         oracle.wait_new(after_host_ns=time.monotonic_ns(), timeout_s=3)
         second = wait(lambda s: s["world_version"]["revision"] > first["world_version"]["revision"])
         assert not second["system_send"] and not second["action_send"]
+        assert second["localization"] is not None
+        assert second["localization"]["position"] == second["vehicle"]["pose"]["position"]
+        assert second["localization"]["frame"] == "odom"
+        assert second["localization"]["age_ns"] < owned.profile.safety.max_snapshot_age_ns
         assert second["world_age_ns"] < owned.profile.safety.max_snapshot_age_ns
         assert not cli("start", "--mission", "disarmed_mode")["ok"]
         app.terminate()
@@ -97,6 +101,7 @@ def run(run_dir, kind):
         owned.start_sitl("-reconnect")
         reconnected = wait(lambda s: s["state"] == "READY" and s["session_id"] != session, 60)
         assert not reconnected["system_send"] and reconnected["task"]["status"] == "CANCELLED"
+        assert reconnected["localization"]["transform_epoch"] != cancelled["localization"]["transform_epoch"]
         assert reconnected["world_version"]["generation"] != cancelled["world_version"]["generation"]
         summary["checks"].append("reconnect_readonly_new_epoch")
         assert cli("shutdown")["ok"]

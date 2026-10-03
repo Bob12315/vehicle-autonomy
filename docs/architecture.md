@@ -161,3 +161,9 @@ through Execution. Leases belong to individual compiled Actions; idle and
 reconnected processes have SEND disabled. Both vehicles passed actual App
 subprocess tests and the original physical/fault suite; see
 [the P9 audit](autonomy/phase-9.md). No real-device or onboard claim follows.
+
+P10 adds a telemetry-only reported-pose localization projection and bounded
+base_link/odom TransformTree to each simulation epoch. Snapshot dependencies
+pin the same vehicle source revision; no map/world identity transform is
+inferred. Source capture, receive and publish times are logged. Reconnect
+discards the old graph and world epoch. See [P10 evidence](autonomy/phase-10.md).

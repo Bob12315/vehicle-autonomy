@@ -22,6 +22,7 @@ from core.control_authority import ControlAuthority, ControlLease
 from core.vehicle_execution import DispatchResult, StopState, VehicleExecution
 from infrastructure.transports.bytes import TcpByteTransport
 from protocols.mavlink.codec import MavlinkCodec
+from localization.online import OnlineLocalization
 from runtime.simulation_profile import SimulationProfile
 from vehicles.multirotor.ardupilot_commands import ArduPilotCommandTranslator
 from vehicles.multirotor.mavlink_port import ArduPilotCommandPort
@@ -75,6 +76,7 @@ class SimulationRuntime:
         self._port: ArduPilotCommandPort | None = None
         self._execution: VehicleExecution | None = None
         self._world = self._new_world()
+        self.localization = OnlineLocalization(self.profile.safety.max_snapshot_age_ns)
         self._run_id: RunId | None = None
         self._action_id: str | None = None
         self._effects: dict[str, str | None] = {}
@@ -140,7 +142,7 @@ class SimulationRuntime:
                 max_sample_skew_ns=500_000_000,
                 max_field_age_ns=self.profile.safety.max_snapshot_age_ns,
                 link_timeout_ns=self.profile.link_timeout_ns),
-            captured_at=capture_clock.capture,
+            captured_at=lambda message, received: self._capture(capture_clock, message, received),
         )
         self._transport, self._port, self._session = transport, port, session
         safety_class = RoverSimulationSafetyPolicy if self.profile.kind == "rover" else SimulationSafetyPolicy
@@ -149,6 +151,7 @@ class SimulationRuntime:
                                                         motion_mode_id=self.profile.mode_ids["GUIDED"]),
                                            lambda: f"command:{uuid4().hex}")
         self._world = self._new_world()
+        self.localization = OnlineLocalization(self.profile.safety.max_snapshot_age_ns)
         self._last_cycle = None
         self._had_session = False
         self._run_id = None
@@ -156,6 +159,14 @@ class SimulationRuntime:
         self._fault = None
         self._active_stream_ids.clear()
         self._emit("connected_transport", host=self.profile.host, port=self.profile.port)
+
+    def _capture(self, source_clock, message, received):
+        captured = source_clock.capture(message, received)
+        if message.get_type() in ("LOCAL_POSITION_NED", "GLOBAL_POSITION_INT", "ATTITUDE"):
+            self._emit("source_time", message_type=message.get_type(), boot_ms=int(message.time_boot_ms),
+                       capture_ns=captured.monotonic_ns, receive_ns=received.monotonic_ns,
+                       clock_domain=str(received.clock_domain_id))
+        return captured
 
     def _write_guard(self, command: VehicleCommandEnvelope) -> str | None:
         if self._session is None or self._session.session_id is None:
@@ -251,7 +262,11 @@ class SimulationRuntime:
             self._close_link("link_session_lost")
             return SimulationCycle(len(messages), None, None, False, self._fault)
         try:
-            self._world.update_vehicle(self._session.snapshot())
+            state = self._session.snapshot()
+            self._world.update_vehicle(state)
+            estimate, transform_dependency = self.localization.update(state, now)
+            self._world.update_localization(estimate)
+            self._world.update_transform_dependency(transform_dependency)
             world = self._world.publish(now)
         except ValueError as exc:
             self._close_link(f"world_state_fault:{type(exc).__name__}")
@@ -269,6 +284,15 @@ class SimulationRuntime:
             if self._execution.stop_status(stream_id).state is StopState.CONFIRMED:
                 self._active_stream_ids.discard(stream_id)
         state = world.vehicle
+        if world.localization is not None and state is not None:
+            if world.localization.pose != state.reported_pose or world.localization.version.revision != state.version.revision:
+                self._close_link("localization_source_mismatch")
+                return SimulationCycle(len(messages), written, None, False, self._fault)
+            self._emit("state_cut", world_generation=world.version.generation_id,
+                       world_revision=world.version.revision, source_generation=state.version.generation_id,
+                       source_revision=state.version.revision, transform_epoch=self.localization.epoch,
+                       capture_ns=world.localization.pose.captured_at.monotonic_ns,
+                       publish_ns=now.monotonic_ns, frame=str(world.localization.pose.frame_id))
         fresh = (state is not None and state.health.quality is QualityState.VALID
                  and state.reported_pose is not None and state.reported_twist is not None)
         return SimulationCycle(len(messages), written, self.session_id, fresh, self._fault)

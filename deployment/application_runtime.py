@@ -129,6 +129,14 @@ class ApplicationRuntime:
                     "pose": None if pose is None else {"frame": str(pose.frame_id),
                         "position": [pose.value.position.x, pose.value.position.y, pose.value.position.z],
                         "age_ns": now.elapsed_ns_since(pose.captured_at)}},
+                "localization": None if world is None or world.localization is None else {
+                    "quality": world.localization.quality.value, "source": str(world.localization.producer_id),
+                    "frame": str(world.localization.pose.frame_id),
+                    "age_ns": now.elapsed_ns_since(world.localization.pose.captured_at),
+                    "source_revision": world.localization.version.revision,
+                    "transform_epoch": self.vehicle.localization.epoch,
+                    "position": [world.localization.pose.value.position.x, world.localization.pose.value.position.y,
+                                 world.localization.pose.value.position.z]},
                 "system_send": self.vehicle.authority.system_send,
                 "action_send": self.vehicle.authority.action_send, "task": self.task_status()}
 

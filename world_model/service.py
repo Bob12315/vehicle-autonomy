@@ -54,6 +54,7 @@ class WorldModel:
         self._producer_sequences: dict[str, int] = {}
         self._latest: WorldSnapshot[WorldObject] | None = None
         self._revision = 0
+        self._transform_dependency = None
 
     def reader(self) -> WorldReader:
         return WorldReader(self)
@@ -102,6 +103,13 @@ class WorldModel:
         with self._lock:
             self._reject_older(self._localization, estimate)
             self._localization = estimate
+
+    def update_transform_dependency(self, dependency: ResourceDependency | None) -> None:
+        if dependency is not None and (not isinstance(dependency, ResourceDependency)
+                                       or dependency.resource_type != "Transform"):
+            raise TypeError("Transform dependency required")
+        with self._lock:
+            self._transform_dependency = dependency
 
     def ingest_observation(self, observation: Observation[DetectedObject]) -> None:
         if not isinstance(observation, Observation) or not isinstance(observation.data, DetectedObject):
@@ -185,6 +193,11 @@ class WorldModel:
                 localization is not None and localization_freshness.state is FreshnessState.FRESH
                 and self._usable(localization.quality)
             ) else None
+
+            if (selected_vehicle is not None and selected_localization is not None
+                    and self._transform_dependency is not None
+                    and self._transform_dependency.version == selected_vehicle.version):
+                dependencies.append(self._transform_dependency)
 
             objects: list[WorldObject] = []
             object_freshness: list[ComponentFreshness] = []

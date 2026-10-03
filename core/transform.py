@@ -99,9 +99,12 @@ IDENTITY = Transform3(Vector3(0, 0, 0), Quaternion(0, 0, 0, 1))
 class TransformTree:
     """One-path frame graph with bounded interpolation and no extrapolation."""
 
-    def __init__(self, *, max_interpolation_gap_ns: int) -> None:
+    def __init__(self, *, max_interpolation_gap_ns: int, max_dynamic_samples: int = 1024) -> None:
         if isinstance(max_interpolation_gap_ns, bool) or not isinstance(max_interpolation_gap_ns, int) or max_interpolation_gap_ns <= 0:
             raise ValueError("max_interpolation_gap_ns must be positive")
+        if type(max_dynamic_samples) is not int or max_dynamic_samples < 2:
+            raise ValueError("max_dynamic_samples must be at least two")
+        self._capacity = max_dynamic_samples
         self._max_gap_ns = max_interpolation_gap_ns
         self._lock = RLock()
         self._static: dict[tuple[FrameId, FrameId], Transform3] = {}
@@ -162,6 +165,7 @@ class TransformTree:
                 if at_time <= samples[-1][0]:
                     raise ValueError("dynamic sample time must increase")
             samples.append((at_time, value))
+            del samples[:-self._capacity]
 
     def _edge_at(self, edge: tuple[FrameId, FrameId], at_time: TimePoint) -> Transform3:
         static = self._static.get(edge)
