@@ -9,3 +9,5 @@
 P13 两车连续路线及失败场景已通过，完整最终回归证据待汇总补入。Gazebo fixture 的显式坐标关系仅属此仿真场景；不是真实感知或通用 world/odom 单位变换假设。服务仅用于测试刺激，传感器没有服务/发送 API。
 
 Gazebo UserCommands 服务依据 [官方实体 API](https://gazebosim.org/api/sim/8/entity_creation.html)，loopback/隔离 partition 依据 [Transport 环境变量](https://gazebosim.org/api/transport/12/envvars.html)。
+
+长任务发现 Gazebo RTF 略低于 1，原等速映射使新观测年龄累积约 2 s，P15 首次业务因目标过期而明确失败（`autonomy-copter-90838672`）。修正为订阅独立 `/world/.../clock` 的 SIM/REAL 对，REAL 在本机 monotonic epoch 锚定；对象 SIM capture 只在成对样本间插值，禁止外推，延迟/重复保留真实年龄。新增慢速仿真/延迟/无覆盖/回退测试；4 项对象单元和正式对象进程重跑 PASS，P15 新鲜目标链随后通过。仅用于固定本机 loopback 组合，不是通用硬件时间同步。

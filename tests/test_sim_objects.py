@@ -38,3 +38,15 @@ class SimObjectTests(unittest.TestCase):
         self.world.ingest_observation(future);self.assertFalse(self.world.publish(TimePoint(301,utc=datetime.now(timezone.utc),clock_domain_id='test')).objects)
         self.projector.project(5_000_000_000,200,{})
         self.assertEqual(self.projector.error,'simulation_clock_skew')
+
+    def test_clock_pair_mapping_slow_simulation_and_delay_without_extrapolation(self):
+        from sensors.simulation.objects import GazeboClockBridge
+        bridge=GazeboClockBridge();bridge.ingest(0,0,100)
+        bridge.ingest(50,100,200)
+        self.assertEqual(bridge.capture(25),150)
+        self.assertEqual(bridge.capture(50),200)
+        self.assertIsNone(bridge.capture(51));self.assertIsNone(bridge.capture(-1))
+        first=self.projector.project(25,300,{'target_1':Vector3(1,0,0)},capture_ns=bridge.capture(25))[0]
+        self.assertEqual(first.captured_at.monotonic_ns,150)
+        self.assertEqual(self.projector.project(25,500,{},capture_ns=bridge.capture(25)),())
+        bridge.ingest(49,110,210);self.assertEqual(bridge.error,'gazebo_clock_regressed')
