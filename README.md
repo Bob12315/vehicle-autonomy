@@ -45,7 +45,7 @@ Copter USB 诊断使用 `PYTHONPATH=. python tests/manual_p5_copter_usb.py --por
 
 [V1 模块进度与未完成项](docs/v1_progress.md)按目标架构逐项记录当前成熟度、证据与待验收工作。
 
-[基础自主系统实施计划](docs/basic_autonomy_implementation_plan.md)列出车辆仿真完成后的 P9–P17 阶段、依赖与验收门槛；[P9 专项计划](docs/p9_application_runtime_plan.md)细化下一阶段的 Runtime 接口与执行步骤。P9 已实现并通过本机两车进程与完整仿真回归，见 [P9 审计](docs/autonomy/phase-9.md)；P10 在线 Localization/Transform 也已通过完整回归，见 [P10 审计](docs/autonomy/phase-10.md)；P11 版本化 Environment 已通过两车命名点与完整回归，见 [P11](docs/autonomy/phase-11.md)；P12–P17 尚未验收。
+[基础自主系统实施计划](docs/basic_autonomy_implementation_plan.md)列出车辆仿真完成后的 P9–P17 阶段、依赖与验收门槛；[P9 专项计划](docs/p9_application_runtime_plan.md)细化下一阶段的 Runtime 接口与执行步骤。P9 已实现并通过本机两车进程与完整仿真回归，见 [P9 审计](docs/autonomy/phase-9.md)；P10 在线 Localization/Transform 也已通过完整回归，见 [P10 审计](docs/autonomy/phase-10.md)；P11 版本化 Environment 已通过两车命名点与完整回归，见 [P11](docs/autonomy/phase-11.md)；P12 基础 Action 已通过完整回归，见 [P12](docs/autonomy/phase-12.md)；P13–P17 尚未验收。
 
 [P6 首个持续运行组合实施计划与验收](docs/p6_runtime_integration_plan.md)记录 localhost ArduCopter SITL 的装配顺序、测试结果和未覆盖范围。
 
@@ -60,4 +60,4 @@ python -m app.main ctl --profile copter_sim start --mission disarmed_mode
 python -m app.main ctl --profile copter_sim shutdown
 ```
 
-Rover 使用 `rover_sim`。不传 `--allow-send` 为只读；当前任务目录只有未解锁模式诊断。没有活跃任务时撤销双 SEND 与租约，重连只读恢复。`--config` 可提供经严格验证的 loopback 仿真 profile；`--control-socket` 指定本机端点。不是实机或 Web 入口。
+Rover 使用 `rover_sim`。不传 `--allow-send` 为只读；任务目录包括 disarmed_mode、action_probe 与 safe_recovery。没有活跃任务时撤销双 SEND 与租约，重连只读恢复。`--config` 可提供经严格验证的 loopback 仿真 profile；`--control-socket` 指定本机端点。不是实机或 Web 入口。

@@ -102,3 +102,5 @@
 ## P11 Environment
 
 **PASS**：命名点/HOME/区域/围栏、显式来源、资源版本/会话绑定、配置变化和原点拒绝。两车正式 App、命名点物理验收及完整正常/故障回归通过，见 [P11](autonomy/phase-11.md)。
+
+P12 finite typed Actions and physical result/exit barriers passed both public App processes and the complete regression. See [P12](autonomy/phase-12.md).

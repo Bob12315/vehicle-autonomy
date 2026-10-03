@@ -9,6 +9,8 @@ import time
 from uuid import uuid4
 
 from contracts.core.primitives import RunId
+from actions.basic import register_basic
+from applications.basic_catalog import MISSION_NAMES, build, capabilities
 from contracts.decision import EffectPhase, EffectResult, MissionPlan, MissionStep
 from contracts.vehicle.ports import VehicleCapabilities
 from core.action_registry import ActionRegistry
@@ -37,6 +39,7 @@ class ApplicationRuntime:
         self.events = event_sink or (lambda event: None)
         self.registry = ActionRegistry()
         self.registry.register_typed(SITL_MODE_SPEC, SitlModeAction())
+        register_basic(self.registry)
         mode = "HOLD" if profile.kind == "rover" else "GUIDED"
         self.plans = {"disarmed_mode": MissionPlan("disarmed_mode", (
             MissionStep("mode", SITL_MODE_SPEC.name, SitlModeParameters(mode, profile.mode_ids[mode])),))}
@@ -52,6 +55,9 @@ class ApplicationRuntime:
         self.stopping = False
         self.stops = {}
         self._active_action = None
+        self.connected_at_ns = None
+        self.task_environment = None
+        self.task_name = None
 
     def _emit(self, event, **fields):
         self.events({"event": event, "profile": self.profile_name, **fields})
@@ -66,6 +72,7 @@ class ApplicationRuntime:
                 return
             try:
                 self.vehicle.connect()
+                self.connected_at_ns = self.vehicle.clock().monotonic_ns
                 self.error = None
                 self.retry_delay_ns = 200_000_000
             except (OSError, ConnectionError) as exc:
@@ -91,6 +98,7 @@ class ApplicationRuntime:
             self.error = result.fault
             if self.task and self.task.view().status not in TERMINAL:
                 self.task.abort(result.fault)
+                self.stops = self.vehicle.end_run()
                 self._emit("task_failed", error=result.fault)
             self.state = "DEGRADED"
             return
@@ -102,7 +110,11 @@ class ApplicationRuntime:
 
     def _advance(self):
         now = self.vehicle.clock()
-        if now.monotonic_ns - self.task_started_ns > self.task_timeout_ns:
+        world = self.vehicle.world_snapshot()
+        if self.task_environment is not None and (world is None or world.environment != self.task_environment
+                or world.localization is None or world.vehicle is None):
+            self.task.abort("mission_environment_or_localization_unavailable")
+        elif now.monotonic_ns - self.task_started_ns > self.task_timeout_ns:
             self.task.abort("mission_deadline_exceeded")
         else:
             for effect_id, envelope in self.envelopes.items():
@@ -116,7 +128,11 @@ class ApplicationRuntime:
                 self.vehicle.authorize_action(action_id, allow_send=self.allow_send)
                 self._active_action = action_id
             update = self.task.tick(now)
+            if update.error:
+                self.task.abort(update.error)
             for envelope in update.effects:
+                self._emit("effect_requested", run_id=str(envelope.run_id), action_id=str(envelope.action_instance_id),
+                           effect_id=str(envelope.effect_id), effect_type=type(envelope.effect).__name__)
                 self.envelopes[str(envelope.effect_id)] = envelope
                 self.vehicle.dispatch_envelope(envelope)
         if self.task.view().status in TERMINAL:
@@ -128,10 +144,13 @@ class ApplicationRuntime:
         if self.task is None:
             return None
         view = self.task.view()
-        return {"task_id": str(view.run_id), "status": view.status.value, "step": view.step_id,
+        return {"task_id": str(view.run_id), "mission": self.task_name, "status": view.status.value, "step": view.step_id,
                 "error": view.error, "steps": [{"step": r.step_id, "reason": r.reason.value,
                     "error": r.error} for r in view.results],
                 "effects": {key: self.vehicle.effect_status(key) for key in self.envelopes},
+                "requests": {key: {"action_id": str(envelope.action_instance_id),
+                    "effect_type": type(envelope.effect).__name__, "created_ns": envelope.created_at.monotonic_ns,
+                    "deadline_ns": envelope.deadline.monotonic_ns} for key,envelope in self.envelopes.items()},
                 "stops": self.stops}
 
     def get_status(self):
@@ -168,7 +187,7 @@ class ApplicationRuntime:
                 "action_send": self.vehicle.authority.action_send, "task": self.task_status()}
 
     def start_mission(self, name):
-        if name not in self.plans:
+        if name not in self.plans and name not in MISSION_NAMES:
             raise ValueError("mission is not registered")
         if not self.allow_send:
             raise ValueError("application started without --allow-send")
@@ -177,16 +196,30 @@ class ApplicationRuntime:
         if self.task and self.task.view().status not in TERMINAL:
             raise ValueError("another mission is active")
         world = self.vehicle.world_snapshot()
-        if world is None or world.vehicle is None or world.vehicle.operation.armed:
+        if world is None or world.vehicle is None or (name != "safe_recovery" and world.vehicle.operation.armed):
             raise ValueError("fresh disarmed vehicle required")
-        compiled = MissionValidator(self.registry).compile(self.plans[name], VehicleCapabilities(frozenset()))
+        if name in MISSION_NAMES:
+            if self.environment is None or world.environment != self.environment.reference or world.localization is None:
+                raise ValueError("bound environment and fresh localization required")
+            if (self.connected_at_ns is None or self.vehicle.clock().monotonic_ns-self.connected_at_ns < self.profile.warmup_ns):
+                raise ValueError("simulation motion warmup incomplete")
+            self.environment.validate_origin(world.vehicle)
+            plan = build(name, self.profile.kind, self.environment, self.profile.mode_ids["GUIDED"])
+            self.task_environment = self.environment.reference
+        else:
+            plan = self.plans[name]
+            self.task_environment = None
+        compiled = MissionValidator(self.registry).compile(plan, VehicleCapabilities(capabilities(self.profile.kind)))
         run_id = f"application:{uuid4().hex}"
         action_id = f"{run_id}:{compiled.steps[0].step.step_id}:1"
         self.vehicle.begin_run(allow_send=True, run_id=run_id, action_id=action_id)
-        self.task = MissionRuntime(compiled, self.vehicle, RunId(run_id),
+        self.task = MissionRuntime(compiled, self.vehicle.world_reader(), RunId(run_id),
                                    max_snapshot_age_ns=self.profile.safety.max_snapshot_age_ns)
         self.envelopes = {}
         self.stops = {}
+        self.task_name = name
+        self.task_timeout_ns = sum(getattr(step.step.parameters,"timeout_ns",15_000_000_000)+8_000_000_000
+                                   for step in compiled.steps)
         self._active_action = action_id
         self.task_started_ns = self.vehicle.clock().monotonic_ns
         self.state = "RUNNING_TASK"
@@ -209,7 +242,7 @@ class ApplicationRuntime:
         if self.task and self.task.view().status not in TERMINAL:
             self.task.cancel()
             self.task.abort("shutdown; sent commands cannot be undone")
-        self.stops = self.vehicle.shutdown()
+        self.stops.update(self.vehicle.shutdown())
         self.state = "STOPPED"
         self._emit("application_stopped", stops=self.stops)
         return self.get_status()

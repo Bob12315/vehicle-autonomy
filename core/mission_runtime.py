@@ -148,7 +148,10 @@ class MissionRuntime:
         assert self._instance is not None and self._pending is not None
         reason, result, error = self._pending
         try:
-            decision = self._instance.exit(snapshot, reason)
+            action_id = f"{self._run_id}:{self._step().step.step_id}:{self._attempt}"
+            results = tuple(result for result in self._effect_results.values() if result.action_instance_id == action_id)
+            decision = (self._instance.exit_with_results(snapshot, reason, results)
+                        if hasattr(self._instance, "exit_with_results") else self._instance.exit(snapshot, reason))
             if not isinstance(decision, ExitDecision):
                 raise TypeError("Action exit must return ExitDecision")
             envelopes = self._envelopes(decision.effects, now)

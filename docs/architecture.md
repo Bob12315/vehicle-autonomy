@@ -174,3 +174,5 @@ and source; geofences must match the enforced SafetyPolicy. Config changes
 revoke the current task and require a new preflight. Reported local/global
 pose can validate the configured origin; missing fix evidence is rejected.
 The resource service never sends commands. See [P11](autonomy/phase-11.md).
+
+P12 finite typed Actions and physical result/exit barriers passed both public App processes and the complete regression. See [P12](autonomy/phase-12.md).

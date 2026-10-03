@@ -49,6 +49,17 @@ class SimulationCycle:
     fault: str | None
 
 
+class RuntimeWorldReader:
+    """Only snapshot is exposed to the decision scheduler across world epochs."""
+    __slots__ = ('_read',)
+
+    def __init__(self, read):
+        self._read = read
+
+    def snapshot(self):
+        return self._read()
+
+
 class SimulationRuntime:
     """Caller-scheduled loop. `connect` and `begin_run` are both explicit."""
 
@@ -113,6 +124,9 @@ class SimulationRuntime:
     @property
     def connected(self) -> bool:
         return self._transport is not None
+
+    def world_reader(self):
+        return RuntimeWorldReader(self.world_snapshot)
 
     def snapshot(self):
         """WorldQueryPort view for decision consumers."""
@@ -354,6 +368,9 @@ class SimulationRuntime:
             self.authority.set_system_send(True)
             self.authority.set_action_send(True)
 
+        self._emit("action_authorized", action_id=action_id, allow_send=allow_send,
+                   lease_id=None if self.authority.lease is None else str(self.authority.lease.lease_id))
+
     def dispatch_envelope(self, envelope: EffectEnvelope) -> DispatchResult:
         """Preserve the Mission identity and deadline at the Execution boundary."""
         if not isinstance(envelope, EffectEnvelope):
@@ -383,7 +400,8 @@ class SimulationRuntime:
             "command_id": command_id, "reason": result.reason,
         }
         self._emit("effect_submitted", effect_id=selected_id, action_id=str(envelope.action_instance_id),
-                   deadline_ns=envelope.deadline.monotonic_ns, command_id=command_id, reason=result.reason)
+                   deadline_ns=envelope.deadline.monotonic_ns, effect_type=type(envelope.effect).__name__,
+                   command_id=command_id, reason=result.reason)
         return result
 
     def effect_status(self, effect_id: str) -> dict | None:
@@ -429,7 +447,7 @@ class SimulationRuntime:
     def shutdown(self) -> dict[str, str]:
         if self._closed:
             return {}
-        stops = self.end_run() if self._run_id is not None else {}
+        stops = self.end_run() if self._run_id is not None or self._active_stream_ids else {}
         if self._session is not None:
             self._close_link("shutdown")
         self._closed = True

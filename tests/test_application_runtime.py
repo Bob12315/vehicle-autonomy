@@ -23,6 +23,8 @@ class ApplicationRuntimeTests(SimulationRuntimeTests):
     def test_mission_preserves_ids_requires_ack_and_new_state(self):
         self.ready()
         task = self.app.start_mission("disarmed_mode")
+        self.assertFalse(hasattr(self.app.task._world, "dispatch_envelope"))
+        self.assertFalse(hasattr(self.app.task._world, "authority"))
         self.app_cycle()
         envelope = next(iter(self.app.envelopes.values()))
         self.assertEqual(str(envelope.run_id), task["task_id"])
