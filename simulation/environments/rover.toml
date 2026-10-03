@@ -1,0 +1,40 @@
+[environment]
+schema = 1
+id = "environment:rover-training-v1"
+frame = "odom"
+units = "m"
+origin = [-35.363262, 149.165237, 584.0]
+origin_source = "configured speed-one SITL local ENU origin; owned launcher home"
+home = "HOME"
+home_source = "explicit training profile home in odom; rebind per session"
+
+[geofence]
+name = "training_fence"
+frame = "odom"
+min_x = -5.0
+max_x = 5.0
+min_y = -5.0
+max_y = 5.0
+
+[[regions]]
+name = "search"
+frame = "odom"
+min_x = 0.5
+max_x = 3.0
+min_y = -0.5
+max_y = 2.0
+
+[[points]]
+name = "HOME"
+frame = "odom"
+position = [0.0, 0.0, 0.0]
+
+[[points]]
+name = "A"
+frame = "odom"
+position = [2.0, 0.0, 0.0]
+
+[[points]]
+name = "B"
+frame = "odom"
+position = [2.0, 1.5, 0.0]

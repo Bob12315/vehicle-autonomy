@@ -12,7 +12,7 @@ from contracts.core.time import TimePoint
 from contracts.localization.models import LocalizationEstimate
 from contracts.sensor import DetectedObject, Observation
 from contracts.vehicle.models import VehicleStateSnapshot
-from contracts.world.models import ResourceDependency, WorldSnapshot
+from contracts.world.models import ResourceDependency, ResourceReference, WorldSnapshot
 from .models import WorldObject
 
 
@@ -55,6 +55,17 @@ class WorldModel:
         self._latest: WorldSnapshot[WorldObject] | None = None
         self._revision = 0
         self._transform_dependency = None
+        self._environment = None
+
+    @property
+    def generation_id(self):
+        return self._generation
+
+    def update_environment(self, reference: ResourceReference | None):
+        if reference is not None and not isinstance(reference, ResourceReference):
+            raise TypeError("typed Environment reference required")
+        with self._lock:
+            self._environment = reference
 
     def reader(self) -> WorldReader:
         return WorldReader(self)
@@ -232,12 +243,15 @@ class WorldModel:
                                            max(item.age_ns for item in object_freshness if item.age_ns is not None))
             freshness.extend((group, *object_freshness))
 
+            if self._environment is not None:
+                dependencies.append(ResourceDependency("Environment", self._environment.resource_id,
+                                                       self._environment.version))
             revision = self._revision + 1
             result = WorldSnapshot(
                 SchemaVersion(1, 0), f"{self._generation}:{revision}",
                 ResourceVersion(self._generation, revision), published_at,
                 selected_vehicle, selected_localization, tuple(objects),
-                freshness=tuple(freshness), dependencies=tuple(dependencies),
+                environment=self._environment, freshness=tuple(freshness), dependencies=tuple(dependencies),
             )
             self._revision = revision
             self._latest = result

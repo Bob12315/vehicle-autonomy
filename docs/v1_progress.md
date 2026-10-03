@@ -98,3 +98,7 @@
 ## P10 在线状态链
 
 **PASS**：同源 Vehicle/Localization/Transform、拒绝外推、有界历史、新会话隔离，两车完整正常/故障回归。见 [P10](autonomy/phase-10.md)。
+
+## P11 Environment
+
+**PASS**：命名点/HOME/区域/围栏、显式来源、资源版本/会话绑定、配置变化和原点拒绝。两车正式 App、命名点物理验收及完整正常/故障回归通过，见 [P11](autonomy/phase-11.md)。

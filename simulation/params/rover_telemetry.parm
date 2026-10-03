@@ -4,3 +4,6 @@ MAV1_EXTRA1 10
 # Increase the Rover speed-loop response for this 7.18 kg Gazebo chassis.
 ATC_SPEED_P 0.5
 ATC_SPEED_I 0.3
+
+# Environment origin preflight requires fresh GPS_RAW_INT fix evidence.
+MAV1_EXT_STAT 5

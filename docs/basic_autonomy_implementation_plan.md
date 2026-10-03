@@ -1,6 +1,6 @@
 # Vehicle Autonomy Framework：从仿真车辆底座到基础自主系统
 
-**状态：P9/P10 已验收；P11–P17 继续按本文实施，证据见 [P9](autonomy/phase-9.md)。** 制定日期：2026-10-03。本文覆盖完整后续主线，供另一会话按阶段实施。P9 的接口设计和更细执行步骤见 [P9 专项计划](p9_application_runtime_plan.md)。当前已通过的仅是 [ArduCopter + Rover 基础控制 Simulation Complete](simulation/completion-audit.md)：审计记录 125 项单元测试、11 个回归阶段、5 个物理场景、零失败及零核心跳过。本计划不重新打开已验收的 Vehicle 功能范围。
+**状态：P9–P11 已验收；P12–P17 继续按本文实施，证据见 [P9](autonomy/phase-9.md)。** 制定日期：2026-10-03。本文覆盖完整后续主线，供另一会话按阶段实施。P9 的接口设计和更细执行步骤见 [P9 专项计划](p9_application_runtime_plan.md)。当前已通过的仅是 [ArduCopter + Rover 基础控制 Simulation Complete](simulation/completion-audit.md)：审计记录 125 项单元测试、11 个回归阶段、5 个物理场景、零失败及零核心跳过。本计划不重新打开已验收的 Vehicle 功能范围。
 
 ## 1. 目标、阶段和完成口径
 

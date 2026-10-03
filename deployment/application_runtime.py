@@ -2,6 +2,9 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from pathlib import Path
+import hashlib
+from environments.resources import Environment
 import time
 from uuid import uuid4
 
@@ -27,6 +30,10 @@ class ApplicationRuntime:
         translator = (ArduRoverCommandTranslator if profile.kind == "rover" else ArduPilotCommandTranslator)
         self.vehicle = runtime or SimulationRuntime(profile, translator=translator(mode_ids=profile.mode_ids),
                                                     event_sink=event_sink)
+        self.environment_path = Path(__file__).resolve().parents[1] / f"simulation/environments/{profile.kind}.toml"
+        self._environment_source = Environment.load(self.environment_path).check_safety(profile.safety)
+        self.environment = None
+        self.environment_fault = False
         self.events = event_sink or (lambda event: None)
         self.registry = ActionRegistry()
         self.registry.register_typed(SITL_MODE_SPEC, SitlModeAction())
@@ -66,6 +73,19 @@ class ApplicationRuntime:
                 self.retry_at_ns = now.monotonic_ns + self.retry_delay_ns
                 self.retry_delay_ns = min(2_000_000_000, self.retry_delay_ns * 2)
                 return
+        if hashlib.sha256(self.environment_path.read_bytes()).hexdigest() != self._environment_source.content_hash:
+            self.environment_fault = True
+            self.error = "environment_configuration_changed; restart and preflight required"
+            if self.task and self.task.view().status not in TERMINAL:
+                self.task.abort(self.error)
+                self.stops = self.vehicle.end_run()
+        if self.environment_fault:
+            self.environment = None
+            self.vehicle.set_environment(None)
+        else:
+            if self.environment is None or self.environment.frame_epoch != self.vehicle.world_epoch:
+                self.environment = self._environment_source.bind(self.vehicle.world_epoch)
+            self.vehicle.set_environment(self.environment.reference)
         result = self.vehicle.cycle()
         if result.fault:
             self.error = result.fault
@@ -74,7 +94,8 @@ class ApplicationRuntime:
                 self._emit("task_failed", error=result.fault)
             self.state = "DEGRADED"
             return
-        self.state = "READY" if result.vehicle_fresh else "CONNECTING"
+        self.state = ("DEGRADED" if self.environment_fault else
+                      "READY" if result.vehicle_fresh else "CONNECTING")
         if self.task and self.task.view().status not in TERMINAL:
             self.state = "RUNNING_TASK"
             self._advance()
@@ -129,6 +150,12 @@ class ApplicationRuntime:
                     "pose": None if pose is None else {"frame": str(pose.frame_id),
                         "position": [pose.value.position.x, pose.value.position.y, pose.value.position.z],
                         "age_ns": now.elapsed_ns_since(pose.captured_at)}},
+                "environment": None if self.environment is None else {
+                    "id": self.environment.resource_id, "generation": self.environment.version.generation_id,
+                    "revision": self.environment.version.revision, "frame": str(self.environment.frame),
+                    "home": self.environment.home_name, "home_source": self.environment.home_source,
+                    "origin_source": self.environment.origin_source, "points": [p.name for p in self.environment.points],
+                    "regions": [r.name for r in self.environment.regions]},
                 "localization": None if world is None or world.localization is None else {
                     "quality": world.localization.quality.value, "source": str(world.localization.producer_id),
                     "frame": str(world.localization.pose.frame_id),

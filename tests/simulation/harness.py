@@ -126,7 +126,7 @@ def main():
     env['VAF_SIMULATION_PLUGIN_DIR'] = str(plugin_dir)
     runner = StageRunner(run_dir, total_timeout=args.timeout, env=env)
     summary = {'passed': False, 'run_dir': str(run_dir),
-               'started_at': stamp(), 'core_skipped': 0, 'expected_scenarios': 7,
+               'started_at': stamp(), 'core_skipped': 0, 'expected_scenarios': 9,
                'scenarios': [], 'framework_sha': output(['git', 'rev-parse', 'HEAD']),
                'ardupilot_sha': output(['git', 'rev-parse', 'HEAD'], ARDUPILOT),
                'plugin_sha': output(['git', 'rev-parse', 'HEAD'], PLUGIN), 'build_dir': str(build_dir),
@@ -157,6 +157,8 @@ def main():
         scenarios = [
             ('copter_application', 'tests.simulation.application_process', ['--kind', 'copter']),
             ('rover_application', 'tests.simulation.application_process', ['--kind', 'rover']),
+            ('copter_environment', 'tests.simulation.environment_probe', ['--kind', 'copter', '--allow-send']),
+            ('rover_environment', 'tests.simulation.environment_probe', ['--kind', 'rover', '--allow-send']),
             ('copter_full', 'tests.simulation.copter_scenario', ['--allow-send', '--full']),
             ('copter_land', 'tests.simulation.copter_scenario', ['--allow-send']),
             ('rover_full', 'tests.simulation.rover_protocol', ['--allow-send', '--full']),

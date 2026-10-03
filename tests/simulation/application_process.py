@@ -67,6 +67,8 @@ def run(run_dir, kind):
         oracle.wait_new(after_host_ns=time.monotonic_ns(), timeout_s=3)
         second = wait(lambda s: s["world_version"]["revision"] > first["world_version"]["revision"])
         assert not second["system_send"] and not second["action_send"]
+        assert second["environment"]["frame"] == "odom"
+        assert "A" in second["environment"]["points"] and second["environment"]["home_source"]
         assert second["localization"] is not None
         assert second["localization"]["position"] == second["vehicle"]["pose"]["position"]
         assert second["localization"]["frame"] == "odom"

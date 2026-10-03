@@ -104,6 +104,13 @@ class SimulationRuntime:
         return None if self._session is None or self._session.session_id is None else str(self._session.session_id)
 
     @property
+    def world_epoch(self):
+        return self._world.generation_id
+
+    def set_environment(self, reference):
+        self._world.update_environment(reference)
+
+    @property
     def connected(self) -> bool:
         return self._transport is not None
 

@@ -7,3 +7,6 @@ MAV1_EXTRA1 10
 # This ArduPilot revision expresses RTL altitude in metres.
 RTL_ALT_M 2
 RTL_ALT_FINAL_M 0
+
+# Environment origin preflight requires fresh GPS_RAW_INT fix evidence.
+MAV1_EXT_STAT 5

@@ -167,3 +167,10 @@ base_link/odom TransformTree to each simulation epoch. Snapshot dependencies
 pin the same vehicle source revision; no map/world identity transform is
 inferred. Source capture, receive and publish times are logged. Reconnect
 discards the old graph and world epoch. See [P10 evidence](autonomy/phase-10.md).
+
+P11 publishes immutable, session-bound Environment references from explicit
+training TOML resources. Named points/home/regions declare their odom frame
+and source; geofences must match the enforced SafetyPolicy. Config changes
+revoke the current task and require a new preflight. Reported local/global
+pose can validate the configured origin; missing fix evidence is rejected.
+The resource service never sends commands. See [P11](autonomy/phase-11.md).
