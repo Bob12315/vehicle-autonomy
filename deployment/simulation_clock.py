@@ -18,11 +18,17 @@ class SimulationSourceClock:
         self.anchor: tuple[int, TimePoint] | None = None
         self.last_boot: dict[str, int] = {}
 
-    def capture(self, message: object, received: TimePoint) -> TimePoint:
+    def capture(self, message: object, received: TimePoint) -> TimePoint | None:
         kind = message.get_type()
-        if kind not in ("LOCAL_POSITION_NED", "GLOBAL_POSITION_INT", "ATTITUDE"):
+        if kind not in ("LOCAL_POSITION_NED", "GLOBAL_POSITION_INT", "ATTITUDE", "GPS_RAW_INT"):
             return received
-        boot = int(message.time_boot_ms)
+        if kind=='GPS_RAW_INT':
+            # Pinned ArduPilot AP_GPS.cpp sends last_fix_time_ms * 1000 here.
+            # Zero/Unix timestamps are not assumed to be boot time.
+            micros=int(message.time_usec)
+            if not 0<micros<1_000_000_000_000 or self.anchor is None:return None
+            boot=micros//1000
+        else:boot = int(message.time_boot_ms)
         previous = self.last_boot.get(kind)
         if previous is not None and boot < previous:
             raise ValueError("SITL source boot time regressed; new epoch required")

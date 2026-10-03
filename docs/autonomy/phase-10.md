@@ -13,3 +13,5 @@
 物理回归：`./scripts/test_simulation_v1.sh --build-dir artifacts/simulation/suite-e8ba09fa/build`，保留两车正式 App 状态/定位查询和原 +X/+Y/旋转/Stop/重连/故障物理场景；数值门槛未修改。
 
 最终报告：`artifacts/simulation/suite-0fdc15bf/summary.json`，139 单元测试、13 阶段、7 场景全 PASS，无失败或跳过；进程组/端口清理通过。Copter/Rover 正常运动分别记录 1072/1171 个同源 cut，最大采样年龄 139.6/71.3 ms；fault 场景均通过。
+
+后续记录图像 CPU 负载揭示 GPS fix 原用 receive，global pose 用 source boot，超过原 500 ms 配对门槛时拒绝 origin。只读审查 ArduPilot libraries/AP_GPS/AP_GPS.cpp:1405 确认 GPS_RAW_INT time_usec 是 last_fix_time_ms 乘 1000；将其纳入同一 boot epoch，未知、零、Unix stamp 不采用，GPS 不用于首次 anchor。重复、延迟、回退测试及视觉业务、对象丢失恢复场景通过。未放宽状态年龄或原点匹配门槛。

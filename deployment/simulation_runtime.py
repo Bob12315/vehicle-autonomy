@@ -186,8 +186,8 @@ class SimulationRuntime:
 
     def _capture(self, source_clock, message, received):
         captured = source_clock.capture(message, received)
-        if message.get_type() in ("LOCAL_POSITION_NED", "GLOBAL_POSITION_INT", "ATTITUDE"):
-            self._emit("source_time", message_type=message.get_type(), boot_ms=int(message.time_boot_ms),
+        if captured is not None and message.get_type() in ("LOCAL_POSITION_NED", "GLOBAL_POSITION_INT", "ATTITUDE", "GPS_RAW_INT"):
+            self._emit("source_time", message_type=message.get_type(), boot_ms=int(message.time_usec)//1000 if message.get_type()=="GPS_RAW_INT" else int(message.time_boot_ms),
                        capture_ns=captured.monotonic_ns, receive_ns=received.monotonic_ns,
                        clock_domain=str(received.clock_domain_id))
         return captured

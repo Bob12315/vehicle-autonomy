@@ -41,3 +41,16 @@ class SourceClockTests(unittest.TestCase):
         message.time_boot_ms = 1
         fresh = SimulationSourceClock().capture(message, self.received(20_000_000_000))
         self.assertEqual(fresh.monotonic_ns, 20_000_000_000)
+
+    def test_gps_fix_uses_same_boot_epoch_and_unknown_timestamp_is_not_adopted(self):
+        sender=mav.MAVLink(None)
+        clock=SimulationSourceClock()
+        clock.capture(sender.global_position_int_encode(1000,0,0,0,0,0,0,0,0),self.received(10_000_000_000))
+        gps=sender.gps_raw_int_encode(1_100_000,3,0,0,0,0,0,0,0,10)
+        capture=clock.capture(gps,self.received(12_000_000_000))
+        self.assertEqual(capture.monotonic_ns,10_100_000_000)
+        self.assertEqual(clock.capture(gps,self.received(13_000_000_000)),capture)
+        gps.time_usec=1_099_000
+        with self.assertRaises(ValueError):clock.capture(gps,self.received(13_000_000_000))
+        gps.time_usec=0;self.assertIsNone(clock.capture(gps,self.received(14_000_000_000)))
+        gps.time_usec=1_700_000_000_000_000;self.assertIsNone(clock.capture(gps,self.received(14_000_000_000)))
