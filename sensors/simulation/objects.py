@@ -1,5 +1,5 @@
 """Replaceable, read-only Gazebo object producer, independent of acceptance Oracle."""
-from datetime import datetime,timezone
+from datetime import datetime,timezone,timedelta
 from dataclasses import dataclass
 from collections import deque
 import hashlib
@@ -91,8 +91,10 @@ class ObjectProjector:
 
     def _observation(self,model,position,capture,receive,quality):
         self.sequence+=1
+        received_utc=datetime.now(timezone.utc)-timedelta(microseconds=(time.monotonic_ns()-receive)//1000)
+        captured_utc=received_utc-timedelta(microseconds=(receive-capture)//1000)
         return Observation(f'{self.producer}:{self.sequence}',SchemaVersion(1,0),self.producer,self.sequence,
-            TimePoint(capture,utc=datetime.now(timezone.utc),clock_domain_id=self.domain),TimePoint(receive,utc=datetime.now(timezone.utc),clock_domain_id=self.domain),quality,
+            TimePoint(capture,captured_utc,self.domain),TimePoint(receive,received_utc,self.domain),quality,
             DetectedObject(model,'bucket_'+model.rsplit('_',1)[-1],position,1.0),'odom')
 
     def invalidate(self,now):

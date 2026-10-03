@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import replace
+import hashlib
 from datetime import datetime, timezone
 import json
 import os
@@ -62,7 +63,13 @@ class OwnedSimulation:
         self.model = "iris_with_gimbal" if kind == "copter" else "target_rover"
         self.profile = replace(SimulationProfile.load(ROOT / f"simulation/profiles/{kind}.toml"), port=self.port)
         self.processes = []
-        self.manifest = {"kind": kind, "framework_sha": output(["git", "rev-parse", "HEAD"]),
+        code_hash=hashlib.sha256()
+        for package in ('contracts','core','deployment','runtime','application','applications','actions','app','environments','localization','world_model','sensors','perception','vehicles','protocols','infrastructure','simulation','tests/simulation'):
+            for source in sorted((ROOT/package).rglob('*')):
+                if source.is_file() and source.suffix in ('.py','.toml','.json','.sdf'):
+                    code_hash.update(str(source.relative_to(ROOT)).encode()+b'\0'+source.read_bytes()+b'\0')
+        self.manifest = {"root_source_sha256":code_hash.hexdigest(),
+            "working_tree_dirty":bool(output(["git","status","--porcelain"])),"kind": kind, "framework_sha": output(["git", "rev-parse", "HEAD"]),
             "ardupilot_sha": output(["git", "rev-parse", "HEAD"], ARDUPILOT),
             "plugin_sha": output(["git", "rev-parse", "HEAD"], PLUGIN),
             "gazebo_version": output(["gz", "sim", "--version"]),

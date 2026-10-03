@@ -109,7 +109,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--run-dir', type=Path)
     parser.add_argument('--build-dir', type=Path)
-    parser.add_argument('--timeout', type=float, default=2400)
+    parser.add_argument('--timeout', type=float, default=3600)
     parser.add_argument('--inject-failure', action='store_true', help='verify nonzero result before vehicles launch')
     parser.add_argument('--unit-report', type=Path, help=argparse.SUPPRESS)
     args = parser.parse_args()
@@ -126,7 +126,7 @@ def main():
     env['VAF_SIMULATION_PLUGIN_DIR'] = str(plugin_dir)
     runner = StageRunner(run_dir, total_timeout=args.timeout, env=env)
     summary = {'passed': False, 'run_dir': str(run_dir),
-               'started_at': stamp(), 'core_skipped': 0, 'expected_scenarios': 15,
+               'started_at': stamp(), 'core_skipped': 0, 'expected_scenarios': 20,
                'scenarios': [], 'framework_sha': output(['git', 'rev-parse', 'HEAD']),
                'ardupilot_sha': output(['git', 'rev-parse', 'HEAD'], ARDUPILOT),
                'plugin_sha': output(['git', 'rev-parse', 'HEAD'], PLUGIN), 'build_dir': str(build_dir),
@@ -165,6 +165,11 @@ def main():
             ('rover_route', 'tests.simulation.autonomy_process', ['--kind','rover','--allow-send','--mission','basic_route','--repeats','2']),
             ('copter_mission_faults', 'tests.simulation.mission_faults', ['--kind','copter','--allow-send']),
             ('rover_mission_faults', 'tests.simulation.mission_faults', ['--kind','rover','--allow-send']),
+            ('objects', 'tests.simulation.object_process', []),
+            ('cuadc_first', 'tests.simulation.autonomy_process', ['--kind','copter','--allow-send','--mission','cuadc_demo','--objects']),
+            ('cuadc_second', 'tests.simulation.autonomy_process', ['--kind','copter','--allow-send','--mission','cuadc_demo','--objects']),
+            ('rover_inspection', 'tests.simulation.autonomy_process', ['--kind','rover','--allow-send','--mission','object_inspection','--objects']),
+            ('business_faults', 'tests.simulation.business_faults', ['--kind','copter','--allow-send']),
             ('copter_full', 'tests.simulation.copter_scenario', ['--allow-send', '--full']),
             ('copter_land', 'tests.simulation.copter_scenario', ['--allow-send']),
             ('rover_full', 'tests.simulation.rover_protocol', ['--allow-send', '--full']),

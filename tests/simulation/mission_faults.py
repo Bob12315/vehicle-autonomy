@@ -35,10 +35,17 @@ def run(directory,kind):
             evidence.write(json.dumps({'host_ns':time.monotonic_ns(),'status':state,'truth':None if truth is None else [truth.x_m,truth.y_m,truth.z_m],'speed':oracle.recent_speed_mps()})+'\n');evidence.flush()
             return state
         def ctl(operation,*flags):
-            result=subprocess.run([sys.executable,'-m','app.main','ctl','--profile',kind+'_sim','--control-socket',str(endpoint),operation,*flags],capture_output=True,text=True,timeout=4)
-            value=json.loads(result.stdout)
-            if result.returncode or not value['ok']:raise RuntimeError(value)
-            return value['result']
+            deadline=time.monotonic()+3
+            while True:
+                result=subprocess.run([sys.executable,'-m','app.main','ctl','--profile',f'{kind}_sim',
+                    '--control-socket',str(endpoint),operation,*flags],capture_output=True,text=True,timeout=4)
+                response=json.loads(result.stdout)
+                if not result.returncode and response['ok']:return response['result']
+                # This exact error precedes Run/lease creation and any Arm request.
+                if operation=='start' and response.get('error')=='reported local/global origin evidence unavailable' and time.monotonic()<deadline:
+                    time.sleep(.1);continue
+                raise RuntimeError(response)
+
         def wait(predicate,timeout):
             until=time.monotonic()+timeout
             while time.monotonic()<until:

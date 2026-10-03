@@ -155,11 +155,11 @@ def request(path, command, payload=None, *, request_id=None):
     return json.loads(result)
 
 
-def run_application(profile, *, profile_name, allow_send, path, sensor_config=None):
+def run_application(profile, *, profile_name, allow_send, path, sensor_config=None, sim_payload=False):
     import signal
     from application.runtime_service import RuntimeService
     from deployment.application_runtime import ApplicationRuntime
-    runtime = ApplicationRuntime(profile, profile_name=profile_name, allow_send=allow_send, sensor_config=sensor_config,
+    runtime = ApplicationRuntime(profile, profile_name=profile_name, allow_send=allow_send, sensor_config=sensor_config, sim_payload=sim_payload,
         event_sink=lambda event: print(json.dumps(event, sort_keys=True), flush=True))
     server = ControlServer(path, RuntimeService(runtime))
     previous = {}

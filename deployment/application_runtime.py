@@ -11,6 +11,9 @@ from uuid import uuid4
 from contracts.core.primitives import RunId
 from actions.basic import register_basic
 from applications.basic_catalog import MISSION_NAMES, build, capabilities
+from applications.cuadc.catalog import NAMES as BUSINESS_NAMES, build as build_business
+from applications.cuadc.actions import register_targets
+from contracts.effects.payload import PayloadEffectEnvelope
 from contracts.decision import EffectPhase, EffectResult, MissionPlan, MissionStep
 from contracts.vehicle.ports import VehicleCapabilities
 from core.action_registry import ActionRegistry
@@ -25,7 +28,7 @@ TERMINAL = (RunStatus.SUCCEEDED, RunStatus.FAILED, RunStatus.CANCELLED)
 
 
 class ApplicationRuntime:
-    def __init__(self, profile, *, profile_name: str, allow_send=False, runtime=None, event_sink=None, sensor_config=None):
+    def __init__(self, profile, *, profile_name: str, allow_send=False, runtime=None, event_sink=None, sensor_config=None, sim_payload=False):
         self.profile = profile
         self.profile_name = profile_name
         self.allow_send = allow_send
@@ -40,6 +43,7 @@ class ApplicationRuntime:
         self.registry = ActionRegistry()
         self.registry.register_typed(SITL_MODE_SPEC, SitlModeAction())
         register_basic(self.registry)
+        register_targets(self.registry)
         mode = "HOLD" if profile.kind == "rover" else "GUIDED"
         self.plans = {"disarmed_mode": MissionPlan("disarmed_mode", (
             MissionStep("mode", SITL_MODE_SPEC.name, SitlModeParameters(mode, profile.mode_ids[mode])),))}
@@ -58,6 +62,16 @@ class ApplicationRuntime:
         self.connected_at_ns = None
         self.task_environment = None
         self.task_name = None
+        self.task_configuration_sha256 = None
+        self.payload = None
+        self.payload_port = None
+        if sim_payload:
+            if profile.kind!='copter':raise ValueError('simulation payload requires Copter')
+            from core.payload_execution import PayloadExecution,PayloadSafetyPolicy
+            from infrastructure.simulation.payload import SimPayloadPort
+            self.payload_port=SimPayloadPort()
+            self.payload=PayloadExecution(self.vehicle.authority,self.payload_port,
+                PayloadSafetyPolicy(('sim.objects:','vision.recorded:'),max_vehicle_age_ns=profile.safety.max_snapshot_age_ns),self.vehicle.world_reader())
         self.sensor_calibration = None
         self.sensor = None
         self.sensor_epoch = None
@@ -91,6 +105,7 @@ class ApplicationRuntime:
             self.error = "environment_configuration_changed; restart and preflight required"
             if self.task and self.task.view().status not in TERMINAL:
                 self.task.abort(self.error)
+                self._cancel_payload()
                 self.stops = self.vehicle.end_run()
         if self.environment_fault:
             self.environment = None
@@ -110,11 +125,15 @@ class ApplicationRuntime:
                 self._emit('object_observation',producer=str(observation.producer_id),sequence=observation.sequence,
                     capture_ns=observation.captured_at.monotonic_ns,receive_ns=observation.received_at.monotonic_ns,
                     quality=observation.quality.value,frame=str(observation.frame_id),object_id=str(observation.data.object_id))
+        if self.payload is not None:
+            for observation in self.payload_port.poll(self.vehicle.clock()):self.vehicle.ingest_observation(observation)
         result = self.vehicle.cycle()
+        if self.payload is not None:self.payload.tick(self.vehicle.clock())
         if result.fault:
             self.error = result.fault
             if self.task and self.task.view().status not in TERMINAL:
                 self.task.abort(result.fault)
+                self._cancel_payload()
                 self.stops = self.vehicle.end_run()
                 self._emit("task_failed", error=result.fault)
             self.state = "DEGRADED"
@@ -135,7 +154,7 @@ class ApplicationRuntime:
             self.task.abort("mission_deadline_exceeded")
         else:
             for effect_id, envelope in self.envelopes.items():
-                status = self.vehicle.effect_status(effect_id)
+                status = self._effect_status(effect_id)
                 if status:
                     self.task.record_effect_result(EffectResult(effect_id, str(envelope.action_instance_id),
                         EffectPhase(status["phase"]), status["command_id"], self.vehicle.session_id, status["reason"]))
@@ -151,20 +170,31 @@ class ApplicationRuntime:
                 self._emit("effect_requested", run_id=str(envelope.run_id), action_id=str(envelope.action_instance_id),
                            effect_id=str(envelope.effect_id), effect_type=type(envelope.effect).__name__)
                 self.envelopes[str(envelope.effect_id)] = envelope
-                self.vehicle.dispatch_envelope(envelope)
+                if isinstance(envelope,PayloadEffectEnvelope):
+                    if self.payload is None:raise RuntimeError('payload port unavailable after preflight')
+                    self.payload.dispatch(envelope,self.vehicle.clock())
+                else:self.vehicle.dispatch_envelope(envelope)
         if self.task.view().status in TERMINAL:
+            self._cancel_payload()
             self.stops = self.vehicle.end_run()
             self.state = "READY" if self.vehicle.connected else "DEGRADED"
             self._emit("task_finished", **self.task_status())
+
+    def _cancel_payload(self):
+        if self.payload is not None and self.task is not None:self.payload.cancel(self.task.view().run_id)
+
+    def _effect_status(self,key):
+        if isinstance(self.envelopes.get(key),PayloadEffectEnvelope):return None if self.payload is None else self.payload.status(key)
+        return self.vehicle.effect_status(key)
 
     def task_status(self):
         if self.task is None:
             return None
         view = self.task.view()
-        return {"task_id": str(view.run_id), "mission": self.task_name, "status": view.status.value, "step": view.step_id,
+        return {"task_id": str(view.run_id), "mission": self.task_name, "configuration_sha256":self.task_configuration_sha256, "status": view.status.value, "step": view.step_id,
                 "error": view.error, "steps": [{"step": r.step_id, "reason": r.reason.value,
                     "error": r.error} for r in view.results],
-                "effects": {key: self.vehicle.effect_status(key) for key in self.envelopes},
+                "effects": {key: self._effect_status(key) for key in self.envelopes},
                 "requests": {key: {"action_id": str(envelope.action_instance_id),
                     "effect_type": type(envelope.effect).__name__, "created_ns": envelope.created_at.monotonic_ns,
                     "deadline_ns": envelope.deadline.monotonic_ns} for key,envelope in self.envelopes.items()},
@@ -175,11 +205,16 @@ class ApplicationRuntime:
         now = self.vehicle.clock()
         state = world.vehicle if world else None
         pose = state.reported_pose if state else None
+        origin_error='vehicle/environment unavailable'
+        if self.environment is not None and state is not None:
+            try:self.environment.validate_origin(state);origin_error=None
+            except ValueError as exc:origin_error=str(exc)
         return {"profile": self.profile_name, "vehicle_kind": self.profile.kind,
                 "state": self.state, "started_at": self.started_at, "session_id": self.vehicle.session_id,
                 "connected": self.vehicle.connected, "error": self.error,
                 "world_version": None if world is None else {"generation": world.version.generation_id,
                     "revision": world.version.revision},
+                "motion_warmup_remaining_ns":None if self.connected_at_ns is None else max(0,self.profile.warmup_ns-(now.monotonic_ns-self.connected_at_ns)),
                 "world_age_ns": None if world is None else now.elapsed_ns_since(world.published_at),
                 "vehicle": None if state is None else {"quality": state.health.quality.value,
                     "armed": state.operation.armed, "mode": state.operation.native_mode,
@@ -190,7 +225,7 @@ class ApplicationRuntime:
                     "id": self.environment.resource_id, "generation": self.environment.version.generation_id,
                     "revision": self.environment.version.revision, "frame": str(self.environment.frame),
                     "home": self.environment.home_name, "home_source": self.environment.home_source,
-                    "origin_source": self.environment.origin_source, "points": [p.name for p in self.environment.points],
+                    "origin_source": self.environment.origin_source,"origin_verified":origin_error is None,"origin_error":origin_error, "points": [p.name for p in self.environment.points],
                     "regions": [r.name for r in self.environment.regions]},
                 "localization": None if world is None or world.localization is None else {
                     "quality": world.localization.quality.value, "source": str(world.localization.producer_id),
@@ -206,11 +241,12 @@ class ApplicationRuntime:
                     "confidence":obj.confidence,"position":[obj.position.value.x,obj.position.value.y,obj.position.value.z]} for obj in world.objects],
                 "sensor": None if self.sensor is None else {"kind":"sim_objects","source":self.sensor_calibration.source,
                     "version":self.sensor_calibration.version,"error":self.sensor.projector.error},
+                "payload":None if self.payload_port is None else self.payload_port.inventory(),
                 "system_send": self.vehicle.authority.system_send,
                 "action_send": self.vehicle.authority.action_send, "task": self.task_status()}
 
     def start_mission(self, name):
-        if name not in self.plans and name not in MISSION_NAMES:
+        if name not in self.plans and name not in MISSION_NAMES and name not in BUSINESS_NAMES:
             raise ValueError("mission is not registered")
         if not self.allow_send:
             raise ValueError("application started without --allow-send")
@@ -221,18 +257,23 @@ class ApplicationRuntime:
         world = self.vehicle.world_snapshot()
         if world is None or world.vehicle is None or (name != "safe_recovery" and world.vehicle.operation.armed):
             raise ValueError("fresh disarmed vehicle required")
-        if name in MISSION_NAMES:
+        if name in MISSION_NAMES or name in BUSINESS_NAMES:
             if self.environment is None or world.environment != self.environment.reference or world.localization is None:
                 raise ValueError("bound environment and fresh localization required")
             if name != "safe_recovery" and (self.connected_at_ns is None or self.vehicle.clock().monotonic_ns-self.connected_at_ns < self.profile.warmup_ns):
                 raise ValueError("simulation motion warmup incomplete")
             self.environment.validate_origin(world.vehicle)
-            plan = build(name, self.profile.kind, self.environment, self.profile.mode_ids["GUIDED"])
+            if name in BUSINESS_NAMES:
+                if self.sensor is None:raise ValueError('business mission requires explicit observation input')
+                plan=build_business(name,self.profile.kind,self.environment,self.profile.mode_ids['GUIDED'],self.payload is not None)
+                if name=='cuadc_demo' and 'sim_payload_1' not in self.payload_port.loaded:raise ValueError('simulation payload already consumed; no automatic reset')
+            else:plan = build(name, self.profile.kind, self.environment, self.profile.mode_ids["GUIDED"])
             self.task_environment = self.environment.reference
         else:
             plan = self.plans[name]
             self.task_environment = None
-        compiled = MissionValidator(self.registry).compile(plan, VehicleCapabilities(capabilities(self.profile.kind)))
+        compiled = MissionValidator(self.registry).compile(plan, VehicleCapabilities(capabilities(self.profile.kind) | (frozenset({"payload_release"}) if self.payload is not None else frozenset())))
+        self.task_configuration_sha256=hashlib.sha256(repr(tuple(step.step for step in compiled.steps)).encode()).hexdigest()
         run_id = f"application:{uuid4().hex}"
         action_id = f"{run_id}:{compiled.steps[0].step.step_id}:1"
         self.vehicle.begin_run(allow_send=True, run_id=run_id, action_id=action_id)
@@ -252,6 +293,7 @@ class ApplicationRuntime:
     def cancel_mission(self):
         if self.task is None or self.task.view().status in TERMINAL:
             raise ValueError("no active mission")
+        self._cancel_payload()
         self.vehicle.cancel_pending_requests()
         self.task.cancel()
         return self.task_status()
@@ -263,6 +305,7 @@ class ApplicationRuntime:
 
     def shutdown(self):
         self.request_shutdown()
+        self._cancel_payload()
         self.vehicle.cancel_pending_requests()
         if self.task and self.task.view().status not in TERMINAL:
             self.task.cancel()

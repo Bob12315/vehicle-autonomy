@@ -19,6 +19,7 @@ class BasicParameters:
     vehicle_kind: str
     environment: ResourceReference
     target: ResolvedTarget | None = None
+    arrival_margin_m: float = .75
     height_m: float = 1.5
     duration_ns: int = 2_000_000_000
     timeout_ns: int = 15_000_000_000
@@ -26,6 +27,8 @@ class BasicParameters:
     def __post_init__(self):
         if self.vehicle_kind not in ('copter','rover'):
             raise ValueError('unsupported kind')
+        if not math.isfinite(self.arrival_margin_m) or not .1<=self.arrival_margin_m<=.75:
+            raise ValueError('invalid arrival margin')
         if not math.isfinite(self.height_m) or not 0 < self.height_m <= 2:
             raise ValueError('invalid height')
         if any(type(value) is not int for value in (self.duration_ns,self.timeout_ns)) or not 0 < self.duration_ns <= self.timeout_ns <= 45_000_000_000:
@@ -241,7 +244,7 @@ class BasicInstance:
         else:
             destination = self.pose if self.name=='hold' else Pose3(target.position, self.pose.orientation)
             p=destination.position
-            reached=(math.hypot(current.position.x-p.x,current.position.y-p.y)<=(.45 if self.p.vehicle_kind=="rover" and self.name in ("goto","return_home") else .75)
+            reached=(math.hypot(current.position.x-p.x,current.position.y-p.y)<=(min(.45,self.p.arrival_margin_m) if self.p.vehicle_kind=="rover" and self.name in ("goto","return_home") else self.p.arrival_margin_m)
                      and (self.p.vehicle_kind=='rover' or abs(current.position.z-p.z)<=.35))
         good = written and post_sample and reached
         if self.name == 'stop':good = good and self._steady(world)
