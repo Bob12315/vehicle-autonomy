@@ -6,7 +6,7 @@ Vehicle Autonomy Framework 是面向多旋翼、无人车、固定翼、VTOL 及
 
 ## 当前实现
 
-根目录目前提供 P1 基础合同、P2 离线 World Model 状态链、P3 Typed Action/Mission 决策链、P4 控制边界、P5 ArduCopter/MAVLink/TCP 插件，以及 P6 本机 SITL 单进程模式任务运行组合。通用 TransformTree 求解静态/动态 Frame 关系。P5 已在内存传输、本机 Copter SITL 和已连接 Copter 飞控的受限 USB 模式诊断中验证；此前还完成 Rover 飞控的受限 USB HOLD 诊断。P6 将 Effect 经双 SEND、Lease、Safety 和唯一 writer 分派，并等待 ACK 与后续模式状态。**尚无**经过整车实机验收的生产车辆连接、Web UI、相机进程或服务器部署。
+根目录目前提供 P1 基础合同、P2 离线 World Model 状态链、P3 Typed Action/Mission 决策链、P4 控制边界、P5 ArduCopter/MAVLink/TCP 插件，以及 P6 本机 SITL 单进程模式任务运行组合。通用 TransformTree 求解静态/动态 Frame 关系。P5 已在内存传输、本机 Copter SITL 和已连接 Copter 飞控的受限 USB 模式诊断中验证；此前还完成 Rover 飞控的受限 USB HOLD 诊断。P6 将 Effect 经双 SEND、Lease、Safety 和唯一 writer 分派，并等待 ACK 与后续模式状态。**尚无**经过整车实机验收的生产车辆连接、Web UI、真实相机设备采集或服务器部署。
 
 车辆基础仿真新增了共享 `SimulationRuntime`、完整 Rover 插件和两主动轮/两后万向轮模型。Copter、Rover 正常动作与故障场景已通过四轮完整回归；**本轮基础车辆控制 Simulation Complete：PASS**，见[审计记录](docs/simulation/completion-audit.md)。
 
@@ -45,11 +45,11 @@ Copter USB 诊断使用 `PYTHONPATH=. python tests/manual_p5_copter_usb.py --por
 
 [V1 模块进度与未完成项](docs/v1_progress.md)按目标架构逐项记录当前成熟度、证据与待验收工作。
 
-[基础自主系统实施计划](docs/basic_autonomy_implementation_plan.md)列出车辆仿真完成后的 P9–P17 阶段、依赖与验收门槛；[P9 专项计划](docs/p9_application_runtime_plan.md)细化下一阶段的 Runtime 接口与执行步骤。P9 已实现并通过本机两车进程与完整仿真回归，见 [P9 审计](docs/autonomy/phase-9.md)；P10 在线 Localization/Transform 也已通过完整回归，见 [P10 审计](docs/autonomy/phase-10.md)；P11 版本化 Environment 已通过两车命名点与完整回归，见 [P11](docs/autonomy/phase-11.md)；P12 基础 Action 已通过完整回归，见 [P12](docs/autonomy/phase-12.md)；P13–P17 尚未验收。
+[基础自主系统实施计划](docs/basic_autonomy_implementation_plan.md)的 P9–P15 已完成本机仿真验收：长运行 App、在线定位/Transform、Environment、基础 Action、双车命名路线、仿真对象输入及 CUADC 业务链。P17 已完成记录图像/CPU YOLOX/虚拟标定的感知替换；P16 真实硬件按计划暂缓。提交、测试和适用范围见 [自主系统完成审计](docs/autonomy/completion-audit.md)。
 
 [P6 首个持续运行组合实施计划与验收](docs/p6_runtime_integration_plan.md)记录 localhost ArduCopter SITL 的装配顺序、测试结果和未覆盖范围。
 
-## 本机仿真应用进程（P9）
+## 本机仿真应用进程
 
 先启动自己的 localhost SITL/Gazebo，再运行：
 
@@ -60,4 +60,21 @@ python -m app.main ctl --profile copter_sim start --mission disarmed_mode
 python -m app.main ctl --profile copter_sim shutdown
 ```
 
-Rover 使用 `rover_sim`。不传 `--allow-send` 为只读；任务目录包括 disarmed_mode、action_probe 与 safe_recovery。没有活跃任务时撤销双 SEND 与租约，重连只读恢复。`--config` 可提供经严格验证的 loopback 仿真 profile；`--control-socket` 指定本机端点。不是实机或 Web 入口。
+Rover 使用 `rover_sim`。不传 `--allow-send` 为只读；任务目录包括 disarmed_mode、action_probe、basic_route 与 safe_recovery；显式对象源可启用 object_inspection，Copter 另需显式仿真载荷才可运行 cuadc_demo。没有活跃任务时撤销双 SEND 与租约，重连只读恢复。`--config` 可提供经严格验证的 loopback 仿真 profile；`--control-socket` 指定本机端点。不是实机或 Web 入口。
+
+两车命名路线从公开控制入口启动：
+
+```bash
+python -m app.main ctl --profile copter_sim start --mission basic_route
+python -m app.main ctl --profile rover_sim start --mission basic_route
+```
+
+记录视觉需要 [可选 CPU 依赖](requirements-vision.txt)。`python scripts/prepare_vision_fixture.py` 下载并校验公开模型/照片，生成虚拟标定与有限记录清单。以下命令仅用于已启动的 localhost Copter 仿真：
+
+```bash
+python -m app.main run --profile copter_sim --allow-send --sim-payload \
+  --recorded-vision-config artifacts/simulation/vision-assets/recording.json
+python -m app.main ctl --profile copter_sim start --mission cuadc_demo
+```
+
+视觉源和 `--sim-sensor-config` 互斥，默认不加载任何对象源或载荷。该 fixture 的 COCO bus→bucket_1 映射只验证传感器替换边界；真实比赛识别、相机空间标定、物理载荷与 RKNN 均未验收，见 [P17](docs/autonomy/phase-17.md)。

@@ -11,3 +11,5 @@ Arm/Disarm 等待后续 heartbeat；起飞/落地须 ACK 加新鲜高度、速�
 保留失败：`suite-d5210812`、`autonomy-rover-31aa7065`、`autonomy-rover-df09fecf`。原生 Rover 位置导航在返航转向后误差超 0.75 m；重写有限 body 导航，选择较小转向的前进/倒车，加入实际角速度阻尼和 0.45 m 内部到达余量。最终验收容差仍 0.75 m、导航截止 45 s，未放宽。Rover Hold 使用零速；停止后撤销授权。
 
 仅 localhost speed-one SITL/Gazebo；不构成真实飞行/停车证据。P13 完整路线和中途取消/状态过期另行验收。
+
+阶段实现提交：`951e94e`；后续完整软件组合回归与补强见 [完成审计](completion-audit.md)。

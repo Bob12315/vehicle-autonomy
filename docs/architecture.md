@@ -176,3 +176,43 @@ pose can validate the configured origin; missing fix evidence is rejected.
 The resource service never sends commands. See [P11](autonomy/phase-11.md).
 
 P12 finite typed Actions and physical result/exit barriers passed both public App processes and the complete regression. See [P12](autonomy/phase-12.md).
+
+## P13–P15 and recorded visual composition
+
+The public App catalog compiles strict named-point routes for both vehicles.
+Each Action has its own lease, finite deadline, result feedback and confirmed
+Stop barrier; cancellation fences queued requests before the next write.
+Already transmitted one-shot side effects cannot be undone. Reconnected
+sessions remain read-only until a new explicit task.
+
+Environment references bind to the current world/frame epoch. The explicit
+Gazebo object adapter has a separate read-only subscription from the test
+Oracle, a whitelist and a content-hashed world-to-odom calibration. SIM/REAL
+clock pairs map capture time without extrapolation; duplicates retain their
+age and disappearing targets publish unavailable tombstones. WorldModel
+adopts only fresh, valid standard observations.
+
+CUADC search/selection/approach Actions use those immutable WorldObjects and
+produce typed requests. ReleasePayloadEffect is an independently reviewed
+non-vehicle contract; PayloadExecution checks both SEND gates, scoped lease,
+session/generations/deadline and explicit PayloadSafety before mutation.
+Only its injected SimPayloadPort changes the simulation inventory. A later
+independent payload-state observation must agree before COMPLETED. The
+vehicle envelope and VehicleExecution reject payload requests. No Servo/PWM
+or real payload transport exists in this composition.
+
+`--recorded-vision-config` selects a finite, checksum-pinned image recording
+instead of the simulation object adapter. A bounded asynchronous CPU YOLOX
+worker produces pixel detections; explicit pinhole/plane calibration is
+required to produce located odom observations. Unlocated or ambiguous
+detections never become motion targets. Capture/receive/inference times,
+source/calibration versions, confidence, drops, exposure provenance and
+health remain observable. Late results are invalid; absent targets expire
+or publish unavailable tombstones. Vehicle shutdown fences control before
+waiting for the sensor worker, including worker-close failures.
+
+P9–P15 and the P17 recorded-image/virtual-calibration software scope passed
+actual App/SITL/Gazebo acceptance; see the [autonomy audit](autonomy/completion-audit.md).
+The bus-to-bucket fixture mapping verifies adapter substitution only. Physical
+camera calibration, competition bucket recognition, RKNN, real payloads and
+P16 hardware motion remain unvalidated; hardware work is deferred.

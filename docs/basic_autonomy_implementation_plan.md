@@ -1,6 +1,6 @@
 # Vehicle Autonomy Framework：从仿真车辆底座到基础自主系统
 
-**状态：P9–P12 已验收；P13–P17 继续按本文实施，证据见 [P9](autonomy/phase-9.md)。** 制定日期：2026-10-03。本文覆盖完整后续主线，供另一会话按阶段实施。P9 的接口设计和更细执行步骤见 [P9 专项计划](p9_application_runtime_plan.md)。当前已通过的仅是 [ArduCopter + Rover 基础控制 Simulation Complete](simulation/completion-audit.md)：审计记录 125 项单元测试、11 个回归阶段、5 个物理场景、零失败及零核心跳过。本计划不重新打开已验收的 Vehicle 功能范围。
+**状态：P9–P15 已通过 localhost SITL/Gazebo 验收；P17 已通过记录图像、CPU YOLOX 和虚拟标定的软件验收；P16 按本文保持暂缓。** 制定日期：2026-10-03；最终核对：2026-10-04。阶段实现、提交和最终测试证据见 [自主系统完成审计](autonomy/completion-audit.md)；P17 不代表真实相机标定、比赛目标检测或 RKNN 设备验收。P9 的接口设计和执行步骤见 [P9 专项计划](p9_application_runtime_plan.md)。原 [基础车辆控制 Simulation Complete](simulation/completion-audit.md) 的 125 项测试、11 个阶段、5 个场景作为历史基线保留，本文新增场景没有降低其门槛。
 
 ## 1. 目标、阶段和完成口径
 
@@ -34,7 +34,7 @@ P9–P15 以 localhost SITL/Gazebo 为主要验收环境。P16 是**单独解冻
 
 ## 2. 当前基线、全程约束与交付方式
 
-当前仓库为 `/home/level6/vehicle-autonomy-framework`。现有可复用接口：`deployment/simulation_runtime.py::SimulationRuntime`、`runtime/simulation_profile.py::SimulationProfile`、`localization/reported.py::ReportedPoseLocalization`、`core/transform.py::TransformTree`、`world_model/service.py::WorldModel`、`core/mission_runtime.py::MissionRuntime`、`core/action_registry.py`、`core/vehicle_execution.py`、`application/mission_service.py`。当前缺口：正式 App 长运行入口、Localization/Transform 在线组合、Environment、通用运动 Action 和业务 Mission。`WorldSnapshot` 已有 `vehicle`、`localization`、`objects`、`map`、`environment` 字段；字段存在不等于在线生产者已接入。现有 `WorldModel.publish()` 会选用 vehicle/localization/objects，尚未发布 Environment 引用。当前 `SimulationRuntime.cycle()` 只更新车辆状态后发布 WorldSnapshot。
+当前仓库为 `/home/level6/vehicle-autonomy-framework`。以下现状描述为制定计划时的基线，新增实现与证据以完成审计为准。现有可复用接口：`deployment/simulation_runtime.py::SimulationRuntime`、`runtime/simulation_profile.py::SimulationProfile`、`localization/reported.py::ReportedPoseLocalization`、`core/transform.py::TransformTree`、`world_model/service.py::WorldModel`、`core/mission_runtime.py::MissionRuntime`、`core/action_registry.py`、`core/vehicle_execution.py`、`application/mission_service.py`。当前缺口：正式 App 长运行入口、Localization/Transform 在线组合、Environment、通用运动 Action 和业务 Mission。`WorldSnapshot` 已有 `vehicle`、`localization`、`objects`、`map`、`environment` 字段；字段存在不等于在线生产者已接入。现有 `WorldModel.publish()` 会选用 vehicle/localization/objects，尚未发布 Environment 引用。当前 `SimulationRuntime.cycle()` 只更新车辆状态后发布 WorldSnapshot。
 
 所有阶段必须保持：
 
@@ -165,3 +165,9 @@ P9–P15 以 localhost SITL/Gazebo 为主要验收环境。P16 是**单独解冻
 6. **硬件失联物理停车**：P16 前始终按 `UNCONFIRMED` 报告无证据停车；真实制动、失联和校准必须另验。
 
 完成每一阶段后只更新已证实的模块进度。若 P9–P13 全部通过，可单独发布“基础自主系统仿真闭环 PASS”；这**不等于** P15 的 CUADC 业务、P16 的实机或 P17 的视觉已完成。
+
+## 14. 实施结果
+
+P9–P13 的基础自主系统仿真闭环、P14 的可替换对象输入和 P15 的 CUADC 仿真业务链均为 **PASS**。P17 采用本文允许的记录数据路径，真实照片作为虚拟平面相机纹理，实际 YOLOX CPU 推理接入同一 Observation/WorldModel/Mission 边界。真实相机采集、实测标定、比赛桶识别和 RKNN 不在此次验收范围。P16 未启动。
+
+逐阶段证据：[P9](autonomy/phase-9.md)、[P10](autonomy/phase-10.md)、[P11](autonomy/phase-11.md)、[P12](autonomy/phase-12.md)、[P13](autonomy/phase-13.md)、[P14](autonomy/phase-14.md)、[P15](autonomy/phase-15.md)、[P16 暂缓](autonomy/phase-16.md)、[P17](autonomy/phase-17.md)。命令、版本、数值门槛、最终回归与限制统一见 [完成审计](autonomy/completion-audit.md)。

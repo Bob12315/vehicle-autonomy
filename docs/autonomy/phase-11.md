@@ -17,3 +17,5 @@ Application 绑定资源并发布 WorldSnapshot.environment 和 Environment depe
 当前完整命令：`./scripts/test_simulation_v1.sh --build-dir artifacts/simulation/suite-e8ba09fa/build`，加入两车 named-resource probe，原五个正常/故障场景全部保留。
 
 最终报告：`artifacts/simulation/suite-863c8818/summary.json`，143 tests、15 阶段、9 场景全 PASS，零失败、零跳过。两车正式 App、命名点、原完整车辆正常与故障场景和所有清理均通过。
+
+阶段实现提交：`2674d61`；后续完整软件组合回归与补强见 [完成审计](completion-audit.md)。
