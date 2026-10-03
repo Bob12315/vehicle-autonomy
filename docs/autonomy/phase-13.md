@@ -7,3 +7,5 @@
 保留原 0.75 m 导航误差、45 s 导航、8 s Stop/2 s 稳定门槛。Rover 使用较低角速度增益/阻尼、逐渐减速和前进/倒车方向选择，内部到达余量 0.45 m。连续任务暴露 EffectResult 查询全历史扫描引发 O(n²) 周期超时，改为按 ID 查询，200 项历史测试证明查询有界，保留原周期超时保护。Gazebo 已限定 loopback/每场景独立 partition，避免宿主 Wi-Fi 切换破坏测试订阅；见官方 Transport environment variables 文档。
 
 单元/合同测试全绿；P12 完整回归 `suite-6f5cf91c` 全绿。P13 全套 `suite-330d6a45` 的模式、环境、Action、Copter 两次路线通过，但 Rover 因宿主网络中断真值过期而失败，未把该报告标绿。最终全套汇总在完成后续软件组合时补充，当前提交记录已通过的阶段场景，不宣称实机。
+
+取消/关闭补强：Execution 在保留退出 Stop 租约的同时取消当前 Action 尚未 TRANSMITTED 的队列请求，避免取消先到、下一周期仍写出 Arm/Takeoff/Land。已发送 one-shot 结果不改写为取消，副作用不能撤回。队列取消与已发送不可撤销合同测试通过。

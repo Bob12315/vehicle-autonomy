@@ -408,6 +408,12 @@ class SimulationRuntime:
                    command_id=command_id, reason=result.reason)
         return result
 
+    def cancel_pending_requests(self):
+        if self._execution is None or self._run_id is None:return ()
+        cancelled=self._execution.cancel_pending(self._run_id,self._action_id,self.clock())
+        self._record_results()
+        return cancelled
+
     def effect_status(self, effect_id: str) -> dict | None:
         self._record_results(effect_id)
         result = self._results.get(effect_id)

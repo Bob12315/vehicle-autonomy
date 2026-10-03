@@ -252,6 +252,7 @@ class ApplicationRuntime:
     def cancel_mission(self):
         if self.task is None or self.task.view().status in TERMINAL:
             raise ValueError("no active mission")
+        self.vehicle.cancel_pending_requests()
         self.task.cancel()
         return self.task_status()
 
@@ -262,6 +263,7 @@ class ApplicationRuntime:
 
     def shutdown(self):
         self.request_shutdown()
+        self.vehicle.cancel_pending_requests()
         if self.task and self.task.view().status not in TERMINAL:
             self.task.cancel()
             self.task.abort("shutdown; sent commands cannot be undone")

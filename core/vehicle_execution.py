@@ -77,6 +77,23 @@ class VehicleExecution:
                      if stream.stop_command_id is None
                      or self.stop_status(stream_id).state is not StopState.CONFIRMED)
 
+    def cancel_pending(self, run_id, action_id, now: TimePoint) -> tuple[str, ...]:
+        """Cancel queued requests while preserving the lease for an exit Stop.
+
+        Already transmitted one-shot commands cannot be undone; their observed
+        results stay visible and are never relabelled as cancelled.
+        """
+        cancelled=[]
+        with self._authority.lock:
+            for effect_id,(envelope,result) in self._effect_results.items():
+                if envelope.run_id!=run_id or envelope.action_instance_id!=action_id or result.receipt is None:
+                    continue
+                status=self._commands.status(result.receipt.command_id)
+                if status is not None and status.phase is CommandPhase.ACCEPTED:
+                    self._commands.cancel(CancelCommandRequest(result.receipt.command_id,now))
+                    cancelled.append(str(effect_id))
+        return tuple(cancelled)
+
     def dispatch(self, envelope: EffectEnvelope, world: WorldSnapshot, now: TimePoint) -> DispatchResult:
         if not isinstance(envelope, EffectEnvelope) or not isinstance(world, WorldSnapshot) or not isinstance(now, TimePoint):
             raise TypeError("typed Effect, WorldSnapshot and TimePoint required")

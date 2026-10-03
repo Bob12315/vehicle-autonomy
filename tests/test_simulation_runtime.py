@@ -49,6 +49,22 @@ class Transport:
 
 
 class SimulationRuntimeTests(unittest.TestCase):
+    def test_cancel_pending_fences_queued_requests_without_erasing_transmission(self):
+        self.runtime.connect()
+        self.cycle(self.heartbeat(mode=4)+self.state_messages())
+        self.runtime.begin_run(allow_send=True)
+        self.runtime.submit_effect(ModeEffect('GUIDED'),effect_id='queued')
+        before=len(self.transports[-1].writes)
+        self.assertEqual(self.runtime.cancel_pending_requests(),('queued',))
+        self.cycle(self.heartbeat(mode=4)+self.state_messages())
+        self.assertEqual(len(self.transports[-1].writes),before)
+        self.assertEqual(self.runtime.effect_status('queued')['phase'],'CANCELLED')
+        self.runtime.submit_effect(ModeEffect('GUIDED'),effect_id='sent')
+        self.cycle(self.heartbeat(mode=4)+self.state_messages())
+        self.assertEqual(self.runtime.effect_status('sent')['phase'],'TRANSMITTED')
+        self.assertEqual(self.runtime.cancel_pending_requests(),())
+        self.assertEqual(self.runtime.effect_status('sent')['phase'],'TRANSMITTED')
+
     def test_result_queries_are_bounded_with_long_mission_history(self):
         self.runtime.connect()
         for index in range(200):self.runtime._effects[f'effect:{index}']=f'command:{index}'
