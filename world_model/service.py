@@ -21,9 +21,10 @@ class FreshnessLimits:
     vehicle_ns: int
     localization_ns: int
     objects_ns: int
+    map_ns: int = 10_000_000_000
 
     def __post_init__(self) -> None:
-        for name in ("vehicle_ns", "localization_ns", "objects_ns"):
+        for name in ("vehicle_ns", "localization_ns", "objects_ns", "map_ns"):
             value = getattr(self, name)
             if isinstance(value, bool) or not isinstance(value, int) or value <= 0:
                 raise ValueError(f"{name} must be a positive nanosecond duration")
@@ -57,6 +58,8 @@ class WorldModel:
         self._revision = 0
         self._transform_dependency = None
         self._environment = None
+        self._map = None
+        self._map_captured_at = None
 
     @property
     def generation_id(self):
@@ -67,6 +70,20 @@ class WorldModel:
             raise TypeError("typed Environment reference required")
         with self._lock:
             self._environment = reference
+
+    def update_map(self, reference: ResourceReference | None, captured_at: TimePoint | None = None):
+        """Adopt only a reference; grid content belongs to the mapping resource store."""
+        if reference is not None and (not isinstance(reference, ResourceReference) or not isinstance(captured_at, TimePoint)):
+            raise TypeError("map reference requires a typed source timestamp")
+        with self._lock:
+            if reference is not None and self._map is not None:
+                old, new = self._map.version, reference.version
+                if old.generation_id == new.generation_id and new.revision < old.revision:
+                    raise ValueError("map version regressed")
+                if reference == self._map and captured_at != self._map_captured_at:
+                    raise ValueError("map version reused for another source timestamp")
+            self._map = reference
+            self._map_captured_at = captured_at if reference is not None else None
 
     def reader(self) -> WorldReader:
         return WorldReader(self)
@@ -252,12 +269,18 @@ class WorldModel:
             if self._environment is not None:
                 dependencies.append(ResourceDependency("Environment", self._environment.resource_id,
                                                        self._environment.version))
+            map_freshness = self._freshness("map", published_at, self._limits.map_ns,
+                *((self._map_captured_at,) if self._map_captured_at is not None else ()))
+            freshness.append(map_freshness)
+            adopted_map = self._map if map_freshness.state is FreshnessState.FRESH else None
+            if self._map is not None:
+                dependencies.append(ResourceDependency("Map", self._map.resource_id, self._map.version))
             revision = self._revision + 1
             result = WorldSnapshot(
                 SchemaVersion(1, 0), f"{self._generation}:{revision}",
                 ResourceVersion(self._generation, revision), published_at,
                 selected_vehicle, selected_localization, tuple(objects),
-                environment=self._environment, freshness=tuple(freshness), dependencies=tuple(dependencies),
+                map=adopted_map, environment=self._environment, freshness=tuple(freshness), dependencies=tuple(dependencies),
             )
             self._revision = revision
             self._latest = result

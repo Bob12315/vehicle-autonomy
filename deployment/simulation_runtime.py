@@ -124,6 +124,9 @@ class SimulationRuntime:
     def set_environment(self, reference):
         self._world.update_environment(reference)
 
+    def set_map(self, reference, captured_at=None):
+        self._world.update_map(reference, captured_at)
+
     @property
     def connected(self) -> bool:
         return self._transport is not None

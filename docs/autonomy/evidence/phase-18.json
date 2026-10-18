@@ -1,0 +1,1236 @@
+{
+  "date": "2026-10-19",
+  "scope": "Local Rover 2D simulation in a room rotated 0.15 rad; not arbitrary geometry, active SLAM navigation or hardware acceptance",
+  "unit": {
+    "command": "python -m unittest discover -s tests -q",
+    "tests": 190,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "elapsed_s": 11.652
+  },
+  "mapping": {
+    "directory": "artifacts/simulation/ros2-mapping-30501ec0",
+    "summary": {
+      "passed": true,
+      "smoke_only": false,
+      "room_yaw_rad": 0.15,
+      "steps": {
+        "mode": {
+          "truth": [
+            -3.644955362262506e-12,
+            4.3060573515279613e-17
+          ],
+          "reason": "SUCCEEDED"
+        },
+        "arm": {
+          "truth": [
+            0.00021590879672485951,
+            -1.9582401416698119e-16
+          ],
+          "reason": "SUCCEEDED"
+        },
+        "goto_a": {
+          "truth": [
+            1.8147059211417886,
+            1.1250320126192866e-06
+          ],
+          "reason": "SUCCEEDED",
+          "truth_error_m": 0.18529407885798188,
+          "truth_speed_mps": 0.005090183022831811
+        },
+        "goto_b": {
+          "truth": [
+            1.751956296191058,
+            1.7421907651594373
+          ],
+          "reason": "SUCCEEDED",
+          "truth_error_m": 0.3466728223065138,
+          "truth_speed_mps": 0.00015717922265186634
+        },
+        "home": {
+          "truth": [
+            0.0756436149680724,
+            -0.10407422370964005
+          ],
+          "reason": "SUCCEEDED",
+          "truth_error_m": 0.1286600191464063,
+          "truth_speed_mps": 0.03862085187450819
+        },
+        "stop": {
+          "truth": [
+            -0.028637664938469958,
+            -0.030074431574737704
+          ],
+          "reason": "SUCCEEDED",
+          "truth_speed_mps": 0.02702245870312693
+        },
+        "disarm": {
+          "truth": [
+            -0.03276867837223992,
+            -0.026931311808269527
+          ],
+          "reason": "SUCCEEDED"
+        }
+      },
+      "initial_map": {
+        "width": 178,
+        "height": 177,
+        "resolution_m": 0.05000000074505806,
+        "known": 14622,
+        "occupied": 607,
+        "wall_matches": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      "export_roundtrip": true,
+      "task_id": "application:afee0ea4dc954348b5d750718b1a795e",
+      "final_map": {
+        "width": 178,
+        "height": 178,
+        "resolution_m": 0.05000000074505806,
+        "known": 24739,
+        "occupied": 966,
+        "wall_matches": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      "reload": {
+        "old_source": "c38c180cbdd74e08b92f6e6a5388f775",
+        "new_source": "393f8893027b456d9d1af0c0a58787b5",
+        "map": {
+          "width": 178,
+          "height": 178,
+          "resolution_m": 0.05000000074505806,
+          "known": 24740,
+          "occupied": 967,
+          "wall_matches": [
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "mapping_loss_cancel_stop_s": 3.001626499,
+      "mapping_loss_isolated": true
+    },
+    "manifest": {
+      "root_source_sha256": "42961950ce6c88d23d1bdd85fda35a7f01160fba45f0bf37152624b05568d19c",
+      "working_tree_dirty": true,
+      "kind": "rover",
+      "framework_sha": "6fa2ef9ee02f98de3ff816e194c00a95acecbc68",
+      "ardupilot_sha": "b5fbe26515eddb9277e1b5e7a4fcf3f37cf449a6",
+      "plugin_sha": "3ec51428fd43deb7b71137192ba16394b450d78e",
+      "gazebo_version": "Gazebo Sim, version 8.15.0\nCopyright (C) 2018 Open Source Robotics Foundation.\nReleased under the Apache 2.0 License.",
+      "world": "rover_95cb656fda64",
+      "model": "target_rover",
+      "instance": 1,
+      "ports": {
+        "tcp": 5770,
+        "json_udp": 9012
+      },
+      "gazebo_transport": {
+        "ip": "127.0.0.1",
+        "partition": "vaf_rover_95cb656fda64"
+      },
+      "started_at": "2026-10-18T16:39:27.505865+00:00",
+      "processes": [
+        {
+          "name": "gazebo",
+          "command": [
+            "gz",
+            "sim",
+            "-s",
+            "-r",
+            "-v3",
+            "/home/level6/vehicle-autonomy-framework/artifacts/simulation/ros2-mapping-30501ec0/world.sdf"
+          ],
+          "pid": 60850,
+          "pgid": 60850,
+          "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/ros2-mapping-30501ec0/gazebo.log",
+          "exit_code": 0,
+          "start_ticks": "3938112",
+          "stopped": true
+        },
+        {
+          "name": "sitl",
+          "command": [
+            "/home/level6/vehicle-autonomy-framework/artifacts/simulation/suite-e8ba09fa/build/ardupilot/sitl/bin/ardurover",
+            "--model",
+            "JSON",
+            "--speedup",
+            "1",
+            "--defaults",
+            "/home/level6/ardupilot/Tools/autotest/default_params/rover.parm,/home/level6/ardupilot/Tools/autotest/default_params/rover-skid.parm,/home/level6/vehicle-autonomy-framework/simulation/params/rover_telemetry.parm",
+            "--sim-address=127.0.0.1",
+            "--home=-35.363262,149.165237,584,90",
+            "-I1"
+          ],
+          "pid": 60851,
+          "pgid": 60851,
+          "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/ros2-mapping-30501ec0/sitl.log",
+          "exit_code": 0,
+          "start_ticks": "3938112",
+          "stopped": true
+        },
+        {
+          "name": "application",
+          "command": [
+            "/home/level6/venv-ardupilot/bin/python",
+            "-m",
+            "app.main",
+            "run",
+            "--profile",
+            "rover_sim",
+            "--config",
+            "/home/level6/vehicle-autonomy-framework/artifacts/simulation/ros2-mapping-30501ec0/profile.toml",
+            "--control-socket",
+            "/home/level6/vehicle-autonomy-framework/artifacts/simulation/ros2-mapping-30501ec0/app.sock",
+            "--ros2-mapping-config",
+            "/home/level6/vehicle-autonomy-framework/artifacts/simulation/ros2-mapping-30501ec0/mapping.toml",
+            "--allow-send"
+          ],
+          "pid": 60865,
+          "pgid": 60865,
+          "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/ros2-mapping-30501ec0/application.log",
+          "exit_code": 0,
+          "start_ticks": "3938123",
+          "stopped": true
+        },
+        {
+          "name": "gz_bridge",
+          "command": [
+            "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+            "/home/level6/venv-ardupilot/bin/python",
+            "-m",
+            "integrations.ros2.run",
+            "ros_gz_bridge",
+            "parameter_bridge",
+            "--ros-args",
+            "-p",
+            "config_file:=/home/level6/vehicle-autonomy-framework/artifacts/simulation/ros2-mapping-30501ec0/bridge.yaml"
+          ],
+          "pid": 60866,
+          "pgid": 60866,
+          "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/ros2-mapping-30501ec0/gz_bridge.log",
+          "exit_code": 0,
+          "start_ticks": "3938123",
+          "stopped": true
+        },
+        {
+          "name": "mapping_sidecar",
+          "command": [
+            "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+            "/home/level6/venv-ardupilot/bin/python",
+            "-m",
+            "integrations.ros2.mapping_node",
+            "--config",
+            "/home/level6/vehicle-autonomy-framework/artifacts/simulation/ros2-mapping-30501ec0/mapping.toml",
+            "--control-socket",
+            "/home/level6/vehicle-autonomy-framework/artifacts/simulation/ros2-mapping-30501ec0/app.sock"
+          ],
+          "pid": 60867,
+          "pgid": 60867,
+          "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/ros2-mapping-30501ec0/mapping_sidecar.log",
+          "exit_code": 0,
+          "start_ticks": "3938123",
+          "stopped": true
+        },
+        {
+          "name": "slam",
+          "command": [
+            "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+            "/home/level6/venv-ardupilot/bin/python",
+            "-m",
+            "integrations.ros2.run",
+            "slam_toolbox",
+            "async_slam_toolbox_node",
+            "--ros-args",
+            "--params-file",
+            "/home/level6/vehicle-autonomy-framework/simulation/mapping/slam_toolbox.yaml"
+          ],
+          "pid": 60868,
+          "pgid": 60868,
+          "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/ros2-mapping-30501ec0/slam.log",
+          "exit_code": 0,
+          "start_ticks": "3938123",
+          "stopped": true
+        },
+        {
+          "name": "slam_configure",
+          "command": [
+            "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+            "ros2",
+            "lifecycle",
+            "set",
+            "--no-daemon",
+            "/slam_toolbox",
+            "configure"
+          ],
+          "pid": 60871,
+          "pgid": 60871,
+          "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/ros2-mapping-30501ec0/slam_configure.log",
+          "exit_code": 0,
+          "start_ticks": "3938123",
+          "stopped": true
+        },
+        {
+          "name": "slam_activate",
+          "command": [
+            "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+            "ros2",
+            "lifecycle",
+            "set",
+            "--no-daemon",
+            "/slam_toolbox",
+            "activate"
+          ],
+          "pid": 60996,
+          "pgid": 60996,
+          "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/ros2-mapping-30501ec0/slam_activate.log",
+          "exit_code": 0,
+          "start_ticks": "3938275",
+          "stopped": true
+        },
+        {
+          "name": "serialize",
+          "command": [
+            "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+            "ros2",
+            "service",
+            "call",
+            "/slam_toolbox/serialize_map",
+            "slam_toolbox/srv/SerializePoseGraph",
+            "{\"filename\": \"/home/level6/vehicle-autonomy-framework/artifacts/simulation/ros2-mapping-30501ec0/saved_graph\"}"
+          ],
+          "pid": 61353,
+          "pgid": 61353,
+          "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/ros2-mapping-30501ec0/serialize.log",
+          "exit_code": 0,
+          "start_ticks": "3951057",
+          "stopped": true
+        },
+        {
+          "name": "slam_reload",
+          "command": [
+            "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+            "/home/level6/venv-ardupilot/bin/python",
+            "-m",
+            "integrations.ros2.run",
+            "slam_toolbox",
+            "async_slam_toolbox_node",
+            "--ros-args",
+            "--params-file",
+            "/home/level6/vehicle-autonomy-framework/simulation/mapping/slam_toolbox.yaml"
+          ],
+          "pid": 61377,
+          "pgid": 61377,
+          "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/ros2-mapping-30501ec0/slam_reload.log",
+          "exit_code": 0,
+          "start_ticks": "3952067",
+          "stopped": true
+        },
+        {
+          "name": "slam_reload_configure",
+          "command": [
+            "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+            "ros2",
+            "lifecycle",
+            "set",
+            "--no-daemon",
+            "/slam_toolbox",
+            "configure"
+          ],
+          "pid": 61378,
+          "pgid": 61378,
+          "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/ros2-mapping-30501ec0/slam_reload_configure.log",
+          "exit_code": 0,
+          "start_ticks": "3952067",
+          "stopped": true
+        },
+        {
+          "name": "reload_activate",
+          "command": [
+            "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+            "ros2",
+            "lifecycle",
+            "set",
+            "--no-daemon",
+            "/slam_toolbox",
+            "activate"
+          ],
+          "pid": 61425,
+          "pgid": 61425,
+          "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/ros2-mapping-30501ec0/reload_activate.log",
+          "exit_code": 0,
+          "start_ticks": "3952214",
+          "stopped": true
+        },
+        {
+          "name": "deserialize",
+          "command": [
+            "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+            "ros2",
+            "service",
+            "call",
+            "/slam_toolbox/deserialize_map",
+            "slam_toolbox/srv/DeserializePoseGraph",
+            "{\"filename\": \"/home/level6/vehicle-autonomy-framework/artifacts/simulation/ros2-mapping-30501ec0/saved_graph\", \"match_type\": 1, \"initial_pose\": {\"x\": 0.0, \"y\": 0.0, \"theta\": 0.0}}"
+          ],
+          "pid": 61455,
+          "pgid": 61455,
+          "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/ros2-mapping-30501ec0/deserialize.log",
+          "exit_code": 0,
+          "start_ticks": "3952361",
+          "stopped": true
+        }
+      ],
+      "source_model": "/home/level6/vehicle-autonomy-framework/simulation/models/target_rover/model.sdf",
+      "source_world": "/home/level6/vehicle-autonomy-framework/simulation/worlds/rover_runway.sdf",
+      "parameters": [
+        "/home/level6/ardupilot/Tools/autotest/default_params/rover.parm",
+        "/home/level6/ardupilot/Tools/autotest/default_params/rover-skid.parm",
+        "/home/level6/vehicle-autonomy-framework/simulation/params/rover_telemetry.parm"
+      ],
+      "ros_domain_id": "143",
+      "renderer": "GLX server-only",
+      "ended_at": "2026-10-18T16:42:27.728489+00:00",
+      "remaining_process_groups": [],
+      "ports_released": true
+    }
+  },
+  "copter_compatibility": {
+    "directory": "artifacts/simulation/autonomy-copter-7523f8ef",
+    "summary": {
+      "passed": true,
+      "runs": [
+        {
+          "task_id": "application:dc55c5a433a04291bd579070f3ed45ad",
+          "steps": {
+            "mode": {
+              "truth": [
+                -3.938304540680777e-12,
+                2.573308782284006e-10,
+                0.19499942739960946
+              ],
+              "vehicle": {
+                "quality": "VALID",
+                "armed": false,
+                "mode": "ARDUPILOT_CUSTOM_4",
+                "pose": {
+                  "frame": "odom",
+                  "position": [
+                    0.0,
+                    0.0,
+                    0.1899999976158142
+                  ],
+                  "orientation_xyzw": [
+                    4.737184473704767e-10,
+                    -4.5943703724236235e-10,
+                    -0.7071067811865468,
+                    -0.7071067811865483
+                  ],
+                  "captured_ns": 39311737312916,
+                  "age_ns": 35914992
+                }
+              },
+              "reason": "SUCCEEDED"
+            },
+            "arm": {
+              "truth": [
+                -3.938304540680777e-12,
+                2.573308782284006e-10,
+                0.19499942739960946
+              ],
+              "vehicle": {
+                "quality": "VALID",
+                "armed": true,
+                "mode": "ARDUPILOT_CUSTOM_4",
+                "pose": {
+                  "frame": "odom",
+                  "position": [
+                    0.0,
+                    0.0,
+                    0.1899999976158142
+                  ],
+                  "orientation_xyzw": [
+                    4.737184473704767e-10,
+                    -4.5943703724236235e-10,
+                    -0.7071067811865468,
+                    -0.7071067811865483
+                  ],
+                  "captured_ns": 39312737312916,
+                  "age_ns": 36658057
+                }
+              },
+              "reason": "SUCCEEDED"
+            },
+            "takeoff": {
+              "truth": [
+                0.007960478606775533,
+                0.0040831278376565975,
+                1.679035485867313
+              ],
+              "vehicle": {
+                "quality": "VALID",
+                "armed": true,
+                "mode": "ARDUPILOT_CUSTOM_4",
+                "pose": {
+                  "frame": "odom",
+                  "position": [
+                    0.0,
+                    0.0,
+                    1.6799999475479126
+                  ],
+                  "orientation_xyzw": [
+                    -0.003927582808235889,
+                    -0.008750951975751846,
+                    -0.7071572908014125,
+                    -0.7069912029150074
+                  ],
+                  "captured_ns": 39319637312916,
+                  "age_ns": 42204677
+                }
+              },
+              "reason": "SUCCEEDED",
+              "truth_rise_m": 1.4840360584677037
+            },
+            "goto_a": {
+              "truth": [
+                1.8764125980604476,
+                0.925059876080231,
+                1.4928579247617915
+              ],
+              "vehicle": {
+                "quality": "VALID",
+                "armed": true,
+                "mode": "ARDUPILOT_CUSTOM_4",
+                "pose": {
+                  "frame": "odom",
+                  "position": [
+                    1.888232707977295,
+                    0.9350783228874207,
+                    1.4900000095367432
+                  ],
+                  "orientation_xyzw": [
+                    -0.0008233301896371206,
+                    -0.004361971032011131,
+                    -0.7067953611962814,
+                    -0.7074041367758128
+                  ],
+                  "captured_ns": 39326137312916,
+                  "age_ns": 46319164
+                }
+              },
+              "reason": "SUCCEEDED",
+              "truth_error_m": 0.14453327689108192,
+              "truth_stop_speed_mps": 0.04811048791066927
+            },
+            "hold": {
+              "truth": [
+                1.893647352839177,
+                0.9437744946420759,
+                1.4906828034997446
+              ],
+              "vehicle": {
+                "quality": "VALID",
+                "armed": true,
+                "mode": "ARDUPILOT_CUSTOM_4",
+                "pose": {
+                  "frame": "odom",
+                  "position": [
+                    1.8973108530044556,
+                    0.9350783228874207,
+                    1.4800000190734863
+                  ],
+                  "orientation_xyzw": [
+                    0.00028728570404445996,
+                    0.00039319430734847927,
+                    -0.707152087168041,
+                    -0.7070613046115906
+                  ],
+                  "captured_ns": 39330637312916,
+                  "age_ns": 49927160
+                }
+              },
+              "reason": "SUCCEEDED",
+              "truth_stop_speed_mps": 0.002903979229311928
+            },
+            "goto_b": {
+              "truth": [
+                -0.7921601015996326,
+                1.4675506856461238,
+                1.4883184086163663
+              ],
+              "vehicle": {
+                "quality": "VALID",
+                "armed": true,
+                "mode": "ARDUPILOT_CUSTOM_4",
+                "pose": {
+                  "frame": "odom",
+                  "position": [
+                    -0.7897896766662598,
+                    1.4694087505340576,
+                    1.4800000190734863
+                  ],
+                  "orientation_xyzw": [
+                    0.0001550593643272623,
+                    -0.0014308145555791826,
+                    -0.7072283824481057,
+                    -0.7069836941444528
+                  ],
+                  "captured_ns": 39338538312916,
+                  "age_ns": 54905448
+                }
+              },
+              "reason": "SUCCEEDED",
+              "truth_error_m": 0.21035774620262804,
+              "truth_stop_speed_mps": 0.00953609356193553
+            },
+            "home": {
+              "truth": [
+                -0.03876188950951169,
+                0.08846243910375415,
+                1.499958254751429
+              ],
+              "vehicle": {
+                "quality": "VALID",
+                "armed": true,
+                "mode": "ARDUPILOT_CUSTOM_9",
+                "pose": {
+                  "frame": "odom",
+                  "position": [
+                    -0.045390207320451736,
+                    0.07792319357395172,
+                    1.4900000095367432
+                  ],
+                  "orientation_xyzw": [
+                    -0.000903010651777673,
+                    0.0008034015536362434,
+                    -0.7076058996813236,
+                    -0.7066062764042583
+                  ],
+                  "captured_ns": 39345537312916,
+                  "age_ns": 60418945
+                }
+              },
+              "reason": "SUCCEEDED",
+              "truth_error_m": 0.09658202298926782,
+              "truth_stop_speed_mps": 0.013925392282552598
+            },
+            "land": {
+              "truth": [
+                -0.03773594412357872,
+                0.09589657212971409,
+                0.19499971643220895
+              ],
+              "vehicle": {
+                "quality": "VALID",
+                "armed": false,
+                "mode": "ARDUPILOT_CUSTOM_9",
+                "pose": {
+                  "frame": "odom",
+                  "position": [
+                    -0.045390207320451736,
+                    0.10018695890903473,
+                    0.1899999976158142
+                  ],
+                  "orientation_xyzw": [
+                    4.85473507739177e-10,
+                    -4.672378789752894e-10,
+                    -0.7081769389447862,
+                    -0.7060350013609756
+                  ],
+                  "captured_ns": 39360437312916,
+                  "age_ns": 71435273
+                }
+              },
+              "reason": "SUCCEEDED"
+            },
+            "disarm": {
+              "truth": [
+                -0.03773594412357872,
+                0.09589657212971409,
+                0.19499971643220895
+              ],
+              "vehicle": {
+                "quality": "VALID",
+                "armed": false,
+                "mode": "ARDUPILOT_CUSTOM_9",
+                "pose": {
+                  "frame": "odom",
+                  "position": [
+                    -0.045390207320451736,
+                    0.10018695890903473,
+                    0.1899999976158142
+                  ],
+                  "orientation_xyzw": [
+                    4.85473507739177e-10,
+                    -4.672378789752894e-10,
+                    -0.7081769389447862,
+                    -0.7060350013609756
+                  ],
+                  "captured_ns": 39361437312916,
+                  "age_ns": 71529498
+                }
+              },
+              "reason": "SUCCEEDED"
+            }
+          },
+          "effects": {
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:1": {
+              "phase": "COMPLETED",
+              "command_id": "command:6a1fc0a307f640a5858c9a4d525f14a5",
+              "reason": null
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:2": {
+              "phase": "COMPLETED",
+              "command_id": "command:b843b082a46d47e2be32ffd6307a23cd",
+              "reason": null
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:3": {
+              "phase": "ACKNOWLEDGED",
+              "command_id": "command:6b6154dcf6924fc4af3ac9bd4943aaec",
+              "reason": null
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:4": {
+              "phase": "CANCELLED",
+              "command_id": "command:50e38bfb9191488bb61aa2eae99a4bf6",
+              "reason": null
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:5": {
+              "phase": "CANCELLED",
+              "command_id": "command:4d228547a6d74b88845f3a8c29ffe4fb",
+              "reason": null
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:6": {
+              "phase": "CANCELLED",
+              "command_id": "command:37db7929eb2a45539ea880f0cc0bda9a",
+              "reason": null
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:7": {
+              "phase": "CANCELLED",
+              "command_id": "command:4e9142ec5ee6447aaf43af4a93bc3e1f",
+              "reason": null
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:8": {
+              "phase": "CANCELLED",
+              "command_id": "command:74cad09f7fd049118faa5db8761b245c",
+              "reason": null
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:9": {
+              "phase": "CANCELLED",
+              "command_id": "command:4d411a50e6544929b837f4d91197f0b9",
+              "reason": null
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:10": {
+              "phase": "CANCELLED",
+              "command_id": "command:aed88ab919c4401e9d542b21623d1fff",
+              "reason": null
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:11": {
+              "phase": "CANCELLED",
+              "command_id": "command:bdbf137e877b44d3961e8136f8bd6283",
+              "reason": null
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:12": {
+              "phase": "COMPLETED",
+              "command_id": "command:4ad5364474074caa8de02f64365f4020",
+              "reason": null
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:13": {
+              "phase": "CANCELLED",
+              "command_id": "command:a12c1081f3c946e5af82ffae797ce683",
+              "reason": null
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:14": {
+              "phase": "CANCELLED",
+              "command_id": "command:edf8e49bbd094ea58bd9422744fb36ee",
+              "reason": null
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:15": {
+              "phase": "CANCELLED",
+              "command_id": "command:8e27bd25341b4c20bfca4262891756b1",
+              "reason": null
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:16": {
+              "phase": "CANCELLED",
+              "command_id": "command:66b6ea6caa514235a1c5ce09e905f4b9",
+              "reason": null
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:17": {
+              "phase": "CANCELLED",
+              "command_id": "command:efe4df40397d4049b699d1cf7f9a1e55",
+              "reason": null
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:18": {
+              "phase": "CANCELLED",
+              "command_id": "command:abd34f3310354f11b39f2636bbb66576",
+              "reason": null
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:19": {
+              "phase": "COMPLETED",
+              "command_id": "command:30b0ad929f834384a1800f5b0277a924",
+              "reason": null
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:20": {
+              "phase": "CANCELLED",
+              "command_id": "command:344afd18bf184181acdbc4913fb9513a",
+              "reason": null
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:21": {
+              "phase": "CANCELLED",
+              "command_id": "command:807f4668ae754590949154c5fea65bdb",
+              "reason": null
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:22": {
+              "phase": "CANCELLED",
+              "command_id": "command:f9694baca5534849b56070da98e6cc55",
+              "reason": null
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:23": {
+              "phase": "CANCELLED",
+              "command_id": "command:faec273d5c034ecfaf5fec12ca141eef",
+              "reason": null
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:24": {
+              "phase": "CANCELLED",
+              "command_id": "command:9ea7a068a365428d8c5c20d2f22118fe",
+              "reason": null
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:25": {
+              "phase": "CANCELLED",
+              "command_id": "command:491af4f9095b443ea748030e43984a0c",
+              "reason": null
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:26": {
+              "phase": "CANCELLED",
+              "command_id": "command:a48dc245c1054bf493ccc5279ba97ff5",
+              "reason": null
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:27": {
+              "phase": "CANCELLED",
+              "command_id": "command:1b1656b9ddd1450eb87ac7acfad245b2",
+              "reason": null
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:28": {
+              "phase": "COMPLETED",
+              "command_id": "command:144451facd194193b563cbc205ee1b36",
+              "reason": null
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:29": {
+              "phase": "CANCELLED",
+              "command_id": "command:ef6151db609a4fb488ae8f90a0a7b7b7",
+              "reason": null
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:30": {
+              "phase": "CANCELLED",
+              "command_id": "command:581ec62cee594a6194a92805ae21cd38",
+              "reason": null
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:31": {
+              "phase": "CANCELLED",
+              "command_id": "command:6a869c052658484d86c3bb40964d41ff",
+              "reason": null
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:32": {
+              "phase": "CANCELLED",
+              "command_id": "command:76a7f52c400640ebaf0cc0703f219175",
+              "reason": null
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:33": {
+              "phase": "CANCELLED",
+              "command_id": "command:d03942cbb47047cf85cddd1f9a6720e3",
+              "reason": null
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:34": {
+              "phase": "CANCELLED",
+              "command_id": "command:4f0c6f4ff09d4c198439dedb84420de5",
+              "reason": null
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:35": {
+              "phase": "CANCELLED",
+              "command_id": "command:f22af24ccd1145e3856467da53f74c7a",
+              "reason": null
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:36": {
+              "phase": "COMPLETED",
+              "command_id": "command:650d11c3c28b4b70b5433826d56d1de3",
+              "reason": null
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:37": {
+              "phase": "ACKNOWLEDGED",
+              "command_id": "command:c044a0b7ce3c4a98931aa451ec90076c",
+              "reason": null
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:38": {
+              "phase": "COMPLETED",
+              "command_id": "command:e4f105da77d7443ab855cf4032ac0bda",
+              "reason": null
+            }
+          },
+          "requests": {
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:1": {
+              "action_id": "application:dc55c5a433a04291bd579070f3ed45ad:mode:1",
+              "effect_type": "ModeEffect",
+              "created_ns": 39310072190062,
+              "deadline_ns": 39315072190062
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:2": {
+              "action_id": "application:dc55c5a433a04291bd579070f3ed45ad:arm:1",
+              "effect_type": "ArmEffect",
+              "created_ns": 39311473171649,
+              "deadline_ns": 39316473171649
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:3": {
+              "action_id": "application:dc55c5a433a04291bd579070f3ed45ad:takeoff:1",
+              "effect_type": "TakeoffEffect",
+              "created_ns": 39312473885970,
+              "deadline_ns": 39317473885970
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:4": {
+              "action_id": "application:dc55c5a433a04291bd579070f3ed45ad:goto_a:1",
+              "effect_type": "PoseTargetEffect",
+              "created_ns": 39319378538863,
+              "deadline_ns": 39320378538863
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:5": {
+              "action_id": "application:dc55c5a433a04291bd579070f3ed45ad:goto_a:1",
+              "effect_type": "PoseTargetEffect",
+              "created_ns": 39319679178100,
+              "deadline_ns": 39320679178100
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:6": {
+              "action_id": "application:dc55c5a433a04291bd579070f3ed45ad:goto_a:1",
+              "effect_type": "PoseTargetEffect",
+              "created_ns": 39320079416324,
+              "deadline_ns": 39321079416324
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:7": {
+              "action_id": "application:dc55c5a433a04291bd579070f3ed45ad:goto_a:1",
+              "effect_type": "PoseTargetEffect",
+              "created_ns": 39320379461045,
+              "deadline_ns": 39321379461045
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:8": {
+              "action_id": "application:dc55c5a433a04291bd579070f3ed45ad:goto_a:1",
+              "effect_type": "PoseTargetEffect",
+              "created_ns": 39320680204758,
+              "deadline_ns": 39321680204758
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:9": {
+              "action_id": "application:dc55c5a433a04291bd579070f3ed45ad:goto_a:1",
+              "effect_type": "PoseTargetEffect",
+              "created_ns": 39321080118534,
+              "deadline_ns": 39322080118534
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:10": {
+              "action_id": "application:dc55c5a433a04291bd579070f3ed45ad:goto_a:1",
+              "effect_type": "PoseTargetEffect",
+              "created_ns": 39321480543366,
+              "deadline_ns": 39322480543366
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:11": {
+              "action_id": "application:dc55c5a433a04291bd579070f3ed45ad:goto_a:1",
+              "effect_type": "PoseTargetEffect",
+              "created_ns": 39321880864447,
+              "deadline_ns": 39322880864447
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:12": {
+              "action_id": "application:dc55c5a433a04291bd579070f3ed45ad:goto_a:1",
+              "effect_type": "StopMotionEffect",
+              "created_ns": 39322081254262,
+              "deadline_ns": 39323081254262
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:13": {
+              "action_id": "application:dc55c5a433a04291bd579070f3ed45ad:hold:1",
+              "effect_type": "PoseTargetEffect",
+              "created_ns": 39325983358278,
+              "deadline_ns": 39326983358278
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:14": {
+              "action_id": "application:dc55c5a433a04291bd579070f3ed45ad:hold:1",
+              "effect_type": "PoseTargetEffect",
+              "created_ns": 39326283939689,
+              "deadline_ns": 39327283939689
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:15": {
+              "action_id": "application:dc55c5a433a04291bd579070f3ed45ad:hold:1",
+              "effect_type": "PoseTargetEffect",
+              "created_ns": 39326684233171,
+              "deadline_ns": 39327684233171
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:16": {
+              "action_id": "application:dc55c5a433a04291bd579070f3ed45ad:hold:1",
+              "effect_type": "PoseTargetEffect",
+              "created_ns": 39327084481858,
+              "deadline_ns": 39328084481858
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:17": {
+              "action_id": "application:dc55c5a433a04291bd579070f3ed45ad:hold:1",
+              "effect_type": "PoseTargetEffect",
+              "created_ns": 39327484700938,
+              "deadline_ns": 39328484700938
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:18": {
+              "action_id": "application:dc55c5a433a04291bd579070f3ed45ad:hold:1",
+              "effect_type": "PoseTargetEffect",
+              "created_ns": 39327885041557,
+              "deadline_ns": 39328885041557
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:19": {
+              "action_id": "application:dc55c5a433a04291bd579070f3ed45ad:hold:1",
+              "effect_type": "StopMotionEffect",
+              "created_ns": 39328185097841,
+              "deadline_ns": 39329185097841
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:20": {
+              "action_id": "application:dc55c5a433a04291bd579070f3ed45ad:goto_b:1",
+              "effect_type": "PoseTargetEffect",
+              "created_ns": 39330486861613,
+              "deadline_ns": 39331486861613
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:21": {
+              "action_id": "application:dc55c5a433a04291bd579070f3ed45ad:goto_b:1",
+              "effect_type": "PoseTargetEffect",
+              "created_ns": 39330887225779,
+              "deadline_ns": 39331887225779
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:22": {
+              "action_id": "application:dc55c5a433a04291bd579070f3ed45ad:goto_b:1",
+              "effect_type": "PoseTargetEffect",
+              "created_ns": 39331287523379,
+              "deadline_ns": 39332287523379
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:23": {
+              "action_id": "application:dc55c5a433a04291bd579070f3ed45ad:goto_b:1",
+              "effect_type": "PoseTargetEffect",
+              "created_ns": 39331687745210,
+              "deadline_ns": 39332687745210
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:24": {
+              "action_id": "application:dc55c5a433a04291bd579070f3ed45ad:goto_b:1",
+              "effect_type": "PoseTargetEffect",
+              "created_ns": 39332088038760,
+              "deadline_ns": 39333088038760
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:25": {
+              "action_id": "application:dc55c5a433a04291bd579070f3ed45ad:goto_b:1",
+              "effect_type": "PoseTargetEffect",
+              "created_ns": 39332488388657,
+              "deadline_ns": 39333488388657
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:26": {
+              "action_id": "application:dc55c5a433a04291bd579070f3ed45ad:goto_b:1",
+              "effect_type": "PoseTargetEffect",
+              "created_ns": 39332888647523,
+              "deadline_ns": 39333888647523
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:27": {
+              "action_id": "application:dc55c5a433a04291bd579070f3ed45ad:goto_b:1",
+              "effect_type": "PoseTargetEffect",
+              "created_ns": 39333188969244,
+              "deadline_ns": 39334188969244
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:28": {
+              "action_id": "application:dc55c5a433a04291bd579070f3ed45ad:goto_b:1",
+              "effect_type": "StopMotionEffect",
+              "created_ns": 39333490319338,
+              "deadline_ns": 39334490319338
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:29": {
+              "action_id": "application:dc55c5a433a04291bd579070f3ed45ad:home:1",
+              "effect_type": "PoseTargetEffect",
+              "created_ns": 39338592660294,
+              "deadline_ns": 39339592660294
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:30": {
+              "action_id": "application:dc55c5a433a04291bd579070f3ed45ad:home:1",
+              "effect_type": "PoseTargetEffect",
+              "created_ns": 39338892994698,
+              "deadline_ns": 39339892994698
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:31": {
+              "action_id": "application:dc55c5a433a04291bd579070f3ed45ad:home:1",
+              "effect_type": "PoseTargetEffect",
+              "created_ns": 39339193177322,
+              "deadline_ns": 39340193177322
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:32": {
+              "action_id": "application:dc55c5a433a04291bd579070f3ed45ad:home:1",
+              "effect_type": "PoseTargetEffect",
+              "created_ns": 39339493495057,
+              "deadline_ns": 39340493495057
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:33": {
+              "action_id": "application:dc55c5a433a04291bd579070f3ed45ad:home:1",
+              "effect_type": "PoseTargetEffect",
+              "created_ns": 39339893735864,
+              "deadline_ns": 39340893735864
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:34": {
+              "action_id": "application:dc55c5a433a04291bd579070f3ed45ad:home:1",
+              "effect_type": "PoseTargetEffect",
+              "created_ns": 39340294116670,
+              "deadline_ns": 39341294116670
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:35": {
+              "action_id": "application:dc55c5a433a04291bd579070f3ed45ad:home:1",
+              "effect_type": "PoseTargetEffect",
+              "created_ns": 39340694295601,
+              "deadline_ns": 39341694295601
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:36": {
+              "action_id": "application:dc55c5a433a04291bd579070f3ed45ad:home:1",
+              "effect_type": "StopMotionEffect",
+              "created_ns": 39341194352167,
+              "deadline_ns": 39342194352167
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:37": {
+              "action_id": "application:dc55c5a433a04291bd579070f3ed45ad:land:1",
+              "effect_type": "LandEffect",
+              "created_ns": 39345297494551,
+              "deadline_ns": 39350297494551
+            },
+            "application:dc55c5a433a04291bd579070f3ed45ad:effect:38": {
+              "action_id": "application:dc55c5a433a04291bd579070f3ed45ad:disarm:1",
+              "effect_type": "DisarmEffect",
+              "created_ns": 39360508318683,
+              "deadline_ns": 39365508318683
+            }
+          }
+        }
+      ]
+    },
+    "manifest": {
+      "root_source_sha256": "13c47664147a977204e12c0b642c2b57257bd7ee03d3f71469050983a1f141f4",
+      "working_tree_dirty": true,
+      "kind": "copter",
+      "framework_sha": "6fa2ef9ee02f98de3ff816e194c00a95acecbc68",
+      "ardupilot_sha": "b5fbe26515eddb9277e1b5e7a4fcf3f37cf449a6",
+      "plugin_sha": "3ec51428fd43deb7b71137192ba16394b450d78e",
+      "gazebo_version": "Gazebo Sim, version 8.15.0\nCopyright (C) 2018 Open Source Robotics Foundation.\nReleased under the Apache 2.0 License.",
+      "world": "copter_9358a02792a3",
+      "model": "iris_with_gimbal",
+      "instance": 1,
+      "ports": {
+        "tcp": 5770,
+        "json_udp": 9012
+      },
+      "gazebo_transport": {
+        "ip": "127.0.0.1",
+        "partition": "vaf_copter_9358a02792a3"
+      },
+      "started_at": "2026-10-18T16:42:58.050514+00:00",
+      "processes": [
+        {
+          "name": "gazebo",
+          "command": [
+            "gz",
+            "sim",
+            "-s",
+            "-r",
+            "-v3",
+            "/home/level6/vehicle-autonomy-framework/artifacts/simulation/autonomy-copter-7523f8ef/world.sdf"
+          ],
+          "pid": 61562,
+          "pgid": 61562,
+          "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/autonomy-copter-7523f8ef/gazebo.log",
+          "exit_code": 0,
+          "start_ticks": "3959166",
+          "stopped": true
+        },
+        {
+          "name": "sitl",
+          "command": [
+            "/home/level6/vehicle-autonomy-framework/artifacts/simulation/suite-e8ba09fa/build/ardupilot/sitl/bin/arducopter",
+            "--model",
+            "JSON",
+            "--speedup",
+            "1",
+            "--defaults",
+            "/home/level6/ardupilot/Tools/autotest/default_params/copter.parm,/home/level6/ardupilot/Tools/autotest/default_params/gazebo-iris.parm,/home/level6/vehicle-autonomy-framework/simulation/params/copter_telemetry.parm",
+            "--sim-address=127.0.0.1",
+            "--home=-35.363262,149.165237,584,90",
+            "-I1"
+          ],
+          "pid": 61563,
+          "pgid": 61563,
+          "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/autonomy-copter-7523f8ef/sitl.log",
+          "exit_code": 0,
+          "start_ticks": "3959166",
+          "stopped": true
+        },
+        {
+          "name": "application",
+          "command": [
+            "/home/level6/venv-ardupilot/bin/python",
+            "-m",
+            "app.main",
+            "run",
+            "--profile",
+            "copter_sim",
+            "--config",
+            "/home/level6/vehicle-autonomy-framework/artifacts/simulation/autonomy-copter-7523f8ef/profile.toml",
+            "--control-socket",
+            "/home/level6/vehicle-autonomy-framework/artifacts/simulation/autonomy-copter-7523f8ef/app.sock",
+            "--allow-send"
+          ],
+          "pid": 61576,
+          "pgid": 61576,
+          "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/autonomy-copter-7523f8ef/application.log",
+          "exit_code": 0,
+          "start_ticks": "3959177",
+          "stopped": true
+        }
+      ],
+      "source_model": "/home/level6/gz_ws/src/ardupilot_gazebo/models/iris_with_gimbal/model.sdf",
+      "source_world": "/home/level6/gz_ws/src/ardupilot_gazebo/worlds/iris_runway.sdf",
+      "parameters": [
+        "/home/level6/ardupilot/Tools/autotest/default_params/copter.parm",
+        "/home/level6/ardupilot/Tools/autotest/default_params/gazebo-iris.parm",
+        "/home/level6/vehicle-autonomy-framework/simulation/params/copter_telemetry.parm"
+      ],
+      "ended_at": "2026-10-18T16:44:38.439041+00:00",
+      "remaining_process_groups": [],
+      "ports_released": true
+    }
+  },
+  "post_mapping_changes": [
+    "Map input/grid file opens additionally use O_NONBLOCK before the existing regular-file check",
+    "MappingInput also rejects RecursionError for deeply nested malformed JSON; targeted mapping tests and final 190-test regression passed after these changes"
+  ],
+  "known_open_issue": "Axis-aligned closed-room occupancy-boundary cells can disappear, reproduced in ros2-mapping-6f3d5b6a; not fixed by rotating the acceptance room",
+  "artifacts_sha256": {
+    "world.sdf": "653b511f589615c4af6ae92b69df4a30f6076590fe6e3a545f1c5aec8374a471",
+    "model.sdf": "d854c78c9625c51255ea09bff57bd59a48ccdf12469fbf002dcf376a9bafcd95",
+    "profile.toml": "54f84e00befd3fc44f2b72a4278d87c0873fb338ac503dc7e8a56ec9234ab7da",
+    "mapping.toml": "314b3ddcf1e3bfb01ef64752e5ed5609df3c2faf94f9ab8690a17ac99316eda4",
+    "bridge.yaml": "c8beeff13bc65c45e6e1f64f2e016e97f85264a906d1f9ba322d83c2711bfd22",
+    "final-export/map.pgm": "f5be8420e552b30ebae1fd17cae22ae63546bf38ec90031489dbd25bd7843d4c",
+    "final-export/map.yaml": "544fca9ff0715432099ffc9164b4fd83937d8a630d81ac89baaf8d052f3f1ae9",
+    "saved_graph.posegraph": "288328e33c1d9e85ea7f89b562d3554a2125267d30037a83623e98e812c5e283",
+    "saved_graph.data": "6df98203ce8189db29dd11849a60cf139f1d43ec511967f049afd95f06914fa7"
+  },
+  "ros_packages": [
+    {
+      "file": "ros-jazzy-rclpy_7.1.12-1noble.20260912.162354_amd64.deb",
+      "sha256": "26cd2496696325f508c11913297e1e014a9635c77d5894e7ee08ec5119d70dfe"
+    },
+    {
+      "file": "ros-jazzy-ros-gz-bridge_1.0.24-1noble.20260920.234644_amd64.deb",
+      "sha256": "b3b13a1b621b352b799d9d2981c9508cd37e4af4d7ab2ecec2687822f93ae761"
+    },
+    {
+      "file": "ros-jazzy-slam-toolbox_2.8.5-1noble.20260915.204151_amd64.deb",
+      "sha256": "1ec30a6775a4c187f8f0a74cdb161eac49044ed3f2ad1fd14602245855c4f69b"
+    }
+  ]
+}

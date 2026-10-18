@@ -28,7 +28,7 @@ TERMINAL = (RunStatus.SUCCEEDED, RunStatus.FAILED, RunStatus.CANCELLED)
 
 
 class ApplicationRuntime:
-    def __init__(self, profile, *, profile_name: str, allow_send=False, runtime=None, event_sink=None, sensor_config=None, vision_config=None, sim_payload=False):
+    def __init__(self, profile, *, profile_name: str, allow_send=False, runtime=None, event_sink=None, sensor_config=None, vision_config=None, sim_payload=False, mapping_config=None):
         self.profile = profile
         self.profile_name = profile_name
         self.allow_send = allow_send
@@ -78,6 +78,12 @@ class ApplicationRuntime:
         self.sensor_calibration = None
         self.sensor = None
         self.sensor_epoch = None
+        self.mapping = None
+        if mapping_config is not None:
+            from mapping.exchange import MappingConfig, MappingInput
+            if profile.kind != "rover":
+                raise ValueError("ROS 2 mapping is currently audited only for the Rover simulation")
+            self.mapping = MappingInput(MappingConfig.load(mapping_config, profile.clock_domain_id))
         if sensor_config is not None:
             from sensors.simulation.objects import ObjectCalibration
             self.sensor_calibration = ObjectCalibration.load(Path(sensor_config))
@@ -134,6 +140,10 @@ class ApplicationRuntime:
                     quality=observation.quality.value,frame=str(observation.frame_id),object_id=str(observation.data.object_id))
         if self.payload is not None:
             for observation in self.payload_port.poll(self.vehicle.clock()):self.vehicle.ingest_observation(observation)
+        if self.mapping is not None:
+            mapped = self.mapping.poll(self.vehicle.clock(), self.vehicle.world_epoch)
+            self.vehicle.set_map(None if mapped is None else mapped.reference,
+                                 None if mapped is None else mapped.captured_at)
         result = self.vehicle.cycle()
         if self.payload is not None:self.payload.tick(self.vehicle.clock())
         if result.fault:
@@ -216,7 +226,9 @@ class ApplicationRuntime:
         if self.environment is not None and state is not None:
             try:self.environment.validate_origin(state);origin_error=None
             except ValueError as exc:origin_error=str(exc)
+        twist = state.reported_twist if state else None
         return {"profile": self.profile_name, "vehicle_kind": self.profile.kind,
+                "clock_domain_id": str(now.clock_domain_id),
                 "state": self.state, "started_at": self.started_at, "session_id": self.vehicle.session_id,
                 "connected": self.vehicle.connected, "error": self.error,"shutdown_error":self.shutdown_error,
                 "world_version": None if world is None else {"generation": world.version.generation_id,
@@ -227,7 +239,14 @@ class ApplicationRuntime:
                     "armed": state.operation.armed, "mode": state.operation.native_mode,
                     "pose": None if pose is None else {"frame": str(pose.frame_id),
                         "position": [pose.value.position.x, pose.value.position.y, pose.value.position.z],
+                        "orientation_xyzw": [pose.value.orientation.x, pose.value.orientation.y,
+                                             pose.value.orientation.z, pose.value.orientation.w],
+                        "captured_ns": pose.captured_at.monotonic_ns,
                         "age_ns": now.elapsed_ns_since(pose.captured_at)}},
+                "twist": None if twist is None else {"frame": str(twist.frame_id),
+                    "linear": [twist.value.linear.x, twist.value.linear.y, twist.value.linear.z],
+                    "angular": [twist.value.angular.x, twist.value.angular.y, twist.value.angular.z],
+                    "captured_ns": twist.captured_at.monotonic_ns},
                 "environment": None if self.environment is None else {
                     "id": self.environment.resource_id, "generation": self.environment.version.generation_id,
                     "revision": self.environment.version.revision, "frame": str(self.environment.frame),
@@ -249,6 +268,8 @@ class ApplicationRuntime:
                 "sensor": None if self.sensor is None else (dict(self.sensor.health) if self.vision_config is not None else {"kind":"sim_objects","source":self.sensor_calibration.source,
                     "version":self.sensor_calibration.version,"error":self.sensor.projector.error}),
                 "payload":None if self.payload_port is None else self.payload_port.inventory(),
+                "mapping": None if self.mapping is None else {**self.mapping.health,
+                    "adopted": bool(world is not None and world.map is not None)},
                 "system_send": self.vehicle.authority.system_send,
                 "action_send": self.vehicle.authority.action_send, "task": self.task_status()}
 

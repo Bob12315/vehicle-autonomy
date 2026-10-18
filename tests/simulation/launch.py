@@ -64,9 +64,9 @@ class OwnedSimulation:
         self.profile = replace(SimulationProfile.load(ROOT / f"simulation/profiles/{kind}.toml"), port=self.port)
         self.processes = []
         code_hash=hashlib.sha256()
-        for package in ('contracts','core','deployment','runtime','application','applications','actions','app','environments','localization','world_model','sensors','perception','vehicles','protocols','infrastructure','simulation','tests/simulation'):
+        for package in ('contracts','core','deployment','runtime','application','applications','actions','app','environments','localization','world_model','mapping','integrations','sensors','perception','vehicles','protocols','infrastructure','simulation','scripts','tests/simulation'):
             for source in sorted((ROOT/package).rglob('*')):
-                if source.is_file() and source.suffix in ('.py','.toml','.json','.sdf'):
+                if source.is_file() and source.suffix in ('.py','.toml','.json','.sdf','.yaml','.sh'):
                     code_hash.update(str(source.relative_to(ROOT)).encode()+b'\0'+source.read_bytes()+b'\0')
         self.manifest = {"root_source_sha256":code_hash.hexdigest(),
             "working_tree_dirty":bool(output(["git","status","--porcelain"])),"kind": kind, "framework_sha": output(["git", "rev-parse", "HEAD"]),

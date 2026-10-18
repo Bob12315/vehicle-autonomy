@@ -78,3 +78,9 @@ python -m app.main ctl --profile copter_sim start --mission cuadc_demo
 ```
 
 视觉源和 `--sim-sensor-config` 互斥，默认不加载任何对象源或载荷。该 fixture 的 COCO bus→bucket_1 映射只验证传感器替换边界；真实比赛识别、相机空间标定、物理载荷与 RKNN 均未验收，见 [P17](docs/autonomy/phase-17.md)。
+
+## 可选 ROS 2 Mapping
+
+本机 Rover 仿真增加可选 ROS 2 Jazzy / SLAM Toolbox 二维建图组合，复用正式 Application、`basic_route` Mission 和原有安全执行链。实际 Gazebo 激光经单向桥接进入 SLAM，地图作为带时间和版本的只读资源进入 `WorldSnapshot.map`；ROS 不直接控制车辆，普通框架运行无需安装 ROS。
+
+安装、运行、坐标/时间边界和已知地图边界缺陷见 [Mapping 说明](docs/ros2_mapping.md)，验收范围见 [P18](docs/autonomy/phase-18.md)。本阶段不含 Nav2、地图避障、SLAM 控制定位切换或真实设备。

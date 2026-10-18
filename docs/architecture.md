@@ -216,3 +216,25 @@ actual App/SITL/Gazebo acceptance; see the [autonomy audit](autonomy/completion-
 The bus-to-bucket fixture mapping verifies adapter substitution only. Physical
 camera calibration, competition bucket recognition, RKNN, real payloads and
 P16 hardware motion remain unvalidated; hardware work is deferred.
+
+## Optional P18 ROS 2 mapping composition
+
+An explicitly selected Rover simulation can load `--ros2-mapping-config`.
+Gazebo lidar and simulation clock cross a one-way `ros_gz_bridge`; a separate
+`integrations.ros2.mapping_node` reads only the public Application status use
+case to publish telemetry odometry TF and synchronized scans. SLAM Toolbox owns
+`map -> odom`; the sidecar owns `odom -> base_link` and the explicit laser mount.
+No ROS subscriber can issue a vehicle command. Mission, Effect, authorization,
+Safety and the sole MAVLink writer remain the existing execution path.
+
+The sidecar atomically publishes bounded metadata and content-addressed immutable
+grids. The ROS-free `mapping` package validates content, source/frame epochs,
+versions, original timestamp age and clock domain before WorldModel adopts a
+`WorldSnapshot.map` reference and Map dependency. Unavailable maps are removed.
+SLAM poses are diagnostic only; existing Actions continue to use telemetry
+localization in odom, without silently applying loop-closure corrections.
+
+This is an optional local 2D mapping composition, not hardware clock sync,
+Nav2 navigation, active SLAM localization or arbitrary-scene certification.
+The axis-aligned occupancy-boundary defect remains open; see the
+[mapping guide](ros2_mapping.md) and [P18 evidence](autonomy/phase-18.md).

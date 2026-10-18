@@ -135,13 +135,13 @@ class ControlServer:
                 pass
 
 
-def request(path, command, payload=None, *, request_id=None):
+def request(path, command, payload=None, *, request_id=None, timeout_s=2):
     data = json.dumps({"request_id": request_id or uuid4().hex, "command": command,
                        "payload": payload or {}}).encode() + b"\n"
     if len(data) > LIMIT:
         raise ValueError("request too long")
     with socket.socket(socket.AF_UNIX) as client:
-        client.settimeout(2)
+        client.settimeout(timeout_s)
         client.connect(str(path))
         client.sendall(data)
         result = bytearray()
@@ -155,11 +155,11 @@ def request(path, command, payload=None, *, request_id=None):
     return json.loads(result)
 
 
-def run_application(profile, *, profile_name, allow_send, path, sensor_config=None, vision_config=None, sim_payload=False):
+def run_application(profile, *, profile_name, allow_send, path, sensor_config=None, vision_config=None, sim_payload=False, mapping_config=None):
     import signal
     from application.runtime_service import RuntimeService
     from deployment.application_runtime import ApplicationRuntime
-    runtime = ApplicationRuntime(profile, profile_name=profile_name, allow_send=allow_send, sensor_config=sensor_config, vision_config=vision_config, sim_payload=sim_payload,
+    runtime = ApplicationRuntime(profile, profile_name=profile_name, allow_send=allow_send, sensor_config=sensor_config, vision_config=vision_config, sim_payload=sim_payload, mapping_config=mapping_config,
         event_sink=lambda event: print(json.dumps(event, sort_keys=True), flush=True))
     server = ControlServer(path, RuntimeService(runtime))
     previous = {}
