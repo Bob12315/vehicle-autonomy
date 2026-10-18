@@ -22,11 +22,12 @@ ROS_KEY = "C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654"
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--directory", type=Path, default=Path.home()/".local/share/vehicle-autonomy/ros2-jazzy")
+    parser.add_argument("--navigation", action="store_true", help="also extract the read-only Nav2 planner dependencies")
     args = parser.parse_args()
     if subprocess.check_output(["dpkg", "--print-architecture"], text=True).strip() != "amd64" or 'VERSION_ID="24.04"' not in Path("/etc/os-release").read_text():
         parser.error("the audited local extraction requires Ubuntu 24.04 amd64")
     directory = args.directory.resolve()
-    if (directory / "root/opt/ros/jazzy/local_setup.bash").exists():
+    if (directory / "root/opt/ros/jazzy/local_setup.bash").exists() and not args.navigation:
         print(f"Existing local Jazzy tree retained: {directory}/root")
         return 0
     apt = directory / "apt"
@@ -59,14 +60,15 @@ Acquire::https::Timeout "30";
 Acquire::Languages "none";
 ''')
     subprocess.run(["apt-get", "-c", str(config), "update"], check=True)
+    requested = PACKAGES + (["ros-jazzy-nav2-planner", "ros-jazzy-nav2-smac-planner", "ros-jazzy-nav2-msgs"] if args.navigation else [])
     subprocess.run(["apt-get", "-c", str(config), "--download-only", "--assume-yes",
-                    "--no-install-recommends", "install", *PACKAGES], check=True)
+                    "--no-install-recommends", "install", *requested], check=True)
     packages = []
     for archive in sorted((apt / "archives").glob("*.deb")):
         subprocess.run(["dpkg-deb", "--extract", str(archive), str(directory / "root")], check=True)
         packages.append({"file": archive.name, "sha256": hashlib.sha256(archive.read_bytes()).hexdigest()})
     (directory / "manifest.json").write_text(json.dumps({"distribution": "jazzy", "key": ROS_KEY,
-        "requested": PACKAGES, "packages": packages, "system_status": "/var/lib/dpkg/status"}, indent=2))
+        "requested": requested, "packages": packages, "system_status": "/var/lib/dpkg/status"}, indent=2))
     print(f"Local ROS 2 environment prepared: {directory}/root")
     return 0
 

@@ -238,3 +238,28 @@ This is an optional local 2D mapping composition, not hardware clock sync,
 Nav2 navigation, active SLAM localization or arbitrary-scene certification.
 The axis-aligned occupancy-boundary defect remains open; see the
 [mapping guide](ros2_mapping.md) and [P18 evidence](autonomy/phase-18.md).
+
+
+## P19 read-only Nav2 planning
+
+`app.plan` is an explicit independent read-only composition. It accepts a
+content-addressed recorded map, or queries the existing idle Rover App's
+public status and P18 MappingInput. The ROS-free `ReadOnlyPlanningService`
+pins map content, source/frame epochs and source capture time; verifies
+endpoints, full segment/footprint collision and result deadlines; and rechecks
+the map before returning an immutable geometric path with executable=false.
+The recorded-map mode makes no live freshness claim.
+
+The optional Nav2 adapter owns one private namespace/map/TF and process group
+per request. Only native Planner Server with SmacPlanner2D runs. Explicit
+start/goal coordinates are converted to a grid-local frame and back; a private
+planning anchor satisfies costmap TF without pretending to be a vehicle pose.
+Costmap content and geometry are checked against the frozen configuration grid.
+Unknown/ambiguous cells are blocked; conservative clearance and an independent
+source-grid segment check remain outside the planner.
+
+No VehicleRuntime, navigation Mission/Action, Effect, controller server, MPPI,
+or second command writer is created by this composition. Existing vehicle
+Application scheduling and safety authority are unchanged. Paths are planning
+results, not executable trajectories or an avoidance-driving claim. See the
+[planning guide](nav2_planning.md) and [P19 audit](autonomy/phase-19.md).

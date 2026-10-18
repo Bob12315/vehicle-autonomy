@@ -83,4 +83,10 @@ python -m app.main ctl --profile copter_sim start --mission cuadc_demo
 
 本机 Rover 仿真增加可选 ROS 2 Jazzy / SLAM Toolbox 二维建图组合，复用正式 Application、`basic_route` Mission 和原有安全执行链。实际 Gazebo 激光经单向桥接进入 SLAM，地图作为带时间和版本的只读资源进入 `WorldSnapshot.map`；ROS 不直接控制车辆，普通框架运行无需安装 ROS。
 
-安装、运行、坐标/时间边界和已知地图边界缺陷见 [Mapping 说明](docs/ros2_mapping.md)，验收范围见 [P18](docs/autonomy/phase-18.md)。本阶段不含 Nav2、地图避障、SLAM 控制定位切换或真实设备。
+安装、运行、坐标/时间边界和已知地图边界缺陷见 [Mapping 说明](docs/ros2_mapping.md)，验收范围见 [P18](docs/autonomy/phase-18.md)。P18 不含 Nav2、地图避障、SLAM 控制定位切换或真实设备；新增只读规划见下节。
+
+## 可选 Nav2 只读路径规划
+
+新增 `python -m app.plan`，从记录地图或当前只读 Rover App 的 P18 地图计算几何路径。使用 ROS 2 Jazzy / Nav2 SmacPlanner2D，返回前核对地图内容、版本来源、Frame epoch、时间和整段车体碰撞。输出明确为 `executable=false`，尚未接入 Mission 路径跟踪或地图避障行驶。
+
+安装与可直接运行的记录图示例见 [Nav2 规划说明](docs/nav2_planning.md)；206 项单元测试、真实 Nav2 拒绝/绕墙/超时及在线只读链证据见 [P19 第一步验收](docs/autonomy/phase-19.md)。

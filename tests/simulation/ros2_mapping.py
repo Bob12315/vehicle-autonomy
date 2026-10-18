@@ -73,7 +73,7 @@ def map_metrics(grid, transform):
             "wall_matches": walls}
 
 
-def run(directory, *, smoke=False):
+def run(directory, *, smoke=False, planning_probe=None):
     directory.mkdir(parents=True, exist_ok=False)
     os.environ["ROS_DOMAIN_ID"] = str(100 + (os.getpid() % 100))
     owned = OwnedSimulation(directory, "rover")
@@ -171,6 +171,8 @@ def run(directory, *, smoke=False):
             raise RuntimeError(f"independent scene geometry not represented: {report['initial_map']}")
         store.export_pgm(digest, directory / "export")
         report["export_roundtrip"] = store.load(digest) == grid
+        if planning_probe is not None:
+            report["readonly_planning"] = planning_probe(endpoint, config, directory)
         if not smoke:
             ready = wait_for(lambda s: s["state"] == "READY" and s["environment"]["origin_verified"]
                 and s["motion_warmup_remaining_ns"] == 0 and s["mapping"]["adopted"], 60, "motion preflight")

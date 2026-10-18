@@ -1,0 +1,2538 @@
+{
+  "date": "2026-10-19",
+  "scope": "Read-only geometric path planning; no Mission/Action execution or vehicle commands",
+  "baseline_commit": "8277090",
+  "unit": {
+    "command": "python -m unittest discover -s tests -q",
+    "tests": 206,
+    "new_planning_tests": 16,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "elapsed_s": 11.977
+  },
+  "offline": {
+    "directory": "artifacts/simulation/nav2-readonly-4cacaef5",
+    "summary": {
+      "passed": true,
+      "cases": {
+        "wall_detour": {
+          "passed": true,
+          "length_m": 8.876955394446986,
+          "points": 79,
+          "samples": 598,
+          "verified_clearance_m": 0.55,
+          "backend_directory": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/nav2-readonly-4cacaef5/wall_detour/backend/fdd95e51546942b9b6cc4b129cd9a565",
+          "nav2_version": "1.3.13"
+        },
+        "sealed_wall": {
+          "passed": true,
+          "expected_rejection": "NO_PATH",
+          "message": "PlanningError: Nav2 planning failed: status=6, error_code=208, ",
+          "backend_directory": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/nav2-readonly-4cacaef5/sealed_wall/backend/2288de62c468419183239948bad8f2ec",
+          "nav2_version": "1.3.13"
+        },
+        "unknown_barrier": {
+          "passed": true,
+          "expected_rejection": "NO_PATH",
+          "message": "PlanningError: Nav2 planning failed: status=6, error_code=208, ",
+          "backend_directory": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/nav2-readonly-4cacaef5/unknown_barrier/backend/e21c80ec3521471e8699147d3fe69bc5",
+          "nav2_version": "1.3.13"
+        },
+        "narrow_gate": {
+          "passed": true,
+          "expected_rejection": "NO_PATH",
+          "message": "PlanningError: Nav2 planning failed: status=6, error_code=208, ",
+          "backend_directory": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/nav2-readonly-4cacaef5/narrow_gate/backend/07ec7df1721843c2847813e7304a30c5",
+          "nav2_version": "1.3.13"
+        },
+        "rotated_origin": {
+          "passed": true,
+          "length_m": 8.876955394446986,
+          "points": 79,
+          "samples": 598,
+          "verified_clearance_m": 0.55,
+          "backend_directory": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/nav2-readonly-4cacaef5/rotated_origin/backend/6ba6524eabf142b6a0df8b3eab0ae91e",
+          "nav2_version": "1.3.13"
+        },
+        "recorded_p18": {
+          "passed": true,
+          "length_m": 4.287005832390244,
+          "points": 71,
+          "samples": 534,
+          "verified_clearance_m": 0.55,
+          "backend_directory": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/nav2-readonly-4cacaef5/recorded_p18/backend/4c1e0de7fe2244a3bd61e4a682a04341",
+          "nav2_version": "1.3.13"
+        },
+        "recorded_invalid_goal": {
+          "passed": true,
+          "expected_rejection": "INVALID_GOAL",
+          "message": "path footprint intersects occupied, uncertain or unknown cells"
+        },
+        "recorded_conservative_goal": {
+          "passed": true,
+          "expected_rejection": "NO_PATH",
+          "message": "PlanningError: Nav2 planning failed: status=6, error_code=206, ",
+          "backend_directory": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/nav2-readonly-4cacaef5/recorded_conservative_goal/backend/3af922b764fe4b95bbfa9ea1cdc82077",
+          "nav2_version": "1.3.13"
+        },
+        "public_cli_oracle": {
+          "samples": 534,
+          "verified_clearance_m": 0.55
+        }
+      },
+      "public_cli": true,
+      "deadline_rejection": "TIMEOUT"
+    }
+  },
+  "live": {
+    "directory": "artifacts/simulation/nav2-live-4cef8a97",
+    "summary": {
+      "passed": true,
+      "smoke_only": true,
+      "room_yaw_rad": 0.15,
+      "steps": {},
+      "initial_map": {
+        "width": 178,
+        "height": 177,
+        "resolution_m": 0.05000000074505806,
+        "known": 14693,
+        "occupied": 602,
+        "wall_matches": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      "export_roundtrip": true,
+      "readonly_planning": {
+        "passed": true,
+        "points": 21,
+        "length_m": 1.0000000149011612,
+        "source_kind": "live_map",
+        "source_map_sha256": "70b57053d8762005e5143fdc148c044ddc10505b3dd7796c931e815be475ca25",
+        "executable": false,
+        "system_send": false,
+        "action_send": false,
+        "vehicle_armed": false,
+        "task": null,
+        "backend_directory": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/nav2-live-4cef8a97/planning/23583740cbc94c9bbecbf148eebdd6f0",
+        "samples": 120,
+        "verified_clearance_m": 0.55
+      }
+    },
+    "manifest": {
+      "root_source_sha256": "475e5b83e6baa7583ac8d7c31d371457ccedf860537db858a75f9b5f5e5e1f0d",
+      "working_tree_dirty": true,
+      "kind": "rover",
+      "framework_sha": "8277090c651be8c9d9d5434d1d047812107aa471",
+      "ardupilot_sha": "b5fbe26515eddb9277e1b5e7a4fcf3f37cf449a6",
+      "plugin_sha": "3ec51428fd43deb7b71137192ba16394b450d78e",
+      "gazebo_version": "Gazebo Sim, version 8.15.0\nCopyright (C) 2018 Open Source Robotics Foundation.\nReleased under the Apache 2.0 License.",
+      "world": "rover_e58d53a94b16",
+      "model": "target_rover",
+      "instance": 1,
+      "ports": {
+        "tcp": 5770,
+        "json_udp": 9012
+      },
+      "gazebo_transport": {
+        "ip": "127.0.0.1",
+        "partition": "vaf_rover_e58d53a94b16"
+      },
+      "started_at": "2026-10-18T23:29:10.755508+00:00",
+      "processes": [
+        {
+          "name": "gazebo",
+          "command": [
+            "gz",
+            "sim",
+            "-s",
+            "-r",
+            "-v3",
+            "/home/level6/vehicle-autonomy-framework/artifacts/simulation/nav2-live-4cef8a97/world.sdf"
+          ],
+          "pid": 96742,
+          "pgid": 96742,
+          "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/nav2-live-4cef8a97/gazebo.log",
+          "exit_code": 0,
+          "start_ticks": "6396437",
+          "stopped": true
+        },
+        {
+          "name": "sitl",
+          "command": [
+            "/home/level6/vehicle-autonomy-framework/artifacts/simulation/suite-e8ba09fa/build/ardupilot/sitl/bin/ardurover",
+            "--model",
+            "JSON",
+            "--speedup",
+            "1",
+            "--defaults",
+            "/home/level6/ardupilot/Tools/autotest/default_params/rover.parm,/home/level6/ardupilot/Tools/autotest/default_params/rover-skid.parm,/home/level6/vehicle-autonomy-framework/simulation/params/rover_telemetry.parm",
+            "--sim-address=127.0.0.1",
+            "--home=-35.363262,149.165237,584,90",
+            "-I1"
+          ],
+          "pid": 96743,
+          "pgid": 96743,
+          "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/nav2-live-4cef8a97/sitl.log",
+          "exit_code": 0,
+          "start_ticks": "6396438",
+          "stopped": true
+        },
+        {
+          "name": "application",
+          "command": [
+            "/home/level6/venv-ardupilot/bin/python",
+            "-m",
+            "app.main",
+            "run",
+            "--profile",
+            "rover_sim",
+            "--config",
+            "/home/level6/vehicle-autonomy-framework/artifacts/simulation/nav2-live-4cef8a97/profile.toml",
+            "--control-socket",
+            "/home/level6/vehicle-autonomy-framework/artifacts/simulation/nav2-live-4cef8a97/app.sock",
+            "--ros2-mapping-config",
+            "/home/level6/vehicle-autonomy-framework/artifacts/simulation/nav2-live-4cef8a97/mapping.toml"
+          ],
+          "pid": 96750,
+          "pgid": 96750,
+          "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/nav2-live-4cef8a97/application.log",
+          "exit_code": 0,
+          "start_ticks": "6396438",
+          "stopped": true
+        },
+        {
+          "name": "gz_bridge",
+          "command": [
+            "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+            "/home/level6/venv-ardupilot/bin/python",
+            "-m",
+            "integrations.ros2.run",
+            "ros_gz_bridge",
+            "parameter_bridge",
+            "--ros-args",
+            "-p",
+            "config_file:=/home/level6/vehicle-autonomy-framework/artifacts/simulation/nav2-live-4cef8a97/bridge.yaml"
+          ],
+          "pid": 96751,
+          "pgid": 96751,
+          "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/nav2-live-4cef8a97/gz_bridge.log",
+          "exit_code": 0,
+          "start_ticks": "6396439",
+          "stopped": true
+        },
+        {
+          "name": "mapping_sidecar",
+          "command": [
+            "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+            "/home/level6/venv-ardupilot/bin/python",
+            "-m",
+            "integrations.ros2.mapping_node",
+            "--config",
+            "/home/level6/vehicle-autonomy-framework/artifacts/simulation/nav2-live-4cef8a97/mapping.toml",
+            "--control-socket",
+            "/home/level6/vehicle-autonomy-framework/artifacts/simulation/nav2-live-4cef8a97/app.sock"
+          ],
+          "pid": 96752,
+          "pgid": 96752,
+          "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/nav2-live-4cef8a97/mapping_sidecar.log",
+          "exit_code": 0,
+          "start_ticks": "6396439",
+          "stopped": true
+        },
+        {
+          "name": "slam",
+          "command": [
+            "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+            "/home/level6/venv-ardupilot/bin/python",
+            "-m",
+            "integrations.ros2.run",
+            "slam_toolbox",
+            "async_slam_toolbox_node",
+            "--ros-args",
+            "--params-file",
+            "/home/level6/vehicle-autonomy-framework/simulation/mapping/slam_toolbox.yaml"
+          ],
+          "pid": 96755,
+          "pgid": 96755,
+          "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/nav2-live-4cef8a97/slam.log",
+          "exit_code": 0,
+          "start_ticks": "6396440",
+          "stopped": true
+        },
+        {
+          "name": "slam_configure",
+          "command": [
+            "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+            "ros2",
+            "lifecycle",
+            "set",
+            "--no-daemon",
+            "/slam_toolbox",
+            "configure"
+          ],
+          "pid": 96758,
+          "pgid": 96758,
+          "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/nav2-live-4cef8a97/slam_configure.log",
+          "exit_code": 0,
+          "start_ticks": "6396440",
+          "stopped": true
+        },
+        {
+          "name": "slam_activate",
+          "command": [
+            "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+            "ros2",
+            "lifecycle",
+            "set",
+            "--no-daemon",
+            "/slam_toolbox",
+            "activate"
+          ],
+          "pid": 96979,
+          "pgid": 96979,
+          "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/nav2-live-4cef8a97/slam_activate.log",
+          "exit_code": 0,
+          "start_ticks": "6396598",
+          "stopped": true
+        }
+      ],
+      "source_model": "/home/level6/vehicle-autonomy-framework/simulation/models/target_rover/model.sdf",
+      "source_world": "/home/level6/vehicle-autonomy-framework/simulation/worlds/rover_runway.sdf",
+      "parameters": [
+        "/home/level6/ardupilot/Tools/autotest/default_params/rover.parm",
+        "/home/level6/ardupilot/Tools/autotest/default_params/rover-skid.parm",
+        "/home/level6/vehicle-autonomy-framework/simulation/params/rover_telemetry.parm"
+      ],
+      "ros_domain_id": "115",
+      "renderer": "GLX server-only",
+      "ended_at": "2026-10-18T23:29:21.513750+00:00",
+      "remaining_process_groups": [],
+      "ports_released": true
+    }
+  },
+  "backends": [
+    {
+      "directory": "artifacts/simulation/nav2-readonly-4cacaef5/cli-backend/f5236ab148b34de9ace2abd1f3ae6375",
+      "manifest": {
+        "command": [
+          "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+          "/home/level6/venv-ardupilot/bin/python",
+          "-m",
+          "integrations.ros2.nav2_worker",
+          "/home/level6/vehicle-autonomy-framework/artifacts/simulation/nav2-readonly-4cacaef5/cli-backend/f5236ab148b34de9ace2abd1f3ae6375"
+        ],
+        "pid": 97361,
+        "pgid": 97361,
+        "returncode": 0,
+        "process_group_released": true,
+        "timed_out": false,
+        "ros_domain_id": "193",
+        "started_ns": 63642501047414,
+        "ended_ns": 63643466425403,
+        "source_map_sha256": "e0e7a625e27ed2ac86b9621543cd9fd934af395b04431efd884e63f71af34081",
+        "configuration_grid_sha256": "9a9146411b12d95f9a1c057493bcefe8372a20741291441f38493f9ef39d00f8",
+        "source_files_sha256": {
+          "planning/models.py": "ea3bbb65476fd5dcf109ea9354f5e75fda0484e2c8683e98c119acabc27e5f07",
+          "planning/collision.py": "c89c43c4dc00cd4ad40dcc0923f0ec0e8f09be29b5efede406a1083bc5b76ccf",
+          "application/planning.py": "2a3a8d4501358b2b2a80322dbbb8432e50dc4c740c9d44f65075a271db22d77c",
+          "app/plan.py": "63c249e2606e46f32a803da2a71bcf44d8e419c99ead2a17487abf59a8c6d762",
+          "integrations/ros2/nav2_planner.py": "20937ef94ad3539631a0e9934610da26f73506dbe5a2db5163716921c7b3705e",
+          "integrations/ros2/nav2_worker.py": "fb877c26cc5290e57a60d3a7af1d02fa4977ebb4870697f7eab7011b1dc1eb78",
+          "scripts/with_ros2.sh": "ec2fb05881250b1068e425e4ea55e40677fbf1f909ed43d246e8d6bf89353219"
+        }
+      },
+      "response": {
+        "ok": true,
+        "request_id": "f5236ab148b34de9ace2abd1f3ae6375",
+        "map_sha256": "e0e7a625e27ed2ac86b9621543cd9fd934af395b04431efd884e63f71af34081",
+        "frame_epoch": "recording:e0e7a625e27ed2ac86b9621543cd9fd934af395b04431efd884e63f71af34081",
+        "costmap_verified": true,
+        "nav2_version": "1.3.13",
+        "poses": [
+          [
+            4.450000066310167,
+            4.450000066310167,
+            0.0
+          ],
+          [
+            4.500000067055225,
+            4.500000067055225,
+            0.0
+          ],
+          [
+            4.550000067800283,
+            4.550000067800283,
+            0.0
+          ],
+          [
+            4.6000000685453415,
+            4.6000000685453415,
+            0.0
+          ],
+          [
+            4.6500000692903996,
+            4.6500000692903996,
+            0.0
+          ],
+          [
+            4.700000070035458,
+            4.700000070035458,
+            0.0
+          ],
+          [
+            4.750000070780516,
+            4.750000070780516,
+            0.0
+          ],
+          [
+            4.800000071525574,
+            4.800000071525574,
+            0.0
+          ],
+          [
+            4.850000072270632,
+            4.850000072270632,
+            0.0
+          ],
+          [
+            4.90000007301569,
+            4.90000007301569,
+            0.0
+          ],
+          [
+            4.950000073760748,
+            4.950000073760748,
+            0.0
+          ],
+          [
+            5.000000074505806,
+            5.000000074505806,
+            0.0
+          ],
+          [
+            5.050000075250864,
+            5.050000075250864,
+            0.0
+          ],
+          [
+            5.100000075995922,
+            5.100000075995922,
+            0.0
+          ],
+          [
+            5.15000007674098,
+            5.15000007674098,
+            0.0
+          ],
+          [
+            5.200000077486038,
+            5.200000077486038,
+            0.0
+          ],
+          [
+            5.250000078231096,
+            5.250000078231096,
+            0.0
+          ],
+          [
+            5.300000078976154,
+            5.300000078976154,
+            0.0
+          ],
+          [
+            5.350000079721212,
+            5.350000079721212,
+            0.0
+          ],
+          [
+            5.4000000804662704,
+            5.4000000804662704,
+            0.0
+          ],
+          [
+            5.4500000812113285,
+            5.4500000812113285,
+            0.0
+          ],
+          [
+            5.500000081956387,
+            5.500000081956387,
+            0.0
+          ],
+          [
+            5.550000082701445,
+            5.550000082701445,
+            0.0
+          ],
+          [
+            5.600000083446503,
+            5.600000083446503,
+            0.0
+          ],
+          [
+            5.600000083446503,
+            5.650000084191561,
+            0.0
+          ],
+          [
+            5.600000083446503,
+            5.700000084936619,
+            0.0
+          ],
+          [
+            5.600000083446503,
+            5.750000085681677,
+            0.0
+          ],
+          [
+            5.600000083446503,
+            5.800000086426735,
+            0.0
+          ],
+          [
+            5.600000083446503,
+            5.850000087171793,
+            0.0
+          ],
+          [
+            5.600000083446503,
+            5.900000087916851,
+            0.0
+          ],
+          [
+            5.600000083446503,
+            5.950000088661909,
+            0.0
+          ],
+          [
+            5.600000083446503,
+            6.000000089406967,
+            0.0
+          ],
+          [
+            5.600000083446503,
+            6.050000090152025,
+            0.0
+          ],
+          [
+            5.600000083446503,
+            6.100000090897083,
+            0.0
+          ],
+          [
+            5.600000083446503,
+            6.150000091642141,
+            0.0
+          ],
+          [
+            5.600000083446503,
+            6.200000092387199,
+            0.0
+          ],
+          [
+            5.600000083446503,
+            6.2500000931322575,
+            0.0
+          ],
+          [
+            5.600000083446503,
+            6.3000000938773155,
+            0.0
+          ],
+          [
+            5.600000083446503,
+            6.350000094622374,
+            0.0
+          ],
+          [
+            5.650000084191561,
+            6.400000095367432,
+            0.0
+          ],
+          [
+            5.650000084191561,
+            6.45000009611249,
+            0.0
+          ],
+          [
+            5.700000084936619,
+            6.500000096857548,
+            0.0
+          ],
+          [
+            5.700000084936619,
+            6.550000097602606,
+            0.0
+          ],
+          [
+            5.750000085681677,
+            6.600000098347664,
+            0.0
+          ],
+          [
+            5.750000085681677,
+            6.650000099092722,
+            0.0
+          ],
+          [
+            5.800000086426735,
+            6.70000009983778,
+            0.0
+          ],
+          [
+            5.800000086426735,
+            6.750000100582838,
+            0.0
+          ],
+          [
+            5.800000086426735,
+            6.800000101327896,
+            0.0
+          ],
+          [
+            5.850000087171793,
+            6.850000102072954,
+            0.0
+          ],
+          [
+            5.850000087171793,
+            6.900000102818012,
+            0.0
+          ],
+          [
+            5.900000087916851,
+            6.95000010356307,
+            0.0
+          ],
+          [
+            5.900000087916851,
+            7.000000104308128,
+            0.0
+          ],
+          [
+            5.950000088661909,
+            7.050000105053186,
+            0.0
+          ],
+          [
+            5.950000088661909,
+            7.1000001057982445,
+            0.0
+          ],
+          [
+            6.000000089406967,
+            7.1500001065433025,
+            0.0
+          ],
+          [
+            6.000000089406967,
+            7.200000107288361,
+            0.0
+          ],
+          [
+            6.050000090152025,
+            7.250000108033419,
+            0.0
+          ],
+          [
+            6.050000090152025,
+            7.300000108778477,
+            0.0
+          ],
+          [
+            6.050000090152025,
+            7.350000109523535,
+            0.0
+          ],
+          [
+            6.050000090152025,
+            7.400000110268593,
+            0.0
+          ],
+          [
+            6.050000090152025,
+            7.450000111013651,
+            0.0
+          ],
+          [
+            6.050000090152025,
+            7.500000111758709,
+            0.0
+          ],
+          [
+            6.050000090152025,
+            7.550000112503767,
+            0.0
+          ],
+          [
+            6.050000090152025,
+            7.600000113248825,
+            0.0
+          ],
+          [
+            6.100000090897083,
+            7.650000113993883,
+            0.0
+          ],
+          [
+            6.150000091642141,
+            7.700000114738941,
+            0.0
+          ],
+          [
+            6.200000092387199,
+            7.750000115483999,
+            0.0
+          ],
+          [
+            6.2500000931322575,
+            7.800000116229057,
+            0.0
+          ],
+          [
+            6.3000000938773155,
+            7.850000116974115,
+            0.0
+          ],
+          [
+            6.3000000938773155,
+            7.900000117719173,
+            0.0
+          ],
+          [
+            6.350000094622374,
+            7.9500001184642315,
+            0.0
+          ]
+        ],
+        "topics": [
+          "/vaf_plan_f5236ab148b34de9ace2abd1f3ae6375/compute_path_through_poses/_action/feedback",
+          "/vaf_plan_f5236ab148b34de9ace2abd1f3ae6375/compute_path_through_poses/_action/status",
+          "/vaf_plan_f5236ab148b34de9ace2abd1f3ae6375/compute_path_to_pose/_action/feedback",
+          "/vaf_plan_f5236ab148b34de9ace2abd1f3ae6375/compute_path_to_pose/_action/status",
+          "/vaf_plan_f5236ab148b34de9ace2abd1f3ae6375/global_costmap/costmap",
+          "/vaf_plan_f5236ab148b34de9ace2abd1f3ae6375/global_costmap/costmap_raw",
+          "/vaf_plan_f5236ab148b34de9ace2abd1f3ae6375/global_costmap/costmap_raw_updates",
+          "/vaf_plan_f5236ab148b34de9ace2abd1f3ae6375/global_costmap/costmap_updates",
+          "/vaf_plan_f5236ab148b34de9ace2abd1f3ae6375/global_costmap/footprint",
+          "/vaf_plan_f5236ab148b34de9ace2abd1f3ae6375/global_costmap/global_costmap/transition_event",
+          "/vaf_plan_f5236ab148b34de9ace2abd1f3ae6375/global_costmap/published_footprint",
+          "/vaf_plan_f5236ab148b34de9ace2abd1f3ae6375/global_costmap/static_layer",
+          "/vaf_plan_f5236ab148b34de9ace2abd1f3ae6375/global_costmap/static_layer_raw",
+          "/vaf_plan_f5236ab148b34de9ace2abd1f3ae6375/global_costmap/static_layer_raw_updates",
+          "/vaf_plan_f5236ab148b34de9ace2abd1f3ae6375/global_costmap/static_layer_updates",
+          "/vaf_plan_f5236ab148b34de9ace2abd1f3ae6375/map",
+          "/vaf_plan_f5236ab148b34de9ace2abd1f3ae6375/plan",
+          "/vaf_plan_f5236ab148b34de9ace2abd1f3ae6375/planner_server/transition_event",
+          "/vaf_plan_f5236ab148b34de9ace2abd1f3ae6375/tf",
+          "/vaf_plan_f5236ab148b34de9ace2abd1f3ae6375/tf_static",
+          "/vaf_plan_f5236ab148b34de9ace2abd1f3ae6375/unsmoothed_plan"
+        ],
+        "planner": "nav2_smac_planner::SmacPlanner2D",
+        "planner_returncode": 0
+      },
+      "native_process": {
+        "pid": 97394,
+        "pgid": 97361
+      }
+    },
+    {
+      "directory": "artifacts/simulation/nav2-readonly-4cacaef5/narrow_gate/backend/07ec7df1721843c2847813e7304a30c5",
+      "manifest": {
+        "command": [
+          "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+          "/home/level6/venv-ardupilot/bin/python",
+          "-m",
+          "integrations.ros2.nav2_worker",
+          "/home/level6/vehicle-autonomy-framework/artifacts/simulation/nav2-readonly-4cacaef5/narrow_gate/backend/07ec7df1721843c2847813e7304a30c5"
+        ],
+        "pid": 97070,
+        "pgid": 97070,
+        "returncode": 1,
+        "process_group_released": true,
+        "timed_out": false,
+        "ros_domain_id": "149",
+        "started_ns": 63638305324510,
+        "ended_ns": 63639321371760,
+        "source_map_sha256": "8ae31a30a236e3ec4d51247b5263e58655f214f9ea41976e6bf4850a48965999",
+        "configuration_grid_sha256": "b454bc42bfd6ea58abdeff72e7e8815450c33fcef86165c4c803b24c286dc554",
+        "source_files_sha256": {
+          "planning/models.py": "ea3bbb65476fd5dcf109ea9354f5e75fda0484e2c8683e98c119acabc27e5f07",
+          "planning/collision.py": "c89c43c4dc00cd4ad40dcc0923f0ec0e8f09be29b5efede406a1083bc5b76ccf",
+          "application/planning.py": "2a3a8d4501358b2b2a80322dbbb8432e50dc4c740c9d44f65075a271db22d77c",
+          "app/plan.py": "63c249e2606e46f32a803da2a71bcf44d8e419c99ead2a17487abf59a8c6d762",
+          "integrations/ros2/nav2_planner.py": "20937ef94ad3539631a0e9934610da26f73506dbe5a2db5163716921c7b3705e",
+          "integrations/ros2/nav2_worker.py": "fb877c26cc5290e57a60d3a7af1d02fa4977ebb4870697f7eab7011b1dc1eb78",
+          "scripts/with_ros2.sh": "ec2fb05881250b1068e425e4ea55e40677fbf1f909ed43d246e8d6bf89353219"
+        }
+      },
+      "response": {
+        "ok": false,
+        "request_id": "07ec7df1721843c2847813e7304a30c5",
+        "map_sha256": "8ae31a30a236e3ec4d51247b5263e58655f214f9ea41976e6bf4850a48965999",
+        "frame_epoch": "recording:8ae31a30a236e3ec4d51247b5263e58655f214f9ea41976e6bf4850a48965999",
+        "costmap_verified": true,
+        "nav2_version": "1.3.13",
+        "code": "NO_PATH",
+        "error": "PlanningError: Nav2 planning failed: status=6, error_code=208, ",
+        "planner_returncode": 0
+      },
+      "native_process": {
+        "pid": 97105,
+        "pgid": 97070
+      }
+    },
+    {
+      "directory": "artifacts/simulation/nav2-readonly-4cacaef5/recorded_conservative_goal/backend/3af922b764fe4b95bbfa9ea1cdc82077",
+      "manifest": {
+        "command": [
+          "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+          "/home/level6/venv-ardupilot/bin/python",
+          "-m",
+          "integrations.ros2.nav2_worker",
+          "/home/level6/vehicle-autonomy-framework/artifacts/simulation/nav2-readonly-4cacaef5/recorded_conservative_goal/backend/3af922b764fe4b95bbfa9ea1cdc82077"
+        ],
+        "pid": 97306,
+        "pgid": 97306,
+        "returncode": 1,
+        "process_group_released": true,
+        "timed_out": false,
+        "ros_domain_id": "179",
+        "started_ns": 63641446075909,
+        "ended_ns": 63642411364935,
+        "source_map_sha256": "e0e7a625e27ed2ac86b9621543cd9fd934af395b04431efd884e63f71af34081",
+        "configuration_grid_sha256": "9a9146411b12d95f9a1c057493bcefe8372a20741291441f38493f9ef39d00f8",
+        "source_files_sha256": {
+          "planning/models.py": "ea3bbb65476fd5dcf109ea9354f5e75fda0484e2c8683e98c119acabc27e5f07",
+          "planning/collision.py": "c89c43c4dc00cd4ad40dcc0923f0ec0e8f09be29b5efede406a1083bc5b76ccf",
+          "application/planning.py": "2a3a8d4501358b2b2a80322dbbb8432e50dc4c740c9d44f65075a271db22d77c",
+          "app/plan.py": "63c249e2606e46f32a803da2a71bcf44d8e419c99ead2a17487abf59a8c6d762",
+          "integrations/ros2/nav2_planner.py": "20937ef94ad3539631a0e9934610da26f73506dbe5a2db5163716921c7b3705e",
+          "integrations/ros2/nav2_worker.py": "fb877c26cc5290e57a60d3a7af1d02fa4977ebb4870697f7eab7011b1dc1eb78",
+          "scripts/with_ros2.sh": "ec2fb05881250b1068e425e4ea55e40677fbf1f909ed43d246e8d6bf89353219"
+        }
+      },
+      "response": {
+        "ok": false,
+        "request_id": "3af922b764fe4b95bbfa9ea1cdc82077",
+        "map_sha256": "e0e7a625e27ed2ac86b9621543cd9fd934af395b04431efd884e63f71af34081",
+        "frame_epoch": "recording:e0e7a625e27ed2ac86b9621543cd9fd934af395b04431efd884e63f71af34081",
+        "costmap_verified": true,
+        "nav2_version": "1.3.13",
+        "code": "NO_PATH",
+        "error": "PlanningError: Nav2 planning failed: status=6, error_code=206, ",
+        "planner_returncode": 0
+      },
+      "native_process": {
+        "pid": 97338,
+        "pgid": 97306
+      }
+    },
+    {
+      "directory": "artifacts/simulation/nav2-readonly-4cacaef5/recorded_p18/backend/4c1e0de7fe2244a3bd61e4a682a04341",
+      "manifest": {
+        "command": [
+          "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+          "/home/level6/venv-ardupilot/bin/python",
+          "-m",
+          "integrations.ros2.nav2_worker",
+          "/home/level6/vehicle-autonomy-framework/artifacts/simulation/nav2-readonly-4cacaef5/recorded_p18/backend/4c1e0de7fe2244a3bd61e4a682a04341"
+        ],
+        "pid": 97237,
+        "pgid": 97237,
+        "returncode": 0,
+        "process_group_released": true,
+        "timed_out": false,
+        "ros_domain_id": "155",
+        "started_ns": 63640326822820,
+        "ended_ns": 63641392630522,
+        "source_map_sha256": "e0e7a625e27ed2ac86b9621543cd9fd934af395b04431efd884e63f71af34081",
+        "configuration_grid_sha256": "9a9146411b12d95f9a1c057493bcefe8372a20741291441f38493f9ef39d00f8",
+        "source_files_sha256": {
+          "planning/models.py": "ea3bbb65476fd5dcf109ea9354f5e75fda0484e2c8683e98c119acabc27e5f07",
+          "planning/collision.py": "c89c43c4dc00cd4ad40dcc0923f0ec0e8f09be29b5efede406a1083bc5b76ccf",
+          "application/planning.py": "2a3a8d4501358b2b2a80322dbbb8432e50dc4c740c9d44f65075a271db22d77c",
+          "app/plan.py": "63c249e2606e46f32a803da2a71bcf44d8e419c99ead2a17487abf59a8c6d762",
+          "integrations/ros2/nav2_planner.py": "20937ef94ad3539631a0e9934610da26f73506dbe5a2db5163716921c7b3705e",
+          "integrations/ros2/nav2_worker.py": "fb877c26cc5290e57a60d3a7af1d02fa4977ebb4870697f7eab7011b1dc1eb78",
+          "scripts/with_ros2.sh": "ec2fb05881250b1068e425e4ea55e40677fbf1f909ed43d246e8d6bf89353219"
+        }
+      },
+      "response": {
+        "ok": true,
+        "request_id": "4c1e0de7fe2244a3bd61e4a682a04341",
+        "map_sha256": "e0e7a625e27ed2ac86b9621543cd9fd934af395b04431efd884e63f71af34081",
+        "frame_epoch": "recording:e0e7a625e27ed2ac86b9621543cd9fd934af395b04431efd884e63f71af34081",
+        "costmap_verified": true,
+        "nav2_version": "1.3.13",
+        "poses": [
+          [
+            4.450000066310167,
+            4.450000066310167,
+            0.0
+          ],
+          [
+            4.500000067055225,
+            4.500000067055225,
+            0.0
+          ],
+          [
+            4.550000067800283,
+            4.550000067800283,
+            0.0
+          ],
+          [
+            4.6000000685453415,
+            4.6000000685453415,
+            0.0
+          ],
+          [
+            4.6500000692903996,
+            4.6500000692903996,
+            0.0
+          ],
+          [
+            4.700000070035458,
+            4.700000070035458,
+            0.0
+          ],
+          [
+            4.750000070780516,
+            4.750000070780516,
+            0.0
+          ],
+          [
+            4.800000071525574,
+            4.800000071525574,
+            0.0
+          ],
+          [
+            4.850000072270632,
+            4.850000072270632,
+            0.0
+          ],
+          [
+            4.90000007301569,
+            4.90000007301569,
+            0.0
+          ],
+          [
+            4.950000073760748,
+            4.950000073760748,
+            0.0
+          ],
+          [
+            5.000000074505806,
+            5.000000074505806,
+            0.0
+          ],
+          [
+            5.050000075250864,
+            5.050000075250864,
+            0.0
+          ],
+          [
+            5.100000075995922,
+            5.100000075995922,
+            0.0
+          ],
+          [
+            5.15000007674098,
+            5.15000007674098,
+            0.0
+          ],
+          [
+            5.200000077486038,
+            5.200000077486038,
+            0.0
+          ],
+          [
+            5.250000078231096,
+            5.250000078231096,
+            0.0
+          ],
+          [
+            5.300000078976154,
+            5.300000078976154,
+            0.0
+          ],
+          [
+            5.350000079721212,
+            5.350000079721212,
+            0.0
+          ],
+          [
+            5.4000000804662704,
+            5.4000000804662704,
+            0.0
+          ],
+          [
+            5.4500000812113285,
+            5.4500000812113285,
+            0.0
+          ],
+          [
+            5.500000081956387,
+            5.500000081956387,
+            0.0
+          ],
+          [
+            5.550000082701445,
+            5.550000082701445,
+            0.0
+          ],
+          [
+            5.600000083446503,
+            5.600000083446503,
+            0.0
+          ],
+          [
+            5.600000083446503,
+            5.650000084191561,
+            0.0
+          ],
+          [
+            5.600000083446503,
+            5.700000084936619,
+            0.0
+          ],
+          [
+            5.600000083446503,
+            5.750000085681677,
+            0.0
+          ],
+          [
+            5.600000083446503,
+            5.800000086426735,
+            0.0
+          ],
+          [
+            5.600000083446503,
+            5.850000087171793,
+            0.0
+          ],
+          [
+            5.600000083446503,
+            5.900000087916851,
+            0.0
+          ],
+          [
+            5.600000083446503,
+            5.950000088661909,
+            0.0
+          ],
+          [
+            5.600000083446503,
+            6.000000089406967,
+            0.0
+          ],
+          [
+            5.600000083446503,
+            6.050000090152025,
+            0.0
+          ],
+          [
+            5.600000083446503,
+            6.100000090897083,
+            0.0
+          ],
+          [
+            5.600000083446503,
+            6.150000091642141,
+            0.0
+          ],
+          [
+            5.600000083446503,
+            6.200000092387199,
+            0.0
+          ],
+          [
+            5.600000083446503,
+            6.2500000931322575,
+            0.0
+          ],
+          [
+            5.600000083446503,
+            6.3000000938773155,
+            0.0
+          ],
+          [
+            5.600000083446503,
+            6.350000094622374,
+            0.0
+          ],
+          [
+            5.650000084191561,
+            6.400000095367432,
+            0.0
+          ],
+          [
+            5.650000084191561,
+            6.45000009611249,
+            0.0
+          ],
+          [
+            5.700000084936619,
+            6.500000096857548,
+            0.0
+          ],
+          [
+            5.700000084936619,
+            6.550000097602606,
+            0.0
+          ],
+          [
+            5.750000085681677,
+            6.600000098347664,
+            0.0
+          ],
+          [
+            5.750000085681677,
+            6.650000099092722,
+            0.0
+          ],
+          [
+            5.800000086426735,
+            6.70000009983778,
+            0.0
+          ],
+          [
+            5.800000086426735,
+            6.750000100582838,
+            0.0
+          ],
+          [
+            5.800000086426735,
+            6.800000101327896,
+            0.0
+          ],
+          [
+            5.850000087171793,
+            6.850000102072954,
+            0.0
+          ],
+          [
+            5.850000087171793,
+            6.900000102818012,
+            0.0
+          ],
+          [
+            5.900000087916851,
+            6.95000010356307,
+            0.0
+          ],
+          [
+            5.900000087916851,
+            7.000000104308128,
+            0.0
+          ],
+          [
+            5.950000088661909,
+            7.050000105053186,
+            0.0
+          ],
+          [
+            5.950000088661909,
+            7.1000001057982445,
+            0.0
+          ],
+          [
+            6.000000089406967,
+            7.1500001065433025,
+            0.0
+          ],
+          [
+            6.000000089406967,
+            7.200000107288361,
+            0.0
+          ],
+          [
+            6.050000090152025,
+            7.250000108033419,
+            0.0
+          ],
+          [
+            6.050000090152025,
+            7.300000108778477,
+            0.0
+          ],
+          [
+            6.050000090152025,
+            7.350000109523535,
+            0.0
+          ],
+          [
+            6.050000090152025,
+            7.400000110268593,
+            0.0
+          ],
+          [
+            6.050000090152025,
+            7.450000111013651,
+            0.0
+          ],
+          [
+            6.050000090152025,
+            7.500000111758709,
+            0.0
+          ],
+          [
+            6.050000090152025,
+            7.550000112503767,
+            0.0
+          ],
+          [
+            6.050000090152025,
+            7.600000113248825,
+            0.0
+          ],
+          [
+            6.100000090897083,
+            7.650000113993883,
+            0.0
+          ],
+          [
+            6.150000091642141,
+            7.700000114738941,
+            0.0
+          ],
+          [
+            6.200000092387199,
+            7.750000115483999,
+            0.0
+          ],
+          [
+            6.2500000931322575,
+            7.800000116229057,
+            0.0
+          ],
+          [
+            6.3000000938773155,
+            7.850000116974115,
+            0.0
+          ],
+          [
+            6.3000000938773155,
+            7.900000117719173,
+            0.0
+          ],
+          [
+            6.350000094622374,
+            7.9500001184642315,
+            0.0
+          ]
+        ],
+        "topics": [
+          "/vaf_plan_4c1e0de7fe2244a3bd61e4a682a04341/compute_path_through_poses/_action/feedback",
+          "/vaf_plan_4c1e0de7fe2244a3bd61e4a682a04341/compute_path_through_poses/_action/status",
+          "/vaf_plan_4c1e0de7fe2244a3bd61e4a682a04341/compute_path_to_pose/_action/feedback",
+          "/vaf_plan_4c1e0de7fe2244a3bd61e4a682a04341/compute_path_to_pose/_action/status",
+          "/vaf_plan_4c1e0de7fe2244a3bd61e4a682a04341/global_costmap/costmap",
+          "/vaf_plan_4c1e0de7fe2244a3bd61e4a682a04341/global_costmap/costmap_raw",
+          "/vaf_plan_4c1e0de7fe2244a3bd61e4a682a04341/global_costmap/costmap_raw_updates",
+          "/vaf_plan_4c1e0de7fe2244a3bd61e4a682a04341/global_costmap/costmap_updates",
+          "/vaf_plan_4c1e0de7fe2244a3bd61e4a682a04341/global_costmap/footprint",
+          "/vaf_plan_4c1e0de7fe2244a3bd61e4a682a04341/global_costmap/global_costmap/transition_event",
+          "/vaf_plan_4c1e0de7fe2244a3bd61e4a682a04341/global_costmap/published_footprint",
+          "/vaf_plan_4c1e0de7fe2244a3bd61e4a682a04341/global_costmap/static_layer",
+          "/vaf_plan_4c1e0de7fe2244a3bd61e4a682a04341/global_costmap/static_layer_raw",
+          "/vaf_plan_4c1e0de7fe2244a3bd61e4a682a04341/global_costmap/static_layer_raw_updates",
+          "/vaf_plan_4c1e0de7fe2244a3bd61e4a682a04341/global_costmap/static_layer_updates",
+          "/vaf_plan_4c1e0de7fe2244a3bd61e4a682a04341/map",
+          "/vaf_plan_4c1e0de7fe2244a3bd61e4a682a04341/plan",
+          "/vaf_plan_4c1e0de7fe2244a3bd61e4a682a04341/planner_server/transition_event",
+          "/vaf_plan_4c1e0de7fe2244a3bd61e4a682a04341/tf",
+          "/vaf_plan_4c1e0de7fe2244a3bd61e4a682a04341/tf_static",
+          "/vaf_plan_4c1e0de7fe2244a3bd61e4a682a04341/unsmoothed_plan"
+        ],
+        "planner": "nav2_smac_planner::SmacPlanner2D",
+        "planner_returncode": 0
+      },
+      "native_process": {
+        "pid": 97269,
+        "pgid": 97237
+      }
+    },
+    {
+      "directory": "artifacts/simulation/nav2-readonly-4cacaef5/rotated_origin/backend/6ba6524eabf142b6a0df8b3eab0ae91e",
+      "manifest": {
+        "command": [
+          "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+          "/home/level6/venv-ardupilot/bin/python",
+          "-m",
+          "integrations.ros2.nav2_worker",
+          "/home/level6/vehicle-autonomy-framework/artifacts/simulation/nav2-readonly-4cacaef5/rotated_origin/backend/6ba6524eabf142b6a0df8b3eab0ae91e"
+        ],
+        "pid": 97183,
+        "pgid": 97183,
+        "returncode": 0,
+        "process_group_released": true,
+        "timed_out": false,
+        "ros_domain_id": "158",
+        "started_ns": 63639326381580,
+        "ended_ns": 63640292841393,
+        "source_map_sha256": "200bf492bd1d4ae4b78d4a87ffd8c0e0f314e1e902ab3d9f98a4547668ed0c9e",
+        "configuration_grid_sha256": "3bd83c5034499c79fa95448f0dafaa82cdf3faf2557a81bd6e12a6501201483f",
+        "source_files_sha256": {
+          "planning/models.py": "ea3bbb65476fd5dcf109ea9354f5e75fda0484e2c8683e98c119acabc27e5f07",
+          "planning/collision.py": "c89c43c4dc00cd4ad40dcc0923f0ec0e8f09be29b5efede406a1083bc5b76ccf",
+          "application/planning.py": "2a3a8d4501358b2b2a80322dbbb8432e50dc4c740c9d44f65075a271db22d77c",
+          "app/plan.py": "63c249e2606e46f32a803da2a71bcf44d8e419c99ead2a17487abf59a8c6d762",
+          "integrations/ros2/nav2_planner.py": "20937ef94ad3539631a0e9934610da26f73506dbe5a2db5163716921c7b3705e",
+          "integrations/ros2/nav2_worker.py": "fb877c26cc5290e57a60d3a7af1d02fa4977ebb4870697f7eab7011b1dc1eb78",
+          "scripts/with_ros2.sh": "ec2fb05881250b1068e425e4ea55e40677fbf1f909ed43d246e8d6bf89353219"
+        }
+      },
+      "response": {
+        "ok": true,
+        "request_id": "6ba6524eabf142b6a0df8b3eab0ae91e",
+        "map_sha256": "200bf492bd1d4ae4b78d4a87ffd8c0e0f314e1e902ab3d9f98a4547668ed0c9e",
+        "frame_epoch": "recording:200bf492bd1d4ae4b78d4a87ffd8c0e0f314e1e902ab3d9f98a4547668ed0c9e",
+        "costmap_verified": true,
+        "nav2_version": "1.3.13",
+        "poses": [
+          [
+            2.0000000298023224,
+            4.000000059604645,
+            0.0
+          ],
+          [
+            2.1000000312924385,
+            4.100000061094761,
+            0.0
+          ],
+          [
+            2.2000000327825546,
+            4.200000062584877,
+            0.0
+          ],
+          [
+            2.3000000342726707,
+            4.300000064074993,
+            0.0
+          ],
+          [
+            2.3000000342726707,
+            4.400000065565109,
+            0.0
+          ],
+          [
+            2.3000000342726707,
+            4.500000067055225,
+            0.0
+          ],
+          [
+            2.3000000342726707,
+            4.6000000685453415,
+            0.0
+          ],
+          [
+            2.400000035762787,
+            4.700000070035458,
+            0.0
+          ],
+          [
+            2.500000037252903,
+            4.800000071525574,
+            0.0
+          ],
+          [
+            2.600000038743019,
+            4.90000007301569,
+            0.0
+          ],
+          [
+            2.7000000402331352,
+            5.000000074505806,
+            0.0
+          ],
+          [
+            2.8000000417232513,
+            5.100000075995922,
+            0.0
+          ],
+          [
+            2.8000000417232513,
+            5.200000077486038,
+            0.0
+          ],
+          [
+            2.8000000417232513,
+            5.300000078976154,
+            0.0
+          ],
+          [
+            2.9000000432133675,
+            5.4000000804662704,
+            0.0
+          ],
+          [
+            3.0000000447034836,
+            5.500000081956387,
+            0.0
+          ],
+          [
+            3.1000000461935997,
+            5.600000083446503,
+            0.0
+          ],
+          [
+            3.200000047683716,
+            5.700000084936619,
+            0.0
+          ],
+          [
+            3.200000047683716,
+            5.800000086426735,
+            0.0
+          ],
+          [
+            3.200000047683716,
+            5.900000087916851,
+            0.0
+          ],
+          [
+            3.200000047683716,
+            6.000000089406967,
+            0.0
+          ],
+          [
+            3.200000047683716,
+            6.100000090897083,
+            0.0
+          ],
+          [
+            3.200000047683716,
+            6.200000092387199,
+            0.0
+          ],
+          [
+            3.200000047683716,
+            6.3000000938773155,
+            0.0
+          ],
+          [
+            3.200000047683716,
+            6.400000095367432,
+            0.0
+          ],
+          [
+            3.200000047683716,
+            6.500000096857548,
+            0.0
+          ],
+          [
+            3.200000047683716,
+            6.600000098347664,
+            0.0
+          ],
+          [
+            3.200000047683716,
+            6.70000009983778,
+            0.0
+          ],
+          [
+            3.200000047683716,
+            6.800000101327896,
+            0.0
+          ],
+          [
+            3.200000047683716,
+            6.900000102818012,
+            0.0
+          ],
+          [
+            3.200000047683716,
+            7.000000104308128,
+            0.0
+          ],
+          [
+            3.200000047683716,
+            7.1000001057982445,
+            0.0
+          ],
+          [
+            3.300000049173832,
+            7.200000107288361,
+            0.0
+          ],
+          [
+            3.400000050663948,
+            7.200000107288361,
+            0.0
+          ],
+          [
+            3.500000052154064,
+            7.200000107288361,
+            0.0
+          ],
+          [
+            3.6000000536441803,
+            7.200000107288361,
+            0.0
+          ],
+          [
+            3.7000000551342964,
+            7.200000107288361,
+            0.0
+          ],
+          [
+            3.8000000566244125,
+            7.200000107288361,
+            0.0
+          ],
+          [
+            3.9000000581145287,
+            7.200000107288361,
+            0.0
+          ],
+          [
+            4.000000059604645,
+            7.200000107288361,
+            0.0
+          ],
+          [
+            4.100000061094761,
+            7.200000107288361,
+            0.0
+          ],
+          [
+            4.200000062584877,
+            7.200000107288361,
+            0.0
+          ],
+          [
+            4.300000064074993,
+            7.200000107288361,
+            0.0
+          ],
+          [
+            4.400000065565109,
+            7.200000107288361,
+            0.0
+          ],
+          [
+            4.500000067055225,
+            7.200000107288361,
+            0.0
+          ],
+          [
+            4.6000000685453415,
+            7.200000107288361,
+            0.0
+          ],
+          [
+            4.700000070035458,
+            7.200000107288361,
+            0.0
+          ],
+          [
+            4.800000071525574,
+            7.1000001057982445,
+            0.0
+          ],
+          [
+            4.800000071525574,
+            7.000000104308128,
+            0.0
+          ],
+          [
+            4.800000071525574,
+            6.900000102818012,
+            0.0
+          ],
+          [
+            4.800000071525574,
+            6.800000101327896,
+            0.0
+          ],
+          [
+            4.800000071525574,
+            6.70000009983778,
+            0.0
+          ],
+          [
+            4.800000071525574,
+            6.600000098347664,
+            0.0
+          ],
+          [
+            4.90000007301569,
+            6.500000096857548,
+            0.0
+          ],
+          [
+            4.90000007301569,
+            6.400000095367432,
+            0.0
+          ],
+          [
+            5.000000074505806,
+            6.3000000938773155,
+            0.0
+          ],
+          [
+            5.000000074505806,
+            6.200000092387199,
+            0.0
+          ],
+          [
+            5.000000074505806,
+            6.100000090897083,
+            0.0
+          ],
+          [
+            5.100000075995922,
+            6.000000089406967,
+            0.0
+          ],
+          [
+            5.100000075995922,
+            5.900000087916851,
+            0.0
+          ],
+          [
+            5.200000077486038,
+            5.800000086426735,
+            0.0
+          ],
+          [
+            5.200000077486038,
+            5.700000084936619,
+            0.0
+          ],
+          [
+            5.300000078976154,
+            5.600000083446503,
+            0.0
+          ],
+          [
+            5.300000078976154,
+            5.500000081956387,
+            0.0
+          ],
+          [
+            5.4000000804662704,
+            5.4000000804662704,
+            0.0
+          ],
+          [
+            5.4000000804662704,
+            5.300000078976154,
+            0.0
+          ],
+          [
+            5.500000081956387,
+            5.200000077486038,
+            0.0
+          ],
+          [
+            5.500000081956387,
+            5.100000075995922,
+            0.0
+          ],
+          [
+            5.500000081956387,
+            5.000000074505806,
+            0.0
+          ],
+          [
+            5.600000083446503,
+            4.90000007301569,
+            0.0
+          ],
+          [
+            5.600000083446503,
+            4.800000071525574,
+            0.0
+          ],
+          [
+            5.700000084936619,
+            4.700000070035458,
+            0.0
+          ],
+          [
+            5.700000084936619,
+            4.6000000685453415,
+            0.0
+          ],
+          [
+            5.800000086426735,
+            4.500000067055225,
+            0.0
+          ],
+          [
+            5.800000086426735,
+            4.400000065565109,
+            0.0
+          ],
+          [
+            5.900000087916851,
+            4.300000064074993,
+            0.0
+          ],
+          [
+            5.900000087916851,
+            4.200000062584877,
+            0.0
+          ],
+          [
+            6.000000089406967,
+            4.100000061094761,
+            0.0
+          ],
+          [
+            6.000000089406967,
+            4.000000059604645,
+            0.0
+          ]
+        ],
+        "topics": [
+          "/vaf_plan_6ba6524eabf142b6a0df8b3eab0ae91e/compute_path_through_poses/_action/feedback",
+          "/vaf_plan_6ba6524eabf142b6a0df8b3eab0ae91e/compute_path_through_poses/_action/status",
+          "/vaf_plan_6ba6524eabf142b6a0df8b3eab0ae91e/compute_path_to_pose/_action/feedback",
+          "/vaf_plan_6ba6524eabf142b6a0df8b3eab0ae91e/compute_path_to_pose/_action/status",
+          "/vaf_plan_6ba6524eabf142b6a0df8b3eab0ae91e/global_costmap/costmap",
+          "/vaf_plan_6ba6524eabf142b6a0df8b3eab0ae91e/global_costmap/costmap_raw",
+          "/vaf_plan_6ba6524eabf142b6a0df8b3eab0ae91e/global_costmap/costmap_raw_updates",
+          "/vaf_plan_6ba6524eabf142b6a0df8b3eab0ae91e/global_costmap/costmap_updates",
+          "/vaf_plan_6ba6524eabf142b6a0df8b3eab0ae91e/global_costmap/footprint",
+          "/vaf_plan_6ba6524eabf142b6a0df8b3eab0ae91e/global_costmap/global_costmap/transition_event",
+          "/vaf_plan_6ba6524eabf142b6a0df8b3eab0ae91e/global_costmap/published_footprint",
+          "/vaf_plan_6ba6524eabf142b6a0df8b3eab0ae91e/global_costmap/static_layer",
+          "/vaf_plan_6ba6524eabf142b6a0df8b3eab0ae91e/global_costmap/static_layer_raw",
+          "/vaf_plan_6ba6524eabf142b6a0df8b3eab0ae91e/global_costmap/static_layer_raw_updates",
+          "/vaf_plan_6ba6524eabf142b6a0df8b3eab0ae91e/global_costmap/static_layer_updates",
+          "/vaf_plan_6ba6524eabf142b6a0df8b3eab0ae91e/map",
+          "/vaf_plan_6ba6524eabf142b6a0df8b3eab0ae91e/plan",
+          "/vaf_plan_6ba6524eabf142b6a0df8b3eab0ae91e/planner_server/transition_event",
+          "/vaf_plan_6ba6524eabf142b6a0df8b3eab0ae91e/tf",
+          "/vaf_plan_6ba6524eabf142b6a0df8b3eab0ae91e/tf_static",
+          "/vaf_plan_6ba6524eabf142b6a0df8b3eab0ae91e/unsmoothed_plan"
+        ],
+        "planner": "nav2_smac_planner::SmacPlanner2D",
+        "planner_returncode": 0
+      },
+      "native_process": {
+        "pid": 97215,
+        "pgid": 97183
+      }
+    },
+    {
+      "directory": "artifacts/simulation/nav2-readonly-4cacaef5/sealed_wall/backend/2288de62c468419183239948bad8f2ec",
+      "manifest": {
+        "command": [
+          "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+          "/home/level6/venv-ardupilot/bin/python",
+          "-m",
+          "integrations.ros2.nav2_worker",
+          "/home/level6/vehicle-autonomy-framework/artifacts/simulation/nav2-readonly-4cacaef5/sealed_wall/backend/2288de62c468419183239948bad8f2ec"
+        ],
+        "pid": 96904,
+        "pgid": 96904,
+        "returncode": 1,
+        "process_group_released": true,
+        "timed_out": false,
+        "ros_domain_id": "170",
+        "started_ns": 63636359612513,
+        "ended_ns": 63637327496092,
+        "source_map_sha256": "6cb351aa3c68d8ca1426b2a7110096d11e02adc667b7fb80336e9e3d49c5472b",
+        "configuration_grid_sha256": "b454bc42bfd6ea58abdeff72e7e8815450c33fcef86165c4c803b24c286dc554",
+        "source_files_sha256": {
+          "planning/models.py": "ea3bbb65476fd5dcf109ea9354f5e75fda0484e2c8683e98c119acabc27e5f07",
+          "planning/collision.py": "c89c43c4dc00cd4ad40dcc0923f0ec0e8f09be29b5efede406a1083bc5b76ccf",
+          "application/planning.py": "2a3a8d4501358b2b2a80322dbbb8432e50dc4c740c9d44f65075a271db22d77c",
+          "app/plan.py": "63c249e2606e46f32a803da2a71bcf44d8e419c99ead2a17487abf59a8c6d762",
+          "integrations/ros2/nav2_planner.py": "20937ef94ad3539631a0e9934610da26f73506dbe5a2db5163716921c7b3705e",
+          "integrations/ros2/nav2_worker.py": "fb877c26cc5290e57a60d3a7af1d02fa4977ebb4870697f7eab7011b1dc1eb78",
+          "scripts/with_ros2.sh": "ec2fb05881250b1068e425e4ea55e40677fbf1f909ed43d246e8d6bf89353219"
+        }
+      },
+      "response": {
+        "ok": false,
+        "request_id": "2288de62c468419183239948bad8f2ec",
+        "map_sha256": "6cb351aa3c68d8ca1426b2a7110096d11e02adc667b7fb80336e9e3d49c5472b",
+        "frame_epoch": "recording:6cb351aa3c68d8ca1426b2a7110096d11e02adc667b7fb80336e9e3d49c5472b",
+        "costmap_verified": true,
+        "nav2_version": "1.3.13",
+        "code": "NO_PATH",
+        "error": "PlanningError: Nav2 planning failed: status=6, error_code=208, ",
+        "planner_returncode": 0
+      },
+      "native_process": {
+        "pid": 96954,
+        "pgid": 96904
+      }
+    },
+    {
+      "directory": "artifacts/simulation/nav2-readonly-4cacaef5/timeout-backend/8a672f59bdfd4b2ead9baa01ad077111",
+      "manifest": {
+        "command": [
+          "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+          "/home/level6/venv-ardupilot/bin/python",
+          "-m",
+          "integrations.ros2.nav2_worker",
+          "/home/level6/vehicle-autonomy-framework/artifacts/simulation/nav2-readonly-4cacaef5/timeout-backend/8a672f59bdfd4b2ead9baa01ad077111"
+        ],
+        "pid": 97415,
+        "pgid": 97415,
+        "returncode": 1,
+        "process_group_released": true,
+        "timed_out": true,
+        "ros_domain_id": "137",
+        "started_ns": 63643512035289,
+        "ended_ns": 63645473415132,
+        "source_map_sha256": "5d80eb4e885bbcfaa1d6bd0632607a206c9297612f92fd123e00e29854be6420",
+        "configuration_grid_sha256": "3bd83c5034499c79fa95448f0dafaa82cdf3faf2557a81bd6e12a6501201483f",
+        "source_files_sha256": {
+          "planning/models.py": "ea3bbb65476fd5dcf109ea9354f5e75fda0484e2c8683e98c119acabc27e5f07",
+          "planning/collision.py": "c89c43c4dc00cd4ad40dcc0923f0ec0e8f09be29b5efede406a1083bc5b76ccf",
+          "application/planning.py": "2a3a8d4501358b2b2a80322dbbb8432e50dc4c740c9d44f65075a271db22d77c",
+          "app/plan.py": "63c249e2606e46f32a803da2a71bcf44d8e419c99ead2a17487abf59a8c6d762",
+          "integrations/ros2/nav2_planner.py": "20937ef94ad3539631a0e9934610da26f73506dbe5a2db5163716921c7b3705e",
+          "integrations/ros2/nav2_worker.py": "fb877c26cc5290e57a60d3a7af1d02fa4977ebb4870697f7eab7011b1dc1eb78",
+          "scripts/with_ros2.sh": "ec2fb05881250b1068e425e4ea55e40677fbf1f909ed43d246e8d6bf89353219"
+        }
+      },
+      "response": {
+        "ok": false,
+        "request_id": "8a672f59bdfd4b2ead9baa01ad077111",
+        "map_sha256": "5d80eb4e885bbcfaa1d6bd0632607a206c9297612f92fd123e00e29854be6420",
+        "frame_epoch": "timeout",
+        "code": "BACKEND_FAILURE",
+        "error": "ExternalShutdownException: ",
+        "planner_returncode": -6
+      },
+      "native_process": {
+        "pid": 97447,
+        "pgid": 97415
+      }
+    },
+    {
+      "directory": "artifacts/simulation/nav2-readonly-4cacaef5/unknown_barrier/backend/e21c80ec3521471e8699147d3fe69bc5",
+      "manifest": {
+        "command": [
+          "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+          "/home/level6/venv-ardupilot/bin/python",
+          "-m",
+          "integrations.ros2.nav2_worker",
+          "/home/level6/vehicle-autonomy-framework/artifacts/simulation/nav2-readonly-4cacaef5/unknown_barrier/backend/e21c80ec3521471e8699147d3fe69bc5"
+        ],
+        "pid": 96985,
+        "pgid": 96985,
+        "returncode": 1,
+        "process_group_released": true,
+        "timed_out": false,
+        "ros_domain_id": "128",
+        "started_ns": 63637332451366,
+        "ended_ns": 63638300523614,
+        "source_map_sha256": "ec2072344fa2f8bfa6127b068b0567ffbb41aa7e3666a7af782fab3bd9980378",
+        "configuration_grid_sha256": "b454bc42bfd6ea58abdeff72e7e8815450c33fcef86165c4c803b24c286dc554",
+        "source_files_sha256": {
+          "planning/models.py": "ea3bbb65476fd5dcf109ea9354f5e75fda0484e2c8683e98c119acabc27e5f07",
+          "planning/collision.py": "c89c43c4dc00cd4ad40dcc0923f0ec0e8f09be29b5efede406a1083bc5b76ccf",
+          "application/planning.py": "2a3a8d4501358b2b2a80322dbbb8432e50dc4c740c9d44f65075a271db22d77c",
+          "app/plan.py": "63c249e2606e46f32a803da2a71bcf44d8e419c99ead2a17487abf59a8c6d762",
+          "integrations/ros2/nav2_planner.py": "20937ef94ad3539631a0e9934610da26f73506dbe5a2db5163716921c7b3705e",
+          "integrations/ros2/nav2_worker.py": "fb877c26cc5290e57a60d3a7af1d02fa4977ebb4870697f7eab7011b1dc1eb78",
+          "scripts/with_ros2.sh": "ec2fb05881250b1068e425e4ea55e40677fbf1f909ed43d246e8d6bf89353219"
+        }
+      },
+      "response": {
+        "ok": false,
+        "request_id": "e21c80ec3521471e8699147d3fe69bc5",
+        "map_sha256": "ec2072344fa2f8bfa6127b068b0567ffbb41aa7e3666a7af782fab3bd9980378",
+        "frame_epoch": "recording:ec2072344fa2f8bfa6127b068b0567ffbb41aa7e3666a7af782fab3bd9980378",
+        "costmap_verified": true,
+        "nav2_version": "1.3.13",
+        "code": "NO_PATH",
+        "error": "PlanningError: Nav2 planning failed: status=6, error_code=208, ",
+        "planner_returncode": 0
+      },
+      "native_process": {
+        "pid": 97029,
+        "pgid": 96985
+      }
+    },
+    {
+      "directory": "artifacts/simulation/nav2-readonly-4cacaef5/wall_detour/backend/fdd95e51546942b9b6cc4b129cd9a565",
+      "manifest": {
+        "command": [
+          "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+          "/home/level6/venv-ardupilot/bin/python",
+          "-m",
+          "integrations.ros2.nav2_worker",
+          "/home/level6/vehicle-autonomy-framework/artifacts/simulation/nav2-readonly-4cacaef5/wall_detour/backend/fdd95e51546942b9b6cc4b129cd9a565"
+        ],
+        "pid": 96716,
+        "pgid": 96716,
+        "returncode": 0,
+        "process_group_released": true,
+        "timed_out": false,
+        "ros_domain_id": "105",
+        "started_ns": 63635322548462,
+        "ended_ns": 63636344996314,
+        "source_map_sha256": "5d80eb4e885bbcfaa1d6bd0632607a206c9297612f92fd123e00e29854be6420",
+        "configuration_grid_sha256": "3bd83c5034499c79fa95448f0dafaa82cdf3faf2557a81bd6e12a6501201483f",
+        "source_files_sha256": {
+          "planning/models.py": "ea3bbb65476fd5dcf109ea9354f5e75fda0484e2c8683e98c119acabc27e5f07",
+          "planning/collision.py": "c89c43c4dc00cd4ad40dcc0923f0ec0e8f09be29b5efede406a1083bc5b76ccf",
+          "application/planning.py": "2a3a8d4501358b2b2a80322dbbb8432e50dc4c740c9d44f65075a271db22d77c",
+          "app/plan.py": "63c249e2606e46f32a803da2a71bcf44d8e419c99ead2a17487abf59a8c6d762",
+          "integrations/ros2/nav2_planner.py": "20937ef94ad3539631a0e9934610da26f73506dbe5a2db5163716921c7b3705e",
+          "integrations/ros2/nav2_worker.py": "fb877c26cc5290e57a60d3a7af1d02fa4977ebb4870697f7eab7011b1dc1eb78",
+          "scripts/with_ros2.sh": "ec2fb05881250b1068e425e4ea55e40677fbf1f909ed43d246e8d6bf89353219"
+        }
+      },
+      "response": {
+        "ok": true,
+        "request_id": "fdd95e51546942b9b6cc4b129cd9a565",
+        "map_sha256": "5d80eb4e885bbcfaa1d6bd0632607a206c9297612f92fd123e00e29854be6420",
+        "frame_epoch": "recording:5d80eb4e885bbcfaa1d6bd0632607a206c9297612f92fd123e00e29854be6420",
+        "costmap_verified": true,
+        "nav2_version": "1.3.13",
+        "poses": [
+          [
+            2.0000000298023224,
+            4.000000059604645,
+            0.0
+          ],
+          [
+            2.1000000312924385,
+            4.100000061094761,
+            0.0
+          ],
+          [
+            2.2000000327825546,
+            4.200000062584877,
+            0.0
+          ],
+          [
+            2.3000000342726707,
+            4.300000064074993,
+            0.0
+          ],
+          [
+            2.3000000342726707,
+            4.400000065565109,
+            0.0
+          ],
+          [
+            2.3000000342726707,
+            4.500000067055225,
+            0.0
+          ],
+          [
+            2.3000000342726707,
+            4.6000000685453415,
+            0.0
+          ],
+          [
+            2.400000035762787,
+            4.700000070035458,
+            0.0
+          ],
+          [
+            2.500000037252903,
+            4.800000071525574,
+            0.0
+          ],
+          [
+            2.600000038743019,
+            4.90000007301569,
+            0.0
+          ],
+          [
+            2.7000000402331352,
+            5.000000074505806,
+            0.0
+          ],
+          [
+            2.8000000417232513,
+            5.100000075995922,
+            0.0
+          ],
+          [
+            2.8000000417232513,
+            5.200000077486038,
+            0.0
+          ],
+          [
+            2.8000000417232513,
+            5.300000078976154,
+            0.0
+          ],
+          [
+            2.9000000432133675,
+            5.4000000804662704,
+            0.0
+          ],
+          [
+            3.0000000447034836,
+            5.500000081956387,
+            0.0
+          ],
+          [
+            3.1000000461935997,
+            5.600000083446503,
+            0.0
+          ],
+          [
+            3.200000047683716,
+            5.700000084936619,
+            0.0
+          ],
+          [
+            3.200000047683716,
+            5.800000086426735,
+            0.0
+          ],
+          [
+            3.200000047683716,
+            5.900000087916851,
+            0.0
+          ],
+          [
+            3.200000047683716,
+            6.000000089406967,
+            0.0
+          ],
+          [
+            3.200000047683716,
+            6.100000090897083,
+            0.0
+          ],
+          [
+            3.200000047683716,
+            6.200000092387199,
+            0.0
+          ],
+          [
+            3.200000047683716,
+            6.3000000938773155,
+            0.0
+          ],
+          [
+            3.200000047683716,
+            6.400000095367432,
+            0.0
+          ],
+          [
+            3.200000047683716,
+            6.500000096857548,
+            0.0
+          ],
+          [
+            3.200000047683716,
+            6.600000098347664,
+            0.0
+          ],
+          [
+            3.200000047683716,
+            6.70000009983778,
+            0.0
+          ],
+          [
+            3.200000047683716,
+            6.800000101327896,
+            0.0
+          ],
+          [
+            3.200000047683716,
+            6.900000102818012,
+            0.0
+          ],
+          [
+            3.200000047683716,
+            7.000000104308128,
+            0.0
+          ],
+          [
+            3.200000047683716,
+            7.1000001057982445,
+            0.0
+          ],
+          [
+            3.300000049173832,
+            7.200000107288361,
+            0.0
+          ],
+          [
+            3.400000050663948,
+            7.200000107288361,
+            0.0
+          ],
+          [
+            3.500000052154064,
+            7.200000107288361,
+            0.0
+          ],
+          [
+            3.6000000536441803,
+            7.200000107288361,
+            0.0
+          ],
+          [
+            3.7000000551342964,
+            7.200000107288361,
+            0.0
+          ],
+          [
+            3.8000000566244125,
+            7.200000107288361,
+            0.0
+          ],
+          [
+            3.9000000581145287,
+            7.200000107288361,
+            0.0
+          ],
+          [
+            4.000000059604645,
+            7.200000107288361,
+            0.0
+          ],
+          [
+            4.100000061094761,
+            7.200000107288361,
+            0.0
+          ],
+          [
+            4.200000062584877,
+            7.200000107288361,
+            0.0
+          ],
+          [
+            4.300000064074993,
+            7.200000107288361,
+            0.0
+          ],
+          [
+            4.400000065565109,
+            7.200000107288361,
+            0.0
+          ],
+          [
+            4.500000067055225,
+            7.200000107288361,
+            0.0
+          ],
+          [
+            4.6000000685453415,
+            7.200000107288361,
+            0.0
+          ],
+          [
+            4.700000070035458,
+            7.200000107288361,
+            0.0
+          ],
+          [
+            4.800000071525574,
+            7.1000001057982445,
+            0.0
+          ],
+          [
+            4.800000071525574,
+            7.000000104308128,
+            0.0
+          ],
+          [
+            4.800000071525574,
+            6.900000102818012,
+            0.0
+          ],
+          [
+            4.800000071525574,
+            6.800000101327896,
+            0.0
+          ],
+          [
+            4.800000071525574,
+            6.70000009983778,
+            0.0
+          ],
+          [
+            4.800000071525574,
+            6.600000098347664,
+            0.0
+          ],
+          [
+            4.90000007301569,
+            6.500000096857548,
+            0.0
+          ],
+          [
+            4.90000007301569,
+            6.400000095367432,
+            0.0
+          ],
+          [
+            5.000000074505806,
+            6.3000000938773155,
+            0.0
+          ],
+          [
+            5.000000074505806,
+            6.200000092387199,
+            0.0
+          ],
+          [
+            5.000000074505806,
+            6.100000090897083,
+            0.0
+          ],
+          [
+            5.100000075995922,
+            6.000000089406967,
+            0.0
+          ],
+          [
+            5.100000075995922,
+            5.900000087916851,
+            0.0
+          ],
+          [
+            5.200000077486038,
+            5.800000086426735,
+            0.0
+          ],
+          [
+            5.200000077486038,
+            5.700000084936619,
+            0.0
+          ],
+          [
+            5.300000078976154,
+            5.600000083446503,
+            0.0
+          ],
+          [
+            5.300000078976154,
+            5.500000081956387,
+            0.0
+          ],
+          [
+            5.4000000804662704,
+            5.4000000804662704,
+            0.0
+          ],
+          [
+            5.4000000804662704,
+            5.300000078976154,
+            0.0
+          ],
+          [
+            5.500000081956387,
+            5.200000077486038,
+            0.0
+          ],
+          [
+            5.500000081956387,
+            5.100000075995922,
+            0.0
+          ],
+          [
+            5.500000081956387,
+            5.000000074505806,
+            0.0
+          ],
+          [
+            5.600000083446503,
+            4.90000007301569,
+            0.0
+          ],
+          [
+            5.600000083446503,
+            4.800000071525574,
+            0.0
+          ],
+          [
+            5.700000084936619,
+            4.700000070035458,
+            0.0
+          ],
+          [
+            5.700000084936619,
+            4.6000000685453415,
+            0.0
+          ],
+          [
+            5.800000086426735,
+            4.500000067055225,
+            0.0
+          ],
+          [
+            5.800000086426735,
+            4.400000065565109,
+            0.0
+          ],
+          [
+            5.900000087916851,
+            4.300000064074993,
+            0.0
+          ],
+          [
+            5.900000087916851,
+            4.200000062584877,
+            0.0
+          ],
+          [
+            6.000000089406967,
+            4.100000061094761,
+            0.0
+          ],
+          [
+            6.000000089406967,
+            4.000000059604645,
+            0.0
+          ]
+        ],
+        "topics": [
+          "/vaf_plan_fdd95e51546942b9b6cc4b129cd9a565/compute_path_through_poses/_action/feedback",
+          "/vaf_plan_fdd95e51546942b9b6cc4b129cd9a565/compute_path_through_poses/_action/status",
+          "/vaf_plan_fdd95e51546942b9b6cc4b129cd9a565/compute_path_to_pose/_action/feedback",
+          "/vaf_plan_fdd95e51546942b9b6cc4b129cd9a565/compute_path_to_pose/_action/status",
+          "/vaf_plan_fdd95e51546942b9b6cc4b129cd9a565/global_costmap/costmap",
+          "/vaf_plan_fdd95e51546942b9b6cc4b129cd9a565/global_costmap/costmap_raw",
+          "/vaf_plan_fdd95e51546942b9b6cc4b129cd9a565/global_costmap/costmap_raw_updates",
+          "/vaf_plan_fdd95e51546942b9b6cc4b129cd9a565/global_costmap/costmap_updates",
+          "/vaf_plan_fdd95e51546942b9b6cc4b129cd9a565/global_costmap/footprint",
+          "/vaf_plan_fdd95e51546942b9b6cc4b129cd9a565/global_costmap/global_costmap/transition_event",
+          "/vaf_plan_fdd95e51546942b9b6cc4b129cd9a565/global_costmap/published_footprint",
+          "/vaf_plan_fdd95e51546942b9b6cc4b129cd9a565/global_costmap/static_layer",
+          "/vaf_plan_fdd95e51546942b9b6cc4b129cd9a565/global_costmap/static_layer_raw",
+          "/vaf_plan_fdd95e51546942b9b6cc4b129cd9a565/global_costmap/static_layer_raw_updates",
+          "/vaf_plan_fdd95e51546942b9b6cc4b129cd9a565/global_costmap/static_layer_updates",
+          "/vaf_plan_fdd95e51546942b9b6cc4b129cd9a565/map",
+          "/vaf_plan_fdd95e51546942b9b6cc4b129cd9a565/plan",
+          "/vaf_plan_fdd95e51546942b9b6cc4b129cd9a565/planner_server/transition_event",
+          "/vaf_plan_fdd95e51546942b9b6cc4b129cd9a565/tf",
+          "/vaf_plan_fdd95e51546942b9b6cc4b129cd9a565/tf_static",
+          "/vaf_plan_fdd95e51546942b9b6cc4b129cd9a565/unsmoothed_plan"
+        ],
+        "planner": "nav2_smac_planner::SmacPlanner2D",
+        "planner_returncode": 0
+      },
+      "native_process": {
+        "pid": 96779,
+        "pgid": 96716
+      }
+    },
+    {
+      "directory": "artifacts/simulation/nav2-live-4cef8a97/planning/23583740cbc94c9bbecbf148eebdd6f0",
+      "manifest": {
+        "command": [
+          "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+          "/home/level6/venv-ardupilot/bin/python",
+          "-m",
+          "integrations.ros2.nav2_worker",
+          "/home/level6/vehicle-autonomy-framework/artifacts/simulation/nav2-live-4cef8a97/planning/23583740cbc94c9bbecbf148eebdd6f0"
+        ],
+        "pid": 97461,
+        "pgid": 97461,
+        "returncode": 0,
+        "process_group_released": true,
+        "timed_out": false,
+        "ros_domain_id": "172",
+        "started_ns": 63643896877428,
+        "ended_ns": 63644914235051,
+        "source_map_sha256": "70b57053d8762005e5143fdc148c044ddc10505b3dd7796c931e815be475ca25",
+        "configuration_grid_sha256": "8b7c52008dc93595f1e6fbc5ba6615316b5ed41c144cdd158f3e64afb1044b1d",
+        "source_files_sha256": {
+          "planning/models.py": "ea3bbb65476fd5dcf109ea9354f5e75fda0484e2c8683e98c119acabc27e5f07",
+          "planning/collision.py": "c89c43c4dc00cd4ad40dcc0923f0ec0e8f09be29b5efede406a1083bc5b76ccf",
+          "application/planning.py": "2a3a8d4501358b2b2a80322dbbb8432e50dc4c740c9d44f65075a271db22d77c",
+          "app/plan.py": "63c249e2606e46f32a803da2a71bcf44d8e419c99ead2a17487abf59a8c6d762",
+          "integrations/ros2/nav2_planner.py": "20937ef94ad3539631a0e9934610da26f73506dbe5a2db5163716921c7b3705e",
+          "integrations/ros2/nav2_worker.py": "fb877c26cc5290e57a60d3a7af1d02fa4977ebb4870697f7eab7011b1dc1eb78",
+          "scripts/with_ros2.sh": "ec2fb05881250b1068e425e4ea55e40677fbf1f909ed43d246e8d6bf89353219"
+        }
+      },
+      "response": {
+        "ok": true,
+        "request_id": "23583740cbc94c9bbecbf148eebdd6f0",
+        "map_sha256": "70b57053d8762005e5143fdc148c044ddc10505b3dd7796c931e815be475ca25",
+        "frame_epoch": "fe09718130bd4df69963dbe0fa3fca34",
+        "costmap_verified": true,
+        "nav2_version": "1.3.13",
+        "poses": [
+          [
+            4.400000065565109,
+            4.400000065565109,
+            0.0
+          ],
+          [
+            4.450000066310167,
+            4.400000065565109,
+            0.0
+          ],
+          [
+            4.500000067055225,
+            4.400000065565109,
+            0.0
+          ],
+          [
+            4.550000067800283,
+            4.400000065565109,
+            0.0
+          ],
+          [
+            4.6000000685453415,
+            4.400000065565109,
+            0.0
+          ],
+          [
+            4.6500000692903996,
+            4.400000065565109,
+            0.0
+          ],
+          [
+            4.700000070035458,
+            4.400000065565109,
+            0.0
+          ],
+          [
+            4.750000070780516,
+            4.400000065565109,
+            0.0
+          ],
+          [
+            4.800000071525574,
+            4.400000065565109,
+            0.0
+          ],
+          [
+            4.850000072270632,
+            4.400000065565109,
+            0.0
+          ],
+          [
+            4.90000007301569,
+            4.400000065565109,
+            0.0
+          ],
+          [
+            4.950000073760748,
+            4.400000065565109,
+            0.0
+          ],
+          [
+            5.000000074505806,
+            4.400000065565109,
+            0.0
+          ],
+          [
+            5.050000075250864,
+            4.400000065565109,
+            0.0
+          ],
+          [
+            5.100000075995922,
+            4.400000065565109,
+            0.0
+          ],
+          [
+            5.15000007674098,
+            4.400000065565109,
+            0.0
+          ],
+          [
+            5.200000077486038,
+            4.400000065565109,
+            0.0
+          ],
+          [
+            5.250000078231096,
+            4.400000065565109,
+            0.0
+          ],
+          [
+            5.300000078976154,
+            4.400000065565109,
+            0.0
+          ],
+          [
+            5.350000079721212,
+            4.400000065565109,
+            0.0
+          ],
+          [
+            5.4000000804662704,
+            4.400000065565109,
+            0.0
+          ]
+        ],
+        "topics": [
+          "/vaf_plan_23583740cbc94c9bbecbf148eebdd6f0/compute_path_through_poses/_action/feedback",
+          "/vaf_plan_23583740cbc94c9bbecbf148eebdd6f0/compute_path_through_poses/_action/status",
+          "/vaf_plan_23583740cbc94c9bbecbf148eebdd6f0/compute_path_to_pose/_action/feedback",
+          "/vaf_plan_23583740cbc94c9bbecbf148eebdd6f0/compute_path_to_pose/_action/status",
+          "/vaf_plan_23583740cbc94c9bbecbf148eebdd6f0/global_costmap/costmap",
+          "/vaf_plan_23583740cbc94c9bbecbf148eebdd6f0/global_costmap/costmap_raw",
+          "/vaf_plan_23583740cbc94c9bbecbf148eebdd6f0/global_costmap/costmap_raw_updates",
+          "/vaf_plan_23583740cbc94c9bbecbf148eebdd6f0/global_costmap/costmap_updates",
+          "/vaf_plan_23583740cbc94c9bbecbf148eebdd6f0/global_costmap/footprint",
+          "/vaf_plan_23583740cbc94c9bbecbf148eebdd6f0/global_costmap/global_costmap/transition_event",
+          "/vaf_plan_23583740cbc94c9bbecbf148eebdd6f0/global_costmap/published_footprint",
+          "/vaf_plan_23583740cbc94c9bbecbf148eebdd6f0/global_costmap/static_layer",
+          "/vaf_plan_23583740cbc94c9bbecbf148eebdd6f0/global_costmap/static_layer_raw",
+          "/vaf_plan_23583740cbc94c9bbecbf148eebdd6f0/global_costmap/static_layer_raw_updates",
+          "/vaf_plan_23583740cbc94c9bbecbf148eebdd6f0/global_costmap/static_layer_updates",
+          "/vaf_plan_23583740cbc94c9bbecbf148eebdd6f0/map",
+          "/vaf_plan_23583740cbc94c9bbecbf148eebdd6f0/plan",
+          "/vaf_plan_23583740cbc94c9bbecbf148eebdd6f0/planner_server/transition_event",
+          "/vaf_plan_23583740cbc94c9bbecbf148eebdd6f0/tf",
+          "/vaf_plan_23583740cbc94c9bbecbf148eebdd6f0/tf_static",
+          "/vaf_plan_23583740cbc94c9bbecbf148eebdd6f0/unsmoothed_plan"
+        ],
+        "planner": "nav2_smac_planner::SmacPlanner2D",
+        "planner_returncode": 0
+      },
+      "native_process": {
+        "pid": 97500,
+        "pgid": 97461
+      }
+    }
+  ],
+  "ros_packages": [
+    {
+      "file": "ros-jazzy-nav2-costmap-2d_1.3.13-1noble.20260921.024946_amd64.deb",
+      "sha256": "e5dd68805a8291db972f321ce11e2686bf8d84cf3ddb212f7a8935f13f626b06"
+    },
+    {
+      "file": "ros-jazzy-nav2-msgs_1.3.13-1noble.20260921.023049_amd64.deb",
+      "sha256": "2a9605718f6d95997b0b8282dbdf5a96cb4245b429e5eb12d0a0d4ab6cb500d8"
+    },
+    {
+      "file": "ros-jazzy-nav2-planner_1.3.13-1noble.20260921.031801_amd64.deb",
+      "sha256": "82275521c98816a41f5704c7a2e6ea895c24b10d8a18cb522393b7e4a99a8170"
+    },
+    {
+      "file": "ros-jazzy-nav2-smac-planner_1.3.13-1noble.20260921.031850_amd64.deb",
+      "sha256": "8f1a3305dfd4935239312e5ae7ff678003c009300da567fd0b8b9d258be10359"
+    }
+  ],
+  "recorded_map": {
+    "schema": 1,
+    "sha256": "e0e7a625e27ed2ac86b9621543cd9fd934af395b04431efd884e63f71af34081",
+    "source": "P18 actual Gazebo LaserScan -> SLAM Toolbox, ros2-mapping-30501ec0 final-export",
+    "room_yaw_rad": 0.15,
+    "source_summary": "docs/autonomy/evidence/phase-18.json",
+    "start": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "goal": [
+      1.9,
+      3.5,
+      0.0
+    ],
+    "source_kind": "recorded_map"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "sha256": "e0e7a625e27ed2ac86b9621543cd9fd934af395b04431efd884e63f71af34081",
+  "source": "P18 actual Gazebo LaserScan -> SLAM Toolbox, ros2-mapping-30501ec0 final-export",
+  "room_yaw_rad": 0.15,
+  "source_summary": "docs/autonomy/evidence/phase-18.json",
+  "start": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "goal": [
+    1.9,
+    3.5,
+    0.0
+  ],
+  "source_kind": "recorded_map"
+}
