@@ -96,11 +96,14 @@ class ApplicationRuntime:
         self.sensor = None
         self.sensor_epoch = None
         self.mapping = None
+        self.slam_candidate = None
         if mapping_config is not None:
             from mapping.exchange import MappingConfig, MappingInput
             if profile.kind != "rover":
                 raise ValueError("ROS 2 mapping is currently audited only for the Rover simulation")
             self.mapping = MappingInput(MappingConfig.load(mapping_config, profile.clock_domain_id))
+            from localization.slam_candidate import SlamCandidateAudit
+            self.slam_candidate = SlamCandidateAudit()
             if self.navigation is not None:self.navigation.source_store = self.mapping.store
         if sensor_config is not None:
             from sensors.simulation.objects import ObjectCalibration
@@ -164,6 +167,11 @@ class ApplicationRuntime:
                                  None if mapped is None else mapped.captured_at)
             if self.navigation is not None:
                 self.navigation.update_map(mapped, self.mapping.health, self.vehicle.clock(), self.vehicle.world_epoch)
+            if self.slam_candidate is not None:
+                from planning.models import MapContext
+                context=None if mapped is None else MapContext(mapped.reference,mapped.sha256,self.vehicle.world_epoch,
+                    mapped.grid,'live_map',mapped.captured_at,2_500_000_000)
+                self.slam_candidate.update(context,self.mapping.health,self.vehicle.clock(),self.vehicle.world_epoch)
         result = self.vehicle.cycle()
         if self.payload is not None:self.payload.tick(self.vehicle.clock())
         if result.fault:
@@ -308,6 +316,7 @@ class ApplicationRuntime:
                 "mapping": None if self.mapping is None else {**self.mapping.health,
                     "adopted": bool(world is not None and world.map is not None)},
                 "navigation": None if self.navigation is None else self.navigation.status(world, now),
+                "slam_localization_candidate":None if self.slam_candidate is None else self.slam_candidate.view(now),
                 "system_send": self.vehicle.authority.system_send,
                 "action_send": self.vehicle.authority.action_send, "task": self.task_status() if include_task else None}
 
@@ -391,6 +400,23 @@ class ApplicationRuntime:
         self.navigation_task = GoalNavigation(self,name)
         self.state = "PLANNING"
         return self.task_status()
+
+    def export_map_anchor(self,path):
+        from mapping.anchors import MapAnchor
+        path=Path(path)
+        if not path.is_absolute() or self.state!='READY' or self.navigation is None or self.navigation.context is None:
+            raise ValueError('map anchor registration requires explicit path and idle mapped READY application')
+        if self.navigation_task and self.navigation_task.active:
+            raise ValueError('map registration during navigation is forbidden')
+        world=self.vehicle.world_snapshot()
+        if (world is None or world.vehicle is None or world.environment!=self.environment.reference
+                or world.map!=self.navigation.context.reference):
+            raise ValueError('map registration requires an adopted WorldSnapshot')
+        anchor=MapAnchor.create(self.environment,self.navigation.context,self.navigation.binding,self.vehicle.clock(),world.vehicle,
+            system_send=self.vehicle.authority.system_send,action_send=self.vehicle.authority.action_send)
+        anchor.save(path)
+        self._emit('map_anchor_registered',path=str(path),**anchor.document())
+        return anchor.document()
 
     def cancel_mission(self):
         if self.navigation_task and self.navigation_task.active:

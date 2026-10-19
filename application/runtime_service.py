@@ -14,6 +14,10 @@ class RuntimeService:
         self.coordinator = coordinator
 
     def handle(self, command: str, payload: dict) -> dict:
+        if command=='anchor':
+            if set(payload)!={'path'} or type(payload['path']) is not str:
+                raise ValueError('anchor requires only an explicit output path')
+            return self.coordinator.export_map_anchor(payload['path'])
         if command == "status" and payload == {"view":"state"}:
             return self.coordinator.get_status(include_task=False)
         if command == "start":

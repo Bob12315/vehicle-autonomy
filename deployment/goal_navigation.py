@@ -22,6 +22,12 @@ class GoalNavigation:
             raise ValueError("unregistered navigation goal")
         self.goal = self.catalog.goals[name]
         self.destination = self.goal.resolve(app.environment)
+        self.anchor = None
+        self.anchor_sha256 = None
+        if self.goal.frame == 'map':
+            from mapping.anchors import MapAnchor
+            self.anchor,self.anchor_sha256=MapAnchor.load_with_sha(self.catalog.anchor_path)
+            self.destination=self.anchor.binding.to_odom(self.destination)
         self.environment = app.environment.reference
         self.frame_epoch = app.vehicle.world_epoch
         self.source_generation = str(app.navigation.context.reference.version.generation_id)
@@ -57,6 +63,10 @@ class GoalNavigation:
         nav.context.check_fresh(now)
         if str(nav.context.reference.version.generation_id) != self.source_generation:
             raise ValueError("navigation_map_source_changed")
+        if self.anchor is not None:
+            if self.anchor.load_with_sha(self.catalog.anchor_path)[1]!=self.anchor_sha256:
+                raise ValueError('navigation_map_anchor_changed')
+            self.anchor.check(app.environment,nav.context,nav.binding,now)
         loc = world.localization
         if loc is None or loc.twist is None or loc.pose.frame_id != "odom":
             raise ValueError("navigation_localization_unavailable")
