@@ -73,7 +73,8 @@ def run(directory, case, *, autonomous=False, room_yaw=None, model_id=FRONT_AXLE
     plan=directory/"plan.json"
     config=directory/"navigation.toml"
     config.write_text(f'schema=1\nmodel="{model_id}"\nplan_path="{plan}"\ntimeout_ns={10_000_000_000 if case=="timeout" else 70_000_000_000}\n')
-    if replanning:config.write_text(config.read_text()+'tracking_mode="stop_turn"\n')
+    if replanning or business or model_name=='compact_rover':
+        config.write_text(config.read_text()+'tracking_mode="stop_turn"\n')
     if autonomous:
         goals=directory/"goals.toml"
         goals.write_text('schema=1\nenvironment_id="environment:rover-training-v1"\n[[goals]]\nname="POINT_A"\nframe="odom"\nreference_point="navigation_reference"\nposition=[0.8,2.0]\n')
@@ -342,15 +343,19 @@ def run(directory, case, *, autonomous=False, room_yaw=None, model_id=FRONT_AXLE
             report['checkpoints']=s['task']['checkpoints'];report['inspections']=s['task']['inspections'];report['checkpoint_truth']=checkpoint_truth
             if case=='business_inspect' and (len(report['checkpoints'])!=3 or len(report['inspections'])!=1):raise AssertionError('business result missing route/observation evidence')
             if s['vehicle']['armed']:raise AssertionError('business ended armed')
-        if case not in ("tracking","replan","map_goal","business_inspect"):
-
-
+        if case not in ("tracking","replan","map_goal","business_inspect") and s['vehicle']['armed']:
             recovery=request(endpoint,"start",{"mission":"safe_recovery"})
             if not recovery["ok"]:raise RuntimeError(recovery)
             recovered=wait(lambda s:s["task"]["status"] in ("SUCCEEDED","FAILED"),25,"explicit recovery")
             if recovered["task"]["status"]!="SUCCEEDED" or recovered["vehicle"]["armed"]:
                 raise AssertionError("explicit recovery failed")
             report["recovery_disarmed"]=True
+        elif case not in ("tracking","replan","map_goal","business_inspect"):
+            # Goal recovery / business cleanup already observed Stop+Disarm.
+            # The generic armed-only recovery Mission must not be run twice.
+            if s['system_send'] or s['action_send']:
+                raise AssertionError('disarmed terminal task retained authority')
+            report['recovery_disarmed']=True
         if not request(endpoint,"shutdown")["ok"] or app.wait(timeout=12) or endpoint.exists():
             raise AssertionError("application shutdown failed")
         owned.stop_process(app)
