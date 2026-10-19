@@ -52,12 +52,9 @@ class AutonomyBusiness:
         return obj
 
     def cancel(self,app,error=None):
-        if not self.active:return
+        if not self.active or self.pending is not None:return
         self.pending='FAILED' if error else 'CANCELLED';self.error=error;self.status='CANCELLING'
         if self.navigation.active:self.navigation.cancel(app,error=error)
-        if self.cleanup_id is not None:
-            child=app._mission_status()
-            if child and child['task_id']==self.cleanup_id and child['status'] not in TERMINAL:app._cancel_child()
 
     def _finish(self,app,status,error=None):
         self.status,self.error=status,error

@@ -81,6 +81,8 @@ class BusinessTests(unittest.TestCase):
         task=AutonomyBusiness(self.app,'PATROL');task.navigation.status='PLANNING'
         task.cancel(self.app);task.tick(self.app);self.assertEqual(len(self.launched),1)
         task.navigation.status='CANCELLED';task.tick(self.app)
+        task.cancel(self.app);task.tick(self.app)
+        self.assertEqual(self.cleanup['status'],'RUNNING')
         self.cleanup['status']='SUCCEEDED';task.tick(self.app)
         self.assertEqual(task.status,'CANCELLED');self.assertEqual(task.checkpoints,[])
 
