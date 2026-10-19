@@ -51,7 +51,8 @@ def output(command: list[str], cwd: Path = ROOT) -> str:
 
 
 class OwnedSimulation:
-    def __init__(self, run_dir: Path, kind: str):
+    def __init__(self, run_dir: Path, kind: str, *, rover_model='target_rover'):
+        if rover_model not in ('target_rover','compact_rover'):raise ValueError('unregistered owned Rover fixture')
         self.run_dir = run_dir
         self.kind = kind
         self.instance = choose_instance()
@@ -60,13 +61,14 @@ class OwnedSimulation:
         self.world = f"{kind}_{uuid4().hex[:12]}"
         os.environ["GZ_IP"] = "127.0.0.1"
         os.environ["GZ_PARTITION"] = "vaf_" + self.world
-        self.model = "iris_with_gimbal" if kind == "copter" else "target_rover"
-        self.profile = replace(SimulationProfile.load(ROOT / f"simulation/profiles/{kind}.toml"), port=self.port)
+        self.model = "iris_with_gimbal" if kind == "copter" else rover_model
+        profile_key='compact_rover' if kind=='rover' and rover_model=='compact_rover' else kind
+        self.profile = replace(SimulationProfile.load(ROOT / f"simulation/profiles/{profile_key}.toml"), port=self.port)
         self.processes = []
         code_hash=hashlib.sha256()
         for package in ('contracts','core','deployment','runtime','application','applications','actions','app','environments','localization','world_model','mapping','planning','guidance','integrations','sensors','perception','vehicles','protocols','infrastructure','simulation','scripts','tests/simulation'):
             for source in sorted((ROOT/package).rglob('*')):
-                if source.is_file() and source.suffix in ('.py','.toml','.json','.sdf','.yaml','.sh'):
+                if source.is_file() and source.suffix in ('.py','.toml','.json','.sdf','.yaml','.sh','.parm','.cpp','.h'):
                     code_hash.update(str(source.relative_to(ROOT)).encode()+b'\0'+source.read_bytes()+b'\0')
         self.manifest = {"root_source_sha256":code_hash.hexdigest(),
             "working_tree_dirty":bool(output(["git","status","--porcelain"])),"kind": kind, "framework_sha": output(["git", "rev-parse", "HEAD"]),
@@ -78,7 +80,7 @@ class OwnedSimulation:
             "gazebo_transport": {"ip": "127.0.0.1", "partition": os.environ["GZ_PARTITION"]},
             "started_at": datetime.now(timezone.utc).isoformat(), "processes": []}
         source_model = (PLUGIN / "models/iris_with_gimbal/model.sdf" if kind == "copter"
-                        else ROOT / "simulation/models/target_rover/model.sdf")
+                        else ROOT / f"simulation/models/{rover_model}/model.sdf")
         model = ET.parse(source_model)
         for plugin in model.findall(".//plugin"):
             if plugin.attrib.get("name") == "ArduPilotPlugin":
@@ -89,8 +91,11 @@ class OwnedSimulation:
         world = ET.parse(source_world)
         world.find("world").set("name", self.world)
         for uri in world.findall(".//include/uri"):
-            if uri.text == f"model://{self.model}":
+            if uri.text == f"model://{self.model}" or (kind=='rover' and uri.text=='model://target_rover'):
                 uri.text = str(self.model_path)
+                if kind=='rover':
+                    name=world.find('.//include/name')
+                    if name is not None:name.text=self.model
         self.world_path = run_dir / "world.sdf"
         world.write(self.world_path)
         self.manifest["source_model"] = str(source_model)
@@ -99,6 +104,7 @@ class OwnedSimulation:
         self.params = [ARDUPILOT / "Tools/autotest/default_params" / name for name in default_names]
         self.params.append(ROOT / f"simulation/params/{kind}_telemetry.parm")
         self.manifest["parameters"] = [str(p) for p in self.params]
+        self.manifest["parameter_files_sha256"] = {str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in self.params}
         self._save()
 
     def _save(self):

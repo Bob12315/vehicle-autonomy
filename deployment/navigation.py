@@ -19,8 +19,8 @@ from actions.path_following import TrackingParameters
 from contracts.core.primitives import ResourceVersion
 from contracts.vehicle.command import TwistTargetCommand
 from contracts.world.models import ResourceReference
-from guidance.path_following import (BODY_RADIUS_FROM_DRIVE_M, CROSS_TRACK_M, DRIVE_OFFSET_M,
-                                    PATH_CLEARANCE_M, PlanarBinding, PolylineTracker, drive_reference)
+from guidance.path_following import PlanarBinding, PolylineTracker, drive_reference
+from guidance.navigation_model import FRONT_AXLE,VehicleNavigationModel,resolve_model
 from mapping.grid import pose_from_json
 from planning.collision import CollisionGrid
 from planning.models import MapContext, Pose2D, PlanningError
@@ -33,14 +33,17 @@ class NavigationConfig:
     goals_path: Path | None = None
     tracking_mode: str = 'smooth'
     recipes_path: Path | None = None
+    model: VehicleNavigationModel = FRONT_AXLE
+    source_sha256: str | None = None
 
     @classmethod
     def load(cls, path):
-        data = tomllib.loads(Path(path).read_text())
+        raw=Path(path).read_bytes()
+        if len(raw)>32768:raise ValueError("navigation configuration exceeds size bound")
+        data = tomllib.loads(raw.decode())
         if set(data)-{"schema", "model", "plan_path", "timeout_ns", "goals_path", "tracking_mode", "recipes_path"} or not {"schema", "model", "plan_path", "timeout_ns"} <= set(data) or type(data["schema"]) is not int or data["schema"] != 1:
             raise ValueError("invalid navigation configuration")
-        if data["model"] != "target_rover_front_axle_v1":
-            raise ValueError("only the audited front-drive Rover model is supported")
+        model=resolve_model(data["model"])
         if type(data["plan_path"]) is not str or not Path(data["plan_path"]).is_absolute():
             raise ValueError("navigation plan path must be explicit and absolute")
         if type(data["timeout_ns"]) is not int or not 1_000_000_000 <= data["timeout_ns"] <= 70_000_000_000:
@@ -54,7 +57,7 @@ class NavigationConfig:
         if recipes is not None and (type(recipes) is not str or not Path(recipes).is_absolute() or goals is None):
             raise ValueError('recipes require an explicit absolute path and a goal catalog')
         return cls(Path(data["plan_path"]), data["timeout_ns"],None if goals is None else Path(goals),mode,
-            None if recipes is None else Path(recipes))
+            None if recipes is None else Path(recipes),model,hashlib.sha256(raw).hexdigest())
 
 
 @dataclass(frozen=True, slots=True)
@@ -88,6 +91,7 @@ def read_plan(path):
 class NavigationSupervisor:
     def __init__(self, config, safety, event_sink=None, source_store=None):
         self.config, self.safety = config, safety
+        self.model=config.model
         self.source_store = source_store
         self.emit = event_sink or (lambda *args, **kwargs: None)
         self.context = self.binding = self.body_grid = self.route_grid = None
@@ -134,12 +138,12 @@ class NavigationSupervisor:
                 if self.context is None or self.context.sha256 != context.sha256 or self.binding != binding:
                     # A changing SLAM map is accepted only after checking every
                     # segment again in that map's explicitly observed alignment.
-                    self.route_grid = CollisionGrid(context, PATH_CLEARANCE_M)
+                    self.route_grid = CollisionGrid(context, self.model.path_clearance_m)
                     try:
                         self.route_grid.validate(tuple(binding.to_map(point) for point in p.poses))
                     except PlanningError as exc:
                         raise ValueError("navigation_path_blocked: "+str(exc)) from exc
-                    self.body_grid = CollisionGrid(context, BODY_RADIUS_FROM_DRIVE_M+.04)
+                    self.body_grid = CollisionGrid(context, self.model.footprint_radius_m+.04)
                     self.revalidations += 1
                     self.emit("navigation_map_revalidated", sha256=context.sha256,
                               revision=context.reference.version.revision, drift_m=drift)
@@ -186,8 +190,8 @@ class NavigationSupervisor:
             raise ValueError("invalid source content identity")
         if m["revision"] == context.reference.version.revision and (m["sha256"] != context.sha256 or m["captured_ns"] != context.captured_at.monotonic_ns):
             raise ValueError("plan reuses a map revision with different source facts")
-        if type(d["clearance_m"]) not in (int, float) or not math.isfinite(d["clearance_m"]) or not PATH_CLEARANCE_M <= d["clearance_m"] <= 2:
-            raise ValueError("motion requires at least 0.95 metre planned clearance about the drive axle")
+        if type(d["clearance_m"]) not in (int, float) or not math.isfinite(d["clearance_m"]) or not self.model.path_clearance_m <= d["clearance_m"] <= 2:
+            raise ValueError("motion requires the configured planned clearance about the drive axle")
         if type(d["poses"]) is not list or not 2 <= len(d["poses"]) <= 8192:
             raise ValueError("bounded path required")
         def pose(value):
@@ -214,27 +218,27 @@ class NavigationSupervisor:
         if loc is None or loc.pose.frame_id != "odom" or not 0 <= now.elapsed_ns_since(loc.pose.captured_at) <= 500_000_000:
             raise ValueError("fresh odom localization required")
         current_pose = loc.pose.value
-        current = drive_reference(Pose2D(current_pose.position.x,current_pose.position.y,yaw(current_pose)))
+        current = drive_reference(Pose2D(current_pose.position.x,current_pose.position.y,yaw(current_pose)),self.model)
         if math.hypot(current.x-odom[0].x, current.y-odom[0].y) > .2:
             raise ValueError("plan start is too far from current vehicle")
         for point in odom:
-            if not (self.safety.min_x_m+BODY_RADIUS_FROM_DRIVE_M <= point.x <= self.safety.max_x_m-BODY_RADIUS_FROM_DRIVE_M
-                    and self.safety.min_y_m+BODY_RADIUS_FROM_DRIVE_M <= point.y <= self.safety.max_y_m-BODY_RADIUS_FROM_DRIVE_M):
+            if not (self.safety.min_x_m+self.model.footprint_radius_m <= point.x <= self.safety.max_x_m-self.model.footprint_radius_m
+                    and self.safety.min_y_m+self.model.footprint_radius_m <= point.y <= self.safety.max_y_m-self.model.footprint_radius_m):
                 raise ValueError("bound path footprint exceeds vehicle geofence")
         parameters = TrackingParameters(world.environment, d["request_id"], str(context.frame_epoch),
             str(context.reference.version.generation_id), digest, binding, odom, self.config.timeout_ns,
-            self.config.tracking_mode=='stop_turn')
+            self.config.tracking_mode=='stop_turn',self.model)
         self.parameters = parameters
         self.view = NavigationView(parameters.request_id, None)
-        self.tracker = PolylineTracker(odom)
-        self.route_grid, self.body_grid = route, CollisionGrid(context, BODY_RADIUS_FROM_DRIVE_M+.04)
+        self.tracker = PolylineTracker(odom,model=self.model)
+        self.route_grid, self.body_grid = route, CollisionGrid(context, self.model.footprint_radius_m+.04)
         self.last_drift_m, self.revalidations = 0., 0
         self.last_error = None
-        self.emit("navigation_admitted", request_id=parameters.request_id, plan_sha256=digest,
+        self.emit("navigation_admitted", model=self.model.model_id,model_sha256=self.model.sha256,tracking_mode=self.config.tracking_mode,request_id=parameters.request_id, plan_sha256=digest,
                   source_map_sha256=m["sha256"], adopted_map_sha256=context.sha256,
                   binding={"x": binding.x, "y": binding.y, "yaw": binding.yaw},
-                  reference_point="front_drive_axle", base_to_reference_x_m=DRIVE_OFFSET_M,
-                  footprint_radius_m=BODY_RADIUS_FROM_DRIVE_M,
+                  reference_point=self.model.reference_point, base_to_reference_x_m=self.model.base_to_reference_x_m,
+                  footprint_radius_m=self.model.footprint_radius_m,
                   odom_poses=[[p.x, p.y, p.yaw] for p in odom], length_m=length)
         return parameters
 
@@ -262,13 +266,15 @@ class NavigationSupervisor:
                 if value is None or not 0 <= now.elapsed_ns_since(value.captured_at) <= 500_000_000:
                     raise ValueError("navigation_state_stale")
             p = state.reported_pose.value
-            current = drive_reference(Pose2D(p.position.x, p.position.y, yaw(p)))
+            current = drive_reference(Pose2D(p.position.x, p.position.y, yaw(p)),self.model)
             distance, progress = self.tracker.project(current)
             self.tracker.progress = progress
-            if distance > CROSS_TRACK_M:
+            if distance > self.model.cross_track_m:
                 raise ValueError("navigation_cross_track_exceeded")
             twist = command.command.target_twist
-            if not 0 <= twist.linear.x <= .18 or abs(twist.angular.z) > .25:
+            if any(value != 0 for value in (twist.linear.y,twist.linear.z,twist.angular.x,twist.angular.y)):
+                raise ValueError("navigation_requires_planar_forward_twist")
+            if not 0 <= twist.linear.x <= self.model.max_speed_mps or abs(twist.angular.z) > self.model.max_yaw_rate_rps:
                 raise ValueError("navigation_velocity_bound_exceeded")
             # Check a one-second swept prediction including turning. Unknown
             # cells block it too. StopMotion is exempt in the common writer.
@@ -296,9 +302,9 @@ class NavigationSupervisor:
                 if (world.map == self.context.reference and loc is not None and loc.pose.frame_id == "odom"
                         and 0 <= now.elapsed_ns_since(loc.pose.captured_at) <= 500_000_000):
                     p = loc.pose.value
-                    point = self.binding.to_map(drive_reference(Pose2D(p.position.x,p.position.y,yaw(p))))
+                    point = self.binding.to_map(drive_reference(Pose2D(p.position.x,p.position.y,yaw(p)),self.model))
                     start = {"frame": "map", "frame_epoch": self.context.frame_epoch,
-                             "reference_point": "front_drive_axle", "position": [point.x,point.y],
+                             "reference_point": self.model.reference_point, "position": [point.x,point.y],
                              "captured_ns": loc.pose.captured_at.monotonic_ns}
             except ValueError:
                 pass
@@ -306,6 +312,6 @@ class NavigationSupervisor:
                 "request_id": self.view.request_id, "error": self.view.error,
                 "last_error": self.last_error,
                 "alignment_drift_m": self.last_drift_m, "map_revalidations": self.revalidations,
-                "model": "target_rover_front_axle_v1", "base_to_reference_x_m": DRIVE_OFFSET_M,
-                "required_clearance_m": PATH_CLEARANCE_M, "planning_start": start,
+                "model": self.model.model_id, "model_sha256": self.model.sha256, "configuration_sha256":self.config.source_sha256, "base_to_reference_x_m": self.model.base_to_reference_x_m,
+                "required_clearance_m": self.model.path_clearance_m, "planning_start": start,
                 "progress_m": None if self.tracker is None else self.tracker.progress}

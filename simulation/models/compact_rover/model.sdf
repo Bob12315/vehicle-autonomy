@@ -1,0 +1,143 @@
+<?xml version='1.0' encoding='us-ascii'?>
+<sdf version="1.9">
+  <model name="compact_rover">
+    <pose>0 0 0 0 0 0</pose>
+    <link name="base_link">
+      <pose>0 0 0.19 0 0 0</pose>
+      <inertial>
+        <mass>5</mass>
+        <inertia><ixx>0.22</ixx><iyy>0.35</iyy><izz>0.48</izz></inertia>
+      </inertial>
+      <collision name="body_collision">
+        <geometry><box><size>.64 .40 .16</size></box></geometry>
+      </collision>
+      <visual name="body_visual">
+        <geometry><box><size>.64 .40 .16</size></box></geometry>
+        <material><diffuse>.65 .25 .10 1</diffuse></material>
+      </visual>
+      <sensor name="imu_sensor" type="imu">
+        <pose degrees="true">0 0 0 180 0 0</pose>
+        <always_on>1</always_on>
+        <update_rate>1000</update_rate>
+      </sensor>
+    </link>
+
+    <link name="drive_left_wheel">
+      <pose>-.2 0.29 .11 0 0 0</pose>
+      <inertial><mass>0.35</mass><inertia><ixx>0.0025</ixx><iyy>0.0025</iyy><izz>0.0025</izz></inertia></inertial>
+      <collision name="tire_collision">
+        <geometry><cylinder><radius>0.11</radius><length>0.07</length></cylinder></geometry>
+        <pose>0 0 0 1.57079632679 0 0</pose>
+        <surface><friction><ode><mu>1.8</mu><mu2>1.8</mu2></ode></friction></surface>
+      </collision>
+      <visual name="tire_visual"><pose>0 0 0 1.57079632679 0 0</pose>
+        <geometry><cylinder><radius>0.11</radius><length>0.07</length></cylinder></geometry>
+        <material><diffuse>0.06 0.06 0.06 1</diffuse></material></visual>
+    </link>
+    <joint name="drive_left_drive_joint" type="revolute">
+      <parent>base_link</parent><child>drive_left_wheel</child>
+      <axis><xyz>0 1 0</xyz><limit><lower>-1e16</lower><upper>1e16</upper><effort>8</effort><velocity>30</velocity></limit>
+        <dynamics><damping>0.05</damping></dynamics></axis>
+    </joint>
+
+    <link name="drive_right_wheel">
+      <pose>-.2 -0.29 .11 0 0 0</pose>
+      <inertial><mass>0.35</mass><inertia><ixx>0.0025</ixx><iyy>0.0025</iyy><izz>0.0025</izz></inertia></inertial>
+      <collision name="tire_collision">
+        <geometry><cylinder><radius>0.11</radius><length>0.07</length></cylinder></geometry>
+        <pose>0 0 0 1.57079632679 0 0</pose>
+        <surface><friction><ode><mu>1.8</mu><mu2>1.8</mu2></ode></friction></surface>
+      </collision>
+      <visual name="tire_visual"><pose>0 0 0 1.57079632679 0 0</pose>
+        <geometry><cylinder><radius>0.11</radius><length>0.07</length></cylinder></geometry>
+        <material><diffuse>0.06 0.06 0.06 1</diffuse></material></visual>
+    </link>
+    <joint name="drive_right_drive_joint" type="revolute">
+      <parent>base_link</parent><child>drive_right_wheel</child>
+      <axis><xyz>0 1 0</xyz><limit><lower>-1e16</lower><upper>1e16</upper><effort>8</effort><velocity>30</velocity></limit>
+        <dynamics><damping>0.05</damping></dynamics></axis>
+    </joint>
+
+    <link name="caster_left_swivel">
+      <pose>.29 0.19 .12 0 0 0</pose>
+      <inertial><mass>0.12</mass><inertia><ixx>0.0008</ixx><iyy>0.0008</iyy><izz>0.0008</izz></inertia></inertial>
+      <visual name="stem_visual"><geometry><cylinder><radius>0.02</radius><length>0.10</length></cylinder></geometry></visual>
+    </link>
+    <joint name="caster_left_swivel_joint" type="revolute">
+      <parent>base_link</parent><child>caster_left_swivel</child>
+      <axis><xyz>0 0 1</xyz><limit><lower>-1e16</lower><upper>1e16</upper><effort>0</effort><velocity>20</velocity></limit>
+        <dynamics><damping>0.005</damping></dynamics></axis>
+    </joint>
+    <link name="caster_left_caster_wheel">
+      <pose>.24 0.19 .065 0 0 0</pose>
+      <inertial><mass>0.12</mass><inertia><ixx>0.0004</ixx><iyy>0.0004</iyy><izz>0.0004</izz></inertia></inertial>
+      <collision name="tire_collision"><pose>0 0 0 1.57079632679 0 0</pose>
+        <geometry><cylinder><radius>0.065</radius><length>0.04</length></cylinder></geometry>
+        <surface><friction><ode><mu>0.9</mu><mu2>0.9</mu2></ode></friction></surface></collision>
+      <visual name="tire_visual"><pose>0 0 0 1.57079632679 0 0</pose>
+        <geometry><cylinder><radius>0.065</radius><length>0.04</length></cylinder></geometry>
+        <material><diffuse>0.1 0.1 0.1 1</diffuse></material></visual>
+    </link>
+    <joint name="caster_left_roll_joint" type="revolute">
+      <parent>caster_left_swivel</parent><child>caster_left_caster_wheel</child>
+      <axis><xyz>0 1 0</xyz><limit><lower>-1e16</lower><upper>1e16</upper><effort>0</effort><velocity>40</velocity></limit>
+        <dynamics><damping>0.005</damping></dynamics></axis>
+    </joint>
+
+    <link name="caster_right_swivel">
+      <pose>.29 -0.19 .12 0 0 0</pose>
+      <inertial><mass>0.12</mass><inertia><ixx>0.0008</ixx><iyy>0.0008</iyy><izz>0.0008</izz></inertia></inertial>
+      <visual name="stem_visual"><geometry><cylinder><radius>0.02</radius><length>0.10</length></cylinder></geometry></visual>
+    </link>
+    <joint name="caster_right_swivel_joint" type="revolute">
+      <parent>base_link</parent><child>caster_right_swivel</child>
+      <axis><xyz>0 0 1</xyz><limit><lower>-1e16</lower><upper>1e16</upper><effort>0</effort><velocity>20</velocity></limit>
+        <dynamics><damping>0.005</damping></dynamics></axis>
+    </joint>
+    <link name="caster_right_caster_wheel">
+      <pose>.24 -0.19 .065 0 0 0</pose>
+      <inertial><mass>0.12</mass><inertia><ixx>0.0004</ixx><iyy>0.0004</iyy><izz>0.0004</izz></inertia></inertial>
+      <collision name="tire_collision"><pose>0 0 0 1.57079632679 0 0</pose>
+        <geometry><cylinder><radius>0.065</radius><length>0.04</length></cylinder></geometry>
+        <surface><friction><ode><mu>0.9</mu><mu2>0.9</mu2></ode></friction></surface></collision>
+      <visual name="tire_visual"><pose>0 0 0 1.57079632679 0 0</pose>
+        <geometry><cylinder><radius>0.065</radius><length>0.04</length></cylinder></geometry>
+        <material><diffuse>0.1 0.1 0.1 1</diffuse></material></visual>
+    </link>
+    <joint name="caster_right_roll_joint" type="revolute">
+      <parent>caster_right_swivel</parent><child>caster_right_caster_wheel</child>
+      <axis><xyz>0 1 0</xyz><limit><lower>-1e16</lower><upper>1e16</upper><effort>0</effort><velocity>40</velocity></limit>
+        <dynamics><damping>0.005</damping></dynamics></axis>
+    </joint>
+
+    <plugin filename="gz-sim-joint-state-publisher-system" name="gz::sim::systems::JointStatePublisher" />
+    <plugin filename="gz-sim-apply-joint-force-system" name="gz::sim::systems::ApplyJointForce">
+      <joint_name>drive_left_drive_joint</joint_name>
+    </plugin>
+    <plugin filename="gz-sim-apply-joint-force-system" name="gz::sim::systems::ApplyJointForce">
+      <joint_name>drive_right_drive_joint</joint_name>
+    </plugin>
+    <plugin name="ArduPilotPlugin" filename="ArduPilotPlugin">
+      <fdm_addr>127.0.0.1</fdm_addr><fdm_port_in>9002</fdm_port_in>
+      <connectionTimeoutMaxCount>5</connectionTimeoutMaxCount>
+      <lock_step>1</lock_step><no_time_sync>1</no_time_sync>
+      <modelXYZToAirplaneXForwardZDown degrees="true">0 0 0 180 0 0</modelXYZToAirplaneXForwardZDown>
+      <gazeboXYZToNED degrees="true">0 0 0 180 0 90</gazeboXYZToNED>
+      <imuName>imu_sensor</imuName>
+      <control channel="0">
+        <jointName>drive_left_drive_joint</jointName><useForce>1</useForce>
+        <multiplier>10</multiplier><offset>-0.5</offset>
+        <servo_min>1000</servo_min><servo_max>2000</servo_max>
+        <type>VELOCITY</type><p_gain>1</p_gain><i_gain>0.1</i_gain><d_gain>0.0001</d_gain>
+        <i_max>1</i_max><i_min>-1</i_min><cmd_max>8</cmd_max><cmd_min>-8</cmd_min>
+      </control>
+      <control channel="2">
+        <jointName>drive_right_drive_joint</jointName><useForce>1</useForce>
+        <multiplier>10</multiplier><offset>-0.5</offset>
+        <servo_min>1000</servo_min><servo_max>2000</servo_max>
+        <type>VELOCITY</type><p_gain>1</p_gain><i_gain>0.1</i_gain><d_gain>0.0001</d_gain>
+        <i_max>1</i_max><i_min>-1</i_min><cmd_max>8</cmd_max><cmd_min>-8</cmd_min>
+      </control>
+    </plugin>
+  </model>
+</sdf>

@@ -6,7 +6,7 @@ from pathlib import Path
 from uuid import uuid4
 
 from actions.basic import yaw
-from guidance.path_following import PATH_CLEARANCE_M, drive_reference
+from guidance.path_following import drive_reference
 from mapping.grid import atomic_json
 from planning.models import Pose2D
 from .navigation_job import PlanningJob
@@ -83,12 +83,12 @@ class GoalNavigation:
             raise ValueError("planning requires observed stationary state")
         pose = world.localization.pose.value
         nav = app.navigation
-        start = nav.binding.to_map(drive_reference(Pose2D(pose.position.x,pose.position.y,yaw(pose))))
+        start = nav.binding.to_map(drive_reference(Pose2D(pose.position.x,pose.position.y,yaw(pose)),nav.config.model))
         goal = nav.binding.to_map(self.destination)
         self.attempt += 1
         directory = nav.config.plan_path.parent/"navigation-jobs"/self.task_id.split(":")[1]/str(self.attempt)
         directory.mkdir(parents=True,exist_ok=False)
-        self.job = self.job_factory(nav.context,start,goal,self.catalog.policy,PATH_CLEARANCE_M+self.catalog.policy.planning_reserve_m,directory)
+        self.job = self.job_factory(nav.context,start,goal,self.catalog.policy,nav.config.model.path_clearance_m+self.catalog.policy.planning_reserve_m,directory)
         self.status = "PLANNING"
         app._emit("goal_planning_started",task_id=self.task_id,goal=self.goal.name,attempt=self.attempt,
                   directory=str(directory),source_sha256=nav.context.sha256)
@@ -213,4 +213,5 @@ class GoalNavigation:
             "steps":[] if child is None else child["steps"],"child":child_view,"history":self.child_history,
             "configuration_sha256":self.catalog.sha256,"effects":{} if child is None else child["effects"],
             "requests":{} if child is None else child["requests"],"stops":{} if child is None else child["stops"],
-            "backend_directory":self.last_backend_directory}
+            "backend_directory":self.last_backend_directory,"navigation_model":app.navigation.config.model.model_id,
+            "navigation_model_sha256":app.navigation.config.model.sha256}

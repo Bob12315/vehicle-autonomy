@@ -6,7 +6,8 @@ from contracts.core.geometry import Twist3, Vector3
 from contracts.decision import ActionDecision, ActionOutcome, ActionSpec
 from contracts.effects.vehicle import StopMotionEffect, TwistTargetEffect
 from contracts.world.models import ResourceReference
-from guidance.path_following import CROSS_TRACK_M, PlanarBinding, PolylineTracker, drive_reference
+from guidance.path_following import PlanarBinding, PolylineTracker, drive_reference
+from guidance.navigation_model import FRONT_AXLE,VehicleNavigationModel
 from planning.models import Pose2D
 from .basic import BAD, WRITTEN, BasicInstance, BasicParameters, failed, yaw
 
@@ -22,6 +23,7 @@ class TrackingParameters:
     poses: tuple[Pose2D, ...]  # explicitly bound odom coordinates
     timeout_ns: int = 70_000_000_000
     stop_turn: bool = False
+    model: VehicleNavigationModel = FRONT_AXLE
 
     def __post_init__(self):
         if type(self.timeout_ns) is not int or not 1_000_000_000 <= self.timeout_ns <= 70_000_000_000:
@@ -29,7 +31,7 @@ class TrackingParameters:
         if type(self.stop_turn) is not bool:raise ValueError('invalid tracking strategy')
         if not isinstance(self.environment, ResourceReference) or not isinstance(self.binding, PlanarBinding):
             raise TypeError("typed environment and explicit frame binding required")
-        PolylineTracker(self.poses)
+        PolylineTracker(self.poses,model=self.model)
 
 
 SPEC = ActionSpec("navigation.follow_path", TrackingParameters, frozenset({"navigation"}),
@@ -48,7 +50,7 @@ class TrackingInstance:
     def __init__(self, parameters, world, reader):
         self.p, self.reader = parameters, reader
         self.stop = BasicInstance("hold", BasicParameters("rover", parameters.environment), world)
-        self.tracker = PolylineTracker(parameters.poses,stop_turn=parameters.stop_turn)
+        self.tracker = PolylineTracker(parameters.poses,stop_turn=parameters.stop_turn,model=parameters.model)
         self.start_ns = world.published_at.monotonic_ns
         self.deadline_ns = self.start_ns+parameters.timeout_ns
         self.refresh_ns = 0
@@ -77,8 +79,8 @@ class TrackingInstance:
         if results and results[-1].phase in BAD:
             return failed(results[-1].reason or "navigation_effect_rejected")
         p = loc.pose.value
-        output = self.tracker.update(drive_reference(Pose2D(p.position.x, p.position.y, yaw(p))), loc.twist.value.angular.z)
-        if output.cross_track_m > CROSS_TRACK_M:
+        output = self.tracker.update(drive_reference(Pose2D(p.position.x, p.position.y, yaw(p)),self.p.model), loc.twist.value.angular.z)
+        if output.cross_track_m > self.p.model.cross_track_m:
             return failed("navigation_cross_track_exceeded")
         good = (output.arrived and self.stop.touched and bool(results and results[-1].phase in WRITTEN)
                 and loc.pose.captured_at.monotonic_ns > self.start_ns and self.stop._steady(world))

@@ -5,6 +5,7 @@ from dataclasses import dataclass
 import math
 
 from planning.models import Pose2D
+from .navigation_model import FRONT_AXLE,VehicleNavigationModel
 
 
 def angle(value):
@@ -13,15 +14,15 @@ def angle(value):
 
 # The audited two-front-drive-wheel / two-rear-caster model. Its drive
 # reference is NOT base_link: pivoting translates the body origin.
-DRIVE_OFFSET_M = .25
-BODY_RADIUS_FROM_DRIVE_M = .72
-PATH_CLEARANCE_M = .95
-CROSS_TRACK_M = .15
+DRIVE_OFFSET_M = FRONT_AXLE.base_to_reference_x_m
+BODY_RADIUS_FROM_DRIVE_M = FRONT_AXLE.footprint_radius_m
+PATH_CLEARANCE_M = FRONT_AXLE.path_clearance_m
+CROSS_TRACK_M = FRONT_AXLE.cross_track_m
 
 
-def drive_reference(body):
-    return Pose2D(body.x+DRIVE_OFFSET_M*math.cos(body.yaw),
-                  body.y+DRIVE_OFFSET_M*math.sin(body.yaw), body.yaw)
+def drive_reference(body, model=FRONT_AXLE):
+    return Pose2D(body.x+model.base_to_reference_x_m*math.cos(body.yaw),
+                  body.y+model.base_to_reference_x_m*math.sin(body.yaw), body.yaw)
 
 
 @dataclass(frozen=True, slots=True)
@@ -54,7 +55,9 @@ class GuidanceOutput:
 
 
 class PolylineTracker:
-    def __init__(self, poses, *, stop_turn=False):
+    def __init__(self, poses, *, stop_turn=False, model=FRONT_AXLE):
+        if not isinstance(model,VehicleNavigationModel):raise TypeError("typed navigation model required")
+        self.model=model
         if type(stop_turn) is not bool:raise ValueError('explicit tracking strategy required')
         self.stop_turn=stop_turn
         if not isinstance(poses, tuple) or not 2 <= len(poses) <= 8192 or not all(isinstance(p, Pose2D) for p in poses):
@@ -111,19 +114,20 @@ class PolylineTracker:
                 break
             preview = max(.25,preview-.1)
         error = angle(math.atan2(target.y-pose.y, target.x-pose.x)-pose.yaw)
-        rate = max(-.2, min(.2, .25*error-.75*measured_yaw_rate))
-        speed = min(.15, max(.04, .5*(remaining-.12))) * max(0., math.cos(error))**3
+        rate_limit=min(.2,self.model.max_yaw_rate_rps)
+        rate = max(-rate_limit, min(rate_limit, .25*error-.75*measured_yaw_rate))
+        speed = min(.15, self.model.max_speed_mps, max(.04, .5*(remaining-.12))) * max(0., math.cos(error))**3
         # Caster stiction makes tiny steering corrections ineffective on the
         # audited physical Rover. Align at the drive axle before advancing;
         # hysteresis prevents noisy heading cuts from toggling every cycle.
         if self.stop_turn:
             if abs(error) > .3 or (distance > .06 and abs(error) > .15):
                 self.turning = True
-            if abs(error) < .08 and abs(measured_yaw_rate) < .1:
+            if abs(error) < .15 and abs(measured_yaw_rate) < .1:
                 self.turning = False
             if self.turning:
                 speed = 0.
-                rate = math.copysign(.2,error) if abs(error) >= .08 else 0.
+                rate = math.copysign(rate_limit,error) if abs(error) >= .08 else 0.
         elif abs(error) > .45:
             speed = 0.
         return GuidanceOutput(0. if arrived else speed, 0. if arrived else rate,

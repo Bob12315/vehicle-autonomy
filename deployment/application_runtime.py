@@ -43,6 +43,9 @@ class ApplicationRuntime:
             from .navigation import NavigationConfig, NavigationSupervisor
             self.navigation = NavigationSupervisor(NavigationConfig.load(navigation_config), profile.safety,
                 lambda event, **fields: self._emit(event, **fields))
+            from guidance.navigation_model import DEPLOYMENT_PROFILES
+            if profile.vehicle_id!=DEPLOYMENT_PROFILES[self.navigation.config.model.model_id]:
+                raise ValueError('navigation model and explicit deployment profile do not match')
             if self.navigation.config.goals_path is not None:
                 from application.navigation_goals import GoalCatalog
                 self.navigation_goals = GoalCatalog(self.navigation.config.goals_path)
