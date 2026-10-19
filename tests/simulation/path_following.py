@@ -33,7 +33,7 @@ def segment_distance(x, y, a, b):
 
 def run(directory, case, *, autonomous=False, room_yaw=None, model_id=FRONT_AXLE.model_id):
     navigation_model=resolve_model(model_id)
-    model_name={"target_rover_front_axle_v1":"target_rover","compact_rover_rear_axle_v1":"compact_rover"}[model_id]
+    model_name={"target_rover_front_axle_v1":"target_rover","compact_rover_front_axle_v1":"compact_rover"}[model_id]
     scene_yaw=ROOM_YAW if room_yaw is None else room_yaw
     map_goal=case=="map_goal"
     business=case.startswith("business_")
@@ -73,7 +73,7 @@ def run(directory, case, *, autonomous=False, room_yaw=None, model_id=FRONT_AXLE
     plan=directory/"plan.json"
     config=directory/"navigation.toml"
     config.write_text(f'schema=1\nmodel="{model_id}"\nplan_path="{plan}"\ntimeout_ns={10_000_000_000 if case=="timeout" else 70_000_000_000}\n')
-    if replanning or business or model_name=='compact_rover':
+    if replanning or map_goal or business or model_name=='compact_rover':
         config.write_text(config.read_text()+'tracking_mode="stop_turn"\n')
     if autonomous:
         goals=directory/"goals.toml"
@@ -313,6 +313,12 @@ def run(directory, case, *, autonomous=False, room_yaw=None, model_id=FRONT_AXLE
             clearance.append(math.hypot(max(abs(px-(2.8 if replanning or business else 1.7))-.2,0),max(abs(py-(2 if replanning or business else .3))-.2,0)))
         report["truth_min_pillar_clearance_m"]=min(clearance)
         if cross>.3 or min(clearance)<.51:raise AssertionError("independent path/physical clearance exceeded")
+        if 'new_obstacle' in report:
+            bx,by,bw,bh=report['new_obstacle']
+            obstacle_clearance=min(math.hypot(max(abs(x-bx)-bw/2,0),max(abs(y-by)-bh/2,0))
+                                   for _,x,y,_,_ in trajectory)
+            report['truth_min_new_obstacle_clearance_m']=obstacle_clearance
+            if obstacle_clearance<.51:raise AssertionError('new physical obstacle clearance exceeded')
         if case in ("tracking","replan","map_goal","business_inspect"):
             final=trajectory[-1]
             error=math.hypot(final[1]+truth_offset*math.cos(final[4])-points[-1][0],

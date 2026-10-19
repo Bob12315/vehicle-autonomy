@@ -28,8 +28,8 @@ for case in ('tracking','planning_cancel','unreachable','replan','blocked','repl
     if case=='map_goal':flags+=['--room-yaw','0','--boundary-library',str(library)]
     cases.append(('front-'+case,'tests.simulation.goal_navigation',flags))
 for case in ('tracking','cancel','map_loss'):
-    cases.append(('rear-'+case,'tests.simulation.goal_navigation',
-                  ['--allow-send','--case',case,'--navigation-model','compact_rover_rear_axle_v1']))
+    cases.append(('compact-'+case,'tests.simulation.goal_navigation',
+                  ['--allow-send','--case',case,'--navigation-model','compact_rover_front_axle_v1']))
 results={}
 for name,module,flags in cases:
     with (directory/(name+'.log')).open('w') as output:

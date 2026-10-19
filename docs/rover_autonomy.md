@@ -48,11 +48,11 @@ model = "target_rover_front_axle_v1"
 plan_path = "/absolute/run/plan.json"
 goals_path = "/absolute/run/goals.toml"
 timeout_ns = 70000000000
-tracking_mode = "smooth"
+tracking_mode = "stop_turn"
 # recipes_path = "/absolute/run/recipes.toml"
 ```
 
-前驱模型参考点在 base_link 前 0.25 m；`compact_rover_rear_axle_v1` 在后 0.20 m，须配套 `simulation/profiles/compact_rover.toml` 及其实际 SDF。不匹配的 Deployment 在连接前拒绝；切换 TOML 不会改变现有 Gazebo 车体。模型、配置、SDF 和参数内容进入状态/manifest。
+原前驱模型参考点在 base_link 前 0.25 m；`compact_rover_front_axle_v1` 在前 0.18 m，须配套 `simulation/profiles/compact_rover.toml` 及其实际 SDF。紧凑模型有不同轴距、轮距、车身及质量。不匹配的 Deployment 在连接前拒绝；切换 TOML 不会改变现有 Gazebo 车体。模型、配置、SDF 和参数内容进入状态/manifest。省略 `tracking_mode` 时默认仍为 `smooth`；上述业务配置显式选择停转策略。
 
 启动 Application 时显式传入上述配置：
 

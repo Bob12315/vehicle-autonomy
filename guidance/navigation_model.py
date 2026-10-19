@@ -43,12 +43,12 @@ class VehicleNavigationModel:
 
 
 FRONT_AXLE=VehicleNavigationModel('target_rover_front_axle_v1',1,'front_drive_axle',.25,.72,.95,.15,.18,.25)
-REAR_AXLE=VehicleNavigationModel('compact_rover_rear_axle_v1',1,'rear_drive_axle',-.2,.70,.95,.15,.18,.25)
-MODELS={m.model_id:m for m in (FRONT_AXLE,REAR_AXLE)}
+COMPACT_AXLE=VehicleNavigationModel('compact_rover_front_axle_v1',1,'front_drive_axle',.18,.65,.95,.15,.18,.25)
+MODELS={m.model_id:m for m in (FRONT_AXLE,COMPACT_AXLE)}
 
 
 def resolve_model(model_id):
     if type(model_id) is not str or model_id not in MODELS:raise ValueError('unregistered navigation model')
     return MODELS[model_id]
 
-DEPLOYMENT_PROFILES={FRONT_AXLE.model_id:'simulation-rover',REAR_AXLE.model_id:'simulation-compact-rover'}
+DEPLOYMENT_PROFILES={FRONT_AXLE.model_id:'simulation-rover',COMPACT_AXLE.model_id:'simulation-compact-rover'}

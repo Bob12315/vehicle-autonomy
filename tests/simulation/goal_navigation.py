@@ -14,7 +14,7 @@ def main():
     parser.add_argument('--run-dir',type=Path)
     parser.add_argument('--room-yaw',type=float,choices=(0.,.15))
     parser.add_argument('--boundary-library',type=Path)
-    parser.add_argument('--navigation-model',choices=('target_rover_front_axle_v1','compact_rover_rear_axle_v1'),default='target_rover_front_axle_v1')
+    parser.add_argument('--navigation-model',choices=('target_rover_front_axle_v1','compact_rover_front_axle_v1'),default='target_rover_front_axle_v1')
     args=parser.parse_args()
     if not args.allow_send:parser.error('explicit simulation SEND required')
     install_signal_cleanup()
