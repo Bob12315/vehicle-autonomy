@@ -49,7 +49,10 @@ class PlanningJob:
         try:
             self.future.result(timeout=8)
         except TimeoutError:
-            raise RuntimeError("planning_worker_shutdown_unconfirmed")
+            # A completed backend may itself raise TimeoutError. Only an
+            # unfinished future means the worker exceeded this join barrier.
+            if not self.future.done():
+                raise RuntimeError("planning_worker_shutdown_unconfirmed")
         except Exception:
             pass  # The caller records the job result; cleanup still joins it.
         self.executor.shutdown(wait=True)

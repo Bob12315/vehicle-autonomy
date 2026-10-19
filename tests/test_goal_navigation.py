@@ -180,3 +180,14 @@ class GoalTests(unittest.TestCase):
         self.assertTrue(entered.wait(1));self.assertFalse(job.done)
         release.set();job.future.result(timeout=2);job.close()
         self.assertTrue(job.closed)
+
+    def test_completed_backend_timeout_still_joins_its_worker(self):
+        class TimedOut(Backend):
+            def compute(self,request,grid):raise TimeoutError('backend deadline')
+        now=TimePoint(time.monotonic_ns(),datetime.now(timezone.utc),'host-monotonic-simulation')
+        context=replace(self.helper.supervisor.context,captured_at=now)
+        job=PlanningJob(context,Pose2D(.25,0),Pose2D(.7,0),NavigationPolicy(),.95,
+            self.directory/'timeout-job',backend_factory=TimedOut)
+        with self.assertRaises(TimeoutError):job.future.result(timeout=2)
+        job.close()
+        self.assertTrue(job.closed)
