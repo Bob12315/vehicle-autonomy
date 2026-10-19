@@ -1,10 +1,10 @@
 # Vehicle Autonomy Framework V1：模块进度与未完成项
 
-> 复核日期：2026-10-19。本机 ROS 2 Mapping 见 [P18](autonomy/phase-18.md)，只读 Nav2 规划见 [P19](autonomy/phase-19.md)，正式 Mission 路径消费与物理跟踪见 [P20](autonomy/phase-20.md)。P9–P15 与 P17 软件基线见 [自主系统完成审计](autonomy/completion-audit.md)。本文只计新框架根目录；`legacy/cuadc_2026/` 的历史实现不计入新框架进度。目标职责见 [V1 目标架构](framework_v1.md)。
+> 复核日期：2026-10-19。最新 P21–P25 的命名导航、重规划、地图锚点、巡检和两种前驱几何已完成限定仿真验收：260 项单元测试、最终装配 13 项物理门槛通过，见 [最新完成审计](autonomy/navigation-completion-audit.md)。P9–P20 为历史软件基线。本文只计新框架根目录；`legacy/cuadc_2026/` 的历史实现不计入新框架进度。目标职责见 [V1 目标架构](framework_v1.md)。
 
 ## 进度口径
 
-后续优先级、依赖与验收门槛见 [P20 之后的总计划](autonomy_roadmap.md)。该路线图是规划，不改变本文按实际证据记录的完成度。
+阶段状态、依赖与验收门槛见 [总计划](autonomy_roadmap.md)。P21–P25 已完成各自明确范围；P26 统一版本/长运行未实施。模块成熟度仍按下表证据分档，不把阶段 PASS 直接换算为整个系统 100%。
 
 下面的百分比是**按证据分档的模块成熟度估计**，不是代码量、工时或整个系统的加权完成率。同一模块只取当前达到的最高档；目录占位不算实现。
 
@@ -31,8 +31,8 @@
 | VehicleState 遥测适配 | **75%** | Copter 状态适配及 [Rover GPS 原点/ENU 适配](../vehicles/rover/mavlink_state.py)已在 SITL + Gazebo 验证；仿真源时钟按会话映射，延迟/重复样本保留年龄。 | 生产设备采集时间和硬件同步未验收；USB 接收时间代理不能直接用于真实运动 Safety。 |
 | Sensor Adapter | **75%** | 显式只读 Gazebo 对象源及有限记录图像源已有来源、capture/receive、质量、版本、失效、健康和丢帧处理；见 [P14](autonomy/phase-14.md)、[P17](autonomy/phase-17.md)。 | 未接真实 Camera/LiDAR 设备；记录图像使用虚拟标定。 |
 | Perception | **75%** | CPU OpenCV DNN YOLOX 实际推理、像素检测和显式平面投影通过离线与 App 业务替换验收。 | 仅限公开 bus fixture；比赛目标模型、现场精度、真实标定、跟踪、障碍物和 RKNN 未验收。 |
-| Localization | **75%** | P10 将遥测自报位姿投影到正式版本化状态链，保留源 capture/epoch，GPS fix 使用同一已验证 SITL boot 时间域。 | 自报位姿不构成独立定位真值或 GPS/VIO/SLAM 融合；真实时间同步未验收。 |
-| Mapping | **75%（限定 Rover 二维仿真场景）** | 真实 Gazebo 激光→ROS 2/SLAM Toolbox→不可变版本地图→WorldSnapshot.map；导出/pose graph 重载见 [P18](autonomy/phase-18.md)，限定在线路径消费见 [P20](autonomy/phase-20.md)。 | 轴对齐房间的边界墙面缺失尚未解决；无任意场景可靠性、真实 LiDAR、三维或长期存储验收。 |
+| Localization | **75%** | 遥测自报位姿的正式状态链、capture/epoch 和 SITL boot 时钟；P23 新增 SLAM 候选质量/跳变审查，控制保持单一遥测来源；运动状态与独立真值的采样比对已记录。 | SLAM 候选始终不具控制资格；无 GPS/VIO/SLAM 融合、现场精度或真实时间同步验收。 |
+| Mapping | **75%（限定 Rover 二维仿真场景）** | 实际激光/SLAM/版本地图、导出回读；P23 对受审 2.8.5 提供原生边界修复，轴对齐/旋转房间及 map 锚点目标通过。 | 未显式加载补丁的组合仍有原缺陷；无任意场景、真实 LiDAR、三维/长期存储验收；重载须显式重新登记并核对目标。 |
 | Environment | **100%（命名仿真资源范围）** | P11 不可变 origin/home/geofence/命名点/区域、内容 SHA、会话绑定、原点检查和资源热变更拒绝已通过；见 [P11](autonomy/phase-11.md)。 | 不含地图生产、实测现场原点或设备校准。 |
 | World Model | **75%** | 正式 App 持续发布同源 Vehicle/Localization、Environment、对象 Observation；P18 增加带时间/版本/依赖的可选地图引用，拒绝过期/异域/冲突序号。 | 不做隐式跨 Frame 转换或 SLAM 位姿融合；真实设备采集时间未验收。 |
 | 状态链组合 | **75%** | [SimulationRuntime](../deployment/simulation_runtime.py)共享两车遥测→World Model 链；正常、断连、重启和时钟故障验收通过。 | 无真实传感器或生产设备时间映射；当前仅覆盖 Copter/Rover 仿真组合。 |
@@ -42,10 +42,10 @@
 | 部分 | 进度 | 已完成的证据 | 尚未完成 |
 | --- | ---: | --- | --- |
 | Action | **75%** | 有限基本运动、目标业务与前轴参考点路径跟踪均只读状态、产 Typed Effect，有物理结果及停车屏障；见 [P12](autonomy/phase-12.md)、[P15](autonomy/phase-15.md)、[P20](autonomy/phase-20.md)。 | 实车行为、任意路径和通用动态避障未验收；业务能力按注册参数限制。 |
-| Mission | **75%** | 两车 basic_route、CUADC、inspection 和显式 follow_path 均通过公开 CLI；路径跟踪、取消、地图丢失、文件修改和超时见 [P20](autonomy/phase-20.md)。 | 不含自动重规划、AI 提案或生产任务配置。 |
+| Mission | **75%** | 基本双车任务、CUADC/inspection；新增命名目标、有限停车后重规划、三点地图巡检和失败清理，见 [P21–P25](autonomy/navigation-completion-audit.md)。 | 不含 AI 提案、任意场景的任务成功保证或生产任务验收。 |
 | Intent / MissionProposal | **0%** | [目标架构](framework_v1.md#3-四类核心数据及其边界)定义了上层目标进入系统的边界，当前无对应的 V1 类型与校验用例。 | 仅在接入操作者提案或 Intelligence 时实现标准提案、校验和转 Mission/Action 的流程。 |
-| Planning | **75%（限定 Rover 二维仿真）** | [P19](autonomy/phase-19.md) 真实 Nav2 后端和独立几何校验；[P20](autonomy/phase-20.md) 增加在线计划准入、map/odom 绑定、当前地图复核及正式 Mission 物理路径跟踪。 | 自动重规划、动态避障、时间轨迹、其他车辆和任意场景未验收；记录计划仍只读。 |
-| Guidance | **75%（限定前驱 Rover 二维仿真）** | 前轴参考点、单调局部进度、自适应前视和航向反馈；经原 Typed Effect / 安全链完成路径、取消及故障停车，见 [P20](autonomy/phase-20.md)。 | 仅支持已验收模型与有限静态路径；其他运动学、长复杂路径、最终 yaw、轨迹和真实设备未验收。 |
+| Planning | **75%（限定 Rover 二维仿真）** | 实际 Nav2、请求端点连接及独立几何校验；命名目标组织异步规划，当前地图路径阻断可按显式有限预算停车后重规划。 | 无连续动态避障、时间轨迹、其他车辆/任意场景保证；记录计划仍只读。 |
+| Guidance | **75%（限定两种前驱 Rover 几何）** | 可注入参考点/包络/限值；默认平滑与显式低速跟踪，原车巡检可显式限速倒车；两模型正常/故障和原基线回归通过。 | 后驱原型未通过；其他运动学、长复杂路径、最终 yaw、轨迹和真实设备未验收。 |
 | Intelligence | **0%** | 仅有包占位。 | 无 Intent/MissionProposal 的实际生成、校验或模型接入；不是首个无 AI 组合的必需条件。 |
 
 ## 3. 控制、车辆与设备链
@@ -66,14 +66,14 @@
 
 | 部分 | 进度 | 已完成的证据 | 尚未完成 |
 | --- | ---: | --- | --- |
-| Application 用例 | **75%** | 正式长运行 App 的状态、注册任务启动/取消/关闭经过本机 IPC 与实际子进程验收。 | 无 Web API、生产控制源仲裁或远程服务。 |
-| 具体 Applications / Missions | **75%** | 命名两车路线、cuadc_demo 和 object_inspection 有正式配置及完整仿真业务证据；旧模块依赖/安全只读审查后重写。 | 真实比赛/现场业务未验收；新根不导入历史代码。 |
+| Application 用例 | **75%** | 正式 App 状态/任务/取消/关闭、异步命名导航、锚点登记、Recipe 业务编排经实际进程与原安全链验收。 | 无 Web API、生产控制源仲裁、远程服务或 P26 长运行版本验收。 |
+| 具体 Applications / Missions | **75%** | 基本路线/CUADC/inspection；新增 A→B→HOME 地图巡检、有效观测记录、限速倒车、取消/目标消失清理。 | 真实业务、任意对象接近规划未验收；新根不导入历史代码。 |
 | App 进程入口 | **75%** | `app.main run/ctl` 支持本机白名单任务、有限 IPC、默认只读、重连新 epoch；显式可替换对象源/仿真载荷。 | 无 onboard/server 入口或生产车辆连接。 |
-| Deployment | **75%** | [SimulationRuntime](../deployment/simulation_runtime.py)负责共同车辆周期、状态、结果、授权/停止及会话生命周期；独立构建和自有进程清理已有完整回归。 | 真实设备同步、生产重连/部署和实车停车未验收；没有 onboard/server 入口。 |
+| Deployment | **75%** | 共同车辆周期/会话/授权/停止；P25 显式匹配车型、实际 SDF、参数、规划/传感器/地图来源，版本和内容 SHA 可追溯，所属资源清理通过。 | P26 统一版本/长运行、真实同步/重连/制动及 onboard/server 部署未验收。 |
 | Gateway | **0%** | 仅有包占位。 | 无远程接入、链路监视和本地失联处置；只有远程部署需要。 |
 | Web UI | **0%** | 仅有包占位。 | 无界面或 Web API；不是首个无 Web 组合的必需条件。 |
 | 独立运行配置 | **100%（localhost 仿真范围）** | Copter/Rover 严格 TOML profile 显式指定机型、模式、周期、时钟和 Safety，SEND 默认关闭；每轮使用匹配的空闲端口与新状态目录。 | 不含生产车辆或可发送的 onboard profile。 |
-| 自动化测试与验收 | **75%** | 历史完整回归 29 阶段/21 场景 PASS；P20 最新全量 **223 项单元测试**及 **5 项 Rover 路径跟踪正常/故障物理场景**通过，见 [P20](autonomy/phase-20.md)。未重跑整套历史套件或 Copter 物理任务。 | 实车物理停止、设备和生产部署未验收。 |
+| 自动化测试与验收 | **75%** | 历史完整回归 29 阶段/21 场景；本次 **260 项单元测试、最终装配 13 项物理门槛通过**，无本次声明门槛跳过，见 [最新审计](autonomy/navigation-completion-audit.md)。 | 本次未重跑整套历史/Copter 物理套件；P26 重复任务/长运行、真实设备和生产部署未验收。 |
 
 ## 5. P6 完成后的工作范围
 
@@ -111,11 +111,11 @@
 
 **P13–P15 PASS（localhost 仿真）**：基础双车 Mission、标准对象输入、CUADC 非视觉业务链及专属受控仿真载荷均完成；来源、时间、Frame、授权、结果与物理 Oracle 证据见各阶段审计。**P17 PASS（记录图像/虚拟标定软件范围）**：实际 CPU YOLOX 替换相同 Observation 边界，业务正常、取消及图像损坏过期场景通过。**P16 暂缓**，真实相机/标定、比赛桶模型、物理载荷和 RKNN 未验收。
 
-完整命令、阶段提交、测试计数及剩余范围见 [自主系统完成审计](autonomy/completion-audit.md)。P9–P17 覆盖的可执行软件范围已完成；P19 新增只读 Planning，P20 新增限定 Rover 路径消费与跟踪。动态重规划、LLM、Agent、Web、生产服务器和其他车辆仍按需求独立立项。
+历史命令、阶段提交与测试计数见 [P9–P17 审计](autonomy/completion-audit.md)。后续 P21–P25 已增加有限停车后重规划与两种前驱几何；连续动态避障、LLM、Agent、Web、生产服务器和其他车辆仍按需求独立立项。
 
 ## P18 本机 ROS 2 Mapping（2026-10-19）
 
-实现可选二维建图数据链，复用既有 Application/Mission/安全执行链；P18 当时地图位姿仅供诊断，后续 P20 显式绑定平面 map/odom 关系用于路径消费，仍不替换遥测 Localization。限定场景、最终回归和失败证据见 [P18](autonomy/phase-18.md)。轴对齐边界缺陷仍开放；不能将限定场景 PASS 推广为通用建图完成。P16 真实设备继续暂缓。
+实现可选二维建图数据链；P20 增加平面 map/odom 绑定，P23 对受审版本提供显式原生边界修复、锚点和候选审查，仍不替换遥测 Localization。P18 历史失败保留；未启补丁或未经审查的版本不能继承 P23 PASS。P16 真实设备继续暂缓。
 
 ## P19 第一步：只读 Nav2 规划（2026-10-19）
 
@@ -128,3 +128,9 @@
 ## P21：命名目标到导航结果（2026-10-19）
 
 **PASS（本机 Rover 仿真）**：显式目标目录、非阻塞规划、最新地图准入、原 Mission/安全执行链、取消及晚到结果隔离。230 项单元测试；命名目标实际物理跟踪、规划中取消和不可达拒绝通过。见 [阶段审计](autonomy/phase-21.md)。自动重规划和任意地图/车型仍不在本阶段声明内。
+
+## P22–P25：已完成的当前自主导航范围
+
+**5/5 阶段（P21–P25）完成限定门槛**：P22 显式预算下停车/Disarm 后重规划、无路及取消；P23 受审二维地图边界修复、同会话锚点及只读 SLAM 候选；P24 原前驱 A→B→HOME 巡检及限速倒车/故障清理；P25 两种实际前驱几何的正常/故障与原车默认回归。260 项单元测试、最终装配 13 项物理门槛通过，源码/原始版本/失败/清理见 [完成审计](autonomy/navigation-completion-audit.md)。
+
+**下一项是 P26**：统一版本支持清单、重复任务、有界长运行及资源/恢复验收；尚未实施。真实硬件、生产部署、主动 SLAM/VIO 融合、三维/其他车型导航、现场视觉、Web/服务器和 Intelligence 仍未完成。阶段范围完成不等于整个程序 100%。

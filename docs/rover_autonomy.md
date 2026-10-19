@@ -49,10 +49,13 @@ plan_path = "/absolute/run/plan.json"
 goals_path = "/absolute/run/goals.toml"
 timeout_ns = 70000000000
 tracking_mode = "stop_turn"
+allow_reverse = true
 # recipes_path = "/absolute/run/recipes.toml"
 ```
 
 原前驱模型参考点在 base_link 前 0.25 m；`compact_rover_front_axle_v1` 在前 0.18 m，须配套 `simulation/profiles/compact_rover.toml` 及其实际 SDF。紧凑模型有不同轴距、轮距、车身及质量。不匹配的 Deployment 在连接前拒绝；切换 TOML 不会改变现有 Gazebo 车体。模型、配置、SDF 和参数内容进入状态/manifest。省略 `tracking_mode` 时默认仍为 `smooth`；上述业务配置显式选择停转策略。
+
+`allow_reverse` 默认 false。上述巡检配置显式允许倒车：路径在车后方时，在首次跟踪周期选择并冻结行驶方向，倒车命令限为 0.10 m/s；Action 与最终 writer 同时约束。不会因运行中目标或航向噪声来回切换方向。此选项没有开启 SEND，也不绕过租约、地图、时间、围栏或停车屏障。
 
 启动 Application 时显式传入上述配置：
 

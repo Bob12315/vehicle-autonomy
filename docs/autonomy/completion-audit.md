@@ -1,5 +1,7 @@
 # 基础自主系统实施完成审计
 
+> 本文保留 P9–P17 的历史范围和测试数。最新 P21–P25 完成范围、260 项单元测试及最终装配 13 项物理门槛见 [自主导航完成审计](navigation-completion-audit.md)；本次不把历史整车全套称为重新执行。
+
 核对日期：2026-10-04（Asia/Ulaanbaatar；报告时间为 UTC）。范围依据 [实施计划](../basic_autonomy_implementation_plan.md)。**P9–P15 localhost SITL/Gazebo 范围 PASS；P17 记录图像/CPU YOLOX/虚拟标定的软件范围 PASS；P16 真实硬件暂缓。** 基础自主闭环、非视觉业务与视觉输入替换均从正式 App 入口执行。真实飞行、现场相机标定、比赛桶模型、物理载荷、RKNN、Web/server、Planning/LLM/Agent 不在完成声明中。
 
 ## 阶段产物与提交

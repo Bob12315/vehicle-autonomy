@@ -1,0 +1,152 @@
+{
+  "scope": "Final P22-P25 integration matrix including original named-goal regression and two readonly map fixtures; historical P21 planning-only evidence is separate; P26/full historical vehicle suite not claimed",
+  "passed": true,
+  "physical_cases": 13,
+  "physical_passed": 13,
+  "physical_failed": 0,
+  "physical_skipped": 0,
+  "unit": {
+    "tests": 260,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "output": "----------------------------------------------------------------------\nRan 260 tests in 16.255s\n\nOK\n",
+    "log_sha256": "90e69dcdb5a6f11f70d234e8deb0557bd9d1391ea0e6e63b545a826632532bd9",
+    "source_code_commit": "827582fc2b251f4b1d5b0901f0423caddd83a40e",
+    "root_source_sha256": "d606bbb1a5d92afe9ebd0fe41f9df16110a27eca8de38294546a0afaaf6e1be4"
+  },
+  "source_code_commit": "827582fc2b251f4b1d5b0901f0423caddd83a40e",
+  "root_source_sha256": "d606bbb1a5d92afe9ebd0fe41f9df16110a27eca8de38294546a0afaaf6e1be4",
+  "cases": {
+    "goal-replan-e7cd2f9e": {
+      "phase": 22,
+      "case": "replan",
+      "passed": true,
+      "task_status": "SUCCEEDED",
+      "ports_released": true,
+      "remaining_process_groups": [],
+      "manifest_sha256": "6f121e55e15cbe18ff831b175226170642201bb172b3506a6633e114c165f77b",
+      "summary_sha256": "20a3fb12892b3c9e05955bbb33809cac6389b0a16e28def07b02f9dfe80a608e"
+    },
+    "goal-blocked-80298e1a": {
+      "phase": 22,
+      "case": "blocked",
+      "passed": true,
+      "task_status": "FAILED",
+      "ports_released": true,
+      "remaining_process_groups": [],
+      "manifest_sha256": "dfeff0a8626e4ca68ba6b8a4a6be0a1e782519fa7c8180187af3ef9554623fad",
+      "summary_sha256": "0f9c9c8a3ccfcc46a70e22d82e5cb7bd6ea13f7813b00905aaaf666789aca786"
+    },
+    "goal-replan_cancel-825f30fc": {
+      "phase": 22,
+      "case": "replan_cancel",
+      "passed": true,
+      "task_status": "CANCELLED",
+      "ports_released": true,
+      "remaining_process_groups": [],
+      "manifest_sha256": "57d4bfb8e79886a4921ee2be894adf507c502934e2353c53c768bfd105107fef",
+      "summary_sha256": "79fe5192f9697108972eeee67c7407e901171ed47baa6b4148473eb3ae5dd405"
+    },
+    "map-reliability-0.0-a82cb4be": {
+      "phase": 23,
+      "case": "map_quality_readonly",
+      "passed": true,
+      "task_status": null,
+      "ports_released": true,
+      "remaining_process_groups": [],
+      "manifest_sha256": "8a140e20f0712d712c0cd1bbfa5a85a1d5565f322588f01cf6a13ab92dcccc76",
+      "summary_sha256": "7d7c30f716ed67b7ffc64bd647ed3cd387e9629a9f5aaca4c7dcec71f6bd58f6"
+    },
+    "map-reliability-0.15-10e8b183": {
+      "phase": 23,
+      "case": "map_quality_readonly",
+      "passed": true,
+      "task_status": null,
+      "ports_released": true,
+      "remaining_process_groups": [],
+      "manifest_sha256": "c1ef197842c33321f2553f86b76fac0e44b93394b1b03ff168572f757189ada3",
+      "summary_sha256": "c08880ce89953705e046f9f9d39da30533051196abeb5cf1b6ae976c109e1450"
+    },
+    "goal-map_goal-d593a063": {
+      "phase": 23,
+      "case": "map_goal",
+      "passed": true,
+      "task_status": "SUCCEEDED",
+      "ports_released": true,
+      "remaining_process_groups": [],
+      "manifest_sha256": "c82bafa4cb225c400d3f2be33f48ba743e182cba371e58e546d5b3140aced63a",
+      "summary_sha256": "2c5f867e6b7b94d97cae8dbaf50547badc62e0362f4792e0cb483f14fb85aa5c"
+    },
+    "goal-business_inspect-d854038a": {
+      "phase": 24,
+      "case": "business_inspect",
+      "passed": true,
+      "task_status": "SUCCEEDED",
+      "ports_released": true,
+      "remaining_process_groups": [],
+      "manifest_sha256": "a318a461fc88c15687b1153f2eefb1ca2d54f5ebf66156d72388f8e68953e8ae",
+      "summary_sha256": "c3058236b6e94b5551ee4994bd41a9b138c78d37578fe55dc138dc3ebfb20643"
+    },
+    "goal-business_cancel-92521ce2": {
+      "phase": 24,
+      "case": "business_cancel",
+      "passed": true,
+      "task_status": "CANCELLED",
+      "ports_released": true,
+      "remaining_process_groups": [],
+      "manifest_sha256": "23bbf2985c6fcaa36eec6f02ccbba989ec8c62335bde7cb151bb38e8ed646136",
+      "summary_sha256": "38d1df3f669515a9c8248f09d4a11a85265adaf23ea6c1542eb39314b2e28805"
+    },
+    "goal-business_loss-57d9d41d": {
+      "phase": 24,
+      "case": "business_loss",
+      "passed": true,
+      "task_status": "FAILED",
+      "ports_released": true,
+      "remaining_process_groups": [],
+      "manifest_sha256": "7074dafdc6dbfb3c2f57ab4644a521d1f027aa6eb38ba6014fd86ca9bae2631a",
+      "summary_sha256": "e81ac71d78f6f1ced758c35ef1bc2a0ee7e9d30fee010b5fd84b4afbc843c8e6"
+    },
+    "goal-tracking-81940606": {
+      "phase": 25,
+      "case": "tracking",
+      "passed": true,
+      "task_status": "SUCCEEDED",
+      "ports_released": true,
+      "remaining_process_groups": [],
+      "manifest_sha256": "f305ad8f4d8a33625d70844153bbbab940a77e0e28b13c29d39e30d57a101e9f",
+      "summary_sha256": "9ac63e1209844e01e2b09d2be1a81a172971d931e09a4ec2fb776a8f5d8cf37c"
+    },
+    "goal-cancel-692ae29b": {
+      "phase": 25,
+      "case": "cancel",
+      "passed": true,
+      "task_status": "CANCELLED",
+      "ports_released": true,
+      "remaining_process_groups": [],
+      "manifest_sha256": "1f0740256ca41ff0efc726a98c49cc4934032380ab067f078a659e871960c9e6",
+      "summary_sha256": "b5827e03fc62bade2577f06abde6f028510a9b13c9c7aa7e3b1a0542e6170237"
+    },
+    "goal-map_loss-17079faa": {
+      "phase": 25,
+      "case": "map_loss",
+      "passed": true,
+      "task_status": "FAILED",
+      "ports_released": true,
+      "remaining_process_groups": [],
+      "manifest_sha256": "6d537f4268cb1464a733e6cb2b5ffe4f02b09d1b2194f8c70d0cfd90efcfa2fb",
+      "summary_sha256": "236fbb79ccf908fa2e28181ff4a201a8b99d4762e9d2b4b72313e67c65143f75"
+    },
+    "goal-tracking-d6928a16": {
+      "phase": 25,
+      "case": "tracking",
+      "passed": true,
+      "task_status": "SUCCEEDED",
+      "ports_released": true,
+      "remaining_process_groups": [],
+      "manifest_sha256": "978ed44a2fce5ed4d4462870236e38231c070b7f051b0d50b1bbba6b179e3562",
+      "summary_sha256": "6ed988839727ca659728e3ca48451b71831a0dfffd6ea092b4e15816b426a9a6"
+    }
+  }
+}

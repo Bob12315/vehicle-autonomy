@@ -1,6 +1,6 @@
 # P18：本机 ROS 2 / Rover 二维建图
 
-状态：**限定 Rover 二维仿真场景 PASS**（2026-10-19），通用地图质量与轴对齐边界缺陷仍未完成。环境：Ubuntu 24.04 amd64、Gazebo Sim 8.15.0、ROS 2 Jazzy、SLAM Toolbox 2.8.5、ros_gz_bridge 1.0.24。本阶段只连接本机自有 SITL/Gazebo。真实设备、Nav2 控制、三维 SLAM、生产时钟同步另行验收。
+状态：**P18 限定 Rover 二维仿真场景 PASS**（2026-10-19）；后续 P23 已完成受审 2.8.5 原生边界修复和地图锚点，见 [P23](autonomy/phase-23.md)。环境：Ubuntu 24.04 amd64、Gazebo Sim 8.15.0、ROS 2 Jazzy、SLAM Toolbox 2.8.5、ros_gz_bridge 1.0.24。仅连接本机自有 SITL/Gazebo；真实设备、三维和生产时钟同步未验收。
 
 ## 运行链与职责
 
@@ -56,7 +56,7 @@ python -m tests.simulation.ros2_mapping --allow-send
 
 演示创建独立世界、匹配的 TCP/JSON 端口、ROS domain、仿真激光、4 面墙和一个不对称柱体；启动现有正式 App、单向 Gazebo Bridge、ROS sidecar 和 SLAM Toolbox，明确 configure/activate 生命周期。房间相对 odom 旋转 0.15 rad；几何验收使用相同的明确场景旋转，不改变占据值或验收邻域。默认在有 DISPLAY 的本机使用 server-only GLX，不弹出 Gazebo GUI；无 DISPLAY 时尝试 EGL，须有实际可用的驱动。本机混合显卡 EGL 曾出现驱动崩溃，未以虚构扫描或地图替代，已切换到可用的 GLX。
 
-**已知缺陷：轴对齐封闭房间可能缺失地图边界墙面。** 本机零旋转场景曾在行驶后失去东/北墙的部分占据栅格，验收据实失败，证据保留在 `artifacts/simulation/ros2-mapping-6f3d5b6a/`。这与 [SLAM Toolbox 上游问题 #689](https://github.com/SteveMacenski/slam_toolbox/issues/689) 的边界栅格现象一致；本轮没有修改上游二进制或补画墙面。旋转房间只验证该场景内的接入能力，不能据此宣称任意地图几何均已通过；缺陷仍待上游修复或单独源码修复验收。
+**原 P18 未打补丁组合的缺陷：轴对齐封闭房间可能缺失边界墙面。** 失败证据 `ros2-mapping-6f3d5b6a` 保留，与 [上游 #689](https://github.com/SteveMacenski/slam_toolbox/issues/689) 现象一致。P23 现提供显式原生覆盖库修正栅格上界，原扫描/ray tracing 不变，没有补画墙面；轴对齐与旋转房间均重新匹配四壁并通过。构建/ABI/加载规则见 [修复审计](autonomy/phase-23.md) 和 [装配](rover_autonomy.md)。默认不自动加载补丁；未经审查的版本或任意场景不能继承这些 PASS。
 
 场景依次验证：
 

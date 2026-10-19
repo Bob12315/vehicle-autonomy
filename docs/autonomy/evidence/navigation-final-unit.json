@@ -1,0 +1,10 @@
+{
+  "tests": 260,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "output": "----------------------------------------------------------------------\nRan 260 tests in 16.255s\n\nOK\n",
+  "log_sha256": "90e69dcdb5a6f11f70d234e8deb0557bd9d1391ea0e6e63b545a826632532bd9",
+  "source_code_commit": "827582fc2b251f4b1d5b0901f0423caddd83a40e",
+  "root_source_sha256": "d606bbb1a5d92afe9ebd0fe41f9df16110a27eca8de38294546a0afaaf6e1be4"
+}

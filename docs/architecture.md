@@ -236,8 +236,10 @@ localization in odom, without silently applying loop-closure corrections.
 
 This is an optional local 2D mapping composition, not hardware clock sync,
 Nav2 navigation, active SLAM localization or arbitrary-scene certification.
-The axis-aligned occupancy-boundary defect remains open; see the
-[mapping guide](ros2_mapping.md) and [P18 evidence](autonomy/phase-18.md).
+The P18 baseline has an axis-aligned occupancy-boundary defect. P23 adds an
+explicit source/ABI-pinned native repair for SLAM Toolbox 2.8.5; unpatched
+compositions retain the limitation. See the [mapping guide](ros2_mapping.md),
+[P18 evidence](autonomy/phase-18.md) and [P23 audit](autonomy/phase-23.md).
 
 
 ## P19 read-only Nav2 planning
@@ -289,6 +291,41 @@ polled before queue drain. Stop remains available after a map fault and uses
 the existing observed two-second stability/eight-second deadline barrier.
 Default compositions install no navigation guard or follow_path mission.
 
-No ROS command bridge, automatic replanning/resume, hardware connection or
-general vehicle-kinematic support is implied. See the
+P20 itself supplies no ROS command bridge, automatic replanning/resume,
+hardware connection or general vehicle-kinematic support. See the
 [tracking guide](rover_path_following.md) and [P20 audit](autonomy/phase-20.md).
+
+## P21–P25 optional goal and business composition
+
+Application owns `GoalNavigation`: a frozen named target, Environment/frame/map
+dependencies, finite policy, asynchronous read-only planning job and typed child
+Mission. Immutable inputs cross the worker boundary; no vehicle object does.
+The native Nav2 group is private, cancellable and joined before terminal cleanup.
+Late results cannot restore a cancelled task. The public P19 read-only READY /
+SEND-disabled admission rule is unchanged.
+
+Only a current-map path obstruction is recoverable under an explicit bounded
+retry policy. The old child completes its observed exit and revokes its run;
+a separate typed Stop/Disarm recovery precedes new planning, admission and lease.
+Map-source, clock, frame, localization, alignment, safety and cancellation faults
+do not become retry permissions. Outer and per-action deadlines remain finite.
+
+Persistent map coordinates require a registered `MapAnchor` tied to Environment,
+HOME, vehicle epoch, map publisher generation and observed map<-odom binding.
+Restart/reload needs explicit re-registration. The SLAM localization candidate
+is diagnostic and never control-eligible; no implicit source switch or fusion
+changes the active telemetry localization contract.
+
+Application business recipes sequence independent goal tasks and record stopped,
+disarmed inspection checkpoints from valid observations. The business layer has
+no vehicle port; failure/cancellation waits for navigation exit and typed cleanup.
+Repeated cancellation cannot interrupt that cleanup.
+
+`VehicleNavigationModel` injects versioned reference geometry, footprint,
+capabilities and command bounds into planning, admission, guidance, Action and
+the rejection-only writer guard. Closed registered presets must match their
+Deployment profile. The original front-drive and compact front-drive fixtures
+use distinct physical SDFs; no model branch is added to Core or contracts.
+Only separately accepted combinations are supported, not arbitrary drivetrains.
+Configuration and exact acceptance status: [autonomy guide](rover_autonomy.md)
+and [roadmap](autonomy_roadmap.md). Default composition remains unwired.

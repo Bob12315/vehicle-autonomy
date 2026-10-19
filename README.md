@@ -10,6 +10,8 @@ Vehicle Autonomy Framework 是面向多旋翼、无人车、固定翼、VTOL 及
 
 车辆基础仿真新增了共享 `SimulationRuntime`、完整 Rover 插件和两主动轮/两后万向轮模型。Copter、Rover 正常动作与故障场景已通过四轮完整回归；**本轮基础车辆控制 Simulation Complete：PASS**，见[审计记录](docs/simulation/completion-audit.md)。
 
+后续 **P21–P25 已完成限定本机 Rover 自主导航范围**：命名目标、有限停车后重规划、地图锚点、对象巡检和两种前驱几何。260 项单元测试、最终装配 13 项物理门槛通过；见 [最新完成审计](docs/autonomy/navigation-completion-audit.md)。P26 长运行版本验收及真实硬件仍未完成。
+
 一键构建、启动、真值验收、故障测试和清理：
 
 ```bash
@@ -97,4 +99,12 @@ python -m app.main ctl --profile copter_sim start --mission cuadc_demo
 
 显式 `--navigation-config` 为本机前驱两轮/后万向轮 Rover 模型注册 `follow_path` Mission。它按主动轮轴参考点消费新鲜在线路径，经 GUIDED、Arm、Typed Twist、观察停车和 Disarm 完成有限任务；持续检查当前地图、map/odom 对齐、路径文件和横向偏离。地图失效时走原 Stop 屏障，默认双 SEND 仍关闭。
 
-配置、参考点/余量语义和操作步骤见 [路径跟踪说明](docs/rover_path_following.md)，实测范围见 [P20 审计](docs/autonomy/phase-20.md)。复现命令 `./scripts/test_navigation_v1.sh`，仅创建自有 localhost SITL/Gazebo；不含动态重规划、真实设备或其他车型。
+配置、参考点/余量语义和操作步骤见 [路径跟踪说明](docs/rover_path_following.md)，实测范围见 [P20 审计](docs/autonomy/phase-20.md)。P20 基线复现命令 `./scripts/test_navigation_v1.sh`，仅创建自有 localhost SITL/Gazebo。
+
+## 可选命名目标、自主路线与车型装配
+
+显式目标目录可注册 `navigate:POINT_A`，由 Application 在后台组织 Nav2 规划、最新地图准入及原 Mission/执行链。策略默认不重试；明确授权后可在路径阻断、观察停车及 Disarm 后有限重规划。`autonomy:INSPECT` 组合命名路线、有效对象观测及检查点结果，取消/失败执行 Stop/Disarm 清理。
+
+导航模型显式注入参考点、几何包络和运动界限；第二种已验收车型是不同轴距/轮距/质量的紧凑前驱 Rover，不能只换配置就声称既有世界已换车。地图锚点绑定 Environment/HOME、地图源及车辆会话；SLAM 位姿仍是只读候选，活动控制继续使用遥测 Localization。
+
+配置、实际 SDF、地图边界修复及阶段验收范围见 [自主导航说明](docs/rover_autonomy.md) 和 [总计划/进展](docs/autonomy_roadmap.md)。顺序复现入口：`./scripts/test_autonomy_navigation.sh --allow-send`。各阶段以独立审计中的 PASS 为准；P26 统一版本/长运行及真实设备不由此完成。
