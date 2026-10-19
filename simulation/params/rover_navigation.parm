@@ -1,0 +1,19 @@
+# Explicit owned front-drive navigation calibration, not baseline defaults.
+# SDF: wheel radius .11 m, track .52 m, wheel speed 5 rad/s per motor unit.
+# Turn-rate feedforward = track / (2 * radius * 5) = .47272727.
+ATC_STR_RAT_FF 0.47272727
+ATC_STR_RAT_P 0.2
+ATC_STR_RAT_I 0.02
+ATC_STR_RAT_D 0
+ATC_STR_RAT_IMAX 0.1
+CRUISE_SPEED 0.55
+CRUISE_THROTTLE 100
+ATC_SPEED_P 0.2
+ATC_SPEED_I 0.05
+# Last defaults file must also declare dynamic MAVLink groups explicitly.
+MAV1_POSITION 10
+MAV1_EXTRA1 10
+MAV1_EXT_STAT 5
+MAV2_POSITION 10
+MAV2_EXTRA1 10
+MAV2_EXT_STAT 5

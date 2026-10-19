@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import math
+from dataclasses import replace
 from uuid import uuid4
 
 from planning.collision import CollisionGrid
@@ -38,6 +39,14 @@ class ReadOnlyPlanningService:
         for expected, actual in ((start,candidate.poses[0]),(goal,candidate.poses[-1])):
             if math.hypot(actual.x-expected.x,actual.y-expected.y) > .10:
                 raise PlanningError("INVALID_PATH", "path endpoint differs from the requested position by more than 0.10 m")
+        # Native grid planners may snap endpoints to cell centres. Preserve
+        # their points, but include the actual requested reference positions.
+        # The connectors undergo the same independent collision validation.
+        poses=[start]
+        for point in (*candidate.poses,goal):
+            if point!=poses[-1]:poses.append(point)
+        if len(poses)>8192:raise PlanningError('INVALID_PATH','endpoint connectors exceed the path bound')
+        candidate=replace(candidate,poses=tuple(poses))
         length = collision.validate(candidate.poses)
         current = self.context_provider()
         validated_at = self.clock()

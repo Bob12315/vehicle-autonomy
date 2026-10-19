@@ -125,18 +125,12 @@ class PolylineTracker:
             # repeatedly stopping for small corrections winds up its steering
             # loop and prevents bounded paths finishing within their deadline.
             rate=max(-rate_limit,min(rate_limit,1.2*error-.75*measured_yaw_rate))
-            if abs(error)>.12 and abs(rate)<min(.15,rate_limit):
-                rate=math.copysign(min(.15,rate_limit),error)
+            if abs(measured_yaw_rate)<.05 and abs(error)>.12 and abs(rate)<rate_limit:
+                rate=math.copysign(rate_limit,error)
             speed=min(speed,.12 if distance<=.08 and abs(error)<=.2 else .06)
             self.turning=abs(error)>.45
             if self.turning:
                 speed = 0.
-                # Use the baseline damped pivot once the wheels are moving;
-                # holding a saturated turn into alignment overshoots and can
-                # walk the passive casters outside the path corridor.
-                rate=max(-rate_limit,min(rate_limit,.25*error-.75*measured_yaw_rate))
-                if abs(measured_yaw_rate)<.05 and abs(error)>.2 and abs(rate)<min(.15,rate_limit):
-                    rate=math.copysign(min(.15,rate_limit),error)
         elif abs(error) > .45:
             speed = 0.
         return GuidanceOutput(0. if arrived else speed, 0. if arrived else rate,

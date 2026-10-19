@@ -71,6 +71,16 @@ python -m app.main ctl --profile rover_sim \
 
 ## 有限重规划
 
+### 低速导航的实际仿真装配
+
+原 `target_rover/model.sdf` 及默认平滑基线保留。扩展导航场景显式加载 `simulation/models/target_rover/navigation.sdf`，紧凑车加载 `simulation/models/compact_rover/model.sdf`。两者的轮速执行器仍通过关节力闭环，使用 P=2、I=0；不更换成运动学插件，也不使用测试真值驱动。
+
+SITL 在原 Rover/skid/telemetry defaults 之后，显式追加 `simulation/params/rover_navigation.parm` 或 `compact_rover_navigation.parm`。0.11 m 轮半径、每个电机单位 5 rad/s 给出速度前馈标定 `CRUISE_SPEED=0.55`、`CRUISE_THROTTLE=100`；两车按实际轮距分别使用转向前馈 0.47272727、0.52727273，并降低积分累积。原生 PID、传感器及碰撞动力学仍运行。
+
+这些是受验收的仿真装配参数。Application 不通过 MAVLink 自动改参数或改 SDF；复现脚本在车辆启动前加载，并记录实际源文件、参数 SHA 和黑盒。`tracking_mode` 本身不等于完成了这项装配。真实设备没有继承这些标定。
+
+### 重试策略
+
 `max_replans` 默认为 0；显式选择 1 或 2 才允许地图路径阻断后的重试。先观察旧任务停止并 Disarm，再读取新输入、规划、重新准入及授权。总期限不会随重试续期。地图源丢失、定位/时间/代际变化、对齐漂移、断连、配置修改及取消均不能通过重试绕过。
 
 动态障碍验收场景使用遥测里程计对齐地图，显式关闭 scan matching，选用 `tracking_mode="stop_turn"`；普通静态路线保留 `smooth`。这不等于任意动态环境的连续避障。

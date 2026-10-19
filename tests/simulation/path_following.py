@@ -39,12 +39,13 @@ def run(directory, case, *, autonomous=False, room_yaw=None, model_id=FRONT_AXLE
     business=case.startswith("business_")
     directory.mkdir(parents=True,exist_ok=False)
     os.environ["ROS_DOMAIN_ID"] = str(100+os.getpid()%100)
-    owned=OwnedSimulation(directory,"rover",rover_model=model_name)
+    replanning = case in ("replan","blocked","replan_cancel")
+    owned=OwnedSimulation(directory,"rover",rover_model=model_name,
+        rover_actuation='low_rate' if replanning or map_goal or business or model_name=='compact_rover' else 'baseline')
     owned.manifest["ros_domain_id"]=os.environ["ROS_DOMAIN_ID"]
     owned.manifest["navigation_case"]=case
     # A denser actual sensor reduces unobserved ray gaps; unknown occupancy is
     # never filled by the harness. The pillar forces a non-straight path.
-    replanning = case in ("replan","blocked","replan_cancel")
     lidar_samples=4096 if replanning or business else 2160
     add_mapping_scene(owned,lidar_samples=lidar_samples,pillar=(2.8,2) if replanning or business else (1.7,.3),room_yaw=scene_yaw)
     if replanning:
@@ -75,6 +76,14 @@ def run(directory, case, *, autonomous=False, room_yaw=None, model_id=FRONT_AXLE
     config.write_text(f'schema=1\nmodel="{model_id}"\nplan_path="{plan}"\ntimeout_ns={10_000_000_000 if case=="timeout" else 70_000_000_000}\n')
     if replanning or map_goal or business or model_name=='compact_rover':
         config.write_text(config.read_text()+'tracking_mode="stop_turn"\n')
+        # Match the low-rate SITL loop to the actual declared wheel geometry.
+        # This is startup configuration, never a second vehicle writer.
+        parameter=ROOT/'simulation/params'/('compact_rover_navigation.parm' if model_name=='compact_rover' else 'rover_navigation.parm')
+        owned.params.append(parameter)
+        import hashlib
+        owned.manifest['parameters']=[str(p) for p in owned.params]
+        owned.manifest['parameter_files_sha256']={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in owned.params}
+        owned._save()
     if autonomous:
         goals=directory/"goals.toml"
         goals.write_text('schema=1\nenvironment_id="environment:rover-training-v1"\n[[goals]]\nname="POINT_A"\nframe="odom"\nreference_point="navigation_reference"\nposition=[0.8,2.0]\n')

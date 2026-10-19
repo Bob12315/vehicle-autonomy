@@ -56,6 +56,13 @@ class PlanningTests(unittest.TestCase):
         self.assertFalse(path.document()["executable"])
         with self.assertRaises(AttributeError):path.length_m = 0
 
+    def test_snapped_grid_endpoints_keep_native_points_and_exact_requested_connectors(self):
+        native=(Pose2D(2.04,4.03),Pose2D(5.96,4.03))
+        backend=Backend(lambda request,result:replace(result,poses=native))
+        path=self.service(backend).plan(self.start,self.goal)
+        self.assertEqual(path.candidate.poses,(self.start,*native,self.goal))
+        self.assertAlmostEqual(path.length_m,4.02)
+
     def test_sparse_segments_cannot_tunnel_through_thin_wall_or_unknown(self):
         for occupancy in (100,20,-1):
             cells = list(self.context.grid.cells)

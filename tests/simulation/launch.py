@@ -51,8 +51,9 @@ def output(command: list[str], cwd: Path = ROOT) -> str:
 
 
 class OwnedSimulation:
-    def __init__(self, run_dir: Path, kind: str, *, rover_model='target_rover'):
+    def __init__(self, run_dir: Path, kind: str, *, rover_model='target_rover', rover_actuation='baseline'):
         if rover_model not in ('target_rover','compact_rover'):raise ValueError('unregistered owned Rover fixture')
+        if rover_actuation not in ('baseline','low_rate'):raise ValueError('unregistered actuation fixture')
         self.run_dir = run_dir
         self.kind = kind
         self.instance = choose_instance()
@@ -81,6 +82,9 @@ class OwnedSimulation:
             "started_at": datetime.now(timezone.utc).isoformat(), "processes": []}
         source_model = (PLUGIN / "models/iris_with_gimbal/model.sdf" if kind == "copter"
                         else ROOT / f"simulation/models/{rover_model}/model.sdf")
+        if kind=='rover' and rover_model=='target_rover' and rover_actuation=='low_rate':
+            source_model=ROOT/'simulation/models/target_rover/navigation.sdf'
+        self.manifest['actuation_profile']=rover_actuation if kind=='rover' else 'baseline'
         model = ET.parse(source_model)
         for plugin in model.findall(".//plugin"):
             if plugin.attrib.get("name") == "ArduPilotPlugin":

@@ -20,6 +20,43 @@ from tests import test_path_following as helpers
 
 
 class ModelTests(unittest.TestCase):
+    def test_low_rate_actuation_preserves_front_geometry_and_baseline_controller(self):
+        import xml.etree.ElementTree as ET
+        base=Path('simulation/models/target_rover/model.sdf');nav=base.with_name('navigation.sdf')
+        a,b=measure(base),measure(nav)
+        for key in ('axle_x','track_m','radius_from_axle_m','body_size','body_mass_kg'):
+            self.assertEqual(getattr(a,key),getattr(b,key))
+        original,variant=ET.parse(base),ET.parse(nav)
+        for control in variant.findall(".//plugin[@name='ArduPilotPlugin']/control"):
+            control.find('p_gain').text='1';control.find('i_gain').text='0.1'
+        self.assertEqual(ET.tostring(original.getroot()),ET.tostring(variant.getroot()))
+        for path,expected in ((base,('1','0.1')),(nav,('2','0')),
+                              (Path('simulation/models/compact_rover/model.sdf'),('2','0'))):
+            for control in ET.parse(path).findall(".//plugin[@name='ArduPilotPlugin']/control"):
+                self.assertEqual((control.findtext('p_gain'),control.findtext('i_gain')),expected)
+                self.assertEqual(control.findtext('cmd_max'),'8')
+
+    def test_navigation_feedforward_matches_actual_track_wheels_and_servo_mapping(self):
+        import xml.etree.ElementTree as ET
+        for name,parameter in (('target_rover','rover_navigation'),('compact_rover','compact_rover_navigation')):
+            path=Path('simulation/models')/name/'model.sdf'
+            tree=ET.parse(path);geometry=measure(path)
+            control=tree.find(".//plugin[@name='ArduPilotPlugin']/control")
+            joint=tree.find(f".//joint[@name='{control.findtext('jointName')}']")
+            wheel=tree.find(f".//link[@name='{joint.findtext('child')}']")
+            radius=float(wheel.findtext('collision/geometry/cylinder/radius'))
+            offset=float(control.findtext('offset'));self.assertEqual(offset,-.5)
+            maximum=float(control.findtext('multiplier'))*(1+offset)
+            params=dict(line.split() for line in (Path('simulation/params')/(parameter+'.parm')).read_text().splitlines()
+                        if line.strip() and not line.startswith('#'))
+            self.assertAlmostEqual(float(params['ATC_STR_RAT_FF']),geometry.track_m/(2*radius*maximum),places=7)
+            self.assertLessEqual(float(params['ATC_STR_RAT_I']),.02)
+            self.assertLessEqual(float(params['ATC_STR_RAT_IMAX']),.1)
+            self.assertAlmostEqual(float(params['CRUISE_SPEED']),radius*maximum)
+            self.assertEqual(float(params['CRUISE_THROTTLE']),100)
+            self.assertLessEqual(float(params['ATC_SPEED_I']),.05)
+            for channel in (1,2):self.assertGreaterEqual(float(params[f'MAV{channel}_POSITION']),10)
+
     def test_two_sdfs_have_distinct_verified_drive_axles_and_full_caster_envelopes(self):
         pairs=((FRONT_AXLE,'target_rover'),(COMPACT_AXLE,'compact_rover'))
         geometries=[]
@@ -66,6 +103,11 @@ class ModelTests(unittest.TestCase):
         h.admit()
         command=SimpleNamespace(command=TwistTargetCommand('base_link',Twist3(Vector3(.1,.01,0),Vector3(0,0,0)),'stream'))
         self.assertEqual(h.supervisor.write_guard(command,h.world.vehicle,h.now),'navigation_requires_planar_forward_twist')
+
+    def test_deadband_compensation_never_overrides_yaw_braking_feedback(self):
+        tracker=PolylineTracker((Pose2D(0,0),Pose2D(2,0)),stop_turn=True)
+        out=tracker.update(Pose2D(0,0,-.15),measured_yaw_rate=.3)
+        self.assertLess(out.yaw_rate_rps,0)
 
     def test_model_and_explicit_deployment_profile_must_match_before_connect(self):
         with TemporaryDirectory() as d:
