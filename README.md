@@ -45,6 +45,8 @@ Copter USB 诊断使用 `PYTHONPATH=. python tests/manual_p5_copter_usb.py --por
 
 [V1 模块进度与未完成项](docs/v1_progress.md)按目标架构逐项记录当前成熟度、证据与待验收工作。
 
+[P20 之后的总计划](docs/autonomy_roadmap.md)安排目标导航、受控重规划、地图/定位可靠性、业务整合、复用验证和仿真版本验收，并单列其他机型、视觉、Web、部署及暂缓的真实硬件扩展。
+
 [基础自主系统实施计划](docs/basic_autonomy_implementation_plan.md)的 P9–P15 已完成本机仿真验收：长运行 App、在线定位/Transform、Environment、基础 Action、双车命名路线、仿真对象输入及 CUADC 业务链。P17 已完成记录图像/CPU YOLOX/虚拟标定的感知替换；P16 真实硬件按计划暂缓。提交、测试和适用范围见 [自主系统完成审计](docs/autonomy/completion-audit.md)。
 
 [P6 首个持续运行组合实施计划与验收](docs/p6_runtime_integration_plan.md)记录 localhost ArduCopter SITL 的装配顺序、测试结果和未覆盖范围。
