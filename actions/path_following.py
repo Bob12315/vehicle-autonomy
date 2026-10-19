@@ -21,10 +21,12 @@ class TrackingParameters:
     binding: PlanarBinding
     poses: tuple[Pose2D, ...]  # explicitly bound odom coordinates
     timeout_ns: int = 70_000_000_000
+    stop_turn: bool = False
 
     def __post_init__(self):
         if type(self.timeout_ns) is not int or not 1_000_000_000 <= self.timeout_ns <= 70_000_000_000:
             raise ValueError("tracking deadline must be within 1..70 seconds")
+        if type(self.stop_turn) is not bool:raise ValueError('invalid tracking strategy')
         if not isinstance(self.environment, ResourceReference) or not isinstance(self.binding, PlanarBinding):
             raise TypeError("typed environment and explicit frame binding required")
         PolylineTracker(self.poses)
@@ -46,7 +48,7 @@ class TrackingInstance:
     def __init__(self, parameters, world, reader):
         self.p, self.reader = parameters, reader
         self.stop = BasicInstance("hold", BasicParameters("rover", parameters.environment), world)
-        self.tracker = PolylineTracker(parameters.poses)
+        self.tracker = PolylineTracker(parameters.poses,stop_turn=parameters.stop_turn)
         self.start_ns = world.published_at.monotonic_ns
         self.deadline_ns = self.start_ns+parameters.timeout_ns
         self.refresh_ns = 0

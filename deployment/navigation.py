@@ -31,11 +31,12 @@ class NavigationConfig:
     plan_path: Path
     timeout_ns: int
     goals_path: Path | None = None
+    tracking_mode: str = 'smooth'
 
     @classmethod
     def load(cls, path):
         data = tomllib.loads(Path(path).read_text())
-        if set(data)-{"schema", "model", "plan_path", "timeout_ns", "goals_path"} or not {"schema", "model", "plan_path", "timeout_ns"} <= set(data) or type(data["schema"]) is not int or data["schema"] != 1:
+        if set(data)-{"schema", "model", "plan_path", "timeout_ns", "goals_path", "tracking_mode"} or not {"schema", "model", "plan_path", "timeout_ns"} <= set(data) or type(data["schema"]) is not int or data["schema"] != 1:
             raise ValueError("invalid navigation configuration")
         if data["model"] != "target_rover_front_axle_v1":
             raise ValueError("only the audited front-drive Rover model is supported")
@@ -46,7 +47,9 @@ class NavigationConfig:
         goals = data.get("goals_path")
         if goals is not None and (type(goals) is not str or not Path(goals).is_absolute()):
             raise ValueError("navigation goals path must be explicit and absolute")
-        return cls(Path(data["plan_path"]), data["timeout_ns"],None if goals is None else Path(goals))
+        mode=data.get('tracking_mode','smooth')
+        if mode not in ('smooth','stop_turn'):raise ValueError('unregistered tracking strategy')
+        return cls(Path(data["plan_path"]), data["timeout_ns"],None if goals is None else Path(goals),mode)
 
 
 @dataclass(frozen=True, slots=True)
@@ -214,7 +217,8 @@ class NavigationSupervisor:
                     and self.safety.min_y_m+BODY_RADIUS_FROM_DRIVE_M <= point.y <= self.safety.max_y_m-BODY_RADIUS_FROM_DRIVE_M):
                 raise ValueError("bound path footprint exceeds vehicle geofence")
         parameters = TrackingParameters(world.environment, d["request_id"], str(context.frame_epoch),
-            str(context.reference.version.generation_id), digest, binding, odom, self.config.timeout_ns)
+            str(context.reference.version.generation_id), digest, binding, odom, self.config.timeout_ns,
+            self.config.tracking_mode=='stop_turn')
         self.parameters = parameters
         self.view = NavigationView(parameters.request_id, None)
         self.tracker = PolylineTracker(odom)

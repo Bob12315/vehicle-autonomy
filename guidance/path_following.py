@@ -54,7 +54,9 @@ class GuidanceOutput:
 
 
 class PolylineTracker:
-    def __init__(self, poses):
+    def __init__(self, poses, *, stop_turn=False):
+        if type(stop_turn) is not bool:raise ValueError('explicit tracking strategy required')
+        self.stop_turn=stop_turn
         if not isinstance(poses, tuple) or not 2 <= len(poses) <= 8192 or not all(isinstance(p, Pose2D) for p in poses):
             raise ValueError("tracking needs 2..8192 immutable poses")
         self.poses = poses
@@ -114,12 +116,15 @@ class PolylineTracker:
         # Caster stiction makes tiny steering corrections ineffective on the
         # audited physical Rover. Align at the drive axle before advancing;
         # hysteresis prevents noisy heading cuts from toggling every cycle.
-        if abs(error) > .3 or (distance > .06 and abs(error) > .15):
-            self.turning = True
-        if abs(error) < .08 and abs(measured_yaw_rate) < .1:
-            self.turning = False
-        if self.turning:
+        if self.stop_turn:
+            if abs(error) > .3 or (distance > .06 and abs(error) > .15):
+                self.turning = True
+            if abs(error) < .08 and abs(measured_yaw_rate) < .1:
+                self.turning = False
+            if self.turning:
+                speed = 0.
+                rate = math.copysign(.2,error) if abs(error) >= .08 else 0.
+        elif abs(error) > .45:
             speed = 0.
-            rate = math.copysign(.2,error) if abs(error) >= .08 else 0.
         return GuidanceOutput(0. if arrived else speed, 0. if arrived else rate,
                               self.progress, distance, arrived)

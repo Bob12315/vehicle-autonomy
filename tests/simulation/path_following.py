@@ -52,6 +52,7 @@ def run(directory, case, *, autonomous=False):
     plan=directory/"plan.json"
     config=directory/"navigation.toml"
     config.write_text(f'schema=1\nmodel="target_rover_front_axle_v1"\nplan_path="{plan}"\ntimeout_ns={10_000_000_000 if case=="timeout" else 70_000_000_000}\n')
+    if replanning:config.write_text(config.read_text()+'tracking_mode="stop_turn"\n')
     if autonomous:
         goals=directory/"goals.toml"
         goals.write_text('schema=1\nenvironment_id="environment:rover-training-v1"\n[[goals]]\nname="POINT_A"\nframe="odom"\nreference_point="navigation_reference"\nposition=[0.8,2.0]\n')
