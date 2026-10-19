@@ -117,9 +117,8 @@ class PolylineTracker:
         rate_limit=min(.2,self.model.max_yaw_rate_rps)
         rate = max(-rate_limit, min(rate_limit, .25*error-.75*measured_yaw_rate))
         speed = min(.15, self.model.max_speed_mps, max(.04, .5*(remaining-.12))) * max(0., math.cos(error))**3
-        # Caster stiction makes tiny steering corrections ineffective on the
-        # audited physical Rover. Align at the drive axle before advancing;
-        # hysteresis prevents noisy heading cuts from toggling every cycle.
+        # The explicit caster strategy uses stronger moving feedback and a
+        # damped pivot for large heading errors; the default stays unchanged.
         if self.stop_turn:
             # Stronger heading feedback overcomes the owned caster chassis'
             # small-command deadband. Only large turns require a full stop;
@@ -128,14 +127,16 @@ class PolylineTracker:
             rate=max(-rate_limit,min(rate_limit,1.2*error-.75*measured_yaw_rate))
             if abs(error)>.12 and abs(rate)<min(.15,rate_limit):
                 rate=math.copysign(min(.15,rate_limit),error)
-            speed=min(speed,.12 if distance<=.08 else .06)
-            if abs(error) > .45:
-                self.turning = True
-            if abs(error) < .2 and abs(measured_yaw_rate) < .15:
-                self.turning = False
+            speed=min(speed,.12 if distance<=.08 and abs(error)<=.2 else .06)
+            self.turning=abs(error)>.45
             if self.turning:
                 speed = 0.
-                rate = math.copysign(rate_limit,error) if abs(error) >= .08 else 0.
+                # Use the baseline damped pivot once the wheels are moving;
+                # holding a saturated turn into alignment overshoots and can
+                # walk the passive casters outside the path corridor.
+                rate=max(-rate_limit,min(rate_limit,.25*error-.75*measured_yaw_rate))
+                if abs(measured_yaw_rate)<.05 and abs(error)>.2 and abs(rate)<min(.15,rate_limit):
+                    rate=math.copysign(min(.15,rate_limit),error)
         elif abs(error) > .45:
             speed = 0.
         return GuidanceOutput(0. if arrived else speed, 0. if arrived else rate,
