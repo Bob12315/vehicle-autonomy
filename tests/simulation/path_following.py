@@ -84,6 +84,7 @@ def run(directory, case, *, autonomous=False, room_yaw=None, model_id=FRONT_AXLE
         owned.manifest['parameters']=[str(p) for p in owned.params]
         owned.manifest['parameter_files_sha256']={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in owned.params}
         owned._save()
+    if business:config.write_text(config.read_text()+'allow_reverse=true\n')
     if autonomous:
         goals=directory/"goals.toml"
         goals.write_text('schema=1\nenvironment_id="environment:rover-training-v1"\n[[goals]]\nname="POINT_A"\nframe="odom"\nreference_point="navigation_reference"\nposition=[0.8,2.0]\n')
@@ -357,6 +358,10 @@ def run(directory, case, *, autonomous=False, room_yaw=None, model_id=FRONT_AXLE
         if business:
             report['checkpoints']=s['task']['checkpoints'];report['inspections']=s['task']['inspections'];report['checkpoint_truth']=checkpoint_truth
             if case=='business_inspect' and (len(report['checkpoints'])!=3 or len(report['inspections'])!=1):raise AssertionError('business result missing route/observation evidence')
+            reverse_distance=sum(max(0,-((b[1]-a[1])*math.cos(a[4])+(b[2]-a[2])*math.sin(a[4])))
+                                 for a,b in zip(trajectory,trajectory[1:]))
+            report['truth_reverse_distance_m']=reverse_distance
+            if case=='business_inspect' and reverse_distance<.5:raise AssertionError('return legs did not demonstrate physical reverse travel')
             if s['vehicle']['armed']:raise AssertionError('business ended armed')
         if case not in ("tracking","replan","map_goal","business_inspect") and s['vehicle']['armed']:
             recovery=request(endpoint,"start",{"mission":"safe_recovery"})

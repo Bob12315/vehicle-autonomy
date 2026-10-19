@@ -73,7 +73,7 @@ python -m app.main ctl --profile rover_sim \
 
 ### 低速导航的实际仿真装配
 
-原 `target_rover/model.sdf` 及默认平滑基线保留。扩展导航场景显式加载 `simulation/models/target_rover/navigation.sdf`，紧凑车加载 `simulation/models/compact_rover/model.sdf`。两者的轮速执行器仍通过关节力闭环，使用 P=2、I=0；不更换成运动学插件，也不使用测试真值驱动。
+原 `target_rover/model.sdf` 及默认平滑基线保留。扩展导航场景显式加载 `simulation/models/target_rover/navigation.sdf`，紧凑车加载 `simulation/models/compact_rover/model.sdf`。两者的轮速执行器仍通过关节力闭环，使用 P=4、I=0；不更换成运动学插件，也不使用测试真值驱动。
 
 SITL 在原 Rover/skid/telemetry defaults 之后，显式追加 `simulation/params/rover_navigation.parm` 或 `compact_rover_navigation.parm`。0.11 m 轮半径、每个电机单位 5 rad/s 给出速度前馈标定 `CRUISE_SPEED=0.55`、`CRUISE_THROTTLE=100`；两车按实际轮距分别使用转向前馈 0.47272727、0.52727273，并降低积分累积。原生 PID、传感器及碰撞动力学仍运行。
 

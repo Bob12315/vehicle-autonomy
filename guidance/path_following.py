@@ -55,11 +55,13 @@ class GuidanceOutput:
 
 
 class PolylineTracker:
-    def __init__(self, poses, *, stop_turn=False, model=FRONT_AXLE):
+    def __init__(self, poses, *, stop_turn=False, model=FRONT_AXLE, allow_reverse=False):
         if not isinstance(model,VehicleNavigationModel):raise TypeError("typed navigation model required")
         self.model=model
         if type(stop_turn) is not bool:raise ValueError('explicit tracking strategy required')
         self.stop_turn=stop_turn
+        if type(allow_reverse) is not bool:raise ValueError('explicit reverse permission required')
+        self.allow_reverse=allow_reverse;self.direction=None
         if not isinstance(poses, tuple) or not 2 <= len(poses) <= 8192 or not all(isinstance(p, Pose2D) for p in poses):
             raise ValueError("tracking needs 2..8192 immutable poses")
         self.poses = poses
@@ -113,7 +115,10 @@ class PolylineTracker:
             if preview <= .25 or all(self.project(p)[0] <= .07 for p in chord):
                 break
             preview = max(.25,preview-.1)
-        error = angle(math.atan2(target.y-pose.y, target.x-pose.x)-pose.yaw)
+        bearing=math.atan2(target.y-pose.y, target.x-pose.x)
+        if self.direction is None:
+            self.direction=-1 if self.allow_reverse and abs(angle(bearing-pose.yaw))>2*math.pi/3 else 1
+        error = angle(bearing-pose.yaw-(math.pi if self.direction<0 else 0))
         rate_limit=min(.2,self.model.max_yaw_rate_rps)
         rate = max(-rate_limit, min(rate_limit, .25*error-.75*measured_yaw_rate))
         speed = min(.15, self.model.max_speed_mps, max(.04, .5*(remaining-.12))) * max(0., math.cos(error))**3
@@ -133,5 +138,6 @@ class PolylineTracker:
                 speed = 0.
         elif abs(error) > .45:
             speed = 0.
+        if self.direction<0:speed=-min(speed,.1,self.model.max_speed_mps)
         return GuidanceOutput(0. if arrived else speed, 0. if arrived else rate,
                               self.progress, distance, arrived)

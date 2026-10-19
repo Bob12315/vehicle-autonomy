@@ -30,8 +30,8 @@ class ModelTests(unittest.TestCase):
         for control in variant.findall(".//plugin[@name='ArduPilotPlugin']/control"):
             control.find('p_gain').text='1';control.find('i_gain').text='0.1'
         self.assertEqual(ET.tostring(original.getroot()),ET.tostring(variant.getroot()))
-        for path,expected in ((base,('1','0.1')),(nav,('2','0')),
-                              (Path('simulation/models/compact_rover/model.sdf'),('2','0'))):
+        for path,expected in ((base,('1','0.1')),(nav,('4','0')),
+                              (Path('simulation/models/compact_rover/model.sdf'),('4','0'))):
             for control in ET.parse(path).findall(".//plugin[@name='ArduPilotPlugin']/control"):
                 self.assertEqual((control.findtext('p_gain'),control.findtext('i_gain')),expected)
                 self.assertEqual(control.findtext('cmd_max'),'8')
@@ -108,6 +108,33 @@ class ModelTests(unittest.TestCase):
         tracker=PolylineTracker((Pose2D(0,0),Pose2D(2,0)),stop_turn=True)
         out=tracker.update(Pose2D(0,0,-.15),measured_yaw_rate=.3)
         self.assertLess(out.yaw_rate_rps,0)
+
+    def test_explicit_reverse_tracks_a_backwards_bend_without_changing_yaw_convention(self):
+        poses=(Pose2D(0,0),Pose2D(-1,0),Pose2D(-1,-1))
+        tracker=PolylineTracker(poses,stop_turn=True,allow_reverse=True)
+        pose=Pose2D(0,0);rate=0;maximum=0
+        for _ in range(800):
+            out=tracker.update(pose,rate);maximum=max(maximum,out.cross_track_m)
+            self.assertGreaterEqual(out.speed_mps,-.1);self.assertLessEqual(out.speed_mps,0)
+            if out.arrived:break
+            rate=out.yaw_rate_rps
+            pose=Pose2D(pose.x+out.speed_mps*math.cos(pose.yaw)*.1,
+                        pose.y+out.speed_mps*math.sin(pose.yaw)*.1,pose.yaw+rate*.1)
+        self.assertTrue(out.arrived);self.assertLess(maximum,.15)
+        default=PolylineTracker(poses,stop_turn=True).update(Pose2D(0,0))
+        self.assertEqual(default.speed_mps,0)
+
+    def test_final_writer_reverse_range_requires_frozen_explicit_permission(self):
+        from contracts.core.geometry import Twist3,Vector3
+        from contracts.vehicle.command import TwistTargetCommand
+        from types import SimpleNamespace
+        for allowed,speed,expected in ((False,-.05,'navigation_velocity_bound_exceeded'),(True,-.09,None),
+                                       (True,-.11,'navigation_velocity_bound_exceeded')):
+            h=helpers.NavigationTests();h.setUp();self.addCleanup(h.doCleanups)
+            h.supervisor.config=replace(h.supervisor.config,allow_reverse=allowed)
+            parameters=h.admit();self.assertEqual(parameters.allow_reverse,allowed)
+            command=SimpleNamespace(command=TwistTargetCommand('base_link',Twist3(Vector3(speed,0,0),Vector3(0,0,0)),'stream'))
+            self.assertEqual(h.supervisor.write_guard(command,h.world.vehicle,h.now),expected)
 
     def test_model_and_explicit_deployment_profile_must_match_before_connect(self):
         with TemporaryDirectory() as d:

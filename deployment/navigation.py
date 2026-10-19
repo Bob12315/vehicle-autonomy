@@ -35,13 +35,14 @@ class NavigationConfig:
     recipes_path: Path | None = None
     model: VehicleNavigationModel = FRONT_AXLE
     source_sha256: str | None = None
+    allow_reverse: bool = False
 
     @classmethod
     def load(cls, path):
         raw=Path(path).read_bytes()
         if len(raw)>32768:raise ValueError("navigation configuration exceeds size bound")
         data = tomllib.loads(raw.decode())
-        if set(data)-{"schema", "model", "plan_path", "timeout_ns", "goals_path", "tracking_mode", "recipes_path"} or not {"schema", "model", "plan_path", "timeout_ns"} <= set(data) or type(data["schema"]) is not int or data["schema"] != 1:
+        if set(data)-{"schema", "model", "plan_path", "timeout_ns", "goals_path", "tracking_mode", "recipes_path", "allow_reverse"} or not {"schema", "model", "plan_path", "timeout_ns"} <= set(data) or type(data["schema"]) is not int or data["schema"] != 1:
             raise ValueError("invalid navigation configuration")
         model=resolve_model(data["model"])
         if type(data["plan_path"]) is not str or not Path(data["plan_path"]).is_absolute():
@@ -52,12 +53,14 @@ class NavigationConfig:
         if goals is not None and (type(goals) is not str or not Path(goals).is_absolute()):
             raise ValueError("navigation goals path must be explicit and absolute")
         mode=data.get('tracking_mode','smooth')
+        reverse=data.get('allow_reverse',False)
+        if type(reverse) is not bool:raise ValueError('explicit reverse permission required')
         if mode not in ('smooth','stop_turn'):raise ValueError('unregistered tracking strategy')
         recipes=data.get('recipes_path')
         if recipes is not None and (type(recipes) is not str or not Path(recipes).is_absolute() or goals is None):
             raise ValueError('recipes require an explicit absolute path and a goal catalog')
         return cls(Path(data["plan_path"]), data["timeout_ns"],None if goals is None else Path(goals),mode,
-            None if recipes is None else Path(recipes),model,hashlib.sha256(raw).hexdigest())
+            None if recipes is None else Path(recipes),model,hashlib.sha256(raw).hexdigest(),reverse)
 
 
 @dataclass(frozen=True, slots=True)
@@ -227,7 +230,7 @@ class NavigationSupervisor:
                 raise ValueError("bound path footprint exceeds vehicle geofence")
         parameters = TrackingParameters(world.environment, d["request_id"], str(context.frame_epoch),
             str(context.reference.version.generation_id), digest, binding, odom, self.config.timeout_ns,
-            self.config.tracking_mode=='stop_turn',self.model)
+            self.config.tracking_mode=='stop_turn',self.model,self.config.allow_reverse)
         self.parameters = parameters
         self.view = NavigationView(parameters.request_id, None)
         self.tracker = PolylineTracker(odom,model=self.model)
@@ -237,7 +240,7 @@ class NavigationSupervisor:
         self.emit("navigation_admitted", model=self.model.model_id,model_sha256=self.model.sha256,tracking_mode=self.config.tracking_mode,request_id=parameters.request_id, plan_sha256=digest,
                   source_map_sha256=m["sha256"], adopted_map_sha256=context.sha256,
                   binding={"x": binding.x, "y": binding.y, "yaw": binding.yaw},
-                  reference_point=self.model.reference_point, base_to_reference_x_m=self.model.base_to_reference_x_m,
+                  reference_point=self.model.reference_point, base_to_reference_x_m=self.model.base_to_reference_x_m,allow_reverse=parameters.allow_reverse,
                   footprint_radius_m=self.model.footprint_radius_m,
                   odom_poses=[[p.x, p.y, p.yaw] for p in odom], length_m=length)
         return parameters
@@ -274,7 +277,8 @@ class NavigationSupervisor:
             twist = command.command.target_twist
             if any(value != 0 for value in (twist.linear.y,twist.linear.z,twist.angular.x,twist.angular.y)):
                 raise ValueError("navigation_requires_planar_forward_twist")
-            if not 0 <= twist.linear.x <= self.model.max_speed_mps or abs(twist.angular.z) > self.model.max_yaw_rate_rps:
+            minimum=-min(.1,self.model.max_speed_mps) if self.parameters.allow_reverse else 0
+            if not minimum <= twist.linear.x <= self.model.max_speed_mps or abs(twist.angular.z) > self.model.max_yaw_rate_rps:
                 raise ValueError("navigation_velocity_bound_exceeded")
             # Check a one-second swept prediction including turning. Unknown
             # cells block it too. StopMotion is exempt in the common writer.
@@ -309,6 +313,7 @@ class NavigationSupervisor:
             except ValueError:
                 pass
         return {"configured": True, "active": self.parameters is not None,
+                "allow_reverse":self.config.allow_reverse,"reverse_limit_mps":min(.1,self.model.max_speed_mps) if self.config.allow_reverse else 0,
                 "request_id": self.view.request_id, "error": self.view.error,
                 "last_error": self.last_error,
                 "alignment_drift_m": self.last_drift_m, "map_revalidations": self.revalidations,
