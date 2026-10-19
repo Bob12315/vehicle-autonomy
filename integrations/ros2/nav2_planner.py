@@ -22,9 +22,10 @@ ROOT = Path(__file__).resolve().parents[2]
 class Nav2Planner:
     name = "nav2.SmacPlanner2D.jazzy"
 
-    def __init__(self, evidence_directory=None):
+    def __init__(self, evidence_directory=None, *, cancelled=None):
         self.evidence_directory = None if evidence_directory is None else Path(evidence_directory)
         self.last_directory = None
+        self.cancelled = cancelled or (lambda: False)
 
     def compute(self, request, configuration_grid):
         if self.evidence_directory is None:
@@ -55,10 +56,20 @@ class Nav2Planner:
                    "integrations/ros2/nav2_planner.py", "integrations/ros2/nav2_worker.py", "scripts/with_ros2.sh")
         source_hashes = {name:hashlib.sha256((ROOT/name).read_bytes()).hexdigest() for name in sources}
         timed_out = False
+        cancelled = False
         with (directory / "worker.log").open("wb") as log:
             process = subprocess.Popen(command, cwd=ROOT, env=env, stdout=log, stderr=subprocess.STDOUT, start_new_session=True)
             try:
-                process.wait(timeout=max(.001,(request.deadline_ns-time.monotonic_ns())/1e9))
+                while process.poll() is None:
+                    if self.cancelled():
+                        cancelled = True
+                        break
+                    remaining = (request.deadline_ns-time.monotonic_ns())/1e9
+                    if remaining <= 0:
+                        timed_out = True
+                        break
+                    try:process.wait(timeout=min(.05,remaining))
+                    except subprocess.TimeoutExpired:pass
             except subprocess.TimeoutExpired:
                 timed_out = True
             finally:
@@ -86,11 +97,13 @@ class Nav2Planner:
                         time.sleep(.02)
                     if cleaned:break
         atomic_json(directory / "manifest.json", {"command":command,"pid":process.pid,"pgid":process.pid,
-            "returncode":process.returncode,"process_group_released":cleaned,"timed_out":timed_out,
+            "returncode":process.returncode,"process_group_released":cleaned,"timed_out":timed_out,"cancelled":cancelled,
             "ros_domain_id":env["ROS_DOMAIN_ID"],"started_ns":started,"ended_ns":time.monotonic_ns(),
             "source_map_sha256":request.context.sha256,"configuration_grid_sha256":digest,"source_files_sha256":source_hashes})
         if not cleaned:
             raise PlanningError("BACKEND_FAILURE", "owned Nav2 process group not fully released")
+        if cancelled:
+            raise PlanningError("CANCELLED", "Nav2 request cancelled; owned group released")
         if timed_out:
             raise PlanningError("TIMEOUT", "Nav2 subprocess exceeded the request deadline")
         path = directory / "response.json"

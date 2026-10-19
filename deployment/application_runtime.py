@@ -33,12 +33,17 @@ class ApplicationRuntime:
         self.profile_name = profile_name
         self.allow_send = allow_send
         self.navigation = None
+        self.navigation_goals = None
+        self.navigation_task = None
         if navigation_config is not None:
             if profile.kind != "rover" or mapping_config is None:
                 raise ValueError("path following requires explicit Rover simulation and ROS 2 mapping")
             from .navigation import NavigationConfig, NavigationSupervisor
             self.navigation = NavigationSupervisor(NavigationConfig.load(navigation_config), profile.safety,
                 lambda event, **fields: self._emit(event, **fields))
+            if self.navigation.config.goals_path is not None:
+                from application.navigation_goals import GoalCatalog
+                self.navigation_goals = GoalCatalog(self.navigation.config.goals_path)
         translator = (ArduRoverCommandTranslator if profile.kind == "rover" else ArduPilotCommandTranslator)
         self.vehicle = runtime or SimulationRuntime(profile, translator=translator(mode_ids=profile.mode_ids),
                                                     event_sink=event_sink)
@@ -170,12 +175,19 @@ class ApplicationRuntime:
                 if self.navigation is not None:self.navigation.finish()
                 self._emit("task_failed", error=result.fault)
             self.state = "DEGRADED"
+            if self.navigation_task and self.navigation_task.active:
+                self.navigation_task.fail(self,result.fault)
+                self.navigation_task.tick(self)
             return
         self.state = ("DEGRADED" if self.environment_fault else
                       "READY" if result.vehicle_fresh else "CONNECTING")
         if self.task and self.task.view().status not in TERMINAL:
             self.state = "RUNNING_TASK"
             self._advance()
+        if self.navigation_task and self.navigation_task.active:
+            self.navigation_task.tick(self)
+            if self.navigation_task.active and self.navigation_task.status != "RUNNING":
+                self.state = self.navigation_task.status
 
     def _advance(self):
         now = self.vehicle.clock()
@@ -215,7 +227,7 @@ class ApplicationRuntime:
             self.stops = self.vehicle.end_run()
             if self.navigation is not None:self.navigation.finish()
             self.state = "READY" if self.vehicle.connected else "DEGRADED"
-            self._emit("task_finished", **self.task_status())
+            self._emit("task_finished", **self._mission_status())
 
     def _cancel_payload(self):
         if self.payload is not None and self.task is not None:self.payload.cancel(self.task.view().run_id)
@@ -225,6 +237,11 @@ class ApplicationRuntime:
         return self.vehicle.effect_status(key)
 
     def task_status(self):
+        if self.navigation_task is not None:
+            return self.navigation_task.view(self)
+        return self._mission_status()
+
+    def _mission_status(self):
         if self.task is None:
             return None
         view = self.task.view()
@@ -294,7 +311,13 @@ class ApplicationRuntime:
                 "system_send": self.vehicle.authority.system_send,
                 "action_send": self.vehicle.authority.action_send, "task": self.task_status()}
 
-    def start_mission(self, name):
+    def start_mission(self, name, *, _navigation_child=False):
+        if not _navigation_child:
+            if self.navigation_task and self.navigation_task.active:
+                raise ValueError("another navigation task is active")
+            if name.startswith("navigate:"):
+                return self._start_navigation(name[len("navigate:"):])
+            self.navigation_task = None
         navigation_mission = name == "follow_path" and self.navigation is not None
         if name not in self.plans and name not in MISSION_NAMES and name not in BUSINESS_NAMES and not navigation_mission:
             raise ValueError("mission is not registered")
@@ -347,9 +370,35 @@ class ApplicationRuntime:
         self.task_started_ns = self.vehicle.clock().monotonic_ns
         self.state = "RUNNING_TASK"
         self._emit("task_started", mission=name, task_id=run_id)
+        return self._mission_status()
+
+    def _start_navigation(self, name):
+        if self.navigation_goals is None:
+            raise ValueError("navigation goal catalog is not configured")
+        if not self.allow_send or self.stopping or self.state != "READY":
+            raise ValueError("navigation requires an explicitly authorized idle READY application")
+        if self.task and self.task.view().status not in TERMINAL:
+            raise ValueError("another mission is active")
+        world = self.vehicle.world_snapshot()
+        if (world is None or world.vehicle is None or world.vehicle.operation.armed
+                or self.environment is None or world.environment != self.environment.reference
+                or self.navigation.context is None or world.map != self.navigation.context.reference):
+            raise ValueError("fresh disarmed vehicle, environment and adopted map required")
+        if self.connected_at_ns is None or self.vehicle.clock().monotonic_ns-self.connected_at_ns < self.profile.warmup_ns:
+            raise ValueError("simulation motion warmup incomplete")
+        self.environment.validate_origin(world.vehicle)
+        from .goal_navigation import GoalNavigation
+        self.navigation_task = GoalNavigation(self,name)
+        self.state = "PLANNING"
         return self.task_status()
 
     def cancel_mission(self):
+        if self.navigation_task and self.navigation_task.active:
+            self.navigation_task.cancel(self)
+            return self.task_status()
+        return self._cancel_child()
+
+    def _cancel_child(self):
         if self.task is None or self.task.view().status in TERMINAL:
             raise ValueError("no active mission")
         self._cancel_payload()
@@ -358,6 +407,8 @@ class ApplicationRuntime:
         return self.task_status()
 
     def request_shutdown(self):
+        if self.navigation_task and self.navigation_task.active:
+            self.navigation_task.cancel(self)
         self.stopping = True
         self.state = "STOPPING"
         return {"state": self.state}
@@ -373,6 +424,9 @@ class ApplicationRuntime:
             self.stops.update(self.vehicle.shutdown())
         finally:
             if self.navigation is not None:self.navigation.finish()
+            if self.navigation_task is not None:
+                try:self.navigation_task.close(self)
+                except RuntimeError as exc:self.shutdown_error=str(exc)
             sensor,self.sensor=self.sensor,None
             if sensor is not None:
                 try:sensor.close()

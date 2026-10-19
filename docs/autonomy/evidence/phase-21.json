@@ -1,0 +1,149 @@
+{
+  "goal-tracking-b7f91da4": {
+    "summary.json": {
+      "passed": true,
+      "case": "tracking",
+      "lidar_rays": 2160,
+      "room_yaw_rad": 0.15,
+      "plan": {
+        "request_id": "c131f93c9f184963994516021a9d3663",
+        "length_m": 2.31568545945564,
+        "poses": 44,
+        "clearance_m": 0.95
+      },
+      "task_id": "navigation:792c5644ea774506b47c2102ecc7db29",
+      "task": {
+        "task_id": "navigation:792c5644ea774506b47c2102ecc7db29",
+        "mission": "navigate:POINT_A",
+        "configuration_sha256": "011e63ac60382b52cc5e2d943e3c550c5a2ffd4bebe9756eb6f492a24a27c9b4",
+        "status": "SUCCEEDED",
+        "step": null,
+        "error": null,
+        "steps": [
+          {
+            "step": "mode",
+            "reason": "SUCCEEDED",
+            "error": null
+          },
+          {
+            "step": "arm",
+            "reason": "SUCCEEDED",
+            "error": null
+          },
+          {
+            "step": "follow_path",
+            "reason": "SUCCEEDED",
+            "error": null
+          },
+          {
+            "step": "disarm",
+            "reason": "SUCCEEDED",
+            "error": null
+          }
+        ],
+        "stops": {}
+      },
+      "effect_count": 314,
+      "stop_speed_mps": 0.015120385014635753,
+      "navigation": {
+        "configured": true,
+        "active": false,
+        "request_id": null,
+        "error": "navigation_not_admitted",
+        "last_error": null,
+        "alignment_drift_m": 0.00369496302916995,
+        "map_revalidations": 32,
+        "model": "target_rover_front_axle_v1",
+        "base_to_reference_x_m": 0.25,
+        "required_clearance_m": 0.95,
+        "planning_start": {
+          "frame": "map",
+          "frame_epoch": "1e0511d5773649cabe97ed958dc2fd19",
+          "reference_point": "front_drive_axle",
+          "position": [
+            0.805871425642175,
+            1.8866510743437246
+          ],
+          "captured_ns": 83857514077716
+        },
+        "progress_m": 2.1539764511358817
+      },
+      "duration_s": 75.253696475,
+      "truth_max_cross_track_m": 0.12770576306973655,
+      "truth_min_pillar_clearance_m": 0.9634459555323099,
+      "truth_goal_error_m": 0.07419808749149984,
+      "direct_line_pillar_center_distance_m": 1.215366108504833,
+      "planned_detour_from_direct_line_m": 0.3193930411255827
+    }
+  },
+  "goal-planning_cancel-ff7af3ca": {
+    "summary.json": {
+      "passed": true,
+      "case": "planning_cancel",
+      "lidar_rays": 2160,
+      "room_yaw_rad": 0.15,
+      "task": {
+        "task_id": "navigation:bd13c3a0581c4ef8bc7b4d7157cd1801",
+        "mission": "navigate:POINT_A",
+        "status": "CANCELLED",
+        "step": "cancelled",
+        "error": null,
+        "goal": "POINT_A",
+        "reference_point": "navigation_reference",
+        "destination_odom": [
+          0.8,
+          2.0
+        ],
+        "catalog_sha256": "011e63ac60382b52cc5e2d943e3c550c5a2ffd4bebe9756eb6f492a24a27c9b4",
+        "frame_epoch": "0f3f7882807e4715a7c412b4e7f8418a",
+        "attempt": 1,
+        "deadline_ns": 84216277658506,
+        "steps": [],
+        "child": null,
+        "history": [],
+        "configuration_sha256": "011e63ac60382b52cc5e2d943e3c550c5a2ffd4bebe9756eb6f492a24a27c9b4",
+        "effects": {},
+        "requests": {},
+        "stops": {},
+        "backend_directory": null
+      },
+      "native_jobs": 1,
+      "planning_only": true
+    }
+  },
+  "goal-unreachable-e224ef19": {
+    "summary.json": {
+      "passed": true,
+      "case": "unreachable",
+      "lidar_rays": 2160,
+      "room_yaw_rad": 0.15,
+      "task": {
+        "task_id": "navigation:d8adeea13bc34e7ea628ddffeb5f4084",
+        "mission": "navigate:POINT_A",
+        "status": "FAILED",
+        "step": "failed",
+        "error": "path footprint intersects occupied, uncertain or unknown cells",
+        "goal": "POINT_A",
+        "reference_point": "navigation_reference",
+        "destination_odom": [
+          2.8,
+          0.0
+        ],
+        "catalog_sha256": "56ea1b5e0d52b6ad280dd9a174401d96fd5338d1d3ab2044ce7eea9f97484da9",
+        "frame_epoch": "ce17be82c8e6419ab29ac96cbd1eb3ad",
+        "attempt": 1,
+        "deadline_ns": 84241574896517,
+        "steps": [],
+        "child": null,
+        "history": [],
+        "configuration_sha256": "56ea1b5e0d52b6ad280dd9a174401d96fd5338d1d3ab2044ce7eea9f97484da9",
+        "effects": {},
+        "requests": {},
+        "stops": {},
+        "backend_directory": null
+      },
+      "native_jobs": 0,
+      "planning_only": true
+    }
+  }
+}

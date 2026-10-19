@@ -30,11 +30,12 @@ from planning.models import MapContext, Pose2D
 class NavigationConfig:
     plan_path: Path
     timeout_ns: int
+    goals_path: Path | None = None
 
     @classmethod
     def load(cls, path):
         data = tomllib.loads(Path(path).read_text())
-        if set(data) != {"schema", "model", "plan_path", "timeout_ns"} or type(data["schema"]) is not int or data["schema"] != 1:
+        if set(data)-{"schema", "model", "plan_path", "timeout_ns", "goals_path"} or not {"schema", "model", "plan_path", "timeout_ns"} <= set(data) or type(data["schema"]) is not int or data["schema"] != 1:
             raise ValueError("invalid navigation configuration")
         if data["model"] != "target_rover_front_axle_v1":
             raise ValueError("only the audited front-drive Rover model is supported")
@@ -42,7 +43,10 @@ class NavigationConfig:
             raise ValueError("navigation plan path must be explicit and absolute")
         if type(data["timeout_ns"]) is not int or not 1_000_000_000 <= data["timeout_ns"] <= 70_000_000_000:
             raise ValueError("navigation timeout must be within 1..70 seconds")
-        return cls(Path(data["plan_path"]), data["timeout_ns"])
+        goals = data.get("goals_path")
+        if goals is not None and (type(goals) is not str or not Path(goals).is_absolute()):
+            raise ValueError("navigation goals path must be explicit and absolute")
+        return cls(Path(data["plan_path"]), data["timeout_ns"],None if goals is None else Path(goals))
 
 
 @dataclass(frozen=True, slots=True)

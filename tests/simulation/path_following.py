@@ -29,7 +29,7 @@ def segment_distance(x, y, a, b):
     return math.hypot(x-a[0]-t*dx,y-a[1]-t*dy)
 
 
-def run(directory, case):
+def run(directory, case, *, autonomous=False):
     directory.mkdir(parents=True,exist_ok=False)
     os.environ["ROS_DOMAIN_ID"] = str(100+os.getpid()%100)
     owned=OwnedSimulation(directory,"rover")
@@ -45,6 +45,11 @@ def run(directory, case):
     plan=directory/"plan.json"
     config=directory/"navigation.toml"
     config.write_text(f'schema=1\nmodel="target_rover_front_axle_v1"\nplan_path="{plan}"\ntimeout_ns={10_000_000_000 if case=="timeout" else 70_000_000_000}\n')
+    if autonomous:
+        goals=directory/"goals.toml"
+        goals.write_text('schema=1\nenvironment_id="environment:rover-training-v1"\n[[goals]]\nname="POINT_A"\nframe="odom"\nreference_point="navigation_reference"\nposition=[0.8,2.0]\n')
+        if case == "unreachable":goals.write_text(goals.read_text().replace('[0.8,2.0]','[2.8,0.0]'))
+        config.write_text(config.read_text()+f'goals_path="{goals}"\n')
     profile=directory/"profile.toml"
     profile.write_text((ROOT/"simulation/profiles/rover.toml").read_text().replace("port = 5760",f"port = {owned.port}"))
     bridge=directory/"bridge.yaml"
@@ -110,6 +115,26 @@ def run(directory, case):
                    and s["environment"]["origin_verified"] and s["motion_warmup_remaining_ns"]==0,75,"navigation preflight")
         if ready["system_send"] or ready["action_send"] or ready["vehicle"]["armed"]:
             raise AssertionError("idle Application retained authority")
+        if autonomous and case in ("planning_cancel","unreachable"):
+            before=oracle.latest()
+            response=request(endpoint,"start",{"mission":"navigate:POINT_A"})
+            if not response["ok"]:raise RuntimeError(response)
+            if case == "planning_cancel":
+                if not request(endpoint,"cancel")["ok"]:raise AssertionError("planning cancel rejected")
+            final=wait(lambda s:s['task']['status'] in ('FAILED','CANCELLED','SUCCEEDED'),25,'planning terminal')
+            expected='CANCELLED' if case=='planning_cancel' else 'FAILED'
+            after=oracle.latest()
+            if (final['task']['status']!=expected or final['vehicle']['armed'] or final['system_send']
+                    or final['action_send'] or final['task']['effects']
+                    or math.hypot(after.x_m-before.x_m,after.y_m-before.y_m)>.02):
+                raise AssertionError('planning-only scenario moved or retained authority')
+            manifests=list(directory.glob('navigation-jobs/*/*/*/manifest.json'))
+            if any(not json.loads(p.read_text())['process_group_released'] for p in manifests):
+                raise AssertionError('cancelled planning left a native group')
+            report.update(task=final['task'],native_jobs=len(manifests),planning_only=True)
+            if not request(endpoint,'shutdown')['ok'] or app.wait(timeout=12):raise AssertionError('shutdown failed')
+            owned.stop_process(app);report['passed']=True
+            return report
         transform=pose_from_json(ready["mapping"]["odom_in_map"])
         binding=PlanarBinding(transform.position.x,transform.position.y,yaw(transform))
         position=ready["vehicle"]["pose"]["position"]
@@ -120,15 +145,24 @@ def run(directory, case):
         command=[sys.executable,"-m","app.plan","--mapping-config",str(mapping),"--control-socket",str(endpoint),
             "--start",f"{start.x:.9f}",f"{start.y:.9f}","--goal",f"{goal.x:.9f}",f"{goal.y:.9f}","--clearance",".95",
             "--output",str(plan),"--evidence-directory",str(directory/"nav2")]
-        result=subprocess.run(command,capture_output=True,text=True,timeout=25)
-        (directory/"planning.log").write_text(result.stdout+result.stderr)
-        if result.returncode:raise RuntimeError("live Nav2 planning failed: "+result.stdout)
-        d=json.loads(result.stdout)["result"]
+        origin=oracle.latest()
+        initial=ready["vehicle"]["pose"]["position"]
+        if autonomous:
+            response=request(endpoint,"start",{"mission":"navigate:POINT_A"})
+            if not response["ok"]:raise RuntimeError(response)
+            wait(lambda s:s["task"]["status"] in ("RUNNING","FAILED","CANCELLED"),25,"Application planning")
+            if not plan.exists():raise AssertionError("Application returned no admitted plan")
+            value=json.loads(plan.read_text())
+            (directory/"planning.log").write_text(json.dumps(value)+'\n')
+            d=value["result"]
+        else:
+            result=subprocess.run(command,capture_output=True,text=True,timeout=25)
+            (directory/"planning.log").write_text(result.stdout+result.stderr)
+            if result.returncode:raise RuntimeError("live Nav2 planning failed: "+result.stdout)
+            d=json.loads(result.stdout)["result"]
+            response=request(endpoint,"start",{"mission":"follow_path"})
         report["plan"]={"request_id":d["request_id"],"length_m":d["length_m"],"poses":len(d["poses"]),"clearance_m":d["clearance_m"]}
         if d["executable"]:raise AssertionError("planner granted authority")
-        origin=oracle.latest()
-        initial=status()[0]["vehicle"]["pose"]["position"]
-        response=request(endpoint,"start",{"mission":"follow_path"})
         if not response["ok"]:raise RuntimeError(response)
         report["task_id"]=response["result"]["task_id"]
         submitted_ns=time.monotonic_ns();trigger_ns=None;moving_seen=False;terminal_ns=None;stable=None
