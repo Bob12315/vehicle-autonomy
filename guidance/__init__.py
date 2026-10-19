@@ -1,1 +1,1 @@
-"""Guidance algorithms belong here and cannot submit commands directly."""
+"""Pure guidance algorithms; no vehicle command ports."""

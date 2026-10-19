@@ -20,7 +20,7 @@
 
 `planning/` 的不可变模型、坐标转换、碰撞校验和 `application/planning.py` 不依赖 ROS、车辆端口、协议或 Transport。`app.plan` 是独立的显式只读入口，普通 Python 即可运行；ROS 环境只加载到它创建的 backend 子进程。长运行车辆 App 的周期、Mission、Action、双 SEND、Lease、Safety 和唯一 writer 没有改变。
 
-每次请求创建独立 namespace、ROS domain 和自有进程组，只启动 Nav2 Planner Server。地图和 TF 使用请求私有 topic；没有车辆连接或运动命令 topic。当前没有把输出接入现有 Goto，也没有声称已实现地图避障行驶。
+每次请求创建独立 namespace、ROS domain 和自有进程组，只启动 Nav2 Planner Server。地图和 TF 使用请求私有 topic；没有车辆连接或运动命令 topic。P19 本身不接现有 Goto；后续显式路径准入与跟踪见 [P20](rover_path_following.md)，规划入口仍为只读。
 
 ## 安装与快速运行
 
@@ -104,8 +104,8 @@ python -m tests.simulation.nav2_live
 
 ## 保留限制与下一步
 
-P18 的轴对齐地图边界缺陷仍开放；本阶段既不补画墙面，也不证明地图本身完整。规划依赖输入地图质量。当前未接 Mission 地图导航、路径跟踪、在线重规划、地图参与 Safety、动态障碍或真实设备。
+P18 的轴对齐地图边界缺陷仍开放；本阶段既不补画墙面，也不证明地图本身完整。规划依赖输入地图质量。P19 验收不含路径执行、在线重规划、动态障碍或真实设备。
 
-下一阶段需定义路径消费/失效与 map↔odom 转换，建立 Guidance/跟踪 Action，再通过原 Effect、授权、Safety、唯一 writer 验证运动。直接将 Nav2 `/cmd_vel` 接到 MAVLink 不属于此阶段接口。
+后续 [P20](rover_path_following.md) 实现独立的在线路径消费/失效、map↔odom 绑定和 Guidance/跟踪 Action，再通过原 Effect、授权、Safety、唯一 writer 验证有限仿真运动。执行需要主动轮轴参考点及至少 0.95 m 余量，不能直接消费默认 0.55 m 记录图示例。直接将 Nav2 `/cmd_vel` 接到 MAVLink 不属于此接口。
 
 上游依据：[Smac Jazzy](https://github.com/ros-navigation/navigation2/blob/jazzy/nav2_smac_planner/README.md)、[Planner Server](https://github.com/ros-navigation/navigation2/blob/jazzy/nav2_planner/src/planner_server.cpp)、[ComputePathToPose](https://github.com/ros-navigation/navigation2/blob/jazzy/nav2_msgs/action/ComputePathToPose.action)。

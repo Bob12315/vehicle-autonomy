@@ -67,6 +67,7 @@ class SimulationRuntime:
                  transport_factory: Callable[..., object] | None = None,
                  clock: Callable[[], TimePoint] | None = None,
                  event_sink: Callable[[dict], None] | None = None,
+                 motion_guard: Callable[..., str | None] | None = None,
                  sleep: Callable[[float], None] = time.sleep) -> None:
         if not isinstance(profile, SimulationProfile):
             raise TypeError("validated SimulationProfile required")
@@ -79,6 +80,7 @@ class SimulationRuntime:
                                                  profile.clock_domain_id))
         self._transport_factory = transport_factory or TcpByteTransport.connect
         self._event_sink = event_sink
+        self.motion_guard = motion_guard
         self._sleep = sleep
         self.authority = ControlAuthority()
         self._translator = translator
@@ -225,6 +227,8 @@ class SimulationRuntime:
                 return "motion_requires_armed"
             if state.operation.native_mode != f"ARDUPILOT_CUSTOM_{self.profile.mode_ids['GUIDED']}":
                 return "motion_requires_guided_mode"
+            if self.motion_guard is not None:
+                return self.motion_guard(command, state, now)
         return None
 
     def _close_link(self, reason: str) -> None:

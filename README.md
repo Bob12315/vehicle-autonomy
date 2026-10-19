@@ -87,6 +87,12 @@ python -m app.main ctl --profile copter_sim start --mission cuadc_demo
 
 ## 可选 Nav2 只读路径规划
 
-新增 `python -m app.plan`，从记录地图或当前只读 Rover App 的 P18 地图计算几何路径。使用 ROS 2 Jazzy / Nav2 SmacPlanner2D，返回前核对地图内容、版本来源、Frame epoch、时间和整段车体碰撞。输出明确为 `executable=false`，尚未接入 Mission 路径跟踪或地图避障行驶。
+新增 `python -m app.plan`，从记录地图或当前只读 Rover App 的 P18 地图计算几何路径。使用 ROS 2 Jazzy / Nav2 SmacPlanner2D，返回前核对地图内容、版本来源、Frame epoch、时间和整段车体碰撞。规划入口输出保持 `executable=false`；显式路径消费使用下一节的独立准入与原安全执行链。
 
 安装与可直接运行的记录图示例见 [Nav2 规划说明](docs/nav2_planning.md)；206 项单元测试、真实 Nav2 拒绝/绕墙/超时及在线只读链证据见 [P19 第一步验收](docs/autonomy/phase-19.md)。
+
+## 可选 Rover 路径跟踪
+
+显式 `--navigation-config` 为本机前驱两轮/后万向轮 Rover 模型注册 `follow_path` Mission。它按主动轮轴参考点消费新鲜在线路径，经 GUIDED、Arm、Typed Twist、观察停车和 Disarm 完成有限任务；持续检查当前地图、map/odom 对齐、路径文件和横向偏离。地图失效时走原 Stop 屏障，默认双 SEND 仍关闭。
+
+配置、参考点/余量语义和操作步骤见 [路径跟踪说明](docs/rover_path_following.md)，实测范围见 [P20 审计](docs/autonomy/phase-20.md)。复现命令 `./scripts/test_navigation_v1.sh`，仅创建自有 localhost SITL/Gazebo；不含动态重规划、真实设备或其他车型。

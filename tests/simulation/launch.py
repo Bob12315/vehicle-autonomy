@@ -64,7 +64,7 @@ class OwnedSimulation:
         self.profile = replace(SimulationProfile.load(ROOT / f"simulation/profiles/{kind}.toml"), port=self.port)
         self.processes = []
         code_hash=hashlib.sha256()
-        for package in ('contracts','core','deployment','runtime','application','applications','actions','app','environments','localization','world_model','mapping','planning','integrations','sensors','perception','vehicles','protocols','infrastructure','simulation','scripts','tests/simulation'):
+        for package in ('contracts','core','deployment','runtime','application','applications','actions','app','environments','localization','world_model','mapping','planning','guidance','integrations','sensors','perception','vehicles','protocols','infrastructure','simulation','scripts','tests/simulation'):
             for source in sorted((ROOT/package).rglob('*')):
                 if source.is_file() and source.suffix in ('.py','.toml','.json','.sdf','.yaml','.sh'):
                     code_hash.update(str(source.relative_to(ROOT)).encode()+b'\0'+source.read_bytes()+b'\0')

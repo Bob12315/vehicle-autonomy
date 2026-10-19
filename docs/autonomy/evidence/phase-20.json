@@ -1,0 +1,2746 @@
+{
+  "date": "2026-10-19",
+  "scope": "P20 audited front-drive Rover, live SLAM map, finite Nav2 path tracking through original Mission/Effect/authority/Safety/sole writer; localhost SITL/Gazebo only",
+  "baseline_commit": "ce0a82a",
+  "unit": {
+    "command": "python -m unittest discover -s tests -q",
+    "tests": 223,
+    "new_path_following_tests": 17,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "elapsed_s": 16.707
+  },
+  "run_directory": "artifacts/simulation/navigation-final-20261019",
+  "cases": {
+    "tracking": {
+      "directory": "artifacts/simulation/navigation-final-20261019/tracking",
+      "summary": {
+        "passed": true,
+        "case": "tracking",
+        "lidar_rays": 2160,
+        "room_yaw_rad": 0.15,
+        "plan": {
+          "request_id": "fdd53294ace04671a51104524c971a5f",
+          "length_m": 2.31568545945564,
+          "poses": 44,
+          "clearance_m": 0.95
+        },
+        "task_id": "application:41c311eedd3f4a1a87763b8c8745fd70",
+        "task": {
+          "task_id": "application:41c311eedd3f4a1a87763b8c8745fd70",
+          "mission": "follow_path",
+          "configuration_sha256": "cd5fbe438c5ba2a1dddd843ec308e1fba9f374dbc6b1b216dbffba166e03b7c8",
+          "status": "SUCCEEDED",
+          "step": null,
+          "error": null,
+          "steps": [
+            {
+              "step": "mode",
+              "reason": "SUCCEEDED",
+              "error": null
+            },
+            {
+              "step": "arm",
+              "reason": "SUCCEEDED",
+              "error": null
+            },
+            {
+              "step": "follow_path",
+              "reason": "SUCCEEDED",
+              "error": null
+            },
+            {
+              "step": "disarm",
+              "reason": "SUCCEEDED",
+              "error": null
+            }
+          ],
+          "stops": {}
+        },
+        "effect_count": 299,
+        "stop_speed_mps": 0.01601540070246602,
+        "navigation": {
+          "configured": true,
+          "active": false,
+          "request_id": null,
+          "error": "navigation_not_admitted",
+          "last_error": null,
+          "alignment_drift_m": 0.0068010159372157595,
+          "map_revalidations": 30,
+          "model": "target_rover_front_axle_v1",
+          "base_to_reference_x_m": 0.25,
+          "required_clearance_m": 0.95,
+          "planning_start": {
+            "frame": "map",
+            "frame_epoch": "78d2b02651e04d4d9d8efb5c46d35acb",
+            "reference_point": "front_drive_axle",
+            "position": [
+              0.7822378163952223,
+              1.8804519338939458
+            ],
+            "captured_ns": 71409453964735
+          },
+          "progress_m": 2.194974779538256
+        },
+        "duration_s": 73.65185857,
+        "truth_max_cross_track_m": 0.12441314895414149,
+        "truth_min_pillar_clearance_m": 0.9691778521315554,
+        "truth_goal_error_m": 0.07491844453980803,
+        "direct_line_pillar_center_distance_m": 1.2209397206971822,
+        "planned_detour_from_direct_line_m": 0.3193930411255827
+      },
+      "manifest": {
+        "root_source_sha256": "51d4d1621bb4a026cae43f69e443780598e85b00fd12058d6e81d913059deec6",
+        "working_tree_dirty": true,
+        "kind": "rover",
+        "framework_sha": "ce0a82a7476b1b29ecf7ff048bff9b77dfbf29ef",
+        "ardupilot_sha": "b5fbe26515eddb9277e1b5e7a4fcf3f37cf449a6",
+        "plugin_sha": "3ec51428fd43deb7b71137192ba16394b450d78e",
+        "gazebo_version": "Gazebo Sim, version 8.15.0\nCopyright (C) 2018 Open Source Robotics Foundation.\nReleased under the Apache 2.0 License.",
+        "world": "rover_67cbc6ec1da2",
+        "model": "target_rover",
+        "instance": 1,
+        "ports": {
+          "tcp": 5770,
+          "json_udp": 9012
+        },
+        "gazebo_transport": {
+          "ip": "127.0.0.1",
+          "partition": "vaf_rover_67cbc6ec1da2"
+        },
+        "started_at": "2026-10-19T01:36:41.853408+00:00",
+        "processes": [
+          {
+            "name": "gazebo",
+            "command": [
+              "gz",
+              "sim",
+              "-s",
+              "-r",
+              "-v3",
+              "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/tracking/world.sdf"
+            ],
+            "pid": 113501,
+            "pgid": 113501,
+            "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/tracking/gazebo.log",
+            "exit_code": 0,
+            "start_ticks": "7161547",
+            "stopped": true
+          },
+          {
+            "name": "sitl",
+            "command": [
+              "/home/level6/vehicle-autonomy-framework/artifacts/simulation/suite-e8ba09fa/build/ardupilot/sitl/bin/ardurover",
+              "--model",
+              "JSON",
+              "--speedup",
+              "1",
+              "--defaults",
+              "/home/level6/ardupilot/Tools/autotest/default_params/rover.parm,/home/level6/ardupilot/Tools/autotest/default_params/rover-skid.parm,/home/level6/vehicle-autonomy-framework/simulation/params/rover_telemetry.parm",
+              "--sim-address=127.0.0.1",
+              "--home=-35.363262,149.165237,584,90",
+              "-I1"
+            ],
+            "pid": 113502,
+            "pgid": 113502,
+            "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/tracking/sitl.log",
+            "exit_code": 0,
+            "start_ticks": "7161547",
+            "stopped": true
+          },
+          {
+            "name": "application",
+            "command": [
+              "/home/level6/venv-ardupilot/bin/python",
+              "-m",
+              "app.main",
+              "run",
+              "--profile",
+              "rover_sim",
+              "--config",
+              "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/tracking/profile.toml",
+              "--control-socket",
+              "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/tracking/app.sock",
+              "--ros2-mapping-config",
+              "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/tracking/mapping.toml",
+              "--navigation-config",
+              "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/tracking/navigation.toml",
+              "--allow-send"
+            ],
+            "pid": 113515,
+            "pgid": 113515,
+            "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/tracking/application.log",
+            "exit_code": 0,
+            "start_ticks": "7161557",
+            "stopped": true
+          },
+          {
+            "name": "gz_bridge",
+            "command": [
+              "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+              "/home/level6/venv-ardupilot/bin/python",
+              "-m",
+              "integrations.ros2.run",
+              "ros_gz_bridge",
+              "parameter_bridge",
+              "--ros-args",
+              "-p",
+              "config_file:=/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/tracking/bridge.yaml"
+            ],
+            "pid": 113516,
+            "pgid": 113516,
+            "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/tracking/gz_bridge.log",
+            "exit_code": 0,
+            "start_ticks": "7161557",
+            "stopped": true
+          },
+          {
+            "name": "mapping_sidecar",
+            "command": [
+              "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+              "/home/level6/venv-ardupilot/bin/python",
+              "-m",
+              "integrations.ros2.mapping_node",
+              "--config",
+              "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/tracking/mapping.toml",
+              "--control-socket",
+              "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/tracking/app.sock"
+            ],
+            "pid": 113517,
+            "pgid": 113517,
+            "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/tracking/mapping_sidecar.log",
+            "exit_code": 0,
+            "start_ticks": "7161557",
+            "stopped": true
+          },
+          {
+            "name": "slam",
+            "command": [
+              "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+              "/home/level6/venv-ardupilot/bin/python",
+              "-m",
+              "integrations.ros2.run",
+              "slam_toolbox",
+              "async_slam_toolbox_node",
+              "--ros-args",
+              "--params-file",
+              "/home/level6/vehicle-autonomy-framework/simulation/mapping/slam_toolbox.yaml"
+            ],
+            "pid": 113518,
+            "pgid": 113518,
+            "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/tracking/slam.log",
+            "exit_code": 0,
+            "start_ticks": "7161557",
+            "stopped": true
+          },
+          {
+            "name": "slam_configure",
+            "command": [
+              "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+              "ros2",
+              "lifecycle",
+              "set",
+              "--no-daemon",
+              "/slam_toolbox",
+              "configure"
+            ],
+            "pid": 113519,
+            "pgid": 113519,
+            "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/tracking/slam_configure.log",
+            "exit_code": 0,
+            "start_ticks": "7161557",
+            "stopped": true
+          },
+          {
+            "name": "slam_activate",
+            "command": [
+              "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+              "ros2",
+              "lifecycle",
+              "set",
+              "--no-daemon",
+              "/slam_toolbox",
+              "activate"
+            ],
+            "pid": 113623,
+            "pgid": 113623,
+            "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/tracking/slam_activate.log",
+            "exit_code": 0,
+            "start_ticks": "7161709",
+            "stopped": true
+          }
+        ],
+        "source_model": "/home/level6/vehicle-autonomy-framework/simulation/models/target_rover/model.sdf",
+        "source_world": "/home/level6/vehicle-autonomy-framework/simulation/worlds/rover_runway.sdf",
+        "parameters": [
+          "/home/level6/ardupilot/Tools/autotest/default_params/rover.parm",
+          "/home/level6/ardupilot/Tools/autotest/default_params/rover-skid.parm",
+          "/home/level6/vehicle-autonomy-framework/simulation/params/rover_telemetry.parm"
+        ],
+        "ros_domain_id": "195",
+        "navigation_case": "tracking",
+        "ended_at": "2026-10-19T01:38:47.011740+00:00",
+        "remaining_process_groups": [],
+        "ports_released": true
+      },
+      "admission": {
+        "adopted_map_sha256": "41b2f34ffe25161e9b877230e67573ee07a2c2be0357c322d1e4392266c30295",
+        "base_to_reference_x_m": 0.25,
+        "binding": {
+          "x": 3.870722658808238e-12,
+          "y": -1.6520131673094936e-13,
+          "yaw": 1.0251225991946762e-22
+        },
+        "event": "navigation_admitted",
+        "footprint_radius_m": 0.72,
+        "length_m": 2.31568545945564,
+        "odom_poses": [
+          [
+            0.20825474916266892,
+            -0.03681278946402511,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.20825474916266892,
+            0.013187211281032951,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.20825474916266892,
+            0.06318721202609101,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.20825474916266892,
+            0.11318721277114907,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.20825474916266892,
+            0.16318721351620713,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.20825474916266892,
+            0.2131872142612652,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.20825474916266892,
+            0.26318721500632325,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.20825474916266892,
+            0.3131872157513813,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.20825474916266892,
+            0.36318721649643937,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.20825474916266892,
+            0.41318721724149743,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.20825474916266892,
+            0.4631872179865555,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.20825474916266892,
+            0.5131872187316135,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.20825474916266892,
+            0.5631872194766716,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.20825474916266892,
+            0.6131872202217297,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.20825474916266892,
+            0.6631872209667877,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.20825474916266892,
+            0.7131872217118458,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.25825474990772695,
+            0.7631872224569038,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.25825474990772695,
+            0.8131872232019619,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.25825474990772695,
+            0.86318722394702,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.308254750652785,
+            0.913187224692078,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.308254750652785,
+            0.9631872254371361,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3582547513978431,
+            1.0131872261821941,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3582547513978431,
+            1.0631872269272522,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3582547513978431,
+            1.1131872276723103,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3582547513978431,
+            1.1631872284173683,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3582547513978431,
+            1.2131872291624264,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3582547513978431,
+            1.2631872299074844,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3582547513978431,
+            1.3131872306525425,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3582547513978431,
+            1.3631872313976006,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3582547513978431,
+            1.4131872321426586,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3582547513978431,
+            1.4631872328877167,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3582547513978431,
+            1.5131872336327747,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3582547513978431,
+            1.5631872343778328,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3582547513978431,
+            1.6131872351228909,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3582547513978431,
+            1.663187235867949,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3582547513978431,
+            1.713187236613007,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.40825475214290113,
+            1.763187237358065,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.4582547528879592,
+            1.813187238103123,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.5082547536330173,
+            1.8631872388481812,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.5582547543780754,
+            1.9131872395932392,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.6082547551231334,
+            1.9131872395932392,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.6582547558681915,
+            1.9131872395932392,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.7082547566132495,
+            1.9631872403382973,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.7582547573583076,
+            1.9631872403382973,
+            -1.0251225991946762e-22
+          ]
+        ],
+        "plan_sha256": "85b07cae81eb2ae1f995a6e53e0fb26dceadb3a8094837ee01bd5f43db64810a",
+        "profile": "rover_sim",
+        "reference_point": "front_drive_axle",
+        "request_id": "fdd53294ace04671a51104524c971a5f",
+        "source_map_sha256": "41b2f34ffe25161e9b877230e67573ee07a2c2be0357c322d1e4392266c30295"
+      },
+      "nav2_manifest": {
+        "command": [
+          "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+          "/home/level6/venv-ardupilot/bin/python",
+          "-m",
+          "integrations.ros2.nav2_worker",
+          "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/tracking/nav2/fdd53294ace04671a51104524c971a5f"
+        ],
+        "pid": 113756,
+        "pgid": 113756,
+        "returncode": 0,
+        "process_group_released": true,
+        "timed_out": false,
+        "ros_domain_id": "164",
+        "started_ns": 71332324542556,
+        "ended_ns": 71333290848692,
+        "source_map_sha256": "41b2f34ffe25161e9b877230e67573ee07a2c2be0357c322d1e4392266c30295",
+        "configuration_grid_sha256": "becf3d005d77f1c7abac673ef4a0d27264c8b39a54320156bbf9f04e0a829fb4",
+        "source_files_sha256": {
+          "planning/models.py": "ea3bbb65476fd5dcf109ea9354f5e75fda0484e2c8683e98c119acabc27e5f07",
+          "planning/collision.py": "c89c43c4dc00cd4ad40dcc0923f0ec0e8f09be29b5efede406a1083bc5b76ccf",
+          "application/planning.py": "2a3a8d4501358b2b2a80322dbbb8432e50dc4c740c9d44f65075a271db22d77c",
+          "app/plan.py": "63c249e2606e46f32a803da2a71bcf44d8e419c99ead2a17487abf59a8c6d762",
+          "integrations/ros2/nav2_planner.py": "20937ef94ad3539631a0e9934610da26f73506dbe5a2db5163716921c7b3705e",
+          "integrations/ros2/nav2_worker.py": "fb877c26cc5290e57a60d3a7af1d02fa4977ebb4870697f7eab7011b1dc1eb78",
+          "scripts/with_ros2.sh": "ec2fb05881250b1068e425e4ea55e40677fbf1f909ed43d246e8d6bf89353219"
+        }
+      },
+      "nav2_version": "1.3.13",
+      "native_costmap_verified": true
+    },
+    "cancel": {
+      "directory": "artifacts/simulation/navigation-final-20261019/cancel",
+      "summary": {
+        "passed": true,
+        "case": "cancel",
+        "lidar_rays": 2160,
+        "room_yaw_rad": 0.15,
+        "plan": {
+          "request_id": "54fc266191ae4ea2ae3f5881e446d7ea",
+          "length_m": 2.31568545945564,
+          "poses": 44,
+          "clearance_m": 0.95
+        },
+        "task_id": "application:572c0a774b0240bab687c4be61a7d975",
+        "task": {
+          "task_id": "application:572c0a774b0240bab687c4be61a7d975",
+          "mission": "follow_path",
+          "configuration_sha256": "8b29d513f1f2e524b6edb2dc8330fd64d7a7a318208ccb854b604eff017f5863",
+          "status": "CANCELLED",
+          "step": "follow_path",
+          "error": null,
+          "steps": [
+            {
+              "step": "mode",
+              "reason": "SUCCEEDED",
+              "error": null
+            },
+            {
+              "step": "arm",
+              "reason": "SUCCEEDED",
+              "error": null
+            },
+            {
+              "step": "follow_path",
+              "reason": "CANCELLED",
+              "error": null
+            }
+          ],
+          "stops": {}
+        },
+        "effect_count": 32,
+        "stop_speed_mps": 0.0010033277615416802,
+        "navigation": {
+          "configured": true,
+          "active": false,
+          "request_id": null,
+          "error": "navigation_not_admitted",
+          "last_error": null,
+          "alignment_drift_m": 0.013795667714408748,
+          "map_revalidations": 5,
+          "model": "target_rover_front_axle_v1",
+          "base_to_reference_x_m": 0.25,
+          "required_clearance_m": 0.95,
+          "planning_start": {
+            "frame": "map",
+            "frame_epoch": "cd75519119d642dbb3c8ba5420292e2b",
+            "reference_point": "front_drive_axle",
+            "position": [
+              0.30742239452483455,
+              -0.018321629832589188
+            ],
+            "captured_ns": 71475857277233
+          },
+          "progress_m": 0.06311380831584555
+        },
+        "duration_s": 14.412188351,
+        "truth_max_cross_track_m": 0.12072064115931394,
+        "truth_min_pillar_clearance_m": 1.4127992098867002,
+        "fault_to_confirmed_stop_s": 5.806285165,
+        "recovery_disarmed": true
+      },
+      "manifest": {
+        "root_source_sha256": "51d4d1621bb4a026cae43f69e443780598e85b00fd12058d6e81d913059deec6",
+        "working_tree_dirty": true,
+        "kind": "rover",
+        "framework_sha": "ce0a82a7476b1b29ecf7ff048bff9b77dfbf29ef",
+        "ardupilot_sha": "b5fbe26515eddb9277e1b5e7a4fcf3f37cf449a6",
+        "plugin_sha": "3ec51428fd43deb7b71137192ba16394b450d78e",
+        "gazebo_version": "Gazebo Sim, version 8.15.0\nCopyright (C) 2018 Open Source Robotics Foundation.\nReleased under the Apache 2.0 License.",
+        "world": "rover_d73570288372",
+        "model": "target_rover",
+        "instance": 1,
+        "ports": {
+          "tcp": 5770,
+          "json_udp": 9012
+        },
+        "gazebo_transport": {
+          "ip": "127.0.0.1",
+          "partition": "vaf_rover_d73570288372"
+        },
+        "started_at": "2026-10-19T01:38:47.262477+00:00",
+        "processes": [
+          {
+            "name": "gazebo",
+            "command": [
+              "gz",
+              "sim",
+              "-s",
+              "-r",
+              "-v3",
+              "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/cancel/world.sdf"
+            ],
+            "pid": 113863,
+            "pgid": 113863,
+            "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/cancel/gazebo.log",
+            "exit_code": 0,
+            "start_ticks": "7174088",
+            "stopped": true
+          },
+          {
+            "name": "sitl",
+            "command": [
+              "/home/level6/vehicle-autonomy-framework/artifacts/simulation/suite-e8ba09fa/build/ardupilot/sitl/bin/ardurover",
+              "--model",
+              "JSON",
+              "--speedup",
+              "1",
+              "--defaults",
+              "/home/level6/ardupilot/Tools/autotest/default_params/rover.parm,/home/level6/ardupilot/Tools/autotest/default_params/rover-skid.parm,/home/level6/vehicle-autonomy-framework/simulation/params/rover_telemetry.parm",
+              "--sim-address=127.0.0.1",
+              "--home=-35.363262,149.165237,584,90",
+              "-I1"
+            ],
+            "pid": 113864,
+            "pgid": 113864,
+            "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/cancel/sitl.log",
+            "exit_code": 0,
+            "start_ticks": "7174088",
+            "stopped": true
+          },
+          {
+            "name": "application",
+            "command": [
+              "/home/level6/venv-ardupilot/bin/python",
+              "-m",
+              "app.main",
+              "run",
+              "--profile",
+              "rover_sim",
+              "--config",
+              "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/cancel/profile.toml",
+              "--control-socket",
+              "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/cancel/app.sock",
+              "--ros2-mapping-config",
+              "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/cancel/mapping.toml",
+              "--navigation-config",
+              "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/cancel/navigation.toml",
+              "--allow-send"
+            ],
+            "pid": 113877,
+            "pgid": 113877,
+            "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/cancel/application.log",
+            "exit_code": 0,
+            "start_ticks": "7174098",
+            "stopped": true
+          },
+          {
+            "name": "gz_bridge",
+            "command": [
+              "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+              "/home/level6/venv-ardupilot/bin/python",
+              "-m",
+              "integrations.ros2.run",
+              "ros_gz_bridge",
+              "parameter_bridge",
+              "--ros-args",
+              "-p",
+              "config_file:=/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/cancel/bridge.yaml"
+            ],
+            "pid": 113878,
+            "pgid": 113878,
+            "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/cancel/gz_bridge.log",
+            "exit_code": 0,
+            "start_ticks": "7174098",
+            "stopped": true
+          },
+          {
+            "name": "mapping_sidecar",
+            "command": [
+              "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+              "/home/level6/venv-ardupilot/bin/python",
+              "-m",
+              "integrations.ros2.mapping_node",
+              "--config",
+              "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/cancel/mapping.toml",
+              "--control-socket",
+              "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/cancel/app.sock"
+            ],
+            "pid": 113879,
+            "pgid": 113879,
+            "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/cancel/mapping_sidecar.log",
+            "exit_code": 0,
+            "start_ticks": "7174098",
+            "stopped": true
+          },
+          {
+            "name": "slam",
+            "command": [
+              "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+              "/home/level6/venv-ardupilot/bin/python",
+              "-m",
+              "integrations.ros2.run",
+              "slam_toolbox",
+              "async_slam_toolbox_node",
+              "--ros-args",
+              "--params-file",
+              "/home/level6/vehicle-autonomy-framework/simulation/mapping/slam_toolbox.yaml"
+            ],
+            "pid": 113880,
+            "pgid": 113880,
+            "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/cancel/slam.log",
+            "exit_code": 0,
+            "start_ticks": "7174098",
+            "stopped": true
+          },
+          {
+            "name": "slam_configure",
+            "command": [
+              "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+              "ros2",
+              "lifecycle",
+              "set",
+              "--no-daemon",
+              "/slam_toolbox",
+              "configure"
+            ],
+            "pid": 113883,
+            "pgid": 113883,
+            "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/cancel/slam_configure.log",
+            "exit_code": 0,
+            "start_ticks": "7174098",
+            "stopped": true
+          },
+          {
+            "name": "slam_activate",
+            "command": [
+              "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+              "ros2",
+              "lifecycle",
+              "set",
+              "--no-daemon",
+              "/slam_toolbox",
+              "activate"
+            ],
+            "pid": 113985,
+            "pgid": 113985,
+            "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/cancel/slam_activate.log",
+            "exit_code": 0,
+            "start_ticks": "7174250",
+            "stopped": true
+          }
+        ],
+        "source_model": "/home/level6/vehicle-autonomy-framework/simulation/models/target_rover/model.sdf",
+        "source_world": "/home/level6/vehicle-autonomy-framework/simulation/worlds/rover_runway.sdf",
+        "parameters": [
+          "/home/level6/ardupilot/Tools/autotest/default_params/rover.parm",
+          "/home/level6/ardupilot/Tools/autotest/default_params/rover-skid.parm",
+          "/home/level6/vehicle-autonomy-framework/simulation/params/rover_telemetry.parm"
+        ],
+        "ros_domain_id": "157",
+        "navigation_case": "cancel",
+        "ended_at": "2026-10-19T01:39:58.063245+00:00",
+        "remaining_process_groups": [],
+        "ports_released": true
+      },
+      "admission": {
+        "adopted_map_sha256": "6616ba4a636793247bad5a5cfd6dc7f7bd70aee99fe0765a3bb3ed28a53f8dac",
+        "base_to_reference_x_m": 0.25,
+        "binding": {
+          "x": 3.870722658808238e-12,
+          "y": -1.6520131673094936e-13,
+          "yaw": 1.0251225991946762e-22
+        },
+        "event": "navigation_admitted",
+        "footprint_radius_m": 0.72,
+        "length_m": 2.31568545945564,
+        "odom_poses": [
+          [
+            0.21222514395807576,
+            -0.04117594158393434,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.21222514395807576,
+            0.00882405916112372,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.21222514395807576,
+            0.05882405990618178,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.21222514395807576,
+            0.10882406065123984,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.21222514395807576,
+            0.1588240613962979,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.21222514395807576,
+            0.20882406214135596,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.21222514395807576,
+            0.258824062886414,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.21222514395807576,
+            0.3088240636314721,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.21222514395807576,
+            0.35882406437653014,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.21222514395807576,
+            0.4088240651215882,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.21222514395807576,
+            0.45882406586664626,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.21222514395807576,
+            0.5088240666117043,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.21222514395807576,
+            0.5588240673567624,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.21222514395807576,
+            0.6088240681018204,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.21222514395807576,
+            0.6588240688468785,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.21222514395807576,
+            0.7088240695919366,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.21222514395807576,
+            0.7588240703369946,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.2622251447031338,
+            0.8088240710820527,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.2622251447031338,
+            0.8588240718271107,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.31222514544819185,
+            0.9088240725721688,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.31222514544819185,
+            0.9588240733172269,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3622251461932499,
+            1.008824074062285,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3622251461932499,
+            1.058824074807343,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3622251461932499,
+            1.108824075552401,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3622251461932499,
+            1.158824076297459,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3622251461932499,
+            1.2088240770425172,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3622251461932499,
+            1.2588240777875752,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3622251461932499,
+            1.3088240785326333,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3622251461932499,
+            1.3588240792776913,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3622251461932499,
+            1.4088240800227494,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3622251461932499,
+            1.4588240807678075,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3622251461932499,
+            1.5088240815128655,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3622251461932499,
+            1.5588240822579236,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3622251461932499,
+            1.6088240830029816,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3622251461932499,
+            1.6588240837480397,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3622251461932499,
+            1.7088240844930978,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.412225146938308,
+            1.7588240852381558,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.46222514768336603,
+            1.8088240859832139,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.5122251484284241,
+            1.858824086728272,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.5622251491734822,
+            1.90882408747333,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.6122251499185403,
+            1.90882408747333,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.6622251506635983,
+            1.958824088218388,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.7122251514086564,
+            1.958824088218388,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.7622251521537144,
+            1.958824088218388,
+            -1.0251225991946762e-22
+          ]
+        ],
+        "plan_sha256": "898397a847e21a59189c79d7e311d3da75f14da5b186f016680cea3c1e49b5a3",
+        "profile": "rover_sim",
+        "reference_point": "front_drive_axle",
+        "request_id": "54fc266191ae4ea2ae3f5881e446d7ea",
+        "source_map_sha256": "6616ba4a636793247bad5a5cfd6dc7f7bd70aee99fe0765a3bb3ed28a53f8dac"
+      },
+      "nav2_manifest": {
+        "command": [
+          "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+          "/home/level6/venv-ardupilot/bin/python",
+          "-m",
+          "integrations.ros2.nav2_worker",
+          "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/cancel/nav2/54fc266191ae4ea2ae3f5881e446d7ea"
+        ],
+        "pid": 114108,
+        "pgid": 114108,
+        "returncode": 0,
+        "process_group_released": true,
+        "timed_out": false,
+        "ros_domain_id": "141",
+        "started_ns": 71457729316131,
+        "ended_ns": 71458747188003,
+        "source_map_sha256": "6616ba4a636793247bad5a5cfd6dc7f7bd70aee99fe0765a3bb3ed28a53f8dac",
+        "configuration_grid_sha256": "b4f3469136f6275a9c727a89c21bb4c916671129aac2adfc75540ad5976ea1ae",
+        "source_files_sha256": {
+          "planning/models.py": "ea3bbb65476fd5dcf109ea9354f5e75fda0484e2c8683e98c119acabc27e5f07",
+          "planning/collision.py": "c89c43c4dc00cd4ad40dcc0923f0ec0e8f09be29b5efede406a1083bc5b76ccf",
+          "application/planning.py": "2a3a8d4501358b2b2a80322dbbb8432e50dc4c740c9d44f65075a271db22d77c",
+          "app/plan.py": "63c249e2606e46f32a803da2a71bcf44d8e419c99ead2a17487abf59a8c6d762",
+          "integrations/ros2/nav2_planner.py": "20937ef94ad3539631a0e9934610da26f73506dbe5a2db5163716921c7b3705e",
+          "integrations/ros2/nav2_worker.py": "fb877c26cc5290e57a60d3a7af1d02fa4977ebb4870697f7eab7011b1dc1eb78",
+          "scripts/with_ros2.sh": "ec2fb05881250b1068e425e4ea55e40677fbf1f909ed43d246e8d6bf89353219"
+        }
+      },
+      "nav2_version": "1.3.13",
+      "native_costmap_verified": true
+    },
+    "map_loss": {
+      "directory": "artifacts/simulation/navigation-final-20261019/map_loss",
+      "summary": {
+        "passed": true,
+        "case": "map_loss",
+        "lidar_rays": 2160,
+        "room_yaw_rad": 0.15,
+        "plan": {
+          "request_id": "262d6295917440b2b0b546b3a5712136",
+          "length_m": 2.31568545945564,
+          "poses": 44,
+          "clearance_m": 0.95
+        },
+        "task_id": "application:f19e0a62e3154944aad8165cef2215b1",
+        "task": {
+          "task_id": "application:f19e0a62e3154944aad8165cef2215b1",
+          "mission": "follow_path",
+          "configuration_sha256": "8b78c3784a25ff591203589c0829d9f13754cfc6bf5b76219e1280fe50dc5c41",
+          "status": "FAILED",
+          "step": "follow_path",
+          "error": "navigation_map_unavailable",
+          "steps": [
+            {
+              "step": "mode",
+              "reason": "SUCCEEDED",
+              "error": null
+            },
+            {
+              "step": "arm",
+              "reason": "SUCCEEDED",
+              "error": null
+            },
+            {
+              "step": "follow_path",
+              "reason": "FAILED",
+              "error": "navigation_map_unavailable"
+            }
+          ],
+          "stops": {}
+        },
+        "effect_count": 29,
+        "stop_speed_mps": 0.0007963385255400186,
+        "navigation": {
+          "configured": true,
+          "active": false,
+          "request_id": null,
+          "error": "navigation_not_admitted",
+          "last_error": "navigation_map_unavailable",
+          "alignment_drift_m": 0.0,
+          "map_revalidations": 2,
+          "model": "target_rover_front_axle_v1",
+          "base_to_reference_x_m": 0.25,
+          "required_clearance_m": 0.95,
+          "planning_start": null,
+          "progress_m": 0.05963682406666309
+        },
+        "duration_s": 14.308307078,
+        "truth_max_cross_track_m": 0.12312336509041491,
+        "truth_min_pillar_clearance_m": 1.412658062036235,
+        "fault_to_confirmed_stop_s": 5.70195576,
+        "recovery_disarmed": true
+      },
+      "manifest": {
+        "root_source_sha256": "51d4d1621bb4a026cae43f69e443780598e85b00fd12058d6e81d913059deec6",
+        "working_tree_dirty": true,
+        "kind": "rover",
+        "framework_sha": "ce0a82a7476b1b29ecf7ff048bff9b77dfbf29ef",
+        "ardupilot_sha": "b5fbe26515eddb9277e1b5e7a4fcf3f37cf449a6",
+        "plugin_sha": "3ec51428fd43deb7b71137192ba16394b450d78e",
+        "gazebo_version": "Gazebo Sim, version 8.15.0\nCopyright (C) 2018 Open Source Robotics Foundation.\nReleased under the Apache 2.0 License.",
+        "world": "rover_fa36c525d4f1",
+        "model": "target_rover",
+        "instance": 1,
+        "ports": {
+          "tcp": 5770,
+          "json_udp": 9012
+        },
+        "gazebo_transport": {
+          "ip": "127.0.0.1",
+          "partition": "vaf_rover_fa36c525d4f1"
+        },
+        "started_at": "2026-10-19T01:39:58.308015+00:00",
+        "processes": [
+          {
+            "name": "gazebo",
+            "command": [
+              "gz",
+              "sim",
+              "-s",
+              "-r",
+              "-v3",
+              "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/map_loss/world.sdf"
+            ],
+            "pid": 114208,
+            "pgid": 114208,
+            "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/map_loss/gazebo.log",
+            "exit_code": 0,
+            "start_ticks": "7181192",
+            "stopped": true
+          },
+          {
+            "name": "sitl",
+            "command": [
+              "/home/level6/vehicle-autonomy-framework/artifacts/simulation/suite-e8ba09fa/build/ardupilot/sitl/bin/ardurover",
+              "--model",
+              "JSON",
+              "--speedup",
+              "1",
+              "--defaults",
+              "/home/level6/ardupilot/Tools/autotest/default_params/rover.parm,/home/level6/ardupilot/Tools/autotest/default_params/rover-skid.parm,/home/level6/vehicle-autonomy-framework/simulation/params/rover_telemetry.parm",
+              "--sim-address=127.0.0.1",
+              "--home=-35.363262,149.165237,584,90",
+              "-I1"
+            ],
+            "pid": 114209,
+            "pgid": 114209,
+            "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/map_loss/sitl.log",
+            "exit_code": 0,
+            "start_ticks": "7181192",
+            "stopped": true
+          },
+          {
+            "name": "application",
+            "command": [
+              "/home/level6/venv-ardupilot/bin/python",
+              "-m",
+              "app.main",
+              "run",
+              "--profile",
+              "rover_sim",
+              "--config",
+              "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/map_loss/profile.toml",
+              "--control-socket",
+              "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/map_loss/app.sock",
+              "--ros2-mapping-config",
+              "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/map_loss/mapping.toml",
+              "--navigation-config",
+              "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/map_loss/navigation.toml",
+              "--allow-send"
+            ],
+            "pid": 114222,
+            "pgid": 114222,
+            "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/map_loss/application.log",
+            "exit_code": 0,
+            "start_ticks": "7181202",
+            "stopped": true
+          },
+          {
+            "name": "gz_bridge",
+            "command": [
+              "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+              "/home/level6/venv-ardupilot/bin/python",
+              "-m",
+              "integrations.ros2.run",
+              "ros_gz_bridge",
+              "parameter_bridge",
+              "--ros-args",
+              "-p",
+              "config_file:=/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/map_loss/bridge.yaml"
+            ],
+            "pid": 114223,
+            "pgid": 114223,
+            "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/map_loss/gz_bridge.log",
+            "exit_code": 0,
+            "start_ticks": "7181202",
+            "stopped": true
+          },
+          {
+            "name": "mapping_sidecar",
+            "command": [
+              "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+              "/home/level6/venv-ardupilot/bin/python",
+              "-m",
+              "integrations.ros2.mapping_node",
+              "--config",
+              "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/map_loss/mapping.toml",
+              "--control-socket",
+              "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/map_loss/app.sock"
+            ],
+            "pid": 114224,
+            "pgid": 114224,
+            "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/map_loss/mapping_sidecar.log",
+            "exit_code": 0,
+            "start_ticks": "7181202",
+            "stopped": true
+          },
+          {
+            "name": "slam",
+            "command": [
+              "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+              "/home/level6/venv-ardupilot/bin/python",
+              "-m",
+              "integrations.ros2.run",
+              "slam_toolbox",
+              "async_slam_toolbox_node",
+              "--ros-args",
+              "--params-file",
+              "/home/level6/vehicle-autonomy-framework/simulation/mapping/slam_toolbox.yaml"
+            ],
+            "pid": 114225,
+            "pgid": 114225,
+            "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/map_loss/slam.log",
+            "exit_code": 0,
+            "start_ticks": "7181202",
+            "stopped": true
+          },
+          {
+            "name": "slam_configure",
+            "command": [
+              "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+              "ros2",
+              "lifecycle",
+              "set",
+              "--no-daemon",
+              "/slam_toolbox",
+              "configure"
+            ],
+            "pid": 114226,
+            "pgid": 114226,
+            "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/map_loss/slam_configure.log",
+            "exit_code": 0,
+            "start_ticks": "7181203",
+            "stopped": true
+          },
+          {
+            "name": "slam_activate",
+            "command": [
+              "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+              "ros2",
+              "lifecycle",
+              "set",
+              "--no-daemon",
+              "/slam_toolbox",
+              "activate"
+            ],
+            "pid": 114330,
+            "pgid": 114330,
+            "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/map_loss/slam_activate.log",
+            "exit_code": 0,
+            "start_ticks": "7181355",
+            "stopped": true
+          }
+        ],
+        "source_model": "/home/level6/vehicle-autonomy-framework/simulation/models/target_rover/model.sdf",
+        "source_world": "/home/level6/vehicle-autonomy-framework/simulation/worlds/rover_runway.sdf",
+        "parameters": [
+          "/home/level6/ardupilot/Tools/autotest/default_params/rover.parm",
+          "/home/level6/ardupilot/Tools/autotest/default_params/rover-skid.parm",
+          "/home/level6/vehicle-autonomy-framework/simulation/params/rover_telemetry.parm"
+        ],
+        "ros_domain_id": "102",
+        "navigation_case": "map_loss",
+        "ended_at": "2026-10-19T01:41:08.982366+00:00",
+        "remaining_process_groups": [],
+        "ports_released": true
+      },
+      "admission": {
+        "adopted_map_sha256": "e33d0048f0cb4617a002334530ba700e70609aaeae69f2ea260d3f5d3fe55838",
+        "base_to_reference_x_m": 0.25,
+        "binding": {
+          "x": 3.870722658808238e-12,
+          "y": -1.6520131673094936e-13,
+          "yaw": 1.0251225991946762e-22
+        },
+        "event": "navigation_admitted",
+        "footprint_radius_m": 0.72,
+        "length_m": 2.31568545945564,
+        "odom_poses": [
+          [
+            0.20998320089549602,
+            -0.03767192225228122,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.20998320089549602,
+            0.01232807849277684,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.20998320089549602,
+            0.0623280792378349,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.20998320089549602,
+            0.11232807998289296,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.20998320089549602,
+            0.16232808072795102,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.20998320089549602,
+            0.21232808147300908,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.20998320089549602,
+            0.26232808221806714,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.20998320089549602,
+            0.3123280829631252,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.20998320089549602,
+            0.36232808370818326,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.20998320089549602,
+            0.4123280844532413,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.20998320089549602,
+            0.4623280851982994,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.20998320089549602,
+            0.5123280859433574,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.20998320089549602,
+            0.5623280866884155,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.20998320089549602,
+            0.6123280874334736,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.20998320089549602,
+            0.6623280881785316,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.20998320089549602,
+            0.7123280889235897,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.25998320164055405,
+            0.7623280896686477,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.25998320164055405,
+            0.8123280904137058,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.25998320164055405,
+            0.8623280911587639,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3099832023856121,
+            0.9123280919038219,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3099832023856121,
+            0.96232809264888,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.35998320313067017,
+            1.012328093393938,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.35998320313067017,
+            1.062328094138996,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.35998320313067017,
+            1.1123280948840542,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.35998320313067017,
+            1.1623280956291122,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.35998320313067017,
+            1.2123280963741703,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.35998320313067017,
+            1.2623280971192283,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.35998320313067017,
+            1.3123280978642864,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.35998320313067017,
+            1.3623280986093445,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.35998320313067017,
+            1.4123280993544025,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.35998320313067017,
+            1.4623281000994606,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.35998320313067017,
+            1.5123281008445186,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.35998320313067017,
+            1.5623281015895767,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.35998320313067017,
+            1.6123281023346347,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.35998320313067017,
+            1.6623281030796928,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.35998320313067017,
+            1.7123281038247509,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.40998320387572823,
+            1.762328104569809,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.4599832046207863,
+            1.812328105314867,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.5099832053658444,
+            1.862328106059925,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.5599832061109025,
+            1.912328106804983,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.6099832068559605,
+            1.912328106804983,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.6599832076010186,
+            1.912328106804983,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.7099832083460766,
+            1.9623281075500412,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.7599832090911347,
+            1.9623281075500412,
+            -1.0251225991946762e-22
+          ]
+        ],
+        "plan_sha256": "b2b086ba2ac081ae98311bb653955ef833af3217d6b0eb201f11e396f4099889",
+        "profile": "rover_sim",
+        "reference_point": "front_drive_axle",
+        "request_id": "262d6295917440b2b0b546b3a5712136",
+        "source_map_sha256": "e33d0048f0cb4617a002334530ba700e70609aaeae69f2ea260d3f5d3fe55838"
+      },
+      "nav2_manifest": {
+        "command": [
+          "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+          "/home/level6/venv-ardupilot/bin/python",
+          "-m",
+          "integrations.ros2.nav2_worker",
+          "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/map_loss/nav2/262d6295917440b2b0b546b3a5712136"
+        ],
+        "pid": 114444,
+        "pgid": 114444,
+        "returncode": 0,
+        "process_group_released": true,
+        "timed_out": false,
+        "ros_domain_id": "165",
+        "started_ns": 71528775419591,
+        "ended_ns": 71529793421155,
+        "source_map_sha256": "e33d0048f0cb4617a002334530ba700e70609aaeae69f2ea260d3f5d3fe55838",
+        "configuration_grid_sha256": "7289ef694211dcc6416ee7e0a376765c1d8525827dca0718c98b0e7b37d82907",
+        "source_files_sha256": {
+          "planning/models.py": "ea3bbb65476fd5dcf109ea9354f5e75fda0484e2c8683e98c119acabc27e5f07",
+          "planning/collision.py": "c89c43c4dc00cd4ad40dcc0923f0ec0e8f09be29b5efede406a1083bc5b76ccf",
+          "application/planning.py": "2a3a8d4501358b2b2a80322dbbb8432e50dc4c740c9d44f65075a271db22d77c",
+          "app/plan.py": "63c249e2606e46f32a803da2a71bcf44d8e419c99ead2a17487abf59a8c6d762",
+          "integrations/ros2/nav2_planner.py": "20937ef94ad3539631a0e9934610da26f73506dbe5a2db5163716921c7b3705e",
+          "integrations/ros2/nav2_worker.py": "fb877c26cc5290e57a60d3a7af1d02fa4977ebb4870697f7eab7011b1dc1eb78",
+          "scripts/with_ros2.sh": "ec2fb05881250b1068e425e4ea55e40677fbf1f909ed43d246e8d6bf89353219"
+        }
+      },
+      "nav2_version": "1.3.13",
+      "native_costmap_verified": true
+    },
+    "plan_change": {
+      "directory": "artifacts/simulation/navigation-final-20261019/plan_change",
+      "summary": {
+        "passed": true,
+        "case": "plan_change",
+        "lidar_rays": 2160,
+        "room_yaw_rad": 0.15,
+        "plan": {
+          "request_id": "b9b3489e03b147a0872bc7cd1729430e",
+          "length_m": 2.31568545945564,
+          "poses": 44,
+          "clearance_m": 0.95
+        },
+        "task_id": "application:8c721ec961e54523862c061504a7a0af",
+        "task": {
+          "task_id": "application:8c721ec961e54523862c061504a7a0af",
+          "mission": "follow_path",
+          "configuration_sha256": "f9a3458f2058adbe9fd58b1f2bcda0fa1cdf9355a8c2f1d8f45436c83bc51a53",
+          "status": "FAILED",
+          "step": "follow_path",
+          "error": "navigation_plan_file_changed",
+          "steps": [
+            {
+              "step": "mode",
+              "reason": "SUCCEEDED",
+              "error": null
+            },
+            {
+              "step": "arm",
+              "reason": "SUCCEEDED",
+              "error": null
+            },
+            {
+              "step": "follow_path",
+              "reason": "FAILED",
+              "error": "navigation_plan_file_changed"
+            }
+          ],
+          "stops": {}
+        },
+        "effect_count": 29,
+        "stop_speed_mps": 0.0007950838871901738,
+        "navigation": {
+          "configured": true,
+          "active": false,
+          "request_id": null,
+          "error": "navigation_not_admitted",
+          "last_error": "navigation_plan_file_changed",
+          "alignment_drift_m": 0.0,
+          "map_revalidations": 5,
+          "model": "target_rover_front_axle_v1",
+          "base_to_reference_x_m": 0.25,
+          "required_clearance_m": 0.95,
+          "planning_start": {
+            "frame": "map",
+            "frame_epoch": "013ed909815c4777b9ff5b41e82f04ac",
+            "reference_point": "front_drive_axle",
+            "position": [
+              0.3134829658984437,
+              -0.0030557157166618805
+            ],
+            "captured_ns": 71618734150279
+          },
+          "progress_m": 0.05712467368821495
+        },
+        "duration_s": 14.209145011,
+        "truth_max_cross_track_m": 0.11803188607351159,
+        "truth_min_pillar_clearance_m": 1.4127092850341778,
+        "fault_to_confirmed_stop_s": 5.703947735,
+        "recovery_disarmed": true
+      },
+      "manifest": {
+        "root_source_sha256": "51d4d1621bb4a026cae43f69e443780598e85b00fd12058d6e81d913059deec6",
+        "working_tree_dirty": true,
+        "kind": "rover",
+        "framework_sha": "ce0a82a7476b1b29ecf7ff048bff9b77dfbf29ef",
+        "ardupilot_sha": "b5fbe26515eddb9277e1b5e7a4fcf3f37cf449a6",
+        "plugin_sha": "3ec51428fd43deb7b71137192ba16394b450d78e",
+        "gazebo_version": "Gazebo Sim, version 8.15.0\nCopyright (C) 2018 Open Source Robotics Foundation.\nReleased under the Apache 2.0 License.",
+        "world": "rover_886cc27eab06",
+        "model": "target_rover",
+        "instance": 1,
+        "ports": {
+          "tcp": 5770,
+          "json_udp": 9012
+        },
+        "gazebo_transport": {
+          "ip": "127.0.0.1",
+          "partition": "vaf_rover_886cc27eab06"
+        },
+        "started_at": "2026-10-19T01:41:09.228078+00:00",
+        "processes": [
+          {
+            "name": "gazebo",
+            "command": [
+              "gz",
+              "sim",
+              "-s",
+              "-r",
+              "-v3",
+              "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/plan_change/world.sdf"
+            ],
+            "pid": 114513,
+            "pgid": 114513,
+            "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/plan_change/gazebo.log",
+            "exit_code": 0,
+            "start_ticks": "7188284",
+            "stopped": true
+          },
+          {
+            "name": "sitl",
+            "command": [
+              "/home/level6/vehicle-autonomy-framework/artifacts/simulation/suite-e8ba09fa/build/ardupilot/sitl/bin/ardurover",
+              "--model",
+              "JSON",
+              "--speedup",
+              "1",
+              "--defaults",
+              "/home/level6/ardupilot/Tools/autotest/default_params/rover.parm,/home/level6/ardupilot/Tools/autotest/default_params/rover-skid.parm,/home/level6/vehicle-autonomy-framework/simulation/params/rover_telemetry.parm",
+              "--sim-address=127.0.0.1",
+              "--home=-35.363262,149.165237,584,90",
+              "-I1"
+            ],
+            "pid": 114514,
+            "pgid": 114514,
+            "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/plan_change/sitl.log",
+            "exit_code": 0,
+            "start_ticks": "7188284",
+            "stopped": true
+          },
+          {
+            "name": "application",
+            "command": [
+              "/home/level6/venv-ardupilot/bin/python",
+              "-m",
+              "app.main",
+              "run",
+              "--profile",
+              "rover_sim",
+              "--config",
+              "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/plan_change/profile.toml",
+              "--control-socket",
+              "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/plan_change/app.sock",
+              "--ros2-mapping-config",
+              "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/plan_change/mapping.toml",
+              "--navigation-config",
+              "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/plan_change/navigation.toml",
+              "--allow-send"
+            ],
+            "pid": 114527,
+            "pgid": 114527,
+            "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/plan_change/application.log",
+            "exit_code": 0,
+            "start_ticks": "7188294",
+            "stopped": true
+          },
+          {
+            "name": "gz_bridge",
+            "command": [
+              "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+              "/home/level6/venv-ardupilot/bin/python",
+              "-m",
+              "integrations.ros2.run",
+              "ros_gz_bridge",
+              "parameter_bridge",
+              "--ros-args",
+              "-p",
+              "config_file:=/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/plan_change/bridge.yaml"
+            ],
+            "pid": 114528,
+            "pgid": 114528,
+            "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/plan_change/gz_bridge.log",
+            "exit_code": 0,
+            "start_ticks": "7188294",
+            "stopped": true
+          },
+          {
+            "name": "mapping_sidecar",
+            "command": [
+              "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+              "/home/level6/venv-ardupilot/bin/python",
+              "-m",
+              "integrations.ros2.mapping_node",
+              "--config",
+              "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/plan_change/mapping.toml",
+              "--control-socket",
+              "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/plan_change/app.sock"
+            ],
+            "pid": 114529,
+            "pgid": 114529,
+            "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/plan_change/mapping_sidecar.log",
+            "exit_code": 0,
+            "start_ticks": "7188294",
+            "stopped": true
+          },
+          {
+            "name": "slam",
+            "command": [
+              "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+              "/home/level6/venv-ardupilot/bin/python",
+              "-m",
+              "integrations.ros2.run",
+              "slam_toolbox",
+              "async_slam_toolbox_node",
+              "--ros-args",
+              "--params-file",
+              "/home/level6/vehicle-autonomy-framework/simulation/mapping/slam_toolbox.yaml"
+            ],
+            "pid": 114530,
+            "pgid": 114530,
+            "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/plan_change/slam.log",
+            "exit_code": 0,
+            "start_ticks": "7188295",
+            "stopped": true
+          },
+          {
+            "name": "slam_configure",
+            "command": [
+              "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+              "ros2",
+              "lifecycle",
+              "set",
+              "--no-daemon",
+              "/slam_toolbox",
+              "configure"
+            ],
+            "pid": 114533,
+            "pgid": 114533,
+            "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/plan_change/slam_configure.log",
+            "exit_code": 0,
+            "start_ticks": "7188295",
+            "stopped": true
+          },
+          {
+            "name": "slam_activate",
+            "command": [
+              "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+              "ros2",
+              "lifecycle",
+              "set",
+              "--no-daemon",
+              "/slam_toolbox",
+              "activate"
+            ],
+            "pid": 114635,
+            "pgid": 114635,
+            "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/plan_change/slam_activate.log",
+            "exit_code": 0,
+            "start_ticks": "7188446",
+            "stopped": true
+          }
+        ],
+        "source_model": "/home/level6/vehicle-autonomy-framework/simulation/models/target_rover/model.sdf",
+        "source_world": "/home/level6/vehicle-autonomy-framework/simulation/worlds/rover_runway.sdf",
+        "parameters": [
+          "/home/level6/ardupilot/Tools/autotest/default_params/rover.parm",
+          "/home/level6/ardupilot/Tools/autotest/default_params/rover-skid.parm",
+          "/home/level6/vehicle-autonomy-framework/simulation/params/rover_telemetry.parm"
+        ],
+        "ros_domain_id": "107",
+        "navigation_case": "plan_change",
+        "ended_at": "2026-10-19T01:42:21.153540+00:00",
+        "remaining_process_groups": [],
+        "ports_released": true
+      },
+      "admission": {
+        "adopted_map_sha256": "beff1f054a2974341b261d1dd296b4e285c0960db1b761a381276ad060238be0",
+        "base_to_reference_x_m": 0.25,
+        "binding": {
+          "x": 3.870722658808239e-12,
+          "y": -1.6520131673094936e-13,
+          "yaw": 1.0251225991946762e-22
+        },
+        "event": "navigation_admitted",
+        "footprint_radius_m": 0.72,
+        "length_m": 2.31568545945564,
+        "odom_poses": [
+          [
+            0.2150567389599942,
+            -0.04024950331124888,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.2150567389599942,
+            0.00975049743380918,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.2150567389599942,
+            0.05975049817886724,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.2150567389599942,
+            0.1097504989239253,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.2150567389599942,
+            0.15975049966898336,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.2150567389599942,
+            0.20975050041404142,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.2150567389599942,
+            0.2597505011590995,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.2150567389599942,
+            0.30975050190415754,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.2150567389599942,
+            0.3597505026492156,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.2150567389599942,
+            0.40975050339427366,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.2150567389599942,
+            0.4597505041393317,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.2150567389599942,
+            0.5097505048843898,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.2150567389599942,
+            0.5597505056294478,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.2150567389599942,
+            0.6097505063745059,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.2150567389599942,
+            0.659750507119564,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.2150567389599942,
+            0.709750507864622,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.2150567389599942,
+            0.7597505086096801,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.2650567397050522,
+            0.8097505093547381,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.2650567397050522,
+            0.8597505100997962,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3150567404501103,
+            0.9097505108448543,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3150567404501103,
+            0.9597505115899123,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.36505674119516834,
+            1.0097505123349704,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.36505674119516834,
+            1.0597505130800284,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.36505674119516834,
+            1.1097505138250865,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.36505674119516834,
+            1.1597505145701446,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.36505674119516834,
+            1.2097505153152026,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.36505674119516834,
+            1.2597505160602607,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.36505674119516834,
+            1.3097505168053187,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.36505674119516834,
+            1.3597505175503768,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.36505674119516834,
+            1.4097505182954349,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.36505674119516834,
+            1.459750519040493,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.36505674119516834,
+            1.509750519785551,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.36505674119516834,
+            1.559750520530609,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.36505674119516834,
+            1.609750521275667,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.36505674119516834,
+            1.6597505220207251,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.36505674119516834,
+            1.7097505227657832,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.4150567419402264,
+            1.7597505235108413,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.46505674268528446,
+            1.8097505242558993,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.5150567434303426,
+            1.8597505250009574,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.5650567441754006,
+            1.9097505257460154,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.6150567449204587,
+            1.9097505257460154,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.6650567456655168,
+            1.9597505264910735,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.7150567464105748,
+            1.9597505264910735,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.7650567471556329,
+            1.9597505264910735,
+            -1.0251225991946762e-22
+          ]
+        ],
+        "plan_sha256": "ab3b0feadda04a89b91243b4a892fb1e71154d2e0a0671df079418cb79598855",
+        "profile": "rover_sim",
+        "reference_point": "front_drive_axle",
+        "request_id": "b9b3489e03b147a0872bc7cd1729430e",
+        "source_map_sha256": "beff1f054a2974341b261d1dd296b4e285c0960db1b761a381276ad060238be0"
+      },
+      "nav2_manifest": {
+        "command": [
+          "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+          "/home/level6/venv-ardupilot/bin/python",
+          "-m",
+          "integrations.ros2.nav2_worker",
+          "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/plan_change/nav2/b9b3489e03b147a0872bc7cd1729430e"
+        ],
+        "pid": 114750,
+        "pgid": 114750,
+        "returncode": 0,
+        "process_group_released": true,
+        "timed_out": false,
+        "ros_domain_id": "194",
+        "started_ns": 71600707504300,
+        "ended_ns": 71601778233502,
+        "source_map_sha256": "beff1f054a2974341b261d1dd296b4e285c0960db1b761a381276ad060238be0",
+        "configuration_grid_sha256": "6705667471c18febfcd832a0281fdced0dae503274e114af4b5b79de757a3f8f",
+        "source_files_sha256": {
+          "planning/models.py": "ea3bbb65476fd5dcf109ea9354f5e75fda0484e2c8683e98c119acabc27e5f07",
+          "planning/collision.py": "c89c43c4dc00cd4ad40dcc0923f0ec0e8f09be29b5efede406a1083bc5b76ccf",
+          "application/planning.py": "2a3a8d4501358b2b2a80322dbbb8432e50dc4c740c9d44f65075a271db22d77c",
+          "app/plan.py": "63c249e2606e46f32a803da2a71bcf44d8e419c99ead2a17487abf59a8c6d762",
+          "integrations/ros2/nav2_planner.py": "20937ef94ad3539631a0e9934610da26f73506dbe5a2db5163716921c7b3705e",
+          "integrations/ros2/nav2_worker.py": "fb877c26cc5290e57a60d3a7af1d02fa4977ebb4870697f7eab7011b1dc1eb78",
+          "scripts/with_ros2.sh": "ec2fb05881250b1068e425e4ea55e40677fbf1f909ed43d246e8d6bf89353219"
+        }
+      },
+      "nav2_version": "1.3.13",
+      "native_costmap_verified": true
+    },
+    "timeout": {
+      "directory": "artifacts/simulation/navigation-final-20261019/timeout",
+      "summary": {
+        "passed": true,
+        "case": "timeout",
+        "lidar_rays": 2160,
+        "room_yaw_rad": 0.15,
+        "plan": {
+          "request_id": "f64d090f09dd4c5690958f218ea60ec6",
+          "length_m": 2.31568545945564,
+          "poses": 44,
+          "clearance_m": 0.95
+        },
+        "task_id": "application:157658618e0e492e8325175dcce1f73f",
+        "task": {
+          "task_id": "application:157658618e0e492e8325175dcce1f73f",
+          "mission": "follow_path",
+          "configuration_sha256": "3c96ada515bce23ca19348c91049ac083e0cc91f048fd1ed5b085ce9eae724c0",
+          "status": "FAILED",
+          "step": "follow_path",
+          "error": "navigation_deadline_exceeded",
+          "steps": [
+            {
+              "step": "mode",
+              "reason": "SUCCEEDED",
+              "error": null
+            },
+            {
+              "step": "arm",
+              "reason": "SUCCEEDED",
+              "error": null
+            },
+            {
+              "step": "follow_path",
+              "reason": "FAILED",
+              "error": "navigation_deadline_exceeded"
+            }
+          ],
+          "stops": {}
+        },
+        "effect_count": 46,
+        "stop_speed_mps": 0.0030608592474203416,
+        "navigation": {
+          "configured": true,
+          "active": false,
+          "request_id": null,
+          "error": "navigation_not_admitted",
+          "last_error": null,
+          "alignment_drift_m": 0.011272664303468407,
+          "map_revalidations": 7,
+          "model": "target_rover_front_axle_v1",
+          "base_to_reference_x_m": 0.25,
+          "required_clearance_m": 0.95,
+          "planning_start": {
+            "frame": "map",
+            "frame_epoch": "0115e85f15404d66b3681b1c7a2807df",
+            "reference_point": "front_drive_axle",
+            "position": [
+              0.25005283327840344,
+              -0.11714297221830491
+            ],
+            "captured_ns": 71690598709299
+          },
+          "progress_m": 0.07059302364865777
+        },
+        "duration_s": 14.709809256,
+        "truth_max_cross_track_m": 0.12133086257408945,
+        "truth_min_pillar_clearance_m": 1.4133065199601034,
+        "recovery_disarmed": true
+      },
+      "manifest": {
+        "root_source_sha256": "51d4d1621bb4a026cae43f69e443780598e85b00fd12058d6e81d913059deec6",
+        "working_tree_dirty": true,
+        "kind": "rover",
+        "framework_sha": "ce0a82a7476b1b29ecf7ff048bff9b77dfbf29ef",
+        "ardupilot_sha": "b5fbe26515eddb9277e1b5e7a4fcf3f37cf449a6",
+        "plugin_sha": "3ec51428fd43deb7b71137192ba16394b450d78e",
+        "gazebo_version": "Gazebo Sim, version 8.15.0\nCopyright (C) 2018 Open Source Robotics Foundation.\nReleased under the Apache 2.0 License.",
+        "world": "rover_330ce1a420bd",
+        "model": "target_rover",
+        "instance": 1,
+        "ports": {
+          "tcp": 5770,
+          "json_udp": 9012
+        },
+        "gazebo_transport": {
+          "ip": "127.0.0.1",
+          "partition": "vaf_rover_330ce1a420bd"
+        },
+        "started_at": "2026-10-19T01:42:21.402733+00:00",
+        "processes": [
+          {
+            "name": "gazebo",
+            "command": [
+              "gz",
+              "sim",
+              "-s",
+              "-r",
+              "-v3",
+              "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/timeout/world.sdf"
+            ],
+            "pid": 114857,
+            "pgid": 114857,
+            "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/timeout/gazebo.log",
+            "exit_code": 0,
+            "start_ticks": "7195502",
+            "stopped": true
+          },
+          {
+            "name": "sitl",
+            "command": [
+              "/home/level6/vehicle-autonomy-framework/artifacts/simulation/suite-e8ba09fa/build/ardupilot/sitl/bin/ardurover",
+              "--model",
+              "JSON",
+              "--speedup",
+              "1",
+              "--defaults",
+              "/home/level6/ardupilot/Tools/autotest/default_params/rover.parm,/home/level6/ardupilot/Tools/autotest/default_params/rover-skid.parm,/home/level6/vehicle-autonomy-framework/simulation/params/rover_telemetry.parm",
+              "--sim-address=127.0.0.1",
+              "--home=-35.363262,149.165237,584,90",
+              "-I1"
+            ],
+            "pid": 114858,
+            "pgid": 114858,
+            "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/timeout/sitl.log",
+            "exit_code": 0,
+            "start_ticks": "7195502",
+            "stopped": true
+          },
+          {
+            "name": "application",
+            "command": [
+              "/home/level6/venv-ardupilot/bin/python",
+              "-m",
+              "app.main",
+              "run",
+              "--profile",
+              "rover_sim",
+              "--config",
+              "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/timeout/profile.toml",
+              "--control-socket",
+              "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/timeout/app.sock",
+              "--ros2-mapping-config",
+              "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/timeout/mapping.toml",
+              "--navigation-config",
+              "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/timeout/navigation.toml",
+              "--allow-send"
+            ],
+            "pid": 114871,
+            "pgid": 114871,
+            "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/timeout/application.log",
+            "exit_code": 0,
+            "start_ticks": "7195512",
+            "stopped": true
+          },
+          {
+            "name": "gz_bridge",
+            "command": [
+              "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+              "/home/level6/venv-ardupilot/bin/python",
+              "-m",
+              "integrations.ros2.run",
+              "ros_gz_bridge",
+              "parameter_bridge",
+              "--ros-args",
+              "-p",
+              "config_file:=/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/timeout/bridge.yaml"
+            ],
+            "pid": 114872,
+            "pgid": 114872,
+            "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/timeout/gz_bridge.log",
+            "exit_code": 0,
+            "start_ticks": "7195512",
+            "stopped": true
+          },
+          {
+            "name": "mapping_sidecar",
+            "command": [
+              "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+              "/home/level6/venv-ardupilot/bin/python",
+              "-m",
+              "integrations.ros2.mapping_node",
+              "--config",
+              "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/timeout/mapping.toml",
+              "--control-socket",
+              "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/timeout/app.sock"
+            ],
+            "pid": 114873,
+            "pgid": 114873,
+            "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/timeout/mapping_sidecar.log",
+            "exit_code": 0,
+            "start_ticks": "7195512",
+            "stopped": true
+          },
+          {
+            "name": "slam",
+            "command": [
+              "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+              "/home/level6/venv-ardupilot/bin/python",
+              "-m",
+              "integrations.ros2.run",
+              "slam_toolbox",
+              "async_slam_toolbox_node",
+              "--ros-args",
+              "--params-file",
+              "/home/level6/vehicle-autonomy-framework/simulation/mapping/slam_toolbox.yaml"
+            ],
+            "pid": 114874,
+            "pgid": 114874,
+            "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/timeout/slam.log",
+            "exit_code": 0,
+            "start_ticks": "7195512",
+            "stopped": true
+          },
+          {
+            "name": "slam_configure",
+            "command": [
+              "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+              "ros2",
+              "lifecycle",
+              "set",
+              "--no-daemon",
+              "/slam_toolbox",
+              "configure"
+            ],
+            "pid": 114876,
+            "pgid": 114876,
+            "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/timeout/slam_configure.log",
+            "exit_code": 0,
+            "start_ticks": "7195512",
+            "stopped": true
+          },
+          {
+            "name": "slam_activate",
+            "command": [
+              "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+              "ros2",
+              "lifecycle",
+              "set",
+              "--no-daemon",
+              "/slam_toolbox",
+              "activate"
+            ],
+            "pid": 114984,
+            "pgid": 114984,
+            "log": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/timeout/slam_activate.log",
+            "exit_code": 0,
+            "start_ticks": "7195664",
+            "stopped": true
+          }
+        ],
+        "source_model": "/home/level6/vehicle-autonomy-framework/simulation/models/target_rover/model.sdf",
+        "source_world": "/home/level6/vehicle-autonomy-framework/simulation/worlds/rover_runway.sdf",
+        "parameters": [
+          "/home/level6/ardupilot/Tools/autotest/default_params/rover.parm",
+          "/home/level6/ardupilot/Tools/autotest/default_params/rover-skid.parm",
+          "/home/level6/vehicle-autonomy-framework/simulation/params/rover_telemetry.parm"
+        ],
+        "ros_domain_id": "151",
+        "navigation_case": "timeout",
+        "ended_at": "2026-10-19T01:43:33.252086+00:00",
+        "remaining_process_groups": [],
+        "ports_released": true
+      },
+      "admission": {
+        "adopted_map_sha256": "ff0fff963a53b4e5d4ede742dbbd5a90b02a2e8140bd7f75266fb44970c30e34",
+        "base_to_reference_x_m": 0.25,
+        "binding": {
+          "x": 3.870722658808238e-12,
+          "y": -1.6520131673094936e-13,
+          "yaw": 1.0251225991946762e-22
+        },
+        "event": "navigation_admitted",
+        "footprint_radius_m": 0.72,
+        "length_m": 2.31568545945564,
+        "odom_poses": [
+          [
+            0.21119397176491803,
+            -0.04205165822576351,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.21119397176491803,
+            0.007948342519294549,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.21119397176491803,
+            0.05794834326435261,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.21119397176491803,
+            0.10794834400941067,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.21119397176491803,
+            0.15794834475446873,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.21119397176491803,
+            0.2079483454995268,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.21119397176491803,
+            0.25794834624458485,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.21119397176491803,
+            0.3079483469896429,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.21119397176491803,
+            0.35794834773470097,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.21119397176491803,
+            0.407948348479759,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.21119397176491803,
+            0.4579483492248171,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.21119397176491803,
+            0.5079483499698751,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.21119397176491803,
+            0.5579483507149332,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.21119397176491803,
+            0.6079483514599913,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.21119397176491803,
+            0.6579483522050493,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.21119397176491803,
+            0.7079483529501074,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.21119397176491803,
+            0.7579483536951654,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.26119397250997606,
+            0.8079483544402235,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.26119397250997606,
+            0.8579483551852816,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3111939732550341,
+            0.9079483559303396,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3111939732550341,
+            0.9579483566753977,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3611939740000922,
+            1.0079483574204557,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3611939740000922,
+            1.0579483581655138,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3611939740000922,
+            1.1079483589105719,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3611939740000922,
+            1.15794835965563,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3611939740000922,
+            1.207948360400688,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3611939740000922,
+            1.257948361145746,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3611939740000922,
+            1.307948361890804,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3611939740000922,
+            1.3579483626358622,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3611939740000922,
+            1.4079483633809202,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3611939740000922,
+            1.4579483641259783,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3611939740000922,
+            1.5079483648710363,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3611939740000922,
+            1.5579483656160944,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3611939740000922,
+            1.6079483663611525,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3611939740000922,
+            1.6579483671062105,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.3611939740000922,
+            1.7079483678512686,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.41119397474515024,
+            1.7579483685963266,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.4611939754902083,
+            1.8079483693413847,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.5111939762352664,
+            1.8579483700864428,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.5611939769803245,
+            1.9079483708315008,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.6111939777253825,
+            1.9079483708315008,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.6611939784704406,
+            1.9579483715765589,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.7111939792154987,
+            1.9579483715765589,
+            -1.0251225991946762e-22
+          ],
+          [
+            0.7611939799605567,
+            1.9579483715765589,
+            -1.0251225991946762e-22
+          ]
+        ],
+        "plan_sha256": "ad15df67a1ea489fce52122724b5571b23b0dc4080fbb51cc37fc709e1525a40",
+        "profile": "rover_sim",
+        "reference_point": "front_drive_axle",
+        "request_id": "f64d090f09dd4c5690958f218ea60ec6",
+        "source_map_sha256": "ff0fff963a53b4e5d4ede742dbbd5a90b02a2e8140bd7f75266fb44970c30e34"
+      },
+      "nav2_manifest": {
+        "command": [
+          "/home/level6/vehicle-autonomy-framework/scripts/with_ros2.sh",
+          "/home/level6/venv-ardupilot/bin/python",
+          "-m",
+          "integrations.ros2.nav2_worker",
+          "/home/level6/vehicle-autonomy-framework/artifacts/simulation/navigation-final-20261019/timeout/nav2/f64d090f09dd4c5690958f218ea60ec6"
+        ],
+        "pid": 115097,
+        "pgid": 115097,
+        "returncode": 0,
+        "process_group_released": true,
+        "timed_out": false,
+        "ros_domain_id": "127",
+        "started_ns": 71671870914979,
+        "ended_ns": 71672937079951,
+        "source_map_sha256": "ff0fff963a53b4e5d4ede742dbbd5a90b02a2e8140bd7f75266fb44970c30e34",
+        "configuration_grid_sha256": "d3f9c8374a1d0cb24a850a2b31c06dbe3fc8804bda95990629e1170fde89706c",
+        "source_files_sha256": {
+          "planning/models.py": "ea3bbb65476fd5dcf109ea9354f5e75fda0484e2c8683e98c119acabc27e5f07",
+          "planning/collision.py": "c89c43c4dc00cd4ad40dcc0923f0ec0e8f09be29b5efede406a1083bc5b76ccf",
+          "application/planning.py": "2a3a8d4501358b2b2a80322dbbb8432e50dc4c740c9d44f65075a271db22d77c",
+          "app/plan.py": "63c249e2606e46f32a803da2a71bcf44d8e419c99ead2a17487abf59a8c6d762",
+          "integrations/ros2/nav2_planner.py": "20937ef94ad3539631a0e9934610da26f73506dbe5a2db5163716921c7b3705e",
+          "integrations/ros2/nav2_worker.py": "fb877c26cc5290e57a60d3a7af1d02fa4977ebb4870697f7eab7011b1dc1eb78",
+          "scripts/with_ros2.sh": "ec2fb05881250b1068e425e4ea55e40677fbf1f909ed43d246e8d6bf89353219"
+        }
+      },
+      "nav2_version": "1.3.13",
+      "native_costmap_verified": true
+    }
+  },
+  "additional_oracle": {
+    "tracking": {
+      "truth_min_room_wall_clearance_m": 2.236042599779142
+    },
+    "cancel": {
+      "truth_min_room_wall_clearance_m": 3.6760933323663822
+    },
+    "map_loss": {
+      "truth_min_room_wall_clearance_m": 3.6851965867779914
+    },
+    "plan_change": {
+      "truth_min_room_wall_clearance_m": 3.6851756944662393
+    },
+    "timeout": {
+      "truth_min_room_wall_clearance_m": 3.525484988408202,
+      "action_start_ns": 71675751959233,
+      "action_deadline_ns": 71685751959233,
+      "deadline_to_confirmed_stop_s": 2.809560167
+    }
+  },
+  "sha256": {
+    "artifacts/simulation/navigation-final-20261019/tracking/summary.json": "94ac570e528d0f30acbfe45670542e9f5db693647fb2975160dfd71182c0973e",
+    "artifacts/simulation/navigation-final-20261019/tracking/manifest.json": "e43ddff8267589837bccb5fdcf67c9810b4f30a84305ece46ee4fd6f94dfcbc8",
+    "artifacts/simulation/navigation-final-20261019/tracking/final-task.json": "2a0462604120327b6268307320d2e3db1da786dc8e6988240bd66ed48d4b5381",
+    "artifacts/simulation/navigation-final-20261019/tracking/trajectory.json": "59fe5716f367ad9bab1a6630523af2f77dc6e8b9d419e48b534e8aae814773ef",
+    "artifacts/simulation/navigation-final-20261019/tracking/status.jsonl": "8833f61407d3d0b101747bd8414604120d6339f10c6c0ec876e429f0b1fc1601",
+    "artifacts/simulation/navigation-final-20261019/tracking/application.log": "4950e5bdcb7e62dca72ea27be839256e1271d74f4b8a1f7d7d6818e3acc59da3",
+    "artifacts/simulation/navigation-final-20261019/tracking/planning.log": "b8bf2fb15c7288e632655ca496274fe6b95d8197c59385e6931e89521d0772b2",
+    "artifacts/simulation/navigation-final-20261019/cancel/summary.json": "c9015c40480b5a444c6cde329945cba264d8fb66353fb74d5abb23a73f792883",
+    "artifacts/simulation/navigation-final-20261019/cancel/manifest.json": "8393446507fb5670d96ffe3fe0a23e8b344714b81042afc46585eda2becaeb57",
+    "artifacts/simulation/navigation-final-20261019/cancel/final-task.json": "ba110f8d0a45fb7195c9c35318ee8fca3781a038cdc75ce4e7c682171e3f65dd",
+    "artifacts/simulation/navigation-final-20261019/cancel/trajectory.json": "6791cea8b680c984158245196a4194eb2925cfde04d023d5e1b254306a043edf",
+    "artifacts/simulation/navigation-final-20261019/cancel/status.jsonl": "b2f290d7455947330d34ca19ae94ba73d3db49a8b91f9c93c76acef601c96055",
+    "artifacts/simulation/navigation-final-20261019/cancel/application.log": "f02b84a37e6ac8c4f6005350eee365924566d9e55becc7b56fa822a817bcd776",
+    "artifacts/simulation/navigation-final-20261019/cancel/planning.log": "55f1ace95363d6ec4036cb8a12b82863cad6eaf0ba8c0eb3314f0d65a561204b",
+    "artifacts/simulation/navigation-final-20261019/map_loss/summary.json": "7e2175cc7b9d4d67658be8e04102fe4933ab4117351e1f52dafe2ffb72046a84",
+    "artifacts/simulation/navigation-final-20261019/map_loss/manifest.json": "5a60e400582495a4fb86c3270601e25cb590400d6f3af1efc3aabc6121d14c4b",
+    "artifacts/simulation/navigation-final-20261019/map_loss/final-task.json": "f29739631217829e886c7a1973e1dbd1db4c30042502aa9913284ae2613fc0ab",
+    "artifacts/simulation/navigation-final-20261019/map_loss/trajectory.json": "342bf30e3bc3a84284d3d9915ddd6af39e34625d3a8844bcafb94b94e9e8c64d",
+    "artifacts/simulation/navigation-final-20261019/map_loss/status.jsonl": "02f27f7e18213860eb7217105f72962bb144c78bed64a81c6dc8d14ee76e897c",
+    "artifacts/simulation/navigation-final-20261019/map_loss/application.log": "7475372ab7b23fc4736ddf5f934a5fceec74c82d39c3a824789e08e8b4d0ce41",
+    "artifacts/simulation/navigation-final-20261019/map_loss/planning.log": "ceffb5bb65648b2608fe6b48b8bd10ddf7277d747f720cf111a775bf43f4ab9b",
+    "artifacts/simulation/navigation-final-20261019/plan_change/summary.json": "2fa093831a13033cd76a337cd46e172787f905de05a95a85e1f1112e294d2d7b",
+    "artifacts/simulation/navigation-final-20261019/plan_change/manifest.json": "9582813210c1e25f6909c27c944794dfe61f8953f259634897f155dc3188ce71",
+    "artifacts/simulation/navigation-final-20261019/plan_change/final-task.json": "884500e4684c88358f41bb7db6bcb42e9dd27ca41a0c0ec37ecf3913f5b774c7",
+    "artifacts/simulation/navigation-final-20261019/plan_change/trajectory.json": "719599284eb1d8b83912b8f59b0338e2b6a211d3d5219423831a25044ba546d1",
+    "artifacts/simulation/navigation-final-20261019/plan_change/status.jsonl": "86a9252f806a1d050f42411c137d5c181774343be15929e11c23e6772d2130cd",
+    "artifacts/simulation/navigation-final-20261019/plan_change/application.log": "2ec3443e0d4f262578a3f64717f4122d88f9a60a05639f4f3da10320dd07bc39",
+    "artifacts/simulation/navigation-final-20261019/plan_change/planning.log": "8350505377ca4f7dc59ac13dadbb8bd074f946ad0a29120a4463f53a560591d8",
+    "artifacts/simulation/navigation-final-20261019/timeout/summary.json": "f308da635dfa31891cbda4ad164a4cdf9e82e84f70ad713f031ba36ec8df0d27",
+    "artifacts/simulation/navigation-final-20261019/timeout/manifest.json": "8aed3f62b331519f11ca8d5f8cb9147370f5f8f4521d64814aa19ab4f6cab496",
+    "artifacts/simulation/navigation-final-20261019/timeout/final-task.json": "243fb1cb0adb2874e06353e797de99e691890a10c8966fb3bf40b1a01a75d8bf",
+    "artifacts/simulation/navigation-final-20261019/timeout/trajectory.json": "00945fa6790273103a53d7ad5a277026ec8ad155ebd19e58aae1de81a2cd9642",
+    "artifacts/simulation/navigation-final-20261019/timeout/status.jsonl": "d955c80739b5c90bffb95e30863ff3a4d8526188e875ec04567ecd8b1c3515f2",
+    "artifacts/simulation/navigation-final-20261019/timeout/application.log": "dd5b48da4f5cbbd42b25133baa87b4984bc6c264f473948e6435f5e75df05a2f",
+    "artifacts/simulation/navigation-final-20261019/timeout/planning.log": "e2e908d27c95bb803af884257cce3a88846a939958bc7ec7fefc1566e9c38658"
+  },
+  "root_source_sha256": "51d4d1621bb4a026cae43f69e443780598e85b00fd12058d6e81d913059deec6"
+}

@@ -263,3 +263,32 @@ or second command writer is created by this composition. Existing vehicle
 Application scheduling and safety authority are unchanged. Paths are planning
 results, not executable trajectories or an avoidance-driving claim. See the
 [planning guide](nav2_planning.md) and [P19 audit](autonomy/phase-19.md).
+
+## P20 explicit Rover path consumption
+
+The optional Application navigation configuration registers one finite
+`follow_path` mission: GUIDED, Arm, FollowPath, observed Stop exit, Disarm.
+`NavigationSupervisor` admits only fresh live P19 output and rechecks the
+original stored content, current adopted map, source/frame identity, time,
+start and bound geofence. A plan file is never an authorization grant.
+
+The audited Gazebo chassis has its drive axle 0.25 m ahead of base_link.
+Guidance follows this explicit reference with a 0.72 m footprint radius and
+at least 0.95 m planned clearance; telemetry/localization contracts and their
+base reference are unchanged. A run pins an observed planar map<-odom binding,
+revalidates the complete bound path on live map/alignment updates, and rejects
+source/epoch changes or excessive alignment displacement. This is not a
+permanent static TransformTree relation or a switch to SLAM localization.
+
+`FollowPathAction` reads immutable parameters, WorldSnapshot and a read-only
+navigation view, emitting only typed body Twist/Stop Effects. The original
+Execution, dual SEND, lease, Safety and sole byte writer remain in control.
+An injected rejection-only motion guard at that writer checks the live map,
+state age, file SHA, path corridor and short swept footprint; mapping is
+polled before queue drain. Stop remains available after a map fault and uses
+the existing observed two-second stability/eight-second deadline barrier.
+Default compositions install no navigation guard or follow_path mission.
+
+No ROS command bridge, automatic replanning/resume, hardware connection or
+general vehicle-kinematic support is implied. See the
+[tracking guide](rover_path_following.md) and [P20 audit](autonomy/phase-20.md).

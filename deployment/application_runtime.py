@@ -28,13 +28,22 @@ TERMINAL = (RunStatus.SUCCEEDED, RunStatus.FAILED, RunStatus.CANCELLED)
 
 
 class ApplicationRuntime:
-    def __init__(self, profile, *, profile_name: str, allow_send=False, runtime=None, event_sink=None, sensor_config=None, vision_config=None, sim_payload=False, mapping_config=None):
+    def __init__(self, profile, *, profile_name: str, allow_send=False, runtime=None, event_sink=None, sensor_config=None, vision_config=None, sim_payload=False, mapping_config=None, navigation_config=None):
         self.profile = profile
         self.profile_name = profile_name
         self.allow_send = allow_send
+        self.navigation = None
+        if navigation_config is not None:
+            if profile.kind != "rover" or mapping_config is None:
+                raise ValueError("path following requires explicit Rover simulation and ROS 2 mapping")
+            from .navigation import NavigationConfig, NavigationSupervisor
+            self.navigation = NavigationSupervisor(NavigationConfig.load(navigation_config), profile.safety,
+                lambda event, **fields: self._emit(event, **fields))
         translator = (ArduRoverCommandTranslator if profile.kind == "rover" else ArduPilotCommandTranslator)
         self.vehicle = runtime or SimulationRuntime(profile, translator=translator(mode_ids=profile.mode_ids),
                                                     event_sink=event_sink)
+        if self.navigation is not None:
+            self.vehicle.motion_guard = self.navigation.write_guard
         self.environment_path = Path(__file__).resolve().parents[1] / f"simulation/environments/{profile.kind}.toml"
         self._environment_source = Environment.load(self.environment_path).check_safety(profile.safety)
         self.environment = None
@@ -44,6 +53,9 @@ class ApplicationRuntime:
         self.registry.register_typed(SITL_MODE_SPEC, SitlModeAction())
         register_basic(self.registry)
         register_targets(self.registry)
+        if self.navigation is not None:
+            from actions.path_following import SPEC, FollowPathAction
+            self.registry.register_typed(SPEC, FollowPathAction(self.navigation.reader))
         mode = "HOLD" if profile.kind == "rover" else "GUIDED"
         self.plans = {"disarmed_mode": MissionPlan("disarmed_mode", (
             MissionStep("mode", SITL_MODE_SPEC.name, SitlModeParameters(mode, profile.mode_ids[mode])),))}
@@ -84,6 +96,7 @@ class ApplicationRuntime:
             if profile.kind != "rover":
                 raise ValueError("ROS 2 mapping is currently audited only for the Rover simulation")
             self.mapping = MappingInput(MappingConfig.load(mapping_config, profile.clock_domain_id))
+            if self.navigation is not None:self.navigation.source_store = self.mapping.store
         if sensor_config is not None:
             from sensors.simulation.objects import ObjectCalibration
             self.sensor_calibration = ObjectCalibration.load(Path(sensor_config))
@@ -144,6 +157,8 @@ class ApplicationRuntime:
             mapped = self.mapping.poll(self.vehicle.clock(), self.vehicle.world_epoch)
             self.vehicle.set_map(None if mapped is None else mapped.reference,
                                  None if mapped is None else mapped.captured_at)
+            if self.navigation is not None:
+                self.navigation.update_map(mapped, self.mapping.health, self.vehicle.clock(), self.vehicle.world_epoch)
         result = self.vehicle.cycle()
         if self.payload is not None:self.payload.tick(self.vehicle.clock())
         if result.fault:
@@ -152,6 +167,7 @@ class ApplicationRuntime:
                 self.task.abort(result.fault)
                 self._cancel_payload()
                 self.stops = self.vehicle.end_run()
+                if self.navigation is not None:self.navigation.finish()
                 self._emit("task_failed", error=result.fault)
             self.state = "DEGRADED"
             return
@@ -167,6 +183,9 @@ class ApplicationRuntime:
         if self.task_environment is not None and (world is None or world.environment != self.task_environment
                 or world.localization is None or world.vehicle is None):
             self.task.abort("mission_environment_or_localization_unavailable")
+        elif (self.navigation is not None and self.navigation.parameters is not None
+              and self.navigation.view.error and self.task.view().step_id != "follow_path"):
+            self.task.abort(self.navigation.view.error)
         elif now.monotonic_ns - self.task_started_ns > self.task_timeout_ns:
             self.task.abort("mission_deadline_exceeded")
         else:
@@ -194,6 +213,7 @@ class ApplicationRuntime:
         if self.task.view().status in TERMINAL:
             self._cancel_payload()
             self.stops = self.vehicle.end_run()
+            if self.navigation is not None:self.navigation.finish()
             self.state = "READY" if self.vehicle.connected else "DEGRADED"
             self._emit("task_finished", **self.task_status())
 
@@ -270,11 +290,13 @@ class ApplicationRuntime:
                 "payload":None if self.payload_port is None else self.payload_port.inventory(),
                 "mapping": None if self.mapping is None else {**self.mapping.health,
                     "adopted": bool(world is not None and world.map is not None)},
+                "navigation": None if self.navigation is None else self.navigation.status(world, now),
                 "system_send": self.vehicle.authority.system_send,
                 "action_send": self.vehicle.authority.action_send, "task": self.task_status()}
 
     def start_mission(self, name):
-        if name not in self.plans and name not in MISSION_NAMES and name not in BUSINESS_NAMES:
+        navigation_mission = name == "follow_path" and self.navigation is not None
+        if name not in self.plans and name not in MISSION_NAMES and name not in BUSINESS_NAMES and not navigation_mission:
             raise ValueError("mission is not registered")
         if not self.allow_send:
             raise ValueError("application started without --allow-send")
@@ -285,13 +307,17 @@ class ApplicationRuntime:
         world = self.vehicle.world_snapshot()
         if world is None or world.vehicle is None or (name != "safe_recovery" and world.vehicle.operation.armed):
             raise ValueError("fresh disarmed vehicle required")
-        if name in MISSION_NAMES or name in BUSINESS_NAMES:
+        if name in MISSION_NAMES or name in BUSINESS_NAMES or navigation_mission:
             if self.environment is None or world.environment != self.environment.reference or world.localization is None:
                 raise ValueError("bound environment and fresh localization required")
             if name != "safe_recovery" and (self.connected_at_ns is None or self.vehicle.clock().monotonic_ns-self.connected_at_ns < self.profile.warmup_ns):
                 raise ValueError("simulation motion warmup incomplete")
             self.environment.validate_origin(world.vehicle)
-            if name in BUSINESS_NAMES:
+            if navigation_mission:
+                from applications.navigation import build as build_navigation
+                parameters = self.navigation.admit(world, self.vehicle.clock())
+                plan = build_navigation(parameters, self.profile.mode_ids["GUIDED"])
+            elif name in BUSINESS_NAMES:
                 if self.sensor is None:raise ValueError('business mission requires explicit observation input')
                 plan=build_business(name,self.profile.kind,self.environment,self.profile.mode_ids['GUIDED'],self.payload is not None)
                 if name=='cuadc_demo' and 'sim_payload_1' not in self.payload_port.loaded:raise ValueError('simulation payload already consumed; no automatic reset')
@@ -300,11 +326,16 @@ class ApplicationRuntime:
         else:
             plan = self.plans[name]
             self.task_environment = None
-        compiled = MissionValidator(self.registry).compile(plan, VehicleCapabilities(capabilities(self.profile.kind) | (frozenset({"payload_release"}) if self.payload is not None else frozenset())))
-        self.task_configuration_sha256=hashlib.sha256(repr(tuple(step.step for step in compiled.steps)).encode()).hexdigest()
-        run_id = f"application:{uuid4().hex}"
-        action_id = f"{run_id}:{compiled.steps[0].step.step_id}:1"
-        self.vehicle.begin_run(allow_send=True, run_id=run_id, action_id=action_id)
+        try:
+            compiled = MissionValidator(self.registry).compile(plan, VehicleCapabilities(capabilities(self.profile.kind) | (frozenset({"payload_release"}) if self.payload is not None else frozenset())))
+            self.task_configuration_sha256=hashlib.sha256(repr(tuple(step.step for step in compiled.steps)).encode()).hexdigest()
+            run_id = f"application:{uuid4().hex}"
+            action_id = f"{run_id}:{compiled.steps[0].step.step_id}:1"
+            self.vehicle.begin_run(allow_send=True, run_id=run_id, action_id=action_id)
+        except (ValueError, TypeError, RuntimeError):
+            if navigation_mission:self.navigation.finish()
+            raise
+        if navigation_mission:self.navigation.consume()
         self.task = MissionRuntime(compiled, self.vehicle.world_reader(), RunId(run_id),
                                    max_snapshot_age_ns=self.profile.safety.max_snapshot_age_ns)
         self.envelopes = {}
@@ -341,6 +372,7 @@ class ApplicationRuntime:
         try:
             self.stops.update(self.vehicle.shutdown())
         finally:
+            if self.navigation is not None:self.navigation.finish()
             sensor,self.sensor=self.sensor,None
             if sensor is not None:
                 try:sensor.close()

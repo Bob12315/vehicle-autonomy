@@ -24,13 +24,13 @@ from tests.simulation.oracle import GazeboTruthOracle
 ROOM_YAW = .15  # Avoid the upstream axis-aligned occupancy-boundary defect #689.
 
 
-def add_mapping_scene(owned):
+def add_mapping_scene(owned, *, lidar_samples=720, pillar=(2.8, 2)):
     model = ET.parse(owned.model_path)
-    model.find("model/link[@name='base_link']").append(ET.fromstring('''
+    model.find("model/link[@name='base_link']").append(ET.fromstring(f'''
       <sensor name="mapping_lidar" type="gpu_lidar">
         <pose>0 0 0.2 0 0 0</pose><topic>/vaf/lidar</topic>
         <always_on>true</always_on><update_rate>10</update_rate>
-        <lidar><scan><horizontal><samples>720</samples><resolution>1</resolution>
+        <lidar><scan><horizontal><samples>{lidar_samples}</samples><resolution>1</resolution>
           <min_angle>-3.14159265359</min_angle><max_angle>3.14159265359</max_angle>
         </horizontal></scan><range><min>0.15</min><max>12</max><resolution>0.01</resolution></range>
         <noise><type>gaussian</type><mean>0</mean><stddev>0.005</stddev></noise></lidar>
@@ -41,7 +41,7 @@ def add_mapping_scene(owned):
        name="gz::sim::systems::Sensors"><render_engine>ogre2</render_engine></plugin>'''))
     walls = (("east", 4, 0, .2, 8), ("west", -4, 0, .2, 8),
              ("north", 0, 4, 8, .2), ("south", 0, -4, 8, .2),
-             ("pillar", 2.8, 2, .4, .4))
+             ("pillar", *pillar, .4, .4))
     for name, x, y, width, height in walls:
         x, y = x * math.cos(ROOM_YAW) - y * math.sin(ROOM_YAW), x * math.sin(ROOM_YAW) + y * math.cos(ROOM_YAW)
         geometry = f"<geometry><box><size>{width} {height} 1.5</size></box></geometry>"
