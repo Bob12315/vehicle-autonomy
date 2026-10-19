@@ -12,7 +12,9 @@ import time
 from uuid import uuid4
 
 from app.control import request
-from guidance.path_following import DRIVE_OFFSET_M, PlanarBinding, drive_reference
+from guidance.path_following import PlanarBinding, drive_reference
+from guidance.navigation_model import FRONT_AXLE,resolve_model
+from tests.simulation.model_geometry import measure
 from mapping.grid import pose_from_json
 from actions.basic import yaw
 from planning.models import Pose2D
@@ -29,22 +31,20 @@ def segment_distance(x, y, a, b):
     return math.hypot(x-a[0]-t*dx,y-a[1]-t*dy)
 
 
-def run(directory, case, *, autonomous=False, room_yaw=None):
+def run(directory, case, *, autonomous=False, room_yaw=None, model_id=FRONT_AXLE.model_id):
+    navigation_model=resolve_model(model_id)
+    model_name={"target_rover_front_axle_v1":"target_rover","compact_rover_rear_axle_v1":"compact_rover"}[model_id]
     scene_yaw=ROOM_YAW if room_yaw is None else room_yaw
     map_goal=case=="map_goal"
     business=case.startswith("business_")
     directory.mkdir(parents=True,exist_ok=False)
     os.environ["ROS_DOMAIN_ID"] = str(100+os.getpid()%100)
-    owned=OwnedSimulation(directory,"rover")
+    owned=OwnedSimulation(directory,"rover",rover_model=model_name)
     owned.manifest["ros_domain_id"]=os.environ["ROS_DOMAIN_ID"]
     owned.manifest["navigation_case"]=case
     # A denser actual sensor reduces unobserved ray gaps; unknown occupancy is
     # never filled by the harness. The pillar forces a non-straight path.
     replanning = case in ("replan","blocked","replan_cancel")
-    if replanning:
-        owned.params.append(ROOT/'simulation/params/rover_navigation.parm')
-        owned.manifest['parameters']=[str(p) for p in owned.params]
-        owned._save()
     lidar_samples=4096 if replanning or business else 2160
     add_mapping_scene(owned,lidar_samples=lidar_samples,pillar=(2.8,2) if replanning or business else (1.7,.3),room_yaw=scene_yaw)
     if replanning:
@@ -56,13 +56,23 @@ def run(directory, case, *, autonomous=False, room_yaw=None):
     if business:
         from tests.simulation.object_fixture import add_objects
         calibration=add_objects(owned)
+        # Place the actual marker 1.84 m from the registered inspection stop.
+        # The sensor still observes Gazebo; no observation positions are injected.
+        import xml.etree.ElementTree as ET
+        tree=ET.parse(owned.world_path)
+        tree.find("world/model[@name='target_1']/pose").text='1.8 1.3 0.05 0 0 0'
+        tree.write(owned.world_path)
+    geometry=measure(owned.model_path)
+    if abs(geometry.axle_x-navigation_model.base_to_reference_x_m)>1e-8 or geometry.radius_from_axle_m>navigation_model.footprint_radius_m:
+        raise AssertionError('declared navigation model does not bound the actual Gazebo SDF')
+    truth_offset=geometry.axle_x
     endpoint=directory/"app.sock"
     exchange=directory/"exchange";exchange.mkdir()
     mapping=directory/"mapping.toml"
     mapping.write_text(f'schema=1\ndirectory="{exchange}"\nclock_domain_id="host-monotonic-simulation"\nmax_age_ns=10000000000\n')
     plan=directory/"plan.json"
     config=directory/"navigation.toml"
-    config.write_text(f'schema=1\nmodel="target_rover_front_axle_v1"\nplan_path="{plan}"\ntimeout_ns={10_000_000_000 if case=="timeout" else 70_000_000_000}\n')
+    config.write_text(f'schema=1\nmodel="{model_id}"\nplan_path="{plan}"\ntimeout_ns={10_000_000_000 if case=="timeout" else 70_000_000_000}\n')
     if replanning:config.write_text(config.read_text()+'tracking_mode="stop_turn"\n')
     if autonomous:
         goals=directory/"goals.toml"
@@ -81,7 +91,8 @@ def run(directory, case, *, autonomous=False, room_yaw=None):
         if case == "unreachable":goals.write_text(goals.read_text().replace('[0.8,2.0]','[2.8,0.0]'))
         config.write_text(config.read_text()+f'goals_path="{goals}"\n')
     profile=directory/"profile.toml"
-    profile.write_text((ROOT/"simulation/profiles/rover.toml").read_text().replace("port = 5760",f"port = {owned.port}"))
+    profile_key="compact_rover" if model_name=="compact_rover" else "rover"
+    profile.write_text((ROOT/f"simulation/profiles/{profile_key}.toml").read_text().replace("port = 5760",f"port = {owned.port}"))
     bridge=directory/"bridge.yaml"
     bridge.write_text(f'''- ros_topic_name: /clock
   gz_topic_name: /world/{owned.world}/clock
@@ -96,7 +107,8 @@ def run(directory, case, *, autonomous=False, room_yaw=None):
 ''')
     wrapper=str(ROOT/"scripts/with_ros2.sh")
     evidence=(directory/"status.jsonl").open("w")
-    report={"passed":False,"case":case,"lidar_rays":lidar_samples,"room_yaw_rad":scene_yaw}
+    report={"passed":False,"case":case,"lidar_rays":lidar_samples,"room_yaw_rad":scene_yaw,"navigation_model":navigation_model.document(),"navigation_model_sha256":navigation_model.sha256,
+        "actual_geometry":{"axle_x_m":geometry.axle_x,"track_m":geometry.track_m,"radius_m":geometry.radius_from_axle_m,"sdf_sha256":geometry.source_sha256}}
     slam_parameters=ROOT/"simulation/mapping/slam_toolbox.yaml"
     if replanning or map_goal or business:
         slam_parameters=directory/'slam_toolbox.yaml'
@@ -180,10 +192,10 @@ def run(directory, case, *, autonomous=False, room_yaw=None):
         position=ready["vehicle"]["pose"]["position"]
         q=ready["vehicle"]["pose"]["orientation_xyzw"]
         heading=math.atan2(2*(q[3]*q[2]+q[0]*q[1]),1-2*(q[1]*q[1]+q[2]*q[2]))
-        start=binding.to_map(drive_reference(Pose2D(position[0],position[1],heading)))
+        start=binding.to_map(drive_reference(Pose2D(position[0],position[1],heading),navigation_model))
         goal=binding.to_map(Pose2D(.8,2.0))
         command=[sys.executable,"-m","app.plan","--mapping-config",str(mapping),"--control-socket",str(endpoint),
-            "--start",f"{start.x:.9f}",f"{start.y:.9f}","--goal",f"{goal.x:.9f}",f"{goal.y:.9f}","--clearance",".95",
+            "--start",f"{start.x:.9f}",f"{start.y:.9f}","--goal",f"{goal.x:.9f}",f"{goal.y:.9f}","--clearance",str(navigation_model.path_clearance_m),
             "--output",str(plan),"--evidence-directory",str(directory/"nav2")]
         origin=oracle.latest()
         initial=ready["vehicle"]["pose"]["position"]
@@ -245,7 +257,7 @@ def run(directory, case, *, autonomous=False, room_yaw=None):
             if business:
                 for checkpoint in task['checkpoints'][len(checkpoint_truth):]:
                     target={'POINT_A':(.4,2.5),'POINT_B':(.4,1.5),'HOME':(.25,0)}[checkpoint['goal']]
-                    error=math.hypot(ox+DRIVE_OFFSET_M*math.cos(t.yaw_rad)-target[0],oy+DRIVE_OFFSET_M*math.sin(t.yaw_rad)-target[1])
+                    error=math.hypot(ox+truth_offset*math.cos(t.yaw_rad)-target[0],oy+truth_offset*math.sin(t.yaw_rad)-target[1])
                     if error>.75 or speed is None or speed>.1 or yaw_rate is None or abs(yaw_rate)>.15:
                         raise AssertionError('checkpoint lacks independent arrival/Stop evidence')
                     checkpoint_truth.append({'goal':checkpoint['goal'],'error_m':error,'speed_mps':speed,'yaw_rate_rps':yaw_rate})
@@ -288,7 +300,7 @@ def run(directory, case, *, autonomous=False, room_yaw=None):
         admission=admissions[-1]
         points=admission["odom_poses"]
         by_request={a['request_id']:a['odom_poses'] for a in admissions}
-        cross=max(min(segment_distance(x+DRIVE_OFFSET_M*math.cos(heading),y+DRIVE_OFFSET_M*math.sin(heading),a,b)
+        cross=max(min(segment_distance(x+truth_offset*math.cos(heading),y+truth_offset*math.sin(heading),a,b)
             for a,b in zip(by_request[identity],by_request[identity][1:]))
             for (_,x,y,_,heading),identity in zip(trajectory,trajectory_ids))
         report["truth_max_cross_track_m"]=cross
@@ -302,8 +314,8 @@ def run(directory, case, *, autonomous=False, room_yaw=None):
         if cross>.3 or min(clearance)<.51:raise AssertionError("independent path/physical clearance exceeded")
         if case in ("tracking","replan","map_goal","business_inspect"):
             final=trajectory[-1]
-            error=math.hypot(final[1]+DRIVE_OFFSET_M*math.cos(final[4])-points[-1][0],
-                             final[2]+DRIVE_OFFSET_M*math.sin(final[4])-points[-1][1])
+            error=math.hypot(final[1]+truth_offset*math.cos(final[4])-points[-1][0],
+                             final[2]+truth_offset*math.sin(final[4])-points[-1][1])
             report["truth_goal_error_m"]=error
             if error>.75 or s["vehicle"]["armed"]:raise AssertionError("arrival/disarm failed")
             direct=segment_distance(1.7*math.cos(scene_yaw)-.3*math.sin(scene_yaw),
@@ -345,6 +357,11 @@ def run(directory, case, *, autonomous=False, room_yaw=None):
         jobs=[json.loads(p.read_text()) for p in directory.glob('navigation-jobs/*/*/*/manifest.json')]
         if any(not j['process_group_released'] for j in jobs):raise AssertionError('native planning group not released')
         report['native_jobs_released']=len(jobs)
+        if os.environ.get('VAF_SLAM_BOUNDARY_LIBRARY'):
+            library=Path(os.environ['VAF_SLAM_BOUNDARY_LIBRARY'])
+            manifest=json.loads(library.with_name('manifest.json').read_text())
+            if 'VAF_BOUNDARY_OVERLAY_ACTIVE' not in (directory/'slam.log').read_text():raise AssertionError('native boundary overlay not invoked')
+            report['boundary_overlay']={'library_sha256':manifest['library_sha256'],'method_invoked':True,'native_probes':manifest['native_probes']}
         report["passed"]=True
     except Exception as exc:
         report["error"]=f"{type(exc).__name__}: {exc}"

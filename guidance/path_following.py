@@ -121,9 +121,17 @@ class PolylineTracker:
         # audited physical Rover. Align at the drive axle before advancing;
         # hysteresis prevents noisy heading cuts from toggling every cycle.
         if self.stop_turn:
-            if abs(error) > .3 or (distance > .06 and abs(error) > .15):
+            # Stronger heading feedback overcomes the owned caster chassis'
+            # small-command deadband. Only large turns require a full stop;
+            # repeatedly stopping for small corrections winds up its steering
+            # loop and prevents bounded paths finishing within their deadline.
+            rate=max(-rate_limit,min(rate_limit,1.2*error-.75*measured_yaw_rate))
+            if abs(error)>.12 and abs(rate)<min(.15,rate_limit):
+                rate=math.copysign(min(.15,rate_limit),error)
+            speed=min(speed,.12 if distance<=.08 else .06)
+            if abs(error) > .45:
                 self.turning = True
-            if abs(error) < .15 and abs(measured_yaw_rate) < .1:
+            if abs(error) < .2 and abs(measured_yaw_rate) < .15:
                 self.turning = False
             if self.turning:
                 speed = 0.

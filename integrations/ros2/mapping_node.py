@@ -103,6 +103,7 @@ def main():
             self.odom_updates = 0
             self.map_updates = 0
             self.map_wait = None
+            self.odometry_wait = None
             self.map_publisher = None
             self.last_scan_ros = None
             self.scan_drop = None
@@ -193,13 +194,17 @@ def main():
                 "counts": {"scans": self.scans, "odometry": self.odom_updates, "maps": self.map_updates},
                 "timing": {"clock_ros_ns": None if not self.clock_mapper.pairs else self.clock_mapper.pairs[-1][0],
                            "last_tf_ros_ns": self.last_tf_stamp, "last_scan_ros_ns": self.last_scan_ros,
-                           "scan_drop": self.scan_drop,"map_wait":self.map_wait}}
+                           "scan_drop": self.scan_drop,"map_wait":self.map_wait,"odometry_wait":self.odometry_wait}}
 
         def publish_odometry(self, status):
             pose = status["vehicle"]["pose"]
             if pose is None or pose["frame"] != "odom" or not 0 <= time.monotonic_ns()-pose["captured_ns"] <= 750_000_000:
                 raise ValueError("fresh telemetry pose in odom required")
-            stamp = self.clock_mapper.to_ros(pose["captured_ns"])
+            try:stamp = self.clock_mapper.to_ros(pose["captured_ns"])
+            except LookupError:
+                self.odometry_wait = "waiting for bracketing clock samples"
+                return
+            self.odometry_wait = None
             if self.last_tf_stamp is not None and stamp <= self.last_tf_stamp:
                 return
             validated = pose_from_json({"position": pose["position"], "orientation": pose["orientation_xyzw"]})
