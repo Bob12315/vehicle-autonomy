@@ -14,11 +14,14 @@ python -m unittest discover -s tests -q 2>&1 | tee "$AUTONOMY_RUN_DIR/unit.log"
     --output-dir "$AUTONOMY_RUN_DIR/boundary" > "$AUTONOMY_RUN_DIR/native-build.json"
 python - "$AUTONOMY_RUN_DIR" <<'PY'
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
 
 directory=Path(sys.argv[1]);library=directory/'boundary/libvaf_slam_boundary.so'
+if len(os.fsencode(str(directory/'00/app.sock')))>=108:
+    raise SystemExit('Run directory is too long for AF_UNIX; choose a shorter absolute directory.')
 cases=[]
 for yaw in ('0.0','0.15'):
     cases.append(('map-'+yaw,'tests.simulation.map_reliability',['--yaw',yaw,'--boundary-library',str(library)]))
@@ -31,12 +34,16 @@ for case in ('tracking','cancel','map_loss'):
     cases.append(('compact-'+case,'tests.simulation.goal_navigation',
                   ['--allow-send','--case',case,'--navigation-model','compact_rover_front_axle_v1']))
 results={}
-for name,module,flags in cases:
+for index,(name,module,flags) in enumerate(cases):
+    # Human-readable case names remain in logs/summary. Short physical
+    # directories keep the local control socket within Linux sun_path.
+    case_directory=directory/f'{index:02d}'
     with (directory/(name+'.log')).open('w') as output:
-        code=subprocess.run([sys.executable,'-m',module,*flags,'--run-dir',str(directory/name)],
+        code=subprocess.run([sys.executable,'-m',module,*flags,'--run-dir',str(case_directory)],
                             stdout=output,stderr=subprocess.STDOUT).returncode
-    summary=directory/name/'summary.json'
+    summary=case_directory/'summary.json'
     results[name]=json.loads(summary.read_text()) if summary.exists() else {'passed':False,'error':'no summary'}
+    results[name]['run_directory']=str(case_directory)
     passed=code==0 and results[name].get('passed') is True
     aggregate={'passed':passed and len(results)==len(cases),'expected_cases':len(cases),'cases':results}
     (directory/'summary.json').write_text(json.dumps(aggregate,indent=2)+'\n')
