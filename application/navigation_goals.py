@@ -34,9 +34,10 @@ class NavigationPolicy:
     total_timeout_s: float = 240.
     max_replans: int = 0
     retry_delay_s: float = .5
+    planning_reserve_m: float = 0.
 
     def __post_init__(self):
-        for name, low, high in (("planning_timeout_s",.1,20), ("total_timeout_s",1,600), ("retry_delay_s",.1,5)):
+        for name, low, high in (("planning_timeout_s",.1,20), ("total_timeout_s",1,600), ("retry_delay_s",.1,5), ("planning_reserve_m",0,.25)):
             value = getattr(self,name)
             if type(value) not in (int,float) or not math.isfinite(value) or not low <= value <= high:
                 raise ValueError("invalid bounded navigation policy: "+name)
@@ -78,7 +79,7 @@ class GoalCatalog:
                 raise ValueError("explicit environment point required")
             self.goals[item["name"]] = NavigationGoal(item["name"],position,point)
         policy = data.get("policy",{})
-        if type(policy) is not dict or set(policy)-{"planning_timeout_s","total_timeout_s","max_replans","retry_delay_s"}:
+        if type(policy) is not dict or set(policy)-{"planning_timeout_s","total_timeout_s","max_replans","retry_delay_s","planning_reserve_m"}:
             raise ValueError("unknown navigation policy")
         self.policy = NavigationPolicy(**policy)
 

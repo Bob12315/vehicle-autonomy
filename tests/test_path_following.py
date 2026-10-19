@@ -67,7 +67,18 @@ class GuidanceTests(unittest.TestCase):
             yaw = math.atan2(math.sin(p.yaw+value.yaw_rate_rps*.1),math.cos(p.yaw+value.yaw_rate_rps*.1))
             p = Pose2D(p.x+value.speed_mps*math.cos(yaw)*.1,p.y+value.speed_mps*math.sin(yaw)*.1,yaw)
         self.assertTrue(value.arrived)
-        self.assertLess(maximum,.2)
+        self.assertLess(maximum,.15)
+
+    def test_axle_guidance_with_small_steering_deadzone_stays_inside_guard(self):
+        tracker=PolylineTracker((Pose2D(0,0),Pose2D(0,2),Pose2D(.8,2.5)))
+        p=Pose2D(0,0);maximum=0;rate=0
+        for _ in range(700):
+            value=tracker.update(p,rate);maximum=max(maximum,value.cross_track_m)
+            if value.arrived:break
+            rate=value.yaw_rate_rps if abs(value.yaw_rate_rps)>=.15 else 0
+            heading=math.atan2(math.sin(p.yaw+rate*.1),math.cos(p.yaw+rate*.1))
+            p=Pose2D(p.x+value.speed_mps*math.cos(heading)*.1,p.y+value.speed_mps*math.sin(heading)*.1,heading)
+        self.assertTrue(value.arrived);self.assertLess(maximum,.15)
 
 
 class NavigationTests(unittest.TestCase):

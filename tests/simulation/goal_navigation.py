@@ -10,7 +10,7 @@ from tests.simulation.path_following import run
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--allow-send',action='store_true')
-    parser.add_argument('--case',choices=('tracking','cancel','map_loss','plan_change','timeout','planning_cancel','unreachable'),default='tracking')
+    parser.add_argument('--case',choices=('tracking','cancel','map_loss','plan_change','timeout','planning_cancel','unreachable','replan','blocked','replan_cancel'),default='tracking')
     parser.add_argument('--run-dir',type=Path)
     args=parser.parse_args()
     if not args.allow_send:parser.error('explicit simulation SEND required')

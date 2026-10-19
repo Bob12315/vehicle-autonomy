@@ -91,7 +91,7 @@ class ControlServer:
                     continue
                 self.clients[connection] = {"in": bytearray(), "out": None, "deadline": now + 1}
                 self.selector.register(connection, selectors.EVENT_READ)
-                continue
+                client,mask=connection,selectors.EVENT_READ
             entry = self.clients[client]
             try:
                 if mask & selectors.EVENT_READ:
@@ -110,11 +110,17 @@ class ControlServer:
                         continue
                     entry["out"] = json.dumps(response).encode() + b"\n"
                     self.selector.modify(client, selectors.EVENT_WRITE)
+                    # Try one bounded nonblocking write in this same cycle.
+                    # Deferring every small reply by another vehicle period
+                    # starves time-sensitive read-only telemetry consumers.
+                    mask |= selectors.EVENT_WRITE
                 if mask & selectors.EVENT_WRITE:
                     count = client.send(entry["out"])
                     entry["out"] = entry["out"][count:]
                     if not entry["out"]:
                         self._drop(client)
+            except BlockingIOError:
+                pass
             except (OSError, ValueError):
                 if client in self.clients:
                     self._drop(client)

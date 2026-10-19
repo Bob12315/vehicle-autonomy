@@ -23,7 +23,7 @@ from guidance.path_following import (BODY_RADIUS_FROM_DRIVE_M, CROSS_TRACK_M, DR
                                     PATH_CLEARANCE_M, PlanarBinding, PolylineTracker, drive_reference)
 from mapping.grid import pose_from_json
 from planning.collision import CollisionGrid
-from planning.models import MapContext, Pose2D
+from planning.models import MapContext, Pose2D, PlanningError
 
 
 @dataclass(frozen=True, slots=True)
@@ -101,6 +101,8 @@ class NavigationSupervisor:
     def update_map(self, mapped, health, now, frame_epoch):
         try:
             if mapped is None:
+                if self.parameters is not None and self.view.error is None:
+                    self.emit("navigation_source_fault",health=dict(health))
                 raise ValueError("navigation_map_unavailable")
             context = MapContext(mapped.reference, mapped.sha256, frame_epoch, mapped.grid,
                                  "live_map", mapped.captured_at, 2_500_000_000)
@@ -125,7 +127,10 @@ class NavigationSupervisor:
                     # A changing SLAM map is accepted only after checking every
                     # segment again in that map's explicitly observed alignment.
                     self.route_grid = CollisionGrid(context, PATH_CLEARANCE_M)
-                    self.route_grid.validate(tuple(binding.to_map(point) for point in p.poses))
+                    try:
+                        self.route_grid.validate(tuple(binding.to_map(point) for point in p.poses))
+                    except PlanningError as exc:
+                        raise ValueError("navigation_path_blocked: "+str(exc)) from exc
                     self.body_grid = CollisionGrid(context, BODY_RADIUS_FROM_DRIVE_M+.04)
                     self.revalidations += 1
                     self.emit("navigation_map_revalidated", sha256=context.sha256,

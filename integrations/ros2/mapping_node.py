@@ -34,7 +34,7 @@ class ApplicationProbe:
     def _run(self):
         while not self.closed.is_set():
             try:
-                response = request(self.socket_path, "status", timeout_s=.35)
+                response = request(self.socket_path, "status", {"view":"state"}, timeout_s=.35)
                 if not response["ok"]:
                     raise ValueError(response.get("error", "application status rejected"))
                 self.latest = (time.monotonic_ns(), response["result"])
@@ -102,6 +102,7 @@ def main():
             self.pending_scans = deque(maxlen=16)
             self.odom_updates = 0
             self.map_updates = 0
+            self.map_wait = None
             self.map_publisher = None
             self.last_scan_ros = None
             self.scan_drop = None
@@ -136,6 +137,8 @@ def main():
             self.last_scan_ros = ns(message.header.stamp)
             if len(message.ranges) <= 4096:
                 self.pending_scans.append((message, time.monotonic_ns()))
+            else:
+                self.scan_drop = "scan exceeds 4096-sample bound"
 
         def flush_scans(self):
             # Independent /clock, scan and telemetry streams can arrive in any
@@ -190,7 +193,7 @@ def main():
                 "counts": {"scans": self.scans, "odometry": self.odom_updates, "maps": self.map_updates},
                 "timing": {"clock_ros_ns": None if not self.clock_mapper.pairs else self.clock_mapper.pairs[-1][0],
                            "last_tf_ros_ns": self.last_tf_stamp, "last_scan_ros_ns": self.last_scan_ros,
-                           "scan_drop": self.scan_drop}}
+                           "scan_drop": self.scan_drop,"map_wait":self.map_wait}}
 
         def publish_odometry(self, status):
             pose = status["vehicle"]["pose"]
@@ -226,6 +229,13 @@ def main():
             if time.monotonic_ns() - capture > config.max_age_ns:
                 raise ValueError("SLAM map expired before adoption")
             at = Time.from_msg(message.header.stamp)
+            if not all(self.buffer.can_transform("map",frame,at) for frame in ("base_link","odom")):
+                # A new map can arrive before its matching TF. Keep the last
+                # validated cut with its ORIGINAL capture/revision until the
+                # existing age limit expires; never retime or extrapolate it.
+                self.map_wait = "waiting for map-time transforms"
+                return
+            self.map_wait = None
             base = transform_pose(self.buffer.lookup_transform("map", "base_link", at))
             odom = transform_pose(self.buffer.lookup_transform("map", "odom", at))
             o = message.info.origin

@@ -64,6 +64,7 @@ class PolylineTracker:
         if not .1 <= self.distances[-1] <= 20:
             raise ValueError("initial Rover tracking supports paths of 0.1..20 metres")
         self.progress = 0.
+        self.turning = False
 
     def sample(self, distance):
         for i, end in enumerate(self.distances[1:]):
@@ -110,7 +111,15 @@ class PolylineTracker:
         error = angle(math.atan2(target.y-pose.y, target.x-pose.x)-pose.yaw)
         rate = max(-.2, min(.2, .25*error-.75*measured_yaw_rate))
         speed = min(.15, max(.04, .5*(remaining-.12))) * max(0., math.cos(error))**3
-        if abs(error) > .45:
+        # Caster stiction makes tiny steering corrections ineffective on the
+        # audited physical Rover. Align at the drive axle before advancing;
+        # hysteresis prevents noisy heading cuts from toggling every cycle.
+        if abs(error) > .3 or (distance > .06 and abs(error) > .15):
+            self.turning = True
+        if abs(error) < .08 and abs(measured_yaw_rate) < .1:
+            self.turning = False
+        if self.turning:
             speed = 0.
+            rate = math.copysign(.2,error) if abs(error) >= .08 else 0.
         return GuidanceOutput(0. if arrived else speed, 0. if arrived else rate,
                               self.progress, distance, arrived)

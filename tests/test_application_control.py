@@ -20,6 +20,18 @@ class Service:
 
 
 class ControlTests(unittest.TestCase):
+    def test_ready_local_state_request_does_not_require_three_vehicle_periods(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path=Path(directory)/'control.sock'
+            server=ControlServer(path,Service())
+            try:
+                with socket.socket(socket.AF_UNIX) as client:
+                    client.settimeout(.2);client.connect(str(path))
+                    client.sendall(json.dumps({'request_id':'state','command':'status','payload':{}}).encode()+b'\n')
+                    server.poll();server.poll()
+                    self.assertTrue(json.loads(client.recv(4096))['ok'])
+            finally:server.close()
+
     def test_retry_validation_and_ownership(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "control.sock"
@@ -58,6 +70,9 @@ class ControlTests(unittest.TestCase):
                 state = request(path, "status")["result"]
                 self.assertEqual(state["state"], "CONNECTING")
                 self.assertFalse(state["system_send"])
+                light = request(path,"status",{"view":"state"})
+                self.assertTrue(light['ok']);self.assertIsNone(light['result']['task'])
+                self.assertFalse(request(path,'status',{'view':'unknown'})['ok'])
                 self.assertFalse(request(path, "start", {"mission": "disarmed_mode"})["ok"])
                 self.assertFalse(request(path, "mavlink", {"raw": "x"})["ok"])
                 # A stalled partial message does not block the scheduler/status client.

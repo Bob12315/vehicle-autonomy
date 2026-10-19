@@ -20,8 +20,6 @@ class GoalNavigation:
         self.catalog.check(app.environment)
         if name not in self.catalog.goals:
             raise ValueError("unregistered navigation goal")
-        if self.catalog.policy.max_replans:
-            raise ValueError("replanning is not enabled")
         self.goal = self.catalog.goals[name]
         self.destination = self.goal.resolve(app.environment)
         self.environment = app.environment.reference
@@ -38,6 +36,7 @@ class GoalNavigation:
         self.job_factory = job_factory
         self.pending_terminal = None
         self.attempt = 0
+        self.retry_at_ns = None
         self.last_backend_directory = None
         self._start_plan(app)
 
@@ -79,7 +78,7 @@ class GoalNavigation:
         self.attempt += 1
         directory = nav.config.plan_path.parent/"navigation-jobs"/self.task_id.split(":")[1]/str(self.attempt)
         directory.mkdir(parents=True,exist_ok=False)
-        self.job = self.job_factory(nav.context,start,goal,self.catalog.policy,PATH_CLEARANCE_M,directory)
+        self.job = self.job_factory(nav.context,start,goal,self.catalog.policy,PATH_CLEARANCE_M+self.catalog.policy.planning_reserve_m,directory)
         self.status = "PLANNING"
         app._emit("goal_planning_started",task_id=self.task_id,goal=self.goal.name,attempt=self.attempt,
                   directory=str(directory),source_sha256=nav.context.sha256)
@@ -110,7 +109,23 @@ class GoalNavigation:
         child = self._child(app)
         if self.status == "RUNNING" and child is not None and child["status"] in TERMINAL and self.pending_terminal is None:
             self.child_history.append({"task_id":child["task_id"],"status":child["status"],"error":child["error"]})
-            self._finish(app,child["status"],child["error"])
+            recoverable = child["status"] == "FAILED" and str(child["error"]).startswith("navigation_path_blocked:")
+            if recoverable and self.attempt <= self.catalog.policy.max_replans:
+                try:
+                    self._check(app)
+                    if app.vehicle.clock().monotonic_ns >= self.deadline_ns:
+                        raise ValueError("navigation_total_deadline_exceeded")
+                    # The failed child has already completed its exit barrier
+                    # and end_run. A separate typed recovery Mission must now
+                    # observe Stop and Disarm before any new read-only job.
+                    recovery = app.start_mission("safe_recovery",_navigation_child=True)
+                    self.child_id = recovery["task_id"]
+                    self.status = "RECOVERING"
+                    app._emit("goal_recovery_started",task_id=self.task_id,child_id=self.child_id,attempt=self.attempt)
+                except (OSError,ValueError,TypeError,RuntimeError) as exc:
+                    self._finish(app,"FAILED",str(exc))
+            else:
+                self._finish(app,child["status"],child["error"])
             return
         if self.pending_terminal is None:
             try:
@@ -125,7 +140,22 @@ class GoalNavigation:
                 if self.job:self.job.close();self.job=None
                 self._finish(app,self.pending_terminal,self.error)
             return
-        if self.status == "PLANNING":
+        if self.status == "RECOVERING":
+            child = self._child(app)
+            if child is None:
+                self._finish(app,"FAILED","navigation_recovery_scope_missing")
+            elif child["status"] in TERMINAL:
+                self.child_history.append({"task_id":child["task_id"],"status":child["status"],"error":child["error"]})
+                if child["status"] != "SUCCEEDED":
+                    self._finish(app,"FAILED",child["error"] or "navigation_recovery_failed")
+                else:
+                    self.retry_at_ns = app.vehicle.clock().monotonic_ns+int(self.catalog.policy.retry_delay_s*1e9)
+                    self.status = "RETRY_WAIT"
+        elif self.status == "RETRY_WAIT":
+            if app.vehicle.clock().monotonic_ns >= self.retry_at_ns:
+                try:self._start_plan(app)
+                except (OSError,ValueError,TypeError,RuntimeError) as exc:self._finish(app,"FAILED",str(exc))
+        elif self.status == "PLANNING":
             if not self.job.done:return
             job,self.job = self.job,None
             try:

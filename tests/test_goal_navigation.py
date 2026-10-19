@@ -59,9 +59,9 @@ class GoalTests(unittest.TestCase):
             start_mission=self.launch,_cancel_child=self.cancel_child)
 
     def launch(self,name,**kwargs):
-        self.assertEqual(name,"follow_path")
-        self.app.navigation.admit(self.helper.world,self.helper.now)
-        self.child={"task_id":"child-run","status":"RUNNING","error":None,"step":"follow_path","steps":[],
+        self.assertIn(name,("follow_path","safe_recovery"))
+        if name == "follow_path":self.app.navigation.admit(self.helper.world,self.helper.now)
+        self.child={"task_id":"child-run" if self.child is None else self.child['task_id']+'-next',"status":"RUNNING","error":None,"step":name,"steps":[],
                     "effects":{},"requests":{},"stops":{}}
         return self.child
 
@@ -125,6 +125,47 @@ class GoalTests(unittest.TestCase):
         self.assertEqual(task.status,'CANCELLING');self.assertEqual(self.child['status'],'EXITING')
         self.child['status']='CANCELLED';task.tick(self.app)
         self.assertEqual(task.status,'CANCELLED')
+
+    def test_replan_waits_for_stop_disarm_and_obeys_attempt_budget(self):
+        self.app.navigation_goals.policy=NavigationPolicy(max_replans=1,retry_delay_s=.1)
+        task=self.task();task.job.done=True;task.tick(self.app)
+        old_id=task.child_id
+        self.child.update(status='FAILED',error='navigation_path_blocked: obstacle')
+        self.app.navigation.finish();task.tick(self.app)
+        self.assertEqual(task.status,'RECOVERING');self.assertNotEqual(task.child_id,old_id)
+        for _ in range(10):task.tick(self.app)
+        self.assertEqual(task.attempt,1);self.assertIsNone(task.job)
+        self.child.update(status='SUCCEEDED',error=None);task.tick(self.app)
+        self.assertEqual(task.status,'RETRY_WAIT')
+        self.helper.now=replace(self.helper.now,monotonic_ns=self.helper.now.monotonic_ns+110_000_000)
+        task.tick(self.app);self.assertEqual(task.attempt,2)
+        task.job.done=True;task.tick(self.app)
+        self.child.update(status='FAILED',error='navigation_path_blocked: second obstacle')
+        self.app.navigation.finish();task.tick(self.app)
+        self.assertEqual(task.status,'FAILED');self.assertEqual(task.attempt,2)
+
+    def test_nonrecoverable_faults_and_default_policy_never_retry(self):
+        for error in ('navigation_map_unavailable','navigation_alignment_changed','Safety rejected','navigation_path_blocked: obstacle'):
+            self.child=None
+            self.app.navigation_goals.policy=NavigationPolicy(max_replans=0 if 'path_blocked' in error else 2)
+            task=self.task();task.job.done=True;task.tick(self.app)
+            self.child.update(status='FAILED',error=error)
+            self.app.navigation.finish();task.tick(self.app)
+            self.assertEqual(task.status,'FAILED');self.assertEqual(task.attempt,1)
+
+    def test_cancel_recovery_and_total_deadline_do_not_start_another_job(self):
+        self.app.navigation_goals.policy=NavigationPolicy(max_replans=2)
+        task=self.task();task.job.done=True;task.tick(self.app)
+        self.child.update(status='FAILED',error='navigation_path_blocked: obstacle')
+        self.app.navigation.finish();task.tick(self.app)
+        task.cancel(self.app);task.tick(self.app)
+        self.assertEqual(task.status,'CANCELLING');self.assertEqual(task.attempt,1)
+        self.child['status']='CANCELLED';task.tick(self.app)
+        self.assertEqual(task.status,'CANCELLED')
+        self.child=None
+        task=self.task();task.deadline_ns=self.helper.now.monotonic_ns-1
+        task.tick(self.app);task.job.done=True;task.tick(self.app)
+        self.assertEqual(task.status,'FAILED');self.assertIn('total_deadline',task.error)
 
     def test_background_work_does_not_run_in_vehicle_tick(self):
         entered,release=Event(),Event()

@@ -254,7 +254,7 @@ class ApplicationRuntime:
                     "deadline_ns": envelope.deadline.monotonic_ns} for key,envelope in self.envelopes.items()},
                 "stops": self.stops}
 
-    def get_status(self):
+    def get_status(self, *, include_task=True):
         world = self.vehicle.world_snapshot()
         now = self.vehicle.clock()
         state = world.vehicle if world else None
@@ -309,7 +309,7 @@ class ApplicationRuntime:
                     "adopted": bool(world is not None and world.map is not None)},
                 "navigation": None if self.navigation is None else self.navigation.status(world, now),
                 "system_send": self.vehicle.authority.system_send,
-                "action_send": self.vehicle.authority.action_send, "task": self.task_status()}
+                "action_send": self.vehicle.authority.action_send, "task": self.task_status() if include_task else None}
 
     def start_mission(self, name, *, _navigation_child=False):
         if not _navigation_child:
