@@ -1,0 +1,40 @@
+{
+  "method": "read-only post-run comparison of fresh VALID odom body pose with passive Gazebo truth at status sampling time; includes reporting/recording delay; not an exact capture-time accuracy test or independent SLAM benchmark",
+  "runs": {
+    "goal-map_goal-d593a063": {
+      "samples": 391,
+      "max_body_xy_deviation_m": 0.02482650515299059,
+      "max_body_yaw_deviation_rad": 0.0038500070911646755,
+      "max_report_age_at_sampling_s": 0.024089114,
+      "status_log_sha256": "754325e8ae4dbbb1665d14e7420b7cf8f3d7a639ac017f29f24b69ae434952b2"
+    },
+    "goal-replan-e7cd2f9e": {
+      "samples": 456,
+      "max_body_xy_deviation_m": 0.02454316886227865,
+      "max_body_yaw_deviation_rad": 0.008318806825238943,
+      "max_report_age_at_sampling_s": 0.195366903,
+      "status_log_sha256": "10f973535b943a667fb2829164b5dff876fde79c102158bc14ccefb7452e5f4b"
+    },
+    "goal-business_inspect-d854038a": {
+      "samples": 607,
+      "max_body_xy_deviation_m": 0.03060217858628719,
+      "max_body_yaw_deviation_rad": 0.011253542289190621,
+      "max_report_age_at_sampling_s": 0.214541738,
+      "status_log_sha256": "d0bc66c50ee8abe18fa3bc487e05f0307b63a1ff36879473f7e6b1ac608ce660"
+    },
+    "goal-tracking-81940606": {
+      "samples": 397,
+      "max_body_xy_deviation_m": 0.025852606484355636,
+      "max_body_yaw_deviation_rad": 0.01837587730960732,
+      "max_report_age_at_sampling_s": 0.196029301,
+      "status_log_sha256": "38eba864ea3810a17b60f953c6421c7e3bcc42b82530a1d60569411f40a56fbd"
+    },
+    "goal-tracking-d6928a16": {
+      "samples": 596,
+      "max_body_xy_deviation_m": 0.028681272631313346,
+      "max_body_yaw_deviation_rad": 0.019604231224770674,
+      "max_report_age_at_sampling_s": 0.119605033,
+      "status_log_sha256": "f37083594b4d134072fe2c6f230656eef7a9194fbfa018ee5c3761599a42d857"
+    }
+  }
+}
