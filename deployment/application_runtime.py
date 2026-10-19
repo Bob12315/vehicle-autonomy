@@ -35,6 +35,8 @@ class ApplicationRuntime:
         self.navigation = None
         self.navigation_goals = None
         self.navigation_task = None
+        self.autonomy_recipes = None
+        self.autonomy_task = None
         if navigation_config is not None:
             if profile.kind != "rover" or mapping_config is None:
                 raise ValueError("path following requires explicit Rover simulation and ROS 2 mapping")
@@ -44,6 +46,9 @@ class ApplicationRuntime:
             if self.navigation.config.goals_path is not None:
                 from application.navigation_goals import GoalCatalog
                 self.navigation_goals = GoalCatalog(self.navigation.config.goals_path)
+            if self.navigation.config.recipes_path is not None:
+                from application.autonomy_recipes import RecipeCatalog
+                self.autonomy_recipes=RecipeCatalog(self.navigation.config.recipes_path,self.navigation_goals)
         translator = (ArduRoverCommandTranslator if profile.kind == "rover" else ArduPilotCommandTranslator)
         self.vehicle = runtime or SimulationRuntime(profile, translator=translator(mode_ids=profile.mode_ids),
                                                     event_sink=event_sink)
@@ -186,6 +191,9 @@ class ApplicationRuntime:
             if self.navigation_task and self.navigation_task.active:
                 self.navigation_task.fail(self,result.fault)
                 self.navigation_task.tick(self)
+            if self.autonomy_task and self.autonomy_task.active:
+                self.autonomy_task.cancel(self,result.fault)
+                self.autonomy_task.tick(self)
             return
         self.state = ("DEGRADED" if self.environment_fault else
                       "READY" if result.vehicle_fresh else "CONNECTING")
@@ -196,6 +204,7 @@ class ApplicationRuntime:
             self.navigation_task.tick(self)
             if self.navigation_task.active and self.navigation_task.status != "RUNNING":
                 self.state = self.navigation_task.status
+        if self.autonomy_task and self.autonomy_task.active:self.autonomy_task.tick(self)
 
     def _advance(self):
         now = self.vehicle.clock()
@@ -245,6 +254,7 @@ class ApplicationRuntime:
         return self.vehicle.effect_status(key)
 
     def task_status(self):
+        if self.autonomy_task is not None:return self.autonomy_task.view(self)
         if self.navigation_task is not None:
             return self.navigation_task.view(self)
         return self._mission_status()
@@ -322,8 +332,22 @@ class ApplicationRuntime:
 
     def start_mission(self, name, *, _navigation_child=False):
         if not _navigation_child:
+            if self.autonomy_task and self.autonomy_task.active:
+                raise ValueError('another autonomy business task is active')
             if self.navigation_task and self.navigation_task.active:
                 raise ValueError("another navigation task is active")
+            self.autonomy_task=None
+            if name.startswith('autonomy:'):
+                if self.autonomy_recipes is None:raise ValueError('autonomy recipes are not configured')
+                world=self.vehicle.world_snapshot()
+                if (not self.allow_send or self.stopping or self.state!='READY' or self.environment is None
+                        or world is None or world.vehicle is None or world.localization is None
+                        or world.environment!=self.environment.reference or world.vehicle.operation.armed):
+                    raise ValueError('autonomy business requires authorized fresh disarmed mapped READY application')
+                from deployment.autonomy_business import AutonomyBusiness
+                self.autonomy_task=AutonomyBusiness(self,name[len('autonomy:'):])
+                self._emit('autonomy_business_started',task_id=self.autonomy_task.task_id,recipe=name)
+                return self.task_status()
             if name.startswith("navigate:"):
                 return self._start_navigation(name[len("navigate:"):])
             self.navigation_task = None
@@ -399,14 +423,18 @@ class ApplicationRuntime:
         from .goal_navigation import GoalNavigation
         self.navigation_task = GoalNavigation(self,name)
         self.state = "PLANNING"
-        return self.task_status()
+        return self.navigation_task.view(self)
+
+    def _launch_goal(self,name):
+        self._start_navigation(name)
+        return self.navigation_task
 
     def export_map_anchor(self,path):
         from mapping.anchors import MapAnchor
         path=Path(path)
         if not path.is_absolute() or self.state!='READY' or self.navigation is None or self.navigation.context is None:
             raise ValueError('map anchor registration requires explicit path and idle mapped READY application')
-        if self.navigation_task and self.navigation_task.active:
+        if (self.navigation_task and self.navigation_task.active) or (self.autonomy_task and self.autonomy_task.active):
             raise ValueError('map registration during navigation is forbidden')
         world=self.vehicle.world_snapshot()
         if (world is None or world.vehicle is None or world.environment!=self.environment.reference
@@ -419,6 +447,9 @@ class ApplicationRuntime:
         return anchor.document()
 
     def cancel_mission(self):
+        if self.autonomy_task and self.autonomy_task.active:
+            self.autonomy_task.cancel(self)
+            return self.task_status()
         if self.navigation_task and self.navigation_task.active:
             self.navigation_task.cancel(self)
             return self.task_status()
@@ -433,6 +464,7 @@ class ApplicationRuntime:
         return self.task_status()
 
     def request_shutdown(self):
+        if self.autonomy_task and self.autonomy_task.active:self.autonomy_task.cancel(self)
         if self.navigation_task and self.navigation_task.active:
             self.navigation_task.cancel(self)
         self.stopping = True
@@ -453,6 +485,8 @@ class ApplicationRuntime:
             if self.navigation_task is not None:
                 try:self.navigation_task.close(self)
                 except RuntimeError as exc:self.shutdown_error=str(exc)
+            if self.autonomy_task is not None and self.autonomy_task.active:
+                self.autonomy_task._finish(self,'CANCELLED','application_shutdown; consult runtime stop evidence')
             sensor,self.sensor=self.sensor,None
             if sensor is not None:
                 try:sensor.close()

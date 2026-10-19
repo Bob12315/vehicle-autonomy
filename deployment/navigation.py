@@ -32,11 +32,12 @@ class NavigationConfig:
     timeout_ns: int
     goals_path: Path | None = None
     tracking_mode: str = 'smooth'
+    recipes_path: Path | None = None
 
     @classmethod
     def load(cls, path):
         data = tomllib.loads(Path(path).read_text())
-        if set(data)-{"schema", "model", "plan_path", "timeout_ns", "goals_path", "tracking_mode"} or not {"schema", "model", "plan_path", "timeout_ns"} <= set(data) or type(data["schema"]) is not int or data["schema"] != 1:
+        if set(data)-{"schema", "model", "plan_path", "timeout_ns", "goals_path", "tracking_mode", "recipes_path"} or not {"schema", "model", "plan_path", "timeout_ns"} <= set(data) or type(data["schema"]) is not int or data["schema"] != 1:
             raise ValueError("invalid navigation configuration")
         if data["model"] != "target_rover_front_axle_v1":
             raise ValueError("only the audited front-drive Rover model is supported")
@@ -49,7 +50,11 @@ class NavigationConfig:
             raise ValueError("navigation goals path must be explicit and absolute")
         mode=data.get('tracking_mode','smooth')
         if mode not in ('smooth','stop_turn'):raise ValueError('unregistered tracking strategy')
-        return cls(Path(data["plan_path"]), data["timeout_ns"],None if goals is None else Path(goals),mode)
+        recipes=data.get('recipes_path')
+        if recipes is not None and (type(recipes) is not str or not Path(recipes).is_absolute() or goals is None):
+            raise ValueError('recipes require an explicit absolute path and a goal catalog')
+        return cls(Path(data["plan_path"]), data["timeout_ns"],None if goals is None else Path(goals),mode,
+            None if recipes is None else Path(recipes))
 
 
 @dataclass(frozen=True, slots=True)

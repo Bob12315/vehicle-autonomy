@@ -8,6 +8,17 @@ from tests.test_simulation_runtime import SimulationRuntimeTests
 
 
 class ApplicationRuntimeTests(SimulationRuntimeTests):
+    def test_autonomy_request_requires_authorized_ready_application_before_recipe_reads(self):
+        self.ready(False)
+        self.app.autonomy_recipes=object()
+        with self.assertRaisesRegex(ValueError,'authorized'):
+            self.app.start_mission('autonomy:PATROL')
+        self.app.allow_send=True;self.app.state='CONNECTING'
+        with self.assertRaisesRegex(ValueError,'authorized'):
+            self.app.start_mission('autonomy:PATROL')
+        self.assertFalse(self.runtime.authority.system_send)
+        self.assertEqual(self.transports[-1].writes,[])
+
     def ready(self, allow_send=True):
         self.app = ApplicationRuntime(self.runtime.profile, profile_name="copter_sim",
                                       allow_send=allow_send, runtime=self.runtime)

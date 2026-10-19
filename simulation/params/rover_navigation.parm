@@ -1,0 +1,17 @@
+# Optional low-rate steering calibration for the owned Gazebo front-drive chassis.
+# Loaded only by explicit navigation acceptance fixtures; baseline defaults stay.
+# More proportional authority breaks caster stiction without long I windup.
+# Command speed/yaw, tracking deadline, geofence and Stop gates are unchanged.
+ATC_STR_RAT_FF 0.3
+ATC_STR_RAT_P 0.6
+ATC_STR_RAT_I 0.05
+ATC_STR_RAT_D 0
+ATC_STR_RAT_IMAX 0.2
+# Explicit high-rate state on the first two optional SITL telemetry channels.
+MAV1_POSITION 20
+MAV1_EXTRA1 20
+MAV1_EXT_STAT 5
+MAV2_POSITION 20
+MAV2_EXTRA1 20
+MAV2_EXT_STAT 5
+LOG_DISARMED 1

@@ -29,7 +29,10 @@ def segment_distance(x, y, a, b):
     return math.hypot(x-a[0]-t*dx,y-a[1]-t*dy)
 
 
-def run(directory, case, *, autonomous=False):
+def run(directory, case, *, autonomous=False, room_yaw=None):
+    scene_yaw=ROOM_YAW if room_yaw is None else room_yaw
+    map_goal=case=="map_goal"
+    business=case.startswith("business_")
     directory.mkdir(parents=True,exist_ok=False)
     os.environ["ROS_DOMAIN_ID"] = str(100+os.getpid()%100)
     owned=OwnedSimulation(directory,"rover")
@@ -38,13 +41,21 @@ def run(directory, case, *, autonomous=False):
     # A denser actual sensor reduces unobserved ray gaps; unknown occupancy is
     # never filled by the harness. The pillar forces a non-straight path.
     replanning = case in ("replan","blocked","replan_cancel")
-    lidar_samples=4096 if replanning else 2160
-    add_mapping_scene(owned,lidar_samples=lidar_samples,pillar=(2.8,2) if replanning else (1.7,.3))
+    if replanning:
+        owned.params.append(ROOT/'simulation/params/rover_navigation.parm')
+        owned.manifest['parameters']=[str(p) for p in owned.params]
+        owned._save()
+    lidar_samples=4096 if replanning or business else 2160
+    add_mapping_scene(owned,lidar_samples=lidar_samples,pillar=(2.8,2) if replanning or business else (1.7,.3),room_yaw=scene_yaw)
     if replanning:
         import xml.etree.ElementTree as ET
         tree=ET.parse(owned.world_path)
         ET.SubElement(tree.find('world'),'plugin',filename='gz-sim-user-commands-system',name='gz::sim::systems::UserCommands')
         tree.write(owned.world_path)
+    calibration=None
+    if business:
+        from tests.simulation.object_fixture import add_objects
+        calibration=add_objects(owned)
     endpoint=directory/"app.sock"
     exchange=directory/"exchange";exchange.mkdir()
     mapping=directory/"mapping.toml"
@@ -58,6 +69,15 @@ def run(directory, case, *, autonomous=False):
         goals.write_text('schema=1\nenvironment_id="environment:rover-training-v1"\n[[goals]]\nname="POINT_A"\nframe="odom"\nreference_point="navigation_reference"\nposition=[0.8,2.0]\n')
         if replanning:
             goals.write_text(goals.read_text().replace("[[goals]]", "[policy]\nmax_replans=1\nretry_delay_s=2\nplanning_reserve_m=0.1\n[[goals]]").replace("[0.8,2.0]","[0.4,2.5]"))
+        if map_goal:
+            goals.write_text(goals.read_text().replace('[[goals]]',f'anchor_path="{directory / "anchor.json"}"\n[[goals]]').replace('frame="odom"','frame="map"'))
+        if business:
+            goals.write_text(goals.read_text().replace('[0.8,2.0]','[0.4,2.5]')+
+                '[[goals]]\nname="POINT_B"\nframe="odom"\nreference_point="navigation_reference"\nposition=[0.4,1.5]\n'+
+                '[[goals]]\nname="HOME"\nframe="odom"\nreference_point="navigation_reference"\nposition=[0.25,0.0]\n')
+            recipes=directory/'recipes.toml'
+            recipes.write_text('schema=1\n[[recipes]]\nname="INSPECT"\ngoals=["POINT_A","POINT_B","HOME"]\ntotal_timeout_s=480\ninspection_label="bucket_1"\ninspection_at="POINT_A"\n')
+            config.write_text(config.read_text()+f'recipes_path="{recipes}"\n')
         if case == "unreachable":goals.write_text(goals.read_text().replace('[0.8,2.0]','[2.8,0.0]'))
         config.write_text(config.read_text()+f'goals_path="{goals}"\n')
     profile=directory/"profile.toml"
@@ -76,13 +96,14 @@ def run(directory, case, *, autonomous=False):
 ''')
     wrapper=str(ROOT/"scripts/with_ros2.sh")
     evidence=(directory/"status.jsonl").open("w")
-    report={"passed":False,"case":case,"lidar_rays":lidar_samples,"room_yaw_rad":ROOM_YAW}
+    report={"passed":False,"case":case,"lidar_rays":lidar_samples,"room_yaw_rad":scene_yaw}
     slam_parameters=ROOT/"simulation/mapping/slam_toolbox.yaml"
-    if replanning:
+    if replanning or map_goal or business:
         slam_parameters=directory/'slam_toolbox.yaml'
         slam_parameters.write_text((ROOT/'simulation/mapping/slam_toolbox.yaml').read_text()+'    use_scan_matching: false\n')
         report['map_alignment']='telemetry_odometry; scan matching explicitly disabled for changing scene'
     trajectory=[]
+    trajectory_ids=[];checkpoint_truth=[]
 
     def status():
         owned.assert_alive()
@@ -118,7 +139,7 @@ def run(directory, case, *, autonomous=False):
         oracle=GazeboTruthOracle(owned.world,owned.model)
         app=owned.start_process("application",[sys.executable,"-m","app.main","run","--profile","rover_sim",
             "--config",str(profile),"--control-socket",str(endpoint),"--ros2-mapping-config",str(mapping),
-            "--navigation-config",str(config),"--allow-send"])
+            "--navigation-config",str(config),"--allow-send",*(["--sim-sensor-config",str(calibration)] if calibration else [])])
         owned.start_process("gz_bridge",[wrapper,sys.executable,"-m","integrations.ros2.run","ros_gz_bridge","parameter_bridge",
             "--ros-args","-p",f"config_file:={bridge}"])
         sidecar=owned.start_process("mapping_sidecar",[wrapper,sys.executable,"-m","integrations.ros2.mapping_node",
@@ -126,7 +147,7 @@ def run(directory, case, *, autonomous=False):
         owned.start_process("slam",[wrapper,sys.executable,"-m","integrations.ros2.run","slam_toolbox","async_slam_toolbox_node",
             "--ros-args","--params-file",str(slam_parameters)])
         lifecycle("configure");lifecycle("activate")
-        ready=wait(lambda s:s["state"]=="READY" and s["mapping"]["adopted"] and s["mapping"]["age_ns"]<1_000_000_000
+        ready=wait(lambda s:s["state"]=="READY" and s["mapping"]["adopted"] and s['navigation']['planning_start'] is not None
                    and s["environment"]["origin_verified"] and s["motion_warmup_remaining_ns"]==0,75,"navigation preflight")
         if ready["system_send"] or ready["action_send"] or ready["vehicle"]["armed"]:
             raise AssertionError("idle Application retained authority")
@@ -150,6 +171,10 @@ def run(directory, case, *, autonomous=False):
             if not request(endpoint,'shutdown')['ok'] or app.wait(timeout=12):raise AssertionError('shutdown failed')
             owned.stop_process(app);report['passed']=True
             return report
+        if map_goal:
+            anchored=request(endpoint,'anchor',{'path':str(directory/'anchor.json')})
+            if not anchored['ok']:raise RuntimeError(anchored)
+            report['map_anchor']=anchored['result']
         transform=pose_from_json(ready["mapping"]["odom_in_map"])
         binding=PlanarBinding(transform.position.x,transform.position.y,yaw(transform))
         position=ready["vehicle"]["pose"]["position"]
@@ -163,9 +188,9 @@ def run(directory, case, *, autonomous=False):
         origin=oracle.latest()
         initial=ready["vehicle"]["pose"]["position"]
         if autonomous:
-            response=request(endpoint,"start",{"mission":"navigate:POINT_A"})
+            response=request(endpoint,"start",{"mission":"autonomy:INSPECT" if business else "navigate:POINT_A"})
             if not response["ok"]:raise RuntimeError(response)
-            wait(lambda s:s["task"]["status"] in ("RUNNING","FAILED","CANCELLED"),25,"Application planning")
+            wait(lambda s:(plan.exists() and s["navigation"]["active"]) or s["task"]["status"] in ("FAILED","CANCELLED"),25,"Application planning")
             if not plan.exists():raise AssertionError("Application returned no admitted plan")
             value=json.loads(plan.read_text())
             (directory/"planning.log").write_text(json.dumps(value)+'\n')
@@ -180,24 +205,29 @@ def run(directory, case, *, autonomous=False):
         if d["executable"]:raise AssertionError("planner granted authority")
         if not response["ok"]:raise RuntimeError(response)
         report["task_id"]=response["result"]["task_id"]
-        submitted_ns=time.monotonic_ns();trigger_ns=None;moving_seen=False;terminal_ns=None;stable=None;recovery_stop_ns=None;replan_cancelled=False
-        until=time.monotonic()+110
+        submitted_ns=time.monotonic_ns();trigger_ns=None;moving_seen=False;terminal_ns=None;stable=None;recovery_stop_ns=None;replan_cancelled=False;last_request_id=None
+        until=time.monotonic()+(430 if business else 110)
         while time.monotonic()<until:
             s,t=status()
             # Oracle is a passive measurement only; never used by production
             # guidance, Nav2 or SLAM input.
             ox,oy=t.x_m-origin.x_m+initial[0],t.y_m-origin.y_m+initial[1]
             trajectory.append((time.monotonic_ns(),ox,oy,oracle.recent_speed_mps(),t.yaw_rad))
+            last_request_id=s['navigation']['request_id'] or last_request_id
+            trajectory_ids.append(last_request_id)
             speed=oracle.recent_speed_mps()
             yaw_rate=oracle.recent_yaw_rate_rad_s()
             physical_motion=speed is not None and speed>(.01 if replanning else .06)
             if case=='timeout' and yaw_rate is not None and abs(yaw_rate)>.08:physical_motion=True
             if s["task"]["step"]=="follow_path" and physical_motion:
                 moving_seen=True
-                if trigger_ns is None and case in ("cancel","map_loss","plan_change"):
+                if trigger_ns is None and case in ("cancel","map_loss","plan_change","business_cancel","business_loss"):
                     trigger_ns=time.monotonic_ns()
-                    if case=="cancel":
+                    if case in ("cancel","business_cancel"):
                         if not request(endpoint,"cancel")["ok"]:raise AssertionError("cancel rejected")
+                    elif case=="business_loss":
+                        from tests.simulation.object_fixture import service
+                        service(owned,'remove','gz.msgs.Entity','name: "target_1" type: MODEL')
                     elif case=="map_loss":owned.stop_process(sidecar)
                     else:plan.write_text("{}")
             if replanning and trigger_ns is None and moving_seen:
@@ -212,6 +242,16 @@ def run(directory, case, *, autonomous=False):
                 service(owned,'create','gz.msgs.EntityFactory','sdf: '+json.dumps(model))
                 trigger_ns=time.monotonic_ns()
             task=s["task"]
+            if business:
+                for checkpoint in task['checkpoints'][len(checkpoint_truth):]:
+                    target={'POINT_A':(.4,2.5),'POINT_B':(.4,1.5),'HOME':(.25,0)}[checkpoint['goal']]
+                    error=math.hypot(ox+DRIVE_OFFSET_M*math.cos(t.yaw_rad)-target[0],oy+DRIVE_OFFSET_M*math.sin(t.yaw_rad)-target[1])
+                    if error>.75 or speed is None or speed>.1 or yaw_rate is None or abs(yaw_rate)>.15:
+                        raise AssertionError('checkpoint lacks independent arrival/Stop evidence')
+                    checkpoint_truth.append({'goal':checkpoint['goal'],'error_m':error,'speed_mps':speed,'yaw_rate_rps':yaw_rate})
+            if business and trigger_ns is not None and s['task']['cleanup_id'] and recovery_stop_ns is None:
+                recovery_stop_ns=time.monotonic_ns()
+                if speed is None or speed>.1 or yaw_rate is None or abs(yaw_rate)>.15:raise AssertionError('business cleanup did not follow physical Stop')
             if replanning and task['history'] and recovery_stop_ns is None:
                 recovery_stop_ns=time.monotonic_ns()
                 if speed is None or speed>.1 or yaw_rate is None or abs(yaw_rate)>.15:
@@ -222,7 +262,7 @@ def run(directory, case, *, autonomous=False):
             if task["status"] in ("FAILED","CANCELLED","SUCCEEDED"):
                 if terminal_ns is None:terminal_ns=time.monotonic_ns()
                 if not moving_seen:raise AssertionError("no actual movement before terminal result")
-                expected="SUCCEEDED" if case in ("tracking","replan") else "CANCELLED" if case in ("cancel","replan_cancel") else "FAILED"
+                expected="SUCCEEDED" if case in ("tracking","replan","map_goal","business_inspect") else "CANCELLED" if case in ("cancel","replan_cancel","business_cancel") else "FAILED"
                 if task["status"]!=expected:
                     raise AssertionError(f"unexpected task result: {task['status']}: {task['error']}; {task['steps']}")
                 if s["system_send"] or s["action_send"]:raise AssertionError("terminal retained SEND")
@@ -247,33 +287,35 @@ def run(directory, case, *, autonomous=False):
         admissions=[e for e in events if e.get("event")=="navigation_admitted"]
         admission=admissions[-1]
         points=admission["odom_poses"]
-        cross=max(min(segment_distance(x+DRIVE_OFFSET_M*math.cos(yaw),y+DRIVE_OFFSET_M*math.sin(yaw),a,b)
-                  for adm in admissions for a,b in zip(adm["odom_poses"],adm["odom_poses"][1:])) for _,x,y,_,yaw in trajectory)
+        by_request={a['request_id']:a['odom_poses'] for a in admissions}
+        cross=max(min(segment_distance(x+DRIVE_OFFSET_M*math.cos(heading),y+DRIVE_OFFSET_M*math.sin(heading),a,b)
+            for a,b in zip(by_request[identity],by_request[identity][1:]))
+            for (_,x,y,_,heading),identity in zip(trajectory,trajectory_ids))
         report["truth_max_cross_track_m"]=cross
         # Independent physical obstacle geometry in the rotated room.
         clearance=[]
         for _,x,y,_,_ in trajectory:
-            px=math.cos(ROOM_YAW)*x+math.sin(ROOM_YAW)*y
-            py=-math.sin(ROOM_YAW)*x+math.cos(ROOM_YAW)*y
-            clearance.append(math.hypot(max(abs(px-(2.8 if replanning else 1.7))-.2,0),max(abs(py-(2 if replanning else .3))-.2,0)))
+            px=math.cos(scene_yaw)*x+math.sin(scene_yaw)*y
+            py=-math.sin(scene_yaw)*x+math.cos(scene_yaw)*y
+            clearance.append(math.hypot(max(abs(px-(2.8 if replanning or business else 1.7))-.2,0),max(abs(py-(2 if replanning or business else .3))-.2,0)))
         report["truth_min_pillar_clearance_m"]=min(clearance)
         if cross>.3 or min(clearance)<.51:raise AssertionError("independent path/physical clearance exceeded")
-        if case in ("tracking","replan"):
+        if case in ("tracking","replan","map_goal","business_inspect"):
             final=trajectory[-1]
             error=math.hypot(final[1]+DRIVE_OFFSET_M*math.cos(final[4])-points[-1][0],
                              final[2]+DRIVE_OFFSET_M*math.sin(final[4])-points[-1][1])
             report["truth_goal_error_m"]=error
             if error>.75 or s["vehicle"]["armed"]:raise AssertionError("arrival/disarm failed")
-            direct=segment_distance(1.7*math.cos(ROOM_YAW)-.3*math.sin(ROOM_YAW),
-                1.7*math.sin(ROOM_YAW)+.3*math.cos(ROOM_YAW),points[0],points[-1])
+            direct=segment_distance(1.7*math.cos(scene_yaw)-.3*math.sin(scene_yaw),
+                1.7*math.sin(scene_yaw)+.3*math.cos(scene_yaw),points[0],points[-1])
             report["direct_line_pillar_center_distance_m"]=direct
             detour=max(segment_distance(p[0],p[1],points[0],points[-1]) for p in points)
             report["planned_detour_from_direct_line_m"]=detour
-            if not replanning and detour<.15:raise AssertionError("scene did not require a route detour")
+            if not replanning and not business and detour<.15:raise AssertionError("scene did not require a route detour")
         if trigger_ns is not None:
             # Use first terminal cut, not the extra two seconds used by this
             # oracle, for the original eight-second stopping requirement.
-            report["fault_to_confirmed_stop_s"]=((recovery_stop_ns if replanning else terminal_ns)-trigger_ns)/1e9
+            report["fault_to_confirmed_stop_s"]=((recovery_stop_ns if replanning or business else terminal_ns)-trigger_ns)/1e9
             if report["fault_to_confirmed_stop_s"]>8:raise AssertionError("stop exceeded original eight seconds")
         if case=="timeout" and not any("deadline" in (step["error"] or "") for step in report["task"]["steps"]):
             raise AssertionError("timeout was not the cause of failure")
@@ -284,7 +326,12 @@ def run(directory, case, *, autonomous=False):
             elif s['task']['attempt'] != 2 or recovery_stop_ns is None:raise AssertionError('replan did not follow confirmed stop/recovery')
             if case=='replan_cancel' and not replan_cancelled:raise AssertionError('did not cancel during second plan')
             if case=='replan' and len(admissions)!=2:raise AssertionError('new route did not pass independent admission')
-        if case not in ("tracking","replan"):
+        if business:
+            report['checkpoints']=s['task']['checkpoints'];report['inspections']=s['task']['inspections'];report['checkpoint_truth']=checkpoint_truth
+            if case=='business_inspect' and (len(report['checkpoints'])!=3 or len(report['inspections'])!=1):raise AssertionError('business result missing route/observation evidence')
+            if s['vehicle']['armed']:raise AssertionError('business ended armed')
+        if case not in ("tracking","replan","map_goal","business_inspect"):
+
 
             recovery=request(endpoint,"start",{"mission":"safe_recovery"})
             if not recovery["ok"]:raise RuntimeError(recovery)
@@ -306,6 +353,7 @@ def run(directory, case, *, autonomous=False):
         except Exception as exc:report["cleanup_error"]=str(exc);report["passed"]=False
         evidence.close()
         (directory/"trajectory.json").write_text(json.dumps(trajectory))
+        (directory/"trajectory-requests.json").write_text(json.dumps(trajectory_ids))
         (directory/"summary.json").write_text(json.dumps(report,indent=2))
     return report
 

@@ -24,7 +24,8 @@ from tests.simulation.oracle import GazeboTruthOracle
 ROOM_YAW = .15  # Avoid the upstream axis-aligned occupancy-boundary defect #689.
 
 
-def add_mapping_scene(owned, *, lidar_samples=720, pillar=(2.8, 2)):
+def add_mapping_scene(owned, *, lidar_samples=720, pillar=(2.8, 2), room_yaw=None):
+    room_yaw=ROOM_YAW if room_yaw is None else room_yaw
     model = ET.parse(owned.model_path)
     model.find("model/link[@name='base_link']").append(ET.fromstring(f'''
       <sensor name="mapping_lidar" type="gpu_lidar">
@@ -43,10 +44,10 @@ def add_mapping_scene(owned, *, lidar_samples=720, pillar=(2.8, 2)):
              ("north", 0, 4, 8, .2), ("south", 0, -4, 8, .2),
              ("pillar", *pillar, .4, .4))
     for name, x, y, width, height in walls:
-        x, y = x * math.cos(ROOM_YAW) - y * math.sin(ROOM_YAW), x * math.sin(ROOM_YAW) + y * math.cos(ROOM_YAW)
+        x, y = x * math.cos(room_yaw) - y * math.sin(room_yaw), x * math.sin(room_yaw) + y * math.cos(room_yaw)
         geometry = f"<geometry><box><size>{width} {height} 1.5</size></box></geometry>"
         world.find("world").append(ET.fromstring(f'''<model name="mapping_{name}"><static>true</static>
-          <pose>{x} {y} 0.75 0 0 {ROOM_YAW}</pose><link name="obstacle">
+          <pose>{x} {y} 0.75 0 0 {room_yaw}</pose><link name="obstacle">
           <collision name="collision">{geometry}</collision><visual name="visual">{geometry}</visual>
           </link></model>'''))
     world.write(owned.world_path)
