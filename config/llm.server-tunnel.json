@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "endpoint": "http://127.0.0.1:19436/v1/chat/completions",
+  "model": "coder390-q6",
+  "protocol": "openai_compatible",
+  "timeout_s": 20,
+  "api_key_env": null
+}
