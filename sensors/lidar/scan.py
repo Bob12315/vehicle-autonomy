@@ -22,13 +22,14 @@ class ScanConfig:
     ground_tolerance: float = .1
 
     def __post_init__(self):
+        object.__setattr__(self, 'self_box', tuple(self.self_box))
         values = (self.range_min, self.range_max, self.z_min, self.z_max, self.ground_tolerance)
-        if (not self.frame or type(self.bins) is not int or not 90 <= self.bins <= 4096
-                or not all(math.isfinite(v) for v in values)
+        if (type(self.frame) is not str or not self.frame or type(self.bins) is not int or not 90 <= self.bins <= 4096
+                or not all(type(v) in (int, float) and math.isfinite(v) for v in values)
                 or not 0 < self.range_min < self.range_max <= 200 or self.z_min >= self.z_max
                 or self.ground_tolerance < 0):
             raise ValueError('invalid explicit scan configuration')
-        if self.ground_z is not None and not math.isfinite(self.ground_z):
+        if self.ground_z is not None and (type(self.ground_z) not in (int,float) or not math.isfinite(self.ground_z)):
             raise ValueError('ground height must be finite')
         if self.self_box and (len(self.self_box) != 6 or not all(math.isfinite(v) for v in self.self_box)
                               or any(self.self_box[i] >= self.self_box[i+1] for i in (0, 2, 4))):

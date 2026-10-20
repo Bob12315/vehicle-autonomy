@@ -64,6 +64,7 @@ def capture(config, directory):
             frames += 1
             elapsed = time.monotonic() - started
             health = {'kind': config['kind'], 'source': source, 'frames': frames, 'dropped': dropped,
+                      'sensor_drop_count': None, 'drop_metric_scope': 'preview processing only; device drop counter unavailable',
                       'fps': frames / max(elapsed, .001), 'received_ns': received_ns,
                       'capture_time': 'unknown; acquisition completion diagnostic',
                       'frame': 'camera_optical', 'spatial_calibration': 'unverified',

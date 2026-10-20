@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import math
+import json
 import time
 from uuid import uuid4
 
@@ -48,6 +49,11 @@ class TelemetryDiagnostics:
                         'EKF_STATUS_REPORT', 'SYS_STATUS', 'GPS_GLOBAL_ORIGIN', 'STATUSTEXT'):
             return
         value = message.to_dict()
+        try:
+            json.dumps(value, allow_nan=False)
+        except ValueError:
+            self.fault = 'nonfinite_telemetry_' + kind
+            return
         if kind == 'GLOBAL_POSITION_INT':
             lat, lon = int(message.lat) / 1e7, int(message.lon) / 1e7
             if not -90 <= lat <= 90 or not -180 <= lon <= 180:
@@ -77,8 +83,14 @@ class TelemetryDiagnostics:
         for key, fact in (('heartbeat', hb), ('gps', gps), ('position', position), ('ekf', ekf)):
             if fact is None or not 0 <= fact['receive_age_ns'] <= 1_000_000_000:
                 reasons.append(key + '_missing_or_stale')
-        if gps and gps['value'].get('fix_type', 0) < 3:
-            reasons.append('gps_fix_below_3d')
+        if gps:
+            fix = gps['value']
+            if fix.get('fix_type', 0) < 3:
+                reasons.append('gps_fix_below_3d')
+            if fix.get('satellites_visible', 255) == 255 or fix.get('satellites_visible', 0) < 6:
+                reasons.append('gps_satellites_unknown_or_insufficient')
+            if fix.get('eph', 65535) > 500:
+                reasons.append('gps_hdop_unknown_or_degraded')
         if ekf:
             flags = ekf['value'].get('flags', 0)
             # attitude, horizontal velocity, absolute horizontal position;

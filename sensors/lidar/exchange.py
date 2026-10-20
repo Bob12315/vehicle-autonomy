@@ -22,6 +22,10 @@ def load_exchange(path, now_ns):
                 'receive_ns','source_timestamp_s','provenance','points'}
     if type(value) is not dict or set(value) != required or value['schema'] != 1 or value['source'] != 'robosense.rs_driver':
         raise ValueError('official rs_driver cloud envelope required')
+    if (type(value['epoch']) is not str or not 1 <= len(value['epoch']) <= 128
+            or value['provenance'] not in ('pcap_replay','live_sdk_system_timestamp')
+            or type(value['source_timestamp_s']) not in (int,float) or not math.isfinite(value['source_timestamp_s'])):
+        raise ValueError('explicit SDK provenance, timestamp and epoch required')
     if value['clock_domain'] != Path('/proc/sys/kernel/random/boot_id').read_text().strip():
         raise ValueError('LiDAR exchange belongs to a different host boot')
     if (any(type(value[key]) is not int for key in ('sequence','capture_ns','receive_ns'))
@@ -40,6 +44,10 @@ def load_exchange(path, now_ns):
 
 def read_exchange(path, now_ns):
     value = load_exchange(path, now_ns)
+    return exchange_view(value, now_ns)
+
+
+def exchange_view(value, now_ns):
     points = value['points']
     return {'online': True, 'source': value['source'], 'epoch': value['epoch'],
             'frame': value['frame'], 'sequence': value['sequence'], 'points': len(points),
@@ -47,3 +55,25 @@ def read_exchange(path, now_ns):
             'preview_xyz': points[::max(1,len(points)//1000)][:1000],
             'provenance': value['provenance'], 'control_eligible': False,
             'reason': 'mount/exposure clock, ground/body filters and physical acceptance unqualified'}
+
+
+class ExchangeMonitor:
+    def __init__(self):
+        self.previous = None
+        self.dropped = 0
+
+    def poll(self, path, now_ns):
+        value = load_exchange(path, now_ns)
+        key = value['epoch'], value['sequence'], value['capture_ns']
+        if self.previous is not None:
+            epoch, sequence, capture = self.previous
+            if key[0] != epoch:
+                raise ValueError('SDK source epoch changed; restart read-only admission')
+            if key[1] < sequence or key[2] < capture or (key[1] == sequence and key[2] != capture):
+                raise ValueError('SDK sequence/timestamp regression or version reuse')
+            if key[1] > sequence:
+                if key[2] <= capture:
+                    raise ValueError('new SDK sequence reused capture timestamp')
+                self.dropped += key[1] - sequence - 1
+        self.previous = key
+        return {**exchange_view(value, now_ns), 'dropped_clouds': self.dropped}

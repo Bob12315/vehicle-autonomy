@@ -1,6 +1,9 @@
 from datetime import datetime, timezone
 import math
 import unittest
+import json
+from pathlib import Path
+import tempfile
 from dataclasses import replace
 
 from contracts.core.primitives import SchemaVersion
@@ -16,6 +19,22 @@ def stamp(value, domain='test'):
 
 
 class LidarTests(unittest.TestCase):
+    def test_sdk_exchange_loss_reorder_boot_and_expiry(self):
+        from sensors.lidar.exchange import ExchangeMonitor
+        base={'schema':1,'source':'robosense.rs_driver','epoch':'test','clock_domain':Path('/proc/sys/kernel/random/boot_id').read_text().strip(),
+              'frame':'lidar','sequence':1,'capture_ns':100,'receive_ns':200,'source_timestamp_s':1.,
+              'provenance':'pcap_replay','points':[[1.,0.,0.]]}
+        with tempfile.TemporaryDirectory() as directory:
+            path=Path(directory)/'cloud.json';monitor=ExchangeMonitor()
+            def poll(changes,now=1000):
+                path.write_text(json.dumps({**base,**changes}));return monitor.poll(path,now)
+            self.assertTrue(poll({})['online'])
+            self.assertTrue(poll({})['online'])
+            self.assertEqual(poll({'sequence':4,'capture_ns':300,'receive_ns':400})['dropped_clouds'],2)
+            for changes in ({},{'epoch':'other'},{'clock_domain':'other'},{'sequence':4,'capture_ns':500,'receive_ns':600},
+                            {'sequence':5,'capture_ns':300,'receive_ns':400},{'source_timestamp_s':float('nan')}):
+                with self.assertRaises(ValueError):poll(changes)
+            with self.assertRaises(ValueError):poll({'sequence':5,'capture_ns':500,'receive_ns':600},600_000_000)
     def test_scan_filter_nearest_unknown_and_provenance(self):
         processor = ScanProcessor(ScanConfig('lidar', self_box=(-.3,.3,-.3,.3,-.3,.3), ground_z=-.1, ground_tolerance=.03), 'test.lidar', 'e1')
         observation = processor.convert([(1.,0.,0.), (2.,0.,0.), (.25,0.,0.), (1.,0.,-.1), (1.,0.,10.), (math.nan,0.,0.)],

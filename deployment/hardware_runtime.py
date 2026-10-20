@@ -33,6 +33,8 @@ class HardwareReadOnlyRuntime:
         self.telemetry = None
         self.errors = {}
         self.inventory = discover()
+        from sensors.lidar.exchange import ExchangeMonitor
+        self.lidar_monitor = ExchangeMonitor()
         self.lidar = {'online': False, 'reason': 'no admitted lidar exchange configured', 'control_eligible': False}
         self._event('started', mode='hardware_readonly', send=False)
         if profile['camera']:
@@ -62,8 +64,7 @@ class HardwareReadOnlyRuntime:
                 self._event('telemetry_lost', error=self.errors['telemetry'])
         if self.profile['lidar_exchange']:
             try:
-                from sensors.lidar.exchange import read_exchange
-                self.lidar = read_exchange(self.profile['lidar_exchange'], time.monotonic_ns())
+                self.lidar = self.lidar_monitor.poll(self.profile['lidar_exchange'], time.monotonic_ns())
                 self.errors.pop('lidar', None)
             except (ValueError, OSError) as exc:
                 self.lidar = {'online': False, 'control_eligible': False, 'reason': str(exc)}
