@@ -60,6 +60,24 @@ class WebTests(unittest.TestCase):
         self.assertEqual(self.call('/api/map/load',{'sha256':'../../secret'})[0],409)
         self.assertEqual(self.call('/api/waypoint',{'name':'../x','x':1.,'y':2.,'frame':'map'})[0],409)
         self.assertEqual(self.backend.starts,[])
+    def test_recorded_map_save_export_load_remains_a_preview(self):
+        metadata=json.loads(Path('simulation/planning/recorded_map.json').read_text())
+        grid=json.loads((Path('simulation/planning/maps')/(metadata['sha256']+'.json')).read_text())
+        class RecordedMapBackend:
+            def handle(self,operation,payload):
+                if operation!='map':raise AssertionError('map preview attempted a control operation')
+                return {'grid':grid,'metadata':{'source_kind':'recorded_map'}}
+        self.service.application=RecordedMapBackend()
+        saved=self.call('/api/map/save',{})
+        self.assertEqual(saved[0],200)
+        digest=json.loads(saved[1])['result']['sha256']
+        self.assertEqual(digest,metadata['sha256'])
+        loaded=self.call('/api/map/load',{'sha256':digest})
+        self.assertEqual(loaded[0],200)
+        result=json.loads(loaded[1])['result']
+        self.assertEqual(result['grid'],grid)
+        self.assertFalse(result['control_eligible'])
+        self.assertTrue((Path(self.directory.name)/'exports'/digest/'map.pgm').is_file())
     def test_token_permissions_and_public_bind_refused(self):
         path=Path(self.directory.name)/'weak';path.write_text('a'*64);path.chmod(0o644)
         with self.assertRaises(ValueError):load_token(path)
