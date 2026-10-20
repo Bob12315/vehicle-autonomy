@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import argparse
 from contextlib import closing
-import http.client
+from http.client import HTTPConnection
 import json
 from pathlib import Path
 import socket
@@ -49,7 +49,7 @@ def run(directory):
             if body is not None:
                 headers.update({'Content-Type':'application/json','X-VAF-Request-ID':rid})
                 if csrf:headers['X-VAF-CSRF']=token
-            with closing(http.client.HTTPConnection('127.0.0.1',port,timeout=3)) as client:
+            with closing(HTTPConnection('127.0.0.1',port,timeout=3)) as client:
                 client.request('GET' if body is None else 'POST','/api/'+path,
                     None if body is None else json.dumps(body),headers)
                 response=client.getresponse();return response.status,json.loads(response.read())
