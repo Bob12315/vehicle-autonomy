@@ -5,6 +5,7 @@ from dataclasses import asdict
 import hashlib
 import json
 import time
+from threading import RLock
 from uuid import uuid4
 
 
@@ -21,20 +22,33 @@ class ProposalService:
         self.registered = tuple(registered)
         self.clock = clock
         self.pending = {}
+        self.lock = RLock()
+        self.in_flight = 0
 
     def propose(self, text):
-        if len(self.pending) >= 256:
-            raise ValueError('proposal session budget exhausted; restart operator console')
-        state = self.application.handle('status', {})
-        proposal = self.adapter.propose(text, self.registered)
-        identifier = uuid4().hex
-        result = {'id': identifier, **asdict(proposal), 'expires_in_s': 60,
-                  'requires_human_approval': True, 'executed': False}
-        self.pending[identifier] = {'result': result, 'context': context_key(state),
-                                   'deadline': self.clock() + 60, 'consumed': False}
-        return result
+        with self.lock:
+            if len(self.pending) + self.in_flight >= 256:
+                raise ValueError('proposal session budget exhausted; restart operator console')
+            self.in_flight += 1
+        try:
+            state = self.application.handle('status', {})
+            proposal = self.adapter.propose(text, self.registered)
+            identifier = uuid4().hex
+            result = {'id': identifier, **asdict(proposal), 'expires_in_s': 60,
+                      'requires_human_approval': True, 'executed': False}
+            with self.lock:
+                self.pending[identifier] = {'result': result, 'context': context_key(state),
+                                           'deadline': self.clock() + 60, 'consumed': False}
+            return result
+        finally:
+            with self.lock:
+                self.in_flight -= 1
 
     def approve(self, identifier, human_approved):
+        with self.lock:
+            return self._approve(identifier, human_approved)
+
+    def _approve(self, identifier, human_approved):
         entry = self.pending.get(identifier)
         if human_approved is not True or entry is None:
             raise ValueError('explicit human approval of a known proposal required')

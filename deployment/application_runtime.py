@@ -275,6 +275,14 @@ class ApplicationRuntime:
                     "deadline_ns": envelope.deadline.monotonic_ns} for key,envelope in self.envelopes.items()},
                 "stops": self.stops}
 
+    def map_view(self):
+        world = self.vehicle.world_snapshot()
+        if self.mapping is None or world is None or world.map is None or not self.mapping.health.get('valid'):
+            raise ValueError('fresh adopted map required')
+        # Public read-only export. Loading a saved preview never sets WorldSnapshot.map.
+        grid = self.mapping.store.load(self.mapping.health['sha256'])
+        return {'grid': grid.document(), 'metadata': dict(self.mapping.health), 'control_eligible': False}
+
     def get_status(self, *, include_task=True):
         world = self.vehicle.world_snapshot()
         now = self.vehicle.clock()
@@ -286,6 +294,9 @@ class ApplicationRuntime:
             except ValueError as exc:origin_error=str(exc)
         twist = state.reported_twist if state else None
         return {"profile": self.profile_name, "vehicle_kind": self.profile.kind,
+                "missions": sorted(set(self.plans) | set(MISSION_NAMES) |
+                    ({'follow_path'} if self.navigation is not None else set()) |
+                    ({'navigate:'+name for name in self.navigation_goals.goals} if self.navigation_goals is not None else set())),
                 "clock_domain_id": str(now.clock_domain_id),
                 "state": self.state, "started_at": self.started_at, "session_id": self.vehicle.session_id,
                 "connected": self.vehicle.connected, "error": self.error,"shutdown_error":self.shutdown_error,

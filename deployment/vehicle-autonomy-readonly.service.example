@@ -1,0 +1,15 @@
+# Optional user service template. Never installed/enabled automatically.
+[Unit]
+Description=Vehicle Autonomy receive-only diagnostics
+
+[Service]
+Type=simple
+WorkingDirectory=/home/pi/vehicle-autonomy/current
+ExecStart=/home/pi/vehicle-autonomy/venv/bin/python -m deployment.onboard supervise
+Restart=no
+NoNewPrivileges=true
+UMask=0077
+TimeoutStopSec=15
+
+[Install]
+WantedBy=default.target
