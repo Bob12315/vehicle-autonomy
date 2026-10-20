@@ -1,0 +1,6 @@
+# Isolated onboard Python environment. No kernel/ROS/firmware changes.
+tomli==2.2.1; python_version < "3.11"
+pymavlink==2.4.49
+pyserial==3.5
+# Optional video uses distribution python3-opencv (board: 4.5.4).
+# ROS2/SLAM/Nav2 remain external optional stacks; see hardware deployment guide.

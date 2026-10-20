@@ -4,7 +4,10 @@ import hashlib
 import math
 from pathlib import Path
 import re
-import tomllib
+try:
+    import tomllib
+except ModuleNotFoundError:  # Ubuntu 22.04 / Python 3.10, isolated dependency
+    import tomli as tomllib
 
 
 @dataclass(frozen=True,slots=True)

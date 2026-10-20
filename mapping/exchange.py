@@ -7,7 +7,10 @@ import json
 import os
 from pathlib import Path
 import stat
-import tomllib
+try:
+    import tomllib
+except ModuleNotFoundError:  # Ubuntu 22.04 / Python 3.10, isolated dependency
+    import tomli as tomllib
 
 from contracts.core.primitives import ResourceVersion
 from contracts.core.time import TimePoint

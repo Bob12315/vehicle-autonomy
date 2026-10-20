@@ -1,6 +1,9 @@
 """Finite application-owned mission recipes; no raw coordinates or ports."""
 from pathlib import Path
-import tomllib
+try:
+    import tomllib
+except ModuleNotFoundError:  # Ubuntu 22.04 / Python 3.10, isolated dependency
+    import tomli as tomllib
 from actions.basic import BasicParameters
 from contracts.decision import MissionPlan, MissionStep
 from core.sitl_mode_action import SITL_MODE_SPEC, SitlModeParameters

@@ -4,7 +4,10 @@ from dataclasses import dataclass, replace
 import hashlib
 import math
 from pathlib import Path
-import tomllib
+try:
+    import tomllib
+except ModuleNotFoundError:  # Ubuntu 22.04 / Python 3.10, isolated dependency
+    import tomli as tomllib
 from contracts.core.geometry import FrameId, GeoPoint, Vector3
 from contracts.core.primitives import ResourceVersion
 from contracts.world.models import ResourceReference

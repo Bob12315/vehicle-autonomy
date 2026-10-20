@@ -1,6 +1,10 @@
 """Validated pinhole/plane geometry; pixel labels alone cannot create a target."""
 from dataclasses import dataclass
-import hashlib,math,tomllib
+import hashlib,math
+try:
+    import tomllib
+except ModuleNotFoundError:
+    import tomli as tomllib
 from contracts.core.geometry import Vector3,Transform3,Quaternion
 from core.transform import rotate_vector
 

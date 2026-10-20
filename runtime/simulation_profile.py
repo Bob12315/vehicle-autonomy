@@ -4,7 +4,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-import tomllib
+try:
+    import tomllib
+except ModuleNotFoundError:  # Ubuntu 22.04 / Python 3.10, isolated dependency
+    import tomli as tomllib
 
 from contracts.core.geometry import FrameId
 from core.vehicle_safety import SafetyLimits

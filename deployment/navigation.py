@@ -12,7 +12,10 @@ import math
 import os
 from pathlib import Path
 import stat
-import tomllib
+try:
+    import tomllib
+except ModuleNotFoundError:  # Ubuntu 22.04 / Python 3.10, isolated dependency
+    import tomli as tomllib
 
 from actions.basic import yaw
 from actions.path_following import TrackingParameters

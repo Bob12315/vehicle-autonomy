@@ -14,6 +14,16 @@ class RuntimeService:
         self.coordinator = coordinator
 
     def handle(self, command: str, payload: dict) -> dict:
+        if command == 'camera' and payload == {}:
+            camera = getattr(self.coordinator, 'camera_frame', None)
+            if camera is None:
+                raise ValueError('this composition has no live camera use case')
+            return camera()
+        if command == 'map' and payload == {}:
+            map_view = getattr(self.coordinator, 'map_view', None)
+            if map_view is None:
+                raise ValueError('this composition has no adopted map')
+            return map_view()
         if command=='anchor':
             if set(payload)!={'path'} or type(payload['path']) is not str:
                 raise ValueError('anchor requires only an explicit output path')

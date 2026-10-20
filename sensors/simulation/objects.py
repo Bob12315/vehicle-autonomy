@@ -6,7 +6,10 @@ import hashlib
 import re
 from threading import Lock
 import time
-import tomllib
+try:
+    import tomllib
+except ModuleNotFoundError:  # Ubuntu 22.04 / Python 3.10, isolated dependency
+    import tomli as tomllib
 from uuid import uuid4
 from contracts.core.geometry import Transform3, Quaternion, Vector3
 from contracts.core.primitives import SchemaVersion

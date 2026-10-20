@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "mode": "simulation",
+  "system_send": false,
+  "action_send": false,
+  "telemetry": null,
+  "camera": null,
+  "lidar_exchange": null,
+  "period_s": 0.1
+}
