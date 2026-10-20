@@ -136,8 +136,13 @@ never active control. There is no hardware navigation-mode switch or resume.
 
 The new near-field collision monitor supplies conservative stop/slowdown
 recommendations and rejects missing forward coverage, stale scans and failed
-localization. **It is not yet wired into a hardware Execution guard or a live
-Nav2 obstacle layer.** Real dynamic avoidance, physical braking, motion-mode
+localization. `deployment.collision_guard.ScanWriteGuard` can be explicitly
+injected into the existing simulation writer with an admitted base_link scan
+reader; offline writer tests reject sudden obstacles after queue admission and
+preserve the original Stop path. It conservatively rejects reverse/turning and
+requires upstream guidance to lower speed; it cannot mutate a command or grant
+authority. **No default or hardware composition installs this guard, and no live
+Nav2 obstacle layer is configured.** Real dynamic avoidance, physical braking, motion-mode
 switching and complete scan-to-stop hardware fault injection remain unimplemented
 or unqualified. Ordinary GPS is not precise local obstacle-avoidance localization.
 
