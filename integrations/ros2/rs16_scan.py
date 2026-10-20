@@ -41,6 +41,7 @@ def main():
     last_exchange=None
     rejected=0
     observed=[]
+    last_ros_stamp=None
 
     def write_health(error=None):
         now=TimePoint(time.monotonic_ns(),datetime.now(timezone.utc),domain)
@@ -51,11 +52,14 @@ def main():
         temporary.write_text(json.dumps(health));temporary.replace(args.health_file)
 
     def consume(message, *, raw=None):
-        nonlocal count,rejected
+        nonlocal count,rejected,last_ros_stamp
         count+=1
         received=time.monotonic_ns()
         capture=(received-(node.get_clock().now().nanoseconds-(message.header.stamp.sec*1_000_000_000+message.header.stamp.nanosec))) if raw is None else raw['capture_ns']
         try:
+            source_stamp=message.header.stamp.sec*1_000_000_000+message.header.stamp.nanosec
+            if raw is None and last_ros_stamp is not None and source_stamp<=last_ros_stamp:
+                raise ValueError('duplicate or regressed ROS source capture stamp')
             points=(tuple(float(v) for v in p) for p in point_cloud2.read_points(message,field_names=('x','y','z'),skip_nans=False))
             observation=processor.convert(points,frame=message.header.frame_id,
                 sequence=count if raw is None else raw['sequence'],
@@ -68,6 +72,7 @@ def main():
             scan.range_min=data.range_min;scan.range_max=data.range_max
             scan.ranges=[math.nan if r is None else r for r in data.ranges]
             publisher.publish(scan)
+            if raw is None:last_ros_stamp=source_stamp
             observed.append(min(r for r in data.ranges if r is not None))
             del observed[:-20]
             write_health()
