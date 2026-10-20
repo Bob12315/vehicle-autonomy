@@ -6,7 +6,9 @@ Vehicle Autonomy Framework 是面向多旋翼、无人车、固定翼、VTOL 及
 
 ## 当前实现
 
-根目录目前提供 P1 基础合同、P2 离线 World Model 状态链、P3 Typed Action/Mission 决策链、P4 控制边界、P5 ArduCopter/MAVLink/TCP 插件，以及 P6 本机 SITL 单进程模式任务运行组合。通用 TransformTree 求解静态/动态 Frame 关系。P5 已在内存传输、本机 Copter SITL 和已连接 Copter 飞控的受限 USB 模式诊断中验证；此前还完成 Rover 飞控的受限 USB HOLD 诊断。P6 将 Effect 经双 SEND、Lease、Safety 和唯一 writer 分派，并等待 ACK 与后续模式状态。**尚无**经过整车实机验收的生产车辆连接、Web UI、真实相机设备采集或服务器部署。
+根目录目前提供 P1 基础合同、P2 离线 World Model 状态链、P3 Typed Action/Mission 决策链、P4 控制边界、P5 ArduCopter/MAVLink/TCP 插件，以及 P6 本机 SITL 单进程模式任务运行组合。通用 TransformTree 求解静态/动态 Frame 关系。P5 已在内存传输、本机 Copter SITL 和已连接 Copter 飞控的受限 USB 模式诊断中验证；此前还完成 Rover 飞控的受限 USB HOLD 诊断。P6 将 Effect 经双 SEND、Lease、Safety 和唯一 writer 分派，并等待 ACK 与后续模式状态。新增显式机载只读部署、认证 Web 控制台和 LLM 提案适配；**尚无经过整车安全验收的生产运动连接**。
+
+2026-10-21 Hardware-Ready 开发：NanoPC-T6/ARM64 的只读应用和 Web 已实际启动，官方 RS16 驱动适配器在 PC/ARM64 编译，真实服务器 LLM 提案已验证。P26 的 10 分钟/100 任务资源门槛通过，但统一导航回归发现越轨和定位新鲜度失败，**P26 尚未通过**。真实 LiDAR/Camera/飞控输入、主动地图定位、实车动态避障与运动验收仍阻塞。详见 [最终审计](docs/HARDWARE_READY_AUDIT.md)、[启动部署说明](docs/hardware_deployment.md)及[首次接车清单](docs/FIRST_VEHICLE_TEST_CHECKLIST.md)。`hardware_controlled` 配置会被拒绝，不能通过修改 SEND 字段解锁。
 
 车辆基础仿真新增了共享 `SimulationRuntime`、完整 Rover 插件和两主动轮/两后万向轮模型。Copter、Rover 正常动作与故障场景已通过四轮完整回归；**本轮基础车辆控制 Simulation Complete：PASS**，见[审计记录](docs/simulation/completion-audit.md)。
 

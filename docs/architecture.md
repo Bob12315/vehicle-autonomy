@@ -4,6 +4,40 @@ This page describes the **implemented root**. The reusable framework's full
 target responsibilities and dependency rules are in [Vehicle Autonomy Framework
 V1: target architecture](framework_v1.md).
 
+## Explicit onboard diagnostics and operator console (2026-10-21)
+
+`app.hardware` composes a separate `HardwareReadOnlyRuntime`, bounded sensor
+workers and receive-only Rover telemetry. It constructs no VehicleCommandPort,
+ControlAuthority grant or MAVLink sender. Unknown serial/camera/lidar sources
+remain null; capture time and physical Stop remain unknown. The controlled
+hardware profile is rejected before opening devices. Python 3.10 uses an
+isolated tomli backport; framework Core and frozen foundation contracts are
+unchanged.
+
+`app.web` injects the existing Unix Application client into OperatorService.
+The HTTP listener is loopback-only with a private Bearer token, custom CSRF
+header, Host/Origin checks, bounded workers/requests, operation audit and
+non-evicting mutation IDs. Session-checked start is evaluated inside one
+Application event-loop request. Original CLI start semantics remain available.
+The console cannot submit Effects or obtain a vehicle writer. Saved maps and
+clicked waypoints are previews/drafts, never implicit localization or authority.
+
+LLM adapters return strict MissionProposal JSON, restricted to registered
+missions. Approval is finite, human-confirmed, one-shot and session/environment
+bound; this release allows execution only through an authorized simulation
+Application. Hardware remains read-only. Remote inference does not hold the
+operator cancellation lock or participate in the vehicle cycle.
+
+The official pinned rs_driver adapter writes bounded same-host diagnostic
+cloud envelopes. An optional ROS sidecar produces PointCloud2/LaserScan and
+immutable Observation data with explicit provenance and frame/time checks.
+No physical mount transform or hardware clock qualification is inferred.
+`ScanWriteGuard` is an explicit rejection-only adapter for the existing writer;
+it has offline queue/fault tests, but no default/hardware scan-control or live
+Nav2 obstacle-layer composition. Real GPS/map navigation and physical braking
+remain unqualified. [Audit](HARDWARE_READY_AUDIT.md) records current failures;
+historical P21–P25 PASS does not override the new P26 FAIL.
+
 The root has no automatically opened hardware connection. Its implemented path is:
 
 ```text
