@@ -21,6 +21,7 @@ def main():
     parser.add_argument('--health-file',type=Path,required=True)
     parser.add_argument('--exchange',type=Path,help='same-host official native SDK exchange; publishes PointCloud2')
     parser.add_argument('--self-test',action='store_true',help='explicit synthetic ROS software fixture, never hardware evidence')
+    parser.add_argument('--replay',action='store_true',help='explicit rosbag --clock input, never a live hardware claim')
     args=parser.parse_args()
     config=ScanConfig(**json.loads(Path(args.config).read_text()))
     import rclpy
@@ -30,7 +31,8 @@ def main():
     from sensor_msgs_py import point_cloud2
     from std_msgs.msg import Header
     rclpy.init()
-    node=Node('vaf_rs16_scan')
+    from rclpy.parameter import Parameter
+    node=Node('vaf_rs16_scan',parameter_overrides=[Parameter('use_sim_time',Parameter.Type.BOOL,args.replay)])
     domain=Path('/proc/sys/kernel/random/boot_id').read_text().strip()
     processor=ScanProcessor(config,'robosense.ros2',uuid4().hex)
     publisher=node.create_publisher(LaserScan,args.scan_topic,qos_profile_sensor_data)
@@ -42,7 +44,7 @@ def main():
 
     def write_health(error=None):
         now=TimePoint(time.monotonic_ns(),datetime.now(timezone.utc),domain)
-        health={**processor.health(now),'scope':'synthetic_ros_software_fixture' if args.self_test else 'SDK ROS input; mount/time unqualified',
+        health={**processor.health(now),'scope':'synthetic_ros_software_fixture' if args.self_test else 'rosbag_replay' if args.replay else 'SDK ROS input; mount/time unqualified',
                 'control_eligible':False,'rejected':rejected}
         if error:health.update(error=error,online=False)
         temporary=args.health_file.with_suffix('.tmp')
@@ -52,7 +54,7 @@ def main():
         nonlocal count,rejected
         count+=1
         received=time.monotonic_ns()
-        capture=(received-(time.time_ns()-(message.header.stamp.sec*1_000_000_000+message.header.stamp.nanosec))) if raw is None else raw['capture_ns']
+        capture=(received-(node.get_clock().now().nanoseconds-(message.header.stamp.sec*1_000_000_000+message.header.stamp.nanosec))) if raw is None else raw['capture_ns']
         try:
             points=(tuple(float(v) for v in p) for p in point_cloud2.read_points(message,field_names=('x','y','z'),skip_nans=False))
             observation=processor.convert(points,frame=message.header.frame_id,
