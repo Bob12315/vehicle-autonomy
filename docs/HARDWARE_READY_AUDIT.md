@@ -2,6 +2,8 @@
 
 日期：2026-10-21，Asia/Ulaanbaatar。**已交付并部署硬件只读应用；尚未达到完整
 Hardware-Ready Simulation 验收。P26 统一导航门槛 FAIL，真实车辆运动 BLOCKED。**
+最终安装运行版本为 `8b8f61a`，后续本地提交仅补充审计证据。板端最终 255 项非 Gazebo 测试、认证/幂等/报告页面/真实 LLM 和 ARM SDK 无输入诊断均再次通过。
+
 软件可部署不等于真实车辆已通过安全验收。本轮没有向真实飞控发送解锁、模式、
 运动、电机或参数请求，没有改管理网络、内核、飞控固件或旧 CUADC/legacy。
 所有运动测试均为本次进程拥有的 localhost SITL/Gazebo；没有自动 push。
@@ -24,7 +26,7 @@ BLOCKED 包括外部条件不足或所需软件组合尚未实现，原因逐项
 | P28 点云/扫描与异常软件链 | PASS | ROS 合成测试接受 6 帧、拒绝错误 Frame/过期帧各 1；typed 单元覆盖丢失、重排、epoch/boot、不合格点、时间/覆盖/地面/自遮挡过滤。明确为软件测试。 |
 | P28 真实 RS16 / PCAP / rosbag | BLOCKED | eth0 无载波；未取得真实 UDP/PCAP/rosbag；被动抓包曾因权限失败。板端编译禁用 PCAP，未装 libpcap 开发依赖。不能把无输入退出码 3 算真实雷达 PASS。 |
 | P28 Camera 采集软件与记录源 | PASS | 实际记录视频 worker/JPEG/健康、失效与进程清理测试，记录源明确标记 recording。 |
-| P28 真实 Camera | BLOCKED | `/dev/video22`、`/dev/video31`、HDMI `/dev/video40` 实际探测均 0 帧、无法打开。ISP 节点不能证明已连接摄像头。型号、接口、曝光/标定仍未知。 |
+| P28 真实 Camera | BLOCKED | `/dev/video22`、`/dev/video31`、HDMI `/dev/video40` 实际探测均 0 帧、无法打开。ISP 节点不能证明已连接摄像头。型号、接口、曝光/标定仍未知，实时采集到现有视觉感知 Observation 的软件装配也尚未完成。 |
 | P29 GPS/EKF 诊断软件 | PASS | 接收适配不发 MAVLink，源/epoch、NED→ENU 速度、GPS 质量/跳变、过期与非有限值拒绝有单元证据。 |
 | P29 实车 GPS Navigation | BLOCKED | 未发现 USB 飞控；UART 接线未知。真实 EKF/原点/围栏/采集时钟和制动未验收。普通 GPS 不作为精确局部避障定位。 |
 | P29 实车 LiDAR Map Navigation/模式切换 | BLOCKED | 无实际扫描/外参/地图及独立定位精度；活动 SLAM、地图重定位和硬件模式切换软件组合未完成，候选始终禁止控制。 |
@@ -63,8 +65,9 @@ inode 与本进程此前观察一致时清理。应用/操作审计日志轮转�
 - `d5c6b23` 尝试提前恢复平滑跟踪余量：减速并加强有界转向反馈，保持 0.15 m
   writer guard、70 s 期限及原速度/转向上限。55 项相关测试通过；实际复测
   `/tmp/vaf-fixed-tracking-1/` 被 0.119664 m 地图对齐变化阻断，随后无并行 Gazebo 的串行复测 `/tmp/vaf-fixed-tracking-serial/` 又触发原 70 s `navigation_deadline_exceeded`，因此**候选未通过物理复测，已撤回默认策略改动**；候选实现/专属单元仍保留在 Git 历史，所有原 P26 mandatory 测试和门槛保持。
-- 当前新增功能的 PC 全量门槛：284 项，0 失败/错误/跳过。板端 `d5c6b23` 的独立
-  非 Gazebo profile 为 255 项、0 跳过。不能将这两组计数与 P26 冻结版 260 项混用。
+- 当前新增功能的 PC 全量门槛：284 项，0 失败/错误/跳过。板端最终部署 `8b8f61a` 的独立
+  非 Gazebo profile 为 255 项、0 失败/错误/跳过。实际运行源码逐文件核对 290 个文件，
+  代码指纹 `cc414864f2258dba8fb9fdc83b37a479a79f25b14a1f624ae050c584ebaf1f5c` 完全一致。不能将这两组计数与 P26 冻结版 260 项混用。
 - P26 复用已审查的 SITL 二进制 `suite-e8ba09fa/build/ardupilot/sitl/bin`，本轮没有
   宣称从空目录重新构建 ArduPilot/Gazebo。每个场景保留实际源 SHA、配置 SHA、
   world/端口/PID、状态与独立真值，清理不通过即场景 FAIL。
@@ -90,7 +93,7 @@ inode 与本进程此前观察一致时清理。应用/操作审计日志轮转�
 重规划场景状态捕获年龄 570.845 ms，原 500 ms 门槛拒绝；同期间独立跟踪复测也在
 运行，可能影响仿真实时性，但**没有足够证据将失败归因于负载并免除门槛**。
 独立跟踪复测还触发地图对齐变化；候选串行复测又到达原期限。SLAM/里程计对齐及跟踪的重复稳定性仍需修复和单独重验。
-旧通过记录不能覆盖本轮失败。仍须完整新版本回归，P26 保持 FAIL。
+最新发布源码 `8b8f61a` 在无并行 Gazebo 的独立重规划复测中 PASS：49.138 s 到达、2 次 native job 释放，5.720 s 确认旧运动停车，最大真值偏差 0.046795 m、终点误差 0.177243 m。此结果是单独 follow-up，不替换原统一门槛；不能据此认定早先超时只由负载造成。旧通过记录和单项重测不能覆盖本轮完整运行失败。仍须修复跟踪并完整重验，P26 保持 FAIL。
 
 ## LLM 实测
 

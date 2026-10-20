@@ -184,7 +184,7 @@ vehicle/safety loop.
 ```bash
 # PC, full framework units (no skipped tests):
 python -m unittest discover -s tests -q
-# PC, unified mandatory simulation gates, original frozen P26 commit:
+# PC, unified mandatory simulation gates (exact original run: isolated checkout of 9750c50):
 VAF_SIMULATION_SITL_BIN_DIR=/absolute/reviewed/sitl/bin \
   ./scripts/test_hardware_ready_simulation.sh --allow-send --run-dir /tmp/vaf26-NEW
 # Explicit synthetic ROS software test, never a real RS16 claim:

@@ -1142,6 +1142,262 @@
     "artifacts/hardware-ready/supervisor-crash.log": "6bc0cc46c2301ffc7b58ea9a10af97b3b580c4fdaece9ffc4700f75f82149c26",
     "artifacts/hardware-ready/web-map-tests.log": "1be79fdd0e7257d04430a3c2ee7876157d60ad252da3cd08b90e9031379bf184",
     "artifacts/hardware-ready/rs16-ros-final.log": "b726d022f8b54365b99cc8b4a80a0ca55d10a07dd7a2a0f4a3495c799554d5f9",
-    "artifacts/hardware-ready/rs16-noinput.json": "a55bab1df87f7f5dcb0f772040a97de70db3799bdaa40a5e86e3183c3339465f"
+    "artifacts/hardware-ready/rs16-noinput.json": "a55bab1df87f7f5dcb0f772040a97de70db3799bdaa40a5e86e3183c3339465f",
+    "artifacts/hardware-ready/board-release-unit.json": "6498632594de9ef785d349551406c234bb1ba570b101d5381f2123a48e416418",
+    "artifacts/hardware-ready/board-final-application.json": "0a1eb8aa980c90fdb5f5fe94fa274028abb54eaafe5c2c1eff6591fdde533581",
+    "artifacts/hardware-ready/board-final-smoke.jsonl": "f667bd0aad06b097db343ad1f852ea46b409883ad05c8a4abcd07d3e9a4e564c",
+    "artifacts/hardware-ready/board-final-smoke-exit.json": "628ba459d4cb161044630f2cb9a09fb4f5bbba81f9d2693fe7b2e377848b0891",
+    "artifacts/hardware-ready/replan-solo.log": "36eac7cbf76f05794579805fba22dca337d6343049994c6ac8a5f69a99110314"
+  },
+  "installed_release": {
+    "commit": "8b8f61acc0da42ec4b249629e369492291fe40fd",
+    "path": "/home/pi/vehicle-autonomy/releases/8b8f61acc0da42ec4b249629e369492291fe40fd",
+    "application_running": true,
+    "mode": "hardware_readonly",
+    "system_send": false,
+    "action_send": false,
+    "verified_code_sha256": "cc414864f2258dba8fb9fdc83b37a479a79f25b14a1f624ae050c584ebaf1f5c"
+  },
+  "onboard_release_profile": {
+    "passed": true,
+    "profile": "onboard_non_gazebo",
+    "tests": 255,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "modules": [
+      "tests.test_application_control",
+      "tests.test_application_runtime",
+      "tests.test_autonomy_business",
+      "tests.test_basic_actions",
+      "tests.test_basic_missions",
+      "tests.test_collision_writer",
+      "tests.test_cuadc_actions",
+      "tests.test_environment",
+      "tests.test_foundation_contracts",
+      "tests.test_framework",
+      "tests.test_goal_navigation",
+      "tests.test_hardware_readonly",
+      "tests.test_lidar_safety",
+      "tests.test_live_camera",
+      "tests.test_llm_proposals",
+      "tests.test_map_reliability",
+      "tests.test_mapping",
+      "tests.test_mavlink_state_adapter",
+      "tests.test_navigation_models",
+      "tests.test_onboard_supervisor",
+      "tests.test_online_localization",
+      "tests.test_p2_state_chain",
+      "tests.test_p3_decision",
+      "tests.test_p4_control",
+      "tests.test_p5_mavlink",
+      "tests.test_p6_sitl_runtime",
+      "tests.test_path_following",
+      "tests.test_payload_contracts",
+      "tests.test_payload_execution",
+      "tests.test_planning",
+      "tests.test_recorded_camera",
+      "tests.test_rover_model",
+      "tests.test_rover_plugin",
+      "tests.test_sim_objects",
+      "tests.test_simulation_profile",
+      "tests.test_simulation_runtime",
+      "tests.test_simulation_safety",
+      "tests.test_sitl_arm_mission",
+      "tests.test_transform",
+      "tests.test_vision_geometry",
+      "tests.test_web_console"
+    ],
+    "external_gates": {
+      "tests.test_gazebo_oracle": "PC P26 mandatory; Gazebo bindings unavailable on board",
+      "tests.simulation.*": "PC P26 mandatory; owned SITL/Gazebo/toolchain checkouts are PC-only"
+    },
+    "physical_vehicle_io": "none; actual serial source configuration remains null"
+  },
+  "onboard_final_smoke": [
+    {
+      "case": "release_code_hash",
+      "passed": true,
+      "sha256": "cc414864f2258dba8fb9fdc83b37a479a79f25b14a1f624ae050c584ebaf1f5c",
+      "source_commit": "8b8f61acc0da42ec4b249629e369492291fe40fd"
+    },
+    {
+      "case": "onboard_http_readonly_auth_stop_idempotence_report",
+      "passed": true,
+      "session_id": "cb6fa4873dde4f2db2b5e487f73dd97b",
+      "report_source": "8b8f61acc0da42ec4b249629e369492291fe40fd",
+      "physical_stop": "UNCONFIRMED"
+    },
+    {
+      "case": "onboard_actual_llm",
+      "passed": true,
+      "proposal": {
+        "id": "36ccaed585be45e694d9e993a8d350f2",
+        "decision": "reject",
+        "mission": null,
+        "reason": "无已注册任务可执行，且要求保持停车不执行动作",
+        "expires_in_s": 60,
+        "requires_human_approval": true,
+        "executed": false
+      }
+    },
+    {
+      "case": "arm_sdk_noinput",
+      "passed": true,
+      "exit": 3,
+      "decoded_clouds": 0,
+      "physical_lidar_acceptance": "BLOCKED",
+      "stderr": "ERRCODE_MSOPTIMEOUT\nERRCODE_MSOPTIMEOUT\ndecoded_clouds=0"
+    }
+  ],
+  "onboard_final_smoke_exit": {
+    "exit": 0,
+    "stderr": ""
+  },
+  "replan_serial_followup": {
+    "scope": "final source, no parallel Gazebo; does not replace original failed unified gate",
+    "source_commit": "8b8f61acc0da42ec4b249629e369492291fe40fd",
+    "source_hash": "d854bba6bb4c31a05ea5165ceb9d7fb2c2cda4514b83609d096b087847701224",
+    "report": {
+      "passed": true,
+      "case": "replan",
+      "lidar_rays": 4096,
+      "room_yaw_rad": 0.15,
+      "navigation_model": {
+        "model_id": "target_rover_front_axle_v1",
+        "revision": 1,
+        "reference_point": "front_drive_axle",
+        "base_to_reference_x_m": 0.25,
+        "footprint_radius_m": 0.72,
+        "path_clearance_m": 0.95,
+        "cross_track_m": 0.15,
+        "max_speed_mps": 0.18,
+        "max_yaw_rate_rps": 0.25,
+        "capabilities": [
+          "arm",
+          "disarm",
+          "hold",
+          "navigation",
+          "stop"
+        ],
+        "motion_effects": [
+          "TwistTargetEffect",
+          "StopMotionEffect"
+        ]
+      },
+      "navigation_model_sha256": "91157eec87cfcaadafff151c87a394e76aef24bdf4802f3dd893025fce1ee1c4",
+      "actual_geometry": {
+        "axle_x_m": 0.25,
+        "track_m": 0.52,
+        "radius_m": 0.6904582237981457,
+        "sdf_sha256": "f37a5ad3a78dcf93b2ff7424db2145f4a8c90a641551be7f04171c88b07b3772"
+      },
+      "map_alignment": "telemetry_odometry; scan matching explicitly disabled for changing scene",
+      "plan": {
+        "request_id": "c775e1b1bbbb4aee9835307e0f905e0e",
+        "length_m": 2.6762218930398403,
+        "poses": 53,
+        "clearance_m": 1.05
+      },
+      "task_id": "navigation:f901c67474fa4099a3363c786fc7cbd2",
+      "new_obstacle": [
+        -0.7398832379699003,
+        1.2592146058824074,
+        0.12,
+        0.12
+      ],
+      "task": {
+        "task_id": "navigation:f901c67474fa4099a3363c786fc7cbd2",
+        "mission": "navigate:POINT_A",
+        "configuration_sha256": "a39cf9ed289e973eaa34b2a123e025c0aa8a4f47b6c5e549ce51d7bbc87533f9",
+        "status": "SUCCEEDED",
+        "step": null,
+        "error": null,
+        "steps": [
+          {
+            "step": "mode",
+            "reason": "SUCCEEDED",
+            "error": null
+          },
+          {
+            "step": "arm",
+            "reason": "SUCCEEDED",
+            "error": null
+          },
+          {
+            "step": "follow_path",
+            "reason": "SUCCEEDED",
+            "error": null
+          },
+          {
+            "step": "disarm",
+            "reason": "SUCCEEDED",
+            "error": null
+          }
+        ],
+        "stops": {}
+      },
+      "effect_count": 109,
+      "stop_speed_mps": 0.0,
+      "stop_yaw_rate_rps": 0.0,
+      "navigation": {
+        "configured": true,
+        "active": false,
+        "allow_reverse": false,
+        "reverse_limit_mps": 0,
+        "request_id": null,
+        "error": "navigation_not_admitted",
+        "last_error": null,
+        "alignment_drift_m": 5.96489167447851e-10,
+        "map_revalidations": 19,
+        "model": "target_rover_front_axle_v1",
+        "model_sha256": "91157eec87cfcaadafff151c87a394e76aef24bdf4802f3dd893025fce1ee1c4",
+        "configuration_sha256": "7124a78b5235165cfc4a61e802dc549407b06acc8b7c6dc5fb7aef520e652122",
+        "base_to_reference_x_m": 0.25,
+        "required_clearance_m": 0.95,
+        "planning_start": {
+          "frame": "map",
+          "frame_epoch": "ad6dd3fc099149a3be4943224fc7a89c",
+          "reference_point": "front_drive_axle",
+          "position": [
+            0.4043884638500816,
+            2.320136274400399
+          ],
+          "captured_ns": 8369925184483
+        },
+        "progress_m": 2.441361752508549
+      },
+      "duration_s": 49.13820588,
+      "truth_max_cross_track_m": 0.04679414539971616,
+      "truth_min_pillar_clearance_m": 1.89018220853394,
+      "truth_min_new_obstacle_clearance_m": 1.073662424694799,
+      "truth_goal_error_m": 0.17724254311033277,
+      "direct_line_pillar_center_distance_m": 1.3208955043486363,
+      "planned_detour_from_direct_line_m": 0.14344334915462345,
+      "fault_to_confirmed_stop_s": 5.719787601,
+      "attempt": 2,
+      "history": [
+        {
+          "task_id": "application:b5ed0106271840b8b7fbc2cf0dae99b8",
+          "status": "FAILED",
+          "error": "navigation_path_blocked: path footprint intersects occupied, uncertain or unknown cells"
+        },
+        {
+          "task_id": "application:60946a67fd3646c78cd82774c8c01542",
+          "status": "SUCCEEDED",
+          "error": null
+        },
+        {
+          "task_id": "application:090f7fd2060647b0ad1afbcccce76692",
+          "status": "SUCCEEDED",
+          "error": null
+        }
+      ],
+      "native_jobs_released": 2
+    },
+    "ports_released": true,
+    "remaining_process_groups": [],
+    "retained_directory": "artifacts/simulation/hardware-ready-replan-serial",
+    "report_sha256": "a54a44b977e10de561ac2be8d7a7338c5ff8e74427486be0c00e2f5beed3436e"
   }
 }
