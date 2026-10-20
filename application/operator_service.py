@@ -28,7 +28,7 @@ class OperatorService:
             self.proposals = ProposalService(llm, application, missions)
 
     def handle(self, operation, payload):
-        if operation in ('status', 'camera', 'map'):
+        if operation in ('status', 'camera', 'map', 'reports'):
             if payload:
                 raise ValueError('read use case takes no payload')
             return self.application.handle(operation, {})
@@ -41,9 +41,12 @@ class OperatorService:
             return self.proposals.propose(payload['text'])
         with self.lock:
             if operation == 'start':
-                if set(payload) != {'mission'} or payload['mission'] not in self.missions:
+                if set(payload) != {'mission','expected_session'} or payload['mission'] not in self.missions:
                     raise ValueError('choose an explicitly registered operator mission')
-                return self.application.handle('start', payload)
+                state = self.application.handle('status', {})
+                if type(payload['expected_session']) is not str or payload['expected_session'] != state.get('session_id'):
+                    raise ValueError('application session changed; refresh and authorize a new request')
+                return self.application.handle('start_checked', payload)
             if operation == 'cancel':
                 if payload:
                     raise ValueError('cancel takes no payload')

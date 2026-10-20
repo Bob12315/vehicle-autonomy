@@ -41,7 +41,8 @@ class HardwareTests(unittest.TestCase):
                 self.assertFalse(state['connected'])
                 self.assertEqual(service.handle('cancel', {})['physical_stop'], 'UNCONFIRMED')
                 for cmd, payload in [('start', {'mission': 'basic_route'}), ('arm', {}),
-                                     ('mavlink', {}), ('camera', {})]:
+                                     ('mavlink', {}), ('camera', {}),
+                                     ('start_checked',{'mission':'basic_route','expected_session':'old'})]:
                     with self.assertRaises(ValueError):
                         service.handle(cmd, payload)
                 self.assertFalse(hasattr(runtime, 'vehicle'))

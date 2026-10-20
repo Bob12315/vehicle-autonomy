@@ -281,7 +281,11 @@ class ApplicationRuntime:
             raise ValueError('fresh adopted map required')
         # Public read-only export. Loading a saved preview never sets WorldSnapshot.map.
         grid = self.mapping.store.load(self.mapping.health['sha256'])
-        return {'grid': grid.document(), 'metadata': dict(self.mapping.health), 'control_eligible': False}
+        path=[]
+        if self.navigation is not None and self.navigation.parameters is not None and self.navigation.binding is not None:
+            path=[[point.x,point.y] for point in (self.navigation.binding.to_map(p) for p in self.navigation.parameters.poses)]
+        return {'grid': grid.document(), 'metadata': dict(self.mapping.health), 'path_frame':'map',
+                'path':path, 'control_eligible': False}
 
     def get_status(self, *, include_task=True):
         world = self.vehicle.world_snapshot()

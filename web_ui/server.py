@@ -9,6 +9,7 @@ from logging.handlers import RotatingFileHandler
 import os
 from pathlib import Path
 import secrets
+import re
 import stat
 import threading
 
@@ -40,6 +41,8 @@ class ConsoleServer(ThreadingHTTPServer):
             raise ValueError('console must bind loopback; use an authenticated SSH tunnel')
         self.service, self.token = service, token
         self.slots = threading.BoundedSemaphore(12)
+        self.requests = {}
+        self.request_lock = threading.RLock()
         self.audit = logging.getLogger('vaf.web.' + secrets.token_hex(8))
         self.audit.setLevel(logging.INFO)
         self.audit.propagate = False
@@ -119,7 +122,8 @@ class Handler(BaseHTTPRequestHandler):
             return
         if not self.authorized():
             return
-        routes = {'/api/status':'status','/api/map':'map','/api/camera':'camera','/api/waypoints':'waypoints'}
+        routes = {'/api/status':'status','/api/map':'map','/api/camera':'camera','/api/waypoints':'waypoints',
+                  '/api/reports':'reports'}
         if self.path == '/api/catalog':
             self.reply(200,{'ok':True,'result':list(self.server.service.missions)})
             return
@@ -149,9 +153,29 @@ class Handler(BaseHTTPRequestHandler):
         except (ValueError,TypeError) as exc:
             self.reply(400,{'ok':False,'error':str(exc)})
             return
+        if operation in ('start','approve','cancel'):
+            identifier = self.headers.get('X-VAF-Request-ID','')
+            if re.fullmatch(r'[A-Za-z0-9:_-]{1,128}',identifier) is None:
+                self.reply(400,{'ok':False,'error':'bounded mutation request ID required'})
+                return
+            canonical=json.dumps([operation,payload],sort_keys=True,allow_nan=False)
+            with self.server.request_lock:
+                if identifier in self.server.requests:
+                    old,code,response=self.server.requests[identifier]
+                    if old!=canonical:
+                        self.reply(409,{'ok':False,'error':'request ID reused with different content'})
+                    else:self.reply(code,response)
+                    return
+                if len(self.server.requests)>=4096:
+                    self.reply(409,{'ok':False,'error':'mutation budget exhausted; restart console and re-admit'})
+                    return
+                code,response=self.invoke(operation,payload,mutation=True,send=False)
+                self.server.requests[identifier]=canonical,code,response
+                self.reply(code,response)
+            return
         self.invoke(operation,payload,mutation=True)
 
-    def invoke(self, operation, payload, mutation=False):
+    def invoke(self, operation, payload, mutation=False, send=True):
         try:
             result = self.server.service.handle(operation,payload)
             response = {'ok':True,'result':result}
@@ -165,4 +189,5 @@ class Handler(BaseHTTPRequestHandler):
                 'mission':payload.get('mission') if operation=='start' else None,
                 'proposal_id':payload.get('id') if operation=='approve' else None,
                 'task_id':(response.get('result') or {}).get('task_id') if type(response.get('result')) is dict else None}))
-        self.reply(code,response)
+        if send:self.reply(code,response)
+        return code,response

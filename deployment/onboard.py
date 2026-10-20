@@ -7,6 +7,7 @@ import json
 import os
 from pathlib import Path
 import signal
+import stat
 import subprocess
 import sys
 import time
@@ -55,6 +56,7 @@ def supervise(args,directory):
     children=[]
     handles=[]
     stopping=False
+    socket_identity=None
     def stop(*_):
         nonlocal stopping
         stopping=True
@@ -77,6 +79,12 @@ def supervise(args,directory):
             children.append((name,child))
         metadata(directory/'children.json',[{'name':name,'pid':child.pid,'start_ticks':process_identity(child.pid)} for name,child in children])
         while not stopping:
+            if socket_identity is None:
+                try:
+                    info=(directory/'app.sock').lstat()
+                    if stat.S_ISSOCK(info.st_mode) and info.st_uid==os.getuid():
+                        socket_identity=info.st_ino
+                except FileNotFoundError:pass
             for name,child in children:
                 if child.poll() is not None:
                     raise RuntimeError(f'{name} exited {child.returncode}; read-only stack stopped, explicit restart required')
@@ -97,6 +105,13 @@ def supervise(args,directory):
                 os.killpg(child.pid,signal.SIGKILL);child.wait(timeout=2)
                 result.update(passed=False,cleanup_error=name+' exceeded shutdown deadline')
         for handle in handles:handle.close()
+        # SIGKILL cannot run the Application's finally block. Only remove the
+        # exact private socket observed while our own child was alive.
+        if socket_identity is not None:
+            try:
+                if (directory/'app.sock').lstat().st_ino==socket_identity:
+                    (directory/'app.sock').unlink()
+            except FileNotFoundError:pass
         metadata(directory/'last-stop.json',result)
         (directory/'supervisor.json').unlink(missing_ok=True)
         lock.close()

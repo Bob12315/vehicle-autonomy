@@ -12,7 +12,10 @@ class Application:
         self.starts=[]
     def handle(self, command, payload):
         if command=='status':return self.state
-        if command=='start':self.starts.append(payload);return {'started':True}
+        if command in ('start','start_checked'):
+            if command=='start_checked' and payload['expected_session']!=self.state['session_id']:
+                raise ValueError('session changed')
+            self.starts.append(payload);return {'started':True}
         raise ValueError(command)
 
 

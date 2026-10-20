@@ -6,6 +6,7 @@ from pathlib import Path
 import tempfile
 import threading
 import unittest
+from uuid import uuid4
 
 from application.operator_service import OperatorService
 from web_ui.server import ConsoleServer, load_token
@@ -26,7 +27,7 @@ class WebTests(unittest.TestCase):
     def call(self,path,body=None,**extra):
         headers={'Authorization':'Bearer '+self.token,'Host':f'127.0.0.1:{self.port}'}
         if body is not None:
-            headers.update({'Content-Type':'application/json','X-VAF-CSRF':self.token})
+            headers.update({'Content-Type':'application/json','X-VAF-CSRF':self.token,'X-VAF-Request-ID':uuid4().hex})
         headers.update(extra)
         with closing(http.client.HTTPConnection('127.0.0.1',self.port,timeout=3)) as client:
             client.request('POST' if body is not None else 'GET',path,
@@ -40,8 +41,12 @@ class WebTests(unittest.TestCase):
         self.assertEqual(self.call('/api/start',{'mission':'basic_route'},**{'X-VAF-CSRF':''})[0],403)
         self.assertEqual(self.call('/api/start',{'mission':'arm'})[0],409)
         self.assertEqual(self.backend.starts,[])
-        self.assertEqual(self.call('/api/start',{'mission':'basic_route'})[0],200)
+        payload={'mission':'basic_route','expected_session':'one'}
+        self.assertEqual(self.call('/api/start',payload,**{'X-VAF-Request-ID':'once'})[0],200)
+        self.assertEqual(self.call('/api/start',payload,**{'X-VAF-Request-ID':'once'})[0],200)
         self.assertEqual(len(self.backend.starts),1)
+        self.assertEqual(self.call('/api/start',{**payload,'expected_session':'old'},**{'X-VAF-Request-ID':'once'})[0],409)
+        self.assertEqual(self.call('/api/start',{**payload,'expected_session':'old'})[0],409)
         code,body,headers=self.call('/api/status')
         self.assertEqual(code,200);self.assertIn("frame-ancestors 'none'",headers['Content-Security-Policy'])
         self.assertEqual(headers['Cache-Control'],'no-store')

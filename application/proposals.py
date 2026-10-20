@@ -64,4 +64,5 @@ class ProposalService:
             raise ValueError('hardware motion remains disabled pending onsite acceptance')
         # Consume before mutation; a transport timeout must not trigger a blind retry.
         entry['consumed'] = True
-        return self.application.handle('start', {'mission': result['mission']})
+        return self.application.handle('start_checked', {'mission': result['mission'],
+                                                        'expected_session': state['session_id']})
