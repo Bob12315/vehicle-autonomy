@@ -138,14 +138,6 @@ class PolylineTracker:
                 speed = 0.
         elif abs(error) > .45:
             speed = 0.
-        # The original smooth chassis can understeer on a different valid
-        # staircase-shaped Nav2 path. Recover margin before the unchanged
-        # 0.15 m writer fence: slow translation and strengthen bounded heading
-        # feedback while preserving yaw braking. Keep a small positive crawl
-        # so a front-axle reference can converge after its heading is corrected.
-        if not self.stop_turn and distance > .06:
-            speed = min(speed, max(.025, .12 * (.13-distance)/.07))
-            rate = max(-rate_limit, min(rate_limit, .8*error-.75*measured_yaw_rate))
         if self.direction<0:speed=-min(speed,.1,self.model.max_speed_mps)
         return GuidanceOutput(0. if arrived else speed, 0. if arrived else rate,
                               self.progress, distance, arrived)
