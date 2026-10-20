@@ -52,7 +52,9 @@ def main():
     if len(os.fsencode(str(directory / '00/app.sock'))) >= 108:
         parser.error('use a shorter run directory for Unix sockets')
     directory.mkdir(parents=True, exist_ok=False)
-    runner = StageRunner(directory, total_timeout=7200)
+    env = dict(os.environ)
+    env['PYTHONPATH'] = str(ROOT) + (os.pathsep + env['PYTHONPATH'] if env.get('PYTHONPATH') else '')
+    runner = StageRunner(directory, total_timeout=7200, env=env)
     library = directory / 'boundary/libvaf_slam_boundary.so'
     matrix = cases(library)
     report = {'passed': False, 'started_at': datetime.now(timezone.utc).isoformat(),
