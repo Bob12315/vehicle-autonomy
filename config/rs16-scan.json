@@ -1,0 +1,11 @@
+{
+  "frame": "lidar",
+  "bins": 720,
+  "range_min": 0.2,
+  "range_max": 30.0,
+  "z_min": -0.2,
+  "z_max": 1.0,
+  "self_box": [],
+  "ground_z": null,
+  "ground_tolerance": 0.1
+}
