@@ -25,6 +25,14 @@ IDENTITY = Pose3(Vector3(0,0,0), Quaternion(0,0,0,1))
 
 
 class GuidanceTests(unittest.TestCase):
+    def test_smooth_tracking_recovers_margin_before_the_unchanged_writer_fence(self):
+        tracker=PolylineTracker((Pose2D(0,0),Pose2D(2,0)))
+        output=tracker.update(Pose2D(.3,.10,.2),measured_yaw_rate=0.)
+        self.assertLess(output.speed_mps,.06)
+        self.assertLess(output.yaw_rate_rps,-.15)
+        self.assertGreaterEqual(output.yaw_rate_rps,-.2)
+        self.assertAlmostEqual(output.cross_track_m,.10)
+        self.assertEqual(tracker.model.cross_track_m,.15)
     def test_drive_reference_matches_model_and_pivot_is_not_body_stationary(self):
         import xml.etree.ElementTree as ET
         from guidance.path_following import DRIVE_OFFSET_M, drive_reference
