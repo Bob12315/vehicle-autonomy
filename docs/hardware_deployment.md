@@ -11,6 +11,9 @@ current configured launcher is `scripts/onboard-connected.sh`; use
 [the connection setup](HARDWARE_CONNECTION_SETUP.md) for its state directory,
 observed device addresses, limitations and commands. Sections below preserve
 the initial empty-source template and initial deployment history.
+The revised Web UI now owns mission/status functions; spatial views use
+RViz2. See [ROS tool workflow](ROS2_OPERATOR_WORKFLOW.md) for viewer launchers,
+local-only DDS scope and the still-unimplemented hardware control adapters.
 
 ## Installed board and lifecycle
 

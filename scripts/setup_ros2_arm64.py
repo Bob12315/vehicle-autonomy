@@ -34,6 +34,7 @@ def main():
                         help='unmodified dpkg status copied from Ubuntu 22.04 ARM64 target')
     parser.add_argument('--os-release-file', required=True, type=Path,
                         help='target /etc/os-release copy')
+    parser.add_argument('--visualization', action='store_true', help='also extract RViz2 for the board ROS host')
     args = parser.parse_args()
     status = args.status_file.resolve()
     text = status.read_text()
@@ -77,8 +78,9 @@ Acquire::https::Timeout "30";
 Acquire::Languages "none";
 ''')
     subprocess.run(['apt-get', '-c', str(config), 'update'], check=True)
+    requested=PACKAGES+(['ros-humble-rviz2'] if args.visualization else [])
     subprocess.run(['apt-get', '-c', str(config), '--download-only', '--allow-downgrades', '--assume-yes',
-                    '--no-install-recommends', 'install', *PACKAGES], check=True)
+                    '--no-install-recommends', 'install', *requested], check=True)
     packages = []
     for archive in sorted((apt/'archives').glob('*.deb')):
         package = subprocess.check_output(['dpkg-deb', '-f', str(archive), 'Package'], text=True).strip()
@@ -92,7 +94,7 @@ Acquire::Languages "none";
         packages.append({'file': archive.name, 'package': package, 'architecture': arch,
                          'sha256': hashlib.sha256(archive.read_bytes()).hexdigest()})
     (directory/'manifest.json').write_text(json.dumps({'distribution': 'humble', 'architecture': 'arm64',
-        'key': ROS_KEY, 'requested': PACKAGES, 'target_os': release,
+        'key': ROS_KEY, 'requested': requested, 'target_os': release,
         'status_sha256': hashlib.sha256(status.read_bytes()).hexdigest(),
         'packages': packages}, indent=2))
     print('Prepared isolated target prefix:', directory/'root')

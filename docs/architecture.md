@@ -19,8 +19,14 @@ The HTTP listener is loopback-only with a private Bearer token, custom CSRF
 header, Host/Origin checks, bounded workers/requests, operation audit and
 non-evicting mutation IDs. Session-checked start is evaluated inside one
 Application event-loop request. Original CLI start semantics remain available.
-The console cannot submit Effects or obtain a vehicle writer. Saved maps and
-clicked waypoints are previews/drafts, never implicit localization or authority.
+The console cannot submit Effects or obtain a vehicle writer. Following the
+operator's revised workflow, the Web UI owns mission selection, status, camera,
+logs and AI proposals; RViz2 owns spatial visualization. The former map/click/
+save controls are removed from the Web page. Existing map-preview/draft APIs
+remain compatibility use cases and never grant localization or authority.
+Read-only RViz profiles publish no navigation goals. Full Nav2 control-candidate
+and RViz-goal admission adapters remain unimplemented for hardware; see
+[ROS 2 operator workflow](ROS2_OPERATOR_WORKFLOW.md).
 
 LLM adapters return strict MissionProposal JSON, restricted to registered
 missions. Approval is finite, human-confirmed, one-shot and session/environment

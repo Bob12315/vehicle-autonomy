@@ -1,0 +1,90 @@
+{
+  "date": "2026-10-21",
+  "change": "ROS spatial tools and Web mission/status UI",
+  "tested_scope": {
+    "web_llm_units": {
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "dom_smoke": "PASS synthetic DOM/API only; not browser visual",
+    "pc_rviz_help": "PASS native Qt offscreen --help",
+    "arm_rviz_help_initial": "FAIL Qt offscreen plugin not found; original log retained",
+    "arm_rviz_help_after_private_plugin_path": "PASS native Qt offscreen --help",
+    "rviz_profiles": "YAML and viewer-only tools validated",
+    "rviz_gui": "BLOCKED no controlled graphical session; no screenshot/visual acceptance",
+    "hardware_nav2_control_adapter": "UNIMPLEMENTED; hardware read-only unchanged",
+    "pc_full_units": {
+      "tests": 289,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "arm_packages": 627,
+  "dds_network_change": false,
+  "view_commands": [
+    "./scripts/ros2_view.sh lidar",
+    "./scripts/ros2_view.sh navigation",
+    "./scripts/ros2_view.sh lidar --check"
+  ],
+  "artifact_directory": "artifacts/hardware-ready/ros-tools",
+  "artifacts": [
+    {
+      "path": "arm-manifest-before-rviz.json",
+      "sha256": "bc336ba3a915aa75e691a853f807614b6054ed7a01aaea99b34aa5c458562a6b",
+      "bytes": 148414
+    },
+    {
+      "path": "arm-rviz-delta.tar.gz",
+      "sha256": "5265f5475c3a66d1fed28b94eaeeed8a06b26756c2e3519a9e130b6e3f7e706b",
+      "bytes": 51480
+    },
+    {
+      "path": "arm-rviz-native-help-r2.log",
+      "sha256": "fe34c159347539c1abd7bcbd7aa752ee125d6daf6b8777e4baa69d4c5250af65",
+      "bytes": 1152
+    },
+    {
+      "path": "arm-rviz-native-help.log",
+      "sha256": "29544a8c9c96f782939149dbea8da44bf32892f3dcad3659a5badc3759290026",
+      "bytes": 267
+    },
+    {
+      "path": "arm-rviz-prepare.log",
+      "sha256": "3ab43c763ea1f35492c7ef8be652ccdfe33a6ddcce6a8a293d34a98988ecb808",
+      "bytes": 28055
+    },
+    {
+      "path": "pc-rviz-native-help.log",
+      "sha256": "39e275b340433e8f2a0e2f9fca4fdbd31cc98e5aa0c570c78a4f1a9a73637de8",
+      "bytes": 1297
+    },
+    {
+      "path": "pc-rviz-prepare.log",
+      "sha256": "1bea718ee8a41e11415071a0a1a200412c32fb035abbdc04d500e8e8d6c7790c",
+      "bytes": 21188
+    },
+    {
+      "path": "view-script-check.log",
+      "sha256": "39e275b340433e8f2a0e2f9fca4fdbd31cc98e5aa0c570c78a4f1a9a73637de8",
+      "bytes": 1297
+    },
+    {
+      "path": "web-dom-smoke.log",
+      "sha256": "4f21c2dba37494b5db7eecf5db3d20bd70465695de602a258ee561868f79b381",
+      "bytes": 222
+    },
+    {
+      "path": "web-tests.log",
+      "sha256": "65dbac000bd7cce020755910db2ea57e559f58ace3191d189c0e78ff72a95040",
+      "bytes": 98
+    },
+    {
+      "path": "full-unit.log",
+      "bytes": 100,
+      "sha256": "1c6465b462b4bda914da8d04738092d352fd62d3c00290a10775ea803e9423b4"
+    }
+  ]
+}

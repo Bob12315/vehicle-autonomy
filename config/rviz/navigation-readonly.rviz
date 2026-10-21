@@ -1,0 +1,78 @@
+Panels:
+  - Class: rviz_common/Displays
+    Name: Displays
+  - Class: rviz_common/Views
+    Name: Views
+Visualization Manager:
+  Class: ""
+  Global Options:
+    Background Color: 18; 25; 35
+    Fixed Frame: map
+    Frame Rate: 30
+  Displays:
+    - Class: rviz_default_plugins/Map
+      Name: ROS map
+      Enabled: true
+      Topic:
+        Value: /map
+        Reliability Policy: Reliable
+        Durability Policy: Transient Local
+        History Policy: Keep Last
+        Depth: 1
+      Alpha: 0.8
+      Value: true
+    - Class: rviz_default_plugins/TF
+      Name: Qualified frame tree
+      Enabled: true
+      Show Axes: true
+      Show Names: true
+      Show Arrows: true
+      Frame Timeout: 2
+      Value: true
+    - Class: rviz_default_plugins/Path
+      Name: ROS planned route
+      Enabled: true
+      Topic:
+        Value: /plan
+        Reliability Policy: Reliable
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Depth: 5
+      Color: 80; 220; 195
+      Line Style: Lines
+      Line Width: 0.05
+      Value: true
+    - Class: rviz_default_plugins/Map
+      Name: Global costmap
+      Enabled: false
+      Topic:
+        Value: /global_costmap/costmap
+        Reliability Policy: Reliable
+        Durability Policy: Transient Local
+        History Policy: Keep Last
+        Depth: 1
+      Alpha: 0.4
+      Value: false
+    - Class: rviz_default_plugins/Map
+      Name: Local costmap
+      Enabled: false
+      Topic:
+        Value: /local_costmap/costmap
+        Reliability Policy: Reliable
+        Durability Policy: Transient Local
+        History Policy: Keep Last
+        Depth: 1
+      Alpha: 0.4
+      Value: false
+  Tools:
+    - Class: rviz_default_plugins/MoveCamera
+    - Class: rviz_default_plugins/Select
+    - Class: rviz_default_plugins/FocusCamera
+  Views:
+    Current:
+      Class: rviz_default_plugins/TopDownOrtho
+      Scale: 30
+      Target Frame: <Fixed Frame>
+Window Geometry:
+  Width: 1280
+  Height: 800

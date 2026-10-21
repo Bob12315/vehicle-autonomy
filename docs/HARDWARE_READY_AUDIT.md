@@ -10,6 +10,11 @@ Hardware-Ready Simulation 验收。P26 统一导航门槛 FAIL，真实车辆运
 [`hardware-connected.json`](autonomy/evidence/hardware-connected.json)。板端与电脑 309 个
 非文档/非 legacy 文件指纹完全一致，后续本地文档提交不改变运行代码。
 
+用户后续调整操作分工：Web 为任务与状态台，空间可视化使用 ROS 2/RViz2。
+新界面已移除地图画布/航点编辑，保留任务、状态/视频、日志和 AI。PC/板端 RViz2
+原生加载及只读配置通过；图形画面尚未验收，硬件 Nav2 控制适配仍未实现。
+参见[ROS 2 操作流程](ROS2_OPERATOR_WORKFLOW.md)与[增量证据](autonomy/evidence/ros-tools.json)。
+
 软件可部署不等于真实车辆已通过安全验收。本轮没有向真实飞控发送解锁、模式、
 运动、电机或参数请求，没有改管理网络、内核、飞控固件或旧 CUADC/legacy。
 所有运动测试均为本次进程拥有的 localhost SITL/Gazebo；没有自动 push。
