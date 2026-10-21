@@ -122,6 +122,31 @@ class ManeuverFaultTests(ScenarioTests):
         instance.tick_with_results(self.sample(world,4*math.pi,1.2),done)
         self.assertEqual(instance.tick_with_results(self.sample(world,4*math.pi,1.8),done).outcome,ActionOutcome.SUCCEEDED)
 
+    def test_waypoint_alignment_waits_for_stop_then_starts_a_fresh_drive_stream(self):
+        from contracts.decision import EffectResult,EffectPhase
+        from contracts.effects.vehicle import TwistTargetEffect,StopMotionEffect
+        p=self.parse(('motion:visit',{'waypoint':'A','speed_mps':.15}))
+        prepared,_=resolve(p,self.environment,Pose2D(.25,0),self.scene);world=self.world()
+        instance=ManeuverAction().start(prepared[0],world)
+        feedback=(EffectResult('align','action',EffectPhase.TRANSMITTED),)
+        first=instance.tick_with_results(self.sample(world,math.pi/2,.1),feedback)
+        self.assertIsInstance(first.effects[0],TwistTargetEffect)
+        self.assertAlmostEqual(first.effects[0].target_twist.linear.x,0.)
+        old_stream=instance.stream
+        stop=instance.tick_with_results(self.sample(world,0,.3),feedback)
+        self.assertIsInstance(stop.effects[0],StopMotionEffect)
+        self.assertTrue(instance.initial_alignment)
+        pending=feedback+(EffectResult('stop','action',EffectPhase.TRANSMITTED),)
+        self.assertFalse(instance.tick_with_results(self.sample(world,0,.6),pending).effects)
+        complete=feedback+(EffectResult('stop','action',EffectPhase.COMPLETED),)
+        instance.tick_with_results(self.sample(world,0,.7),complete)
+        instance.tick_with_results(self.sample(world,0,1.3),complete)
+        self.assertFalse(instance.initial_alignment)
+        self.assertNotEqual(instance.stream,old_stream)
+        move=instance.tick_with_results(self.sample(world,0,1.5),complete)
+        self.assertIsInstance(move.effects[0],TwistTargetEffect)
+        self.assertGreater(move.effects[0].target_twist.linear.x,0.)
+
     def test_spinning_in_place_cannot_fake_a_driven_circle(self):
         from contracts.decision import EffectResult,EffectPhase
         p=self.parse(('motion:circle',{'radius_m':1.5,'laps':1,'direction':'left','speed_mps':.15}))

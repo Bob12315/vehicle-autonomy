@@ -53,6 +53,7 @@ class ManeuverInstance:
         self.initial_heading_error=None;self.stable_since=None;self.exit_ns=None
         self.last_polar=None;self.orbit=0.
         self.goal_alignment=False
+        self.initial_alignment=p.kind=='visit';self.align_stop_boundary=None;self.align_stable=None
 
     def _pose(self,world):
         loc=world.localization
@@ -86,8 +87,35 @@ class ManeuverInstance:
             steady=bool(feedback and feedback[-1].phase is not None and feedback[-1].phase.value=='COMPLETED') and self._stopped(twist)
             self.stable_since=(self.stable_since if self.stable_since is not None else now) if steady else None
             return ActionDecision(ActionOutcome.SUCCEEDED if self.stable_since is not None and now-self.stable_since>=500_000_000 else ActionOutcome.RUNNING)
-        if results and results[-1].phase in BAD:return failed(results[-1].reason or 'maneuver_effect_failed')
+        if self.align_stop_boundary is None and results and results[-1].phase in BAD:return failed(results[-1].reason or 'maneuver_effect_failed')
         p=self.p;v=0.;w=0.;arrived=False
+        if self.initial_alignment:
+            if math.hypot(p.end.x-pose.x,p.end.y-pose.y)<=.05:
+                self.initial_alignment=False;self.goal_alignment=True
+            elif self.align_stop_boundary is not None:
+                feedback=results[self.align_stop_boundary:]
+                if feedback and feedback[-1].phase in BAD:return failed('initial_alignment_stop_failed')
+                steady=bool(feedback and feedback[-1].phase.value=='COMPLETED') and self._stopped(twist)
+                self.align_stable=(self.align_stable if self.align_stable is not None else now) if steady else None
+                if self.align_stable is not None and now-self.align_stable>=500_000_000:
+                    self.initial_alignment=False;self.stream='maneuver:'+uuid4().hex
+                    self.refresh_ns=0;self.touched=False;self.align_stop_boundary=None
+                return ActionDecision(ActionOutcome.RUNNING)
+            else:
+                error=angle(math.atan2(p.end.y-pose.y,p.end.x-pose.x)-pose.yaw)
+                dx,dy=p.start.x-pose.x,p.start.y-pose.y
+                if abs(error)<=.07 and self._stopped(twist) and math.hypot(dx,dy)<=.1:
+                    if not self.touched:
+                        self.initial_alignment=False
+                        return ActionDecision(ActionOutcome.RUNNING)
+                    self.align_stop_boundary=len(results);self.touched=True
+                    return ActionDecision(ActionOutcome.RUNNING,(StopMotionEffect(self.stream),))
+                if now>=self.refresh_ns:
+                    self.refresh_ns=now+200_000_000;self.touched=True
+                    v=max(-.05,min(.05,.9*(dx*math.cos(pose.yaw)+dy*math.sin(pose.yaw))))
+                    w=math.copysign(min(.25,max(.08,.8*abs(error))),error)
+                    return ActionDecision(ActionOutcome.RUNNING,(TwistTargetEffect('base_link',Twist3(Vector3(v,0,0),Vector3(0,0,w)),self.stream),))
+                return ActionDecision(ActionOutcome.RUNNING)
         if p.kind=='wait':arrived=now-self.start_ns>=p.duration_s*1e9
         elif p.kind=='turn':
             remaining=p.turn_rad+self.initial_heading_error-self.rotation
@@ -143,6 +171,7 @@ class ManeuverInstance:
         if self.exit_ns is None:self.exit_ns=now
         if now-self.exit_ns>8_000_000_000:raise RuntimeError('maneuver_exit_stop_unconfirmed')
         if not self.touched:return ExitDecision(True)
+        if self.stop_boundary is None and self.align_stop_boundary is not None:self.stop_boundary=self.align_stop_boundary
         if self.stop_boundary is None:
             self.stop_boundary=len(results)
             return ExitDecision(False,(StopMotionEffect(self.stream),))

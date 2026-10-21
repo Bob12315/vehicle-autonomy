@@ -33,7 +33,8 @@ class ScenarioGuard:
             t=c.target_twist;v,w=t.linear.x,t.angular.z
             raw=state.reported_pose.value;p=drive_reference(Pose2D(raw.position.x,raw.position.y,yaw(raw)))
             centering=(self.parameters.kind=='turn' or self.parameters.kind in ('drive','visit')
-                       and math.hypot(p.x-self.parameters.end.x,p.y-self.parameters.end.y)<=.15)
+                       and math.hypot(p.x-self.parameters.end.x,p.y-self.parameters.end.y)<=.15
+                       or self.parameters.kind=='visit' and math.hypot(p.x-self.parameters.start.x,p.y-self.parameters.start.y)<=.15)
             minimum=-.05 if centering else 0
             maximum=.05 if self.parameters.kind=='turn' else .18
             if (any(x!=0 for x in (t.linear.y,t.linear.z,t.angular.x,t.angular.y)) or not minimum<=v<=maximum or abs(w)>.25):
