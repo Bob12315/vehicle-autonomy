@@ -35,7 +35,7 @@ BLOCKED 包括外部条件不足或所需软件组合尚未实现，原因逐项
 | P28 Camera 采集软件与记录源 | PASS | 实际记录视频 worker/JPEG/健康、失效与进程清理测试，记录源明确标记 recording。 |
 | P28 真实 Camera | BLOCKED | `/dev/video22`、`/dev/video31`、HDMI `/dev/video40` 实际探测均 0 帧、无法打开。ISP 节点不能证明已连接摄像头。型号、接口、曝光/标定仍未知，实时采集到现有视觉感知 Observation 的软件装配也尚未完成。 |
 | P29 GPS/EKF 诊断软件 | PASS | 接收适配不发 MAVLink，源/epoch、NED→ENU 速度、GPS 质量/跳变、过期与非有限值拒绝有单元证据。 |
-| P29 实车 GPS Navigation | BLOCKED | 电脑已实际识别 MicoAir743v2 USB、收到未解锁 Rover 心跳和姿态，0 字节 MAVLink 写入；本次无 GPS_RAW_INT/EKF_STATUS_REPORT，位置为 0，曾报告 Radio Failsafe。罗盘未校准；原点/围栏/采集时钟和制动未验收。普通 GPS 不作为精确局部避障定位。 |
+| P29 实车 GPS Navigation | BLOCKED | 电脑已实际识别 MicoAir743v2 USB、收到未解锁 Rover 心跳和姿态，0 字节 MAVLink 写入；本次无 GPS_RAW_INT/EKF_STATUS_REPORT，位置为 0。曾报告 Radio Failsafe，用户随后确认遥控器未开机，可以解释该提示，开机恢复未复核。罗盘未校准；原点/围栏/采集时钟和制动未验收。普通 GPS 不作为精确局部避障定位。 |
 | P29 实车 LiDAR Map Navigation/模式切换 | BLOCKED | 已有实际扫描，但缺外参、地图与独立定位精度；活动 SLAM、地图重定位和硬件模式切换软件组合未完成，候选始终禁止控制。 |
 | P30 近场检查与原 writer 拒绝链 | PASS | 离线测试在 Effect 排队后插入障碍/断流，原唯一 writer 零写出；原 Stop 仍可通过。拒绝缺失覆盖、超时、未准入转向/倒车，速度建议不授予权限。 |
 | P30 实车避障/减速/物理停车 | BLOCKED | 没有默认/硬件 scan guard 装配或 live Nav2 障碍层；没有真实故障到物理制动链。STM32/双 DAC 适配与物理急停/驱动失能必须现场验收。 |

@@ -417,7 +417,7 @@
     "P26": "FAIL unchanged; full mandatory suite 21/23, previous tracking/freshness failures retained",
     "compass": "BLOCKED onsite calibration",
     "gps_ekf": "BLOCKED no valid GPS_RAW_INT/EKF_STATUS_REPORT in finite passive USB observations",
-    "radio": "BLOCKED initial Radio Failsafe / PreArm warning needs onsite confirmation",
+    "radio": "EXPLAINED by user report: transmitter was powered off during observation; no radio hardware fault established; recovery after power-on remains unverified",
     "lidar_coverage": "BLOCKED full obstacle coverage; many invalid returns, mount/scene/sensor cause unknown",
     "mount_tf_map": "BLOCKED no physical calibration or qualified localization",
     "camera": "BLOCKED no confirmed board camera",
@@ -833,5 +833,12 @@
     "binary_sha256": "99205ecb757d3aa808e01917904ee231375aec2c6cabd3585750865f888d6e79",
     "live_decoded_clouds_18_s": 180,
     "real_pcap_decoded_clouds": 78
-  }
+  },
+  "user_clarifications": [
+    {
+      "fact": "transmitter was powered off during connection checks",
+      "source": "user message after final connected-environment report",
+      "effect": "explains observed Radio Failsafe; does not constitute receiver recovery acceptance"
+    }
+  ]
 }
