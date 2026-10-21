@@ -41,6 +41,17 @@ Mission/Action/Effect chain; fresh disarmed stationary observations and released
 SEND/Lease authority are required between children. No unqualified localization
 candidate is promoted. Only explicit simulation compositions expose this use case.
 
+The explicit `yard` composition adds Schema 2 parameters for registered drive,
+turn, circle, wait and named-point visit capabilities. Application resolves the
+whole design once against a fresh, session-bound axle pose and known static
+scene. The approved preview is immutable; approval expires after 60 seconds and
+requires pose continuity. Typed maneuver Actions publish Effects only; the
+existing writer has an additional rejection-only path/scene/swept-footprint
+guard. This qualified target_rover fixture uses its front axle reference and
+cannot be enabled on an unqualified kinematic profile. Default training fences
+and Core/contracts are unchanged. This is not live obstacle avoidance or a
+hardware-control adapter. See [scenario guide](LLM_TASK_DESIGN.md).
+
 The official pinned rs_driver adapter writes bounded same-host diagnostic
 cloud envelopes. An optional ROS sidecar produces PointCloud2/LaserScan and
 immutable Observation data with explicit provenance and frame/time checks.

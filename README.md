@@ -19,8 +19,10 @@ PointCloud2/LaserScan、真实 PCAP 回放通过，隔离 Humble/Nav2/SLAM 环�
 定位与路径使用 ROS 2/RViz2 工具。入口和尚未接入的实车 Nav2 边界见
 [ROS 2 操作流程](docs/ROS2_OPERATOR_WORKFLOW.md)。
 
-仿真新增 [LLM 任务组合](docs/LLM_TASK_DESIGN.md)：最多 8 个已注册任务步骤，
-经环境/会话预检和人工批准执行；每步之间必须观察到停车并释放权限。
+仿真新增 [LLM 参数化任务编排](docs/LLM_TASK_DESIGN.md)：独立 `yard` 场景提供
+装卸点往返、多点巡逻、定距前进、定角旋转、有限绕圆和停留；最多 8 步，
+经静态场景、完整车体、环境/会话预检和人工批准执行。Gazebo 提供 3D 场景，
+Web 审阅步骤；每步之间必须观察到停车并释放权限。已知静态场景不等于实时避障。
 不开放实车运动入口。
 
 车辆基础仿真新增了共享 `SimulationRuntime`、完整 Rover 插件和两主动轮/两后万向轮模型。Copter、Rover 正常动作与故障场景已通过四轮完整回归；**本轮基础车辆控制 Simulation Complete：PASS**，见[审计记录](docs/simulation/completion-audit.md)。

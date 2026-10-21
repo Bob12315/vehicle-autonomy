@@ -1,12 +1,14 @@
 """Failure-preserving serial regression of all practical yard scenarios."""
 import argparse
 from datetime import datetime,timezone
+import hashlib
 import json
 from pathlib import Path
 import sys
 
 from tests.simulation.harness import StageRunner
 from tests.simulation.launch import ROOT,output
+from tests.simulation.practical_evidence import audit
 
 CASES=('admission','calibration','courier','patrol','circle','rotation','cancel','restart')
 
@@ -42,6 +44,11 @@ def main():
         save()
     report['passed']=report['unit']['passed'] and all(c['status']=='PASS' for c in report['cases']) and len(report['cases'])==len(CASES)
     report['finished_at']=datetime.now(timezone.utc).isoformat();save()
+    independent=audit(directory)
+    report['independent_truth_passed']=independent['passed']
+    report['passed']=report['passed'] and independent['passed'];save()
+    independent['summary_sha256']=hashlib.sha256((directory/'summary.json').read_bytes()).hexdigest()
+    (directory/'independent-truth-audit.json').write_text(json.dumps(independent,indent=2)+'\n')
     print(json.dumps(report));return 0 if report['passed'] else 1
 
 
