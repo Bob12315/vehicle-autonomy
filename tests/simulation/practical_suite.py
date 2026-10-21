@@ -8,7 +8,7 @@ import sys
 from tests.simulation.harness import StageRunner
 from tests.simulation.launch import ROOT,output
 
-CASES=('admission','calibration','courier','patrol','circle','rotation','cancel')
+CASES=('admission','calibration','courier','patrol','circle','rotation','cancel','restart')
 
 
 def main():

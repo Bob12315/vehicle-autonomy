@@ -22,7 +22,8 @@ PROMPTS={
  'patrol':'以0.15米每秒依次去A、B、C、HOME，在B停留2秒。',
  'circle':'以0.15米每秒，半径1.5米，向左绕完整1圈，然后停车。',
  'rotation':'原地向左转720度，然后停车。',
- 'cancel':'前进4米，停留3秒，然后回HOME，速度0.15米每秒。'}
+ 'cancel':'前进4米，停留3秒，然后回HOME，速度0.15米每秒。',
+ 'restart':'前进1米，然后停车，速度0.15米每秒。'}
 
 
 def run(directory,case,llm_config):
@@ -33,10 +34,12 @@ def run(directory,case,llm_config):
     try:
         owned.start();oracle=GazeboTruthOracle(owned.world,owned.model)
         profile=directory/'profile.toml';profile.write_text((ROOT/'simulation/profiles/rover_yard.toml').read_text().replace('port = 5760',f'port = {owned.port}'))
-        app=owned.start_process('application',[sys.executable,'-m','app.main','run','--profile','rover_sim',
-            '--config',str(profile),'--control-socket',str(endpoint),'--allow-send',
-            '--environment-config',str(ROOT/'simulation/environments/yard.toml'),
-            '--scenario-scene',str(ROOT/'simulation/scenes/yard.json')])
+        def launch(send,suffix=''):
+            return owned.start_process('application'+suffix,[sys.executable,'-m','app.main','run','--profile','rover_sim',
+                '--config',str(profile),'--control-socket',str(endpoint),*(['--allow-send'] if send else []),
+                '--environment-config',str(ROOT/'simulation/environments/yard.toml'),
+                '--scenario-scene',str(ROOT/'simulation/scenes/yard.json')])
+        app=launch(True)
         def status():
             owned.assert_alive();r=request(endpoint,'status');assert r['ok'],r
             s=r['result'];t=oracle.latest();task=s['task']
@@ -90,6 +93,19 @@ def run(directory,case,llm_config):
             s=status();assert s['task'] is None and not s['system_send'] and not s['vehicle']['armed']
             t=oracle.latest();assert math.hypot(t.x_m-origin.x_m,t.y_m-origin.y_m)<.02
             result['admission']=checks
+        elif case=='restart':
+            code,r=http('design',{'text':PROMPTS[case]});assert code==200,r
+            proposal=r['result'];result['proposal']=proposal
+            assert proposal['decision']=='propose' and proposal['preflight']['eligible'],proposal
+            assert request(endpoint,'shutdown')['ok'];assert app.wait(timeout=12)==0;owned.stop_process(app)
+            app=launch(False,'-readonly-restart')
+            fresh=wait(lambda s:s['state']=='READY' and s['session_id']!=initial['session_id'],30)
+            code,response=http('design/approve',{'id':proposal['id'],'human_approved':True})
+            assert code==409,response
+            assert 'session changed' in response['error'],response
+            assert fresh['task'] is None and not fresh['system_send'] and not fresh['action_send'] and not fresh['vehicle']['armed']
+            t=oracle.latest();assert math.hypot(t.x_m-origin.x_m,t.y_m-origin.y_m)<.02
+            result['checks']=['old_parameterized_proposal_rejected','readonly_restart_no_authority','no_actual_motion']
         else:
             code,r=http('design',{'text':PROMPTS[case]});assert code==200,r
             proposal=r['result'];result['proposal']=proposal
