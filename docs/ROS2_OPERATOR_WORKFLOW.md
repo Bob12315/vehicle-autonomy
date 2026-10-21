@@ -17,6 +17,17 @@ Web 已移除地图画布、点选航点和地图保存/加载按钮；保留传
 任务选择、取消请求、日志、报告和 AI 提案。历史只读地图/草稿 API 保留兼容既有
 工具与验证，不能产生车辆运动。不会为替换 UI 修改 Core、冻结合同或旧归档。
 
+雷达断电/网线拔下时，也可只启动任务和状态台，不拉起 SDK/ROS：
+
+```bash
+/home/pi/vehicle-autonomy/current/scripts/operator-console.sh start
+/home/pi/vehicle-autonomy/current/scripts/operator-console.sh stop
+```
+
+它与 `onboard-connected.sh` 使用同一个自有状态目录，同一时刻只能有一个监管器。
+接回雷达后先停止纯诊断栈，再执行 `onboard-connected.sh start` 启动全部传感器。
+不会在 SDK 崩溃后暗中改成降级运行，既有整栈关闭规则保持；诊断启动是明确选择。
+
 ## 当前查看真实 RS16
 
 板端 SDK/ROS 在 localhost、ROS_DOMAIN_ID=85 发布：
@@ -63,6 +74,9 @@ Humble 的跨版本 DDS 不默认认定可用，也没有自动扩大 ROS 网络
 链，此视图会缺数据；这应通过真实标定与定位解决，不能发布假静态 TF 消除报错。
 现有私有 planner job 使用自己的 namespace/frame，并不自动变成公共 `/plan`。
 将其显示到公共导航图需要显式、保留 frame/epoch 的诊断适配，本次未假装已有该输出。
+RViz 必须使用数据源的 ROS_DOMAIN_ID；仿真/rosbag 时还需启用 use_sim_time 并提供
+/clock。显示脚本不自动猜测或修改私有仿真 job 的域和时钟配置；可直接通过相应
+ROS wrapper 启动 `rviz2 -d config/rviz/navigation-readonly.rviz --ros-args -p use_sim_time:=true`。
 
 两个配置均只带相机移动、选择和聚焦工具，没有 Nav2 Goal、初始定位发布或车辆
 控制面板。未来 RViz 点选目标应作为目标提案进入 Application，经过地图/车辆会话
@@ -120,3 +134,8 @@ PC Jazzy 与板端 Humble 的 RViz2 实际执行 `--help` 成功；ARM 初次缺
 
 图形渲染和显示效果仍未验收，不能把原生帮助输出当作 RViz 画面通过。原始日志与
 文件哈希见 [`autonomy/evidence/ros-tools.json`](autonomy/evidence/ros-tools.json)。
+
+部署复查时，雷达 eth0 已变为 carrier=0、无活动地址（管理 eth1 正常），全传感器
+启动因此在 SDK bind 时失败；原始失败日志保留。已明确改用纯诊断启动并验证新版
+页面/API 可用、雷达如实离线、双 SEND=false。该次硬件离线不算作真实雷达回归
+PASS，也没有重新配置接口来掩盖断链。此前真实数据链的证据保持原版本与时间。
