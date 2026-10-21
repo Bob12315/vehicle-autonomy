@@ -64,3 +64,11 @@ API：`POST /api/design {"text":"..."}` 返回提案和预检；
 后一请求必须携带 `X-VAF-Request-ID`；认证、CSRF、Host/Origin 检查与原任务 API 相同。
 
 本功能的测试结果见最终审计；它不改变 P26 已记录的导航失败，也不代表实车验收。
+
+实际运行组合版本 `848064d`，完整单元测试 322 项通过、0 跳过；两轮真实模型
+端到端路线组合通过，HOME 误差约 4.4 / 4.0 cm。
+原始日志在 `artifacts/simulation/llm-design-20261021-r3` 和 `r4`，可移植的版本/
+断言/日志 SHA 在 `docs/autonomy/evidence/llm-task-designs.json`。
+早期两轮失败也保留，没有覆盖。
+取消实测位于步骤边界；运动中组合取消和组合 Nav2/巡检仍未完成实测。
+无法在取消后 10 秒内观察到静止且 Disarmed 时显示清理未确认，不自动进入下一步。

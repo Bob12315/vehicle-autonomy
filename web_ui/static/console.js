@@ -77,8 +77,21 @@ $('start').onclick = () => action(async () => log(json(await api('start', {
   mission: $('missions').value, expected_session: state.session_id}))));
 $('cancel').onclick = () => action(async () => log('软件停止请求：' + json(await api('cancel', {}))));
 async function propose(path) {
+  $('approve').disabled = true;
+  $('human').checked = false;
   proposal = await api(path, {text: $('intent').value});
   $('proposal').textContent = json(proposal);
+  $('proposal-title').textContent = proposal.title ?? '已有任务提案';
+  $('proposal-reason').textContent = proposal.reason;
+  $('proposal-steps').replaceChildren();
+  for (const step of proposal.steps ?? (proposal.mission ? [{mission: proposal.mission}] : [])) {
+    const item = document.createElement('li'); item.textContent = step.mission;
+    $('proposal-steps').append(item);
+  }
+  $('proposal-check').textContent = proposal.decision === 'clarify' ? '需要补充任务信息'
+    : proposal.decision === 'reject' ? '该请求已被拒绝'
+    : proposal.preflight?.eligible === false ? '预检未通过：' + proposal.preflight.reasons.join('；')
+    : '待人工确认 · 60 秒内有效 · 批准时将重新预检';
   $('approve').disabled = proposal.decision !== 'propose' || proposal.preflight?.eligible === false || state?.mode === 'hardware_readonly';
   $('human').checked = false;
 }
