@@ -55,7 +55,9 @@ def run(directory, llm_config, *, route=True):
                 time.sleep(.1)
             raise TimeoutError('simulation condition unmet')
         app=launch(True,'-send')
-        initial=wait(lambda s:s['state']=='READY' and s['localization'] is not None,60)
+        initial=wait(lambda s:s['state']=='READY' and s['localization'] is not None
+                     and s['environment']['origin_verified']
+                     and s['motion_warmup_remaining_ns']==0,90)
         origin=oracle.wait_new(after_host_ns=time.monotonic_ns(),timeout_s=3)
         with socket.socket() as listener:
             listener.bind(('127.0.0.1',0));port=listener.getsockname()[1]

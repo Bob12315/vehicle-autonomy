@@ -42,6 +42,7 @@ class SimulationDesignSupport:
             context['anchor_sha256'] = hashlib.sha256(self.navigation_goals.anchor_path.read_bytes()).hexdigest()
         digest = hashlib.sha256(json.dumps(context,sort_keys=True).encode()).hexdigest()
         return {'schema':1, 'context':digest, 'session_id':state['session_id'],
+                'context_components':context,
                 'capabilities':capabilities, 'max_steps':8, 'max_duration_s':600,
                 'simulation_only':True, 'requires_human_approval':True}
 
@@ -74,7 +75,7 @@ class SimulationDesignSupport:
     def design_preflight(self, document, expected_context):
         catalog=self.design_catalog()
         if type(expected_context) is not str or expected_context != catalog['context']:
-            raise ValueError('design environment/session/capability context changed')
+            raise ValueError('design environment/session/capability context changed; current='+catalog['context'])
         design=MissionDesign.parse(json.dumps(document),catalog['capabilities'])
         if design.decision!='propose':
             raise ValueError('only proposed finite designs can pass preflight')

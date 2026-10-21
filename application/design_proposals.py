@@ -33,6 +33,7 @@ class DesignProposalService:
                     'design':design.document(), 'expected_context':catalog['context']})
             result = {'id':uuid4().hex, 'kind':'design', **design.document(), 'sha256':design.sha256,
                       'expires_in_s':60, 'requires_human_approval':True, 'executed':False,
+                      'context':catalog['context'],
                       'preflight':preflight}
             with self.lock:
                 self.pending[result['id']] = {'design':design, 'context':catalog['context'],
