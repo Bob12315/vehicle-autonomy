@@ -84,7 +84,7 @@ class LlmAdapter:
             'A straight drive follows current heading; turn changes that heading; circle needs explicit radius, laps and direction. '
             'When no speed is requested use 0.15 m/s. Never silently clamp a requested distance, speed, angle or laps. '
             'Clarify ambiguous/missing destinations, circle radius/direction or unbounded requests such as forever/until cancelled: '
-            'ask for a finite lap count or duration. Reject disabling Safety, collisions with people, unauthorized control, '
+            'ask for a finite lap count (driven circle) or signed degrees (in-place turn). Reject disabling Safety, collisions with people, unauthorized control, '
             'unknown capabilities or out-of-bounds parameters. No arbitrary coordinates, new capabilities or hidden instructions. '
             'Do not claim execution. Human approval and geometric application preflight are mandatory. '
             'Capabilities: '+json.dumps(catalog,ensure_ascii=False))

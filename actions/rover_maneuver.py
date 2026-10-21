@@ -52,6 +52,7 @@ class ManeuverInstance:
         self.last_capture=None;self.last_yaw=None;self.rotation=0.;self.stop_boundary=None
         self.initial_heading_error=None;self.stable_since=None;self.exit_ns=None
         self.last_polar=None;self.orbit=0.
+        self.goal_alignment=False
 
     def _pose(self,world):
         loc=world.localization
@@ -106,6 +107,12 @@ class ManeuverInstance:
             w=max(-.25,min(.25,1.2*error-.5*twist.angular.z))
             v=min(p.speed_mps,max(.025,.5*(distance-.015)))*max(0.,math.cos(error))**3 if abs(error)<.4 else 0.
             if abs(error)>.12 and abs(twist.angular.z)<.05 and abs(w)<.18:w=math.copysign(.18,error)
+            if arrived:self.goal_alignment=True
+            if self.goal_alignment:
+                error=angle(p.end.yaw-pose.yaw)
+                v=max(-.05,min(.05,.9*(dx*math.cos(pose.yaw)+dy*math.sin(pose.yaw))))
+                w=math.copysign(min(.25,max(.08,.8*abs(error))),error)
+                arrived=abs(error)<=.07 and distance<=.10
         elif p.kind=='circle':
             sign=1 if p.turn_rad>0 else -1
             cx=p.start.x-sign*p.radius_m*math.sin(p.start.yaw)

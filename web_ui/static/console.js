@@ -26,6 +26,7 @@ async function action(fn) {
   catch (e) { $('error').textContent = e.message; log(e.message); }
 }
 function showSummary(s) {
+  $('scenario-examples').hidden = !s.scenario;
   const items = {'运行状态': s.state, '车辆连接': s.connected ? '在线' : '离线 / 未接入',
     '飞控模式': s.vehicle?.mode ?? '未知',
     '武装状态': s.vehicle?.armed === true ? 'ARMED' : s.vehicle?.armed === false ? 'Disarmed' : '未知',
@@ -74,6 +75,15 @@ $('connect').onclick = () => action(async () => {
   showSummary(state); log('认证连接成功');
 });
 $('missions').onchange = () => { if (state) showSummary(state); };
+$('fill-example').onclick = () => {
+  const examples = {
+    courier: '以0.15米每秒去DOCK，停留2秒，然后回HOME。',
+    patrol: '以0.15米每秒依次去A、B、C、HOME，在B停留2秒。',
+    'drive-circle': '前进10米，再以半径1.5米向左绕完整1圈，速度0.15米每秒，然后停车。',
+    rotation: '原地向左转720度，然后停车。'
+  };
+  $('intent').value = examples[$('example').value];
+};
 $('start').onclick = () => action(async () => log(json(await api('start', {
   mission: $('missions').value, expected_session: state.session_id}))));
 $('cancel').onclick = () => action(async () => log('软件停止请求：' + json(await api('cancel', {}))));
