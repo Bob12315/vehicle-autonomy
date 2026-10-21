@@ -137,3 +137,24 @@ cd /home/pi/vehicle-autonomy/current
 车体/地面过滤、真实相机、物理急停和驱动失能仍未验收。当前不是自主行驶配置。
 板端 RTC 报告 2021 年且没有可达 NTP 默认路由；本次只校正系统时间，重启后须
 重新检查时间，不能把一次 SSH 校时当持续同步或传感器时间标定。
+
+## 最终发布复核
+
+实际运行源码 `c21645cdc4dadaf57d70a9682f31c63fc2a64d54`，部署时工作树干净。
+PC 289 项、ARM64 非 Gazebo profile 260 项通过，0 失败/错误/跳过。309 个非文档、
+非 legacy 跟踪文件在电脑与板端逐文件哈希一致，组合 SHA256 为
+`55c22beeaaa87eec87d063ebc1059e56916b4fa9e7b526a1797d482b47970069`。
+
+最终板端主动终止自己拥有的 SDK PID 后，监管器确认故障、释放全部四个自有子进程
+和 IPC；显式重启获得新 Application/SDK epoch，SDK 与两个读者的预期 epoch 完全
+匹配，两个 SEND 门仍为 false。随后 20 秒真实检查各收到 200 帧点云和扫描，10 Hz，
+最大 ROS 源年龄 166.953 ms，0 错误，外部 /rslidar_points 订阅为空。未知回波不洗成
+自由空间；物理停车始终 UNCONFIRMED。完整故障原始日志保留预期的失败退出结果。
+
+当前 Web 实测：未认证 401、缺 CSRF 403、硬件任务启动 409、重复软件停止请求响应
+一致且不宣称物理已停、当前审计页面 200。真实服务器提案调用 200，在无注册硬件
+Mission 时返回 reject / executed=false；未生成或执行车辆命令。
+
+完整可移植摘要和原始文件哈希见
+[`autonomy/evidence/hardware-connected.json`](autonomy/evidence/hardware-connected.json)。
+后续文档提交不改变运行代码；本轮本地提交保留，没有 push。

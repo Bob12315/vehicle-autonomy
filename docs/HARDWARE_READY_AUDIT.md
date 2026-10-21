@@ -5,6 +5,10 @@ Hardware-Ready Simulation 验收。P26 统一导航门槛 FAIL，真实车辆运
 首次交付运行版本为 `8b8f61a`。用户接线后的增量版本已完成实际 RS16 接入、
 隔离 ARM64 Humble/Nav2/SLAM 环境及进程监管；当前证据和一键命令见
 [接线与环境配置](HARDWARE_CONNECTION_SETUP.md)。下文历史 P26 失败保持有效。
+接线增量实际运行源码为 `c21645c`，最终 PC 289 / ARM64 260 测试均通过、0 跳过；
+真实 SDK/ROS/PCAP/rosbag、接收进程故障重启、Web/LLM 证据见
+[`hardware-connected.json`](autonomy/evidence/hardware-connected.json)。板端与电脑 309 个
+非文档/非 legacy 文件指纹完全一致，后续本地文档提交不改变运行代码。
 
 软件可部署不等于真实车辆已通过安全验收。本轮没有向真实飞控发送解锁、模式、
 运动、电机或参数请求，没有改管理网络、内核、飞控固件或旧 CUADC/legacy。
@@ -21,7 +25,7 @@ BLOCKED 包括外部条件不足或所需软件组合尚未实现，原因逐项
 | P26 600 秒/100 任务资源门槛 | PASS | 600.436 s，100 个唯一任务/Effect，802 份资源样本；0 跳过。 |
 | P26 统一导航版本门槛 | **FAIL** | 默认前驱跟踪触发 0.15 m 越轨保护；重规划场景定位年龄 570.845 ms 超过 500 ms。未提高门槛或改写失败。23 项 mandatory 场景实际执行 21 PASS / 2 FAIL / 0 跳过 / 0 未运行；所有进程组及端口释放。完整结果见提交的 JSON 证据。 |
 | P27 ARM64 应用与 Web 部署 | PASS | NanoPC-T6 Ubuntu 22.04/Python 3.10，独立 venv/离线 wheels/版本目录，实际启动和 API 健康检查。 |
-| 板端非 Gazebo 单元 profile | PASS | 首次 255 项；接线后环境版本 258 项，进程 epoch 修订 `952ef23` 为 259 项，均 0 失败/错误/跳过；外部仿真门槛另在 PC 执行。 |
+| 板端非 Gazebo 单元 profile | PASS | 首次 255 项；接线后最终 `c21645c` 为 260 项，0 失败/错误/跳过；外部仿真门槛另在 PC 执行。 |
 | 板端递归全量 discovery 尝试 | **FAIL** | 初始发布版 278 项中 3 个错误：PC harness 依赖 Git/本机 simulator checkout，Oracle 依赖 Gazebo Python 包。原始日志保留，不将该尝试改称 PASS。板端不要求运行 Gazebo/SITL。 |
 | P27 板端 ROS/Nav2/SLAM 环境 | PASS | 用户接线后离线提取 626 个认证 ARM64/all 包到独立 prefix，实际 Humble ROS、Nav2 planner/controller、SLAM Ceres solver、robot_localization 原生加载及 launch 参数解析；系统 dpkg 状态 SHA 前后相同。导航/建图本身仍未验收。 |
 | P28 官方 RS16 adapter 编译 | PASS | 官方 rs_driver `897b14d3…`，PC 和 ARM64 g++ 实际编译，保留 vendor license、二进制 SHA。 |

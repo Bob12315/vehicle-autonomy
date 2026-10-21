@@ -1,0 +1,837 @@
+{
+  "date": "2026-10-21",
+  "scope": "connected hardware receive-only environment; no physical motion acceptance",
+  "source": {
+    "commit": "c21645cdc4dadaf57d70a9682f31c63fc2a64d54",
+    "files": 309,
+    "sha256": "55c22beeaaa87eec87d063ebc1059e56916b4fa9e7b526a1797d482b47970069"
+  },
+  "board_attestation": {
+    "files": 309,
+    "sha256": "55c22beeaaa87eec87d063ebc1059e56916b4fa9e7b526a1797d482b47970069",
+    "source_marker": {
+      "source_commit": "c21645cdc4dadaf57d70a9682f31c63fc2a64d54",
+      "source_dirty": false,
+      "archive_sha256": "81f5dd17329448188da18b6e01c16805f07fb532b1cd14db50ba3d652bf196ae",
+      "wheel_hashes": {
+        "fastcrc-0.5.0-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl": "3af29ca78f31919834b64750d12ad82ec29d0b8342878d411bf24d6b13e7a0d6",
+        "lxml-6.1.3-cp310-cp310-manylinux2014_aarch64.manylinux_2_17_aarch64.whl": "ff88a92cafde90888511242d1c54afcc1a8adbb6dc0a88fa7f87e29e92400d4a",
+        "pymavlink-2.4.49-cp310-cp310-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl": "4e03ae4c4a9d3cd261a09c1dcc3b83e4d0493c9d4a8a438219f7133b1bd6d74a",
+        "pyserial-3.5-py2.py3-none-any.whl": "c4451db6ba391ca6ca299fb3ec7bae67a5c55dde170964c7a14ceefec02f2cf0",
+        "tomli-2.2.1-py3-none-any.whl": "cb55c73c5f4408779d0cf3eef9f762b9c9f147a77de7b258bef0a5628adc85cc"
+      }
+    }
+  },
+  "tests": {
+    "pc": {
+      "tests": 289,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "log": "full-unit-source-isolation.log"
+    },
+    "arm64": {
+      "passed": true,
+      "profile": "onboard_non_gazebo",
+      "tests": 260,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "modules": [
+        "tests.test_application_control",
+        "tests.test_application_runtime",
+        "tests.test_autonomy_business",
+        "tests.test_basic_actions",
+        "tests.test_basic_missions",
+        "tests.test_collision_writer",
+        "tests.test_cuadc_actions",
+        "tests.test_environment",
+        "tests.test_foundation_contracts",
+        "tests.test_framework",
+        "tests.test_goal_navigation",
+        "tests.test_hardware_readonly",
+        "tests.test_lidar_safety",
+        "tests.test_live_camera",
+        "tests.test_llm_proposals",
+        "tests.test_map_reliability",
+        "tests.test_mapping",
+        "tests.test_mavlink_state_adapter",
+        "tests.test_navigation_models",
+        "tests.test_onboard_supervisor",
+        "tests.test_online_localization",
+        "tests.test_p2_state_chain",
+        "tests.test_p3_decision",
+        "tests.test_p4_control",
+        "tests.test_p5_mavlink",
+        "tests.test_p6_sitl_runtime",
+        "tests.test_path_following",
+        "tests.test_payload_contracts",
+        "tests.test_payload_execution",
+        "tests.test_planning",
+        "tests.test_recorded_camera",
+        "tests.test_rover_model",
+        "tests.test_rover_plugin",
+        "tests.test_rs16_supervision",
+        "tests.test_sim_objects",
+        "tests.test_simulation_profile",
+        "tests.test_simulation_runtime",
+        "tests.test_simulation_safety",
+        "tests.test_sitl_arm_mission",
+        "tests.test_transform",
+        "tests.test_vision_geometry",
+        "tests.test_web_console"
+      ],
+      "external_gates": {
+        "tests.test_gazebo_oracle": "PC P26 mandatory; Gazebo bindings unavailable on board",
+        "tests.simulation.*": "PC P26 mandatory; owned SITL/Gazebo/toolchain checkouts are PC-only"
+      },
+      "physical_vehicle_io": "none; actual serial source configuration remains null"
+    }
+  },
+  "network": {
+    "pc": "192.168.50.1/24",
+    "board_management": "eth1 192.168.50.2/24 unchanged",
+    "board_lidar": "eth0 192.168.10.15/24 retained, observed 192.168.1.181/24 added and persisted",
+    "lidar": "192.168.1.200",
+    "ports": {
+      "msop": 6699,
+      "difop": 7788
+    },
+    "default_route": "none added",
+    "evidence": "eth0-original.txt; board-link-detail.txt"
+  },
+  "clock": {
+    "pc_ntp_synchronized": true,
+    "before_offset_s": -130240.09435510635,
+    "after_offset_s": -0.19425344467163086,
+    "method": "one-shot SSH date, no RTC/kernel/network modification",
+    "physical_sensor_capture_time_qualified": false
+  },
+  "flightcontroller": {
+    "port": "/dev/serial/by-id/usb-ArduPilot_MicoAir743v2_260029000C51333238373537-if00",
+    "duration_s": 20.0032832779998,
+    "bytes_received": 13463,
+    "bytes_written": 0,
+    "message_counts": {
+      "HEARTBEAT": 31,
+      "AHRS": 28,
+      "ATTITUDE": 28,
+      "GLOBAL_POSITION_INT": 28,
+      "VFR_HUD": 28,
+      "SYS_STATUS": 28,
+      "POWER_STATUS": 28,
+      "MEMINFO": 28,
+      "MISSION_CURRENT": 28,
+      "SERVO_OUTPUT_RAW": 28,
+      "RC_CHANNELS": 28,
+      "RAW_IMU": 28,
+      "SCALED_IMU2": 28,
+      "SCALED_PRESSURE": 28,
+      "SYSTEM_TIME": 28,
+      "VIBRATION": 28,
+      "MCU_STATUS": 28,
+      "TIMESYNC": 4
+    },
+    "status_texts": [],
+    "diagnostics": {
+      "epoch": "3621786095974cbfb4977182bd27837e",
+      "source": [
+        1,
+        1
+      ],
+      "facts": {
+        "HEARTBEAT": {
+          "value": {
+            "mavpackettype": "HEARTBEAT",
+            "type": 10,
+            "autopilot": 3,
+            "base_mode": 1,
+            "custom_mode": 4,
+            "system_status": 5,
+            "mavlink_version": 3
+          },
+          "receive_age_ns": 996214997,
+          "capture_time": "unknown; receive time is diagnostic only"
+        },
+        "ATTITUDE": {
+          "value": {
+            "mavpackettype": "ATTITUDE",
+            "time_boot_ms": 953864,
+            "roll": 0.283114492893219,
+            "pitch": 0.26339128613471985,
+            "yaw": 0.163688063621521,
+            "rollspeed": 0.00029426603578031063,
+            "pitchspeed": -0.00010255773668177426,
+            "yawspeed": -0.0006727072759531438
+          },
+          "receive_age_ns": 996175119,
+          "capture_time": "unknown; receive time is diagnostic only"
+        },
+        "GLOBAL_POSITION_INT": {
+          "value": {
+            "mavpackettype": "GLOBAL_POSITION_INT",
+            "time_boot_ms": 953864,
+            "lat": 0,
+            "lon": 0,
+            "alt": 0,
+            "relative_alt": 3837,
+            "vx": 0,
+            "vy": 0,
+            "vz": 0,
+            "hdg": 937,
+            "velocity_enu_mps": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "receive_age_ns": 996154678,
+          "capture_time": "unknown; receive time is diagnostic only"
+        },
+        "SYS_STATUS": {
+          "value": {
+            "mavpackettype": "SYS_STATUS",
+            "onboard_control_sensors_present": 305191947,
+            "onboard_control_sensors_enabled": 270565387,
+            "onboard_control_sensors_health": 36733195,
+            "load": 17,
+            "voltage_battery": 0,
+            "current_battery": -1,
+            "battery_remaining": -1,
+            "drop_rate_comm": 0,
+            "errors_comm": 0,
+            "errors_count1": 0,
+            "errors_count2": 0,
+            "errors_count3": 0,
+            "errors_count4": 0
+          },
+          "receive_age_ns": 996135732,
+          "capture_time": "unknown; receive time is diagnostic only"
+        }
+      },
+      "gps_diagnostic_eligible": false,
+      "reasons": [
+        "gps_missing_or_stale",
+        "ekf_missing_or_stale"
+      ],
+      "control_eligible": false,
+      "control_block": "physical timing, origin, geofence and chassis acceptance incomplete"
+    },
+    "connection_passed": true,
+    "physical_vehicle_acceptance": "NOT_TESTED"
+  },
+  "raw_packet_diagnostics": {
+    "packet_counts": {
+      "6699": 5812,
+      "7788": 78
+    },
+    "difop": {
+      "rpm": 600,
+      "lidar_ip": "192.168.1.200",
+      "host_ip": "192.168.1.181",
+      "fov_hundredth_degree": [
+        0,
+        36000
+      ]
+    },
+    "distance_counts": {
+      "above_230m": 1916404,
+      "in_range": 270732,
+      "below_0.4m": 44672
+    },
+    "azimuth_range": [
+      0,
+      35999
+    ],
+    "raw_distance_most_common": [
+      [
+        65535,
+        1916404
+      ],
+      [
+        123,
+        10997
+      ],
+      [
+        122,
+        9915
+      ],
+      [
+        121,
+        8465
+      ],
+      [
+        120,
+        7533
+      ]
+    ],
+    "fraction_in_decoder_range": 0.12130613386097729,
+    "interpretation": "raw packet diagnostic using pinned official RS16 layout/range; invalid returns are not free-space evidence; physical cause unqualified"
+  },
+  "live_ros_release": {
+    "passed": true,
+    "provenance": "live_sdk_system_timestamp",
+    "duration_s": 20.043734346999827,
+    "counts": {
+      "points": 200,
+      "scan": 200
+    },
+    "rates_hz": {
+      "points": 10.0,
+      "scan": 10.0
+    },
+    "point_count_range": [
+      3676,
+      3736
+    ],
+    "known_scan_bins_range": [
+      306,
+      318
+    ],
+    "maximum_ros_source_age_ms": 166.952673,
+    "source_epochs": [
+      "31d941b1a8374ba3929e9259d36efc93"
+    ],
+    "unique_source_sequences": 201,
+    "publishers": {
+      "/vaf/lidar/points": [
+        "vaf_rs16_scan"
+      ],
+      "/vaf/lidar/scan": [
+        "vaf_rs16_scan"
+      ]
+    },
+    "external_input_subscribers": [],
+    "errors": [],
+    "error_count": 0,
+    "control_eligible": false,
+    "physical_mount_and_stop_acceptance": "NOT_TESTED"
+  },
+  "sdk_fault_restart": {
+    "passed": true,
+    "source": "c21645c",
+    "old_session": "732b331dcee7404f87911ceb7a88816d",
+    "new_session": "af15e60a76ed4e2c94a82640156ffc17",
+    "old_sdk_epoch": "563273ece6144b2cb0f41ff6e66aabdb",
+    "new_sdk_epoch": "31d941b1a8374ba3929e9259d36efc93",
+    "owned_children": [
+      "rs16",
+      "ros_scan",
+      "application",
+      "web"
+    ],
+    "fault_result": {
+      "passed": false,
+      "mode": "hardware_readonly",
+      "physical_stop": "UNCONFIRMED",
+      "error": "RuntimeError: rs16 exited -9; read-only stack stopped, explicit restart required"
+    },
+    "all_previous_children_released": true,
+    "new_epoch_matches_all_readers": true,
+    "both_send_false": true,
+    "physical_stop": "UNCONFIRMED"
+  },
+  "web_llm_release": {
+    "source": "c21645cdc4dadaf57d70a9682f31c63fc2a64d54",
+    "passed": true,
+    "http": {
+      "unauthenticated": 401,
+      "status": 200,
+      "missing_csrf": 403,
+      "hardware_start": 409,
+      "stop": 200,
+      "stop_repeat": 200,
+      "llm": 200,
+      "reports": 200
+    },
+    "stop_duplicate_identical": true,
+    "physical_stop": "UNCONFIRMED",
+    "both_send_false": true,
+    "lidar_online": true,
+    "reports_current": true,
+    "llm": {
+      "id": "fdb45b8a575240feb750a9d598ed105c",
+      "decision": "reject",
+      "mission": null,
+      "reason": "保持停车属于静止状态，不属于已注册的移动任务，且无对应注册任务可提案。",
+      "expires_in_s": 60,
+      "requires_human_approval": true,
+      "executed": false
+    }
+  },
+  "release_status": {
+    "mode": "hardware_readonly",
+    "system_send": false,
+    "action_send": false,
+    "physical_stop": "UNCONFIRMED",
+    "lidar": {
+      "online": true,
+      "source": "robosense.rs_driver",
+      "epoch": "31d941b1a8374ba3929e9259d36efc93",
+      "frame": "lidar",
+      "sequence": 457,
+      "points": 3715,
+      "capture_ns": 2362002310320,
+      "age_ns": 81226528,
+      "provenance": "live_sdk_system_timestamp",
+      "control_eligible": false,
+      "reason": "mount/exposure clock, ground/body filters and physical acceptance unqualified",
+      "dropped_clouds": 0
+    },
+    "errors": {},
+    "reports_include_current_connected_environment": true
+  },
+  "ros_prefix": {
+    "packages": 626,
+    "path": "/home/pi/vehicle-autonomy/ros2-humble/root",
+    "system_dpkg_sha256_before_and_after": "8a802b25b4da4b92a485a4fe5f3f6c9fe38c289a3361f5f339e1c2ad5e8ed129",
+    "source": "signed APT indexes, architecture arm64/all, extraction only; no system install",
+    "archives": {
+      "initial": {
+        "path": "artifacts/hardware-ready/ros-humble-arm64/bundle.tar.gz",
+        "sha256": "f389934b941c513a70e7da91d2daf9d257a3e46c08d3114dfdbd69bb33386f2e"
+      },
+      "delta": {
+        "path": "artifacts/hardware-ready/ros-humble-arm64/delta.tar.gz",
+        "sha256": "02e9f034a069860b0c6442070c779f324b2a99eff7dbb9c32e9585b9d2ef2382"
+      }
+    }
+  },
+  "recording": {
+    "pcap_sdk_decoded_clouds": 78,
+    "pcap_scope": "replay",
+    "bag_record": {
+      "points": 115,
+      "scan": 114,
+      "duration_s": 11.362751142
+    },
+    "bag_replay": {
+      "accepted": 115,
+      "rejected": 0,
+      "scan_recorded": 115,
+      "scope": "rosbag_replay",
+      "offline_after_end": true
+    }
+  },
+  "remaining": {
+    "P26": "FAIL unchanged; full mandatory suite 21/23, previous tracking/freshness failures retained",
+    "compass": "BLOCKED onsite calibration",
+    "gps_ekf": "BLOCKED no valid GPS_RAW_INT/EKF_STATUS_REPORT in finite passive USB observations",
+    "radio": "BLOCKED initial Radio Failsafe / PreArm warning needs onsite confirmation",
+    "lidar_coverage": "BLOCKED full obstacle coverage; many invalid returns, mount/scene/sensor cause unknown",
+    "mount_tf_map": "BLOCKED no physical calibration or qualified localization",
+    "camera": "BLOCKED no confirmed board camera",
+    "physical_estop_motion": "BLOCKED onsite staged independent acceptance required",
+    "rtc_ntp": "BLOCKED sustained time sync; one-shot SSH correction only"
+  },
+  "safety": {
+    "real_vehicle_mavlink_commands_sent": 0,
+    "both_send": false,
+    "physical_stop": "UNCONFIRMED",
+    "hardware_controlled": "rejected",
+    "core_contracts_legacy_changed": false,
+    "pushed": false
+  },
+  "artifacts": {
+    "base": "artifacts/hardware-ready/connection-20261021",
+    "files": [
+      {
+        "path": "arm-real-pcap-replay.log",
+        "bytes": 39,
+        "sha256": "507e70989065b44f404bf03e4d80d5e3457495f3fa682d2c801f9ea3723cbd82"
+      },
+      {
+        "path": "board-code-attestation.json",
+        "bytes": 1029,
+        "sha256": "7baad2c1babb1fc9526d99c549626894e60fbe6b8ca5ef62a881998373e0f1e7"
+      },
+      {
+        "path": "board-link-detail.txt",
+        "bytes": 5248,
+        "sha256": "4c8593b8a16b46e9021f807f3c63fecf6b6a27ddc918b4890d3f6fcb08e64e75"
+      },
+      {
+        "path": "board-live-status-r1.json",
+        "bytes": 4785,
+        "sha256": "3ca414425269951ccc8e2265ff39afd678fb48d0170d6bbeeb1e21468841290e"
+      },
+      {
+        "path": "clock-correction.json",
+        "bytes": 237,
+        "sha256": "a8d34d9ce2fd93594ecbff7c1918fcf89f2180979b4254cb6f9268f4ec32ffa0"
+      },
+      {
+        "path": "deploy-connected-release/c21645cdc4dadaf57d70a9682f31c63fc2a64d54.tar",
+        "bytes": 3205120,
+        "sha256": "81f5dd17329448188da18b6e01c16805f07fb532b1cd14db50ba3d652bf196ae"
+      },
+      {
+        "path": "deploy-connected-release/deployment.json",
+        "bytes": 4248,
+        "sha256": "4cbeeebd19906aeefb074b61c4dffcc46b49b85920852e7e35886e7b974162f4"
+      },
+      {
+        "path": "deploy-connected-release/wheels.tar",
+        "bytes": 12482560,
+        "sha256": "d785209afe9969efd669846aeda7e3c5cc776ec2b66b77c477d8918c1a2d93b6"
+      },
+      {
+        "path": "deploy-epoch-fence/952ef23ab5c90bf285385629f554095a533612c9.tar",
+        "bytes": 3194880,
+        "sha256": "999ac31665b8af7aea0ddeb66f38a84eccae8693ec2bffd52f06807ae0e3090c"
+      },
+      {
+        "path": "deploy-epoch-fence/deployment.json",
+        "bytes": 4248,
+        "sha256": "31d19e6b83a48cabc0034db47ef2b6a88150560bfe876405425be155d8aa25df"
+      },
+      {
+        "path": "deploy-epoch-fence/wheels.tar",
+        "bytes": 12482560,
+        "sha256": "d785209afe9969efd669846aeda7e3c5cc776ec2b66b77c477d8918c1a2d93b6"
+      },
+      {
+        "path": "deploy-final/a61381791c3266b072bcb405ca0379963a985185.tar",
+        "bytes": 3194880,
+        "sha256": "dad514904dc21d21df630e9a8b9eea4f8961c4e4bda5acb6f690bcf5f1a3b70c"
+      },
+      {
+        "path": "deploy-final/deployment.json",
+        "bytes": 4248,
+        "sha256": "68f68f2d2060882ecb60a8420cdbdcea8c5d935d68786f64fb8f30677c7d0368"
+      },
+      {
+        "path": "deploy-final/wheels.tar",
+        "bytes": 12482560,
+        "sha256": "d785209afe9969efd669846aeda7e3c5cc776ec2b66b77c477d8918c1a2d93b6"
+      },
+      {
+        "path": "deploy-r1/d475ecf5c4b701efcdc0f3d081249accab0426ab.tar",
+        "bytes": 3174400,
+        "sha256": "4ee3d75938e9c4073a7b113ba435548ef174dad7b0111cdbb52c44193f4513eb"
+      },
+      {
+        "path": "deploy-r1/deployment.json",
+        "bytes": 4247,
+        "sha256": "cdc1673cdb7d9ffdca7f4634cd623219fa7283d25b900e4d937c7c973a684233"
+      },
+      {
+        "path": "deploy-r1/wheels.tar",
+        "bytes": 12482560,
+        "sha256": "d785209afe9969efd669846aeda7e3c5cc776ec2b66b77c477d8918c1a2d93b6"
+      },
+      {
+        "path": "environment-final-inventory.txt",
+        "bytes": 2732,
+        "sha256": "d24c36d4e6735cae9a0d3d7e9eacc61d0be26f2617dfab1f7ed1a9f1f44d9434"
+      },
+      {
+        "path": "epoch-cli-regression.log",
+        "bytes": 98,
+        "sha256": "2741f9bee35f913a462b4a18749b4d9b902b0049caa14a03a57fc74883214133"
+      },
+      {
+        "path": "eth0-original.txt",
+        "bytes": 1287,
+        "sha256": "dd1584625f8b4522bf6de9e3071e14111deb354bb97614325a2bcfa7aa96ba40"
+      },
+      {
+        "path": "fc-readonly.json",
+        "bytes": 3709,
+        "sha256": "1aeea2824671cbaa4f9d52edb4cb85b739e39e3eae13e0e15b8c6ec3ddced631"
+      },
+      {
+        "path": "fc-repeat.json",
+        "bytes": 3130,
+        "sha256": "d82d66b67b8add64e96cd438c1e563670b1a435110830b56b88b74e764b8c928"
+      },
+      {
+        "path": "fc-repeat.log",
+        "bytes": 537,
+        "sha256": "15a9d2e9506c683c8908d99c88cb932d988f6e5e8c154af132b2f934d9c818e4"
+      },
+      {
+        "path": "final-start.log",
+        "bytes": 158,
+        "sha256": "a93133203137858ba243b36578b92e50dca695c9c6794f366a7adbd40d8f2a1f"
+      },
+      {
+        "path": "full-unit-epoch-fence.log",
+        "bytes": 100,
+        "sha256": "d1a8c504c54ee53fffe8a920d14a87919166eb85ba23132b6d50151e1dde2147"
+      },
+      {
+        "path": "full-unit-final.log",
+        "bytes": 100,
+        "sha256": "2a456e05cb03627272445300c0c9a3ccd2de954b91de74a7722877fcfce4ea6c"
+      },
+      {
+        "path": "full-unit-source-isolation.log",
+        "bytes": 100,
+        "sha256": "6c65e30e91ce4bd9d28dcc1665c50cd543faea7d5571e2fa231253e08b229e42"
+      },
+      {
+        "path": "full-unit.log",
+        "bytes": 100,
+        "sha256": "0f66f50dfbd54b81f133d103b0044beef4fdf4a5f24a42bff3450ed1e82c7acb"
+      },
+      {
+        "path": "lidar-passive.txt",
+        "bytes": 237,
+        "sha256": "f9ae813e37333a97eae034cf628026656d90df817f248d4728cbec6afdfb2ba1"
+      },
+      {
+        "path": "nav2-full-bundle-probe.log",
+        "bytes": 2239,
+        "sha256": "a328840868518f02e300fbe7c26cb9510d1da4078d82eb4ea1ca4a55f9c66284"
+      },
+      {
+        "path": "nav2-slam-native-probe.log",
+        "bytes": 1788,
+        "sha256": "518cdb2b773dab4b093641059a5e30f63b04e2264b38e2482eae69ccf202027f"
+      },
+      {
+        "path": "onboard-unit-epoch.json",
+        "bytes": 1833,
+        "sha256": "3bd4f5406e02ad71be9df135e3d37349ccd69c352c089d1b810e5224d5efe09b"
+      },
+      {
+        "path": "onboard-unit-epoch.log",
+        "bytes": 360,
+        "sha256": "0ed2cd4d7c4019414ef7f2136476648615542424746595f51b9dd575f6ac025c"
+      },
+      {
+        "path": "onboard-unit-final.json",
+        "bytes": 1833,
+        "sha256": "009b17609c63122ab6f4d31a44432552a2814604222a591f23bfe3d4f0c90c90"
+      },
+      {
+        "path": "onboard-unit-final.log",
+        "bytes": 359,
+        "sha256": "4d7908389b788f0c7ed7dd521b9c494a4bc18a55c125e380a0a972c8e636f04d"
+      },
+      {
+        "path": "onboard-unit-r1.json",
+        "bytes": 1833,
+        "sha256": "009b17609c63122ab6f4d31a44432552a2814604222a591f23bfe3d4f0c90c90"
+      },
+      {
+        "path": "onboard-unit-r1.log",
+        "bytes": 359,
+        "sha256": "6d964d41c2d76f89250c24717b0e236eb3e35dd7a5af01df522d6cd1aa538260"
+      },
+      {
+        "path": "onboard-unit-release.json",
+        "bytes": 1833,
+        "sha256": "6b15ac5a3e47084cf6383c0b5fb0bac32005b54ef9bd0c0658ed6f7f52f2e01b"
+      },
+      {
+        "path": "onboard-unit-release.log",
+        "bytes": 361,
+        "sha256": "5fce8c8e2601cd5d690f6eb75aab01553743ec5129aabda85c7e8cc62fe6b6a5"
+      },
+      {
+        "path": "owned-sdk-crash-restart.json",
+        "bytes": 698,
+        "sha256": "638d48ed264a78360fde85965ba35bc4c5ca63e348558d70faaa5cbb6fbb50a9"
+      },
+      {
+        "path": "owned-sdk-crash-restart.log",
+        "bytes": 792,
+        "sha256": "f8a4da9e26cfa8d074fe8be4654d10da0f95f86173d5cbc32f4b6f7d81975add"
+      },
+      {
+        "path": "release-code-hash.json",
+        "bytes": 154,
+        "sha256": "d68d6491a51a61f04c8f6180810c86358844a83aa8d0b727e2349d388ad02bad"
+      },
+      {
+        "path": "release-stderr-network.txt",
+        "bytes": 837,
+        "sha256": "8ad98cb51fc41523e77099030978a7d79f6365bb3c0d44877825604628565e18"
+      },
+      {
+        "path": "release-web-status.json",
+        "bytes": 629,
+        "sha256": "e146b0e5774a5c6ef6cbcd0d91e28c035c810414a83d5d5db828186fd3b951c0"
+      },
+      {
+        "path": "ros-arm-self-test-r1.log",
+        "bytes": 130,
+        "sha256": "5c3356e194ae430257b631d4a7e3ba97333b3d844de4e2ef05509662dfa2570e"
+      },
+      {
+        "path": "ros-live-final.json",
+        "bytes": 707,
+        "sha256": "b228777739fb21ab36125789b6bca497e1d0cf1949d2a1225094b6564f9a43d5"
+      },
+      {
+        "path": "ros-live-final.log",
+        "bytes": 591,
+        "sha256": "d310dc2b303d5e5864b383ab027c8fd3bc4727e176a3507a231aa62bb9dc9fcc"
+      },
+      {
+        "path": "ros-live-r1.log",
+        "bytes": 334,
+        "sha256": "efb22092825f455ff2e81c618eaf131caa4e39d37e0ce6429f05ff762451d9d4"
+      },
+      {
+        "path": "ros-live-r2.json",
+        "bytes": 706,
+        "sha256": "28482579997f70747d763186545b0647677af711b562347ba8d97f21c27c0763"
+      },
+      {
+        "path": "ros-live-r2.log",
+        "bytes": 583,
+        "sha256": "95983648b2114bf23cf7f67a9dd917e992f88d8a3944a905259c8566b995c406"
+      },
+      {
+        "path": "ros-live-release.json",
+        "bytes": 742,
+        "sha256": "6262e12f5d25bc0977367157cab7098142977ff4534859b276f8fcdbd0aa0844"
+      },
+      {
+        "path": "ros-live-release.log",
+        "bytes": 624,
+        "sha256": "b2faa80e792c2ddaa96eb554819ca41dca53a0c727347395fde6b983c423a6ff"
+      },
+      {
+        "path": "ros-manifest-final.json",
+        "bytes": 148414,
+        "sha256": "bc336ba3a915aa75e691a853f807614b6054ed7a01aaea99b34aa5c458562a6b"
+      },
+      {
+        "path": "ros-manifest-r2.json",
+        "bytes": 122857,
+        "sha256": "155ba245d4de1cedefcf001d65095669b4908aef24de0eea95bd2ae5489fae7e"
+      },
+      {
+        "path": "ros-pc-final.log",
+        "bytes": 123,
+        "sha256": "b726d022f8b54365b99cc8b4a80a0ca55d10a07dd7a2a0f4a3495c799554d5f9"
+      },
+      {
+        "path": "ros-pc-self-test.log",
+        "bytes": 123,
+        "sha256": "b726d022f8b54365b99cc8b4a80a0ca55d10a07dd7a2a0f4a3495c799554d5f9"
+      },
+      {
+        "path": "ros-prepare-r1-failed.log",
+        "bytes": 9444,
+        "sha256": "b0cfa4bd5406d690a1415599c41a14ba3a734e9caebe04f353498a61195c26eb"
+      },
+      {
+        "path": "ros-prepare-r2.log",
+        "bytes": 93038,
+        "sha256": "678a81480f4e631bb906b42c4786a04f43cab6b3800b7dd147fac7b065e7ac44"
+      },
+      {
+        "path": "ros-prepare-r3.log",
+        "bytes": 42119,
+        "sha256": "65ad69ee364935abcd7dc3deb6f856dca5a465d02d845ab2a4f42fac14c367c6"
+      },
+      {
+        "path": "ros-sidecar-term-r2.log",
+        "bytes": 1994,
+        "sha256": "74481816afa7dc5b22703711bce86415d76ec0d4570b1065408d87e1cab84b1f"
+      },
+      {
+        "path": "ros-sidecar-term-r3.log",
+        "bytes": 46,
+        "sha256": "3dffe613f7bd07342b50b1f374dd657e67f690fde87ad6d2d350ce83015a384a"
+      },
+      {
+        "path": "rosbag-live/metadata.yaml",
+        "bytes": 1482,
+        "sha256": "a972a4c9cf93e779bc124a245df790a24876181b34e3c73701bf907158e82b8b"
+      },
+      {
+        "path": "rosbag-live/rosbag-live_0.db3",
+        "bytes": 5672960,
+        "sha256": "2b5c43c83de9e93ebc1dad646aca4d3613b24b6b5bafc2bc4bf86fd9c3fdb5ae"
+      },
+      {
+        "path": "rosbag-record.log",
+        "bytes": 1631,
+        "sha256": "96ab026831c1dcfe38514cce02840deac6da4530708da811e2681d202d7cafe9"
+      },
+      {
+        "path": "rosbag-replay-r1.log",
+        "bytes": 2604,
+        "sha256": "1bc09cf1f0dbc224d0ddb648e8bd91fdad46946d44854b1da106e966390effee"
+      },
+      {
+        "path": "rosbag-replay-scan/metadata.yaml",
+        "bytes": 1009,
+        "sha256": "b7e37ec3d05ff51bd145eaf845f56db0b434d4fa112ddd7985be50e2d344b96c"
+      },
+      {
+        "path": "rosbag-replay-scan/rosbag-replay-scan_0.db3",
+        "bytes": 495616,
+        "sha256": "96bebb4d0286c8082eb318404fec6c9c07e808eaa0ece821ab809840e4380555"
+      },
+      {
+        "path": "rs16-live-cloud-summary.json",
+        "bytes": 735,
+        "sha256": "d5147da9a481d04ae92fde38e4a9be1c5bc08b4f1bb9b8965938576b608900af"
+      },
+      {
+        "path": "rs16-live-native.txt",
+        "bytes": 262,
+        "sha256": "029be502aabb508274cea87290959e13442562da26a65d5eb419cad9e6e70e55"
+      },
+      {
+        "path": "rs16-packet-quality.json",
+        "bytes": 790,
+        "sha256": "dd3e49cdb7ecc7a40f6a057153468c80c20892606c1e29e26aec848331f407d7"
+      },
+      {
+        "path": "rs16-real.pcap",
+        "bytes": 7692364,
+        "sha256": "ea4d2f4a8bcfdf97b1d318f0be14c0ba9f075cdb4fa32f0411d98637b222ffc8"
+      },
+      {
+        "path": "rs16-supervision-tests.log",
+        "bytes": 97,
+        "sha256": "c9088fa5bb0fdd39f35e68119bc2c106b20bccdc46e56e32764d73f520852214"
+      },
+      {
+        "path": "slam-native-probe-r2.log",
+        "bytes": 165,
+        "sha256": "dcb83cc38b1a328ad4316a9f26f0b50a83e6a668671758050c75ab132eec4cd1"
+      },
+      {
+        "path": "source-isolation-tests.log",
+        "bytes": 98,
+        "sha256": "31fa4e3ab73fa82c9db53f902d6debc46599d2b52d00522eea2995a391e03714"
+      },
+      {
+        "path": "stage-regression.log",
+        "bytes": 98,
+        "sha256": "3df5344af93eaf2d58995efd7b96e441ac618a350286916a8a9fc2d7c6113fde"
+      },
+      {
+        "path": "stage-tests.log",
+        "bytes": 97,
+        "sha256": "34bb9164a85a76f508ef8e4b2ad58ac7767ee1b2abe0655653a39b4d8997e54a"
+      },
+      {
+        "path": "web-llm-live.json",
+        "bytes": 1320,
+        "sha256": "017cb1ce497325c9c078036c7d04cebbb46060a3f21e4c5b81683aa8b3ddcd04"
+      },
+      {
+        "path": "web-llm-release.json",
+        "bytes": 836,
+        "sha256": "c740f96cee119ebeb524e6efc7eab62d7ab84ebc5e62abc3886f5f068e2eeba7"
+      }
+    ]
+  },
+  "rs_driver": {
+    "official_revision": "897b14d3bdb6186a75df27ba51b65b5bd5557723",
+    "arm64_binary": "/home/pi/vehicle-autonomy/rs16-build-pcap/rs16_capture",
+    "binary_sha256": "99205ecb757d3aa808e01917904ee231375aec2c6cabd3585750865f888d6e79",
+    "live_decoded_clouds_18_s": 180,
+    "real_pcap_decoded_clouds": 78
+  }
+}
