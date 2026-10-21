@@ -98,6 +98,32 @@ class DesignRuntimeTests(ApplicationRuntimeTests):
         with self.assertRaises(ValueError):self.app.design_catalog()
         self.assertEqual(self.transports[-1].writes,[])
 
+    def test_stale_boundary_cannot_pass_preflight(self):
+        self.ready();catalog=self.bind()
+        self.clock.ns+=600_000_000
+        check=self.app.design_preflight(document('disarmed_mode'),catalog['context'])
+        self.assertIn('localization_or_twist_stale',check['reasons'])
+        self.assertEqual(self.transports[-1].writes,[])
+
+    def test_total_deadline_cannot_launch_next_step(self):
+        self.ready()
+        self.start_design('disarmed_mode','disarmed_mode')
+        self.app.design_task.deadline_ns=self.clock.ns
+        for _ in range(8):self.telemetry()
+        result=self.app.get_status()['task']
+        self.assertEqual(result['status'],'FAILED',result)
+        self.assertIn('deadline',result['error'])
+        self.assertEqual(self.transports[-1].writes,[])
+
+    def test_context_change_invalidates_running_design_without_automatic_restart(self):
+        self.ready();self.start_design('disarmed_mode','disarmed_mode')
+        self.app.design_task.context='old_context'
+        for _ in range(8):self.telemetry()
+        result=self.app.get_status()['task']
+        self.assertEqual(result['status'],'FAILED',result)
+        self.assertIn('context_changed',result['error'])
+        self.assertEqual(self.transports[-1].writes,[])
+
     def test_disconnect_cannot_resume_design_or_reuse_old_authority(self):
         self.ready();self.start_design('disarmed_mode','disarmed_mode')
         for _ in range(8):self.telemetry()
@@ -111,6 +137,29 @@ class DesignRuntimeTests(ApplicationRuntimeTests):
 
 
 class ApprovalTests(unittest.TestCase):
+    def test_blocked_design_inference_does_not_hold_operator_cancel_lock(self):
+        from tempfile import TemporaryDirectory
+        from application.operator_service import OperatorService
+        entered,release,finished=threading.Event(),threading.Event(),threading.Event()
+        class App:
+            def handle(self,op,p):
+                if op=='design_catalog':return dict(context='ctx',session_id='s',capabilities={})
+                if op=='cancel':return {'cancelled':True}
+                raise ValueError(op)
+        class Model:
+            def design(self,*args):
+                entered.set();release.wait(timeout=3)
+                return MissionDesign.parse(json.dumps(document(decision='clarify')),[])
+        with TemporaryDirectory() as directory:
+            service=OperatorService(App(),directory,llm=Model())
+            worker=threading.Thread(target=lambda:service.handle('design',{'text':'wait'}));worker.start()
+            try:
+                self.assertTrue(entered.wait(timeout=1))
+                cancel=threading.Thread(target=lambda:(service.handle('cancel',{}),finished.set()));cancel.start()
+                self.assertTrue(finished.wait(timeout=.5),'design inference held cancel lock')
+                cancel.join(timeout=1)
+            finally:release.set();worker.join(timeout=2)
+
     def test_approval_ttl_replay_and_curated_capability_bound(self):
         class App:
             def __init__(self):self.starts=[]

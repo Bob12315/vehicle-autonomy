@@ -63,6 +63,8 @@ class SimulationDesignSupport:
         if loc is None or loc.twist is None:
             reasons.append('localization_or_twist_missing')
         else:
+            if loc.quality.value != 'VALID':
+                reasons.append('localization_not_valid')
             if any(not 0 <= now.elapsed_ns_since(v.captured_at) <= 500_000_000 for v in (loc.pose,loc.twist)):
                 reasons.append('localization_or_twist_stale')
             twist=loc.twist.value

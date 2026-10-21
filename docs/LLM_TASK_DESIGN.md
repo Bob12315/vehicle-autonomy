@@ -33,6 +33,21 @@ ssh -NT -L 127.0.0.1:19436:127.0.0.1:11436 bob@10.10.12.240
 `config/llm.server-tunnel.json` 对应实际检查过的服务器协议及模型。
 其他服务器须提供真实配置，不能照搬端口或模型名。
 
+交互式体验（独立生成车模，不会自动启动任务）：
+
+```bash
+./scripts/simulation_console.sh --allow-send --llm-config config/llm.server-tunnel.json
+```
+
+约 45 秒初始化后输出 `http://127.0.0.1:8766` 和本次 token 文件路径。
+在本机读取该文件并粘贴到页面认证，输入
+“先执行 disarmed_mode，再执行已配置的 basic_route，最后再次执行 disarmed_mode”。
+检查步骤、预检和确认框后批准。`basic_route` 的实际路线在
+`simulation/missions/rover.toml`，目标在 `simulation/environments/rover.toml`。
+该交互入口只有基础路线；需完整 mapping/Nav2 装配才能使用命名导航能力。
+默认 900 秒后受控结束；Ctrl+C 提前退出。未给 `--allow-send` 时拒绝任务。
+它不连接机载电脑或 USB 飞控，也不将真实传感器接入该车模。
+
 ```bash
 ./scripts/test_llm_design_simulation.sh artifacts/simulation/llm-design-NEW
 ```
