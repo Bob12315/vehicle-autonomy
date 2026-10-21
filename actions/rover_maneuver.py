@@ -90,7 +90,12 @@ class ManeuverInstance:
         if p.kind=='wait':arrived=now-self.start_ns>=p.duration_s*1e9
         elif p.kind=='turn':
             remaining=p.turn_rad+self.initial_heading_error-self.rotation
-            arrived=abs(remaining)<=.07
+            dx,dy=p.start.x-pose.x,p.start.y-pose.y
+            # A caster chassis has transient axle drift during a pivot. Keep
+            # the approved axle point tethered using a small signed correction,
+            # rather than rebasing the task or widening its 0.15 m fence.
+            v=max(-.05,min(.05,.9*(dx*math.cos(pose.yaw)+dy*math.sin(pose.yaw))))
+            arrived=abs(remaining)<=.07 and math.hypot(dx,dy)<=.10
             w=math.copysign(min(.25,max(.08,.8*abs(remaining))),remaining)
         elif p.kind in ('drive','visit'):
             dx,dy=p.end.x-pose.x,p.end.y-pose.y;distance=math.hypot(dx,dy)

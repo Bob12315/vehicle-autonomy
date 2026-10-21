@@ -149,7 +149,8 @@ class SimulationDesignSupport:
     def start_design_checked(self, document, expected_context, expected_session, expected_anchor=None):
         if type(expected_session) is not str or expected_session!=self.vehicle.session_id:
             raise ValueError('design vehicle session changed')
-        if any(s.get('mission','').startswith('motion:') for s in document.get('steps',[]) if isinstance(s,dict)) and expected_anchor is None:
+        design=MissionDesign.parse(json.dumps(document),self._design_capabilities())
+        if any(m.startswith('motion:') for m in design.missions) and expected_anchor is None:
             raise ValueError('parameterized execution requires the approved preview anchor')
         check=self.design_preflight(document,expected_context,anchor=expected_anchor)
         if not check['eligible']:

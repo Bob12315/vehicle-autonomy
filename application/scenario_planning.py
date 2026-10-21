@@ -43,7 +43,9 @@ class StaticScene:
         self.obstacles=tuple(self.obstacles)
 
     def check(self):
-        if hashlib.sha256(self.path.read_bytes()).hexdigest()!=self.sha256:raise ValueError('static_scene_changed')
+        try:raw=self.path.read_bytes()
+        except OSError as exc:raise ValueError('static_scene_unavailable') from exc
+        if hashlib.sha256(raw).hexdigest()!=self.sha256:raise ValueError('static_scene_changed')
 
     def clearance(self,point,environment,*,margin=MARGIN):
         fence=environment.geofence;r=FOOTPRINT+margin

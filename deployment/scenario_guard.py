@@ -31,7 +31,9 @@ class ScenarioGuard:
             c=envelope.command
             if not isinstance(c,TwistTargetCommand) or c.frame_id!='base_link':raise ValueError('scenario_requires_body_twist')
             t=c.target_twist;v,w=t.linear.x,t.angular.z
-            if (any(x!=0 for x in (t.linear.y,t.linear.z,t.angular.x,t.angular.y)) or not 0<=v<=.18 or abs(w)>.25):
+            minimum=-.05 if self.parameters.kind=='turn' else 0
+            maximum=.05 if self.parameters.kind=='turn' else .18
+            if (any(x!=0 for x in (t.linear.y,t.linear.z,t.angular.x,t.angular.y)) or not minimum<=v<=maximum or abs(w)>.25):
                 raise ValueError('scenario_velocity_bound_exceeded')
             raw=state.reported_pose.value;p=drive_reference(Pose2D(raw.position.x,raw.position.y,yaw(raw)))
             if distance_to_path(p,self.parameters.path)>.15:raise ValueError('scenario_cross_track_exceeded')

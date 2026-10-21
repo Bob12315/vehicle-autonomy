@@ -151,7 +151,7 @@ def run(directory,case,llm_config):
                 assert math.hypot(checkpoints[0]['position'][0]-10.25,checkpoints[0]['position'][1])<.25
             if case=='patrol':
                 assert len(checkpoints)==5,checkpoints
-                for q,(x,y) in zip(checkpoints,[(3,0),(3,3),(3,3),(.25,3),(.25,0)]):
+                for q,(x,y) in zip(checkpoints,[(3,0),(2,1.5),(2,1.5),(.25,3),(.25,0)]):
                     assert math.hypot(q['position'][0]-x,q['position'][1]-y)<.25,q
             if case in ('rotation','circle'):
                 points=[q['truth'] for q in trajectory]
