@@ -110,7 +110,15 @@ async function propose(path) {
   }
   $('proposal-check').textContent = proposal.decision === 'clarify' ? '需要补充任务信息'
     : proposal.decision === 'reject' ? '该请求已被拒绝'
-    : proposal.preflight?.eligible === false ? '预检未通过：' + proposal.preflight.reasons.join('；')
+    : proposal.preflight?.eligible === false ? '预检未通过：' + proposal.preflight.reasons.map(reason => {
+      if (reason.includes('outside_geofence')) return '路线连同车体占用超出当前场地围栏';
+      if (reason.startsWith('maneuver_known_obstacle:')) return '路线被已知障碍占用：' + reason.split(':')[1];
+      if (reason.includes('budget') || reason.includes('lease')) return '任务超出已配置的时间预算';
+      if (reason.includes('moved since preview')) return '车辆位姿已变化，请重新设计';
+      if (reason.includes('warmup')) return '仿真车辆仍在初始化';
+      if (reason.includes('SEND_not_authorized')) return '本次仿真未授予执行权限';
+      return reason;
+    }).join('；')
     : '待人工确认 · 60 秒内有效 · 批准时将重新预检';
   if (proposal.preflight?.preview) {
     const p = proposal.preflight.preview;

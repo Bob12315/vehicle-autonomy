@@ -165,6 +165,23 @@ class ManeuverFaultTests(ScenarioTests):
         output=instance.tick(stale)
         self.assertEqual(output.outcome,ActionOutcome.FAILED);self.assertIn('stale',output.error)
 
+    def test_long_corridor_corrects_lateral_error_using_local_preview(self):
+        from contracts.core.geometry import Pose3,Vector3
+        from contracts.decision import EffectResult,EffectPhase
+        p=self.parse(('motion:visit',{'waypoint':'HOME','speed_mps':.15}))
+        prepared,_=resolve(p,self.environment,Pose2D(10.25,0,math.pi),self.scene)
+        world=self.sample(self.world(),math.pi,.1)
+        pose=world.localization.pose.value
+        loc=replace(world.localization,pose=replace(world.localization.pose,
+            value=Pose3(Vector3(9.25,.1,0),pose.orientation)))
+        world=replace(world,localization=loc)
+        instance=ManeuverAction().start(prepared[0],world);instance.initial_alignment=False
+        decision=instance.tick_with_results(world,(EffectResult('drive','action',EffectPhase.TRANSMITTED),))
+        twist=decision.effects[0].target_twist
+        self.assertGreater(twist.angular.z,.18)
+        self.assertGreater(twist.linear.x,0)
+        self.assertLessEqual(twist.linear.x,.15)
+
     def test_scene_change_after_queue_is_rejected_by_original_writer_but_stop_remains_allowed(self):
         from tests import test_simulation_runtime as helpers
         from deployment.scenario_guard import ScenarioGuard
