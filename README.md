@@ -24,6 +24,8 @@ PointCloud2/LaserScan、真实 PCAP 回放通过，隔离 Humble/Nav2/SLAM 环�
 经静态场景、完整车体、环境/会话预检和人工批准执行。Gazebo 提供 3D 场景，
 Web 审阅步骤；每步之间必须观察到停车并释放权限。已知静态场景不等于实时避障。
 不开放实车运动入口。
+本轮340项单元、8/8场景和独立轨迹审计通过；保留的原生启动崩溃及P26失败见
+[实用场景审计](docs/autonomy/llm-practical-scenarios.md)。
 
 车辆基础仿真新增了共享 `SimulationRuntime`、完整 Rover 插件和两主动轮/两后万向轮模型。Copter、Rover 正常动作与故障场景已通过四轮完整回归；**本轮基础车辆控制 Simulation Complete：PASS**，见[审计记录](docs/simulation/completion-audit.md)。
 

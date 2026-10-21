@@ -130,7 +130,7 @@ inode 与本进程此前观察一致时清理。应用/操作审计日志轮转�
 批准及原执行链。LLM 不可直接产生车辆命令。板端链路使用两段私有 SSH 转发，
 会话结束/重启后须重建，未安装自动隧道或把 API 暴露公网。
 
-### 后续有限任务设计实测
+### 后续有限任务设计实测（旧 Schema 1 阶段）
 
 `c39acdf` 与 `848064d` 两次干净源码运行均通过真实模型→认证 Web→Application→
 Gazebo/SITL。模型正确要求补充模糊目标，拒绝关闭安全/发送 PWM/冲向人群，
@@ -156,6 +156,26 @@ CUA 可用浏览器仍为空。只读交互式仿真控制台启动和受控到�
 当前交互入口仅提供基础路线，完整 Nav2/巡检组合尚未验收，真实车辆仍禁止运动。
 
 本地启动与一键真实模型验收见 [LLM 任务设计说明](LLM_TASK_DESIGN.md)。
+
+### 后续参数化实用场景（2026-10-21）
+
+独立 yard 场景新增装卸点往返、多点巡逻/停留、定距前进、定角旋转和有限绕圆，
+Web 展示可读参数步骤并要求预检及人工确认。Schema 2 全计划绑定当前会话、
+源 epoch、场景和批准时前轴位置，继续经原 Typed Effect/Safety/Lease/唯一 writer。
+默认训练围栏、Core、contracts 和 legacy 未改，未部署或控制真实车辆。
+
+干净运行源码 `1feb0c9`：**340 项单元、8/8 真实模型→Web→Application→
+localhost Gazebo/SITL 场景，以及独立原始轨迹审计全部 PASS**。包括实际运动中取消、
+不可用 LLM Adapter 故障及真实只读 App 重启/旧提案隔离。DOCK 约10米往返最大
+路径偏差 5.8cm，多点巡逻返回 HOME 误差 1.6cm，绕圆最大径向偏差 6.3cm；
+原15cm越轨和500ms新鲜度门槛不变。所有自有测试进程组和端口释放。
+
+**仍保留 FAIL**：前两轮统一矩阵分别5/7、7/8；第二轮有一次 Gazebo 在任何任务
+开始前 native `getenv` SIGSEGV，根因未确认。最终整轮PASS不等于原生启动可靠性
+已修复，也不替换原P26 Nav2 FAIL。当前场景只有已知静态几何预检，实时雷达动态
+避障、视觉巡检和实车安全验收仍 BLOCKED。11项Node/合成DOM检查不属于浏览器
+可视验收。详见[场景审计、轨迹与保留失败](autonomy/llm-practical-scenarios.md)
+及[便携证据](autonomy/evidence/llm-practical-scenarios.json)。
 
 ## 启动、回归与明日步骤
 

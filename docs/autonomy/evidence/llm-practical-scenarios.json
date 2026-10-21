@@ -1,0 +1,639 @@
+{
+  "scope": "qualified target_rover; known static yard; localhost real Gazebo/SITL + actual remote LLM; no hardware motion",
+  "feature_regression": "PASS",
+  "runtime_commit": "1feb0c930b39539d1f6d6eba8fd99e41b9410e28",
+  "source_archive_sha256": "d42ab64f2c7b0415e5a05118409c418986073f2f474b1a147c1c681388612558",
+  "unit": {
+    "passed": true,
+    "tests": 340,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "cases": [
+    {
+      "name": "admission",
+      "status": "PASS",
+      "error": null,
+      "duration_s": null,
+      "source_commit": "1feb0c930b39539d1f6d6eba8fd99e41b9410e28",
+      "source_dirty": false,
+      "source_sha256": "a012738722fceda84c586426d76482b8b6e14b533dc06f3aec217f4fd983dfb9",
+      "truth": {},
+      "trajectory_audit": {
+        "name": "admission",
+        "passed": true,
+        "max_body_displacement_m": 0.0
+      },
+      "ports_released": true,
+      "remaining_process_groups": [],
+      "child_task_ids": [],
+      "stop_evidence": null,
+      "files": {
+        "artifacts/simulation/yard-suite-20261021-r3/00/trajectory.json": "bfcbf63d7f474b3cc1da5535d683a688933bf585b06faa535226ca60468b4236",
+        "artifacts/simulation/yard-suite-20261021-r3/00/web.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "artifacts/simulation/yard-suite-20261021-r3/00/world.sdf": "efe6717814cd272ed66586e6b1b5ed7e1c8418368d1b3abedc2150476069ac33",
+        "artifacts/simulation/yard-suite-20261021-r3/00/application.log": "cdf74d0f6ae78cf08a82966d155c489688fa2e01f84bb4a9fc9df00c6635951a",
+        "artifacts/simulation/yard-suite-20261021-r3/00/manifest.json": "e7e8b606c040404ae6f84f9ddfb84e94790a87a0a89a8cac81b76effef9386c5",
+        "artifacts/simulation/yard-suite-20261021-r3/00/gazebo.log": "474f1a343adf15e873824987c029b160f9c0ac413897e64d849bccc1a501dbe6",
+        "artifacts/simulation/yard-suite-20261021-r3/00/summary.json": "d960032324f904a292a20a95121e6304ff60ea7de8c705087076d03da6bf5582",
+        "artifacts/simulation/yard-suite-20261021-r3/00/status.jsonl": "931cb0f519042596b723f2355be2a88b17e2c38b79f21afc38418f73967dcb16"
+      }
+    },
+    {
+      "name": "calibration",
+      "status": "PASS",
+      "error": null,
+      "duration_s": 105.87494135899942,
+      "source_commit": "1feb0c930b39539d1f6d6eba8fd99e41b9410e28",
+      "source_dirty": false,
+      "source_sha256": "a012738722fceda84c586426d76482b8b6e14b533dc06f3aec217f4fd983dfb9",
+      "truth": {
+        "truth_final_reference": [
+          0.24664481307653982,
+          -0.021190313375175494
+        ],
+        "truth_max_displacement_m": 1.5138564655910052,
+        "home_error_m": 0.021454292349772332
+      },
+      "trajectory_audit": {
+        "name": "calibration",
+        "passed": true,
+        "max_truth_path_error_m": 0.04562136297984059,
+        "min_static_clearance_m": 3.8160843806153326,
+        "trajectory_samples": 517,
+        "max_dwell_speed_mps": null
+      },
+      "ports_released": true,
+      "remaining_process_groups": [],
+      "child_task_ids": [
+        "application:4fc5a405467148a2be446ef883eb830e",
+        "application:f9bcac1e068644ed838b868250a96ca3",
+        "application:c421b34d0edb4081b1540031f48f2627",
+        "application:8fad45e9d59140bd9582efb1bbb1af5d"
+      ],
+      "stop_evidence": "SIMULATION_TELEMETRY_DISARMED_STATIONARY",
+      "files": {
+        "artifacts/simulation/yard-suite-20261021-r3/01/trajectory.json": "62562f1f7257a41aaef07483354dd13cdc274e27907e2835eb795a3218343d3f",
+        "artifacts/simulation/yard-suite-20261021-r3/01/web.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "artifacts/simulation/yard-suite-20261021-r3/01/world.sdf": "680d4f31442a5f04336a2771886ab90e7592fc8f4c29290e8ba2945e4e390922",
+        "artifacts/simulation/yard-suite-20261021-r3/01/application.log": "37aa40020cb42fa81324cb7643222b16a51778163f3d41d98bb1bdb62210b18f",
+        "artifacts/simulation/yard-suite-20261021-r3/01/manifest.json": "2900dca658194513d23b60edafd040244f90e9afa513e4858e89e6baedec1693",
+        "artifacts/simulation/yard-suite-20261021-r3/01/gazebo.log": "19755c478e07bbc69d4c2f3baff4513a2aeb51367a118ab0400832679132af24",
+        "artifacts/simulation/yard-suite-20261021-r3/01/summary.json": "cc101bb35be01dc59614b1937efd6233daedc2bad9a4ad3cb942624ff27d1c27",
+        "artifacts/simulation/yard-suite-20261021-r3/01/status.jsonl": "4c040b24e0936d6c40ab7e4c9b94a86cf26724fb00543ab7b84cce65c55f1305"
+      }
+    },
+    {
+      "name": "courier",
+      "status": "PASS",
+      "error": null,
+      "duration_s": 222.15968342400083,
+      "source_commit": "1feb0c930b39539d1f6d6eba8fd99e41b9410e28",
+      "source_dirty": false,
+      "source_sha256": "a012738722fceda84c586426d76482b8b6e14b533dc06f3aec217f4fd983dfb9",
+      "truth": {
+        "truth_final_reference": [
+          0.23883234682454152,
+          0.006058719494122098
+        ],
+        "truth_max_displacement_m": 10.515038700623679,
+        "home_error_m": 0.012705296507983709
+      },
+      "trajectory_audit": {
+        "name": "courier",
+        "passed": true,
+        "max_truth_path_error_m": 0.057691155238858094,
+        "min_static_clearance_m": 2.464477948014294,
+        "trajectory_samples": 950,
+        "max_dwell_speed_mps": 0.0
+      },
+      "ports_released": true,
+      "remaining_process_groups": [],
+      "child_task_ids": [
+        "application:ee82f1ae45de46b3bac443338e36a1ea",
+        "application:9928c2bd1d374603905e3fff748eb92d",
+        "application:de19ba75917c49038454990bd0973cca"
+      ],
+      "stop_evidence": "SIMULATION_TELEMETRY_DISARMED_STATIONARY",
+      "files": {
+        "artifacts/simulation/yard-suite-20261021-r3/02/trajectory.json": "628380c23ed1ccf48d565e1a7ce79fe98f8515dbce17e826fe5b1c16b5d15aed",
+        "artifacts/simulation/yard-suite-20261021-r3/02/web.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "artifacts/simulation/yard-suite-20261021-r3/02/world.sdf": "d10f9ea5d7afd614bbaa8f3233309016a107832da3f9de1a4210c009b305a68a",
+        "artifacts/simulation/yard-suite-20261021-r3/02/application.log": "ebb786e736b4dcc56a49fb86462aaf0a8bb95b3f3b29a5f09ea74e189b4a8eb7",
+        "artifacts/simulation/yard-suite-20261021-r3/02/manifest.json": "f8ca43292a628345aa8bc5a18c6b323674168053e84daaae84fb535333465d90",
+        "artifacts/simulation/yard-suite-20261021-r3/02/gazebo.log": "6d7d333c2bcf46b9c5d5ec556e0b11fa147ae584bb478535b6ce9059ba685cad",
+        "artifacts/simulation/yard-suite-20261021-r3/02/summary.json": "1243aa1a71e47063f697132cf4935acdc720478f6ad79252e26e78b53f93a825",
+        "artifacts/simulation/yard-suite-20261021-r3/02/status.jsonl": "707772745a9665d253c9e25d626edf5db0e469c20a25dc6e8767187b0605136c"
+      }
+    },
+    {
+      "name": "patrol",
+      "status": "PASS",
+      "error": null,
+      "duration_s": 205.54367745299896,
+      "source_commit": "1feb0c930b39539d1f6d6eba8fd99e41b9410e28",
+      "source_dirty": false,
+      "source_sha256": "a012738722fceda84c586426d76482b8b6e14b533dc06f3aec217f4fd983dfb9",
+      "truth": {
+        "truth_final_reference": [
+          0.2648716339711472,
+          -0.00684166399637523
+        ],
+        "truth_max_displacement_m": 3.284440415044971,
+        "home_error_m": 0.016369907245035842
+      },
+      "trajectory_audit": {
+        "name": "patrol",
+        "passed": true,
+        "max_truth_path_error_m": 0.04886686121548367,
+        "min_static_clearance_m": 3.0829398426398287,
+        "trajectory_samples": 909,
+        "max_dwell_speed_mps": 0.0
+      },
+      "ports_released": true,
+      "remaining_process_groups": [],
+      "child_task_ids": [
+        "application:480939c422c34c489e8ce17dcf653f70",
+        "application:bd6b2f4856204ead972d4772be7bd547",
+        "application:b2acc3817d4c43f3bf5b751416393886",
+        "application:4c5d5c8521ac486cba991dc9735c7435",
+        "application:676676bebdd343e58f3c48b781e19d30"
+      ],
+      "stop_evidence": "SIMULATION_TELEMETRY_DISARMED_STATIONARY",
+      "files": {
+        "artifacts/simulation/yard-suite-20261021-r3/03/trajectory.json": "984ef811980af236aeee5661568e7056063da2ab4963126dcb60dfe1639e5be5",
+        "artifacts/simulation/yard-suite-20261021-r3/03/web.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "artifacts/simulation/yard-suite-20261021-r3/03/world.sdf": "7d699c7b4629f33cd2b544faea6ee55505d575fef8ceec248191c4368d64f344",
+        "artifacts/simulation/yard-suite-20261021-r3/03/application.log": "cbf2422d164847fd1036f75dff0f521e8430c8036dc104f06effc4f864654e77",
+        "artifacts/simulation/yard-suite-20261021-r3/03/manifest.json": "af2ee69332df6cbbaf02b5a1db49992b2a2f75e7aa7071a1d1b25e387ca4e07a",
+        "artifacts/simulation/yard-suite-20261021-r3/03/gazebo.log": "c5087fce83d75b82a485f19fd5ad1947434a46d6d9216227c9e0e407bb4beba6",
+        "artifacts/simulation/yard-suite-20261021-r3/03/summary.json": "7dc17647e2a98661401398bdd6e95d660aaf33b9d5656cfeb29dec5823a284d0",
+        "artifacts/simulation/yard-suite-20261021-r3/03/status.jsonl": "6429425ab1727478f2007219dda98d5361414887fe924e3dc860e2fbcdb5ad84"
+      }
+    },
+    {
+      "name": "circle",
+      "status": "PASS",
+      "error": null,
+      "duration_s": 80.06009399399954,
+      "source_commit": "1feb0c930b39539d1f6d6eba8fd99e41b9410e28",
+      "source_dirty": false,
+      "source_sha256": "a012738722fceda84c586426d76482b8b6e14b533dc06f3aec217f4fd983dfb9",
+      "truth": {
+        "truth_final_reference": [
+          0.17957402486590018,
+          -0.0019388074421044371
+        ],
+        "truth_max_displacement_m": 3.102551077287792,
+        "truth_yaw_change_rad": 6.546600602225706,
+        "truth_radial_error_m": 0.062392354672995864,
+        "truth_orbital_progress_rad": 6.236329584344125
+      },
+      "trajectory_audit": {
+        "name": "circle",
+        "passed": true,
+        "max_truth_path_error_m": 0.062392354672995864,
+        "min_static_clearance_m": 1.7303275964034495,
+        "trajectory_samples": 403,
+        "max_dwell_speed_mps": null
+      },
+      "ports_released": true,
+      "remaining_process_groups": [],
+      "child_task_ids": [
+        "application:543f2d5e5960404f8399e451e8f197f0"
+      ],
+      "stop_evidence": "SIMULATION_TELEMETRY_DISARMED_STATIONARY",
+      "files": {
+        "artifacts/simulation/yard-suite-20261021-r3/04/trajectory.json": "569d79696ed9c205a199a07826a7b58e24fcdfc37e5ef53ebb13b16b04023acc",
+        "artifacts/simulation/yard-suite-20261021-r3/04/web.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "artifacts/simulation/yard-suite-20261021-r3/04/world.sdf": "3d976f5eee4b3b0ab0b6284b900c992b89e31093958fc47f226513cff246f050",
+        "artifacts/simulation/yard-suite-20261021-r3/04/application.log": "c3a955f4dcf92b58e3aad6a41336a64c0a88a56e98da8e72bec677871b94fa4d",
+        "artifacts/simulation/yard-suite-20261021-r3/04/manifest.json": "e123c4ad34371d44e31376a1a0e9ebc2c34301b7f56460668f6dc08f09742afe",
+        "artifacts/simulation/yard-suite-20261021-r3/04/gazebo.log": "1c7b5c1de5d19b35d44014193e1a5400e693bc4c37f0c3bea72be3d16d4435e2",
+        "artifacts/simulation/yard-suite-20261021-r3/04/summary.json": "0fbba4b0ca863bb36cd570e8f9b8773e91442253cb41fb88e1ffe1fbaa1f775f",
+        "artifacts/simulation/yard-suite-20261021-r3/04/status.jsonl": "3b967a8324391a13a4565785d8cdbde78b298f22714ad372936b0592cea65ebe"
+      }
+    },
+    {
+      "name": "rotation",
+      "status": "PASS",
+      "error": null,
+      "duration_s": 67.4498380419991,
+      "source_commit": "1feb0c930b39539d1f6d6eba8fd99e41b9410e28",
+      "source_dirty": false,
+      "source_sha256": "a012738722fceda84c586426d76482b8b6e14b533dc06f3aec217f4fd983dfb9",
+      "truth": {
+        "truth_final_reference": [
+          0.2489319505596048,
+          0.05059324241658745
+        ],
+        "truth_max_displacement_m": 0.519483326438472,
+        "truth_yaw_change_rad": 12.56092114638313
+      },
+      "trajectory_audit": {
+        "name": "rotation",
+        "passed": true,
+        "max_truth_path_error_m": 0.06829413434587442,
+        "min_static_clearance_m": 3.752153163325873,
+        "trajectory_samples": 328,
+        "max_dwell_speed_mps": null
+      },
+      "ports_released": true,
+      "remaining_process_groups": [],
+      "child_task_ids": [
+        "application:ed4a5fb3b6a7481495db9d7b5a04fd70"
+      ],
+      "stop_evidence": "SIMULATION_TELEMETRY_DISARMED_STATIONARY",
+      "files": {
+        "artifacts/simulation/yard-suite-20261021-r3/05/trajectory.json": "5abf0a695e0882f4788cd8c872d1c5d4db080a99ab32eca0729146657a63b6ba",
+        "artifacts/simulation/yard-suite-20261021-r3/05/web.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "artifacts/simulation/yard-suite-20261021-r3/05/world.sdf": "9543b847578ed632b80c0862234f90bf16010fe141d5002d337935decd9c105d",
+        "artifacts/simulation/yard-suite-20261021-r3/05/application.log": "d3d50cfcf99a93b00d0928284e4f199d426774f72b2e598eda17c0e87f74751b",
+        "artifacts/simulation/yard-suite-20261021-r3/05/manifest.json": "3888286251e343764107439eca3b3cb71773f9f685ed4b6c090fac5b0106d8c9",
+        "artifacts/simulation/yard-suite-20261021-r3/05/gazebo.log": "6619f163f9ac5cee14d881a1c4fec1b6425b787972fc7f8dcf40101c606c4942",
+        "artifacts/simulation/yard-suite-20261021-r3/05/summary.json": "b0faaffc53059c41927a34e6ef028c5a5feada0d6963a68bcced091bb871b718",
+        "artifacts/simulation/yard-suite-20261021-r3/05/status.jsonl": "dd3e144c5bec87b9ff12fa5fc319e523c24dad85b8c0ba16abdb2caf266f1be3"
+      }
+    },
+    {
+      "name": "cancel",
+      "status": "PASS",
+      "error": null,
+      "duration_s": 15.106777942999543,
+      "source_commit": "1feb0c930b39539d1f6d6eba8fd99e41b9410e28",
+      "source_dirty": false,
+      "source_sha256": "a012738722fceda84c586426d76482b8b6e14b533dc06f3aec217f4fd983dfb9",
+      "truth": {
+        "truth_final_reference": [
+          0.8546981958369332,
+          1.3671926447879496e-07
+        ],
+        "truth_max_displacement_m": 0.6046981958406549
+      },
+      "trajectory_audit": {
+        "name": "cancel",
+        "passed": true,
+        "max_truth_path_error_m": 1.3671926447879496e-07,
+        "min_static_clearance_m": 3.8160843806153326,
+        "trajectory_samples": 77,
+        "max_dwell_speed_mps": null
+      },
+      "ports_released": true,
+      "remaining_process_groups": [],
+      "child_task_ids": [
+        "application:55fe268132ad49f192e896c9871bd722"
+      ],
+      "stop_evidence": "SIMULATION_TELEMETRY_DISARMED_STATIONARY",
+      "files": {
+        "artifacts/simulation/yard-suite-20261021-r3/06/trajectory.json": "c31fb468d72fd6aca9cf2d862da77e91bc8b6c92bef15adea3d6459bedcb61fa",
+        "artifacts/simulation/yard-suite-20261021-r3/06/web.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "artifacts/simulation/yard-suite-20261021-r3/06/world.sdf": "66e1ff5d583917ec350da0c9de9dacabfe5071480ce220fdc9da482857c971c9",
+        "artifacts/simulation/yard-suite-20261021-r3/06/application.log": "3bdef2e057706b18a17e11198969fa34399a46bb1ac48e2350257059bf7a8fcc",
+        "artifacts/simulation/yard-suite-20261021-r3/06/manifest.json": "263528237c57e25ccecc083e638990d09e1feb551f2e6665afd217b249595b9b",
+        "artifacts/simulation/yard-suite-20261021-r3/06/gazebo.log": "48089bee64a649e3d565e697bd76255a409e1386bdd7bd9d53ebee16533d2cd3",
+        "artifacts/simulation/yard-suite-20261021-r3/06/summary.json": "19e853ef3e333c44947398922c41ffe592109ef417cbaf3a1e2e3e77419439c5",
+        "artifacts/simulation/yard-suite-20261021-r3/06/status.jsonl": "5f83d2439ddbaba1756a34cdd735ab41d134b6fb25955ec37e60738c3c2153ee"
+      }
+    },
+    {
+      "name": "restart",
+      "status": "PASS",
+      "error": null,
+      "duration_s": null,
+      "source_commit": "1feb0c930b39539d1f6d6eba8fd99e41b9410e28",
+      "source_dirty": false,
+      "source_sha256": "a012738722fceda84c586426d76482b8b6e14b533dc06f3aec217f4fd983dfb9",
+      "truth": {
+        "checks": [
+          "old_parameterized_proposal_rejected",
+          "readonly_restart_no_authority",
+          "no_actual_motion"
+        ]
+      },
+      "trajectory_audit": {
+        "name": "restart",
+        "passed": true,
+        "max_body_displacement_m": 0.0
+      },
+      "ports_released": true,
+      "remaining_process_groups": [],
+      "child_task_ids": [],
+      "stop_evidence": null,
+      "files": {
+        "artifacts/simulation/yard-suite-20261021-r3/07/trajectory.json": "6f3eee36a4acf541ba4ac1f966273fb3c49f5cbb2a08d12188c08305e18c47c8",
+        "artifacts/simulation/yard-suite-20261021-r3/07/web.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "artifacts/simulation/yard-suite-20261021-r3/07/application-readonly-restart.log": "e5c5895b3f04f9bfdf15e91a492fee801875ab61293e7704c1bc852fffa2e97e",
+        "artifacts/simulation/yard-suite-20261021-r3/07/world.sdf": "4c6f82e90f352011b6d50199f826033be6b3fb30a3079a1a6150257121007481",
+        "artifacts/simulation/yard-suite-20261021-r3/07/application.log": "7eb48d407244318fd3fa9e81256565625a84b17c0a6f358afdf5934fa03ca912",
+        "artifacts/simulation/yard-suite-20261021-r3/07/manifest.json": "81e67753e41c7152d7e60eb9356323b7129519ff2a72f153eacd75b1d9cadfcb",
+        "artifacts/simulation/yard-suite-20261021-r3/07/gazebo.log": "02b7af91fb0f1d15adc49eb487730a0a788bb0da225a8f5a09ae93d709e98484",
+        "artifacts/simulation/yard-suite-20261021-r3/07/summary.json": "8e66e1407a0af65b551bfe1296df18db9aee7b50035dbdebd8d80012d934b899",
+        "artifacts/simulation/yard-suite-20261021-r3/07/status.jsonl": "3f319a75fcff2cd3d32a7b0be5884dcf183b23ec89dd30a1fdedb7df89dfc1ec"
+      }
+    }
+  ],
+  "history": [
+    {
+      "evidence": "artifacts/simulation/practical-calibration-r1",
+      "passed": false,
+      "source_commit": "fc7fa5209d865f1fcf1b6292d92b98062c6c5b84",
+      "error": "AssertionError: {'task_id': 'design:8e62c1a658f543479f1250dada89fcb6', 'mission': 'designed:5d6d8dd34b0f3dc27b56b1fc9d52e346ad6cf12b36e85702a1b5defe298e620f', 'title': '前进1米，左90°，右90°，返回HOME', 'configuration_sha256': '5d6d8dd34b0f3dc27b56b1fc9d52e346ad6cf12b36e85702a1b5defe298e620f', 'status': 'FAILED', 'error': 'design_child_failed: scenario_cross_track_exceeded', 'step_index': 1, 'step_count': 4, 'steps': [{'mission': 'motion:drive', 'parameters': {'distance_m': 1, 'speed_mps': 0.15}}, {'mission': 'motion:turn', 'parameters': {'angle_deg': 90}}, {'mission': 'motion:turn', 'parameters': {'angle_deg': -90}}, {'mission': 'motion:visit', 'parameters': {'speed_mps': 0.15, 'waypoint': 'HOME'}}], 'completed': [{'task_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e', 'mission': 'scenario:5d6d8dd34b0f3dc27b56b1fc9d52e346ad6cf12b36e85702a1b5defe298e620f:0', 'configuration_sha256': '9d260f2feffa0a4beb81fa4da2f72391177d575f7c29326df91722c9d300d1e2', 'status': 'SUCCEEDED', 'step': None, 'error': None, 'steps': [{'step': 'mode', 'reason': 'SUCCEEDED', 'error': None}, {'step': 'arm', 'reason': 'SUCCEEDED', 'error': None}, {'step': 'maneuver', 'reason': 'SUCCEEDED', 'error': None}, {'step': 'stop', 'reason': 'SUCCEEDED', 'error': None}, {'step': 'disarm', 'reason': 'SUCCEEDED', 'error': None}], 'effects': {'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:1': {'phase': 'COMPLETED', 'command_id': 'command:57a01e6af4584a738ca06c661712d0e9', 'reason': None}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:2': {'phase': 'COMPLETED', 'command_id': 'command:3ffcd922123249f48bf8fb358c4abb86', 'reason': None}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:3': {'phase': 'CANCELLED', 'command_id': 'command:f8d579b431bc4546a084cc0cee03891d', 'reason': None}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:4': {'phase': 'CANCELLED', 'command_id': 'command:db5b28b54199475e9fa8f8ffac3cc463', 'reason': None}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:5': {'phase': 'CANCELLED', 'command_id': 'command:335cf1f83d994d538bb8a4caeb2462ad', 'reason': None}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:6': {'phase': 'CANCELLED', 'command_id': 'command:c93a53b024f74b1a9c0d470a6b013ef3', 'reason': None}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:7': {'phase': 'CANCELLED', 'command_id': 'command:15203f65b0b24df79737982a2327870b', 'reason': None}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:8': {'phase': 'CANCELLED', 'command_id': 'command:eaee1639e2e343b4a5deaeb1af342d69', 'reason': None}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:9': {'phase': 'CANCELLED', 'command_id': 'command:6dd18a6b3e3649b0accceb145588cc90', 'reason': None}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:10': {'phase': 'CANCELLED', 'command_id': 'command:069af1dd869240c3919168913ee82955', 'reason': None}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:11': {'phase': 'CANCELLED', 'command_id': 'command:75eee92dbb614899a306814c5e336b6a', 'reason': None}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:12': {'phase': 'CANCELLED', 'command_id': 'command:da9787f227de4017b56da1df734132dc', 'reason': None}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:13': {'phase': 'CANCELLED', 'command_id': 'command:db3ea5a7d4ab46619910e15131cd37cb', 'reason': None}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:14': {'phase': 'CANCELLED', 'command_id': 'command:6298f50f7f444350a6eb039683e12673', 'reason': None}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:15': {'phase': 'CANCELLED', 'command_id': 'command:df3d35aef0b040e1b45f3e589f3930fb', 'reason': None}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:16': {'phase': 'CANCELLED', 'command_id': 'command:9981a868ca39478fa69b604c44179c30', 'reason': None}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:17': {'phase': 'CANCELLED', 'command_id': 'command:b7ebe66fddd14417a5e6afe3365bc8da', 'reason': None}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:18': {'phase': 'CANCELLED', 'command_id': 'command:9b31f13af664444d91f1c0db365b29ec', 'reason': None}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:19': {'phase': 'CANCELLED', 'command_id': 'command:79f5e451fe5544ac94745ee100d4d93d', 'reason': None}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:20': {'phase': 'CANCELLED', 'command_id': 'command:8c1ccafb1a474a4e94b08a2478a19360', 'reason': None}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:21': {'phase': 'CANCELLED', 'command_id': 'command:3ad636228536486685ccaabf1c3f94f4', 'reason': None}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:22': {'phase': 'CANCELLED', 'command_id': 'command:7d1b6196af8b40b59f70624420d398c2', 'reason': None}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:23': {'phase': 'CANCELLED', 'command_id': 'command:d81fd59209c24f6b806fd00e7c9d9b99', 'reason': None}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:24': {'phase': 'CANCELLED', 'command_id': 'command:a257597449b94f13af30976b95322bb5', 'reason': None}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:25': {'phase': 'CANCELLED', 'command_id': 'command:489c049775a34255abeaef45420e5c75', 'reason': None}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:26': {'phase': 'CANCELLED', 'command_id': 'command:ed8aefe825e4429a85d300211eee99bf', 'reason': None}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:27': {'phase': 'CANCELLED', 'command_id': 'command:f63488bfb7d84bd88bf78a8f445ef6db', 'reason': None}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:28': {'phase': 'CANCELLED', 'command_id': 'command:c39a999fa2b046579e2cf26cc5de7be6', 'reason': None}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:29': {'phase': 'CANCELLED', 'command_id': 'command:2c64770d88024371846ac50a15bab763', 'reason': None}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:30': {'phase': 'CANCELLED', 'command_id': 'command:4e8b0da9dac448b2b6db3762c5e9688d', 'reason': None}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:31': {'phase': 'CANCELLED', 'command_id': 'command:0b6a42e10ba34f12903c765455f0e278', 'reason': None}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:32': {'phase': 'CANCELLED', 'command_id': 'command:fc94604cc45843de9e98ea64294a284e', 'reason': None}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:33': {'phase': 'CANCELLED', 'command_id': 'command:a9ebe36f1fdb4746aade6915c5b9a650', 'reason': None}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:34': {'phase': 'CANCELLED', 'command_id': 'command:676fe681cfc345558f3949f233f6b5a7', 'reason': None}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:35': {'phase': 'CANCELLED', 'command_id': 'command:c4db7f151b03439a8f5a47ed3a7d03bf', 'reason': None}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:36': {'phase': 'CANCELLED', 'command_id': 'command:9e9413879418415cb32c9c793fcba9f9', 'reason': None}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:37': {'phase': 'CANCELLED', 'command_id': 'command:425d4a833c234e1ab5c8580bf51af789', 'reason': None}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:38': {'phase': 'CANCELLED', 'command_id': 'command:3f5d10aba1684b3898b095ed02b6bf2f', 'reason': None}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:39': {'phase': 'CANCELLED', 'command_id': 'command:48634add55dd4f4cb09f3dd7280a2fca', 'reason': None}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:40': {'phase': 'CANCELLED', 'command_id': 'command:30876b9706814b2c8a5a824dab0ab82d', 'reason': None}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:41': {'phase': 'COMPLETED', 'command_id': 'command:03a7a446777941b3830c45d0802f93c5', 'reason': None}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:42': {'phase': 'CANCELLED', 'command_id': 'command:b68020f43bc1404bbeb0013a5013f1f6', 'reason': None}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:43': {'phase': 'CANCELLED', 'command_id': 'command:f4f70e7b8b7c4a06a8f8a3f209b1ebb8', 'reason': None}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:44': {'phase': 'CANCELLED', 'command_id': 'command:0f3efac095314f39bd4ad5907cab2072', 'reason': None}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:45': {'phase': 'COMPLETED', 'command_id': 'command:651ba2879947404686581846905a3f33', 'reason': None}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:46': {'phase': 'COMPLETED', 'command_id': 'command:ac9d54842ec24fc58667e97ef01a9a0b', 'reason': None}}, 'requests': {'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:1': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:mode:1', 'effect_type': 'ModeEffect', 'created_ns': 8257674580247, 'deadline_ns': 8262674580247}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:2': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:arm:1', 'effect_type': 'ArmEffect', 'created_ns': 8258945233481, 'deadline_ns': 8263945233481}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:3': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8259945877251, 'deadline_ns': 8260945877251}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:4': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8260146148553, 'deadline_ns': 8261146148553}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:5': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8260346206847, 'deadline_ns': 8261346206847}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:6': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8260546586326, 'deadline_ns': 8261546586326}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:7': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8260747529615, 'deadline_ns': 8261747529615}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:8': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8261046519626, 'deadline_ns': 8262046519626}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:9': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8261246610845, 'deadline_ns': 8262246610845}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:10': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8261446710617, 'deadline_ns': 8262446710617}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:11': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8261646857129, 'deadline_ns': 8262646857129}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:12': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8261846959062, 'deadline_ns': 8262846959062}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:13': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8262047266043, 'deadline_ns': 8263047266043}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:14': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8262247268233, 'deadline_ns': 8263247268233}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:15': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8262447422119, 'deadline_ns': 8263447422119}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:16': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8262647666351, 'deadline_ns': 8263647666351}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:17': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8262847879790, 'deadline_ns': 8263847879790}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:18': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8263048009428, 'deadline_ns': 8264048009428}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:19': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8263348516300, 'deadline_ns': 8264348516300}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:20': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8263548829183, 'deadline_ns': 8264548829183}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:21': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8263749274451, 'deadline_ns': 8264749274451}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:22': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8264048603655, 'deadline_ns': 8265048603655}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:23': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8264248720585, 'deadline_ns': 8265248720585}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:24': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8264448856066, 'deadline_ns': 8265448856066}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:25': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8264648908712, 'deadline_ns': 8265648908712}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:26': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8264849094700, 'deadline_ns': 8265849094700}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:27': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8265049256552, 'deadline_ns': 8266049256552}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:28': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8265249382738, 'deadline_ns': 8266249382738}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:29': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8265449525008, 'deadline_ns': 8266449525008}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:30': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8265649664084, 'deadline_ns': 8266649664084}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:31': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8265849800631, 'deadline_ns': 8266849800631}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:32': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8266049971493, 'deadline_ns': 8267049971493}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:33': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8266250095346, 'deadline_ns': 8267250095346}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:34': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8266450251181, 'deadline_ns': 8267450251181}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:35': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8266650473023, 'deadline_ns': 8267650473023}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:36': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8266850548032, 'deadline_ns': 8267850548032}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:37': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8267050694142, 'deadline_ns': 8268050694142}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:38': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8267250826564, 'deadline_ns': 8268250826564}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:39': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8267451030585, 'deadline_ns': 8268451030585}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:40': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8267681751876, 'deadline_ns': 8268681751876}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:41': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:maneuver:1', 'effect_type': 'StopMotionEffect', 'created_ns': 8267752811995, 'deadline_ns': 8268752811995}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:42': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:stop:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8268753151329, 'deadline_ns': 8269753151329}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:43': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:stop:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8269152412003, 'deadline_ns': 8270152412003}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:44': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:stop:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8269552709153, 'deadline_ns': 8270552709153}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:45': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:stop:1', 'effect_type': 'StopMotionEffect', 'created_ns': 8269952971751, 'deadline_ns': 8270952971751}, 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:effect:46': {'action_id': 'application:1eafa5f7bc0a4574ae870de5d22c5f9e:disarm:1', 'effect_type': 'DisarmEffect', 'created_ns': 8272254332375, 'deadline_ns': 8277254332375}}, 'stops': {}}, {'task_id': 'application:2fb2a496f1ad4823bd66eb5132f91651', 'mission': 'scenario:5d6d8dd34b0f3dc27b56b1fc9d52e346ad6cf12b36e85702a1b5defe298e620f:1', 'configuration_sha256': 'b4908ee4a3b61866d6aee24f91f56788b2e3afe0aa9cbd9796f173afa2852a5a', 'status': 'FAILED', 'step': 'maneuver', 'error': 'scenario_cross_track_exceeded', 'steps': [{'step': 'mode', 'reason': 'SUCCEEDED', 'error': None}, {'step': 'arm', 'reason': 'SUCCEEDED', 'error': None}, {'step': 'maneuver', 'reason': 'FAILED', 'error': 'scenario_cross_track_exceeded'}], 'effects': {'application:2fb2a496f1ad4823bd66eb5132f91651:effect:1': {'phase': 'COMPLETED', 'command_id': 'command:0c0cb3012469475ba452f36e236b1c19', 'reason': None}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:2': {'phase': 'COMPLETED', 'command_id': 'command:ba62d443b0e24f51952adaf8f35ae8f2', 'reason': None}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:3': {'phase': 'CANCELLED', 'command_id': 'command:a2ab1613d1cb452db6d86b4c1d891d70', 'reason': None}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:4': {'phase': 'CANCELLED', 'command_id': 'command:610a07ff1ba446878affe7a16473041f', 'reason': None}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:5': {'phase': 'CANCELLED', 'command_id': 'command:830e747735ca49f89b44092ced7156c8', 'reason': None}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:6': {'phase': 'CANCELLED', 'command_id': 'command:a7478c4b7f914af5ac87cceecdf96016', 'reason': None}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:7': {'phase': 'CANCELLED', 'command_id': 'command:8cdbc7078a8042f7ae2c0eeabcaaabc7', 'reason': None}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:8': {'phase': 'CANCELLED', 'command_id': 'command:a1c14f868bcf43cebe3eda3465bdfaf9', 'reason': None}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:9': {'phase': 'CANCELLED', 'command_id': 'command:698405bbdbc743fe831697fec5e96c5a', 'reason': None}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:10': {'phase': 'CANCELLED', 'command_id': 'command:8d25af674f03490e86f18d01c8d0358f', 'reason': None}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:11': {'phase': 'CANCELLED', 'command_id': 'command:6866a7de51a74d7e846488e93f7d796a', 'reason': None}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:12': {'phase': 'CANCELLED', 'command_id': 'command:3a87ea988d5d4626a52af450fd210402', 'reason': None}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:13': {'phase': 'CANCELLED', 'command_id': 'command:38ad61ab61ca4ff080df65c38f0ea3f0', 'reason': None}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:14': {'phase': 'CANCELLED', 'command_id': 'command:ae68798e4f15470fb3b4c0776039a512', 'reason': None}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:15': {'phase': 'CANCELLED', 'command_id': 'command:45dc5f20e15c40e9ba0fb6470b8cf37b', 'reason': None}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:16': {'phase': 'CANCELLED', 'command_id': 'command:fca6698e27df4530829f109132271e93', 'reason': None}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:17': {'phase': 'CANCELLED', 'command_id': 'command:3d5c6f77cb1d435f9749237d06a19dce', 'reason': None}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:18': {'phase': 'CANCELLED', 'command_id': 'command:49e47814895844b1bc1d31ad67cd0e82', 'reason': None}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:19': {'phase': 'CANCELLED', 'command_id': 'command:e0fc0b3b0b314f32b9ad0a4c2cae81de', 'reason': None}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:20': {'phase': 'CANCELLED', 'command_id': 'command:fd94733dfe6b460e843c5fe9e7a699e1', 'reason': None}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:21': {'phase': 'CANCELLED', 'command_id': 'command:eda387cc7624407f8d692e6bd8bea325', 'reason': None}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:22': {'phase': 'CANCELLED', 'command_id': 'command:c09fa77e95ad407ca58bc8d7ee21f216', 'reason': None}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:23': {'phase': 'CANCELLED', 'command_id': 'command:ac0a282a5c224d2b9779fb58711dffcc', 'reason': None}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:24': {'phase': 'CANCELLED', 'command_id': 'command:1c1c735566a24eeea9d77bb6b2e1d3c5', 'reason': None}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:25': {'phase': 'CANCELLED', 'command_id': 'command:17d53c0623c9404f940500ab7fb73873', 'reason': None}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:26': {'phase': 'CANCELLED', 'command_id': 'command:181a2f7d933548f6a81139fc756b5769', 'reason': None}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:27': {'phase': 'CANCELLED', 'command_id': 'command:a910398bbefd4cfdb3cdd2bec5d1007b', 'reason': None}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:28': {'phase': 'CANCELLED', 'command_id': 'command:65696c835b3d457991541a6047cae9b6', 'reason': None}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:29': {'phase': 'CANCELLED', 'command_id': 'command:a7482a8cdb54487fa79580d8dc82f081', 'reason': None}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:30': {'phase': 'CANCELLED', 'command_id': 'command:ba66facd1fac4035895dde6886c5ebb4', 'reason': None}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:31': {'phase': 'CANCELLED', 'command_id': 'command:81ee2f8441ae4855bb181537865a7830', 'reason': None}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:32': {'phase': 'CANCELLED', 'command_id': 'command:11c1f3a1487843e5aea479bdd7fcde44', 'reason': None}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:33': {'phase': 'CANCELLED', 'command_id': 'command:c51ca852312444aaafd59a6c8e84d1a0', 'reason': None}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:34': {'phase': 'CANCELLED', 'command_id': 'command:2e2d3819542e42d8808b237fdcd2814f', 'reason': None}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:35': {'phase': 'CANCELLED', 'command_id': 'command:d246bf92ef034bf08f34499ab5d89fb9', 'reason': None}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:36': {'phase': 'REJECTED', 'command_id': 'command:0b90a8e9570048d79d570ee1a891b59a', 'reason': 'scenario_cross_track_exceeded'}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:37': {'phase': 'COMPLETED', 'command_id': 'command:266cac9e1fbb402d8afe35a1c5c6f7a7', 'reason': None}}, 'requests': {'application:2fb2a496f1ad4823bd66eb5132f91651:effect:1': {'action_id': 'application:2fb2a496f1ad4823bd66eb5132f91651:mode:1', 'effect_type': 'ModeEffect', 'created_ns': 8273254986040, 'deadline_ns': 8278254986040}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:2': {'action_id': 'application:2fb2a496f1ad4823bd66eb5132f91651:arm:1', 'effect_type': 'ArmEffect', 'created_ns': 8273955772005, 'deadline_ns': 8278955772005}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:3': {'action_id': 'application:2fb2a496f1ad4823bd66eb5132f91651:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8274956480750, 'deadline_ns': 8275956480750}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:4': {'action_id': 'application:2fb2a496f1ad4823bd66eb5132f91651:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8275156635429, 'deadline_ns': 8276156635429}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:5': {'action_id': 'application:2fb2a496f1ad4823bd66eb5132f91651:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8275356758752, 'deadline_ns': 8276356758752}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:6': {'action_id': 'application:2fb2a496f1ad4823bd66eb5132f91651:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8275557072232, 'deadline_ns': 8276557072232}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:7': {'action_id': 'application:2fb2a496f1ad4823bd66eb5132f91651:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8275757699426, 'deadline_ns': 8276757699426}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:8': {'action_id': 'application:2fb2a496f1ad4823bd66eb5132f91651:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8276056978807, 'deadline_ns': 8277056978807}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:9': {'action_id': 'application:2fb2a496f1ad4823bd66eb5132f91651:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8276257068325, 'deadline_ns': 8277257068325}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:10': {'action_id': 'application:2fb2a496f1ad4823bd66eb5132f91651:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8276457288651, 'deadline_ns': 8277457288651}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:11': {'action_id': 'application:2fb2a496f1ad4823bd66eb5132f91651:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8276657398260, 'deadline_ns': 8277657398260}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:12': {'action_id': 'application:2fb2a496f1ad4823bd66eb5132f91651:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8276857747555, 'deadline_ns': 8277857747555}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:13': {'action_id': 'application:2fb2a496f1ad4823bd66eb5132f91651:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8277057913883, 'deadline_ns': 8278057913883}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:14': {'action_id': 'application:2fb2a496f1ad4823bd66eb5132f91651:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8277358277976, 'deadline_ns': 8278358277976}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:15': {'action_id': 'application:2fb2a496f1ad4823bd66eb5132f91651:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8277558314009, 'deadline_ns': 8278558314009}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:16': {'action_id': 'application:2fb2a496f1ad4823bd66eb5132f91651:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8277759209582, 'deadline_ns': 8278759209582}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:17': {'action_id': 'application:2fb2a496f1ad4823bd66eb5132f91651:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8278058365123, 'deadline_ns': 8279058365123}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:18': {'action_id': 'application:2fb2a496f1ad4823bd66eb5132f91651:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8278258789907, 'deadline_ns': 8279258789907}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:19': {'action_id': 'application:2fb2a496f1ad4823bd66eb5132f91651:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8278459068875, 'deadline_ns': 8279459068875}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:20': {'action_id': 'application:2fb2a496f1ad4823bd66eb5132f91651:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8278759884698, 'deadline_ns': 8279759884698}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:21': {'action_id': 'application:2fb2a496f1ad4823bd66eb5132f91651:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8279059178356, 'deadline_ns': 8280059178356}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:22': {'action_id': 'application:2fb2a496f1ad4823bd66eb5132f91651:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8279259222389, 'deadline_ns': 8280259222389}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:23': {'action_id': 'application:2fb2a496f1ad4823bd66eb5132f91651:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8279459684128, 'deadline_ns': 8280459684128}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:24': {'action_id': 'application:2fb2a496f1ad4823bd66eb5132f91651:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8279760980848, 'deadline_ns': 8280760980848}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:25': {'action_id': 'application:2fb2a496f1ad4823bd66eb5132f91651:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8280059869498, 'deadline_ns': 8281059869498}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:26': {'action_id': 'application:2fb2a496f1ad4823bd66eb5132f91651:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8280259971296, 'deadline_ns': 8281259971296}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:27': {'action_id': 'application:2fb2a496f1ad4823bd66eb5132f91651:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8280460146358, 'deadline_ns': 8281460146358}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:28': {'action_id': 'application:2fb2a496f1ad4823bd66eb5132f91651:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8280660225478, 'deadline_ns': 8281660225478}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:29': {'action_id': 'application:2fb2a496f1ad4823bd66eb5132f91651:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8280860370590, 'deadline_ns': 8281860370590}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:30': {'action_id': 'application:2fb2a496f1ad4823bd66eb5132f91651:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8281060536512, 'deadline_ns': 8282060536512}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:31': {'action_id': 'application:2fb2a496f1ad4823bd66eb5132f91651:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8281260672095, 'deadline_ns': 8282260672095}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:32': {'action_id': 'application:2fb2a496f1ad4823bd66eb5132f91651:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8281460798038, 'deadline_ns': 8282460798038}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:33': {'action_id': 'application:2fb2a496f1ad4823bd66eb5132f91651:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8281660943409, 'deadline_ns': 8282660943409}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:34': {'action_id': 'application:2fb2a496f1ad4823bd66eb5132f91651:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8281861059296, 'deadline_ns': 8282861059296}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:35': {'action_id': 'application:2fb2a496f1ad4823bd66eb5132f91651:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8282061217813, 'deadline_ns': 8283061217813}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:36': {'action_id': 'application:2fb2a496f1ad4823bd66eb5132f91651:maneuver:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8282261325532, 'deadline_ns': 8283261325532}, 'application:2fb2a496f1ad4823bd66eb5132f91651:effect:37': {'action_id': 'application:2fb2a496f1ad4823bd66eb5132f91651:maneuver:1', 'effect_type': 'StopMotionEffect', 'created_ns': 8282461464131, 'deadline_ns': 8283461464131}}, 'stops': {}}], 'preview': {'estimated_deadline_s': 283.0, 'frame': 'odom', 'reference_point': 'front_drive_axle', 'footprint_radius_m': 0.72, 'clearance_margin_m': 0.15, 'static_scene_sha256': 'bb13d4be0d784e74c5874b09ce3da2078d1f76d86c701fe81bf3d7f8606c9ad6', 'start': [0.24999999999999928, 1.887447489967719e-08, 7.549789959870882e-08], 'end': [0.25, 0.0, -3.1415925592174188], 'path_preview': [[0.24999999999999928, 1.887447489967719e-08], [0.28999999999999915, 2.189439088362554e-08], [0.32999999999999907, 2.491430686757389e-08], [0.36999999999999894, 2.793422285152224e-08], [0.4099999999999988, 3.095413883547059e-08], [0.44999999999999873, 3.397405481941894e-08], [0.48999999999999855, 3.699397080336729e-08], [0.5299999999999985, 4.001388678731564e-08], [0.5699999999999983, 4.3033802771263994e-08], [0.6099999999999982, 4.6053718755212345e-08], [0.6499999999999981, 4.9073634739160696e-08], [0.689999999999998, 5.209355072310904e-08], [0.7299999999999979, 5.511346670705739e-08], [0.7699999999999978, 5.813338269100574e-08], [0.8099999999999976, 6.115329867495409e-08], [0.8499999999999976, 6.417321465890244e-08], [0.8899999999999975, 6.719313064285079e-08], [0.9299999999999973, 7.021304662679914e-08], [0.9699999999999971, 7.32329626107475e-08], [1.0099999999999971, 7.625287859469585e-08], [1.049999999999997, 7.92727945786442e-08], [1.089999999999997, 8.229271056259255e-08], [1.1299999999999968, 8.53126265465409e-08], [1.1699999999999966, 8.833254253048925e-08], [1.2099999999999964, 9.13524585144376e-08], [1.2499999999999964, 9.437237449838595e-08], [1.2499999999999964, 9.437237449838595e-08], [1.2499999999999964, 9.437237449838595e-08], [1.2499999999999964, 9.437237449838595e-08], [1.2499999999999964, 9.437237449838595e-08], [1.2499999999999964, 9.437237449838595e-08], [1.2115384615384581, 9.074266778690957e-08], [1.1730769230769198, 8.711296107543319e-08], [1.1346153846153815, 8.348325436395681e-08], [1.0961538461538431, 7.985354765248042e-08], [1.0576923076923048, 7.622384094100404e-08], [1.0192307692307665, 7.259413422952766e-08], [0.9807692307692282, 6.896442751805127e-08], [0.9423076923076898, 6.53347208065749e-08], [0.9038461538461515, 6.170501409509851e-08], [0.8653846153846132, 5.8075307383622126e-08], [0.8269230769230749, 5.444560067214574e-08], [0.7884615384615365, 5.0815893960669364e-08], [0.7499999999999982, 4.718618724919298e-08], [0.7115384615384599, 4.3556480537716596e-08], [0.6730769230769216, 3.9926773826240215e-08], [0.6346153846153832, 3.629706711476383e-08], [0.5961538461538449, 3.266736040328744e-08], [0.5576923076923066, 2.903765369181106e-08], [0.5192307692307683, 2.540794698033468e-08], [0.48076923076922995, 2.1778240268858298e-08], [0.4423076923076916, 1.8148533557381904e-08], [0.4038461538461533, 1.4518826845905523e-08], [0.365384615384615, 1.0889120134429142e-08], [0.32692307692307665, 7.259413422952775e-09], [0.2884615384615383, 3.629706711476394e-09], [0.25, 0.0]], 'obstacle_source': 'configured static scene; not live sensor avoidance'}, 'cleanup': {'task_id': 'application:c11eb1c720994e8294e6a5dff5279f00', 'mission': 'safe_recovery', 'configuration_sha256': '0418551aed2789c6d7c83bfe1c9ce334010406cefd804821466d43e85e4017dc', 'status': 'SUCCEEDED', 'step': None, 'error': None, 'steps': [{'step': 'stop', 'reason': 'SUCCEEDED', 'error': None}, {'step': 'disarm', 'reason': 'SUCCEEDED', 'error': None}], 'effects': {'application:c11eb1c720994e8294e6a5dff5279f00:effect:1': {'phase': 'CANCELLED', 'command_id': 'command:8536fa4297484034913443c325ab99ed', 'reason': None}, 'application:c11eb1c720994e8294e6a5dff5279f00:effect:2': {'phase': 'CANCELLED', 'command_id': 'command:3c79cbfe9c424c2cb05e5ac3e421a6ec', 'reason': None}, 'application:c11eb1c720994e8294e6a5dff5279f00:effect:3': {'phase': 'CANCELLED', 'command_id': 'command:c29043777e9d4285bffdd6f0ea140096', 'reason': None}, 'application:c11eb1c720994e8294e6a5dff5279f00:effect:4': {'phase': 'COMPLETED', 'command_id': 'command:4f46b99ee4bc42be99396a521c4dc401', 'reason': None}, 'application:c11eb1c720994e8294e6a5dff5279f00:effect:5': {'phase': 'COMPLETED', 'command_id': 'command:b7f18d9334d341179d9e315b55914cc2', 'reason': None}}, 'requests': {'application:c11eb1c720994e8294e6a5dff5279f00:effect:1': {'action_id': 'application:c11eb1c720994e8294e6a5dff5279f00:stop:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8283462180704, 'deadline_ns': 8284462180704}, 'application:c11eb1c720994e8294e6a5dff5279f00:effect:2': {'action_id': 'application:c11eb1c720994e8294e6a5dff5279f00:stop:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8283763322077, 'deadline_ns': 8284763322077}, 'application:c11eb1c720994e8294e6a5dff5279f00:effect:3': {'action_id': 'application:c11eb1c720994e8294e6a5dff5279f00:stop:1', 'effect_type': 'TwistTargetEffect', 'created_ns': 8284162962906, 'deadline_ns': 8285162962906}, 'application:c11eb1c720994e8294e6a5dff5279f00:effect:4': {'action_id': 'application:c11eb1c720994e8294e6a5dff5279f00:stop:1', 'effect_type': 'StopMotionEffect', 'created_ns': 8284663104341, 'deadline_ns': 8285663104341}, 'application:c11eb1c720994e8294e6a5dff5279f00:effect:5': {'action_id': 'application:c11eb1c720994e8294e6a5dff5279f00:disarm:1', 'effect_type': 'DisarmEffect', 'created_ns': 8286964952644, 'deadline_ns': 8291964952644}}, 'stops': {}}, 'child': None, 'deadline_ns': 8857144983514, 'stop_evidence': 'SIMULATION_TELEMETRY_DISARMED_STATIONARY', 'scope': 'explicit localhost simulation; not physical vehicle stop acceptance'}",
+      "cases": null,
+      "summary_sha256": "16d28b22f5c78fd12aeb23f7d08086fedf322a8a49b96280109472a5a46c66e3"
+    },
+    {
+      "evidence": "artifacts/simulation/practical-calibration-r2",
+      "passed": false,
+      "source_commit": "fdbdee7a6c2de97450373f8f6dcfb0d1d538e84e",
+      "error": "AssertionError: {'status': 'FAILED', 'error': 'design_child_failed: scenario_cross_track_exceeded', 'step_index': 2, 'stop_evidence': 'SIMULATION_TELEMETRY_DISARMED_STATIONARY'}",
+      "cases": null,
+      "summary_sha256": "e250e7c8b6a5b911239f0e0baa3a080648e21c7f4d5ce210c8348e194cdb9182"
+    },
+    {
+      "evidence": "artifacts/simulation/practical-calibration-r3",
+      "passed": false,
+      "source_commit": "a558e480de75459cb9f882d2d988ecba32542ed3",
+      "error": "AssertionError: {'position': [0.28652435116467306, -0.02178171112710023], 'yaw': 2.8852192716344036}",
+      "cases": null,
+      "summary_sha256": "061e0139f813e08c8f438ea0edbbdc87517bed2de9f3e4298844e3ee3355dc11"
+    },
+    {
+      "evidence": "artifacts/simulation/practical-calibration-r4",
+      "passed": true,
+      "source_commit": "fba3ba542196aa1f8a45728da1d86edf001f4069",
+      "error": null,
+      "cases": null,
+      "summary_sha256": "409833e402f0af2fb24695b0b5f233525bfd9a2babdceb2dbf3e9d1843d1d5e3"
+    },
+    {
+      "evidence": "artifacts/simulation/yard-suite-20261021-r1",
+      "passed": false,
+      "source_commit": "fa1f78420b676e7c5d8b2f7db74285fc78f23886",
+      "error": null,
+      "cases": [
+        {
+          "name": "admission",
+          "status": "PASS",
+          "evidence": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/yard-suite-20261021-r1/00",
+          "error": null,
+          "duration_s": null
+        },
+        {
+          "name": "calibration",
+          "status": "PASS",
+          "evidence": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/yard-suite-20261021-r1/01",
+          "error": null,
+          "duration_s": 92.66504692000126
+        },
+        {
+          "name": "courier",
+          "status": "FAIL",
+          "evidence": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/yard-suite-20261021-r1/02",
+          "error": "AssertionError: {'status': 'FAILED', 'error': 'design_child_failed: scenario_cross_track_exceeded', 'step_index': 2, 'stop_evidence': 'SIMULATION_TELEMETRY_DISARMED_STATIONARY'}",
+          "duration_s": null
+        },
+        {
+          "name": "patrol",
+          "status": "FAIL",
+          "evidence": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/yard-suite-20261021-r1/03",
+          "error": "AssertionError: {'status': 'FAILED', 'error': 'design_child_failed: scenario_cross_track_exceeded', 'step_index': 4, 'stop_evidence': 'SIMULATION_TELEMETRY_DISARMED_STATIONARY'}",
+          "duration_s": null
+        },
+        {
+          "name": "circle",
+          "status": "PASS",
+          "evidence": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/yard-suite-20261021-r1/04",
+          "error": null,
+          "duration_s": 80.15486663699994
+        },
+        {
+          "name": "rotation",
+          "status": "PASS",
+          "evidence": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/yard-suite-20261021-r1/05",
+          "error": null,
+          "duration_s": 67.34683206099908
+        },
+        {
+          "name": "cancel",
+          "status": "PASS",
+          "evidence": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/yard-suite-20261021-r1/06",
+          "error": null,
+          "duration_s": 15.10720971199953
+        }
+      ],
+      "summary_sha256": "d4749171946f06a18c6f2bd27fd030871c64c304cb733d99e708a2df502ec8d4"
+    },
+    {
+      "evidence": "artifacts/simulation/practical-courier-fixed-r1",
+      "passed": false,
+      "source_commit": "b5e3b7787cd4318a05fbe9b39aaab767d9e3ea0f",
+      "error": "AssertionError: {'status': 'FAILED', 'error': 'design_child_failed: scenario_cross_track_exceeded', 'step_index': 2, 'stop_evidence': 'SIMULATION_TELEMETRY_DISARMED_STATIONARY'}",
+      "cases": null,
+      "summary_sha256": "b753464be8c315cdc495c36bdf592cb87af69d48c860d4ca45feb08da6d8049a"
+    },
+    {
+      "evidence": "artifacts/simulation/practical-courier-fixed-r2",
+      "passed": true,
+      "source_commit": "5c029bd250e2a836a07d2bacccba0635fc58a989",
+      "error": null,
+      "cases": null,
+      "summary_sha256": "ffbed85b3bf1770216441053b59f3c0eb01d878777c267e4025fb32d3429deab"
+    },
+    {
+      "evidence": "artifacts/simulation/yard-suite-20261021-r2",
+      "passed": false,
+      "source_commit": "c3dd943f356ce58cb5c367b5d18c8d3a3e68be91",
+      "error": null,
+      "cases": [
+        {
+          "name": "admission",
+          "status": "PASS",
+          "evidence": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/yard-suite-20261021-r2/00",
+          "error": null,
+          "duration_s": null
+        },
+        {
+          "name": "calibration",
+          "status": "PASS",
+          "evidence": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/yard-suite-20261021-r2/01",
+          "error": null,
+          "duration_s": 106.77707387699957
+        },
+        {
+          "name": "courier",
+          "status": "PASS",
+          "evidence": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/yard-suite-20261021-r2/02",
+          "error": null,
+          "duration_s": 215.65261762199952
+        },
+        {
+          "name": "patrol",
+          "status": "PASS",
+          "evidence": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/yard-suite-20261021-r2/03",
+          "error": null,
+          "duration_s": 188.43349697300073
+        },
+        {
+          "name": "circle",
+          "status": "PASS",
+          "evidence": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/yard-suite-20261021-r2/04",
+          "error": null,
+          "duration_s": 81.15682898500017
+        },
+        {
+          "name": "rotation",
+          "status": "PASS",
+          "evidence": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/yard-suite-20261021-r2/05",
+          "error": null,
+          "duration_s": 67.45006946799913
+        },
+        {
+          "name": "cancel",
+          "status": "PASS",
+          "evidence": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/yard-suite-20261021-r2/06",
+          "error": null,
+          "duration_s": 15.106440326000666
+        },
+        {
+          "name": "restart",
+          "status": "FAIL",
+          "evidence": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/yard-suite-20261021-r2/07",
+          "error": "RuntimeError: owned gazebo exited -11",
+          "duration_s": null
+        }
+      ],
+      "summary_sha256": "3e6375a098182cf48343c5f4e82b1f308bdc66737e758501b04e26f0c281fe94"
+    },
+    {
+      "evidence": "artifacts/simulation/practical-restart-r1",
+      "passed": true,
+      "source_commit": "c3dd943f356ce58cb5c367b5d18c8d3a3e68be91",
+      "error": null,
+      "cases": null,
+      "summary_sha256": "eb30ac2e4f4c54d2a0ba5d1dd1fd20685ef41dc875e82b5e8fb6ce1fd929a31a"
+    }
+  ],
+  "observed_resources": {
+    "application": {
+      "samples": 1134,
+      "peak_rss_mib": 34.66015625,
+      "peak_fds": 7,
+      "peak_log_bytes": 5183531
+    },
+    "application-readonly-restart": {
+      "samples": 1,
+      "peak_rss_mib": 28.8046875,
+      "peak_fds": 6,
+      "peak_log_bytes": 119
+    },
+    "gazebo": {
+      "samples": 1138,
+      "peak_rss_mib": 189.8671875,
+      "peak_fds": 27,
+      "peak_log_bytes": 425
+    },
+    "sitl": {
+      "samples": 1137,
+      "peak_rss_mib": 8.0,
+      "peak_fds": 17,
+      "peak_log_bytes": 2026
+    },
+    "web": {
+      "samples": 773,
+      "peak_rss_mib": 26.21875,
+      "peak_fds": 7,
+      "peak_log_bytes": 0
+    }
+  },
+  "resource_limitations": "sampled per-scenario peaks, not overnight endurance/no-leak or CPU acceptance",
+  "auditor_negative": {
+    "passed": true,
+    "source_commit": "c3dd943f356ce58cb5c367b5d18c8d3a3e68be91",
+    "positive_case": true,
+    "tampered_truth_rejected": "('truth path deviation', 2.23606797749979)",
+    "missing_full_matrix_rejected": true
+  },
+  "web_smoke": {
+    "passed": true,
+    "source_sha256": "00f8bac67d7f61b1353860855241e488598dd379dabead1c3956d8fcd236fab8",
+    "checks": [
+      "syntax",
+      "design_button_route",
+      "reviewable_steps",
+      "explicit_confirmation",
+      "design_approval_route",
+      "csrf_header",
+      "example_does_not_execute",
+      "parameterized_preview",
+      "failed_preflight_disabled",
+      "readonly_disabled",
+      "token_input_cleared"
+    ],
+    "visual_qa": false
+  },
+  "legacy_schema_compatibility": {
+    "passed": true,
+    "source_commit": "c3dd943f356ce58cb5c367b5d18c8d3a3e68be91",
+    "cases": [
+      {
+        "input": "依次执行两次 disarmed_mode，只确认停车，不移动。",
+        "elapsed_s": 4.55129100799968,
+        "design": {
+          "schema": 1,
+          "decision": "propose",
+          "title": "两次确认停机",
+          "reason": "用户要求连续两次确认停机且不移动，映射为两次 disarmed_mode。",
+          "steps": [
+            {
+              "mission": "disarmed_mode"
+            },
+            {
+              "mission": "disarmed_mode"
+            }
+          ]
+        }
+      },
+      {
+        "input": "执行已注册的 basic_route。",
+        "elapsed_s": 3.9938224850011466,
+        "design": {
+          "schema": 1,
+          "decision": "propose",
+          "title": "Execute registered basic_route",
+          "reason": "The user explicitly requested the registered basic_route capability, which is a finite A-B-HOME route that includes stop and disarm. No parameters are required or provided, so the default registered itinerary is used. No ambiguity, out-of-bounds values, or safety violations are present.",
+          "steps": [
+            {
+              "mission": "basic_route"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "known_failures": [
+    {
+      "status": "FAIL",
+      "name": "Gazebo native startup reliability",
+      "evidence": "artifacts/simulation/yard-suite-20261021-r2/07/gazebo.log",
+      "reason": "SIGSEGV in transport discovery getenv before telemetry; root cause not confirmed; focused restart follow-up passed; no automatic retry hides original failure"
+    },
+    {
+      "status": "FAIL",
+      "name": "P26 unified Nav2 regression",
+      "reason": "existing tracking/freshness failures not covered or repaired by parameterized static-yard maneuvers"
+    }
+  ],
+  "blocked": [
+    "real-vehicle controlled navigation and physical braking/estop acceptance",
+    "current yard live LiDAR/Nav2 dynamic obstacle composition",
+    "camera recognition/business inspection at stations",
+    "native browser visual QA"
+  ],
+  "files": {
+    "artifacts/simulation/yard-suite-20261021-r3/summary.json": "0ddae6058dfcaefd8c30c90118d13ebed9b33074148baac17bad2bcc8c7e59c8",
+    "artifacts/simulation/yard-suite-20261021-r3/independent-truth-audit.json": "3e88158f54dd6ba3e05bfffb9d53dab88e6a377e4b9df67c6f385cbc89965d7b",
+    "artifacts/simulation/yard-suite-20261021-r3/unit.json": "46dfe4c008f0696780f6c3ebde4df1d1ec73abd341dd71ba9aadc52eeabfaa7e",
+    "artifacts/simulation/yard-suite-20261021-r3/resources.jsonl": "4521f3ae4847c514d0bcd3f0a9974526464b3735c9d6a00fb45f1218a13fce2c"
+  }
+}
