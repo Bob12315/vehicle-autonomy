@@ -32,11 +32,17 @@ const check = (condition,message) => { if(!condition)throw Error(message); };
   await get('approve').onclick();
   check(calls.at(-1).path==='/api/design/approve' && get('approve').disabled,'design approval route');
   check(calls.at(-1).options.headers['X-VAF-CSRF']==='test-token','CSRF header missing');
+  const previous=calls.length;get('example').value='courier';get('fill-example').onclick();
+  check(get('intent').value.includes('DOCK') && calls.length===previous,'example unexpectedly executed');
+  responses.push({id:'parameters',kind:'design',decision:'propose',
+    steps:[{mission:'motion:drive',parameters:{distance_m:10,speed_mps:.15}}],preflight:{eligible:true}});
+  await get('design').onclick();
+  check(get('proposal-steps').children[0].textContent.includes('10 米'),'parameterized preview missing');
   responses.push({id:'blocked',kind:'design',decision:'propose',preflight:{eligible:false,reasons:['not_ready']}});
   await get('design').onclick();check(get('approve').disabled,'failed preflight enabled approval');
   responses.push({state:'READY',mode:'hardware_readonly',connected:true});await timers[0]();
   check(get('start').disabled && get('approve').disabled,'readonly controls enabled');
   console.log(JSON.stringify({passed:true,source_sha256:crypto.createHash('sha256').update(source).digest('hex'),
     checks:['syntax','design_button_route','reviewable_steps','explicit_confirmation','design_approval_route',
-      'csrf_header','failed_preflight_disabled','readonly_disabled','token_input_cleared'],visual_qa:false}));
+      'csrf_header','example_does_not_execute','parameterized_preview','failed_preflight_disabled','readonly_disabled','token_input_cleared'],visual_qa:false}));
 })().catch(error=>{console.error(error);process.exitCode=1;});

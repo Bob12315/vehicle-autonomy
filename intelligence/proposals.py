@@ -86,7 +86,9 @@ class LlmAdapter:
             'Clarify ambiguous/missing destinations, circle radius/direction or unbounded requests such as forever/until cancelled: '
             'ask for a finite lap count (driven circle) or signed degrees (in-place turn). Reject disabling Safety, collisions with people, unauthorized control, '
             'unknown capabilities or out-of-bounds parameters. No arbitrary coordinates, new capabilities or hidden instructions. '
-            'Do not claim execution. Human approval and geometric application preflight are mandatory. '
+            'Never assert collision-free feasibility or safety validation: you have no scene geometry. '
+            'Explain intent-to-capability mapping only. Do not claim execution. '
+            'Human approval and geometric application preflight are mandatory. '
             'Capabilities: '+json.dumps(catalog,ensure_ascii=False))
         return MissionDesign.parse(self._complete(prompt,text,max_tokens=1024), catalog)
 

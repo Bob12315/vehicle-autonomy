@@ -97,7 +97,15 @@ async function propose(path) {
   $('proposal-steps').replaceChildren();
   for (const step of proposal.steps ?? (proposal.mission ? [{mission: proposal.mission}] : [])) {
     const item = document.createElement('li');
-    item.textContent = step.mission + (step.parameters && Object.keys(step.parameters).length ? ' · ' + JSON.stringify(step.parameters) : '');
+    const p = step.parameters ?? {};
+    const descriptions = {
+      'motion:drive': () => '前进 ' + p.distance_m + ' 米，速度 ' + p.speed_mps + ' 米/秒',
+      'motion:turn': () => '原地向' + (p.angle_deg >= 0 ? '左' : '右') + '转 ' + Math.abs(p.angle_deg) + '°',
+      'motion:circle': () => '向' + (p.direction === 'left' ? '左' : '右') + '绕 ' + p.laps + ' 圈，半径 ' + p.radius_m + ' 米，速度 ' + p.speed_mps + ' 米/秒',
+      'motion:wait': () => '停车停留 ' + p.duration_s + ' 秒',
+      'motion:visit': () => '前往 ' + p.waypoint + '，速度 ' + p.speed_mps + ' 米/秒'
+    };
+    item.textContent = descriptions[step.mission] ? descriptions[step.mission]() : step.mission;
     $('proposal-steps').append(item);
   }
   $('proposal-check').textContent = proposal.decision === 'clarify' ? '需要补充任务信息'
