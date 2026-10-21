@@ -13,6 +13,14 @@ from deployment.rs16_profile import sensor_commands
 
 
 class Rs16SupervisionTests(unittest.TestCase):
+    def test_native_source_cannot_mix_with_replay_or_synthetic_provenance(self):
+        for flag in ('--self-test','--replay'):
+            result=subprocess.run([sys.executable,'-m','integrations.ros2.rs16_scan',
+                '--exchange','/tmp/not-opened','--config','config/rs16-scan.json',
+                '--health-file','/tmp/not-written',flag],capture_output=True,text=True,timeout=5)
+            self.assertEqual(result.returncode,2)
+            self.assertIn('cannot mix',result.stderr)
+
     def fixture(self, directory):
         root = Path(directory)
         binary = root/'receiver'

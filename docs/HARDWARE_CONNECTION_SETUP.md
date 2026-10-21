@@ -63,11 +63,15 @@ solver 加载成功。Humble 默认 SIGTERM 导致回调中 context 提前关闭
   0 错误、源 epoch 单一、发布者均为 vaf_rs16_scan。未知角度保持 NaN。
 - 实际 ARM64 官方 SDK PCAP 回放：8 秒真实录制输入解码 78 帧，退出码 0；
   标记 pcap_replay，未冒充 live。PCAP-enabled 二进制保存在 rs16-build-pcap。
+- 真实 rosbag：录制 11.36 秒、115 帧 PointCloud2 / 114 帧 LaserScan；在隔离
+  domain 86 使用 bag clock 回放原始点云，经 --replay 适配再次录得 115 帧
+  LaserScan，0 拒绝，scope=rosbag_replay、control_eligible=false；播放结束后
+  健康正确转为离线。live SDK 模式不订阅外部 /rslidar_points，不与记录源混合。
 - Nav2 planner_server 创建生命周期节点/代价地图后受控关闭；SLAM 实际加载
   solver_plugins::CeresSolver 后受控关闭。这是原生依赖运行检查，不是导航/建图验收。
 - 原板端 Jazzy/x86 库未复用，PC Jazzy 合成测试仍接受 6 帧、拒绝 2 帧。
 - 本次基础环境版本的 PC 全量 287 测试、板端非 Gazebo profile 258 测试通过，均 0 跳过。
-  随后的进程 epoch 绑定增加一项旧文件准入回归，PC 288 项通过；板端该修订另行复核。
+  随后的进程 epoch 绑定增加一项旧文件准入回归，PC 288 项、板端 259 项通过。
 
 监督启动将同一新 SDK epoch 注入 Application 和 ROS 侧车。即使上一进程文件仍在
 500 ms 新鲜度窗口，也在首次准入前拒绝；不让旧文件先绑定后阻断新进程数据。

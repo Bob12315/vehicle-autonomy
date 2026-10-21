@@ -2,7 +2,9 @@
 
 日期：2026-10-21，Asia/Ulaanbaatar。**已交付并部署硬件只读应用；尚未达到完整
 Hardware-Ready Simulation 验收。P26 统一导航门槛 FAIL，真实车辆运动 BLOCKED。**
-最终安装运行版本为 `8b8f61a`，后续本地提交仅补充审计证据。板端最终 255 项非 Gazebo 测试、认证/幂等/报告页面/真实 LLM 和 ARM SDK 无输入诊断均再次通过。
+首次交付运行版本为 `8b8f61a`。用户接线后的增量版本已完成实际 RS16 接入、
+隔离 ARM64 Humble/Nav2/SLAM 环境及进程监管；当前证据和一键命令见
+[接线与环境配置](HARDWARE_CONNECTION_SETUP.md)。下文历史 P26 失败保持有效。
 
 软件可部署不等于真实车辆已通过安全验收。本轮没有向真实飞控发送解锁、模式、
 运动、电机或参数请求，没有改管理网络、内核、飞控固件或旧 CUADC/legacy。
@@ -19,17 +21,18 @@ BLOCKED 包括外部条件不足或所需软件组合尚未实现，原因逐项
 | P26 600 秒/100 任务资源门槛 | PASS | 600.436 s，100 个唯一任务/Effect，802 份资源样本；0 跳过。 |
 | P26 统一导航版本门槛 | **FAIL** | 默认前驱跟踪触发 0.15 m 越轨保护；重规划场景定位年龄 570.845 ms 超过 500 ms。未提高门槛或改写失败。23 项 mandatory 场景实际执行 21 PASS / 2 FAIL / 0 跳过 / 0 未运行；所有进程组及端口释放。完整结果见提交的 JSON 证据。 |
 | P27 ARM64 应用与 Web 部署 | PASS | NanoPC-T6 Ubuntu 22.04/Python 3.10，独立 venv/离线 wheels/版本目录，实际启动和 API 健康检查。 |
-| 板端非 Gazebo 单元 profile | PASS | 255 项，0 失败/错误/跳过；全部 root 核心/合同/控制/传感器/Web 单元，外部仿真门槛另在 PC 执行。 |
+| 板端非 Gazebo 单元 profile | PASS | 首次 255 项；接线后环境版本 258 项，进程 epoch 修订 `952ef23` 为 259 项，均 0 失败/错误/跳过；外部仿真门槛另在 PC 执行。 |
 | 板端递归全量 discovery 尝试 | **FAIL** | 初始发布版 278 项中 3 个错误：PC harness 依赖 Git/本机 simulator checkout，Oracle 依赖 Gazebo Python 包。原始日志保留，不将该尝试改称 PASS。板端不要求运行 Gazebo/SITL。 |
-| P27 板端 ROS/Nav2/SLAM | BLOCKED | 板端未装 ROS、无观察到的默认路由；Humble/ARM64 组合尚未构建验收。不能搬 PC Jazzy 的原生库冒充支持。 |
+| P27 板端 ROS/Nav2/SLAM 环境 | PASS | 用户接线后离线提取 626 个认证 ARM64/all 包到独立 prefix，实际 Humble ROS、Nav2 planner/controller、SLAM Ceres solver、robot_localization 原生加载及 launch 参数解析；系统 dpkg 状态 SHA 前后相同。导航/建图本身仍未验收。 |
 | P28 官方 RS16 adapter 编译 | PASS | 官方 rs_driver `897b14d3…`，PC 和 ARM64 g++ 实际编译，保留 vendor license、二进制 SHA。 |
 | P28 点云/扫描与异常软件链 | PASS | ROS 合成测试接受 6 帧、拒绝错误 Frame/过期帧各 1；typed 单元覆盖丢失、重排、epoch/boot、不合格点、时间/覆盖/地面/自遮挡过滤。明确为软件测试。 |
-| P28 真实 RS16 / PCAP / rosbag | BLOCKED | eth0 无载波；未取得真实 UDP/PCAP/rosbag；被动抓包曾因权限失败。板端编译禁用 PCAP，未装 libpcap 开发依赖。不能把无输入退出码 3 算真实雷达 PASS。 |
+| P28 真实 RS16 / PCAP | PASS | 实测 ARP 发现接收地址不匹配，仅为雷达 eth0 添加 192.168.1.181/24 后收到真实 6699/7788 数据；官方 ARM SDK 18 秒 180 帧；真实 ROS 20 秒 200/200 帧；实际 PCAP 回放 78 帧。有限有效回波覆盖、外参/采集时钟与控制资格均另行阻塞。 |
+| P28 真实 rosbag 录放 | PASS | 板端实际录制 115 帧 PointCloud2 / 114 帧 LaserScan；隔离 domain 86 用 bag clock 回放原始点云，经转换后再次录得 115 帧 LaserScan，0 拒绝；回放结束后健康正确离线。录制/回放不作为当时 live 硬件验收。 |
 | P28 Camera 采集软件与记录源 | PASS | 实际记录视频 worker/JPEG/健康、失效与进程清理测试，记录源明确标记 recording。 |
 | P28 真实 Camera | BLOCKED | `/dev/video22`、`/dev/video31`、HDMI `/dev/video40` 实际探测均 0 帧、无法打开。ISP 节点不能证明已连接摄像头。型号、接口、曝光/标定仍未知，实时采集到现有视觉感知 Observation 的软件装配也尚未完成。 |
 | P29 GPS/EKF 诊断软件 | PASS | 接收适配不发 MAVLink，源/epoch、NED→ENU 速度、GPS 质量/跳变、过期与非有限值拒绝有单元证据。 |
-| P29 实车 GPS Navigation | BLOCKED | 未发现 USB 飞控；UART 接线未知。真实 EKF/原点/围栏/采集时钟和制动未验收。普通 GPS 不作为精确局部避障定位。 |
-| P29 实车 LiDAR Map Navigation/模式切换 | BLOCKED | 无实际扫描/外参/地图及独立定位精度；活动 SLAM、地图重定位和硬件模式切换软件组合未完成，候选始终禁止控制。 |
+| P29 实车 GPS Navigation | BLOCKED | 电脑已实际识别 MicoAir743v2 USB、收到未解锁 Rover 心跳和姿态，0 字节 MAVLink 写入；本次无 GPS_RAW_INT/EKF_STATUS_REPORT，位置为 0，曾报告 Radio Failsafe。罗盘未校准；原点/围栏/采集时钟和制动未验收。普通 GPS 不作为精确局部避障定位。 |
+| P29 实车 LiDAR Map Navigation/模式切换 | BLOCKED | 已有实际扫描，但缺外参、地图与独立定位精度；活动 SLAM、地图重定位和硬件模式切换软件组合未完成，候选始终禁止控制。 |
 | P30 近场检查与原 writer 拒绝链 | PASS | 离线测试在 Effect 排队后插入障碍/断流，原唯一 writer 零写出；原 Stop 仍可通过。拒绝缺失覆盖、超时、未准入转向/倒车，速度建议不授予权限。 |
 | P30 实车避障/减速/物理停车 | BLOCKED | 没有默认/硬件 scan guard 装配或 live Nav2 障碍层；没有真实故障到物理制动链。STM32/双 DAC 适配与物理急停/驱动失能必须现场验收。 |
 | P31 认证控制台与 Application API | PASS | 自有 Rover SITL 实际 Web→Application→Typed Mode→ACK/后续状态通过，未解锁；重复请求只执行一次，旧会话和重启未授权请求拒绝。 板端实际 401、拒绝任务、软件 Stop=UNCONFIRMED；root 测试覆盖 Bearer/CSRF/Origin/Host、请求幂等、旧会话隔离、地图保存/只读预览、草稿航点及审计。 |
@@ -41,9 +44,11 @@ BLOCKED 包括外部条件不足或所需软件组合尚未实现，原因逐项
 ## 真实环境与安装
 
 机载 `pi@192.168.50.2`：NanoPC-T6，Linux 6.1.141 aarch64、Ubuntu 22.04.4、Python
-3.10.12，约 3.8 GiB RAM。eth1 为管理链路，eth0 carrier=0；未观察到默认路由。
-板端 UTC 墙钟约落后一天，未自动校时。所有内部新鲜度使用本机单调时间；跨设备
-采集时钟仍未认证。旧应用继续运行，本轮没有修改它们的目录、配置、端口或进程。
+3.10.12，约 3.8 GiB RAM。eth1 为管理链路，保持 192.168.50.2/24。
+首次交付时 eth0 无载波；用户接线后已收到雷达 ARP，保留原 192.168.10.15/24 并
+添加实际接收 IP 192.168.1.181/24；无默认路由。墙钟从落后约 130240 秒经已同步
+电脑单次 SSH 校正到约 0.2 秒差，未写 RTC；重启后需复核。内部新鲜度仍使用本机
+单调时间；跨设备采集时钟未认证。旧应用目录、配置、端口和进程未修改。
 
 最初提供的 `10.101.31.108` SSH 握手失败；随后按用户更正，仅连接
 `bob@10.10.12.240`，Ubuntu 22.04.5/x86_64，ROS Humble 已存在、4×RTX 3090。

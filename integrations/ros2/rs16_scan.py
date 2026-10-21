@@ -25,6 +25,8 @@ def main():
     parser.add_argument('--self-test',action='store_true',help='explicit synthetic ROS software fixture, never hardware evidence')
     parser.add_argument('--replay',action='store_true',help='explicit rosbag --clock input, never a live hardware claim')
     args=parser.parse_args()
+    if args.exchange is not None and (args.replay or args.self_test):
+        parser.error('native SDK exchange cannot mix with ROS replay or synthetic inputs')
     if args.expected_sdk_epoch is not None and (
             args.exchange is None or not 1<=len(args.expected_sdk_epoch)<=128):
         parser.error('owned SDK epoch requires --exchange and 1..128 characters')
@@ -93,7 +95,7 @@ def main():
         except (ValueError,TypeError,OverflowError) as exc:
             rejected+=1;write_health(str(exc))
 
-    subscriber=node.create_subscription(PointCloud2,args.topic,consume,qos_profile_sensor_data)
+    subscriber=node.create_subscription(PointCloud2,args.topic,consume,qos_profile_sensor_data) if args.exchange is None else None
 
     def poll_exchange():
         nonlocal last_exchange,rejected

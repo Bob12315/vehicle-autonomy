@@ -5,6 +5,13 @@ authenticated console and simulation/sensor/LLM validation tools. Physical
 vehicle control is intentionally unavailable. The authoritative results and
 missing software/hardware gates are in [HARDWARE_READY_AUDIT](HARDWARE_READY_AUDIT.md).
 
+After the user's physical connections, the actual RS16 network/ROS/PCAP chain
+and an isolated ARM64 Humble/Nav2/SLAM prefix were installed and tested. The
+current configured launcher is `scripts/onboard-connected.sh`; use
+[the connection setup](HARDWARE_CONNECTION_SETUP.md) for its state directory,
+observed device addresses, limitations and commands. Sections below preserve
+the initial empty-source template and initial deployment history.
+
 ## Installed board and lifecycle
 
 Authorized board: `pi@192.168.50.2`, NanoPC-T6 / RK3588, aarch64, Ubuntu 22.04,
@@ -122,8 +129,8 @@ measurements. No default lidar-to-base transform is invented. Both raw and scan
 capture times retain provenance; stale/future, reordered, empty, oversized,
 wrong-frame and wrong-epoch data are rejected. The cloud monitor records gaps.
 
-Board Ubuntu Jammy ARM64 is compatible with the ROS 2 Humble platform family;
-ROS is **not installed by this release**. PC Jazzy 2.8.5 SLAM native libraries
+The initial release did not install ROS. The connected increment now provides
+isolated ARM64 Humble, with runtime tests in the connection setup. PC Jazzy 2.8.5 SLAM native libraries
 must not be copied to ARM64/Humble. See [official ROS platform information](https://repo.test.ros2.org/en/humble/Installation/Alternatives/Ubuntu-Install-Binary.html).
 
 ## Navigation, mapping and collision limits

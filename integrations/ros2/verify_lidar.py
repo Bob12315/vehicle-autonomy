@@ -67,16 +67,20 @@ def main():
                 errors.append('exchange: '+str(exc))
         for topic in ('/vaf/lidar/points', '/vaf/lidar/scan'):
             publishers[topic] = [p.node_name for p in node.get_publishers_info_by_topic(topic)]
+        external_input_subscribers=[p.node_name for p in node.get_subscriptions_info_by_topic('/rslidar_points')
+                                    if p.node_name=='vaf_rs16_scan']
         passed = (not errors and len(epochs) == 1 and len(source_sequences) >= 5
                   and min(counts.values()) >= max(5, int(args.duration*2))
-                  and all(names == ['vaf_rs16_scan'] for names in publishers.values()))
+                  and all(names == ['vaf_rs16_scan'] for names in publishers.values())
+                  and not external_input_subscribers)
         result = {'passed': passed, 'provenance': args.provenance, 'duration_s': time.monotonic()-start,
                   'counts': counts, 'rates_hz': {k:v/args.duration for k,v in counts.items()},
                   'point_count_range': [min(point_counts),max(point_counts)] if point_counts else None,
                   'known_scan_bins_range': [min(known_bins),max(known_bins)] if known_bins else None,
                   'maximum_ros_source_age_ms': max(ages)/1e6 if ages else None,
                   'source_epochs': sorted(epochs), 'unique_source_sequences':len(source_sequences),
-                  'publishers': publishers, 'errors':errors[:50], 'error_count':len(errors),
+                  'publishers': publishers, 'external_input_subscribers':external_input_subscribers,
+                  'errors':errors[:50], 'error_count':len(errors),
                   'control_eligible': False, 'physical_mount_and_stop_acceptance': 'NOT_TESTED'}
         args.report.parent.mkdir(parents=True, exist_ok=True)
         args.report.write_text(json.dumps(result, indent=2)); print(json.dumps(result))
