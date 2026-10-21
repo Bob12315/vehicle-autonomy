@@ -13,7 +13,7 @@ from sensors.camera.live import CameraSource, discover
 
 
 class HardwareReadOnlyRuntime:
-    def __init__(self, profile, log_dir):
+    def __init__(self, profile, log_dir, *, expected_lidar_epoch=None):
         if profile['mode'] != 'hardware_readonly' or profile['system_send'] or profile['action_send']:
             raise ValueError('hardware diagnostic composition only')
         self.profile = profile
@@ -34,7 +34,7 @@ class HardwareReadOnlyRuntime:
         self.errors = {}
         self.inventory = discover()
         from sensors.lidar.exchange import ExchangeMonitor
-        self.lidar_monitor = ExchangeMonitor()
+        self.lidar_monitor = ExchangeMonitor(expected_lidar_epoch)
         self.lidar = {'online': False, 'reason': 'no admitted lidar exchange configured', 'control_eligible': False}
         self._event('started', mode='hardware_readonly', send=False)
         if profile['camera']:

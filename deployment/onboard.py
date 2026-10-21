@@ -88,11 +88,13 @@ def supervise(args,directory):
     env=dict(os.environ)
     env['PYTHONPATH']=str(ROOT)+(os.pathsep+env['PYTHONPATH'] if env.get('PYTHONPATH') else '')
     commands=[]
+    expected_epoch=[]
     if args.rs16_config:
         from deployment.rs16_profile import sensor_commands
         commands.extend(sensor_commands(args.rs16_config,profile,ROOT,ros=args.ros2_humble))
+        expected_epoch=['--expected-lidar-epoch',commands[0][1][-1]]
     commands.extend([('application',[sys.executable,'-m','app.hardware','--config',str(Path(args.config).resolve()),
-        '--control-socket',str(directory/'app.sock'),'--log-dir',str(directory/'logs')]),
+        '--control-socket',str(directory/'app.sock'),'--log-dir',str(directory/'logs'),*expected_epoch]),
         ('web',[sys.executable,'-m','app.web','--control-socket',str(directory/'app.sock'),
         '--token-file',str(directory/'token'),'--data-dir',str(directory/'console'),'--port',str(args.port),
         *(['--llm-config',str(Path(args.llm_config).resolve())] if args.llm_config else [])])])

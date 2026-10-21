@@ -32,6 +32,8 @@ class Rs16SupervisionTests(unittest.TestCase):
             path.write_text(json.dumps(config))
             command = sensor_commands(path, profile, Path.cwd())[0][1]
             self.assertEqual(command[:6], [config['binary'], '127.0.0.1', '26699', '27788', '10', config['exchange']])
+            commands=sensor_commands(path, profile, Path.cwd(),ros=True)
+            self.assertIn(commands[0][1][-1],commands[1][1])
             for fields in ({'msop_port': True}, {'difop_port': 26699}, {'duration_s': 0},
                            {'exchange': '/tmp/other.json'}, {'host_ip': 'example.com'},
                            {'extra_command': 'arm'}):

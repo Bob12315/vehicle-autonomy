@@ -58,12 +58,15 @@ def exchange_view(value, now_ns):
 
 
 class ExchangeMonitor:
-    def __init__(self):
+    def __init__(self, expected_epoch=None):
+        self.expected_epoch = expected_epoch
         self.previous = None
         self.dropped = 0
 
     def poll(self, path, now_ns):
         value = load_exchange(path, now_ns)
+        if self.expected_epoch is not None and value['epoch'] != self.expected_epoch:
+            raise ValueError('SDK exchange is not from the owned receiver epoch')
         key = value['epoch'], value['sequence'], value['capture_ns']
         if self.previous is not None:
             epoch, sequence, capture = self.previous

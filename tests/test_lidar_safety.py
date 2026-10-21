@@ -19,6 +19,20 @@ def stamp(value, domain='test'):
 
 
 class LidarTests(unittest.TestCase):
+    def test_fresh_previous_receiver_file_cannot_poison_owned_epoch_admission(self):
+        from sensors.lidar.exchange import ExchangeMonitor
+        base={'schema':1,'source':'robosense.rs_driver','epoch':'old',
+              'clock_domain':Path('/proc/sys/kernel/random/boot_id').read_text().strip(),
+              'frame':'lidar','sequence':1,'capture_ns':100,'receive_ns':200,
+              'source_timestamp_s':1.,'provenance':'live_sdk_system_timestamp','points':[[1.,0.,0.]]}
+        with tempfile.TemporaryDirectory() as directory:
+            path=Path(directory)/'cloud.json';monitor=ExchangeMonitor(expected_epoch='new')
+            path.write_text(json.dumps(base))
+            with self.assertRaisesRegex(ValueError,'owned receiver epoch'):monitor.poll(path,1000)
+            self.assertIsNone(monitor.previous)
+            path.write_text(json.dumps({**base,'epoch':'new'}))
+            self.assertTrue(monitor.poll(path,1000)['online'])
+
     def test_sdk_exchange_loss_reorder_boot_and_expiry(self):
         from sensors.lidar.exchange import ExchangeMonitor
         base={'schema':1,'source':'robosense.rs_driver','epoch':'test','clock_domain':Path('/proc/sys/kernel/random/boot_id').read_text().strip(),

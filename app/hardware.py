@@ -18,15 +18,19 @@ def main():
     parser.add_argument('--control-socket')
     parser.add_argument('--log-dir', default='artifacts/hardware-ready/onboard')
     parser.add_argument('--check', action='store_true')
+    parser.add_argument('--expected-lidar-epoch', help='owned SDK process epoch; rejects old files before admission')
     args = parser.parse_args()
     profile = load_profile(args.config)
+    if args.expected_lidar_epoch is not None and (
+            not profile['lidar_exchange'] or not 1 <= len(args.expected_lidar_epoch) <= 128):
+        parser.error('owned LiDAR epoch requires an explicit exchange and 1..128 characters')
     if args.check:
         print(json.dumps({'valid': True, 'mode': profile['mode'], 'system_send': False, 'action_send': False}))
         return 0
     if profile['mode'] != 'hardware_readonly':
         parser.error('Simulation uses the existing app.main run --profile rover_sim entry')
     from deployment.hardware_runtime import HardwareReadOnlyRuntime
-    runtime = HardwareReadOnlyRuntime(profile, args.log_dir)
+    runtime = HardwareReadOnlyRuntime(profile, args.log_dir, expected_lidar_epoch=args.expected_lidar_epoch)
     server = None
     previous = {}
     try:

@@ -32,10 +32,12 @@ def sensor_commands(path, profile, root, *, ros=False):
     info = parent.stat()
     if not parent.is_dir() or info.st_uid != os.getuid() or info.st_mode & 0o077:
         raise ValueError('SDK output directory must be private and owned')
+    epoch=uuid4().hex
     commands = [('rs16', [str(binary), value['host_ip'], str(value['msop_port']),
-                         str(value['difop_port']), str(value['duration_s']), str(exchange), uuid4().hex])]
+                         str(value['difop_port']), str(value['duration_s']), str(exchange), epoch])]
     if ros:
         commands.append(('ros_scan', [str(root/'scripts/with_ros2_humble.sh'), sys.executable,
             '-m', 'integrations.ros2.rs16_scan', '--config', str(root/'config/rs16-scan.json'),
-            '--exchange', str(exchange), '--health-file', str(parent/'ros-scan-health.json')]))
+            '--exchange', str(exchange), '--expected-sdk-epoch', epoch,
+            '--health-file', str(parent/'ros-scan-health.json')]))
     return commands

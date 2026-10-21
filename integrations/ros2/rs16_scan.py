@@ -21,9 +21,13 @@ def main():
     parser.add_argument('--config',required=True)
     parser.add_argument('--health-file',type=Path,required=True)
     parser.add_argument('--exchange',type=Path,help='same-host official native SDK exchange; publishes PointCloud2')
+    parser.add_argument('--expected-sdk-epoch',help='owned receiver epoch; reject previous process files')
     parser.add_argument('--self-test',action='store_true',help='explicit synthetic ROS software fixture, never hardware evidence')
     parser.add_argument('--replay',action='store_true',help='explicit rosbag --clock input, never a live hardware claim')
     args=parser.parse_args()
+    if args.expected_sdk_epoch is not None and (
+            args.exchange is None or not 1<=len(args.expected_sdk_epoch)<=128):
+        parser.error('owned SDK epoch requires --exchange and 1..128 characters')
     config=ScanConfig(**json.loads(Path(args.config).read_text()))
     import rclpy
     from rclpy.node import Node
@@ -96,6 +100,8 @@ def main():
         try:
             from sensors.lidar.exchange import load_exchange
             raw=load_exchange(args.exchange,time.monotonic_ns())
+            if args.expected_sdk_epoch is not None and raw['epoch']!=args.expected_sdk_epoch:
+                raise ValueError('SDK exchange is not from the owned receiver epoch')
             key=raw['epoch'],raw['sequence']
             if key==last_exchange:
                 return
