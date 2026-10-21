@@ -11,6 +11,21 @@ import time
 
 
 class SupervisorTests(unittest.TestCase):
+    def test_previous_boot_cleanup_requires_recorded_socket_identity(self):
+        from deployment.onboard import boot_id, cleanup_previous_boot_socket
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory);path=root/'app.sock'
+            listener=socket.socket(socket.AF_UNIX);listener.bind(str(path));listener.close()
+            inode=path.lstat().st_ino
+            marker=root/'supervisor.json'
+            for value in ({'socket_inode':inode}, {'boot_id':boot_id(),'socket_inode':inode},
+                          {'boot_id':'old-boot','socket_inode':inode+1}):
+                marker.write_text(json.dumps(value));cleanup_previous_boot_socket(root)
+                self.assertTrue(path.exists())
+            marker.write_text(json.dumps({'boot_id':'old-boot','socket_inode':inode}))
+            cleanup_previous_boot_socket(root)
+            self.assertFalse(path.exists())
+
     def test_owned_application_crash_stops_stack_and_restart_stays_readonly(self):
         with tempfile.TemporaryDirectory(prefix='vaf-crash-') as directory:
             with socket.socket() as listener:

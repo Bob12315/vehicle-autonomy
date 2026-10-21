@@ -20,6 +20,24 @@ from web_ui.server import load_token
 ROOT=Path(__file__).resolve().parents[1]
 
 
+def boot_id():
+    return Path('/proc/sys/kernel/random/boot_id').read_text().strip()
+
+
+def cleanup_previous_boot_socket(directory):
+    """Only reclaim our recorded inode from a demonstrably earlier boot."""
+    try:
+        value=json.loads((directory/'supervisor.json').read_text())
+        path=directory/'app.sock'
+        info=path.lstat()
+        if (value.get('boot_id') and value['boot_id']!=boot_id()
+                and value.get('socket_inode')==info.st_ino
+                and stat.S_ISSOCK(info.st_mode) and info.st_uid==os.getuid()):
+            path.unlink()
+    except FileNotFoundError:
+        pass
+
+
 def process_identity(pid):
     try:
         return Path(f'/proc/{pid}/stat').read_text().rsplit(')',1)[1].split()[19]
@@ -34,6 +52,8 @@ def metadata(path, value):
 def owned_supervisor(directory):
     try:
         value=json.loads((directory/'supervisor.json').read_text())
+        if value.get('boot_id') and value['boot_id']!=boot_id():
+            return None
         if process_identity(value['pid'])!=value['start_ticks']:
             return None
         command=Path(f"/proc/{value['pid']}/cmdline").read_bytes().split(b'\0')
@@ -53,6 +73,7 @@ def supervise(args,directory):
         fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
     except BlockingIOError:
         raise ValueError('an onboard supervisor already owns this directory')
+    cleanup_previous_boot_socket(directory)
     children=[]
     handles=[]
     stopping=False
@@ -61,15 +82,20 @@ def supervise(args,directory):
         nonlocal stopping
         stopping=True
     signal.signal(signal.SIGTERM,stop);signal.signal(signal.SIGINT,stop)
-    metadata(directory/'supervisor.json',{'pid':os.getpid(),'start_ticks':process_identity(os.getpid()),
-        'source_root':str(ROOT),'mode':'hardware_readonly','port':args.port})
+    owner={'pid':os.getpid(),'start_ticks':process_identity(os.getpid()),'boot_id':boot_id(),
+        'source_root':str(ROOT),'mode':'hardware_readonly','port':args.port}
+    metadata(directory/'supervisor.json',owner)
     env=dict(os.environ)
     env['PYTHONPATH']=str(ROOT)+(os.pathsep+env['PYTHONPATH'] if env.get('PYTHONPATH') else '')
-    commands=[('application',[sys.executable,'-m','app.hardware','--config',str(Path(args.config).resolve()),
+    commands=[]
+    if args.rs16_config:
+        from deployment.rs16_profile import sensor_commands
+        commands.extend(sensor_commands(args.rs16_config,profile,ROOT,ros=args.ros2_humble))
+    commands.extend([('application',[sys.executable,'-m','app.hardware','--config',str(Path(args.config).resolve()),
         '--control-socket',str(directory/'app.sock'),'--log-dir',str(directory/'logs')]),
         ('web',[sys.executable,'-m','app.web','--control-socket',str(directory/'app.sock'),
         '--token-file',str(directory/'token'),'--data-dir',str(directory/'console'),'--port',str(args.port),
-        *(['--llm-config',str(Path(args.llm_config).resolve())] if args.llm_config else [])])]
+        *(['--llm-config',str(Path(args.llm_config).resolve())] if args.llm_config else [])])])
     result={'passed':False,'mode':'hardware_readonly','physical_stop':'UNCONFIRMED'}
     try:
         load_token(directory/'token')
@@ -84,6 +110,7 @@ def supervise(args,directory):
                     info=(directory/'app.sock').lstat()
                     if stat.S_ISSOCK(info.st_mode) and info.st_uid==os.getuid():
                         socket_identity=info.st_ino
+                        metadata(directory/'supervisor.json',{**owner,'socket_inode':socket_identity})
                 except FileNotFoundError:pass
             for name,child in children:
                 if child.poll() is not None:
@@ -95,8 +122,8 @@ def supervise(args,directory):
     except Exception as exc:
         result['error']=f'{type(exc).__name__}: {exc}'
     finally:
-        # Fence/close application first; its receive-only nature cannot assert physical Stop.
-        for name,child in children:
+        # Close console/Application and owned sensors; no child can assert physical Stop.
+        for name,child in reversed(children):
             if child.poll() is None:
                 child.terminate()
         for name,child in children:
@@ -124,8 +151,12 @@ def main():
     parser.add_argument('--state-dir',default=str(Path.home()/'.local/state/vehicle-autonomy'))
     parser.add_argument('--config',default=str(ROOT/'config/deployment/hardware-readonly.json'))
     parser.add_argument('--llm-config')
+    parser.add_argument('--rs16-config',help='explicit official SDK receiver; never configures a NIC or LiDAR')
+    parser.add_argument('--ros2-humble',action='store_true',help='also supervise the isolated ARM64 ROS scan sidecar')
     parser.add_argument('--port',type=int,default=8765)
     args=parser.parse_args()
+    if args.ros2_humble and not args.rs16_config:
+        parser.error('--ros2-humble requires --rs16-config')
     directory=Path(args.state_dir).resolve();directory.mkdir(parents=True,exist_ok=True,mode=0o700)
     info=directory.stat()
     if info.st_uid!=os.getuid() or info.st_mode&0o077:
@@ -148,9 +179,14 @@ def main():
         print(json.dumps(request(directory/'app.sock','status'),ensure_ascii=False));return 0
     if value:raise ValueError('already running; use status')
     load_profile(args.config)
+    if args.rs16_config:
+        from deployment.rs16_profile import sensor_commands
+        sensor_commands(args.rs16_config,load_profile(args.config),ROOT,ros=args.ros2_humble)
     command=[sys.executable,'-m','deployment.onboard','supervise','--state-dir',str(directory),
         '--config',str(Path(args.config).resolve()),'--port',str(args.port),
-        *(['--llm-config',str(Path(args.llm_config).resolve())] if args.llm_config else [])]
+        *(['--llm-config',str(Path(args.llm_config).resolve())] if args.llm_config else []),
+        *(['--rs16-config',str(Path(args.rs16_config).resolve())] if args.rs16_config else []),
+        *(['--ros2-humble'] if args.ros2_humble else [])]
     with (directory/'supervisor.stderr.log').open('ab') as log:
         child=subprocess.Popen(command,cwd=ROOT,stdout=log,stderr=log,start_new_session=True)
     deadline=time.monotonic()+12

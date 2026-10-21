@@ -16,7 +16,10 @@ fi
 mkdir -m 700 -p "$adapter_output"
 rs16_flags=(-DDISABLE_PCAP_PARSE)
 rs16_libs=()
-if command -v pkg-config >/dev/null && pkg-config --exists libpcap; then
+if [[ -n "${VAF_RS16_PCAP_PREFIX:-}" ]]; then
+  rs16_flags=(-I "$VAF_RS16_PCAP_PREFIX/usr/include")
+  rs16_libs=(-L "$VAF_RS16_PCAP_PREFIX/usr/lib/aarch64-linux-gnu" -lpcap)
+elif command -v pkg-config >/dev/null && pkg-config --exists libpcap; then
   rs16_flags=()
   rs16_libs=(-lpcap)
 fi
