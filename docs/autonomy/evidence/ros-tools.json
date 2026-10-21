@@ -33,58 +33,142 @@
   "artifacts": [
     {
       "path": "arm-manifest-before-rviz.json",
-      "sha256": "bc336ba3a915aa75e691a853f807614b6054ed7a01aaea99b34aa5c458562a6b",
-      "bytes": 148414
+      "bytes": 148414,
+      "sha256": "bc336ba3a915aa75e691a853f807614b6054ed7a01aaea99b34aa5c458562a6b"
     },
     {
       "path": "arm-rviz-delta.tar.gz",
-      "sha256": "5265f5475c3a66d1fed28b94eaeeed8a06b26756c2e3519a9e130b6e3f7e706b",
-      "bytes": 51480
+      "bytes": 51480,
+      "sha256": "5265f5475c3a66d1fed28b94eaeeed8a06b26756c2e3519a9e130b6e3f7e706b"
     },
     {
       "path": "arm-rviz-native-help-r2.log",
-      "sha256": "fe34c159347539c1abd7bcbd7aa752ee125d6daf6b8777e4baa69d4c5250af65",
-      "bytes": 1152
+      "bytes": 1152,
+      "sha256": "fe34c159347539c1abd7bcbd7aa752ee125d6daf6b8777e4baa69d4c5250af65"
     },
     {
       "path": "arm-rviz-native-help.log",
-      "sha256": "29544a8c9c96f782939149dbea8da44bf32892f3dcad3659a5badc3759290026",
-      "bytes": 267
+      "bytes": 267,
+      "sha256": "29544a8c9c96f782939149dbea8da44bf32892f3dcad3659a5badc3759290026"
     },
     {
       "path": "arm-rviz-prepare.log",
-      "sha256": "3ab43c763ea1f35492c7ef8be652ccdfe33a6ddcce6a8a293d34a98988ecb808",
-      "bytes": 28055
+      "bytes": 28055,
+      "sha256": "3ab43c763ea1f35492c7ef8be652ccdfe33a6ddcce6a8a293d34a98988ecb808"
     },
     {
-      "path": "pc-rviz-native-help.log",
-      "sha256": "39e275b340433e8f2a0e2f9fca4fdbd31cc98e5aa0c570c78a4f1a9a73637de8",
-      "bytes": 1297
+      "path": "board-start-native-check.log",
+      "bytes": 721,
+      "sha256": "a7364cd2b95b1bfbf2ecf3102e3b7c1a3d0cb3af971e7f30608ed402d133111c"
     },
     {
-      "path": "pc-rviz-prepare.log",
-      "sha256": "1bea718ee8a41e11415071a0a1a200412c32fb035abbdc04d500e8e8d6c7790c",
-      "bytes": 21188
+      "path": "console-only-start-native-check.log",
+      "bytes": 1303,
+      "sha256": "a6588bb8a572a8b7337942b25a34baf5326ebbc45a048de6bbb4ba27204099fd"
     },
     {
-      "path": "view-script-check.log",
-      "sha256": "39e275b340433e8f2a0e2f9fca4fdbd31cc98e5aa0c570c78a4f1a9a73637de8",
-      "bytes": 1297
+      "path": "deploy/deployment.json",
+      "bytes": 4248,
+      "sha256": "22994014a4a1f8eaf47e674fdfba6797d9c0cd650ce020052b96bb7928539502"
     },
     {
-      "path": "web-dom-smoke.log",
-      "sha256": "4f21c2dba37494b5db7eecf5db3d20bd70465695de602a258ee561868f79b381",
-      "bytes": 222
+      "path": "deploy/e67e05e5fc97d96d6b6d64157c74c344d21303f8.tar",
+      "bytes": 3246080,
+      "sha256": "04083575a93b1615397688214caea222ca1b42f7665c36caec50bd08fb6b7c07"
     },
     {
-      "path": "web-tests.log",
-      "sha256": "65dbac000bd7cce020755910db2ea57e559f58ace3191d189c0e78ff72a95040",
-      "bytes": 98
+      "path": "deploy/wheels.tar",
+      "bytes": 12482560,
+      "sha256": "d785209afe9969efd669846aeda7e3c5cc776ec2b66b77c477d8918c1a2d93b6"
+    },
+    {
+      "path": "deploy-operator/deployment.json",
+      "bytes": 4248,
+      "sha256": "c1e1cb1ef44546b5cef7aed03f9d24fd29ee9620c089b07bac33945fb979fa04"
+    },
+    {
+      "path": "deploy-operator/e99cb02df10ffbb1827d465b03f5f6a73b630384.tar",
+      "bytes": 3256320,
+      "sha256": "39fb5c4afdec752660ebd56f65d582c8d6ecba88f2a270f18e34030ef769f6c9"
+    },
+    {
+      "path": "deploy-operator/wheels.tar",
+      "bytes": 12482560,
+      "sha256": "d785209afe9969efd669846aeda7e3c5cc776ec2b66b77c477d8918c1a2d93b6"
+    },
+    {
+      "path": "deployed-ui-smoke.json",
+      "bytes": 597,
+      "sha256": "708931985a0e5c7acd38a9129f63365132a52e5189631df65064f0153344021a"
+    },
+    {
+      "path": "final-operator-smoke.json",
+      "bytes": 497,
+      "sha256": "1d2d57ea0cd5bdab34b9868004d90229ba4856218da69b1aefdb872d2775fc1a"
+    },
+    {
+      "path": "final-operator-start.log",
+      "bytes": 158,
+      "sha256": "a93133203137858ba243b36578b92e50dca695c9c6794f366a7adbd40d8f2a1f"
     },
     {
       "path": "full-unit.log",
       "bytes": 100,
       "sha256": "1c6465b462b4bda914da8d04738092d352fd62d3c00290a10775ea803e9423b4"
+    },
+    {
+      "path": "pc-rviz-native-help.log",
+      "bytes": 1297,
+      "sha256": "39e275b340433e8f2a0e2f9fca4fdbd31cc98e5aa0c570c78a4f1a9a73637de8"
+    },
+    {
+      "path": "pc-rviz-prepare.log",
+      "bytes": 21188,
+      "sha256": "1bea718ee8a41e11415071a0a1a200412c32fb035abbdc04d500e8e8d6c7790c"
+    },
+    {
+      "path": "start-failure-evidence.log",
+      "bytes": 1802,
+      "sha256": "8fbffef32562e1e5db7bc64e8a9e0d19b39839711785b39f051434aac485bae5"
+    },
+    {
+      "path": "view-script-check.log",
+      "bytes": 1297,
+      "sha256": "39e275b340433e8f2a0e2f9fca4fdbd31cc98e5aa0c570c78a4f1a9a73637de8"
+    },
+    {
+      "path": "web-dom-smoke.log",
+      "bytes": 222,
+      "sha256": "4f21c2dba37494b5db7eecf5db3d20bd70465695de602a258ee561868f79b381"
+    },
+    {
+      "path": "web-tests.log",
+      "bytes": 98,
+      "sha256": "65dbac000bd7cce020755910db2ea57e559f58ace3191d189c0e78ff72a95040"
     }
-  ]
+  ],
+  "runtime": {
+    "passed": true,
+    "runtime_source": "e99cb02df10ffbb1827d465b03f5f6a73b630384",
+    "source_dirty": false,
+    "archive_sha256": "39fb5c4afdec752660ebd56f65d582c8d6ecba88f2a270f18e34030ef769f6c9",
+    "web_status": 200,
+    "web_map_controls_removed": true,
+    "mode": "hardware_readonly",
+    "system_send": false,
+    "action_send": false,
+    "lidar": {
+      "online": false,
+      "control_eligible": false,
+      "reason": "LiDAR frame/time/epoch unavailable or stale"
+    },
+    "physical_stop": "UNCONFIRMED"
+  },
+  "hardware_at_deployment": {
+    "lidar_eth0_carrier": 0,
+    "management_eth1": "192.168.50.2/24 reachable and unchanged",
+    "full_sensor_start": "BLOCKED bind address absent after physical link down; original failure preserved",
+    "current_stack": "explicit operator-console (Application + Web), no owned SDK/ROS process",
+    "real_lidar_retest": "BLOCKED no current physical link; prior connected-hardware evidence retained at its original version"
+  }
 }
