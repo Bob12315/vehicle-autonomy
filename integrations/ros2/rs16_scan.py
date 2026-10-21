@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 import json
 import math
 from pathlib import Path
+import signal
 import time
 from uuid import uuid4
 
@@ -27,10 +28,19 @@ def main():
     import rclpy
     from rclpy.node import Node
     from rclpy.qos import qos_profile_sensor_data
+    from rclpy.executors import ExternalShutdownException
+    from rclpy.signals import SignalHandlerOptions
     from sensor_msgs.msg import LaserScan, PointCloud2
     from sensor_msgs_py import point_cloud2
     from std_msgs.msg import Header
-    rclpy.init()
+    # Humble's default SIGTERM handler invalidates publishers during callbacks.
+    # Only set a stop flag here; tear down the context after the callback returns.
+    rclpy.init(signal_handler_options=SignalHandlerOptions.NO)
+    stopping=False
+    def stop(*_):
+        nonlocal stopping
+        stopping=True
+    previous_handlers={sig:signal.signal(sig,stop) for sig in (signal.SIGINT,signal.SIGTERM)}
     from rclpy.parameter import Parameter
     node=Node('vaf_rs16_scan',parameter_overrides=[Parameter('use_sim_time',Parameter.Type.BOOL,args.replay)])
     domain=Path('/proc/sys/kernel/random/boot_id').read_text().strip()
@@ -120,13 +130,15 @@ def main():
             print(json.dumps({'passed':True,'accepted':processor.accepted,'rejected':rejected,
                               'scope':'synthetic PointCloud2 ROS software chain, not real RS16 or PCAP'}))
         else:
-            while rclpy.ok():
+            while rclpy.ok() and not stopping:
                 rclpy.spin_once(node,timeout_sec=.1)
                 if processor.last_received is not None:write_health()
-    except KeyboardInterrupt:
+    except (KeyboardInterrupt,ExternalShutdownException):
         pass
     finally:
-        node.destroy_node();rclpy.shutdown()
+        node.destroy_node()
+        if rclpy.ok():rclpy.shutdown()
+        for sig,handler in previous_handlers.items():signal.signal(sig,handler)
     return 0
 
 

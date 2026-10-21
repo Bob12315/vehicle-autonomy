@@ -43,3 +43,82 @@ PYTHONPATH=. python scripts/diagnose_rover_readonly.py \
 
 后续安装及实测结果继续记录于本文件；完整日志在
 `artifacts/hardware-ready/connection-20261021/`，原始硬件抓包不能作为合成夹具替换。
+
+## 板端隔离环境与实际验证
+
+ROS 2 Humble、完整 navigation2/nav2_bringup、robot_localization、SLAM Toolbox、
+rosbag2 与 libpcap 开发文件以 626 个经 APT 签名/索引哈希验证的 ARM64/all 包提取到
+`/home/pi/vehicle-autonomy/ros2-humble/root`。没有在系统执行 apt install、维护脚本、
+全局 Python 安装或替换已有系统库；venv 使用板端 Python 3.10。Humble 的本地
+wrapper 单独设置库/包路径，限制 ROS 为 localhost/domain 85。
+
+目标系统原 ICU 来自 proposed，稳定仓库 dev 版本不匹配。首次依赖解析失败日志
+保留；改为在独立 prefix 中同时使用稳定 ICU runtime/dev，原系统 ICU 保持。
+SLAM 初次加载找不到位于 `usr/lib` 的 Ceres，已修复 wrapper 路径，实际 Ceres
+solver 加载成功。Humble 默认 SIGTERM 导致回调中 context 提前关闭，已改为信号
+仅设置退出标记；实际接收中的 SIGTERM 验证退出码 0、无 traceback。
+
+- 真实 SDK → PointCloud2/LaserScan：20 秒各 200 帧，均 10 Hz；有效点
+  3645–3778/帧，扫描已知 bins 305–317/720；最大 ROS 源年龄 207.907 ms，
+  0 错误、源 epoch 单一、发布者均为 vaf_rs16_scan。未知角度保持 NaN。
+- 实际 ARM64 官方 SDK PCAP 回放：8 秒真实录制输入解码 78 帧，退出码 0；
+  标记 pcap_replay，未冒充 live。PCAP-enabled 二进制保存在 rs16-build-pcap。
+- Nav2 planner_server 创建生命周期节点/代价地图后受控关闭；SLAM 实际加载
+  solver_plugins::CeresSolver 后受控关闭。这是原生依赖运行检查，不是导航/建图验收。
+- 原板端 Jazzy/x86 库未复用，PC Jazzy 合成测试仍接受 6 帧、拒绝 2 帧。
+- PC 全量 287 测试、板端非 Gazebo profile 258 测试通过，均 0 跳过。
+
+默认应用采样周期改为本地配置的 50 ms，以避免与 10 Hz 最新点云恰好同频。
+应用的 dropped_clouds 是读取最新文件时跳过的 SDK 序号，不能解释为 UDP 网络
+丢包率；初始 100 ms 配置曾观察到这种跳帧。抓包的 0 dropped 仅指该次内核捕获。
+
+上述 ROS/导航包选择参考 [ROS Humble 官方平台说明](https://docs.ros.org/en/humble/Installation/Alternatives/Ubuntu-Install-Binary.html)
+及 [Nav2 官方安装说明](https://docs.nav2.org/rolling/getting_started/quickstart/quickstart/)。
+
+## 已配置的一键操作
+
+板端执行，启动只读 Application、官方 SDK、ROS 点云/扫描、认证 Web：
+
+```bash
+/home/pi/vehicle-autonomy/current/scripts/onboard-connected.sh start
+/home/pi/vehicle-autonomy/current/scripts/onboard-connected.sh status
+/home/pi/vehicle-autonomy/current/scripts/onboard-connected.sh stop
+```
+
+不安装开机自启。配置在 `/home/pi/vehicle-autonomy/config/`，跨版本保留；源码
+版本目录不混入设备配置。启动不会改网络、设置飞控参数或启动 Nav2 运动节点。
+
+电脑开两个终端维持私有隧道；本次已实际建立，连接结束/重启后需重新运行：
+
+```bash
+ssh -NT -L 127.0.0.1:19436:127.0.0.1:11436 bob@10.10.12.240
+ssh -NT -L 127.0.0.1:8765:127.0.0.1:8765 \
+  -R 127.0.0.1:19436:127.0.0.1:19436 pi@192.168.50.2
+```
+
+打开 http://127.0.0.1:8765 ，令牌通过 SSH 读取后输入页面，不写 URL 或 Git：
+
+```bash
+ssh pi@192.168.50.2 'cat ~/.local/state/vehicle-autonomy-connected/token'
+```
+
+板端重新执行真实数据链检查：
+
+```bash
+cd /home/pi/vehicle-autonomy/current
+./scripts/with_ros2_humble.sh /home/pi/vehicle-autonomy/venv/bin/python \
+  -m integrations.ros2.verify_lidar --exchange /home/pi/vehicle-autonomy/live/cloud.json \
+  --provenance live_sdk_system_timestamp --duration 20 --report /tmp/rs16-live-check.json
+```
+
+离线依赖复现：从目标复制 `/etc/os-release` 与 `/var/lib/dpkg/status`，在联网电脑
+运行 `python scripts/setup_ros2_arm64.py --directory NEW_PRIVATE_DIR --status-file COPY \
+--os-release-file COPY`，核验生成 manifest，再传送 root/。初始包和后续增量归档
+分别保存 SHA256；不需要给 RK3588 添加默认路由。
+
+## 仍需现场确认
+
+罗盘校准、GPS/EKF 质量、遥控失联原因、雷达刚性安装与 lidar→base_link 外参、
+车体/地面过滤、真实相机、物理急停和驱动失能仍未验收。当前不是自主行驶配置。
+板端 RTC 报告 2021 年且没有可达 NTP 默认路由；本次只校正系统时间，重启后须
+重新检查时间，不能把一次 SSH 校时当持续同步或传感器时间标定。
