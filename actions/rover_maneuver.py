@@ -95,9 +95,11 @@ class ManeuverInstance:
         elif p.kind in ('drive','visit'):
             dx,dy=p.end.x-pose.x,p.end.y-pose.y;distance=math.hypot(dx,dy)
             error=angle(math.atan2(dy,dx)-pose.yaw)
-            arrived=distance<=.12
+            # Leave room inside the unchanged 0.15 m writer fence for the
+            # following pivot, whose caster transients can shift the axle.
+            arrived=distance<=.05
             w=max(-.25,min(.25,1.2*error-.5*twist.angular.z))
-            v=min(p.speed_mps,max(.04,.5*(distance-.07)))*max(0.,math.cos(error))**3 if abs(error)<.4 else 0.
+            v=min(p.speed_mps,max(.025,.5*(distance-.015)))*max(0.,math.cos(error))**3 if abs(error)<.4 else 0.
             if abs(error)>.12 and abs(twist.angular.z)<.05 and abs(w)<.18:w=math.copysign(.18,error)
         elif p.kind=='circle':
             sign=1 if p.turn_rad>0 else -1

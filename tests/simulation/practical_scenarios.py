@@ -118,8 +118,9 @@ def run(directory,case,llm_config):
                     observed_children.append(child['task_id'])
                     checkpoints.append({'position':[t.x_m+.25*math.cos(t.yaw_rad),t.y_m+.25*math.sin(t.yaw_rad)],'yaw':t.yaw_rad})
                 if task['status'] in ('SUCCEEDED','FAILED','CANCELLED'):
+                    result['task']=task
                     expected='CANCELLED' if case=='cancel' else 'SUCCEEDED'
-                    assert task['status']==expected,task
+                    assert task['status']==expected,{k:task[k] for k in ('status','error','step_index','stop_evidence')}
                     assert task['task_id']==identifier and not s['system_send'] and not s['action_send'] and not s['vehicle']['armed']
                     assert task['stop_evidence']=='SIMULATION_TELEMETRY_DISARMED_STATIONARY'
                     speed=oracle.recent_speed_mps();rate=oracle.recent_yaw_rate_rad_s()
