@@ -22,23 +22,26 @@ class OperatorService:
         waypoint_file = self.directory / 'waypoints.json'
         if waypoint_file.is_file() and waypoint_file.stat().st_size <= 65536:
             self.waypoints = json.loads(waypoint_file.read_text())
+        self.designs = None
         self.proposals = None
         if llm is not None:
             from application.proposals import ProposalService
             self.proposals = ProposalService(llm, application, missions)
+            from application.design_proposals import DesignProposalService
+            self.designs = DesignProposalService(llm, application, missions)
 
     def handle(self, operation, payload):
         if operation in ('status', 'camera', 'map', 'reports'):
             if payload:
                 raise ValueError('read use case takes no payload')
             return self.application.handle(operation, {})
-        if operation == 'propose':
+        if operation in ('propose','design'):
             if self.proposals is None:
                 raise ValueError('LLM is not configured; local application remains independent')
             if set(payload) != {'text'}:
                 raise ValueError('proposal requires only text')
             # A remote model must never hold the operator mutation/cancel lock.
-            return self.proposals.propose(payload['text'])
+            return (self.designs if operation=='design' else self.proposals).propose(payload['text'])
         with self.lock:
             if operation == 'start':
                 if set(payload) != {'mission','expected_session'} or payload['mission'] not in self.missions:
@@ -81,8 +84,8 @@ class OperatorService:
                 grid = self.maps.load(payload['sha256'])
                 return {'grid':grid.document(),'source':'saved_preview','control_eligible':False,
                         'reason':'preview only; stop/restart mapping, localization and new anchor admission required'}
-            if operation == 'approve':
+            if operation in ('approve','approve_design'):
                 if self.proposals is None or set(payload) != {'id','human_approved'}:
                     raise ValueError('known proposal and explicit human approval required')
-                return self.proposals.approve(payload['id'],payload['human_approved'])
+                return (self.designs if operation=='approve_design' else self.proposals).approve(payload['id'],payload['human_approved'])
         raise ValueError('unknown operator use case')

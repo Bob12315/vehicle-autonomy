@@ -34,6 +34,13 @@ bound; this release allows execution only through an authorized simulation
 Application. Hardware remains read-only. Remote inference does not hold the
 operator cancellation lock or participate in the vehicle cycle.
 
+`MissionDesign` extends proposals with up to eight registered mission references.
+Application pins session/environment/capability configuration, rechecks admission
+on approval, and owns bounded sequential execution. Each child follows the existing
+Mission/Action/Effect chain; fresh disarmed stationary observations and released
+SEND/Lease authority are required between children. No unqualified localization
+candidate is promoted. Only explicit simulation compositions expose this use case.
+
 The official pinned rs_driver adapter writes bounded same-host diagnostic
 cloud envelopes. An optional ROS sidecar produces PointCloud2/LaserScan and
 immutable Observation data with explicit provenance and frame/time checks.

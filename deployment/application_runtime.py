@@ -27,7 +27,10 @@ from .simulation_runtime import SimulationRuntime
 TERMINAL = (RunStatus.SUCCEEDED, RunStatus.FAILED, RunStatus.CANCELLED)
 
 
-class ApplicationRuntime:
+from application.simulation_designs import SimulationDesignSupport
+
+
+class ApplicationRuntime(SimulationDesignSupport):
     def __init__(self, profile, *, profile_name: str, allow_send=False, runtime=None, event_sink=None, sensor_config=None, vision_config=None, sim_payload=False, mapping_config=None, navigation_config=None):
         self.profile = profile
         self.profile_name = profile_name
@@ -37,6 +40,8 @@ class ApplicationRuntime:
         self.navigation_task = None
         self.autonomy_recipes = None
         self.autonomy_task = None
+        self.design_task = None
+        self.designs = {}
         if navigation_config is not None:
             if profile.kind != "rover" or mapping_config is None:
                 raise ValueError("path following requires explicit Rover simulation and ROS 2 mapping")
@@ -125,6 +130,9 @@ class ApplicationRuntime:
             return
         now = self.vehicle.clock()
         if not self.vehicle.connected:
+            if self.design_task and self.design_task.active:
+                self.design_task.cancel(self,"design_connection_lost")
+                self.design_task.tick(self)
             self.state = "CONNECTING"
             if now.monotonic_ns < self.retry_at_ns:
                 return
@@ -197,6 +205,7 @@ class ApplicationRuntime:
             if self.autonomy_task and self.autonomy_task.active:
                 self.autonomy_task.cancel(self,result.fault)
                 self.autonomy_task.tick(self)
+            if self.design_task and self.design_task.active:self.design_task.tick(self)
             return
         self.state = ("DEGRADED" if self.environment_fault else
                       "READY" if result.vehicle_fresh else "CONNECTING")
@@ -208,6 +217,7 @@ class ApplicationRuntime:
             if self.navigation_task.active and self.navigation_task.status != "RUNNING":
                 self.state = self.navigation_task.status
         if self.autonomy_task and self.autonomy_task.active:self.autonomy_task.tick(self)
+        if self.design_task and self.design_task.active:self.design_task.tick(self)
 
     def _advance(self):
         now = self.vehicle.clock()
@@ -346,9 +356,13 @@ class ApplicationRuntime:
                 "navigation": None if self.navigation is None else self.navigation.status(world, now),
                 "slam_localization_candidate":None if self.slam_candidate is None else self.slam_candidate.view(now),
                 "system_send": self.vehicle.authority.system_send,
-                "action_send": self.vehicle.authority.action_send, "task": self.task_status() if include_task else None}
+                "action_send": self.vehicle.authority.action_send, "task": (self.design_task.view(self) if self.design_task is not None else self.task_status()) if include_task else None}
 
-    def start_mission(self, name, *, _navigation_child=False):
+    def start_mission(self, name, *, _navigation_child=False, _design_child=False):
+        if not _navigation_child and not _design_child:
+            if self.design_task and self.design_task.active:
+                raise ValueError('another designed task is active')
+            self.design_task=None
         if not _navigation_child:
             if self.autonomy_task and self.autonomy_task.active:
                 raise ValueError('another autonomy business task is active')
@@ -464,7 +478,10 @@ class ApplicationRuntime:
         self._emit('map_anchor_registered',path=str(path),**anchor.document())
         return anchor.document()
 
-    def cancel_mission(self):
+    def cancel_mission(self, *, _design_child=False):
+        if not _design_child and self.design_task and self.design_task.active:
+            self.design_task.cancel(self)
+            return self.design_task.view(self)
         if self.autonomy_task and self.autonomy_task.active:
             self.autonomy_task.cancel(self)
             return self.task_status()
@@ -482,6 +499,7 @@ class ApplicationRuntime:
         return self.task_status()
 
     def request_shutdown(self):
+        if self.design_task and self.design_task.active:self.design_task.cancel(self)
         if self.autonomy_task and self.autonomy_task.active:self.autonomy_task.cancel(self)
         if self.navigation_task and self.navigation_task.active:
             self.navigation_task.cancel(self)
@@ -509,6 +527,8 @@ class ApplicationRuntime:
             if sensor is not None:
                 try:sensor.close()
                 except Exception as exc:self.shutdown_error=f'sensor_shutdown_unconfirmed:{type(exc).__name__}'
+        if self.design_task and self.design_task.active:
+            self.design_task._finish(self,'CANCELLED','application_shutdown; cleanup evidence is unconfirmed')
         self.state = "STOPPED"
         self._emit("application_stopped", stops=self.stops)
         return self.get_status()

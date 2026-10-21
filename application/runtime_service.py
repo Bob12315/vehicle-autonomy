@@ -18,6 +18,15 @@ class RuntimeService:
             from pathlib import Path
             from application.reports import release_audit
             return release_audit(Path(__file__).resolve().parents[1])
+        if command in ('design_catalog','design_preflight','start_design_checked'):
+            method=getattr(self.coordinator,command,None)
+            if method is None:raise ValueError('task design is unavailable in this composition')
+            fields={'design_catalog':set(), 'design_preflight':{'design','expected_context'},
+                    'start_design_checked':{'design','expected_context','expected_session'}}[command]
+            if set(payload)!=fields:raise ValueError('invalid task design request fields')
+            if 'design' in payload and type(payload['design']) is not dict:
+                raise ValueError('task design document required')
+            return method(**({'document':payload['design'], **{k:v for k,v in payload.items() if k!='design'}} if payload else {}))
         if command == 'start_checked':
             if (set(payload) != {'mission','expected_session'} or type(payload['mission']) is not str
                     or type(payload['expected_session']) is not str):

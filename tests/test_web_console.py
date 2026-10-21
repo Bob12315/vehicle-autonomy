@@ -84,8 +84,36 @@ class WebTests(unittest.TestCase):
         with self.assertRaises(ValueError):ConsoleServer(('0.0.0.0',0),self.service,self.token,Path(self.directory.name)/'public.log')
     def test_model_offline_does_not_mutate_vehicle(self):
         self.assertEqual(self.call('/api/propose',{'text':'route'})[0],409)
+        self.assertEqual(self.call('/api/design',{'text':'route'})[0],409)
         self.assertEqual(self.call('/api/status')[0],200)
         self.assertEqual(self.backend.starts,[])
+
+    def test_design_approval_uses_authenticated_idempotent_application_boundary(self):
+        from tests.test_task_designs import document
+        from intelligence.designs import MissionDesign
+        class Backend:
+            def __init__(self):self.starts=[]
+            def handle(self,operation,payload):
+                if operation=='design_catalog':
+                    return dict(context='ctx',session_id='session',capabilities={'basic_route':{}})
+                if operation=='design_preflight':return {'eligible':True}
+                if operation=='start_design_checked':
+                    self.starts.append(payload);return {'task_id':'design:one'}
+                raise ValueError(operation)
+        class Model:
+            def design(self,text,catalog):return MissionDesign.parse(json.dumps(document('basic_route')),catalog)
+        backend=Backend()
+        self.server.service=OperatorService(backend,self.directory.name,llm=Model(),missions=['basic_route'])
+        code,body,_=self.call('/api/design',{'text':'route'})
+        self.assertEqual(code,200);proposal=json.loads(body)['result']
+        self.assertEqual(backend.starts,[])
+        payload={'id':proposal['id'],'human_approved':True}
+        self.assertEqual(self.call('/api/design/approve',payload,**{'X-VAF-CSRF':''})[0],403)
+        first=self.call('/api/design/approve',payload,**{'X-VAF-Request-ID':'approve-design'})
+        second=self.call('/api/design/approve',payload,**{'X-VAF-Request-ID':'approve-design'})
+        self.assertEqual(first[:2],second[:2]);self.assertEqual(first[0],200)
+        self.assertEqual(self.call('/api/design/approve',payload)[0],409)
+        self.assertEqual(len(backend.starts),1)
     def test_blocked_remote_llm_cannot_block_cancel_use_case(self):
         from intelligence.proposals import MissionProposal
         entered,release=threading.Event(),threading.Event()

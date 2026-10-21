@@ -19,6 +19,10 @@ PointCloud2/LaserScan、真实 PCAP 回放通过，隔离 Humble/Nav2/SLAM 环�
 定位与路径使用 ROS 2/RViz2 工具。入口和尚未接入的实车 Nav2 边界见
 [ROS 2 操作流程](docs/ROS2_OPERATOR_WORKFLOW.md)。
 
+仿真新增 [LLM 任务组合](docs/LLM_TASK_DESIGN.md)：最多 8 个已注册任务步骤，
+经环境/会话预检和人工批准执行；每步之间必须观察到停车并释放权限。
+不开放实车运动入口。
+
 车辆基础仿真新增了共享 `SimulationRuntime`、完整 Rover 插件和两主动轮/两后万向轮模型。Copter、Rover 正常动作与故障场景已通过四轮完整回归；**本轮基础车辆控制 Simulation Complete：PASS**，见[审计记录](docs/simulation/completion-audit.md)。
 
 后续 **P21–P25 已完成限定本机 Rover 自主导航范围**：命名目标、有限停车后重规划、地图锚点、对象巡检和两种前驱几何。260 项单元测试、最终装配 13 项物理门槛通过；见 [最新完成审计](docs/autonomy/navigation-completion-audit.md)。P26 长运行版本验收及真实硬件仍未完成。

@@ -137,7 +137,8 @@ class Handler(BaseHTTPRequestHandler):
             return
         routes = {'/api/start':'start','/api/cancel':'cancel','/api/waypoint':'waypoint',
                   '/api/map/save':'save_map','/api/map/load':'load_map',
-                  '/api/propose':'propose','/api/approve':'approve'}
+                  '/api/propose':'propose','/api/approve':'approve',
+                  '/api/design':'design','/api/design/approve':'approve_design'}
         operation = routes.get(self.path)
         try:
             if operation is None or self.headers.get('Transfer-Encoding'):
@@ -153,7 +154,7 @@ class Handler(BaseHTTPRequestHandler):
         except (ValueError,TypeError) as exc:
             self.reply(400,{'ok':False,'error':str(exc)})
             return
-        if operation in ('start','approve','cancel'):
+        if operation in ('start','approve','approve_design','cancel'):
             identifier = self.headers.get('X-VAF-Request-ID','')
             if re.fullmatch(r'[A-Za-z0-9:_-]{1,128}',identifier) is None:
                 self.reply(400,{'ok':False,'error':'bounded mutation request ID required'})
@@ -187,7 +188,7 @@ class Handler(BaseHTTPRequestHandler):
             self.server.audit.info(json.dumps({'operation':operation,'ok':response['ok'],
                 'peer':self.client_address[0], 'request_id':secrets.token_hex(8),
                 'mission':payload.get('mission') if operation=='start' else None,
-                'proposal_id':payload.get('id') if operation=='approve' else None,
+                'proposal_id':payload.get('id') if operation in ('approve','approve_design') else None,
                 'task_id':(response.get('result') or {}).get('task_id') if type(response.get('result')) is dict else None}))
         if send:self.reply(code,response)
         return code,response

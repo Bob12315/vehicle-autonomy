@@ -76,15 +76,17 @@ $('missions').onchange = () => { if (state) showSummary(state); };
 $('start').onclick = () => action(async () => log(json(await api('start', {
   mission: $('missions').value, expected_session: state.session_id}))));
 $('cancel').onclick = () => action(async () => log('软件停止请求：' + json(await api('cancel', {}))));
-$('propose').onclick = () => action(async () => {
-  proposal = await api('propose', {text: $('intent').value});
+async function propose(path) {
+  proposal = await api(path, {text: $('intent').value});
   $('proposal').textContent = json(proposal);
-  $('approve').disabled = proposal.decision !== 'propose' || state?.mode === 'hardware_readonly';
+  $('approve').disabled = proposal.decision !== 'propose' || proposal.preflight?.eligible === false || state?.mode === 'hardware_readonly';
   $('human').checked = false;
-});
+}
+$('propose').onclick = () => action(() => propose('propose'));
+$('design').onclick = () => action(() => propose('design'));
 $('approve').onclick = () => action(async () => {
   if (!$('human').checked) throw Error('必须人工检查并勾选确认');
-  const value = await api('approve', {id: proposal.id, human_approved: true});
+  const value = await api(proposal.kind === 'design' ? 'design/approve' : 'approve', {id: proposal.id, human_approved: true});
   $('approve').disabled = true; log('提案结果：' + json(value));
 });
 async function refresh() {
