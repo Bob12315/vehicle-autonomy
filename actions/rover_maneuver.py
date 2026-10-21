@@ -128,7 +128,15 @@ class ManeuverInstance:
             w=math.copysign(min(.25,max(.08,.8*abs(remaining))),remaining)
         elif p.kind in ('drive','visit'):
             dx,dy=p.end.x-pose.x,p.end.y-pose.y;distance=math.hypot(dx,dy)
-            error=angle(math.atan2(dy,dx)-pose.yaw)
+            sx,sy=p.end.x-p.start.x,p.end.y-p.start.y;length=math.hypot(sx,sy)
+            # A far endpoint alone provides almost no lateral feedback on a
+            # ten-metre corridor. Follow a local preview on the immutable line.
+            if length>.01:
+                progress=max(0.,min(length,((pose.x-p.start.x)*sx+(pose.y-p.start.y)*sy)/length))
+                ahead=min(length,progress+.5)
+                tx,ty=p.start.x+sx*ahead/length,p.start.y+sy*ahead/length
+            else:tx,ty=p.end.x,p.end.y
+            error=angle(math.atan2(ty-pose.y,tx-pose.x)-pose.yaw)
             # Leave room inside the unchanged 0.15 m writer fence for the
             # following pivot, whose caster transients can shift the axle.
             arrived=distance<=.05
