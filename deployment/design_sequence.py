@@ -15,6 +15,7 @@ class DesignExecution:
         self.pending=None;self.cleanup_deadline_ns=None
         self.stable_since=None;self.last_capture=None;self.samples=0
         self.stop_evidence='UNCONFIRMED'
+        self.prepared={};self.preview=None;self.cleanup_attempted=False;self.cleaning=False;self.cleanup_result=None
 
     @property
     def active(self):return self.status not in TERMINAL
@@ -28,7 +29,7 @@ class DesignExecution:
         self.pending='FAILED' if error else 'CANCELLED'
         self.error=error
         self.status='CANCELLING'
-        self.cleanup_deadline_ns=app.vehicle.clock().monotonic_ns+10_000_000_000
+        self.cleanup_deadline_ns=app.vehicle.clock().monotonic_ns+(30_000_000_000 if self.prepared else 10_000_000_000)
         self._reset_boundary()
         if self.child_id is not None:
             try:app.cancel_mission(_design_child=True)
@@ -61,7 +62,11 @@ class DesignExecution:
                 if self.pending is not None and now>=self.cleanup_deadline_ns:
                     self._finish(app,'FAILED',(self.error or 'cancel')+'; cleanup_unconfirmed')
                 return
-            if not self.results or self.results[-1]['task_id']!=self.child_id:
+            if self.cleaning:
+                self.cleanup_result=deepcopy(child);self.child_id=None;self.cleaning=False
+                if child['status']!='SUCCEEDED':
+                    self._finish(app,'FAILED','scenario_recovery_failed; cleanup_unconfirmed');return
+            elif not self.results or self.results[-1]['task_id']!=self.child_id:
                 self.results.append(deepcopy(child))
             self.child_id=None
             if self.pending is None and child['status']!='SUCCEEDED':
@@ -80,11 +85,21 @@ class DesignExecution:
         if self.pending is not None:
             if stable:self._finish(app,self.pending)
             elif now>=self.cleanup_deadline_ns:self._finish(app,'FAILED',(self.error or 'cancel')+'; cleanup_unconfirmed')
+            elif self.prepared and not self.cleanup_attempted and self.child_id is None:
+                world=app.vehicle.world_snapshot()
+                if (app.state=='READY' and app.vehicle.connected and world is not None and world.vehicle is not None
+                        and world.vehicle.operation.armed and app.vehicle.authority.lease is None):
+                    self.cleanup_attempted=True
+                    try:
+                        child=app.start_mission('safe_recovery',_design_child=True)
+                        self.child_id=child['task_id'];self.cleaning=True
+                        app._emit('design_recovery_started',task_id=self.task_id,child_task_id=self.child_id)
+                    except (OSError,ValueError,RuntimeError) as exc:self.error=(self.error or 'cancel')+'; recovery_rejected:'+str(exc)
             return
         if not stable:return
         if self.index==len(self.design.missions):self._finish(app,'SUCCEEDED');return
         try:
-            child=app.start_mission(self.design.missions[self.index],_design_child=True)
+            child=app.start_design_child(self)
             self.child_id=child['task_id'];self.status='RUNNING';self._reset_boundary()
             app._emit('design_step_started',task_id=self.task_id,index=self.index,
                       mission=self.design.missions[self.index],child_task_id=self.child_id)
@@ -94,7 +109,8 @@ class DesignExecution:
         return {'task_id':self.task_id,'mission':'designed:'+self.design.sha256,'title':self.design.title,
                 'configuration_sha256':self.design.sha256,'status':self.status,'error':self.error,
                 'step_index':self.index,'step_count':len(self.design.missions),
-                'steps':[{'mission':m} for m in self.design.missions], 'completed':deepcopy(self.results),
+                'steps':self.design.document()['steps'], 'completed':deepcopy(self.results),
+                'preview':self.preview,'cleanup':deepcopy(self.cleanup_result),
                 'child':app.task_status() if self.child_id is not None else None,
                 'deadline_ns':self.deadline_ns,'stop_evidence':self.stop_evidence,
                 'scope':'explicit localhost simulation; not physical vehicle stop acceptance'}

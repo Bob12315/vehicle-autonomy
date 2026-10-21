@@ -2,6 +2,7 @@
 from dataclasses import dataclass
 import hashlib
 import json
+import math
 
 MAX_STEPS = 8
 
@@ -29,13 +30,15 @@ class MissionDesign:
     title: str
     reason: str
     missions: tuple[str, ...]
+    arguments: tuple[tuple[tuple[str, object], ...], ...] = ()
+    schema: int = 1
 
     @classmethod
     def parse(cls, content, registered):
         value = strict_json(content)
         if (type(value) is not dict or set(value) != {'schema','decision','title','reason','steps'}
-                or type(value['schema']) is not int or value['schema'] != 1):
-            raise ValueError('strict task design schema 1 required')
+                or type(value['schema']) is not int or value['schema'] not in (1,2)):
+            raise ValueError('strict task design schema 1 or 2 required')
         if value['decision'] not in ('propose','clarify','reject'):
             raise ValueError('unknown task design decision')
         if (type(value['title']) is not str or not 1 <= len(value['title']) <= 120
@@ -45,19 +48,34 @@ class MissionDesign:
         if type(steps) is not list or len(steps) > MAX_STEPS:
             raise ValueError('design requires at most eight steps')
         missions = []
+        arguments = []
         for step in steps:
-            if (type(step) is not dict or set(step) != {'mission'}
+            fields={'mission'} if value['schema']==1 else {'mission','parameters'}
+            if (type(step) is not dict or set(step) != fields
                     or type(step['mission']) is not str or step['mission'] not in registered
                     or step['mission'].startswith('designed:')):
                 raise ValueError('design steps must reference registered, non-nested mission capabilities')
             missions.append(step['mission'])
+            parameters={} if value['schema']==1 else step['parameters']
+            spec=registered[step['mission']].get('parameters',{}) if isinstance(registered,dict) else {}
+            if type(parameters) is not dict or set(parameters)!=set(spec):
+                raise ValueError('exact registered mission parameters required')
+            for name,rule in spec.items():
+                v=parameters[name]
+                if 'enum' in rule:
+                    if type(v) is not str or v not in rule['enum']:raise ValueError('unknown parameter choice: '+name)
+                elif (type(v) not in ((int,) if rule.get('type')=='integer' else (int,float))
+                      or not math.isfinite(v) or not rule['min']<=v<=rule['max']):
+                    raise ValueError('parameter outside registered bounds: '+name)
+            arguments.append(tuple(sorted(parameters.items())))
         if (value['decision'] == 'propose') != bool(missions):
             raise ValueError('only proposals have one to eight executable steps')
-        return cls(value['decision'], value['title'], value['reason'], tuple(missions))
+        return cls(value['decision'], value['title'], value['reason'], tuple(missions),tuple(arguments),value['schema'])
 
     def document(self):
-        return {'schema':1, 'decision':self.decision, 'title':self.title, 'reason':self.reason,
-                'steps':[{'mission':mission} for mission in self.missions]}
+        steps=[{'mission':m,**({'parameters':dict(self.arguments[i])} if self.schema==2 else {})}
+               for i,m in enumerate(self.missions)]
+        return {'schema':self.schema, 'decision':self.decision, 'title':self.title, 'reason':self.reason,'steps':steps}
 
     @property
     def sha256(self):

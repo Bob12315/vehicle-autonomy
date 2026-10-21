@@ -44,6 +44,8 @@ class OperatorService:
             return (self.designs if operation=='design' else self.proposals).propose(payload['text'])
         with self.lock:
             if operation == 'start':
+                if str(payload.get('mission','')).startswith('motion:'):
+                    raise ValueError('parameterized capabilities require a previewed, human-approved design')
                 if set(payload) != {'mission','expected_session'} or payload['mission'] not in self.missions:
                     raise ValueError('choose an explicitly registered operator mission')
                 state = self.application.handle('status', {})

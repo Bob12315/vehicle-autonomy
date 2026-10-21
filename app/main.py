@@ -21,6 +21,8 @@ def main() -> int:
     parser.add_argument("--sim-payload",action="store_true")
     parser.add_argument("--ros2-mapping-config", help="explicit read-only ROS 2 map exchange (Rover SITL)")
     parser.add_argument("--navigation-config", help="explicit live-path tracking configuration (Rover SITL)")
+    parser.add_argument("--environment-config", help="explicit reviewed simulation environment matching profile Safety")
+    parser.add_argument("--scenario-scene", help="explicit configured static Rover scenario")
     parser.add_argument("--allow-send", action="store_true")
     parser.add_argument("--allow-arm", action="store_true", help="permit a disarmed localhost SITL arm cycle")
     parser.add_argument("--sitl-version", help="operator reported local SITL binary version for the run log")
@@ -36,8 +38,8 @@ def main() -> int:
                 if args.operation or args.mission or args.request_id:
                     parser.error("run takes no control operation")
                 return run_application(load_profile(args.profile, args.config), profile_name=args.profile,
-                                       allow_send=args.allow_send, path=path, sensor_config=args.sim_sensor_config, vision_config=args.recorded_vision_config, sim_payload=args.sim_payload, mapping_config=args.ros2_mapping_config, navigation_config=args.navigation_config)
-            if not args.operation or args.allow_send or args.config or args.sim_sensor_config or args.recorded_vision_config or args.sim_payload or args.ros2_mapping_config or args.navigation_config:
+                                       allow_send=args.allow_send, path=path, sensor_config=args.sim_sensor_config, vision_config=args.recorded_vision_config, sim_payload=args.sim_payload, mapping_config=args.ros2_mapping_config, navigation_config=args.navigation_config, environment_config=args.environment_config, scenario_scene=args.scenario_scene)
+            if not args.operation or args.allow_send or args.config or args.sim_sensor_config or args.recorded_vision_config or args.sim_payload or args.ros2_mapping_config or args.navigation_config or args.environment_config or args.scenario_scene:
                 parser.error("ctl requires an operation and cannot configure SEND or vehicle")
             if (args.operation == "start") != (args.mission is not None):
                 parser.error("only start requires --mission")
@@ -48,7 +50,7 @@ def main() -> int:
         except (OSError, ValueError, RuntimeError) as exc:
             print(json.dumps({"ok": False, "error": str(exc)}, sort_keys=True))
             return 1
-    if args.sim_sensor_config or args.recorded_vision_config or args.sim_payload or args.ros2_mapping_config or args.navigation_config:
+    if args.sim_sensor_config or args.recorded_vision_config or args.sim_payload or args.ros2_mapping_config or args.navigation_config or args.environment_config or args.scenario_scene:
         parser.error("simulation sensor applies only to explicit run")
     if args.command == "status":
         print(json.dumps({

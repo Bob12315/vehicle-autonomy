@@ -14,6 +14,10 @@ class SimulationDesignSupport:
                         'basic_route':{'description':'Execute the configured finite route, return HOME, stop/land and disarm.'}}
         route=Path(__file__).resolve().parents[1]/f'simulation/missions/{self.profile.kind}.toml'
         capabilities['basic_route']['configuration_sha256']=hashlib.sha256(route.read_bytes()).hexdigest()
+        if self.scenario_scene is not None:
+            self.scenario_scene.check()
+            from application.scenario_planning import catalog
+            capabilities.update(catalog(self.environment or self._environment_source))
         if self.navigation_goals is not None:
             self.navigation_goals.check(self.environment)
             for name,goal in self.navigation_goals.goals.items():
@@ -33,6 +37,7 @@ class SimulationDesignSupport:
         capabilities = self._design_capabilities()
         context = {'application':context_key(state), 'capabilities':capabilities,
             'environment_config':self._environment_source.content_hash,
+            'scenario_scene':None if self.scenario_scene is None else self.scenario_scene.sha256,
             'navigation_config':None if self.navigation is None else self.navigation.config.source_sha256,
             'goal_catalog':None if self.navigation_goals is None else self.navigation_goals.sha256,
             'recipe_catalog':None if self.autonomy_recipes is None else self.autonomy_recipes.sha256,
@@ -74,7 +79,29 @@ class SimulationDesignSupport:
         return {'eligible':not reasons, 'reasons':reasons,
                 'capture_ns':None if loc is None else loc.pose.captured_at.monotonic_ns}
 
-    def design_preflight(self, document, expected_context):
+    def _prepare_scenario(self,design,context,anchor=None):
+        from actions.basic import yaw
+        from guidance.path_following import drive_reference,angle
+        from planning.models import Pose2D
+        from application.scenario_planning import resolve
+        world=self.vehicle.world_snapshot();now=self.vehicle.clock()
+        current=world.localization.pose.value
+        pose=drive_reference(Pose2D(current.position.x,current.position.y,yaw(current)))
+        if anchor is not None:
+            if (type(anchor) is not dict or set(anchor)!={'x','y','yaw','captured_ns','context'}
+                    or anchor['context']!=context or type(anchor['captured_ns']) is not int
+                    or not 0<=now.monotonic_ns-anchor['captured_ns']<=60_000_000_000
+                    or any(type(anchor[k]) not in (int,float) or not math.isfinite(anchor[k]) for k in ('x','y','yaw'))):
+                raise ValueError('known fresh preview anchor required')
+            start=Pose2D(anchor['x'],anchor['y'],anchor['yaw'])
+            if math.hypot(pose.x-start.x,pose.y-start.y)>.1 or abs(angle(pose.yaw-start.yaw))>.1:
+                raise ValueError('vehicle moved since preview; design again')
+        else:
+            start=pose;anchor={'x':pose.x,'y':pose.y,'yaw':pose.yaw,'captured_ns':now.monotonic_ns,'context':context}
+        prepared,preview=resolve(design,self.environment,start,self.scenario_scene)
+        return prepared,preview,anchor
+
+    def design_preflight(self, document, expected_context, *, anchor=None):
         catalog=self.design_catalog()
         if type(expected_context) is not str or expected_context != catalog['context']:
             raise ValueError('design environment/session/capability context changed; current='+catalog['context'])
@@ -107,13 +134,24 @@ class SimulationDesignSupport:
             else:
                 try:self.navigation.context.check_fresh(self.vehicle.clock())
                 except ValueError as exc:reasons.append(str(exc))
-        return {'eligible':not reasons,'reasons':reasons,'sha256':design.sha256,
+        preview=None
+        if any(m.startswith('motion:') for m in design.missions):
+            if self.scenario_scene is None:reasons.append('explicit_scenario_scene_required')
+            elif not reasons:
+                try:
+                    prepared,preview,anchor=self._prepare_scenario(design,expected_context,anchor)
+                    if any(p.timeout_ns+8_000_000_000>self.profile.lease_ns for p in prepared.values()):
+                        reasons.append('maneuver_exceeds_configured_action_lease')
+                except (OSError,ValueError) as exc:reasons.append(str(exc))
+        return {'eligible':not reasons,'reasons':reasons,'sha256':design.sha256,'preview':preview,'anchor':anchor,
                 'context':catalog['context'],'steps':len(design.missions),'simulation_only':True}
 
-    def start_design_checked(self, document, expected_context, expected_session):
+    def start_design_checked(self, document, expected_context, expected_session, expected_anchor=None):
         if type(expected_session) is not str or expected_session!=self.vehicle.session_id:
             raise ValueError('design vehicle session changed')
-        check=self.design_preflight(document,expected_context)
+        if any(s.get('mission','').startswith('motion:') for s in document.get('steps',[]) if isinstance(s,dict)) and expected_anchor is None:
+            raise ValueError('parameterized execution requires the approved preview anchor')
+        check=self.design_preflight(document,expected_context,anchor=expected_anchor)
         if not check['eligible']:
             raise ValueError('design preflight rejected: '+', '.join(check['reasons']))
         design=MissionDesign.parse(json.dumps(document),self._design_capabilities())
@@ -123,6 +161,15 @@ class SimulationDesignSupport:
         # Registration and starting happen in this Application event-loop mutation.
         self.designs[design.sha256]=design
         self.design_task=DesignExecution(design,expected_context,self.vehicle.clock().monotonic_ns)
+        if any(m.startswith('motion:') for m in design.missions):
+            self.design_task.prepared,self.design_task.preview,_=self._prepare_scenario(design,expected_context,expected_anchor)
         self._emit('design_registered',name='designed:'+design.sha256,sha256=design.sha256,
                    task_id=self.design_task.task_id,steps=list(design.missions))
         return self.design_task.view(self)
+
+    def start_design_child(self,execution):
+        if execution is not self.design_task:raise ValueError('inactive design scope')
+        if execution.index in execution.prepared:
+            return self.start_mission(f'scenario:{execution.design.sha256}:{execution.index}',
+                _design_child=True,_scenario=execution.prepared[execution.index])
+        return self.start_mission(execution.design.missions[execution.index],_design_child=True)

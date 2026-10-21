@@ -38,6 +38,7 @@ class DesignProposalService:
             with self.lock:
                 self.pending[result['id']] = {'design':design, 'context':catalog['context'],
                     'session':catalog['session_id'], 'deadline':self.clock()+60, 'consumed':False}
+                self.pending[result['id']]['anchor']=None if preflight is None else preflight.get('anchor')
             return result
         finally:
             with self.lock:
@@ -56,4 +57,5 @@ class DesignProposalService:
             entry['consumed'] = True
             return self.application.handle('start_design_checked', {
                 'design':entry['design'].document(), 'expected_context':entry['context'],
-                'expected_session':entry['session']})
+                'expected_session':entry['session'],
+                **({'expected_anchor':entry['anchor']} if entry['anchor'] is not None else {})})

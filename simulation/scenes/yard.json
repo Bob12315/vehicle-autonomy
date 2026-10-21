@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "environment_id": "environment:rover-yard-v1",
+  "obstacles": [
+    {"name":"parked_van","x":6,"y":4,"width":2,"depth":3,"height":1.8},
+    {"name":"storage_rack","x":-4,"y":4,"width":2,"depth":4,"height":2.0},
+    {"name":"restricted_loading_zone","x":6,"y":-4,"width":4,"depth":2,"height":0.5}
+  ]
+}

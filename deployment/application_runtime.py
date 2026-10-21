@@ -31,7 +31,7 @@ from application.simulation_designs import SimulationDesignSupport
 
 
 class ApplicationRuntime(SimulationDesignSupport):
-    def __init__(self, profile, *, profile_name: str, allow_send=False, runtime=None, event_sink=None, sensor_config=None, vision_config=None, sim_payload=False, mapping_config=None, navigation_config=None):
+    def __init__(self, profile, *, profile_name: str, allow_send=False, runtime=None, event_sink=None, sensor_config=None, vision_config=None, sim_payload=False, mapping_config=None, navigation_config=None, environment_config=None, scenario_scene=None):
         self.profile = profile
         self.profile_name = profile_name
         self.allow_send = allow_send
@@ -62,14 +62,26 @@ class ApplicationRuntime(SimulationDesignSupport):
                                                     event_sink=event_sink)
         if self.navigation is not None:
             self.vehicle.motion_guard = self.navigation.write_guard
-        self.environment_path = Path(__file__).resolve().parents[1] / f"simulation/environments/{profile.kind}.toml"
+        self.environment_path = Path(environment_config) if environment_config else Path(__file__).resolve().parents[1] / f"simulation/environments/{profile.kind}.toml"
         self._environment_source = Environment.load(self.environment_path).check_safety(profile.safety)
+        self.scenario_scene = None
+        self.scenario_guard = None
+        if scenario_scene is not None:
+            if profile.kind!='rover':raise ValueError('finite scenario maneuvers require Rover simulation')
+            from application.scenario_planning import StaticScene
+            from deployment.scenario_guard import ScenarioGuard
+            self.scenario_scene=StaticScene(scenario_scene,self._environment_source)
+            self.scenario_guard=ScenarioGuard(self.scenario_scene,self._environment_source,getattr(self.vehicle,'motion_guard',None))
+            self.vehicle.motion_guard=self.scenario_guard
         self.environment = None
         self.environment_fault = False
         self.events = event_sink or (lambda event: None)
         self.registry = ActionRegistry()
         self.registry.register_typed(SITL_MODE_SPEC, SitlModeAction())
         register_basic(self.registry)
+        if self.scenario_scene is not None:
+            from actions.rover_maneuver import SPEC,ManeuverAction
+            self.registry.register_typed(SPEC,ManeuverAction())
         register_targets(self.registry)
         if self.navigation is not None:
             from actions.path_following import SPEC, FollowPathAction
@@ -196,6 +208,7 @@ class ApplicationRuntime(SimulationDesignSupport):
                 self.task.abort(result.fault)
                 self._cancel_payload()
                 self.stops = self.vehicle.end_run()
+                if self.scenario_guard is not None:self.scenario_guard.parameters=None
                 if self.navigation is not None:self.navigation.finish()
                 self._emit("task_failed", error=result.fault)
             self.state = "DEGRADED"
@@ -255,6 +268,7 @@ class ApplicationRuntime(SimulationDesignSupport):
         if self.task.view().status in TERMINAL:
             self._cancel_payload()
             self.stops = self.vehicle.end_run()
+            if self.scenario_guard is not None:self.scenario_guard.parameters=None
             if self.navigation is not None:self.navigation.finish()
             self.state = "READY" if self.vehicle.connected else "DEGRADED"
             self._emit("task_finished", **self._mission_status())
@@ -353,12 +367,18 @@ class ApplicationRuntime(SimulationDesignSupport):
                 "payload":None if self.payload_port is None else self.payload_port.inventory(),
                 "mapping": None if self.mapping is None else {**self.mapping.health,
                     "adopted": bool(world is not None and world.map is not None)},
+                "scenario": None if self.scenario_scene is None else {"static_scene_sha256":self.scenario_scene.sha256,"kind":"known_static_scene","live_obstacle_avoidance":False},
                 "navigation": None if self.navigation is None else self.navigation.status(world, now),
                 "slam_localization_candidate":None if self.slam_candidate is None else self.slam_candidate.view(now),
                 "system_send": self.vehicle.authority.system_send,
                 "action_send": self.vehicle.authority.action_send, "task": (self.design_task.view(self) if self.design_task is not None else self.task_status()) if include_task else None}
 
-    def start_mission(self, name, *, _navigation_child=False, _design_child=False):
+    def start_mission(self, name, *, _navigation_child=False, _design_child=False, _scenario=None):
+        scenario_mission=_scenario is not None
+        if scenario_mission and (not _design_child or self.design_task is None or not self.design_task.active
+                or self.design_task.prepared.get(self.design_task.index) is not _scenario
+                or name!=f'scenario:{self.design_task.design.sha256}:{self.design_task.index}'):
+            raise ValueError('only the active admitted design can start its bound maneuver')
         if not _navigation_child and not _design_child:
             if self.design_task and self.design_task.active:
                 raise ValueError('another designed task is active')
@@ -384,7 +404,7 @@ class ApplicationRuntime(SimulationDesignSupport):
                 return self._start_navigation(name[len("navigate:"):])
             self.navigation_task = None
         navigation_mission = name == "follow_path" and self.navigation is not None
-        if name not in self.plans and name not in MISSION_NAMES and name not in BUSINESS_NAMES and not navigation_mission:
+        if name not in self.plans and name not in MISSION_NAMES and name not in BUSINESS_NAMES and not navigation_mission and not scenario_mission:
             raise ValueError("mission is not registered")
         if not self.allow_send:
             raise ValueError("application started without --allow-send")
@@ -395,13 +415,18 @@ class ApplicationRuntime(SimulationDesignSupport):
         world = self.vehicle.world_snapshot()
         if world is None or world.vehicle is None or (name != "safe_recovery" and world.vehicle.operation.armed):
             raise ValueError("fresh disarmed vehicle required")
-        if name in MISSION_NAMES or name in BUSINESS_NAMES or navigation_mission:
+        if name in MISSION_NAMES or name in BUSINESS_NAMES or navigation_mission or scenario_mission:
             if self.environment is None or world.environment != self.environment.reference or world.localization is None:
                 raise ValueError("bound environment and fresh localization required")
             if name != "safe_recovery" and (self.connected_at_ns is None or self.vehicle.clock().monotonic_ns-self.connected_at_ns < self.profile.warmup_ns):
                 raise ValueError("simulation motion warmup incomplete")
             self.environment.validate_origin(world.vehicle)
-            if navigation_mission:
+            if scenario_mission:
+                if self.scenario_guard is None:raise ValueError('scenario composition required')
+                from application.scenario_planning import build as build_scenario
+                plan=build_scenario(_scenario,self.profile.mode_ids['GUIDED'])
+                self.scenario_guard.parameters=_scenario
+            elif navigation_mission:
                 from applications.navigation import build as build_navigation
                 parameters = self.navigation.admit(world, self.vehicle.clock())
                 plan = build_navigation(parameters, self.profile.mode_ids["GUIDED"])
@@ -421,6 +446,7 @@ class ApplicationRuntime(SimulationDesignSupport):
             action_id = f"{run_id}:{compiled.steps[0].step.step_id}:1"
             self.vehicle.begin_run(allow_send=True, run_id=run_id, action_id=action_id)
         except (ValueError, TypeError, RuntimeError):
+            if scenario_mission:self.scenario_guard.parameters=None
             if navigation_mission:self.navigation.finish()
             raise
         if navigation_mission:self.navigation.consume()

@@ -23,6 +23,7 @@ class RuntimeService:
             if method is None:raise ValueError('task design is unavailable in this composition')
             fields={'design_catalog':set(), 'design_preflight':{'design','expected_context'},
                     'start_design_checked':{'design','expected_context','expected_session'}}[command]
+            if command=='start_design_checked' and 'expected_anchor' in payload:fields=fields|{'expected_anchor'}
             if set(payload)!=fields:raise ValueError('invalid task design request fields')
             if 'design' in payload and type(payload['design']) is not dict:
                 raise ValueError('task design document required')

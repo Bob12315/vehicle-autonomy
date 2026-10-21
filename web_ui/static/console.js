@@ -62,6 +62,7 @@ $('connect').onclick = () => action(async () => {
   state = await api('status');
   const missions = await api('catalog'); $('missions').replaceChildren();
   for (const mission of missions) {
+    if (mission.startsWith('motion:')) continue; // Parameters require a previewed AI design.
     const option = document.createElement('option'); option.value = option.textContent = mission;
     $('missions').append(option);
   }
@@ -85,13 +86,18 @@ async function propose(path) {
   $('proposal-reason').textContent = proposal.reason;
   $('proposal-steps').replaceChildren();
   for (const step of proposal.steps ?? (proposal.mission ? [{mission: proposal.mission}] : [])) {
-    const item = document.createElement('li'); item.textContent = step.mission;
+    const item = document.createElement('li');
+    item.textContent = step.mission + (step.parameters && Object.keys(step.parameters).length ? ' · ' + JSON.stringify(step.parameters) : '');
     $('proposal-steps').append(item);
   }
   $('proposal-check').textContent = proposal.decision === 'clarify' ? '需要补充任务信息'
     : proposal.decision === 'reject' ? '该请求已被拒绝'
     : proposal.preflight?.eligible === false ? '预检未通过：' + proposal.preflight.reasons.join('；')
     : '待人工确认 · 60 秒内有效 · 批准时将重新预检';
+  if (proposal.preflight?.preview) {
+    const p = proposal.preflight.preview;
+    $('proposal-check').textContent += ' · 预计期限 ' + p.estimated_deadline_s + ' 秒 · 已知静态场景碰撞预检（不含实时避障）';
+  }
   $('approve').disabled = proposal.decision !== 'propose' || proposal.preflight?.eligible === false || state?.mode === 'hardware_readonly';
   $('human').checked = false;
 }

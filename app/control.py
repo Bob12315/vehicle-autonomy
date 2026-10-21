@@ -161,11 +161,11 @@ def request(path, command, payload=None, *, request_id=None, timeout_s=2):
     return json.loads(result)
 
 
-def run_application(profile, *, profile_name, allow_send, path, sensor_config=None, vision_config=None, sim_payload=False, mapping_config=None, navigation_config=None):
+def run_application(profile, *, profile_name, allow_send, path, sensor_config=None, vision_config=None, sim_payload=False, mapping_config=None, navigation_config=None, environment_config=None, scenario_scene=None):
     import signal
     from application.runtime_service import RuntimeService
     from deployment.application_runtime import ApplicationRuntime
-    runtime = ApplicationRuntime(profile, profile_name=profile_name, allow_send=allow_send, sensor_config=sensor_config, vision_config=vision_config, sim_payload=sim_payload, mapping_config=mapping_config, navigation_config=navigation_config,
+    runtime = ApplicationRuntime(profile, profile_name=profile_name, allow_send=allow_send, sensor_config=sensor_config, vision_config=vision_config, sim_payload=sim_payload, mapping_config=mapping_config, navigation_config=navigation_config, environment_config=environment_config, scenario_scene=scenario_scene,
         event_sink=lambda event: print(json.dumps(event, sort_keys=True), flush=True))
     server = ControlServer(path, RuntimeService(runtime))
     previous = {}
