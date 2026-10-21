@@ -240,3 +240,12 @@ class ParameterAdmissionTests(unittest.TestCase):
         self.assertEqual(fx.transports[-1].writes,[])
         with self.assertRaises(ValueError):app.start_mission('scenario:'+task['configuration_sha256']+':0')
         self.assertFalse(runtime.authority.system_send)
+
+
+    def test_unqualified_kinematics_are_rejected_before_runtime_construction(self):
+        from unittest.mock import patch
+        from deployment.application_runtime import ApplicationRuntime
+        profile=replace(SimulationProfile.load('simulation/profiles/rover_yard.toml'),vehicle_id='simulation-compact-rover')
+        with patch('deployment.application_runtime.SimulationRuntime',side_effect=AssertionError('runtime created')):
+            with self.assertRaisesRegex(ValueError,'qualified target_rover'):
+                ApplicationRuntime(profile,profile_name='rover_sim',scenario_scene='simulation/scenes/yard.json')

@@ -32,6 +32,8 @@ from application.simulation_designs import SimulationDesignSupport
 
 class ApplicationRuntime(SimulationDesignSupport):
     def __init__(self, profile, *, profile_name: str, allow_send=False, runtime=None, event_sink=None, sensor_config=None, vision_config=None, sim_payload=False, mapping_config=None, navigation_config=None, environment_config=None, scenario_scene=None):
+        if scenario_scene is not None and (profile.kind!='rover' or profile.vehicle_id!='simulation-rover'):
+            raise ValueError('scenario maneuvers require the qualified target_rover front-axle profile')
         self.profile = profile
         self.profile_name = profile_name
         self.allow_send = allow_send
