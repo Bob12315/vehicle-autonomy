@@ -5,17 +5,17 @@ import tempfile
 import unittest
 from dataclasses import replace
 
-from actions.rover_maneuver import SPEC,ManeuverAction
-from application.scenario_planning import StaticScene,catalog,resolve,build
-from core.action_registry import ActionRegistry
-from core.mission import MissionValidator
-from actions.basic import register_basic
-from core.sitl_mode_action import SITL_MODE_SPEC,SitlModeAction
-from contracts.vehicle.ports import VehicleCapabilities
-from environments.resources import Environment
-from intelligence.designs import MissionDesign
-from planning.models import Pose2D
-from runtime.simulation_profile import SimulationProfile
+from vehicle_autonomy.actions.rover.maneuver import SPEC,ManeuverAction
+from vehicle_autonomy.app.mission_designer.scenario_planning import StaticScene,catalog,resolve,build
+from vehicle_autonomy.engine.action.registry import ActionRegistry
+from vehicle_autonomy.engine.mission.compiler import MissionValidator
+from vehicle_autonomy.actions.common.basic import register_basic
+from vehicle_autonomy.actions.common.sitl_mode import SITL_MODE_SPEC,SitlModeAction
+from vehicle_autonomy.contracts.vehicle.ports import VehicleCapabilities
+from vehicle_autonomy.world.environment.resources import Environment
+from vehicle_autonomy.autonomy.intelligence.designs import MissionDesign
+from vehicle_autonomy.autonomy.planning.models import Pose2D
+from vehicle_autonomy.app.bootstrap.simulation_profile import SimulationProfile
 
 
 def design(*steps):
@@ -97,7 +97,7 @@ class ManeuverFaultTests(ScenarioTests):
         return world
 
     def sample(self,world,heading,seconds):
-        from contracts.core.geometry import Pose3,Vector3,Quaternion
+        from vehicle_autonomy.contracts.core.geometry import Pose3,Vector3,Quaternion
         now=replace(world.published_at,monotonic_ns=world.published_at.monotonic_ns+round(seconds*1e9))
         # Unit-only fixed drive axle at (.25,0); body origin moves during a pivot.
         p=Pose3(Vector3(.25-.25*math.cos(heading),-.25*math.sin(heading),0),Quaternion(0,0,math.sin(heading/2),math.cos(heading/2)))
@@ -106,7 +106,7 @@ class ManeuverFaultTests(ScenarioTests):
         return replace(world,published_at=now,localization=loc)
 
     def test_turn_unwrap_requires_actual_two_revolutions_and_stop_feedback(self):
-        from contracts.decision import EffectResult,EffectPhase,ActionOutcome
+        from vehicle_autonomy.contracts.decision import EffectResult,EffectPhase,ActionOutcome
         p=self.parse(('motion:turn',{'angle_deg':720}));prepared,_=resolve(p,self.environment,Pose2D(.25,0),self.scene)
         world=self.world();instance=ManeuverAction().start(prepared[0],world)
         transmitted=(EffectResult('move','action',EffectPhase.TRANSMITTED),)
@@ -123,8 +123,8 @@ class ManeuverFaultTests(ScenarioTests):
         self.assertEqual(instance.tick_with_results(self.sample(world,4*math.pi,1.8),done).outcome,ActionOutcome.SUCCEEDED)
 
     def test_waypoint_alignment_waits_for_stop_then_starts_a_fresh_drive_stream(self):
-        from contracts.decision import EffectResult,EffectPhase
-        from contracts.effects.vehicle import TwistTargetEffect,StopMotionEffect
+        from vehicle_autonomy.contracts.decision import EffectResult,EffectPhase
+        from vehicle_autonomy.contracts.effects.vehicle import TwistTargetEffect,StopMotionEffect
         p=self.parse(('motion:visit',{'waypoint':'A','speed_mps':.15}))
         prepared,_=resolve(p,self.environment,Pose2D(.25,0),self.scene);world=self.world()
         instance=ManeuverAction().start(prepared[0],world)
@@ -148,7 +148,7 @@ class ManeuverFaultTests(ScenarioTests):
         self.assertGreater(move.effects[0].target_twist.linear.x,0.)
 
     def test_spinning_in_place_cannot_fake_a_driven_circle(self):
-        from contracts.decision import EffectResult,EffectPhase
+        from vehicle_autonomy.contracts.decision import EffectResult,EffectPhase
         p=self.parse(('motion:circle',{'radius_m':1.5,'laps':1,'direction':'left','speed_mps':.15}))
         prepared,_=resolve(p,self.environment,Pose2D(.25,0),self.scene);world=self.world()
         instance=ManeuverAction().start(prepared[0],world)
@@ -158,7 +158,7 @@ class ManeuverFaultTests(ScenarioTests):
         self.assertIsNone(instance.stop_boundary)
 
     def test_stale_localization_cannot_complete_wait_or_motion(self):
-        from contracts.decision import ActionOutcome
+        from vehicle_autonomy.contracts.decision import ActionOutcome
         world=self.world();p=self.parse(('motion:wait',{'duration_s':1}));prepared,_=resolve(p,self.environment,Pose2D(.25,0),self.scene)
         instance=ManeuverAction().start(prepared[0],world)
         stale=replace(world,published_at=replace(world.published_at,monotonic_ns=world.published_at.monotonic_ns+600_000_000))
@@ -166,8 +166,8 @@ class ManeuverFaultTests(ScenarioTests):
         self.assertEqual(output.outcome,ActionOutcome.FAILED);self.assertIn('stale',output.error)
 
     def test_long_corridor_corrects_lateral_error_using_local_preview(self):
-        from contracts.core.geometry import Pose3,Vector3
-        from contracts.decision import EffectResult,EffectPhase
+        from vehicle_autonomy.contracts.core.geometry import Pose3,Vector3
+        from vehicle_autonomy.contracts.decision import EffectResult,EffectPhase
         p=self.parse(('motion:visit',{'waypoint':'HOME','speed_mps':.15}))
         prepared,_=resolve(p,self.environment,Pose2D(10.25,0,math.pi),self.scene)
         world=self.sample(self.world(),math.pi,.1)
@@ -184,17 +184,17 @@ class ManeuverFaultTests(ScenarioTests):
 
     def test_scene_change_after_queue_is_rejected_by_original_writer_but_stop_remains_allowed(self):
         from tests import test_simulation_runtime as helpers
-        from deployment.scenario_guard import ScenarioGuard
-        from contracts.core.geometry import Twist3,Vector3
-        from contracts.effects.vehicle import TwistTargetEffect,StopMotionEffect
+        from vehicle_autonomy.autonomy.guidance.scenario_guard import ScenarioGuard
+        from vehicle_autonomy.contracts.core.geometry import Twist3,Vector3
+        from vehicle_autonomy.contracts.effects.vehicle import TwistTargetEffect,StopMotionEffect
         fx=helpers.SimulationRuntimeTests();fx.setUp();fx.runtime.connect()
         fx.cycle(fx.heartbeat(mode=4,armed=True)+fx.state_messages());fx.runtime.begin_run(allow_send=True)
         with tempfile.TemporaryDirectory() as d:
             path=Path(d)/'scene.json';path.write_text(Path('simulation/scenes/yard.json').read_text())
             guard=ScenarioGuard(StaticScene(path,self.environment),self.environment)
             p=self.parse(('motion:drive',{'distance_m':1,'speed_mps':.15}))
-            from actions.basic import yaw
-            from guidance.path_following import drive_reference
+            from vehicle_autonomy.actions.common.basic import yaw
+            from vehicle_autonomy.autonomy.guidance.path_following import drive_reference
             raw=fx.runtime.world_snapshot().localization.pose.value
             start=drive_reference(Pose2D(raw.position.x,raw.position.y,yaw(raw)))
             guard.parameters=resolve(p,self.environment,start,self.scene)[0][0]
@@ -213,10 +213,10 @@ class ManeuverFaultTests(ScenarioTests):
 class ParameterAdmissionTests(unittest.TestCase):
     def test_approval_requires_fresh_matching_preview_anchor_and_private_child_scope(self):
         from tests import test_simulation_runtime as helpers
-        from deployment.application_runtime import ApplicationRuntime
-        from deployment.simulation_runtime import SimulationRuntime
-        from vehicles.rover.ardupilot_commands import ArduRoverCommandTranslator
-        from protocols.mavlink.constants import TYPE_GROUND_ROVER
+        from vehicle_autonomy.app.bootstrap.application_runtime import ApplicationRuntime
+        from vehicle_autonomy.app.bootstrap.simulation_runtime import SimulationRuntime
+        from vehicle_autonomy.vehicles.rover.ardupilot_commands import ArduRoverCommandTranslator
+        from vehicle_autonomy.vehicles.ardupilot.mavlink.constants import TYPE_GROUND_ROVER
         fx=helpers.SimulationRuntimeTests();fx.setUp()
         profile=SimulationProfile.load('simulation/profiles/rover_yard.toml')
         runtime=SimulationRuntime(profile,translator=ArduRoverCommandTranslator(mode_ids=profile.mode_ids),
@@ -244,8 +244,8 @@ class ParameterAdmissionTests(unittest.TestCase):
 
     def test_unqualified_kinematics_are_rejected_before_runtime_construction(self):
         from unittest.mock import patch
-        from deployment.application_runtime import ApplicationRuntime
+        from vehicle_autonomy.app.bootstrap.application_runtime import ApplicationRuntime
         profile=replace(SimulationProfile.load('simulation/profiles/rover_yard.toml'),vehicle_id='simulation-compact-rover')
-        with patch('deployment.application_runtime.SimulationRuntime',side_effect=AssertionError('runtime created')):
+        with patch('vehicle_autonomy.app.bootstrap.application_runtime.SimulationRuntime',side_effect=AssertionError('runtime created')):
             with self.assertRaisesRegex(ValueError,'qualified target_rover'):
                 ApplicationRuntime(profile,profile_name='rover_sim',scenario_scene='simulation/scenes/yard.json')

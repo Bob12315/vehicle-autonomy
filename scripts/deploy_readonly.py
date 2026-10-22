@@ -27,7 +27,7 @@ def main():
     commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()
     entries=subprocess.check_output(['git','ls-tree','--name-only','HEAD'],cwd=ROOT,text=True).splitlines()
     archive=directory/(commit+'.tar')
-    subprocess.run(['git','archive','--format=tar','--output',str(archive),'HEAD',*[p for p in entries if p!='legacy']],cwd=ROOT,check=True)
+    subprocess.run(['git','archive','--format=tar','--output',str(archive),'HEAD',*entries],cwd=ROOT,check=True)
     wheels=directory/'wheels.tar'
     with tarfile.open(wheels,'w') as stream:
         for path in sorted(args.wheelhouse.glob('*.whl')):stream.add(path,arcname=path.name)
@@ -69,7 +69,8 @@ def main():
         remote('tar -xf '+q(base+'/incoming/wheels.tar')+' -C '+q(base+'/wheels'))
         remote('test -x '+q(base+'/venv/bin/python')+' || python3 -m venv --system-site-packages '+q(base+'/venv'))
         remote(q(base+'/venv/bin/python')+' -m pip install --no-index --find-links '+q(base+'/wheels')+' -r '+q(release+'/requirements-hardware.txt'))
-        remote('cd '+q(release)+' && '+q(base+'/venv/bin/python')+' -m app.hardware --check')
+        remote(q(base+'/venv/bin/python')+' -m pip install --no-index --find-links '+q(base+'/wheels')+' --no-build-isolation --no-deps '+q(release))
+        remote('cd '+q(release)+' && '+q(base+'/venv/bin/python')+' -m vehicle_autonomy.app.bootstrap.hardware --check')
         remote('if test -e '+q(base+'/current')+' && ! test -L '+q(base+'/current')+'; then exit 3; fi; ln -sfn '+q(release)+' '+q(base+'/current'))
         manifest['release_path']=release
         (directory/'deployment.json').write_text(json.dumps({'manifest':manifest,'operations':transcript},indent=2))

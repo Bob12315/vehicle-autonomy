@@ -1,7 +1,7 @@
 import unittest,math
-from contracts.core.geometry import Transform3,Vector3,Quaternion
-from perception.vision.projection import PlaneCalibration
-from perception.vision.yolox import PixelDetection
+from vehicle_autonomy.contracts.core.geometry import Transform3,Vector3,Quaternion
+from vehicle_autonomy.world.perception.vision.projection import PlaneCalibration
+from vehicle_autonomy.world.perception.vision.yolox import PixelDetection
 
 class VisionGeometryTests(unittest.TestCase):
     def test_calibrated_plane_and_unlocated_cases(self):

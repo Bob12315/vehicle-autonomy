@@ -7,15 +7,15 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
 
-from contracts.core.geometry import Pose3, Quaternion, Vector3
-from contracts.core.primitives import ResourceVersion
-from contracts.core.quality import FreshnessState
-from contracts.core.time import TimePoint
-from contracts.world.models import ResourceReference
-from mapping.clock import RosClockBridge
-from mapping.exchange import MappingConfig, MappingInput
-from mapping.grid import MapStore, OccupancyGrid, atomic_json, pose_to_json
-from world_model import WorldModel, FreshnessLimits
+from vehicle_autonomy.contracts.core.geometry import Pose3, Quaternion, Vector3
+from vehicle_autonomy.contracts.core.primitives import ResourceVersion
+from vehicle_autonomy.contracts.core.quality import FreshnessState
+from vehicle_autonomy.contracts.core.time import TimePoint
+from vehicle_autonomy.contracts.world.models import ResourceReference
+from vehicle_autonomy.world.mapping.clock import RosClockBridge
+from vehicle_autonomy.world.mapping.exchange import MappingConfig, MappingInput
+from vehicle_autonomy.world.mapping.grid import MapStore, OccupancyGrid, atomic_json, pose_to_json
+from vehicle_autonomy.world.model import WorldModel, FreshnessLimits
 
 
 IDENTITY = Pose3(Vector3(0, 0, 0), Quaternion(0, 0, 0, 1))

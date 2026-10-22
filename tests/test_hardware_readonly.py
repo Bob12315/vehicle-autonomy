@@ -7,17 +7,17 @@ import tempfile
 import time
 import unittest
 
-from app.control import request
-from deployment.hardware_profile import load_profile
-from deployment.hardware_runtime import HardwareReadOnlyRuntime
-from application.runtime_service import RuntimeService
-from infrastructure.transports.readonly import ReadOnlySerial
-from protocols.mavlink.readonly import TelemetryDiagnostics
+from vehicle_autonomy.app.api.control import request
+from vehicle_autonomy.app.bootstrap.hardware_profile import load_profile
+from vehicle_autonomy.app.bootstrap.hardware_runtime import HardwareReadOnlyRuntime
+from vehicle_autonomy.app.api.runtime_service import RuntimeService
+from vehicle_autonomy.vehicles.ardupilot.transports.readonly import ReadOnlySerial
+from vehicle_autonomy.vehicles.ardupilot.mavlink.readonly import TelemetryDiagnostics
 
 
 class HardwareTests(unittest.TestCase):
     def test_profiles_fail_closed(self):
-        base = json.loads(Path('config/deployment/hardware-readonly.json').read_text())
+        base = json.loads(Path('configs/deployment/hardware-readonly.json').read_text())
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / 'profile.json'
             for key, value in [('system_send', True), ('action_send', 1), ('mode', 'hardware_controlled'),
@@ -32,7 +32,7 @@ class HardwareTests(unittest.TestCase):
 
     def test_runtime_has_no_command_port_and_rejects_motion(self):
         with tempfile.TemporaryDirectory() as directory:
-            runtime = HardwareReadOnlyRuntime(load_profile('config/deployment/hardware-readonly.json'), directory)
+            runtime = HardwareReadOnlyRuntime(load_profile('configs/deployment/hardware-readonly.json'), directory)
             try:
                 service = RuntimeService(runtime)
                 runtime.cycle()
@@ -54,7 +54,7 @@ class HardwareTests(unittest.TestCase):
             endpoint = str(Path(directory) / 'app.sock')
             generations = []
             for _ in range(2):
-                proc = subprocess.Popen([sys.executable, '-m', 'app.hardware', '--control-socket', endpoint,
+                proc = subprocess.Popen([sys.executable, '-m', 'vehicle_autonomy.app.bootstrap.hardware', '--control-socket', endpoint,
                     '--log-dir', directory], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 try:
                     until = time.monotonic() + 5

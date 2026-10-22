@@ -10,7 +10,7 @@ import sys
 import time
 from uuid import uuid4
 
-from app.control import request
+from vehicle_autonomy.app.api.control import request
 from tests.simulation.launch import ROOT,OwnedSimulation,install_signal_cleanup
 from tests.simulation.oracle import GazeboTruthOracle
 from tests.simulation.yard_scene import add_yard
@@ -35,7 +35,7 @@ def run(directory,case,llm_config):
         owned.start();oracle=GazeboTruthOracle(owned.world,owned.model)
         profile=directory/'profile.toml';profile.write_text((ROOT/'simulation/profiles/rover_yard.toml').read_text().replace('port = 5760',f'port = {owned.port}'))
         def launch(send,suffix=''):
-            return owned.start_process('application'+suffix,[sys.executable,'-m','app.main','run','--profile','rover_sim',
+            return owned.start_process('application'+suffix,[sys.executable,'-m','vehicle_autonomy.app.cli','run','--profile','rover_sim',
                 '--config',str(profile),'--control-socket',str(endpoint),*(['--allow-send'] if send else []),
                 '--environment-config',str(ROOT/'simulation/environments/yard.toml'),
                 '--scenario-scene',str(ROOT/'simulation/scenes/yard.json')])
@@ -62,7 +62,7 @@ def run(directory,case,llm_config):
         origin=oracle.wait_new(after_host_ns=time.monotonic_ns(),timeout_s=3)
         with socket.socket() as sock:sock.bind(('127.0.0.1',0));port=sock.getsockname()[1]
         token_file=directory/'token'
-        web=owned.start_process('web',[sys.executable,'-m','app.web','--control-socket',str(endpoint),
+        web=owned.start_process('web',[sys.executable,'-m','vehicle_autonomy.app.web.cli','--control-socket',str(endpoint),
             '--port',str(port),'--data-dir',str(directory/'console'),'--token-file',str(token_file),
             '--llm-config',str(llm_config),'--missions','disarmed_mode,motion:drive,motion:turn,motion:circle,motion:wait,motion:visit'])
         until=time.monotonic()+10
@@ -120,7 +120,7 @@ def run(directory,case,llm_config):
                 s=status();task=s['task'];t=oracle.latest()
                 if case=='cancel' and not cancelled and t is not None and math.hypot(t.x_m-origin.x_m,t.y_m-origin.y_m)>.5:
                     # A separate deliberately unavailable adapter cannot mutate the active task.
-                    from intelligence.proposals import LlmAdapter
+                    from vehicle_autonomy.autonomy.intelligence.proposals import LlmAdapter
                     cfg=json.loads(llm_config.read_text());cfg.update(endpoint='http://127.0.0.1:1/v1/chat/completions',timeout_s=1)
                     try:LlmAdapter(cfg).design('前进1米',{})
                     except OSError:pass

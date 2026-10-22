@@ -35,7 +35,7 @@ PYTHONPATH=. python scripts/diagnose_rover_readonly.py \
 
 ## 接收进程监管
 
-`deployment.onboard --rs16-config /absolute/rs16.json` 会监管官方 SDK、只读 Application
+`vehicle_autonomy.app.bootstrap.onboard --rs16-config /absolute/rs16.json` 会监管官方 SDK、只读 Application
 和认证 Web；`--ros2-humble` 增加隔离 ARM64 ROS 侧车。任一子进程退出都会关闭整栈，
 需要明确重启。SDK 每次新 epoch，接收时间和序号不通过轮询刷新。默认不启动任何
 设备，默认 SEND 保持 false。SDK 持续时间最多 86400 秒，结束后整栈关闭。
@@ -55,7 +55,7 @@ rosbag2 与 libpcap 开发文件以 626 个经 APT 签名/索引哈希验证的 
 wrapper 单独设置库/包路径，限制 ROS 为 localhost/domain 85。
 
 目标系统原 ICU 来自 proposed，稳定仓库 dev 版本不匹配。首次依赖解析失败日志
-保留；改为在独立 prefix 中同时使用稳定 ICU runtime/dev，原系统 ICU 保持。
+保留；改为在独立 prefix 中同时使用稳定 ICU configs/dev，原系统 ICU 保持。
 SLAM 初次加载找不到位于 `usr/lib` 的 Ceres，已修复 wrapper 路径，实际 Ceres
 solver 加载成功。Humble 默认 SIGTERM 导致回调中 context 提前关闭，已改为信号
 仅设置退出标记；实际接收中的 SIGTERM 验证退出码 0、无 traceback。
@@ -124,7 +124,7 @@ ssh pi@192.168.50.2 'cat ~/.local/state/vehicle-autonomy-connected/token'
 ```bash
 cd /home/pi/vehicle-autonomy/current
 ./scripts/with_ros2_humble.sh /home/pi/vehicle-autonomy/venv/bin/python \
-  -m integrations.ros2.verify_lidar --exchange /home/pi/vehicle-autonomy/live/cloud.json \
+  -m vehicle_autonomy.world.sensors.lidar.verify_lidar --exchange /home/pi/vehicle-autonomy/live/cloud.json \
   --provenance live_sdk_system_timestamp --duration 20 --report /tmp/rs16-live-check.json
 ```
 

@@ -7,18 +7,18 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
 
-from actions.path_following import FollowPathAction
-from contracts.core.geometry import Pose3, Quaternion, Twist3, Vector3
-from contracts.core.primitives import ResourceVersion
-from contracts.decision import ActionOutcome, EffectPhase, EffectResult, ExitReason
-from contracts.effects.vehicle import StopMotionEffect, TwistTargetEffect
-from contracts.world.models import ResourceReference
-from deployment.navigation import NavigationConfig, NavigationSupervisor
-from guidance.path_following import PlanarBinding, PolylineTracker
-from localization.reported import ReportedPoseLocalization
-from mapping.exchange import MapInput
-from mapping.grid import OccupancyGrid, pose_to_json
-from planning.models import MapContext, PathCandidate, PlanRequest, Pose2D, VerifiedPath
+from vehicle_autonomy.actions.navigation.path_following import FollowPathAction
+from vehicle_autonomy.contracts.core.geometry import Pose3, Quaternion, Twist3, Vector3
+from vehicle_autonomy.contracts.core.primitives import ResourceVersion
+from vehicle_autonomy.contracts.decision import ActionOutcome, EffectPhase, EffectResult, ExitReason
+from vehicle_autonomy.contracts.effects.vehicle import StopMotionEffect, TwistTargetEffect
+from vehicle_autonomy.contracts.world.models import ResourceReference
+from vehicle_autonomy.autonomy.planning.navigation import NavigationConfig, NavigationSupervisor
+from vehicle_autonomy.autonomy.guidance.path_following import PlanarBinding, PolylineTracker
+from vehicle_autonomy.world.localization.reported import ReportedPoseLocalization
+from vehicle_autonomy.world.mapping.exchange import MapInput
+from vehicle_autonomy.world.mapping.grid import OccupancyGrid, pose_to_json
+from vehicle_autonomy.autonomy.planning.models import MapContext, PathCandidate, PlanRequest, Pose2D, VerifiedPath
 from tests import test_simulation_runtime as helpers
 
 IDENTITY = Pose3(Vector3(0,0,0), Quaternion(0,0,0,1))
@@ -27,7 +27,7 @@ IDENTITY = Pose3(Vector3(0,0,0), Quaternion(0,0,0,1))
 class GuidanceTests(unittest.TestCase):
     def test_drive_reference_matches_model_and_pivot_is_not_body_stationary(self):
         import xml.etree.ElementTree as ET
-        from guidance.path_following import DRIVE_OFFSET_M, drive_reference
+        from vehicle_autonomy.autonomy.guidance.path_following import DRIVE_OFFSET_M, drive_reference
         model=ET.parse("simulation/models/target_rover/model.sdf")
         for wheel in ("front_left_wheel","front_right_wheel"):
             offset=float(model.find(f"model/link[@name='{wheel}']/pose").text.split()[0])
@@ -229,7 +229,7 @@ class NavigationTests(unittest.TestCase):
         self.assertEqual(action.tick_with_results(self.sample(7.1,Vector3(1,0,0)),result).outcome,ActionOutcome.SUCCEEDED)
 
     def test_last_write_guard_rechecks_file_after_poll(self):
-        from contracts.vehicle.command import TwistTargetCommand
+        from vehicle_autonomy.contracts.vehicle.command import TwistTargetCommand
         from types import SimpleNamespace
         self.admit()
         command=SimpleNamespace(command=TwistTargetCommand("base_link",Twist3(Vector3(.1,0,0),Vector3(0,0,0)),"stream"))
@@ -238,13 +238,13 @@ class NavigationTests(unittest.TestCase):
         self.assertEqual(self.supervisor.write_guard(command,self.world.vehicle,self.now),"navigation_plan_file_changed")
 
     def test_registered_mission_compiles_without_device_ports(self):
-        from actions.basic import register_basic
-        from actions.path_following import SPEC
-        from applications.navigation import build
-        from contracts.vehicle.ports import VehicleCapabilities
-        from core.action_registry import ActionRegistry
-        from core.mission import MissionValidator
-        from core.sitl_mode_action import SITL_MODE_SPEC, SitlModeAction
+        from vehicle_autonomy.actions.common.basic import register_basic
+        from vehicle_autonomy.actions.navigation.path_following import SPEC
+        from vehicle_autonomy.app.scenarios.navigation import build
+        from vehicle_autonomy.contracts.vehicle.ports import VehicleCapabilities
+        from vehicle_autonomy.engine.action.registry import ActionRegistry
+        from vehicle_autonomy.engine.mission.compiler import MissionValidator
+        from vehicle_autonomy.actions.common.sitl_mode import SITL_MODE_SPEC, SitlModeAction
         registry=ActionRegistry();register_basic(registry)
         registry.register_typed(SITL_MODE_SPEC,SitlModeAction())
         registry.register_typed(SPEC,FollowPathAction(self.supervisor.reader))
@@ -255,7 +255,7 @@ class NavigationTests(unittest.TestCase):
         self.assertFalse(hasattr(self.supervisor.reader,"admit"))
 
     def test_configuration_requires_bounded_explicit_local_simulation(self):
-        from deployment.application_runtime import ApplicationRuntime
+        from vehicle_autonomy.app.bootstrap.application_runtime import ApplicationRuntime
         path=Path(self.directory.name)/"navigation.toml"
         path.write_text(f'schema=1\nmodel="target_rover_front_axle_v1"\nplan_path="{self.path}"\ntimeout_ns=70000000000\n')
         self.assertEqual(NavigationConfig.load(path).timeout_ns,70_000_000_000)
@@ -271,9 +271,9 @@ class NavigationTests(unittest.TestCase):
 class SoleWriterTests(unittest.TestCase):
     def test_queued_motion_rejected_by_final_guard_but_stop_can_write(self):
         from pymavlink.dialects.v20 import ardupilotmega as mavlink
-        from deployment.simulation_runtime import SimulationRuntime
-        from runtime.simulation_profile import SimulationProfile
-        from vehicles.rover.ardupilot_commands import ArduRoverCommandTranslator
+        from vehicle_autonomy.app.bootstrap.simulation_runtime import SimulationRuntime
+        from vehicle_autonomy.app.bootstrap.simulation_profile import SimulationProfile
+        from vehicle_autonomy.vehicles.rover.ardupilot_commands import ArduRoverCommandTranslator
         clock, transport = helpers.Clock(),helpers.Transport()
         fault = [None]
         profile=SimulationProfile.load("simulation/profiles/rover.toml")

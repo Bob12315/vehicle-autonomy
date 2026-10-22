@@ -1,11 +1,11 @@
 import unittest
 from datetime import datetime,timezone
 from dataclasses import replace
-from contracts.core.geometry import Transform3,Quaternion,Vector3
-from contracts.core.time import TimePoint
-from contracts.core.quality import QualityState
-from sensors.simulation.objects import ObjectCalibration,ObjectProjector
-from world_model.service import WorldModel,FreshnessLimits
+from vehicle_autonomy.contracts.core.geometry import Transform3,Quaternion,Vector3
+from vehicle_autonomy.contracts.core.time import TimePoint
+from vehicle_autonomy.contracts.core.quality import QualityState
+from vehicle_autonomy.world.sensors.simulation.objects import ObjectCalibration,ObjectProjector
+from vehicle_autonomy.world.model.service import WorldModel,FreshnessLimits
 
 class SimObjectTests(unittest.TestCase):
     def setUp(self):
@@ -40,7 +40,7 @@ class SimObjectTests(unittest.TestCase):
         self.assertEqual(self.projector.error,'simulation_clock_skew')
 
     def test_clock_pair_mapping_slow_simulation_and_delay_without_extrapolation(self):
-        from sensors.simulation.objects import GazeboClockBridge
+        from vehicle_autonomy.world.sensors.simulation.objects import GazeboClockBridge
         bridge=GazeboClockBridge();bridge.ingest(0,0,100)
         bridge.ingest(50,100,200)
         self.assertEqual(bridge.capture(25),150)

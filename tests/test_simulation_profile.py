@@ -5,8 +5,8 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from core.control_authority import ControlAuthority
-from runtime.simulation_profile import SimulationProfile
+from vehicle_autonomy.engine.control.control_authority import ControlAuthority
+from vehicle_autonomy.app.bootstrap.simulation_profile import SimulationProfile
 
 
 ROOT = Path(__file__).resolve().parents[1]

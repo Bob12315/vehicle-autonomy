@@ -7,7 +7,7 @@
 - ROS 无关的 MapContext、PlanRequest、PathCandidate、VerifiedPath；保留源地图内容/版本、Frame epoch 和采集时间。
 - ReadOnlyPlanningService：输入预检、固定地图规划、身份/端点/整段碰撞检查、截止和返回前地图复核。
 - Nav2 独立进程/namespace/地图/TF，实际 native Planner Server 生命周期、Costmap 一致性检查及所属进程组清理。
-- `python -m app.plan`：显式记录地图或只读在线地图，输出 `executable=false`；未创建 VehicleRuntime、Mission、Action、Effect 或车辆连接。
+- `python -m vehicle_autonomy.app.planning`：显式记录地图或只读在线地图，输出 `executable=false`；未创建 VehicleRuntime、Mission、Action、Effect 或车辆连接。
 - P18 记录地图数值 fixture 与可重复运行的绕墙、拒绝、原点旋转、实际地图和在线 App 验收。
 
 安装、完整命令、碰撞策略和来源语义见 [运行说明](../nav2_planning.md)。
@@ -24,7 +24,7 @@
 | 旋转/平移原点 | **PASS**；局部请求转换并返回原 map Frame，独立 oracle 通过。 |
 | P18 实际记录图 | **PASS**；`(0,0)→(1.9,3.5)` 约 **4.287 m / 71 点**，独立 oracle 检查 534 个样本。 |
 | 不安全/保守目标 | **PASS**；`(2.3,3.3)` 输入预检 INVALID_GOAL；`(2,3.5)` 在更保守配置网格中被真实 Nav2 拒绝（原生 206）。 |
-| 公开 CLI | **PASS**；`python -m app.plan` 的记录图结果带完整来源且 executable=false。 |
+| 公开 CLI | **PASS**；`python -m vehicle_autonomy.app.planning` 的记录图结果带完整来源且 executable=false。 |
 | 超时 | **PASS**；0.7 s 截止，确认原生 Planner 已启动，拒绝迟到结果并释放整个所属进程组。 |
 | 在线 App→SLAM→Nav2 | **PASS**；`(0,0)→(1,0)` 约 **1 m / 21 点**，live_map 时间/依赖检查与独立 oracle 通过。 |
 | 在线只读边界 | **PASS**；双 SEND=false、armed=false、task=null，未创建任务/运动 Effect。 |

@@ -1,8 +1,8 @@
 import json
 import unittest
 
-from intelligence.proposals import MissionProposal, LlmAdapter
-from application.proposals import ProposalService
+from vehicle_autonomy.autonomy.intelligence.proposals import MissionProposal, LlmAdapter
+from vehicle_autonomy.app.mission_designer.proposals import ProposalService
 
 
 class Application:

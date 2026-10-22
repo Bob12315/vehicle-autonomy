@@ -8,8 +8,8 @@ import threading
 import unittest
 from uuid import uuid4
 
-from application.operator_service import OperatorService
-from web_ui.server import ConsoleServer, load_token
+from vehicle_autonomy.app.operator.service import OperatorService
+from vehicle_autonomy.app.web.server import ConsoleServer, load_token
 from tests.test_llm_proposals import Application
 
 
@@ -90,7 +90,7 @@ class WebTests(unittest.TestCase):
 
     def test_design_approval_uses_authenticated_idempotent_application_boundary(self):
         from tests.test_task_designs import document
-        from intelligence.designs import MissionDesign
+        from vehicle_autonomy.autonomy.intelligence.designs import MissionDesign
         class Backend:
             def __init__(self):self.starts=[]
             def handle(self,operation,payload):
@@ -115,7 +115,7 @@ class WebTests(unittest.TestCase):
         self.assertEqual(self.call('/api/design/approve',payload)[0],409)
         self.assertEqual(len(backend.starts),1)
     def test_blocked_remote_llm_cannot_block_cancel_use_case(self):
-        from intelligence.proposals import MissionProposal
+        from vehicle_autonomy.autonomy.intelligence.proposals import MissionProposal
         entered,release=threading.Event(),threading.Event()
         class Model:
             def propose(self,*args):

@@ -9,12 +9,12 @@ import time
 from types import SimpleNamespace
 import unittest
 
-from application.navigation_goals import GoalCatalog,NavigationPolicy
-from application.planning import ReadOnlyPlanningService
-from contracts.core.time import TimePoint
-from deployment.goal_navigation import GoalNavigation
-from deployment.navigation_job import PlanningJob
-from planning.models import PathCandidate,PlanningError,Pose2D
+from vehicle_autonomy.autonomy.planning.goals import GoalCatalog,NavigationPolicy
+from vehicle_autonomy.autonomy.planning.service import ReadOnlyPlanningService
+from vehicle_autonomy.contracts.core.time import TimePoint
+from vehicle_autonomy.app.scenarios.goal_navigation import GoalNavigation
+from vehicle_autonomy.autonomy.planning.job import PlanningJob
+from vehicle_autonomy.autonomy.planning.models import PathCandidate,PlanningError,Pose2D
 from tests import test_path_following as nav_helpers
 
 

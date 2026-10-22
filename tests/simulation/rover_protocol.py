@@ -9,12 +9,12 @@ from pathlib import Path
 import time
 from uuid import uuid4
 
-from contracts.core.geometry import Pose3, Quaternion, Twist3, Vector3
-from contracts.effects.vehicle import ArmEffect, DisarmEffect, ModeEffect, PoseTargetEffect, StopMotionEffect, TwistTargetEffect
-from deployment.simulation_runtime import SimulationRuntime
+from vehicle_autonomy.contracts.core.geometry import Pose3, Quaternion, Twist3, Vector3
+from vehicle_autonomy.contracts.effects.vehicle import ArmEffect, DisarmEffect, ModeEffect, PoseTargetEffect, StopMotionEffect, TwistTargetEffect
+from vehicle_autonomy.app.bootstrap.simulation_runtime import SimulationRuntime
 from tests.simulation.oracle import GazeboTruthOracle
 from tests.simulation.launch import OwnedSimulation, ROOT, install_signal_cleanup
-from vehicles.rover.ardupilot_commands import ArduRoverCommandTranslator
+from vehicle_autonomy.vehicles.rover.ardupilot_commands import ArduRoverCommandTranslator
 
 
 def run(run_dir: Path, *, gazebo: bool = False, full: bool = False) -> dict:

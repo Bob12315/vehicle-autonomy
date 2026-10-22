@@ -75,7 +75,7 @@
 | --- | ---: | --- | --- |
 | Application 用例 | **75%** | 正式 App 状态/任务/取消/关闭、异步命名导航、锚点登记、Recipe 业务编排经实际进程与原安全链验收。 | 无 Web API、生产控制源仲裁、远程服务或 P26 长运行版本验收。 |
 | 具体 Applications / Missions | **75%** | 基本路线/CUADC/inspection；新增 A→B→HOME 地图巡检、有效观测记录、限速倒车、取消/目标消失清理。 | 真实业务、任意对象接近规划未验收；新根不导入历史代码。 |
-| App 进程入口 | **75%** | `app.main run/ctl` 支持本机白名单任务、有限 IPC、默认只读、重连新 epoch；显式可替换对象源/仿真载荷。 | 无 onboard/server 入口或生产车辆连接。 |
+| App 进程入口 | **75%** | `vehicle_autonomy.app.cli run/ctl` 支持本机白名单任务、有限 IPC、默认只读、重连新 epoch；显式可替换对象源/仿真载荷。 | 无 onboard/server 入口或生产车辆连接。 |
 | Deployment | **75%** | 共同车辆周期/会话/授权/停止；P25 显式匹配车型、实际 SDF、参数、规划/传感器/地图来源，版本和内容 SHA 可追溯，所属资源清理通过。 | P26 统一版本/长运行、真实同步/重连/制动及 onboard/server 部署未验收。 |
 | Gateway | **0%** | 仅有包占位。 | 无远程接入、链路监视和本地失联处置；只有远程部署需要。 |
 | Web UI | **75%（只读机载/有限仿真 API）** | 实际 ARM64 只读控制台、Bearer/CSRF/Host/Origin、操作审计、地图保存/预览、草稿航点、LLM 提案；见 [审计](HARDWARE_READY_AUDIT.md)。 | 无真实视频/点云接入验收、任意坐标运动或硬件控制；浏览器视觉验收阻塞。 |
@@ -96,7 +96,7 @@
 
 ## 验证边界
 
-历史 `final-unit.json` 为 177 项；2026-10-19 P18 为 190 项，P19 为 206 项，P20 最新全量单元测试为 **223 项通过，0 失败/错误/跳过**；另有 **5 项导航物理场景 PASS**，准确范围见 [P20](autonomy/phase-20.md)，未重跑整套 29 阶段或 Copter 物理任务。`python -m app.main status` 仍返回 `mission_scheduler=unwired`、`vehicle_connection=unwired`、`send_commands=false`，表示默认入口不连接车辆。历史模式/解锁见[记录](sitl_arm_mission.md)，车辆基础真值验收见[仿真审计](simulation/completion-audit.md)；均不替代实机运动、物理停止或服务器部署验收。
+历史 `final-unit.json` 为 177 项；2026-10-19 P18 为 190 项，P19 为 206 项，P20 最新全量单元测试为 **223 项通过，0 失败/错误/跳过**；另有 **5 项导航物理场景 PASS**，准确范围见 [P20](autonomy/phase-20.md)，未重跑整套 29 阶段或 Copter 物理任务。`python -m vehicle_autonomy.app.cli status` 仍返回 `mission_scheduler=unwired`、`vehicle_connection=unwired`、`send_commands=false`，表示默认入口不连接车辆。历史模式/解锁见[记录](sitl_arm_mission.md)，车辆基础真值验收见[仿真审计](simulation/completion-audit.md)；均不替代实机运动、物理停止或服务器部署验收。
 
 更新本文时应同时更新基线提交、运行测试、模块证据和未完成项。若某模块只因新增文件而没有达到更高档位的验证要求，进度分档不应上调。
 

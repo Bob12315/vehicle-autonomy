@@ -7,7 +7,7 @@
 ```text
 Gazebo 实际激光 → ROS 2 / SLAM Toolbox → MappingInput → WorldSnapshot.map
                                              ↓
-App 公开 status + 独立 app.plan → Nav2 → executable=false 的几何路径文件
+App 公开 status + 独立 vehicle_autonomy.app.planning → Nav2 → executable=false 的几何路径文件
                                              ↓
 显式 start follow_path → 路径准入 / 帧绑定 / 重新校验
                                              ↓
@@ -49,7 +49,7 @@ timeout_ns = 70000000000
 配置只在启动时加载。超时允许 1–70 s，配置变更需要重启。启动 App 时，路径文件可以尚未生成：
 
 ```bash
-python -m app.main run --profile rover_sim \
+python -m vehicle_autonomy.app.cli run --profile rover_sim \
   --config /absolute/path/rover-profile.toml \
   --control-socket /absolute/path/app.sock \
   --ros2-mapping-config /absolute/path/mapping.toml \
@@ -59,7 +59,7 @@ python -m app.main run --profile rover_sim \
 App 空闲时双 SEND 仍关闭。等待 READY、原点检查通过、45 s 仿真预热结束、在线地图有效，然后查询：
 
 ```bash
-python -m app.main ctl --profile rover_sim \
+python -m vehicle_autonomy.app.cli ctl --profile rover_sim \
   --control-socket /absolute/path/app.sock status
 ```
 
@@ -68,7 +68,7 @@ python -m app.main ctl --profile rover_sim \
 在另一个进程中运行 P19 只读规划，替换下例中的起终点为当前地图中的明确数值：
 
 ```bash
-python -m app.plan --mapping-config /absolute/path/mapping.toml \
+python -m vehicle_autonomy.app.planning --mapping-config /absolute/path/mapping.toml \
   --control-socket /absolute/path/app.sock --frame map \
   --start 0.25 0.0 --goal 0.8 2.0 --clearance 0.95 \
   --output /absolute/path/live-plan.json
@@ -77,7 +77,7 @@ python -m app.plan --mapping-config /absolute/path/mapping.toml \
 这组坐标仅是验收场景示例；其他地图可能拒绝。成功响应仍标记 `executable=false`，只代表几何结果。文件本身不授予车辆权限。生成后须在原规划截止前显式启动：
 
 ```bash
-python -m app.main ctl --profile rover_sim \
+python -m vehicle_autonomy.app.cli ctl --profile rover_sim \
   --control-socket /absolute/path/app.sock start --mission follow_path
 ```
 

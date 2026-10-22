@@ -6,7 +6,7 @@ V1: target architecture](framework_v1.md).
 
 ## Explicit onboard diagnostics and operator console (2026-10-21)
 
-`app.hardware` composes a separate `HardwareReadOnlyRuntime`, bounded sensor
+`vehicle_autonomy.app.bootstrap.hardware` composes a separate `HardwareReadOnlyRuntime`, bounded sensor
 workers and receive-only Rover telemetry. It constructs no VehicleCommandPort,
 ControlAuthority grant or MAVLink sender. Unknown serial/camera/lidar sources
 remain null; capture time and physical Stop remain unknown. The controlled
@@ -14,7 +14,7 @@ hardware profile is rejected before opening devices. Python 3.10 uses an
 isolated tomli backport; framework Core and frozen foundation contracts are
 unchanged.
 
-`app.web` injects the existing Unix Application client into OperatorService.
+`vehicle_autonomy.app.web.cli` injects the existing Unix Application client into OperatorService.
 The HTTP listener is loopback-only with a private Bearer token, custom CSRF
 header, Host/Origin checks, bounded workers/requests, operation audit and
 non-evicting mutation IDs. Session-checked start is evaluated inside one
@@ -93,30 +93,33 @@ Explicit Rover HOLD diagnostic -> VehicleExecution -> ArduPilotCommandPort
                               -> MAVLink codec -> serial byte transport -> USB controller
 ```
 
-`contracts/` contains shared, vehicle independent data and ports, including the
-P1 time, geometry, observation, vehicle state, localization, world snapshot,
-typed effect, and vehicle command contracts. `core/`
-implements Action registration, Mission compilation/runtime, TransformTree,
-the P4 offline control boundary, and the older demonstration Execution
-gateway. `application/` exposes use cases without a hardware port. `app/`
-contains the disconnected status CLI and explicit loopback SITL entries.
-`sensors/`, `vehicles/`, `localization/`, and
-`world_model/` contain P2 offline fake sources, a pure reported-pose projection,
-and a World Model that publishes immutable snapshots. `vehicles/multirotor/`
-normalizes received ArduPilot telemetry and translates approved commands;
-`protocols/mavlink/` packs/parses messages; `infrastructure/transports/` owns
-only TCP/serial byte I/O. The P5 `ArduPilotCommandPort` is the sole writer in
-these explicit compositions. It holds the authority lock across the final
-fence and transport write, and the session receiver handles heartbeat, ACK and
-state observations.
+The single installable source root is `src/vehicle_autonomy/`. `contracts/`
+contains the unchanged time, geometry, state, observation and Effect contracts.
+`engine/action` and `engine/mission` own registration and execution lifecycle;
+`engine/control` owns authority, execution and Safety. Concrete behaviors live in
+`actions/`, including the original SITL Mode Action. `world/` contains sensors,
+perception, localization, maps, environment, transforms and immutable WorldModel
+publication. `autonomy/` contains planning, guidance and intelligence.
+`app/` owns CLI/API, operator use cases, mission design, scenarios, Web and
+explicit runtime bootstrap. There is no parallel legacy implementation.
+
+`vehicles/ardupilot/` owns the shared session, telemetry base, fenced command
+port, MAVLink codec and byte transports; `vehicles/copter/` and `vehicles/rover/`
+retain vehicle-specific restrictions and translation. The shared translator
+retains its original Copter default and Rover subclass behavior; relocation
+adds no new command support. The sole writer still holds the authority lock
+across the final fence and transport write. Resource data lives in root
+`configs/` and `simulation/`, or the installed wheel's resource set.
+Optional ROS code remains deferred to explicit processes.
+
 `ArduPilotSession` requires an expected MAVLink vehicle type and ArduPilot
 autopilot heartbeat before granting a link session. Separate narrow USB
 diagnostics expose only Rover HOLD-to-HOLD or Copter STABILIZE-to-STABILIZE;
 neither exposes arm, takeoff, or motion. Separate bare-controller bench
 translators limit requests to STABILIZE/ACRO modes or Arm/Disarm/STABILIZE.
-`deployment/CopterCycleDriver` connects receive, P4 deadman, and queue drain
+`app/bootstrap/copter_cycle.py` connects receive, P4 deadman, and queue drain
 when explicitly scheduled by a caller; the CLI does not schedule it.
-`deployment/SitlRuntime` is the P6 single-process scheduler for an explicit
+`app/bootstrap/sitl_runtime.py` is the P6 single-process scheduler for an explicit
 `run-sitl` CLI invocation. It validates the loopback-only profile before
 connecting, publishes a WorldSnapshot each cycle, runs one unarmed Mode Action,
 and maps Effect IDs to command statuses. A final write guard rechecks the
@@ -180,7 +183,7 @@ was restored and reboot verified. No physical output or flight was tested.
 
 ## Dual-vehicle simulation composition
 
-`deployment/SimulationRuntime` shares Execution, Authority, codec, session and
+`app/bootstrap/simulation_runtime.py` shares Execution, Authority, codec, session and
 the sole command port between Copter and Rover. Vehicle differences are the
 injected translator, reported-state adapter, profile and explicit safety
 policy. Rover projects MAVLink GPS global origin/state into bounded local ENU
@@ -210,7 +213,7 @@ manifests and fails on missing evidence or cleanup failure. See
 
 ## P9 application process
 
-`app.main run` composes a caller-scheduled `SimulationRuntime` and Typed
+`vehicle_autonomy.app.cli run` composes a caller-scheduled `SimulationRuntime` and Typed
 `MissionRuntime` in one local loop. Unix-domain IPC exposes only status,
 registered mission start, cancel and shutdown. The `disarmed_mode` catalog
 contains Copter GUIDED and Rover HOLD, and never accepts client-provided
@@ -279,7 +282,7 @@ P16 hardware motion remain unvalidated; hardware work is deferred.
 
 An explicitly selected Rover simulation can load `--ros2-mapping-config`.
 Gazebo lidar and simulation clock cross a one-way `ros_gz_bridge`; a separate
-`integrations.ros2.mapping_node` reads only the public Application status use
+`vehicle_autonomy.world.mapping.ros2_node` reads only the public Application status use
 case to publish telemetry odometry TF and synchronized scans. SLAM Toolbox owns
 `map -> odom`; the sidecar owns `odom -> base_link` and the explicit laser mount.
 No ROS subscriber can issue a vehicle command. Mission, Effect, authorization,
@@ -302,7 +305,7 @@ compositions retain the limitation. See the [mapping guide](ros2_mapping.md),
 
 ## P19 read-only Nav2 planning
 
-`app.plan` is an explicit independent read-only composition. It accepts a
+`vehicle_autonomy.app.planning` is an explicit independent read-only composition. It accepts a
 content-addressed recorded map, or queries the existing idle Rover App's
 public status and P18 MappingInput. The ROS-free `ReadOnlyPlanningService`
 pins map content, source/frame epochs and source capture time; verifies

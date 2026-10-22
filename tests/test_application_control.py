@@ -7,7 +7,7 @@ import sys
 import tempfile
 import time
 import unittest
-from app.control import ControlServer, request
+from vehicle_autonomy.app.api.control import ControlServer, request
 
 
 class Service:
@@ -60,7 +60,7 @@ class ControlTests(unittest.TestCase):
                 port = listener.getsockname()[1]
             source = Path("simulation/profiles/copter.toml").read_text()
             config.write_text(source.replace("port = 5760", f"port = {port}"))
-            process = subprocess.Popen([sys.executable, "-m", "app.main", "run", "--profile", "copter_sim",
+            process = subprocess.Popen([sys.executable, "-m", "vehicle_autonomy.app.cli", "run", "--profile", "copter_sim",
                                        "--config", str(config), "--control-socket", str(path)],
                                       stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
             try:
@@ -80,7 +80,7 @@ class ControlTests(unittest.TestCase):
                     stalled.connect(str(path))
                     stalled.sendall(b'{')
                     self.assertTrue(request(path, "status")["ok"])
-                cli = subprocess.run([sys.executable, "-m", "app.main", "ctl", "--profile", "copter_sim",
+                cli = subprocess.run([sys.executable, "-m", "vehicle_autonomy.app.cli", "ctl", "--profile", "copter_sim",
                     "--control-socket", str(path), "status"], capture_output=True, text=True, timeout=4)
                 self.assertEqual(cli.returncode, 0, cli.stderr)
                 self.assertTrue(json.loads(cli.stdout)["ok"])

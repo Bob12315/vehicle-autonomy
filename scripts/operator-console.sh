@@ -7,4 +7,4 @@ cd "$vaf_install_root/current"
 exec ./scripts/onboard.sh "$@" \
   --state-dir "$HOME/.local/state/vehicle-autonomy-connected" \
   --config "$vaf_install_root/config/hardware-readonly.json" \
-  --llm-config config/llm.server-tunnel.json
+  --llm-config configs/llm.server-tunnel.json

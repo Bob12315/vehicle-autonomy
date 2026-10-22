@@ -18,15 +18,15 @@
 
 ## 1. 已核实基线与差异
 
-唯一新仓库：`/home/level6/vehicle-autonomy-framework`。审计时 HEAD 为 `2dc2cd0cd995ac65d9981c1f9c413a7b97ce26f2`，工作区干净；附件所述 `f0021a93668603f4a27b6931ca0c1e188d5d994f` 为较早基线，后续从当前 HEAD 继续。`python -m unittest discover -s tests -q`：**81 tests，0 failures，0 skips**，约 0.48 秒。`python -m app.main status` 报告 `mission_scheduler=unwired`、`vehicle_connection=unwired`、`send_commands=false`。这是默认入口的安全状态；显式 P6 入口已可组成 localhost SITL 小任务，不能把默认状态解释为 P6 完全不存在。
+唯一新仓库：`/home/level6/vehicle-autonomy-framework`。审计时 HEAD 为 `2dc2cd0cd995ac65d9981c1f9c413a7b97ce26f2`，工作区干净；附件所述 `f0021a93668603f4a27b6931ca0c1e188d5d994f` 为较早基线，后续从当前 HEAD 继续。`python -m unittest discover -s tests -q`：**81 tests，0 failures，0 skips**，约 0.48 秒。`python -m vehicle_autonomy.app.cli status` 报告 `mission_scheduler=unwired`、`vehicle_connection=unwired`、`send_commands=false`。这是默认入口的安全状态；显式 P6 入口已可组成 localhost SITL 小任务，不能把默认状态解释为 P6 完全不存在。
 
 | 能力 | 实际源码/证据 | Simulation Complete 缺口 |
 | --- | --- | --- |
-| 合同、状态、决策 | `contracts/`、`application/state_chain.py`、`world_model/service.py`、`core/mission_runtime.py`、`core/transform.py`；现有单元测试 | 在长期运行与真实仿真时钟下验证完整性和新鲜度；不随意改冻结合同 |
-| 控制边界 | `core/vehicle_execution.py`、`core/vehicle_safety.py`、`core/control_authority.py`；`tests/test_p4_control.py` | Deadman 须由调度器持续 tick；当前 Stop 在授权失效后可能无法写出，只能报告未确认，须设计安全降级和运动停止验收 |
-| P5 Copter | `vehicles/multirotor/ardupilot_commands.py`、`mavlink_port.py`、`session.py`、`mavlink_state.py`、`protocols/mavlink/codec.py` | 翻译器覆盖更多命令的存在不等于 Gazebo 飞行验证；检查模式、frame、ACK 与状态完成语义 |
-| P6 入口 | `deployment/sitl_runtime.py`、`runtime/sitl.py`、`runtime/sitl.toml`、`runtime/sitl_arm.toml`、`app/main.py`；`tests/test_p6_sitl_runtime.py`、`tests/test_sitl_arm_mission.py` | 当前 `SitlRuntime.start_mission()` 固定模式或 Arm/Disarm，小范围 profile 硬编码 Copter、GUIDED 与 mode ID 4；没有可复用双车持续运行任务/重连/运动场景 |
-| Rover | `vehicles/rover/diagnostic.py` 仅受限 HOLD 诊断 | 完整 translator、状态/会话装配、模式映射、运动 Safety、仿真控制均缺 |
+| 合同、状态、决策 | `src/vehicle_autonomy/contracts/`、`src/vehicle_autonomy/world/model/state_chain.py`、`src/vehicle_autonomy/world/model/service.py`、`src/vehicle_autonomy/engine/mission/runtime.py`、`src/vehicle_autonomy/world/transform/tree.py`；现有单元测试 | 在长期运行与真实仿真时钟下验证完整性和新鲜度；不随意改冻结合同 |
+| 控制边界 | `src/vehicle_autonomy/engine/control/vehicle_execution.py`、`src/vehicle_autonomy/engine/control/vehicle_safety.py`、`src/vehicle_autonomy/engine/control/control_authority.py`；`tests/test_p4_control.py` | Deadman 须由调度器持续 tick；当前 Stop 在授权失效后可能无法写出，只能报告未确认，须设计安全降级和运动停止验收 |
+| P5 Copter | `src/vehicle_autonomy/vehicles/ardupilot/commands.py`、`mavlink_port.py`、`session.py`、`mavlink_state.py`、`src/vehicle_autonomy/vehicles/ardupilot/mavlink/codec.py` | 翻译器覆盖更多命令的存在不等于 Gazebo 飞行验证；检查模式、frame、ACK 与状态完成语义 |
+| P6 入口 | `src/vehicle_autonomy/app/bootstrap/sitl_runtime.py`、`src/vehicle_autonomy/app/bootstrap/sitl.py`、`configs/sitl.toml`、`configs/sitl_arm.toml`、`src/vehicle_autonomy/app/cli.py`；`tests/test_p6_sitl_runtime.py`、`tests/test_sitl_arm_mission.py` | 当前 `SitlRuntime.start_mission()` 固定模式或 Arm/Disarm，小范围 profile 硬编码 Copter、GUIDED 与 mode ID 4；没有可复用双车持续运行任务/重连/运动场景 |
+| Rover | `src/vehicle_autonomy/vehicles/rover/diagnostic.py` 仅受限 HOLD 诊断 | 完整 translator、状态/会话装配、模式映射、运动 Safety、仿真控制均缺 |
 | 验收 | P6/SITL 手工脚本和 81 个单元/局部测试 | 没有 Gazebo 独立真值 Oracle、无人值守启动器、两车物理运动与系统故障矩阵 |
 
 环境已核实：Python 3.12.3、`pymavlink 2.4.49`、`pyserial 3.5`；`/home/level6/ardupilot` 为官方仓库本地 HEAD `b5fbe26515`，`Tools/autotest/sim_vehicle.py` 可用，`build/sitl/bin/arducopter` 已有，**`build/sitl/bin/ardurover` 尚无**。`gz sim --version` 为 **Gazebo Sim 8.15.0**；`/home/level6/gz_ws/src/ardupilot_gazebo` 本地 HEAD `3ec5142`，来源为本地 fork，`build/libArduPilotPlugin.so` 存在。已配置 `GZ_SIM_RESOURCE_PATH` 和 `GZ_SIM_SYSTEM_PLUGIN_PATH`。现有 `worlds/iris_runway.sdf` 的 world 名称是 `iris_runway`，包含 `model://iris_with_gimbal`，模型插件 `fdm_port_in=9002`；目录中没有符合目标的 Rover model/world。本次未启动 Gazebo 或做运动验收，也未验证插件加载时的 ABI/资源解析；这些是 Phase 0 的实测门槛。审计时 5760、5762、14550、14551、9002、9003 无本任务进程监听。
@@ -39,7 +39,7 @@
 
 每次启动前 `git status --short`，保留用户未提交内容。自有进程单独 process group 与唯一 PID/端口清单，只停止自己启动的进程，不 `pkill` 宽匹配，不重启/关机。仿真运行产物写入项目忽略的 `artifacts/simulation/<时间戳>/`，记录 `manifest.json`（Git SHA、ArduPilot/Gazebo/plugin SHA/版本、world/model、参数、端口、命令、进程、开始/结束时间和 exit codes）、stdout/stderr、事件 JSONL、MAVLink/VehicleState 摘要、Gazebo truth CSV/JSONL、断言报告。日志大小设上限并保留失败片段；不将大日志提交 Git。失败后先保存证据，再清理进程。
 
-冻结合同（`contracts/`）原则上不动；确实无法表达必要语义时，先在阶段记录中写明阻塞、最小变更、兼容性与替代方案，补对应合同测试，**独立 commit**，再继续阶段实现。禁止因为方便改大范围合同。既有失败测试不得删除/弱化，核心验收不得 `skip`/`xfail`，不许通过放宽阈值掩盖失败。
+冻结合同（`src/vehicle_autonomy/contracts/`）原则上不动；确实无法表达必要语义时，先在阶段记录中写明阻塞、最小变更、兼容性与替代方案，补对应合同测试，**独立 commit**，再继续阶段实现。禁止因为方便改大范围合同。既有失败测试不得删除/弱化，核心验收不得 `skip`/`xfail`，不许通过放宽阈值掩盖失败。
 
 ## 3. 统一测试 Oracle 与数值门槛
 
@@ -53,11 +53,11 @@ Phase 1 应将阈值写入只读的场景配置并附实测基线；初始建议
 
 - **Goal**：固化可复现基线并实际验证 Gazebo/SITL 最小连通性；本阶段不做框架功能改造。
 - **Existing evidence**：上述 81 tests、Copter SITL 二进制、Gazebo 8.15.0 和 Iris world/plugin；Rover SITL binary/model 缺失。当前工作区干净。
-- **Files/modules likely involved**：`README.md`、`docs/architecture.md`、`docs/v1_progress.md`、`docs/p6_runtime_integration_plan.md`、`runtime/sitl*.toml`、`tests/manual_p6_sitl.sh`；记录到 `docs/simulation/phase-0.md`。
+- **Files/modules likely involved**：`README.md`、`docs/architecture.md`、`docs/v1_progress.md`、`docs/p6_runtime_integration_plan.md`、`configs/sitl*.toml`、`tests/manual_p6_sitl.sh`；记录到 `docs/simulation/phase-0.md`。
 - **Required implementation**：只补审计记录与可复现环境清单；核对 Python 包、SITL 参数、Gazebo 插件依赖和 ABI、world/model 资源路径、端口与现有脚本。只读查看旧 CUADC 的 Gazebo 启动用法，禁止复制其任务进程。
 - **Forbidden shortcuts**：不因有 `.so` 就声称插件可用；不碰真实飞控；不改旧项目；不覆盖占用端口的外部进程。
 - **Tests to add**：环境 preflight 脚本/测试只检查工具、二进制、资源解析、端口及可启动性；不将缺少 Rover 文件误报为通过。
-- **Commands to run**：`git status --short`; `python -m unittest discover -s tests -q`; `python -m app.main status`; `gz sim --version`; `gz topic -l`; `ldd /home/level6/gz_ws/src/ardupilot_gazebo/build/libArduPilotPlugin.so`; `python /home/level6/ardupilot/Tools/autotest/sim_vehicle.py --help`。启动测试用自己的临时工作目录和进程组：`gz sim -s -r -v4 /home/level6/gz_ws/src/ardupilot_gazebo/worlds/iris_runway.sdf`；确认 world/pose topic 后结束自有进程。SITL 依本地 `sim_vehicle.py` 帮助选择 `--no-mavproxy --use-dir <临时目录>`，不要将构建/日志写入旧 CUADC。
+- **Commands to run**：`git status --short`; `python -m unittest discover -s tests -q`; `python -m vehicle_autonomy.app.cli status`; `gz sim --version`; `gz topic -l`; `ldd /home/level6/gz_ws/src/ardupilot_gazebo/build/libArduPilotPlugin.so`; `python /home/level6/ardupilot/Tools/autotest/sim_vehicle.py --help`。启动测试用自己的临时工作目录和进程组：`gz sim -s -r -v4 /home/level6/gz_ws/src/ardupilot_gazebo/worlds/iris_runway.sdf`；确认 world/pose topic 后结束自有进程。SITL 依本地 `sim_vehicle.py` 帮助选择 `--no-mavproxy --use-dir <临时目录>`，不要将构建/日志写入旧 CUADC。
 - **Simulation scenario**：Iris world 启动、插件加载、SITL Copter JSON 握手、只读遥测及 truth pose 采样；不解锁。
 - **Acceptance criteria**：记录真实命令/版本/port/topic/模型实体；无插件加载错误，SITL 握手和 pose 实际更新；若无法启动，保留诊断，修复后重跑。
 - **Failure diagnostics**：Gazebo stderr、`ldd`、`gz topic -l`、`ss -ltnup`、SITL stdout/参数、资源路径、Gazebo server exit code。
@@ -68,7 +68,7 @@ Phase 1 应将阈值写入只读的场景配置并附实测基线；初始建议
 
 - **Goal**：冻结两车命令/模式、运行拓扑、Safety、时钟、Oracle、场景和 DoD。
 - **Existing evidence**：P6 profile 只许 Copter GUIDED/mode ID 4；`SafetyLimits` 含必需高度字段；`ArduPilotCommandTranslator` 是 Copter 子集；Rover 只诊断 HOLD。
-- **Files/modules likely involved**：新增 `docs/simulation/scope-v1.md`、建议 `runtime/simulation_copter.toml`、`runtime/simulation_rover.toml`、`tests/simulation/scenarios/*.json`；若需修改 `runtime/sitl.py`，必须兼容现有 P6 入口。
+- **Files/modules likely involved**：新增 `docs/simulation/scope-v1.md`、建议 `configs/simulation_copter.toml`、`configs/simulation_rover.toml`、`tests/simulation/scenarios/*.json`；若需修改 `src/vehicle_autonomy/app/bootstrap/sitl.py`，必须兼容现有 P6 入口。
 - **Required implementation**：按车辆列出 effect→ArduPilot 模式/MAVLink 消息→结果完成条件；核对 Copter GUIDED/LOITER/RTL/LAND 与 Rover HOLD/GUIDED/手动或差速控制模式的**实际固件映射**，不得共享硬编码 mode ID。确定 Rover 前后/转向/pivot 采用原有 `TwistTargetEffect` 的车体 FLU 语义、流式频率与 Stop 零命令；若 ArduPilot Rover JSON/Guided 支持位置目标，则把 Goto 纳入正式场景，否则保存协议试验证据并显式拒绝。冻结 loopback TCP、单车每次运行、宿主单调时钟与 Gazebo sim time 的用途、port 分配、地理/局部坐标转换、系统+Action 授权入口、Copter/Rover 专属 Safety 数值、阈值和超时。
 - **Forbidden shortcuts**：不能为 Rover 借用 Copter 模式 ID、以旧 6WD 模型满足目标、用 ACK 替代位姿判定；不能默许“可选 Goto”而不裁决。
 - **Tests to add**：profile 严格校验、未知车辆/模式/帧拒绝、默认 SEND 关闭、两车配置边界与阈值一致性。
@@ -83,11 +83,11 @@ Phase 1 应将阈值写入只读的场景配置并附实测基线；初始建议
 
 - **Goal**：把现有 P6 单线程循环演进为可配置、可连续运行、可重连的双车共用编排，不改变默认断连状态。
 - **Existing evidence**：`SitlRuntime.cycle()` 已执行 RX→WorldModel→Mission tick→Execution→write→结果；`start_mission()` 仍写死 mode/arm 步骤；`ArduPilotSession` 断链会清会话；`VehicleExecution.tick()` 需调用者调度。
-- **Files/modules likely involved**：`deployment/sitl_runtime.py`（提取共用循环，保留 P6 外部行为）、`deployment/copter_cycle.py`、`application/mission_service.py`、`runtime/sitl.py`、`app/main.py`、`core/vehicle_execution.py`、`vehicles/multirotor/session.py`、`tests/test_p6_sitl_runtime.py`，新建通用 composition 与 `tests/test_simulation_runtime.py`。
-- **Required implementation**：显式 startup/connect/warmup、profile 选择 vehicle plugin、周期 RX/state/tick/dispatch/TX/ACK/result、任务队列或标准控制输入、生命周期状态、信号/异常处理、取消与关闭。每次运动发送前查最新 state/心跳；断链立即禁用双 SEND、撤销 Lease、让流式命令终止并记录 `UNCONFIRMED`，关闭旧 socket；重连使用新 transport/codec/session，须新 run/Action 授权且不带旧队列。区分“Stop 已请求”“零速度已写”“状态/真值确认停止”；授权已失效或失联时禁止虚假补发，记录未确认，重连后只允许新的显式恢复流程。周期 deadline/写队列/ACK 超时必须可观测。保留 `app.main status` 零连接与 P6 旧入口回归。
+- **Files/modules likely involved**：`src/vehicle_autonomy/app/bootstrap/sitl_runtime.py`（提取共用循环，保留 P6 外部行为）、`src/vehicle_autonomy/app/bootstrap/copter_cycle.py`、`src/vehicle_autonomy/app/api/mission_service.py`、`src/vehicle_autonomy/app/bootstrap/sitl.py`、`src/vehicle_autonomy/app/cli.py`、`src/vehicle_autonomy/engine/control/vehicle_execution.py`、`src/vehicle_autonomy/vehicles/ardupilot/session.py`、`tests/test_p6_sitl_runtime.py`，新建通用 composition 与 `tests/test_simulation_runtime.py`。
+- **Required implementation**：显式 startup/connect/warmup、profile 选择 vehicle plugin、周期 RX/state/tick/dispatch/TX/ACK/result、任务队列或标准控制输入、生命周期状态、信号/异常处理、取消与关闭。每次运动发送前查最新 state/心跳；断链立即禁用双 SEND、撤销 Lease、让流式命令终止并记录 `UNCONFIRMED`，关闭旧 socket；重连使用新 transport/codec/session，须新 run/Action 授权且不带旧队列。区分“Stop 已请求”“零速度已写”“状态/真值确认停止”；授权已失效或失联时禁止虚假补发，记录未确认，重连后只允许新的显式恢复流程。周期 deadline/写队列/ACK 超时必须可观测。保留 `vehicle_autonomy.app.cli status` 零连接与 P6 旧入口回归。
 - **Forbidden shortcuts**：Mission/Action 不直接引用 VehicleCommandPort；不在断链后复用旧 lease/session；不靠 Gazebo truth 驱动恢复；不通过延长 TTL 躲 timeout。
 - **Tests to add**：fake clock/transport 的多周期状态新鲜度、单次/流式 Effect、ACK 映射、lease 轮换、重复/过期/取消、RX 异常、断线重连、旧队列隔离、deadman、关闭动作与无授权零写出。
-- **Commands to run**：`python -m unittest discover -s tests -q`; `python -m app.main status`; P6 手工或自动 localhost Copter mode/arm 回归（使用自有 SITL 进程，命令见 Phase 0）。
+- **Commands to run**：`python -m unittest discover -s tests -q`; `python -m vehicle_autonomy.app.cli status`; P6 手工或自动 localhost Copter mode/arm 回归（使用自有 SITL 进程，命令见 Phase 0）。
 - **Simulation scenario**：Copter 空载连接→断开框架 TCP→恢复 SITL→只读状态恢复；重连前不发旧 mode 命令；保留 P6 mode/arm 任务。
 - **Acceptance criteria**：调度周期有上界，状态持续更新；重连 Session ID 改变；旧 run/lease/command 不写出；stop/取消/关闭结果准确；旧 81 tests 无退化。
 - **Failure diagnostics**：周期耗时直方图、状态年龄、会话/授权代际、queue/command/effect IDs、TCP 错误、最终 effect phase。
@@ -98,7 +98,7 @@ Phase 1 应将阈值写入只读的场景配置并附实测基线；初始建议
 
 - **Goal**：用 ArduCopter SITL + Gazebo 完成全部 Copter 基础动作和独立物理验收。
 - **Existing evidence**：Iris world/model、已建插件、Copter SITL binary；现有 translator 支持 Arm/Disarm/Takeoff/Land/Mode/Pose/Twist/Stop 的编码，但运动未在 Gazebo 证明；`MavlinkCodec` 目前只编码 COMMAND_LONG 与 local setpoint。
-- **Files/modules likely involved**：`vehicles/multirotor/ardupilot_commands.py`、`mavlink_port.py`、`mavlink_state.py`、`protocols/mavlink/codec.py`、`deployment/`、`tests/simulation/oracle.py`、`tests/simulation/test_copter.py`、`runtime/simulation_copter.toml`。
+- **Files/modules likely involved**：`src/vehicle_autonomy/vehicles/ardupilot/commands.py`、`mavlink_port.py`、`mavlink_state.py`、`src/vehicle_autonomy/vehicles/ardupilot/mavlink/codec.py`、`deployment/`、`tests/simulation/oracle.py`、`tests/simulation/test_copter.py`、`configs/simulation_copter.toml`。
 - **Required implementation**：核对 ArduCopter 固件实际 GUIDED/LOITER/RTL/LAND 模式与 ACK/状态转换；补齐基于 Typed Effect 的 Takeoff→Hold→Goto→Velocity→Stop→RTL→Land→Disarm 编排，执行取消分支。Pose/Twist ENU/FLU→MAVLink NED/FRD 的目标和反馈必须与真值对齐；Goto、流式速度、Stop 要有持续刷新/超时/结果语义。用真值 Oracle 读取 `iris_runway` 的 `iris_with_gimbal` 物理模型 pose，记录状态、模式、armed 与实际高度/速度。若该 gimbal 模型带来无关障碍，可在新项目复制并精简为纯 Iris world，记录来源/许可证及原因，不修改外部插件仓库。
 - **Forbidden shortcuts**：不直接往 SITL 发测试控制命令，不用 Gazebo 位姿服务“搬运”模型，不只看 ACK，不把接受 setpoint 视为到达。
 - **Tests to add**：翻译/frame/mode/ACK 状态单元测试；自动 E2E：正常完整飞行、取消时 stop/land 策略、各门控拒绝、真值缺失失败。
@@ -112,8 +112,8 @@ Phase 1 应将阈值写入只读的场景配置并附实测基线；初始建议
 ## 8. Phase 4 — Rover Plugin
 
 - **Goal**：在共用 Runtime 下新增完整 ArduPilot Rover 车辆插件及差速运动语义。
-- **Existing evidence**：`vehicles/rover/diagnostic.py` 只验证 HOLD；Copter session 的 `expected_vehicle_type` 可配置但当前 composition 写死 `TYPE_QUADROTOR`；`SafetyLimits` 当前有 Copter 高度字段。
-- **Files/modules likely involved**：`vehicles/rover/` 新增 translator/adapter/plugin，`vehicles/multirotor/session.py`（若抽共享 session）、`protocols/mavlink/constants.py`、`core/vehicle_safety.py`、`deployment/`、`runtime/simulation_rover.toml`、`tests/test_rover_plugin.py`。
+- **Existing evidence**：`src/vehicle_autonomy/vehicles/rover/diagnostic.py` 只验证 HOLD；Copter session 的 `expected_vehicle_type` 可配置但当前 composition 写死 `TYPE_QUADROTOR`；`SafetyLimits` 当前有 Copter 高度字段。
+- **Files/modules likely involved**：`src/vehicle_autonomy/vehicles/rover/` 新增 translator/adapter/plugin，`src/vehicle_autonomy/vehicles/ardupilot/session.py`（若抽共享 session）、`src/vehicle_autonomy/vehicles/ardupilot/mavlink/constants.py`、`src/vehicle_autonomy/engine/control/vehicle_safety.py`、`deployment/`、`configs/simulation_rover.toml`、`tests/test_rover_plugin.py`。
 - **Required implementation**：先在 `/home/level6/ardupilot` 执行 `./waf configure --board sitl && ./waf rover` 生成 SITL Rover binary，构建产物仅落该仓库正常 build 路径，不碰旧 CUADC。核对 Rover HEARTBEAT 类型、HOLD/GUIDED/驾驶模式 ID、MAVLink 控制消息与 skid-steer 参数 `Tools/autotest/default_params/rover-skid.parm`。给 Rover 建独立 translator/mode table、车辆能力/Safety（平面边界、线/角速度、zero altitude 或容差、帧）、操作状态/速度反馈，映射前进/倒退/左右转/pivot 为车体线速度 x 与角速度 z 的带期限流式控制；按 SITL 实测协议选择消息编码。共用 Authority、Execution、Port、Session 和 Runtime，不复刻 Copter 控制栈。未知模式/车型/帧 fail closed。若通用 Safety 接口需支持车辆专属规则，优先增加注入式策略，合同确实受阻才走独立变更政策。
 - **Forbidden shortcuts**：不把 Copter mode ID 4 当 Rover GUIDED；不从 Actuator 绕过 MAVLink/Execution；不把二维速度检查取消；不修改冻结合同只为省事。
 - **Tests to add**：Rover 车型筛选、模式表、速度/角速度正负号、零速度 Stop、平面 Safety、唯一 writer/授权/超时、Copter 回归、Goto 支持或显式拒绝。
@@ -143,7 +143,7 @@ Phase 1 应将阈值写入只读的场景配置并附实测基线；初始建议
 
 - **Goal**：两车完成可重复的故障矩阵；注入点位于自有 transport/clock/进程代理和测试 harness，不能伪造真值。
 - **Existing evidence**：P4 有 TTL/门控/代际及 deadman 单元逻辑，P5 会话重置，P6 在断链时 fault；尚无系统级自动验证。
-- **Files/modules likely involved**：`tests/simulation/faults.py`、`tests/simulation/test_faults.py`、`core/vehicle_execution.py`、`vehicles/multirotor/session.py`、`vehicles/multirotor/mavlink_port.py`、`deployment/`。
+- **Files/modules likely involved**：`tests/simulation/faults.py`、`tests/simulation/test_faults.py`、`src/vehicle_autonomy/engine/control/vehicle_execution.py`、`src/vehicle_autonomy/vehicles/ardupilot/session.py`、`src/vehicle_autonomy/vehicles/ardupilot/command_port.py`、`deployment/`。
 - **Required implementation**：建立 TCP 透明代理用于丢/延 RX、ACK、TX 与断连；fake clock 用于纯单元时间故障，进程管理器仅重启自有 SITL/Runtime；记录注入时刻和所有命令 ID。故障后安全行为的“物理停住”只在链路可控时承诺；失联时真实运动未可确认，必须给出 `UNKNOWN/UNCONFIRMED`，后续恢复不得重放。
 - **Forbidden shortcuts**：不只测异常字符串；不把连接失败当 Stop 已成功；不复用旧授权；不关闭核心故障测试。
 - **Tests to add**：下表每项分别在 Copter/Rover 适用场景执行；纯逻辑层先单元，关键断线/运动中断在 Gazebo E2E。

@@ -1,4 +1,4 @@
-"""Deterministic fault matrix at the real runtime/codec/writer boundary."""
+"""Deterministic fault matrix at the real configs/codec/writer boundary."""
 
 from dataclasses import replace
 from datetime import datetime, timezone
@@ -7,17 +7,17 @@ import unittest
 
 from pymavlink.dialects.v20 import ardupilotmega as mav
 
-from contracts.core.geometry import Twist3, Vector3
-from contracts.core.primitives import SchemaVersion
-from contracts.core.time import TimePoint
-from contracts.effects.vehicle import ArmEffect, EffectEnvelope, ModeEffect, TwistTargetEffect
-from contracts.vehicle.command import CancelCommandRequest, CommandPhase
-from core.control_authority import ControlLease
-from deployment.simulation_runtime import SimulationRuntime
-from protocols.mavlink.codec import MavlinkCodec
-from runtime.simulation_profile import SimulationProfile
-from vehicles.multirotor.ardupilot_commands import ArduPilotCommandTranslator
-from vehicles.rover.ardupilot_commands import ArduRoverCommandTranslator
+from vehicle_autonomy.contracts.core.geometry import Twist3, Vector3
+from vehicle_autonomy.contracts.core.primitives import SchemaVersion
+from vehicle_autonomy.contracts.core.time import TimePoint
+from vehicle_autonomy.contracts.effects.vehicle import ArmEffect, EffectEnvelope, ModeEffect, TwistTargetEffect
+from vehicle_autonomy.contracts.vehicle.command import CancelCommandRequest, CommandPhase
+from vehicle_autonomy.engine.control.control_authority import ControlLease
+from vehicle_autonomy.app.bootstrap.simulation_runtime import SimulationRuntime
+from vehicle_autonomy.vehicles.ardupilot.mavlink.codec import MavlinkCodec
+from vehicle_autonomy.app.bootstrap.simulation_profile import SimulationProfile
+from vehicle_autonomy.vehicles.ardupilot.commands import ArduPilotCommandTranslator
+from vehicle_autonomy.vehicles.rover.ardupilot_commands import ArduRoverCommandTranslator
 
 
 ROOT = Path(__file__).resolve().parents[2]

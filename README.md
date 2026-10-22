@@ -4,6 +4,30 @@ Vehicle Autonomy Framework 是面向多旋翼、无人车、固定翼、VTOL 及
 
 完整的职责、数据流、依赖规则和目标包归属见 [V1 目标架构](docs/framework_v1.md)；时间、坐标、状态、Effect 和端口的冻结语义见 [V1 基础合同冻结规范](docs/foundation_contracts_v1.md)。这两份文档描述设计目标，不代表其中的组件已由当前代码实现。
 
+
+## 安装与七模块源码布局
+
+正式 Python 源码唯一位于 `src/vehicle_autonomy/`：`contracts`、`engine`、
+`actions`、`vehicles`、`world`、`autonomy`、`app`。配置在 `configs/`，仿真资源在
+`simulation/`；旧根包已移除。先在独立环境安装，再运行下文命令：
+
+```bash
+python3 -m venv --system-site-packages .venv
+source .venv/bin/activate
+python -m pip install -e '.[mavlink]' -r requirements-vision.txt
+vehicle-autonomy status
+vehicle-autonomy-hardware --check
+python -m unittest discover -s tests -v
+```
+
+`python -m vehicle_autonomy` 等价于 `vehicle-autonomy`。只读硬件、Web、规划、
+锚点与 supervisor 分别使用 `vehicle-autonomy-hardware`、`vehicle-autonomy-web`、
+`vehicle-autonomy-plan`、`vehicle-autonomy-anchor`、`vehicle-autonomy-onboard`。
+普通 wheel 同时携带配置/仿真资源和所需 ROS 启动脚本；源码安装从仓库定位资源，
+不依赖调用者的当前目录。显式外部资源集可通过 `VAF_RESOURCE_ROOT` 指定。
+相对用户输入和输出路径仍相对调用目录。完整路径变化及验证见
+[架构迁移报告](docs/ARCHITECTURE_MIGRATION_REPORT.md)。
+
 ## 当前实现
 
 根目录目前提供 P1 基础合同、P2 离线 World Model 状态链、P3 Typed Action/Mission 决策链、P4 控制边界、P5 ArduCopter/MAVLink/TCP 插件，以及 P6 本机 SITL 单进程模式任务运行组合。通用 TransformTree 求解静态/动态 Frame 关系。P5 已在内存传输、本机 Copter SITL 和已连接 Copter 飞控的受限 USB 模式诊断中验证；此前还完成 Rover 飞控的受限 USB HOLD 诊断。P6 将 Effect 经双 SEND、Lease、Safety 和唯一 writer 分派，并等待 ACK 与后续模式状态。新增显式机载只读部署、认证 Web 控制台和 LLM 提案适配；**尚无经过整车安全验收的生产运动连接**。
@@ -44,13 +68,13 @@ P6 的 localhost SITL 范围已完成；**当前暂缓真实飞控接入**。P5 
 车辆发送默认关闭。P5 命令端口在唯一字节写入点前重新检查系统 SEND、Action SEND、Lease、代际、会话和期限；断链时停止结果保持未确认。TCP/串口连接只能由调用方显式创建；显式 `run-sitl`/`run-sitl-arm` 和受控仿真脚本装配 localhost TCP 与专用 Safety，默认入口不连接车辆。旧演示网关仍使用旧 Effect 测试端口，不能据此宣称已支持实机飞行。
 
 ```bash
-python -m app.main status
+python -m vehicle_autonomy.app.cli status
 python -m unittest discover -s tests -v
 ```
 
-P6 的配置为 [runtime/sitl.toml](runtime/sitl.toml)，仅接受数值 loopback 地址和 ArduCopter 四旋翼。先单独启动本机 ArduCopter SITL 的 TCP 5760 端口，再运行 `python -m app.main run-sitl --config runtime/sitl.toml --allow-send`。省略 `--allow-send` 会连接并发布状态，但 ModeEffect 被授权边界拒绝，且不会写出车辆命令。可用 `tests/manual_p6_sitl.sh runtime/sitl.toml '<SITL 版本>'` 验收 ACK 与新心跳状态；版本参数由操作者报告，日志标明来源。P6 只请求一次未解锁 `GUIDED` 模式，不发解锁、起飞、运动或 StopMotion。
+P6 的配置为 [configs/sitl.toml](configs/sitl.toml)，仅接受数值 loopback 地址和 ArduCopter 四旋翼。先单独启动本机 ArduCopter SITL 的 TCP 5760 端口，再运行 `python -m vehicle_autonomy.app.cli run-sitl --config configs/sitl.toml --allow-send`。省略 `--allow-send` 会连接并发布状态，但 ModeEffect 被授权边界拒绝，且不会写出车辆命令。可用 `tests/manual_p6_sitl.sh configs/sitl.toml '<SITL 版本>'` 验收 ACK 与新心跳状态；版本参数由操作者报告，日志标明来源。P6 只请求一次未解锁 `GUIDED` 模式，不发解锁、起飞、运动或 StopMotion。
 
-另有独立的 **SITL 解锁验收任务**：`python -m app.main run-sitl-arm --allow-send --allow-arm` 使用 [解锁专用 profile](runtime/sitl_arm.toml)，依次确认 `GUIDED`、Arm 和 Disarm，最终回到未解锁。全新本机 SITL 的验证命令、拒绝记录、取消及未知结果边界见 [SITL 解锁任务验收](docs/sitl_arm_mission.md)。该入口只允许 loopback SITL；不提供起飞或运动命令。
+另有独立的 **SITL 解锁验收任务**：`python -m vehicle_autonomy.app.cli run-sitl-arm --allow-send --allow-arm` 使用 [解锁专用 profile](configs/sitl_arm.toml)，依次确认 `GUIDED`、Arm 和 Disarm，最终回到未解锁。全新本机 SITL 的验证命令、拒绝记录、取消及未知结果边界见 [SITL 解锁任务验收](docs/sitl_arm_mission.md)。该入口只允许 loopback SITL；不提供起飞或运动命令。
 
 ArduCopter 插件使用 [requirements-p5.txt](requirements-p5.txt) 中的可选依赖。本机 SITL 验证需先自行启动 ArduCopter 的 TCP 5760 端口，再显式运行 `PYTHONPATH=. python tests/manual_p5_sitl.py --allow-send`；脚本仅连接 `127.0.0.1`，确认未解锁后请求 `GUIDED` 模式并等待 ACK。它不会执行起飞或实机连接。
 
@@ -62,7 +86,7 @@ Copter USB 诊断使用 `PYTHONPATH=. python tests/manual_p5_copter_usb.py --por
 
 裸飞控台架曾临时配置 `FRAME_CLASS=1`、保留 `FRAME_TYPE=1`（四旋翼 X）并重启。通过受控端口验证未解锁的 `STABILIZE → ACRO → STABILIZE`；Arm 请求由飞控预解锁检查拒绝，随后 Disarm 请求获确认。测试结束已恢复 `FRAME_CLASS=0` 并重启复核。复现台架脚本须分别显式运行 `PYTHONPATH=. python tests/manual_p5_copter_bench_mode.py --port /dev/ttyACM0 --allow-mode-roundtrip` 与 `PYTHONPATH=. python tests/manual_p5_copter_bench_arm.py --port /dev/ttyACM0 --bare-controller --allow-arm-bench`；路径随重新连接可能变化，**Arm 脚本仅供确认没有执行器连接的裸飞控使用**。预解锁阻断、日志存储错误和未验收项见[迁移记录](docs/migration_plan.md)。
 
-[当前实现边界](docs/architecture.md)记录已有能力与限制。[迁移计划与记录](docs/migration_plan.md)给出从合同、状态链到控制与设备接入的阶段顺序。[历史程序说明](docs/migration.md)介绍 `legacy/cuadc_2026/`：它完整保存旧应用的代码、配置、测试和资源，供后续逐项评估复用；新根目录不导入该目录。
+[当前实现边界](docs/architecture.md)记录已有能力与限制。[迁移计划与记录](docs/migration_plan.md)给出从合同、状态链到控制与设备接入的阶段顺序。[历史程序说明](docs/migration.md)记录旧程序；本轮按明确要求移除了仓库内 Legacy，源码可从 Git 历史查看，本地数据已备份。
 
 [V1 模块进度与未完成项](docs/v1_progress.md)按目标架构逐项记录当前成熟度、证据与待验收工作。
 
@@ -77,10 +101,10 @@ Copter USB 诊断使用 `PYTHONPATH=. python tests/manual_p5_copter_usb.py --por
 先启动自己的 localhost SITL/Gazebo，再运行：
 
 ```bash
-python -m app.main run --profile copter_sim --allow-send
-python -m app.main ctl --profile copter_sim status
-python -m app.main ctl --profile copter_sim start --mission disarmed_mode
-python -m app.main ctl --profile copter_sim shutdown
+python -m vehicle_autonomy.app.cli run --profile copter_sim --allow-send
+python -m vehicle_autonomy.app.cli ctl --profile copter_sim status
+python -m vehicle_autonomy.app.cli ctl --profile copter_sim start --mission disarmed_mode
+python -m vehicle_autonomy.app.cli ctl --profile copter_sim shutdown
 ```
 
 Rover 使用 `rover_sim`。不传 `--allow-send` 为只读；任务目录包括 disarmed_mode、action_probe、basic_route 与 safe_recovery；显式对象源可启用 object_inspection，Copter 另需显式仿真载荷才可运行 cuadc_demo。没有活跃任务时撤销双 SEND 与租约，重连只读恢复。`--config` 可提供经严格验证的 loopback 仿真 profile；`--control-socket` 指定本机端点。不是实机或 Web 入口。
@@ -88,16 +112,16 @@ Rover 使用 `rover_sim`。不传 `--allow-send` 为只读；任务目录包括 
 两车命名路线从公开控制入口启动：
 
 ```bash
-python -m app.main ctl --profile copter_sim start --mission basic_route
-python -m app.main ctl --profile rover_sim start --mission basic_route
+python -m vehicle_autonomy.app.cli ctl --profile copter_sim start --mission basic_route
+python -m vehicle_autonomy.app.cli ctl --profile rover_sim start --mission basic_route
 ```
 
 记录视觉需要 [可选 CPU 依赖](requirements-vision.txt)。`python scripts/prepare_vision_fixture.py` 下载并校验公开模型/照片，生成虚拟标定与有限记录清单。以下命令仅用于已启动的 localhost Copter 仿真：
 
 ```bash
-python -m app.main run --profile copter_sim --allow-send --sim-payload \
+python -m vehicle_autonomy.app.cli run --profile copter_sim --allow-send --sim-payload \
   --recorded-vision-config artifacts/simulation/vision-assets/recording.json
-python -m app.main ctl --profile copter_sim start --mission cuadc_demo
+python -m vehicle_autonomy.app.cli ctl --profile copter_sim start --mission cuadc_demo
 ```
 
 视觉源和 `--sim-sensor-config` 互斥，默认不加载任何对象源或载荷。该 fixture 的 COCO bus→bucket_1 映射只验证传感器替换边界；真实比赛识别、相机空间标定、物理载荷与 RKNN 均未验收，见 [P17](docs/autonomy/phase-17.md)。
@@ -110,7 +134,7 @@ python -m app.main ctl --profile copter_sim start --mission cuadc_demo
 
 ## 可选 Nav2 只读路径规划
 
-新增 `python -m app.plan`，从记录地图或当前只读 Rover App 的 P18 地图计算几何路径。使用 ROS 2 Jazzy / Nav2 SmacPlanner2D，返回前核对地图内容、版本来源、Frame epoch、时间和整段车体碰撞。规划入口输出保持 `executable=false`；显式路径消费使用下一节的独立准入与原安全执行链。
+新增 `python -m vehicle_autonomy.app.planning`，从记录地图或当前只读 Rover App 的 P18 地图计算几何路径。使用 ROS 2 Jazzy / Nav2 SmacPlanner2D，返回前核对地图内容、版本来源、Frame epoch、时间和整段车体碰撞。规划入口输出保持 `executable=false`；显式路径消费使用下一节的独立准入与原安全执行链。
 
 安装与可直接运行的记录图示例见 [Nav2 规划说明](docs/nav2_planning.md)；206 项单元测试、真实 Nav2 拒绝/绕墙/超时及在线只读链证据见 [P19 第一步验收](docs/autonomy/phase-19.md)。
 

@@ -52,7 +52,7 @@ export VAF_SIMULATION_PLUGIN_DIR="$PWD/artifacts/simulation/suite-e8ba09fa/build
 python -m tests.simulation.vision_faults --allow-send
 ```
 
-不传 --build-dir 的一键套件会在新 run 的 build 目录从空输出构建。公开 App 支持 run/ctl status/start/cancel/shutdown，只允许注册任务；启动与发送必须显式 loopback profile/--allow-send。默认 `python -m app.main status` 仍为 unwired/发送关闭，不连接车辆。仿真载荷和两种对象源必须显式加载。
+不传 --build-dir 的一键套件会在新 run 的 build 目录从空输出构建。公开 App 支持 run/ctl status/start/cancel/shutdown，只允许注册任务；启动与发送必须显式 loopback profile/--allow-send。默认 `python -m vehicle_autonomy.app.cli status` 仍为 unwired/发送关闭，不连接车辆。仿真载荷和两种对象源必须显式加载。
 
 ## 原门槛与安全合同
 

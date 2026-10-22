@@ -17,7 +17,7 @@
 
 运行：`./scripts/test_navigation_v1.sh "$PWD/artifacts/simulation/navigation-final-20261019"`，复用显式指定的本机 SITL 二进制目录。
 
-**223 项单元测试通过，0 失败/错误/跳过**，其中新增路径跟踪测试 17 项。全量耗时 16.707 s；默认 `python -m app.main status` 仍为 unwired / SEND false。编译与 `git diff --check` 通过。
+**223 项单元测试通过，0 失败/错误/跳过**，其中新增路径跟踪测试 17 项。全量耗时 16.707 s；默认 `python -m vehicle_autonomy.app.cli status` 仍为 unwired / SEND false。编译与 `git diff --check` 通过。
 
 实际 ROS 2 Jazzy / SLAM Toolbox / Nav2 **1.3.13** / Rover SITL / Gazebo 运行结果：
 

@@ -8,16 +8,16 @@ import unittest
 
 from pymavlink.dialects.v20 import ardupilotmega as mavlink
 
-from contracts.vehicle.command import ArmCommand, DisarmCommand, TakeoffCommand
-from contracts.core.quality import QualityState
-from deployment.sitl_runtime import SitlRuntime
-from protocols.mavlink.constants import CMD_ARM_DISARM, CMD_SET_MODE, TYPE_QUADROTOR
-from runtime.sitl import SitlProfile
+from vehicle_autonomy.contracts.vehicle.command import ArmCommand, DisarmCommand, TakeoffCommand
+from vehicle_autonomy.contracts.core.quality import QualityState
+from vehicle_autonomy.app.bootstrap.sitl_runtime import SitlRuntime
+from vehicle_autonomy.vehicles.ardupilot.mavlink.constants import CMD_ARM_DISARM, CMD_SET_MODE, TYPE_QUADROTOR
+from vehicle_autonomy.app.bootstrap.sitl import SitlProfile
 from tests.test_p6_sitl_runtime import Clock, Transport
-from vehicles.multirotor.sitl_guard import SitlArmTranslator, sitl_arm_write_guard
+from vehicle_autonomy.vehicles.copter.sitl_guard import SitlArmTranslator, sitl_arm_write_guard
 
 
-ARM_PROFILE = Path(__file__).resolve().parents[1] / "runtime" / "sitl_arm.toml"
+ARM_PROFILE = Path(__file__).resolve().parents[1] / "configs" / "sitl_arm.toml"
 
 
 class SitlArmMissionTests(unittest.TestCase):

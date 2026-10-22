@@ -3,9 +3,9 @@ from dataclasses import replace
 from pathlib import Path
 import tempfile
 import unittest
-from environments.resources import Environment
-from runtime.simulation_profile import SimulationProfile
-from world_model import WorldModel, FreshnessLimits
+from vehicle_autonomy.world.environment.resources import Environment
+from vehicle_autonomy.app.bootstrap.simulation_profile import SimulationProfile
+from vehicle_autonomy.world.model import WorldModel, FreshnessLimits
 from tests.test_simulation_runtime import Clock
 
 
@@ -33,8 +33,8 @@ class EnvironmentTests(unittest.TestCase):
             env.check_safety(replace(self.profile.safety, max_x_m=4))
 
     def test_origin_change_is_rejected(self):
-        from contracts.core.geometry import GeoPoint
-        from contracts.core.stamped import Stamped
+        from vehicle_autonomy.contracts.core.geometry import GeoPoint
+        from vehicle_autonomy.contracts.core.stamped import Stamped
         from tests import test_simulation_runtime as helpers
         harness = helpers.SimulationRuntimeTests()
         harness.setUp()
@@ -68,7 +68,7 @@ class EnvironmentTests(unittest.TestCase):
                         Environment.load(path)
 
     def test_application_detects_hot_change_and_rebinds_reconnect(self):
-        from deployment.application_runtime import ApplicationRuntime
+        from vehicle_autonomy.app.bootstrap.application_runtime import ApplicationRuntime
         from tests import test_simulation_runtime as helpers
         harness = helpers.SimulationRuntimeTests()
         harness.setUp()

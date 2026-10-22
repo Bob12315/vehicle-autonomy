@@ -12,7 +12,7 @@ import time
 
 class SupervisorTests(unittest.TestCase):
     def test_previous_boot_cleanup_requires_recorded_socket_identity(self):
-        from deployment.onboard import boot_id, cleanup_previous_boot_socket
+        from vehicle_autonomy.app.bootstrap.onboard import boot_id, cleanup_previous_boot_socket
         with tempfile.TemporaryDirectory() as directory:
             root=Path(directory);path=root/'app.sock'
             listener=socket.socket(socket.AF_UNIX);listener.bind(str(path));listener.close()
@@ -31,7 +31,7 @@ class SupervisorTests(unittest.TestCase):
             with socket.socket() as listener:
                 listener.bind(('127.0.0.1',0));port=listener.getsockname()[1]
             def command(operation):
-                result=subprocess.run([sys.executable,'-m','deployment.onboard',operation,'--state-dir',directory,
+                result=subprocess.run([sys.executable,'-m','vehicle_autonomy.app.bootstrap.onboard',operation,'--state-dir',directory,
                     '--port',str(port)],capture_output=True,text=True,timeout=20)
                 self.assertEqual(result.returncode,0,result.stderr)
                 return json.loads(result.stdout)
@@ -40,7 +40,7 @@ class SupervisorTests(unittest.TestCase):
                 time.sleep(.3)  # allow supervisor to record its own socket inode
                 children=json.loads((Path(directory)/'children.json').read_text())
                 app=next(child for child in children if child['name']=='application')
-                from deployment.onboard import process_identity
+                from vehicle_autonomy.app.bootstrap.onboard import process_identity
                 self.assertEqual(process_identity(app['pid']),app['start_ticks'])
                 os.kill(app['pid'],signal.SIGKILL)
                 deadline=time.monotonic()+6
@@ -52,14 +52,14 @@ class SupervisorTests(unittest.TestCase):
                 command('start');new=command('status')['result']
                 self.assertNotEqual(old,new['session_id'])
                 self.assertFalse(new['system_send'] or new['action_send'])
-            finally:subprocess.run([sys.executable,'-m','deployment.onboard','stop','--state-dir',directory],capture_output=True,timeout=15)
+            finally:subprocess.run([sys.executable,'-m','vehicle_autonomy.app.bootstrap.onboard','stop','--state-dir',directory],capture_output=True,timeout=15)
     def test_actual_start_health_stop_and_fresh_restart(self):
         with tempfile.TemporaryDirectory(prefix='vaf-supervisor-') as directory:
             Path(directory).chmod(0o700)
             with socket.socket() as listener:
                 listener.bind(('127.0.0.1',0));port=listener.getsockname()[1]
             def command(operation):
-                result=subprocess.run([sys.executable,'-m','deployment.onboard',operation,'--state-dir',directory,
+                result=subprocess.run([sys.executable,'-m','vehicle_autonomy.app.bootstrap.onboard',operation,'--state-dir',directory,
                     '--port',str(port)],capture_output=True,text=True,timeout=20)
                 self.assertEqual(result.returncode,0,result.stderr+result.stdout)
                 return json.loads(result.stdout)
@@ -74,5 +74,5 @@ class SupervisorTests(unittest.TestCase):
                     self.assertFalse((Path(directory)/'app.sock').exists())
                 self.assertNotEqual(*sessions)
             finally:
-                subprocess.run([sys.executable,'-m','deployment.onboard','stop','--state-dir',directory],
+                subprocess.run([sys.executable,'-m','vehicle_autonomy.app.bootstrap.onboard','stop','--state-dir',directory],
                                capture_output=True,timeout=15)

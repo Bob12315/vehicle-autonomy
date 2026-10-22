@@ -10,7 +10,7 @@ AUTONOMY_RUN_DIR="${2:-$PWD/artifacts/simulation/autonomy-$(date -u +%Y%m%dT%H%M
 mkdir -p "$AUTONOMY_RUN_DIR"
 AUTONOMY_RUN_DIR="$(realpath "$AUTONOMY_RUN_DIR")"
 python -m unittest discover -s tests -q 2>&1 | tee "$AUTONOMY_RUN_DIR/unit.log"
-./scripts/with_ros2.sh python -m integrations.ros2.build_slam_boundary \
+./scripts/with_ros2.sh python -m vehicle_autonomy.world.mapping.build_slam_boundary \
     --output-dir "$AUTONOMY_RUN_DIR/boundary" > "$AUTONOMY_RUN_DIR/native-build.json"
 python - "$AUTONOMY_RUN_DIR" <<'PY'
 import json

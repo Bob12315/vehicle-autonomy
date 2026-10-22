@@ -7,10 +7,10 @@ import time
 from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
-from contracts.core.time import TimePoint
-from contracts.core.quality import QualityState
-from perception.vision.yolox import PixelDetection
-from sensors.camera.recorded import RecordedVisionSource
+from vehicle_autonomy.contracts.core.time import TimePoint
+from vehicle_autonomy.contracts.core.quality import QualityState
+from vehicle_autonomy.world.perception.vision.yolox import PixelDetection
+from vehicle_autonomy.world.sensors.camera.recorded import RecordedVisionSource
 
 class Detector:
     delay=0
@@ -38,7 +38,7 @@ max_distance_m=4.0
         path=root/'recording.json';path.write_text(json.dumps({'schema':1,'kind':'recorded_virtual_camera','source':'test recording','model':'unused','model_sha256':'unused','calibration':'cal.toml' if calibrated else None,'threshold':.5,'class_map':{'5':'bucket_1'},'frames':[{'pts_ns':0,'path':'image','sha256':digest}]}));return path
     def now(self):return TimePoint(time.monotonic_ns(),datetime.now(timezone.utc),'host-monotonic-simulation')
     def test_unlocated_detections_never_enter_motion_world_and_eos(self):
-        with TemporaryDirectory() as d,patch('sensors.camera.recorded.YoloXDetector',return_value=Detector()),patch.dict('sys.modules',{'cv2':SimpleNamespace(imread=lambda _:SimpleNamespace(shape=(1,1,3)))}):
+        with TemporaryDirectory() as d,patch('vehicle_autonomy.world.sensors.camera.recorded.YoloXDetector',return_value=Detector()),patch.dict('sys.modules',{'cv2':SimpleNamespace(imread=lambda _:SimpleNamespace(shape=(1,1,3)))}):
             source=RecordedVisionSource(self.fixture(d),self.now().clock_domain_id)
             try:
                 source.poll(self.now());until=time.monotonic()+2
@@ -50,7 +50,7 @@ max_distance_m=4.0
             self.assertFalse(source.thread.is_alive())
     def test_late_inference_preserves_capture_and_invalidates(self):
         detector=Detector();detector.delay=1.1
-        with TemporaryDirectory() as d,patch('sensors.camera.recorded.YoloXDetector',return_value=detector),patch.dict('sys.modules',{'cv2':SimpleNamespace(imread=lambda _:SimpleNamespace(shape=(1,1,3)))}):
+        with TemporaryDirectory() as d,patch('vehicle_autonomy.world.sensors.camera.recorded.YoloXDetector',return_value=detector),patch.dict('sys.modules',{'cv2':SimpleNamespace(imread=lambda _:SimpleNamespace(shape=(1,1,3)))}):
             source=RecordedVisionSource(self.fixture(d,calibrated=True),self.now().clock_domain_id)
             try:
                 capture=self.now();source.poll(capture);until=time.monotonic()+3

@@ -4,8 +4,8 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 view_mode="${1:-lidar}"
 case "$view_mode" in
-  lidar) view_config=config/rviz/rs16-readonly.rviz ;;
-  navigation) view_config=config/rviz/navigation-readonly.rviz ;;
+  lidar) view_config=configs/rviz/rs16-readonly.rviz ;;
+  navigation) view_config=configs/rviz/navigation-readonly.rviz ;;
   *) echo 'Usage: ros2_view.sh [lidar|navigation] [--check]' >&2; exit 2 ;;
 esac
 if [[ $# -gt 2 || ( $# -eq 2 && "$2" != --check ) ]]; then

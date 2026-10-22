@@ -6,7 +6,7 @@ import subprocess
 import sys
 import time
 from uuid import uuid4
-from app.control import request
+from vehicle_autonomy.app.api.control import request
 from tests.simulation.launch import ROOT, OwnedSimulation, install_signal_cleanup
 from tests.simulation.oracle import GazeboTruthOracle
 from tests.simulation.faults import TcpFaultProxy
@@ -26,7 +26,7 @@ def run(directory,kind):
         config=directory/'profile.toml'
         config.write_text((ROOT/f'simulation/profiles/{kind}.toml').read_text().replace('port = 5760',f'port = {proxy.port}'))
         started=time.monotonic()
-        app=owned.start_process('application',[sys.executable,'-m','app.main','run','--profile',kind+'_sim','--config',str(config),'--control-socket',str(endpoint),'--allow-send'])
+        app=owned.start_process('application',[sys.executable,'-m','vehicle_autonomy.app.cli','run','--profile',kind+'_sim','--config',str(config),'--control-socket',str(endpoint),'--allow-send'])
         def status():
             owned.assert_alive()
             state=request(endpoint,'status')['result']
@@ -37,7 +37,7 @@ def run(directory,kind):
         def ctl(operation,*flags):
             deadline=time.monotonic()+3
             while True:
-                result=subprocess.run([sys.executable,'-m','app.main','ctl','--profile',f'{kind}_sim',
+                result=subprocess.run([sys.executable,'-m','vehicle_autonomy.app.cli','ctl','--profile',f'{kind}_sim',
                     '--control-socket',str(endpoint),operation,*flags],capture_output=True,text=True,timeout=4)
                 response=json.loads(result.stdout)
                 if not result.returncode and response['ok']:return response['result']

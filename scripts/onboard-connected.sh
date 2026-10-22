@@ -8,4 +8,4 @@ exec ./scripts/onboard.sh "$@" \
   --state-dir "$HOME/.local/state/vehicle-autonomy-connected" \
   --config "$vaf_install_root/config/hardware-readonly.json" \
   --rs16-config "$vaf_install_root/config/rs16.json" --ros2-humble \
-  --llm-config config/llm.server-tunnel.json
+  --llm-config configs/llm.server-tunnel.json

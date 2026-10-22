@@ -9,14 +9,14 @@ import tempfile
 import time
 import unittest
 
-from deployment.rs16_profile import sensor_commands
+from vehicle_autonomy.world.sensors.lidar.robosense.profile import sensor_commands
 
 
 class Rs16SupervisionTests(unittest.TestCase):
     def test_native_source_cannot_mix_with_replay_or_synthetic_provenance(self):
         for flag in ('--self-test','--replay'):
-            result=subprocess.run([sys.executable,'-m','integrations.ros2.rs16_scan',
-                '--exchange','/tmp/not-opened','--config','config/rs16-scan.json',
+            result=subprocess.run([sys.executable,'-m','vehicle_autonomy.world.sensors.lidar.rs16_scan',
+                '--exchange','/tmp/not-opened','--config','configs/rs16-scan.json',
                 '--health-file','/tmp/not-written',flag],capture_output=True,text=True,timeout=5)
             self.assertEqual(result.returncode,2)
             self.assertIn('cannot mix',result.stderr)
@@ -26,7 +26,7 @@ class Rs16SupervisionTests(unittest.TestCase):
         binary = root/'receiver'
         binary.write_text('#!/bin/sh\nsleep 2\nexit 9\n')
         binary.chmod(0o700)
-        profile = json.loads(Path('config/deployment/hardware-readonly.json').read_text())
+        profile = json.loads(Path('configs/deployment/hardware-readonly.json').read_text())
         profile['lidar_exchange'] = str(root/'cloud.json')
         config = {'schema': 1, 'host_ip': '127.0.0.1', 'msop_port': 26699,
                   'difop_port': 27788, 'duration_s': 10, 'binary': str(binary),
@@ -62,7 +62,7 @@ class Rs16SupervisionTests(unittest.TestCase):
             state = root/'state'
             with socket.socket() as s:
                 s.bind(('127.0.0.1', 0)); port = s.getsockname()[1]
-            args = [sys.executable, '-m', 'deployment.onboard']
+            args = [sys.executable, '-m', 'vehicle_autonomy.app.bootstrap.onboard']
             try:
                 result = subprocess.run([*args, 'start', '--state-dir', str(state), '--config',
                     str(root/'profile.json'), '--rs16-config', str(root/'rs16.json'), '--port', str(port)],
@@ -78,7 +78,7 @@ class Rs16SupervisionTests(unittest.TestCase):
                 self.assertIn('rs16 exited 9', stopped['error'])
                 self.assertEqual(stopped['physical_stop'], 'UNCONFIRMED')
                 self.assertFalse((state/'app.sock').exists())
-                from deployment.onboard import process_identity
+                from vehicle_autonomy.app.bootstrap.onboard import process_identity
                 for child in children:
                     self.assertNotEqual(process_identity(child['pid']), child['start_ticks'])
             finally:

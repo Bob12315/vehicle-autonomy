@@ -3,9 +3,9 @@ import json
 import threading
 import unittest
 
-from application.design_proposals import DesignProposalService
-from application.runtime_service import RuntimeService
-from intelligence.designs import MissionDesign
+from vehicle_autonomy.app.mission_designer.design_proposals import DesignProposalService
+from vehicle_autonomy.app.api.runtime_service import RuntimeService
+from vehicle_autonomy.autonomy.intelligence.designs import MissionDesign
 from tests.test_application_runtime import ApplicationRuntimeTests
 
 
@@ -139,7 +139,7 @@ class DesignRuntimeTests(ApplicationRuntimeTests):
 class ApprovalTests(unittest.TestCase):
     def test_blocked_design_inference_does_not_hold_operator_cancel_lock(self):
         from tempfile import TemporaryDirectory
-        from application.operator_service import OperatorService
+        from vehicle_autonomy.app.operator.service import OperatorService
         entered,release,finished=threading.Event(),threading.Event(),threading.Event()
         class App:
             def handle(self,op,p):

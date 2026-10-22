@@ -11,14 +11,14 @@ import sys
 import time
 from uuid import uuid4
 
-from contracts.core.geometry import Twist3, Vector3
-from contracts.effects.vehicle import ArmEffect, DisarmEffect, LandEffect, ModeEffect, TakeoffEffect, TwistTargetEffect
-from deployment.simulation_runtime import SimulationRuntime
+from vehicle_autonomy.contracts.core.geometry import Twist3, Vector3
+from vehicle_autonomy.contracts.effects.vehicle import ArmEffect, DisarmEffect, LandEffect, ModeEffect, TakeoffEffect, TwistTargetEffect
+from vehicle_autonomy.app.bootstrap.simulation_runtime import SimulationRuntime
 from tests.simulation.faults import TcpFaultProxy
 from tests.simulation.launch import OwnedSimulation, ROOT, install_signal_cleanup
 from tests.simulation.oracle import GazeboTruthOracle
-from vehicles.multirotor.ardupilot_commands import ArduPilotCommandTranslator
-from vehicles.rover.ardupilot_commands import ArduRoverCommandTranslator
+from vehicle_autonomy.vehicles.ardupilot.commands import ArduPilotCommandTranslator
+from vehicle_autonomy.vehicles.rover.ardupilot_commands import ArduRoverCommandTranslator
 
 
 def run(run_dir: Path, kind: str) -> dict:

@@ -9,16 +9,16 @@ from tempfile import TemporaryDirectory
 import unittest
 from unittest.mock import patch
 
-from app.plan import LiveMapProvider
-from application.planning import ReadOnlyPlanningService
-from contracts.core.geometry import Pose3,Quaternion,Vector3
-from contracts.core.primitives import ResourceVersion
-from contracts.core.time import TimePoint
-from contracts.world.models import ResourceReference
-from mapping.exchange import MappingConfig
-from mapping.grid import MapStore,OccupancyGrid,atomic_json,pose_to_json
-from planning.collision import CollisionGrid
-from planning.models import MapContext,PathCandidate,PlanningError,Pose2D
+from vehicle_autonomy.app.planning import LiveMapProvider
+from vehicle_autonomy.autonomy.planning.service import ReadOnlyPlanningService
+from vehicle_autonomy.contracts.core.geometry import Pose3,Quaternion,Vector3
+from vehicle_autonomy.contracts.core.primitives import ResourceVersion
+from vehicle_autonomy.contracts.core.time import TimePoint
+from vehicle_autonomy.contracts.world.models import ResourceReference
+from vehicle_autonomy.world.mapping.exchange import MappingConfig
+from vehicle_autonomy.world.mapping.grid import MapStore,OccupancyGrid,atomic_json,pose_to_json
+from vehicle_autonomy.autonomy.planning.collision import CollisionGrid
+from vehicle_autonomy.autonomy.planning.models import MapContext,PathCandidate,PlanningError,Pose2D
 
 IDENTITY = Pose3(Vector3(0,0,0),Quaternion(0,0,0,1))
 
@@ -160,12 +160,13 @@ class PlanningTests(unittest.TestCase):
 
     def test_domain_and_application_have_no_ros_or_command_dependencies(self):
         root = Path(__file__).resolve().parents[1]
-        paths = list((root/"planning").rglob("*.py"))+[root/"application/planning.py"]
+        paths = [root/"src/vehicle_autonomy/autonomy/planning"/name for name in ("__init__.py", "models.py", "collision.py", "service.py")]
         forbidden = {"rclpy","nav2_msgs","vehicles","protocols","infrastructure","legacy","integrations"}
         for path in paths:
+            self.assertTrue(path.is_file(), str(path))
             for node in ast.walk(ast.parse(path.read_text())):
                 modules = [n.name for n in node.names] if isinstance(node,ast.Import) else [node.module or ""] if isinstance(node,ast.ImportFrom) else []
-                self.assertFalse(any(name.split('.')[0] in forbidden for name in modules),str(path))
+                self.assertFalse(any((name.removeprefix('vehicle_autonomy.').split('.')[0] in forbidden) for name in modules),str(path))
 
 
 class LivePlanningTests(unittest.TestCase):
@@ -184,7 +185,7 @@ class LivePlanningTests(unittest.TestCase):
                 "mapping":{"adopted":True,"sha256":digest,"source_epoch":"source-A"}}
             provider = LiveMapProvider(MappingConfig(directory,"test-clock",10_000_000_000),"/unused-test.sock")
             provider.clock = lambda:now
-            with patch("app.control.request",return_value={"ok":True,"result":state}) as status:
+            with patch("vehicle_autonomy.app.api.control.request",return_value={"ok":True,"result":state}) as status:
                 self.assertEqual(provider().source_kind,"live_map")
                 self.assertEqual(status.call_args.args[1],"status")
                 for key,value in (("mapping",None),("system_send",True),("connected",False)):

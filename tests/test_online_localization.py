@@ -1,9 +1,9 @@
 """Same-source cuts, source-age rejection and epoch isolation."""
 from dataclasses import replace
 import unittest
-from contracts.core.geometry import Transform3, Quaternion, Vector3
-from core.transform import TransformTree
-from localization.online import OnlineLocalization
+from vehicle_autonomy.contracts.core.geometry import Transform3, Quaternion, Vector3
+from vehicle_autonomy.world.transform.tree import TransformTree
+from vehicle_autonomy.world.localization.online import OnlineLocalization
 from tests import test_simulation_runtime as helpers
 
 

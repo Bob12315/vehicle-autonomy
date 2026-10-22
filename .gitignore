@@ -14,17 +14,9 @@ artifacts/hardware-ready/
 # Local developer state
 .reasonix/
 reasonix.toml
-legacy/cuadc_2026/eeprom.bin
 
-# The new runtime stores generated state here when adapters are added.
-runtime/*
-!runtime/.gitkeep
-!runtime/__init__.py
-!runtime/sitl.py
-!runtime/sitl.toml
-!runtime/sitl_arm.toml
-!runtime/simulation_profile.py
-!runtime/application_profile.py
+# Generated local runtime state (source now lives under src/).
+runtime/
 
 # Local migration evidence and isolated packaging checks
 artifacts/migration/

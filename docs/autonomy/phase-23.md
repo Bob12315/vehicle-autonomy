@@ -8,10 +8,10 @@
 
 提供可复建的本地原生覆盖库，将宽高改为 `ceil(extent / resolution) + 1`。原始扫描与 ray tracing 不变，不补画障碍或空闲格、不钳制越界端点。原生反例：原版 156×156、丢失 2 个端点；修复 157×157、丢失 0 个端点。
 
-覆盖库仅支持经审查的 **SLAM Toolbox 2.8.5**，构建时检查原始头文件 SHA，运行时检查覆盖库和原始两个运行库的 SHA。只为显式选择的 SLAM 子进程设置 `LD_PRELOAD`；不替换系统 ROS 文件。源码、上游出处和许可证见 `integrations/ros2/native/`。
+覆盖库仅支持经审查的 **SLAM Toolbox 2.8.5**，构建时检查原始头文件 SHA，运行时检查覆盖库和原始两个运行库的 SHA。只为显式选择的 SLAM 子进程设置 `LD_PRELOAD`；不替换系统 ROS 文件。源码、上游出处和许可证见 `src/vehicle_autonomy/world/mapping/native/`。
 
 ```bash
-./scripts/with_ros2.sh python -m integrations.ros2.build_slam_boundary --output-dir /absolute/new-build-directory
+./scripts/with_ros2.sh python -m vehicle_autonomy.world.mapping.build_slam_boundary --output-dir /absolute/new-build-directory
 export VAF_SLAM_BOUNDARY_LIBRARY=/absolute/new-build-directory/libvaf_slam_boundary.so
 ```
 
@@ -24,7 +24,7 @@ export VAF_SLAM_BOUNDARY_LIBRARY=/absolute/new-build-directory/libvaf_slam_bound
 登记只允许新鲜地图、已验证原点、已观察停稳、Disarm 且双 SEND 关闭。文件有大小、普通文件、无符号链接及同一次读取的 SHA 检查。目标任务冻结锚点内容；地图内容可在同源后续 revision 正常演进，但仍经过当前地图整段路径校验和对齐约束。
 
 ```bash
-python -m app.anchor --control-socket /absolute/app.sock --output /absolute/anchor.json
+python -m vehicle_autonomy.app.anchor --control-socket /absolute/app.sock --output /absolute/anchor.json
 ```
 
 旧锚点在车辆会话、地图发布者或原点/HOME 改变后拒绝使用，必须显式重新登记及核对目标；不会自动把旧命名点投到新环境。持久化网格不自动成为定位或运动权限。**支持的重载流程须先停车、重启映射栈并重新登记；不支持外部绕过框架、在原 ROS 发布者中原地替换 pose graph 后继续使用旧锚点。**

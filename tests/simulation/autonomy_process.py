@@ -8,8 +8,8 @@ import subprocess
 import sys
 import time
 from uuid import uuid4
-from app.control import request
-from environments.resources import Environment
+from vehicle_autonomy.app.api.control import request
+from vehicle_autonomy.world.environment.resources import Environment
 from tests.simulation.launch import ROOT, OwnedSimulation, install_signal_cleanup
 from tests.simulation.oracle import GazeboTruthOracle
 
@@ -40,7 +40,7 @@ def run(directory,kind,mission='action_probe',repeats=1,*,objects=False,vision_c
         environment=Environment.load(ROOT/f'simulation/environments/{kind}.toml')
         bounds=json.loads((ROOT/'simulation/scenarios/acceptance-v1.json').read_text())[kind]
         started=time.monotonic()
-        app=owned.start_process('application',[sys.executable,'-m','app.main','run','--profile',f'{kind}_sim',
+        app=owned.start_process('application',[sys.executable,'-m','vehicle_autonomy.app.cli','run','--profile',f'{kind}_sim',
             '--config',str(config),'--control-socket',str(endpoint),'--allow-send',*flags])
 
         def status():
@@ -60,7 +60,7 @@ def run(directory,kind,mission='action_probe',repeats=1,*,objects=False,vision_c
         def cli(operation,*flags):
             deadline=time.monotonic()+3
             while True:
-                result=subprocess.run([sys.executable,'-m','app.main','ctl','--profile',f'{kind}_sim',
+                result=subprocess.run([sys.executable,'-m','vehicle_autonomy.app.cli','ctl','--profile',f'{kind}_sim',
                     '--control-socket',str(endpoint),operation,*flags],capture_output=True,text=True,timeout=4)
                 response=json.loads(result.stdout)
                 if not result.returncode and response['ok']:return response['result']
@@ -141,7 +141,7 @@ def run(directory,kind,mission='action_probe',repeats=1,*,objects=False,vision_c
                 time.sleep(.2)
             else:raise TimeoutError(f'{mission} deadline')
         if mission=='cuadc_demo':
-            result=subprocess.run([sys.executable,'-m','app.main','ctl','--profile',kind+'_sim','--control-socket',str(endpoint),'start','--mission','cuadc_demo'],capture_output=True,text=True,timeout=4)
+            result=subprocess.run([sys.executable,'-m','vehicle_autonomy.app.cli','ctl','--profile',kind+'_sim','--control-socket',str(endpoint),'start','--mission','cuadc_demo'],capture_output=True,text=True,timeout=4)
             if result.returncode==0:raise RuntimeError('consumed payload was silently reset')
             report['consumed_payload_rejected']=True
         cli('shutdown')

@@ -12,34 +12,34 @@ import unittest
 
 from pymavlink.dialects.v20 import ardupilotmega as mavlink
 
-from contracts.core.geometry import FrameId, Pose3, Quaternion, Twist3, Vector3
-from contracts.core.primitives import ResourceVersion, SchemaVersion
-from contracts.core.serialization import to_json_value
-from contracts.core.quality import ComponentFreshness, FreshnessState, QualityState
-from contracts.core.time import TimePoint
-from contracts.effects.vehicle import ArmEffect, EffectEnvelope, ModeEffect, PoseTargetEffect, TwistTargetEffect
-from contracts.vehicle.command import (
+from vehicle_autonomy.contracts.core.geometry import FrameId, Pose3, Quaternion, Twist3, Vector3
+from vehicle_autonomy.contracts.core.primitives import ResourceVersion, SchemaVersion
+from vehicle_autonomy.contracts.core.serialization import to_json_value
+from vehicle_autonomy.contracts.core.quality import ComponentFreshness, FreshnessState, QualityState
+from vehicle_autonomy.contracts.core.time import TimePoint
+from vehicle_autonomy.contracts.effects.vehicle import ArmEffect, EffectEnvelope, ModeEffect, PoseTargetEffect, TwistTargetEffect
+from vehicle_autonomy.contracts.vehicle.command import (
     ArmCommand, CommandPhase, CommandStatus, DisarmCommand, LandCommand,
     ModeCommand, StopMotionCommand, TakeoffCommand,
 )
-from contracts.vehicle.models import VehicleHealth, VehicleStateSnapshot
-from contracts.world.models import WorldSnapshot
-from core.control_authority import ControlAuthority, ControlLease
-from core.vehicle_execution import StopState, VehicleExecution
-from core.vehicle_safety import SafetyLimits, VehicleSafetyPolicy
-from deployment.copter_cycle import CopterCycleDriver
-from infrastructure.transports.bytes import SerialByteTransport, TcpByteTransport
-from protocols.mavlink.codec import MavlinkCodec
-from protocols.mavlink.constants import TYPE_GROUND_ROVER, TYPE_QUADROTOR
-from vehicles.multirotor.ardupilot_commands import ArduPilotCommandTranslator
-from vehicles.multirotor.diagnostic import (
+from vehicle_autonomy.contracts.vehicle.models import VehicleHealth, VehicleStateSnapshot
+from vehicle_autonomy.contracts.world.models import WorldSnapshot
+from vehicle_autonomy.engine.control.control_authority import ControlAuthority, ControlLease
+from vehicle_autonomy.engine.control.vehicle_execution import StopState, VehicleExecution
+from vehicle_autonomy.engine.control.vehicle_safety import SafetyLimits, VehicleSafetyPolicy
+from vehicle_autonomy.app.bootstrap.copter_cycle import CopterCycleDriver
+from vehicle_autonomy.vehicles.ardupilot.transports.bytes import SerialByteTransport, TcpByteTransport
+from vehicle_autonomy.vehicles.ardupilot.mavlink.codec import MavlinkCodec
+from vehicle_autonomy.vehicles.ardupilot.mavlink.constants import TYPE_GROUND_ROVER, TYPE_QUADROTOR
+from vehicle_autonomy.vehicles.ardupilot.commands import ArduPilotCommandTranslator
+from vehicle_autonomy.vehicles.copter.diagnostic import (
     CopterBenchArmDiagnosticTranslator, CopterBenchModeDiagnosticTranslator,
     CopterStabilizeDiagnosticTranslator,
 )
-from vehicles.multirotor.mavlink_port import ArduPilotCommandPort
-from vehicles.multirotor.mavlink_state import ArduPilotTelemetryState
-from vehicles.multirotor.session import ArduPilotSession
-from vehicles.rover.diagnostic import RoverHoldDiagnosticTranslator
+from vehicle_autonomy.vehicles.ardupilot.command_port import ArduPilotCommandPort
+from vehicle_autonomy.vehicles.ardupilot.telemetry_state import ArduPilotTelemetryState
+from vehicle_autonomy.vehicles.ardupilot.session import ArduPilotSession
+from vehicle_autonomy.vehicles.rover.diagnostic import RoverHoldDiagnosticTranslator
 
 
 def at(ns: int) -> TimePoint:
@@ -393,16 +393,19 @@ class P5MavlinkTests(unittest.TestCase):
     def test_only_vehicle_port_calls_byte_transport_write(self):
         root = Path(__file__).resolve().parents[1]
         writers = set()
-        for directory in ("app", "application", "core", "deployment", "vehicles", "protocols"):
-            for path in (root / directory).rglob("*.py"):
-                tree = ast.parse(path.read_text(encoding="utf-8"))
-                if any(
-                    isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
-                    and node.func.attr == "write" for node in ast.walk(tree)
-                ):
-                    writers.add(path.relative_to(root).as_posix())
-        self.assertEqual(writers, {"vehicles/multirotor/mavlink_port.py"})
-        self.assertNotIn("ArduPilotSession", (root / "app" / "main.py").read_text(encoding="utf-8"))
+        import json
+        manifest = json.loads((root / "docs/architecture_migration_files.json").read_text())
+        paths = [root / new for old, new in manifest['moved'].items()
+                 if old.startswith(("app/", "application/", "core/", "deployment/", "vehicles/", "protocols/")) and old.endswith('.py')]
+        self.assertTrue(paths)
+        for path in paths:
+            self.assertTrue(path.is_file(), str(path))
+            tree = ast.parse(path.read_text(encoding="utf-8"))
+            if any(isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
+                   and node.func.attr == "write" for node in ast.walk(tree)):
+                writers.add(path.relative_to(root).as_posix())
+        self.assertEqual(writers, {"src/vehicle_autonomy/vehicles/ardupilot/command_port.py"})
+        self.assertNotIn("ArduPilotSession", (root / "src/vehicle_autonomy/app/cli.py").read_text(encoding="utf-8"))
 
 
 if __name__ == "__main__":

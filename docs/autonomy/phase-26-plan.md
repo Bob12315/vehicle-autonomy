@@ -1,7 +1,7 @@
 # P26 frozen acceptance — Rover Autonomy Simulation V1
 
 2026-10-21. The support scope remains P21–P25's two front-drive simulated
-Rovers, telemetry control localization, bounded Nav2 planning/replanning and
+Rovers, telemetry control localization, bounded Nav2 src/vehicle_autonomy/autonomy/planning/replanning and
 recorded/simulated observations. No hardware motion or active SLAM localization.
 
 Mandatory gates: complete root unit suite (zero skips); Copter/Rover base

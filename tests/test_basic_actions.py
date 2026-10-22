@@ -1,18 +1,18 @@
 """Finite Action feedback and stop barriers, without a vehicle command port."""
 from dataclasses import replace
 import unittest
-from actions.basic import BasicAction, BasicParameters, register_basic
-from applications.basic_catalog import build, capabilities
-from contracts.core.geometry import Pose3, Vector3
-from contracts.core.primitives import ResourceVersion
-from contracts.core.stamped import Stamped
-from contracts.decision import ActionOutcome, EffectPhase, EffectResult, ExitReason
-from contracts.effects.vehicle import PoseTargetEffect, StopMotionEffect
-from contracts.vehicle.ports import VehicleCapabilities
-from core.action_registry import ActionRegistry
-from core.mission import MissionValidator
-from environments.resources import Environment
-from localization.reported import ReportedPoseLocalization
+from vehicle_autonomy.actions.common.basic import BasicAction, BasicParameters, register_basic
+from vehicle_autonomy.app.scenarios.basic_catalog import build, capabilities
+from vehicle_autonomy.contracts.core.geometry import Pose3, Vector3
+from vehicle_autonomy.contracts.core.primitives import ResourceVersion
+from vehicle_autonomy.contracts.core.stamped import Stamped
+from vehicle_autonomy.contracts.decision import ActionOutcome, EffectPhase, EffectResult, ExitReason
+from vehicle_autonomy.contracts.effects.vehicle import PoseTargetEffect, StopMotionEffect
+from vehicle_autonomy.contracts.vehicle.ports import VehicleCapabilities
+from vehicle_autonomy.engine.action.registry import ActionRegistry
+from vehicle_autonomy.engine.mission.compiler import MissionValidator
+from vehicle_autonomy.world.environment.resources import Environment
+from vehicle_autonomy.world.localization.reported import ReportedPoseLocalization
 from tests import test_simulation_runtime as helpers
 
 
@@ -101,7 +101,7 @@ class BasicActionTests(unittest.TestCase):
             (self.result(EffectPhase.REJECTED),)).outcome,ActionOutcome.FAILED)
 
     def test_rover_navigation_has_bounded_body_feedback_and_stopping_margin(self):
-        from contracts.effects.vehicle import TwistTargetEffect
+        from vehicle_autonomy.contracts.effects.vehicle import TwistTargetEffect
         parameters=replace(self.params,vehicle_kind='rover')
         world=replace(self.world,vehicle=replace(self.world.vehicle,
             operation=replace(self.world.vehicle.operation,native_mode='ARDUPILOT_CUSTOM_15')))
@@ -117,7 +117,7 @@ class BasicActionTests(unittest.TestCase):
     def test_vehicle_capabilities_and_declared_effect_allowlists(self):
         registry=ActionRegistry()
         register_basic(registry)
-        from core.sitl_mode_action import SITL_MODE_SPEC,SitlModeAction
+        from vehicle_autonomy.actions.common.sitl_mode import SITL_MODE_SPEC,SitlModeAction
         registry.register_typed(SITL_MODE_SPEC,SitlModeAction())
         plan=build('action_probe','copter',self.environment,4)
         MissionValidator(registry).compile(plan,VehicleCapabilities(capabilities('copter')))

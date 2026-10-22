@@ -27,7 +27,7 @@ existing SSH host keys and records archive/wheel hashes.
 ```bash
 cd /home/pi/vehicle-autonomy/current
 export VAF_PYTHON=/home/pi/vehicle-autonomy/venv/bin/python
-./scripts/onboard.sh start --llm-config config/llm.server-tunnel.json
+./scripts/onboard.sh start --llm-config configs/llm.server-tunnel.json
 ./scripts/onboard.sh status
 ./scripts/onboard.sh stop
 ```
@@ -53,11 +53,11 @@ require a custom CSRF header and matching Host/Origin. Console binds loopback,
 has bounded request sizes and workers, and writes operation audits. Browser
 HTTP protection relies on the SSH tunnel; no public control listener is used.
 
-`config/deployment/{simulation,hardware-readonly,hardware-controlled}.json`
+`configs/deployment/{simulation,hardware-readonly,hardware-controlled}.json`
 separate the deployment modes. Both SEND values must be exactly `false`.
 The hardware-controlled template is **rejected even with SEND false** until a
 separately reviewed control composition and onsite acceptance exist.
-Simulation uses the original `app.main run --profile rover_sim` entry and its
+Simulation uses the original `vehicle_autonomy.app.cli run --profile rover_sim` entry and its
 existing loopback-only Safety/Execution/writer chain.
 
 ## Sensor and telemetry configuration
@@ -117,8 +117,8 @@ real hardware evidence.
 Optional ROS 2 sidecar, on a configured ROS host:
 
 ```bash
-./scripts/with_ros2.sh python -m integrations.ros2.rs16_scan \
-  --config config/rs16-scan.json --health-file /tmp/rs16-health.json
+./scripts/with_ros2.sh python -m vehicle_autonomy.world.sensors.lidar.rs16_scan \
+  --config configs/rs16-scan.json --health-file /tmp/rs16-health.json
 # Native same-host SDK exchange -> PointCloud2 + LaserScan:
 # add --exchange /private/cloud.json
 # rosbag replay (recording only): add --replay and play with ros2 bag play BAG --clock
@@ -146,7 +146,7 @@ never active control. There is no hardware navigation-mode switch or resume.
 
 The new near-field collision monitor supplies conservative stop/slowdown
 recommendations and rejects missing forward coverage, stale scans and failed
-localization. `deployment.collision_guard.ScanWriteGuard` can be explicitly
+localization. `vehicle_autonomy.autonomy.guidance.collision_guard.ScanWriteGuard` can be explicitly
 injected into the existing simulation writer with an admitted base_link scan
 reader; offline writer tests reject sudden obstacles after queue admission and
 preserve the original Stop path. It conservatively rejects reverse/turning and
@@ -177,7 +177,7 @@ ssh -NT -R 127.0.0.1:19436:127.0.0.1:19436 pi@192.168.50.2
 
 These tunnels must remain alive; they are not persistent services. The board
 has no observed default route and cannot be assumed to reach the server
-directly. `config/llm.server-tunnel.json` records only the observed endpoint/model.
+directly. `configs/llm.server-tunnel.json` records only the observed endpoint/model.
 The adapter also supports explicitly configured Ollama chat JSON. API keys, if
 required by another deployment, are read from a named environment variable.
 
@@ -198,8 +198,8 @@ python -m unittest discover -s tests -q
 VAF_SIMULATION_SITL_BIN_DIR=/absolute/reviewed/sitl/bin \
   ./scripts/test_hardware_ready_simulation.sh --allow-send --run-dir /tmp/vaf26-NEW
 # Explicit synthetic ROS software test, never a real RS16 claim:
-./scripts/with_ros2.sh python -m integrations.ros2.rs16_scan \
-  --config config/rs16-scan.json --health-file /tmp/scan-test.json --self-test
+./scripts/with_ros2.sh python -m vehicle_autonomy.world.sensors.lidar.rs16_scan \
+  --config configs/rs16-scan.json --health-file /tmp/scan-test.json --self-test
 # Board, separately declared non-Gazebo deployment unit profile:
 PYTHONPATH=. /home/pi/vehicle-autonomy/venv/bin/python scripts/test_onboard_readonly.py \
   --report /tmp/onboard-tests.json

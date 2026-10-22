@@ -10,7 +10,7 @@ import socket
 import sys
 import time
 
-from app.control import request
+from vehicle_autonomy.app.api.control import request
 from tests.simulation.launch import OwnedSimulation, ROOT, install_signal_cleanup
 
 
@@ -24,7 +24,7 @@ def run(directory):
         profile=directory/'profile.toml'
         profile.write_text((ROOT/'simulation/profiles/rover.toml').read_text().replace('port = 5760',f'port = {owned.port}'))
         def launch(send,suffix):
-            return owned.start_process('application'+suffix,[sys.executable,'-m','app.main','run','--profile','rover_sim',
+            return owned.start_process('application'+suffix,[sys.executable,'-m','vehicle_autonomy.app.cli','run','--profile','rover_sim',
                 '--config',str(profile),'--control-socket',str(endpoint),*(['--allow-send'] if send else [])])
         def ready():
             deadline=time.monotonic()+60
@@ -39,7 +39,7 @@ def run(directory):
         with socket.socket() as listener:
             listener.bind(('127.0.0.1',0));port=listener.getsockname()[1]
         token_file=directory/'token'
-        web=owned.start_process('web',[sys.executable,'-m','app.web','--control-socket',str(endpoint),
+        web=owned.start_process('web',[sys.executable,'-m','vehicle_autonomy.app.web.cli','--control-socket',str(endpoint),
             '--port',str(port),'--data-dir',str(directory/'console'),'--token-file',str(token_file),'--missions','disarmed_mode'])
         deadline=time.monotonic()+8
         while time.monotonic()<deadline and not token_file.exists():owned.assert_alive();time.sleep(.05)

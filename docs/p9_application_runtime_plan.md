@@ -7,26 +7,26 @@
 目标是让一个独立进程通过正式入口启动、连接已运行的 localhost SITL、持续读取和发布 `WorldSnapshot`、接受已注册的 Typed Mission、查询运行状态、取消任务，并安全关闭。期望使用方式：
 
 ```bash
-python -m app.main run --profile copter_sim
-python -m app.main ctl --profile copter_sim status
-python -m app.main ctl --profile copter_sim start --mission disarmed_mode
-python -m app.main ctl --profile copter_sim cancel
-python -m app.main ctl --profile copter_sim shutdown
+python -m vehicle_autonomy.app.cli run --profile copter_sim
+python -m vehicle_autonomy.app.cli ctl --profile copter_sim status
+python -m vehicle_autonomy.app.cli ctl --profile copter_sim start --mission disarmed_mode
+python -m vehicle_autonomy.app.cli ctl --profile copter_sim cancel
+python -m vehicle_autonomy.app.cli ctl --profile copter_sim shutdown
 ```
 
 `rover_sim` 使用同一组命令。`run` 默认只读，双 SEND 关闭；需要发送**已注册的受限 Mission**时，进程启动者须显式传入 `--allow-send`。控制客户端不能自行开启 SEND、创建租约、提交任意 Effect、传入任意 MAVLink 指令或更改 Safety。P9 最小 Mission 只复用现有 `sitl.unarmed_mode` Action：Copter 在未解锁时请求 GUIDED，Rover 在未解锁时请求 HOLD，并以 ACK **加后续新状态**确认。两车起飞、行驶及业务 Action 属于 P12/P13，不通过 P9 CLI 暴露。
 
-“正式”指应用生命周期、配置和用例接口成为仓库受支持的入口；**不指生产 onboard/实车验收**。本阶段只支持数值 loopback TCP、ArduPilot SITL 与本地进程控制。Gazebo 真值继续只用于测试 Oracle，不进入运行时。默认 `python -m app.main status` 的断连语义保留；运行中状态通过 `ctl status` 查询。
+“正式”指应用生命周期、配置和用例接口成为仓库受支持的入口；**不指生产 onboard/实车验收**。本阶段只支持数值 loopback TCP、ArduPilot SITL 与本地进程控制。Gazebo 真值继续只用于测试 Oracle，不进入运行时。默认 `python -m vehicle_autonomy.app.cli status` 的断连语义保留；运行中状态通过 `ctl status` 查询。
 
 ## 2. 当前代码事实与需解决的接口缺口
 
 | 现有能力 | 位置 | P9 需要做的事 |
 | --- | --- | --- |
-| 两车周期、遥测→WorldModel、授权/Safety、唯一 writer、断链和 Stop | `deployment/simulation_runtime.py::SimulationRuntime` | 由长期运行 Application 调度；不复制控制循环 |
-| 严格 Copter/Rover 仿真配置 | `runtime/simulation_profile.py`、`simulation/profiles/{copter,rover}.toml` | 增加白名单 profile 名与应用配置；保留原 Safety、时限和车辆模式映射 |
-| Typed Action/Mission 与结果回流 | `core/sitl_mode_action.py`、`core/mission_runtime.py`、`core/mission.py`、`core/action_registry.py` | 为已注册 Mission 建编排器和结果桥接，避免 Application 直接发送命令 |
-| Application 用例外壳 | `application/mission_service.py`、`application/service.py` | 定义运行进程的状态/启动/取消/关闭用例，避免向接口泄漏 Port/Transport |
-| CLI 入口 | `app/main.py` | 新增 `run`/`ctl`，保留 `status`、`run-sitl`、`run-sitl-arm` 行为和参数 |
+| 两车周期、遥测→WorldModel、授权/Safety、唯一 writer、断链和 Stop | `src/vehicle_autonomy/app/bootstrap/simulation_runtime.py::SimulationRuntime` | 由长期运行 Application 调度；不复制控制循环 |
+| 严格 Copter/Rover 仿真配置 | `src/vehicle_autonomy/app/bootstrap/simulation_profile.py`、`simulation/profiles/{copter,rover}.toml` | 增加白名单 profile 名与应用配置；保留原 Safety、时限和车辆模式映射 |
+| Typed Action/Mission 与结果回流 | `src/vehicle_autonomy/actions/common/sitl_mode.py`、`src/vehicle_autonomy/engine/mission/runtime.py`、`src/vehicle_autonomy/engine/mission/compiler.py`、`src/vehicle_autonomy/engine/action/registry.py` | 为已注册 Mission 建编排器和结果桥接，避免 Application 直接发送命令 |
+| Application 用例外壳 | `src/vehicle_autonomy/app/api/mission_service.py`、`src/vehicle_autonomy/app/api/service.py` | 定义运行进程的状态/启动/取消/关闭用例，避免向接口泄漏 Port/Transport |
+| CLI 入口 | `src/vehicle_autonomy/app/cli.py` | 新增 `run`/`ctl`，保留 `status`、`run-sitl`、`run-sitl-arm` 行为和参数 |
 | 仿真验收系统 | `tests/simulation/`、`scripts/test_simulation_v1.sh` | 新增真实进程 E2E，且原 125 项及完整回归不退化 |
 
 关键接口差异：`MissionRuntime.tick()` 产生带 Run/Action/Effect ID、期限的 `EffectEnvelope`；当前 `SimulationRuntime.submit_effect()` 会自行创建另一份 Envelope，并把整个 run 固定在 `:control:1` Action 上。后续实现**不能**直接把 Action 的 `effect` 值转交 `submit_effect()`，否则会丢失 Mission 的身份/期限/作用域。应在车辆 Runtime 增加受控的 `dispatch_envelope(envelope)` 或等价注入式适配方法：验证 envelope 属于当前 Run 和当前获授权的 Action、期限/时钟/重复 ID，再调用已有 `VehicleExecution.dispatch`；唯一写入点、Safety 和 ControlAuthority 保持不变。每个 Mission step 的 Lease 随 Action ID 显式切换；授权未开启时仍可看到拒绝结果，不能因为任务 API 存在就自动开门。
@@ -36,7 +36,7 @@ python -m app.main ctl --profile copter_sim shutdown
 ## 3. 推荐装配与职责
 
 ```text
-app.main run / app.main ctl
+vehicle_autonomy.app.cli run / vehicle_autonomy.app.cli ctl
          │ 本机控制协议（仅用例请求）
          ▼
 ApplicationRuntime / ApplicationService
@@ -46,7 +46,7 @@ ApplicationRuntime / ApplicationService
           └── Copter/Rover translator → MAVLink writer → localhost SITL
 ```
 
-建议文件：`application/runtime_service.py`（用例与任务状态）、`deployment/application_runtime.py`（进程装配/调度/重连）、`runtime/application_profile.py` 或 `runtime/profiles.py`（仅两个允许的 profile 名）、`app/control.py`（本机请求协议）、`app/main.py`（CLI）。实际文件名可按现有风格调整，但要保持 Application 不导入 MAVLink/Transport/VehicleCommandPort；具体装配只能在 `deployment/` 或 `app/`，控制链不进入 `application/`。
+建议文件：`src/vehicle_autonomy/app/api/runtime_service.py`（用例与任务状态）、`src/vehicle_autonomy/app/bootstrap/application_runtime.py`（进程装配/调度/重连）、`src/vehicle_autonomy/app/bootstrap/application_profile.py` 或 `configs/profiles.py`（仅两个允许的 profile 名）、`src/vehicle_autonomy/app/api/control.py`（本机请求协议）、`src/vehicle_autonomy/app/cli.py`（CLI）。实际文件名可按现有风格调整，但要保持 Application 不导入 MAVLink/Transport/VehicleCommandPort；具体装配只能在 `deployment/` 或 `app/`，控制链不进入 `application/`。
 
 ### 生命周期状态
 
@@ -87,10 +87,10 @@ P9 仅注册一个**有限、可审计**的 `disarmed_mode` Mission。Copter 参
 
 ```bash
 python -m unittest discover -s tests -q
-python -m app.main status
-python -m app.main run --profile copter_sim          # 另一个终端，需先启动自己的 SITL/Gazebo
-python -m app.main ctl --profile copter_sim status
-python -m app.main ctl --profile copter_sim shutdown
+python -m vehicle_autonomy.app.cli status
+python -m vehicle_autonomy.app.cli run --profile copter_sim          # 另一个终端，需先启动自己的 SITL/Gazebo
+python -m vehicle_autonomy.app.cli ctl --profile copter_sim status
+python -m vehicle_autonomy.app.cli ctl --profile copter_sim shutdown
 ./scripts/test_simulation_v1.sh
 ```
 
@@ -100,7 +100,7 @@ python -m app.main ctl --profile copter_sim shutdown
 
 只有以下条件全部满足才能在进度文档标记 **P9 PASS**：
 
-1. `app.main run --profile copter_sim|rover_sim` 是可持续运行、可状态查询和安全关闭的正式仿真入口；不依赖 `tests/simulation/*` 进程作为应用主进程。
+1. `vehicle_autonomy.app.cli run --profile copter_sim|rover_sim` 是可持续运行、可状态查询和安全关闭的正式仿真入口；不依赖 `tests/simulation/*` 进程作为应用主进程。
 2. 进程默认只读、双 SEND 关闭；无活跃任务也关闭发送；控制客户端无法绕过注册表、Action、Execution、Safety、Authority、唯一 writer。
 3. 两车均能通过 Application 用例运行已注册的受限 `disarmed_mode` Typed Mission，看到完整结果链；无 ACK、旧状态、取消或断链不能报告成功。
 4. 新鲜遥测与 WorldSnapshot 持续可查询；断线自动退回只读状态，新会话不得恢复旧任务或旧授权；连接未建立时状态可查询且明确错误。

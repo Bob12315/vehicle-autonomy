@@ -1,15 +1,15 @@
 """Payload queue, final authorization fence, observed completion and irreversibility."""
 from dataclasses import replace
 import unittest
-from contracts.core.geometry import Vector3
-from contracts.core.primitives import SchemaVersion
-from contracts.core.quality import QualityState
-from contracts.core.stamped import Stamped
-from contracts.effects.payload import ReleasePayloadEffect,PayloadEffectEnvelope
-from core.control_authority import ControlAuthority,ControlLease
-from core.payload_execution import PayloadExecution,PayloadSafetyPolicy
-from infrastructure.simulation.payload import SimPayloadPort
-from world_model.models import WorldObject
+from vehicle_autonomy.contracts.core.geometry import Vector3
+from vehicle_autonomy.contracts.core.primitives import SchemaVersion
+from vehicle_autonomy.contracts.core.quality import QualityState
+from vehicle_autonomy.contracts.core.stamped import Stamped
+from vehicle_autonomy.contracts.effects.payload import ReleasePayloadEffect,PayloadEffectEnvelope
+from vehicle_autonomy.engine.control.control_authority import ControlAuthority,ControlLease
+from vehicle_autonomy.engine.control.payload_execution import PayloadExecution,PayloadSafetyPolicy
+from vehicle_autonomy.actions.devices.simulation_payload import SimPayloadPort
+from vehicle_autonomy.world.model.models import WorldObject
 from tests import test_basic_actions as helpers
 from tests.test_payload_contracts import Reader
 

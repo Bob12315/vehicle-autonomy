@@ -18,7 +18,7 @@
                   几何路径 JSON（executable=false）
 ```
 
-`planning/` 的不可变模型、坐标转换、碰撞校验和 `application/planning.py` 不依赖 ROS、车辆端口、协议或 Transport。`app.plan` 是独立的显式只读入口，普通 Python 即可运行；ROS 环境只加载到它创建的 backend 子进程。长运行车辆 App 的周期、Mission、Action、双 SEND、Lease、Safety 和唯一 writer 没有改变。
+`src/vehicle_autonomy/autonomy/planning/` 的不可变模型、坐标转换、碰撞校验和 `src/vehicle_autonomy/autonomy/planning/service.py` 不依赖 ROS、车辆端口、协议或 Transport。`vehicle_autonomy.app.planning` 是独立的显式只读入口，普通 Python 即可运行；ROS 环境只加载到它创建的 backend 子进程。长运行车辆 App 的周期、Mission、Action、双 SEND、Lease、Safety 和唯一 writer 没有改变。
 
 每次请求创建独立 namespace、ROS domain 和自有进程组，只启动 Nav2 Planner Server。地图和 TF 使用请求私有 topic；没有车辆连接或运动命令 topic。P19 本身不接现有 Goto；后续显式路径准入与跟踪见 [P20](rover_path_following.md)，规划入口仍为只读。
 
@@ -40,7 +40,7 @@ scripts/with_ros2.sh ros2 pkg prefix nav2_planner
 元数据和原报告来源见 [recorded_map.json](../simulation/planning/recorded_map.json)。可直接规划：
 
 ```bash
-python -m app.plan \
+python -m vehicle_autonomy.app.planning \
   --map-store simulation/planning/maps \
   --map-sha256 e0e7a625e27ed2ac86b9621543cd9fd934af395b04431efd884e63f71af34081 \
   --frame map --start 0 0 --goal 1.9 3.5 \
@@ -54,7 +54,7 @@ python -m app.plan \
 已有显式只读 Rover App、P18 Mapping 栈时，保持两者运行，再在独立进程调用：
 
 ```bash
-python -m app.plan --mapping-config /absolute/path/mapping.toml \
+python -m vehicle_autonomy.app.planning --mapping-config /absolute/path/mapping.toml \
   --control-socket /absolute/path/app.sock \
   --frame map --start 0 0 --goal 1 0 \
   --output artifacts/simulation/live-plan.json

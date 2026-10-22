@@ -2,8 +2,8 @@
 from datetime import datetime, timezone
 import unittest
 from pymavlink.dialects.v20 import ardupilotmega as mav
-from contracts.core.time import TimePoint
-from deployment.simulation_clock import SimulationSourceClock
+from vehicle_autonomy.contracts.core.time import TimePoint
+from vehicle_autonomy.vehicles.ardupilot.simulation_clock import SimulationSourceClock
 
 
 class SourceClockTests(unittest.TestCase):

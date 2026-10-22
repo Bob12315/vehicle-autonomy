@@ -7,8 +7,8 @@ import json
 from pathlib import Path
 import time
 
-from infrastructure.transports.readonly import ReadOnlySerial
-from protocols.mavlink.readonly import ReceiveDecoder, TelemetryDiagnostics
+from vehicle_autonomy.vehicles.ardupilot.transports.readonly import ReadOnlySerial
+from vehicle_autonomy.vehicles.ardupilot.mavlink.readonly import ReceiveDecoder, TelemetryDiagnostics
 
 
 def main():

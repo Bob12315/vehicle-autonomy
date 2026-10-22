@@ -5,11 +5,11 @@
 冻结范围：仅 `copter_sim`/`rover_sim` 数值 loopback 配置；本机 Unix socket 一行 JSON 用例请求，8192 字节、16 客户端、1 秒处理期限，socket 0600；不接受 Effect/MAVLink/授权配置。重复 mutation request ID 缓存结果，内容冲突拒绝；缓存满后拒绝新 mutation，不淘汰后重执行。
 
 ```bash
-python -m app.main run --profile copter_sim --allow-send
-python -m app.main ctl --profile copter_sim status
-python -m app.main ctl --profile copter_sim start --mission disarmed_mode
-python -m app.main ctl --profile copter_sim cancel
-python -m app.main ctl --profile copter_sim shutdown
+python -m vehicle_autonomy.app.cli run --profile copter_sim --allow-send
+python -m vehicle_autonomy.app.cli ctl --profile copter_sim status
+python -m vehicle_autonomy.app.cli ctl --profile copter_sim start --mission disarmed_mode
+python -m vehicle_autonomy.app.cli ctl --profile copter_sim cancel
+python -m vehicle_autonomy.app.cli ctl --profile copter_sim shutdown
 ```
 
 `--config` 只在 run 入口接受，经严格 SimulationProfile 验证；`--control-socket` 指定端点。默认 SEND 关闭，无任务也关闭。MissionRuntime Envelope 的 Run/Action/Effect/期限直接进入 VehicleExecution，不重新构造身份；Deployment 对编译步骤授予租约。任务只允许未解锁 Copter GUIDED、Rover HOLD，以 ACK 和后续状态为成功条件。模式任务 15 秒截止，失败不自动重试。

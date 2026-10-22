@@ -7,13 +7,13 @@ from tempfile import TemporaryDirectory
 from types import SimpleNamespace
 import unittest
 
-from contracts.core.geometry import Vector3
-from contracts.core.quality import QualityState
-from guidance.path_following import PlanarBinding
-from integrations.ros2.run import boundary_overlay
-from localization.slam_candidate import SlamCandidateAudit
-from mapping.anchors import MapAnchor
-from mapping.grid import pose_to_json
+from vehicle_autonomy.contracts.core.geometry import Vector3
+from vehicle_autonomy.contracts.core.quality import QualityState
+from vehicle_autonomy.autonomy.guidance.path_following import PlanarBinding
+from vehicle_autonomy.app.bootstrap.ros2_run import boundary_overlay
+from vehicle_autonomy.world.localization.slam_candidate import SlamCandidateAudit
+from vehicle_autonomy.world.mapping.anchors import MapAnchor
+from vehicle_autonomy.world.mapping.grid import pose_to_json
 from tests import test_path_following as helpers
 
 
@@ -93,8 +93,8 @@ class ReliabilityTests(unittest.TestCase):
 
     def test_map_goal_binds_saved_coordinates_and_rejects_anchor_mutation(self):
         from tests.test_goal_navigation import GoalTests,Job
-        from application.navigation_goals import GoalCatalog
-        from deployment.goal_navigation import GoalNavigation
+        from vehicle_autonomy.autonomy.planning.goals import GoalCatalog
+        from vehicle_autonomy.app.scenarios.goal_navigation import GoalNavigation
         helper=GoalTests();helper.setUp();self.addCleanup(helper.doCleanups)
         env=helper.app.environment
         env.content_hash='a'*64;env.frame_epoch=helper.app.vehicle.world_epoch;env.home_name='HOME'

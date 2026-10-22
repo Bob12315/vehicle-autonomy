@@ -8,7 +8,7 @@ from pathlib import Path
 import sys
 import time
 
-from app.control import request
+from vehicle_autonomy.app.api.control import request
 from tests.simulation.launch import OwnedSimulation, install_signal_cleanup
 from tests.simulation.oracle import GazeboTruthOracle
 
@@ -35,7 +35,7 @@ def run(directory, duration_s=600, repeats=100):
         config = directory / 'profile.toml'
         config.write_text(Path('simulation/profiles/rover.toml').read_text().replace(
             'port = 5760', f'port = {owned.port}'))
-        app = owned.start_process('endurance-app', [sys.executable, '-m', 'app.main', 'run',
+        app = owned.start_process('endurance-app', [sys.executable, '-m', 'vehicle_autonomy.app.cli', 'run',
             '--profile', 'rover_sim', '--config', str(config), '--control-socket', str(endpoint), '--allow-send'])
 
         def state():

@@ -5,14 +5,14 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from types import SimpleNamespace as NS
 import unittest
-from application.autonomy_recipes import RecipeCatalog
-from contracts.core.geometry import Twist3,Vector3
-from contracts.core.primitives import ResourceVersion
-from contracts.core.quality import QualityState
-from contracts.core.stamped import Stamped
-from contracts.core.time import TimePoint
-from deployment.autonomy_business import AutonomyBusiness
-from planning.models import Pose2D
+from vehicle_autonomy.app.scenarios.autonomy_recipes import RecipeCatalog
+from vehicle_autonomy.contracts.core.geometry import Twist3,Vector3
+from vehicle_autonomy.contracts.core.primitives import ResourceVersion
+from vehicle_autonomy.contracts.core.quality import QualityState
+from vehicle_autonomy.contracts.core.stamped import Stamped
+from vehicle_autonomy.contracts.core.time import TimePoint
+from vehicle_autonomy.app.scenarios.autonomy_business import AutonomyBusiness
+from vehicle_autonomy.autonomy.planning.models import Pose2D
 
 
 class Navigation:

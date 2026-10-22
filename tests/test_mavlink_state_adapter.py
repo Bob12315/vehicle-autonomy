@@ -9,15 +9,15 @@ import math
 from pathlib import Path
 import unittest
 
-from application.state_chain import OfflineStateChain
-from contracts.core.geometry import Vector3
-from contracts.core.quality import QualityState
-from contracts.core.time import TimePoint
-from core.transform import rotate_vector
-from localization.reported import ReportedPoseLocalization
-from protocols.mavlink.telemetry import LocalPositionNed, decode_telemetry
-from vehicles.multirotor import ArduPilotTelemetryState
-from world_model import FreshnessLimits, WorldModel
+from vehicle_autonomy.world.model.state_chain import OfflineStateChain
+from vehicle_autonomy.contracts.core.geometry import Vector3
+from vehicle_autonomy.contracts.core.quality import QualityState
+from vehicle_autonomy.contracts.core.time import TimePoint
+from vehicle_autonomy.world.transform.tree import rotate_vector
+from vehicle_autonomy.world.localization.reported import ReportedPoseLocalization
+from vehicle_autonomy.vehicles.ardupilot.mavlink.telemetry import LocalPositionNed, decode_telemetry
+from vehicle_autonomy.vehicles.copter import ArduPilotTelemetryState
+from vehicle_autonomy.world.model import FreshnessLimits, WorldModel
 
 
 def at(ns: int, domain: str = "receiver") -> TimePoint:
@@ -130,7 +130,7 @@ class MavlinkStateAdapterTests(unittest.TestCase):
 
     def test_adapter_has_no_connection_or_command_import(self):
         root = Path(__file__).resolve().parents[1]
-        for relative in ("protocols/mavlink/telemetry.py", "vehicles/multirotor/mavlink_state.py"):
+        for relative in ("src/vehicle_autonomy/vehicles/ardupilot/mavlink/telemetry.py", "src/vehicle_autonomy/vehicles/ardupilot/telemetry_state.py"):
             tree = ast.parse((root / relative).read_text(encoding="utf-8"))
             imports = []
             for node in ast.walk(tree):
@@ -138,7 +138,7 @@ class MavlinkStateAdapterTests(unittest.TestCase):
                     imports.append(node.module or "")
                 elif isinstance(node, ast.Import):
                     imports.extend(alias.name for alias in node.names)
-            self.assertFalse(any(name.startswith(("legacy", "telemetry_link", "contracts.vehicle.command", "core.execution", "pymavlink"))
+            self.assertFalse(any(name.startswith(("legacy", "telemetry_link", "vehicle_autonomy.contracts.vehicle.command", "vehicle_autonomy.engine.control.execution", "pymavlink"))
                                  for name in imports), relative)
             self.assertFalse(any(isinstance(node, ast.Attribute) and node.attr in {"send_raw_message", "mavlink_connection"}
                                  for node in ast.walk(tree)), relative)

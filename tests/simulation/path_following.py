@@ -11,13 +11,13 @@ import sys
 import time
 from uuid import uuid4
 
-from app.control import request
-from guidance.path_following import PlanarBinding, drive_reference
-from guidance.navigation_model import FRONT_AXLE,resolve_model
+from vehicle_autonomy.app.api.control import request
+from vehicle_autonomy.autonomy.guidance.path_following import PlanarBinding, drive_reference
+from vehicle_autonomy.autonomy.guidance.navigation_model import FRONT_AXLE,resolve_model
 from tests.simulation.model_geometry import measure
-from mapping.grid import pose_from_json
-from actions.basic import yaw
-from planning.models import Pose2D
+from vehicle_autonomy.world.mapping.grid import pose_from_json
+from vehicle_autonomy.actions.common.basic import yaw
+from vehicle_autonomy.autonomy.planning.models import Pose2D
 from tests.simulation.launch import ROOT, OwnedSimulation, install_signal_cleanup
 from tests.simulation.oracle import GazeboTruthOracle
 from tests.simulation.ros2_mapping import ROOM_YAW, add_mapping_scene
@@ -160,14 +160,14 @@ def run(directory, case, *, autonomous=False, room_yaw=None, model_id=FRONT_AXLE
         owned.start_process("gazebo",["gz","sim","-s","-r",*flags,"-v3",str(owned.world_path)])
         owned.start_sitl()
         oracle=GazeboTruthOracle(owned.world,owned.model)
-        app=owned.start_process("application",[sys.executable,"-m","app.main","run","--profile","rover_sim",
+        app=owned.start_process("application",[sys.executable,"-m","vehicle_autonomy.app.cli","run","--profile","rover_sim",
             "--config",str(profile),"--control-socket",str(endpoint),"--ros2-mapping-config",str(mapping),
             "--navigation-config",str(config),"--allow-send",*(["--sim-sensor-config",str(calibration)] if calibration else [])])
-        owned.start_process("gz_bridge",[wrapper,sys.executable,"-m","integrations.ros2.run","ros_gz_bridge","parameter_bridge",
+        owned.start_process("gz_bridge",[wrapper,sys.executable,"-m","vehicle_autonomy.app.bootstrap.ros2_run","ros_gz_bridge","parameter_bridge",
             "--ros-args","-p",f"config_file:={bridge}"])
-        sidecar=owned.start_process("mapping_sidecar",[wrapper,sys.executable,"-m","integrations.ros2.mapping_node",
+        sidecar=owned.start_process("mapping_sidecar",[wrapper,sys.executable,"-m","vehicle_autonomy.world.mapping.ros2_node",
             "--config",str(mapping),"--control-socket",str(endpoint)])
-        owned.start_process("slam",[wrapper,sys.executable,"-m","integrations.ros2.run","slam_toolbox","async_slam_toolbox_node",
+        owned.start_process("slam",[wrapper,sys.executable,"-m","vehicle_autonomy.app.bootstrap.ros2_run","slam_toolbox","async_slam_toolbox_node",
             "--ros-args","--params-file",str(slam_parameters)])
         lifecycle("configure");lifecycle("activate")
         ready=wait(lambda s:s["state"]=="READY" and s["mapping"]["adopted"] and s['navigation']['planning_start'] is not None
@@ -205,7 +205,7 @@ def run(directory, case, *, autonomous=False, room_yaw=None, model_id=FRONT_AXLE
         heading=math.atan2(2*(q[3]*q[2]+q[0]*q[1]),1-2*(q[1]*q[1]+q[2]*q[2]))
         start=binding.to_map(drive_reference(Pose2D(position[0],position[1],heading),navigation_model))
         goal=binding.to_map(Pose2D(.8,2.0))
-        command=[sys.executable,"-m","app.plan","--mapping-config",str(mapping),"--control-socket",str(endpoint),
+        command=[sys.executable,"-m","vehicle_autonomy.app.planning","--mapping-config",str(mapping),"--control-socket",str(endpoint),
             "--start",f"{start.x:.9f}",f"{start.y:.9f}","--goal",f"{goal.x:.9f}",f"{goal.y:.9f}","--clearance",str(navigation_model.path_clearance_m),
             "--output",str(plan),"--evidence-directory",str(directory/"nav2")]
         origin=oracle.latest()

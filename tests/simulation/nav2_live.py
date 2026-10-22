@@ -5,13 +5,13 @@ from pathlib import Path
 import time
 from uuid import uuid4
 
-from app.control import request
-from app.plan import LiveMapProvider
-from application.planning import ReadOnlyPlanningService
-from integrations.ros2.nav2_planner import Nav2Planner
-from mapping.exchange import MappingConfig
-from mapping.grid import atomic_json
-from planning.models import Pose2D
+from vehicle_autonomy.app.api.control import request
+from vehicle_autonomy.app.planning import LiveMapProvider
+from vehicle_autonomy.autonomy.planning.service import ReadOnlyPlanningService
+from vehicle_autonomy.autonomy.planning.nav2_planner import Nav2Planner
+from vehicle_autonomy.world.mapping.exchange import MappingConfig
+from vehicle_autonomy.world.mapping.grid import atomic_json
+from vehicle_autonomy.autonomy.planning.models import Pose2D
 from tests.simulation.launch import ROOT,install_signal_cleanup
 from tests.simulation.nav2_planning import oracle
 from tests.simulation.ros2_mapping import run

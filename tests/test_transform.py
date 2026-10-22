@@ -6,9 +6,9 @@ from datetime import datetime, timezone
 import math
 import unittest
 
-from contracts.core.geometry import Pose3, Quaternion, Transform3, Twist3, Vector3
-from contracts.core.time import TimePoint
-from core.transform import TransformTree
+from vehicle_autonomy.contracts.core.geometry import Pose3, Quaternion, Transform3, Twist3, Vector3
+from vehicle_autonomy.contracts.core.time import TimePoint
+from vehicle_autonomy.world.transform.tree import TransformTree
 
 
 def at(ns: int, domain: str = "clock") -> TimePoint:

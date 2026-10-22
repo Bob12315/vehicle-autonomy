@@ -1,0 +1,63 @@
+{
+  "original_head": "6df9fe91819f430c7a0d8f153ff2b06b86895915",
+  "python": "Python 3.12.3",
+  "unit": {
+    "tests": 340,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "elapsed_s": 31.629
+  },
+  "legacy_p0": {
+    "tests": 138,
+    "failures": 0,
+    "elapsed_s": 1.18
+  },
+  "preflight": {
+    "checks": {
+      "copter_binary": true,
+      "copter_telemetry_params": true,
+      "copter_world": true,
+      "gazebo_plugin": true,
+      "gazebo_version": "Gazebo Sim, version 8.15.0\nCopyright (C) 2018 Open Source Robotics Foundation.\nReleased under the Apache 2.0 License.",
+      "isolated_instance": 1,
+      "plugin_dependencies": true,
+      "python_pymavlink": "2.4.49",
+      "python_pyserial": "3.5",
+      "rover_binary": true,
+      "rover_model": true,
+      "rover_telemetry_params": true,
+      "rover_world": true,
+      "tcp_5760_free": true,
+      "tcp_5762_free": true,
+      "tool_gz": true,
+      "tool_python": true,
+      "tool_ss": true,
+      "udp_9002_free": true
+    },
+    "passed": true,
+    "phase0": false
+  },
+  "external_revisions": {
+    "ardupilot": "b5fbe26515eddb9277e1b5e7a4fcf3f37cf449a6",
+    "gazebo_plugin": "3ec51428fd43deb7b71137192ba16394b450d78e"
+  },
+  "simulation": [
+    {
+      "name": "copter_full",
+      "exit": 0
+    },
+    {
+      "name": "rover_full",
+      "exit": 0
+    },
+    {
+      "name": "copter_faults",
+      "exit": 0
+    },
+    {
+      "name": "rover_faults",
+      "exit": 0
+    }
+  ]
+}

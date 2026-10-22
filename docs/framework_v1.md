@@ -141,24 +141,24 @@ Planning 和 Guidance 是按需参与的能力，并非每个 Action 都必须�
 app/                       进程入口与装配
 application/               框架用例与对外服务接口
 applications/              具体业务场景
-core/
-  runtime/ mission/ action/ execution/ safety/ lifecycle/
-contracts/
-  core/ vehicle/ sensor/ perception/ world/
-  planning/ environment/ intelligence/
-vehicles/                  车辆插件与车辆专用能力
-sensors/                   设备采集适配器（camera 等）
-perception/ localization/ mapping/ world_model/
-planning/ guidance/ intelligence/
-environments/              场景数据与环境适配器
+src/vehicle_autonomy/engine/
+  configs/ mission/ action/ execution/ safety/ lifecycle/
+src/vehicle_autonomy/contracts/
+  src/vehicle_autonomy/engine/ vehicle/ sensor/ src/vehicle_autonomy/world/perception/ world/
+  src/vehicle_autonomy/autonomy/planning/ environment/ src/vehicle_autonomy/autonomy/intelligence/
+src/vehicle_autonomy/vehicles/                  车辆插件与车辆专用能力
+src/vehicle_autonomy/world/sensors/                   设备采集适配器（camera 等）
+src/vehicle_autonomy/world/perception/ src/vehicle_autonomy/world/localization/ src/vehicle_autonomy/world/mapping/ src/vehicle_autonomy/world/model/
+src/vehicle_autonomy/autonomy/planning/ src/vehicle_autonomy/autonomy/guidance/ src/vehicle_autonomy/autonomy/intelligence/
+src/vehicle_autonomy/world/environment/              场景数据与环境适配器
 missions/                  可装配的任务定义与目录
 protocols/                 协议实现（如 MAVLink）
 infrastructure/transports/ 字节传输实现
 gateway/ deployment/ web_ui/
-config/ runtime/ tests/
+configs/ configs/ tests/
 ```
 
-共享语义和端口放在 `contracts/`；通用生命周期、校验和执行规则放在 `core/`。业务、车辆、协议及设备实现通过装配进入系统，不反向成为 Core 的依赖。
+共享语义和端口放在 `src/vehicle_autonomy/contracts/`；通用生命周期、校验和执行规则放在 `src/vehicle_autonomy/engine/`。业务、车辆、协议及设备实现通过装配进入系统，不反向成为 Core 的依赖。
 
 ## 6. 不可跨越的依赖规则
 

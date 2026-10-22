@@ -6,23 +6,23 @@ import argparse
 from datetime import datetime, timedelta, timezone
 import time
 
-from contracts.core.geometry import FrameId
-from contracts.core.primitives import ResourceVersion, SchemaVersion
-from contracts.core.quality import ComponentFreshness, FreshnessState
-from contracts.core.time import TimePoint
-from contracts.effects.vehicle import EffectEnvelope, ModeEffect
-from contracts.vehicle.command import CommandPhase
-from contracts.world.models import WorldSnapshot
-from core.control_authority import ControlAuthority, ControlLease
-from core.vehicle_execution import VehicleExecution
-from core.vehicle_safety import SafetyLimits, VehicleSafetyPolicy
-from infrastructure.transports.bytes import SerialByteTransport
-from protocols.mavlink.codec import MavlinkCodec
-from protocols.mavlink.constants import TYPE_GROUND_ROVER
-from vehicles.multirotor.mavlink_port import ArduPilotCommandPort
-from vehicles.multirotor.mavlink_state import ArduPilotTelemetryState
-from vehicles.multirotor.session import ArduPilotSession
-from vehicles.rover.diagnostic import RoverHoldDiagnosticTranslator
+from vehicle_autonomy.contracts.core.geometry import FrameId
+from vehicle_autonomy.contracts.core.primitives import ResourceVersion, SchemaVersion
+from vehicle_autonomy.contracts.core.quality import ComponentFreshness, FreshnessState
+from vehicle_autonomy.contracts.core.time import TimePoint
+from vehicle_autonomy.contracts.effects.vehicle import EffectEnvelope, ModeEffect
+from vehicle_autonomy.contracts.vehicle.command import CommandPhase
+from vehicle_autonomy.contracts.world.models import WorldSnapshot
+from vehicle_autonomy.engine.control.control_authority import ControlAuthority, ControlLease
+from vehicle_autonomy.engine.control.vehicle_execution import VehicleExecution
+from vehicle_autonomy.engine.control.vehicle_safety import SafetyLimits, VehicleSafetyPolicy
+from vehicle_autonomy.vehicles.ardupilot.transports.bytes import SerialByteTransport
+from vehicle_autonomy.vehicles.ardupilot.mavlink.codec import MavlinkCodec
+from vehicle_autonomy.vehicles.ardupilot.mavlink.constants import TYPE_GROUND_ROVER
+from vehicle_autonomy.vehicles.ardupilot.command_port import ArduPilotCommandPort
+from vehicle_autonomy.vehicles.ardupilot.telemetry_state import ArduPilotTelemetryState
+from vehicle_autonomy.vehicles.ardupilot.session import ArduPilotSession
+from vehicle_autonomy.vehicles.rover.diagnostic import RoverHoldDiagnosticTranslator
 
 
 def now() -> TimePoint:

@@ -5,15 +5,15 @@ import unittest
 
 from pymavlink.dialects.v20 import ardupilotmega as mavlink
 
-from contracts.core.geometry import Pose3, Quaternion, Twist3, Vector3
-from contracts.effects.vehicle import LandEffect, ModeEffect, TakeoffEffect, TwistTargetEffect
-from contracts.vehicle.command import PoseTargetCommand, StopMotionCommand, TwistTargetCommand
-from deployment.simulation_runtime import SimulationRuntime
-from runtime.simulation_profile import SimulationProfile
+from vehicle_autonomy.contracts.core.geometry import Pose3, Quaternion, Twist3, Vector3
+from vehicle_autonomy.contracts.effects.vehicle import LandEffect, ModeEffect, TakeoffEffect, TwistTargetEffect
+from vehicle_autonomy.contracts.vehicle.command import PoseTargetCommand, StopMotionCommand, TwistTargetCommand
+from vehicle_autonomy.app.bootstrap.simulation_runtime import SimulationRuntime
+from vehicle_autonomy.app.bootstrap.simulation_profile import SimulationProfile
 from tests.test_simulation_runtime import Clock, Transport
-from vehicles.multirotor.ardupilot_commands import ArduPilotCommandTranslator
-from vehicles.rover.ardupilot_commands import ArduRoverCommandTranslator
-from vehicles.rover.mavlink_state import RoverTelemetryState
+from vehicle_autonomy.vehicles.ardupilot.commands import ArduPilotCommandTranslator
+from vehicle_autonomy.vehicles.rover.ardupilot_commands import ArduRoverCommandTranslator
+from vehicle_autonomy.vehicles.rover.mavlink_state import RoverTelemetryState
 
 
 PROFILE = Path(__file__).resolve().parents[1] / "simulation/profiles/rover.toml"

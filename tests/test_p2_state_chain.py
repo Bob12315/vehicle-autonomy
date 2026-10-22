@@ -9,20 +9,20 @@ import json
 from pathlib import Path
 import unittest
 
-from application.state_chain import OfflineStateChain
-from contracts.core.geometry import Pose3, Quaternion, Vector3
-from contracts.core.primitives import ResourceVersion, SchemaVersion
-from contracts.core.quality import FreshnessState, QualityState
-from contracts.core.serialization import to_json_value
-from contracts.core.stamped import Stamped
-from contracts.core.time import TimePoint
-from contracts.localization.models import LocalizationEstimate
-from contracts.sensor import DetectedObject, Observation
-from contracts.vehicle.models import VehicleHealth, VehicleStateSnapshot
-from localization.reported import ReportedPoseLocalization
-from sensors.fake import FakeDetectionSensor
-from vehicles.fake import FakeVehicleStateSource
-from world_model import FreshnessLimits, WorldModel
+from vehicle_autonomy.world.model.state_chain import OfflineStateChain
+from vehicle_autonomy.contracts.core.geometry import Pose3, Quaternion, Vector3
+from vehicle_autonomy.contracts.core.primitives import ResourceVersion, SchemaVersion
+from vehicle_autonomy.contracts.core.quality import FreshnessState, QualityState
+from vehicle_autonomy.contracts.core.serialization import to_json_value
+from vehicle_autonomy.contracts.core.stamped import Stamped
+from vehicle_autonomy.contracts.core.time import TimePoint
+from vehicle_autonomy.contracts.localization.models import LocalizationEstimate
+from vehicle_autonomy.contracts.sensor import DetectedObject, Observation
+from vehicle_autonomy.contracts.vehicle.models import VehicleHealth, VehicleStateSnapshot
+from vehicle_autonomy.world.localization.reported import ReportedPoseLocalization
+from vehicle_autonomy.world.sensors.fake import FakeDetectionSensor
+from vehicle_autonomy.vehicles.fake import FakeVehicleStateSource
+from vehicle_autonomy.world.model import FreshnessLimits, WorldModel
 
 
 UTC = datetime(2026, 1, 1, tzinfo=timezone.utc)
@@ -191,8 +191,8 @@ class P2StateChainTests(unittest.TestCase):
     def test_state_chain_has_no_command_dependency(self):
         root = Path(__file__).resolve().parents[1]
         paths = (
-            "application/state_chain.py", "world_model/service.py", "world_model/models.py",
-            "sensors/fake.py", "vehicles/fake.py", "localization/reported.py",
+            "src/vehicle_autonomy/world/model/state_chain.py", "src/vehicle_autonomy/world/model/service.py", "src/vehicle_autonomy/world/model/models.py",
+            "src/vehicle_autonomy/world/sensors/fake.py", "src/vehicle_autonomy/vehicles/fake.py", "src/vehicle_autonomy/world/localization/reported.py",
         )
         for path in paths:
             tree = ast.parse((root / path).read_text(encoding="utf-8"))
@@ -202,8 +202,8 @@ class P2StateChainTests(unittest.TestCase):
                     imports.append((node.module or "", {alias.name for alias in node.names}))
                 elif isinstance(node, ast.Import):
                     imports.extend((alias.name, set()) for alias in node.names)
-            self.assertFalse(any(module.startswith(("core.execution", "contracts.vehicle.command", "protocols", "pymavlink", "legacy"))
-                                 or (module == "contracts.vehicle.ports" and "VehicleCommandPort" in names)
+            self.assertFalse(any(module.startswith(("vehicle_autonomy.engine.control.execution", "vehicle_autonomy.contracts.vehicle.command", "vehicle_autonomy.vehicles.ardupilot.mavlink", "pymavlink", "legacy"))
+                                 or (module == "vehicle_autonomy.contracts.vehicle.ports" and "VehicleCommandPort" in names)
                                  for module, names in imports), path)
 
 

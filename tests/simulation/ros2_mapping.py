@@ -12,11 +12,11 @@ import time
 from uuid import uuid4
 import xml.etree.ElementTree as ET
 
-from app.control import request
-from environments.resources import Environment
-from mapping.grid import MapStore, pose_from_json
-from core.transform import rotate_vector
-from contracts.core.geometry import Quaternion, Vector3
+from vehicle_autonomy.app.api.control import request
+from vehicle_autonomy.world.environment.resources import Environment
+from vehicle_autonomy.world.mapping.grid import MapStore, pose_from_json
+from vehicle_autonomy.world.transform.tree import rotate_vector
+from vehicle_autonomy.contracts.core.geometry import Quaternion, Vector3
 from tests.simulation.launch import ROOT, OwnedSimulation, install_signal_cleanup
 from tests.simulation.oracle import GazeboTruthOracle
 
@@ -115,7 +115,7 @@ def run(directory, *, smoke=False, planning_probe=None):
             raise RuntimeError(f"ROS command {label} exited {result}")
 
     def start_slam(label):
-        process = owned.start_process(label, [wrapper, sys.executable, "-m", "integrations.ros2.run", "slam_toolbox", "async_slam_toolbox_node",
+        process = owned.start_process(label, [wrapper, sys.executable, "-m", "vehicle_autonomy.app.bootstrap.ros2_run", "slam_toolbox", "async_slam_toolbox_node",
             "--ros-args", "--params-file", str(ROOT / "simulation/mapping/slam_toolbox.yaml")])
         ros_command(label + "_configure", "lifecycle", "set", "--no-daemon", "/slam_toolbox", "configure")
         return process
@@ -154,12 +154,12 @@ def run(directory, *, smoke=False, planning_probe=None):
         owned.start_process("gazebo", ["gz", "sim", "-s", "-r", *renderer_flags, "-v3", str(owned.world_path)])
         owned.start_sitl()
         oracle = GazeboTruthOracle(owned.world, owned.model)
-        app = owned.start_process("application", [sys.executable, "-m", "app.main", "run", "--profile", "rover_sim",
+        app = owned.start_process("application", [sys.executable, "-m", "vehicle_autonomy.app.cli", "run", "--profile", "rover_sim",
             "--config", str(profile), "--control-socket", str(endpoint), "--ros2-mapping-config", str(config),
             *([] if smoke else ["--allow-send"])])
-        owned.start_process("gz_bridge", [wrapper, sys.executable, "-m", "integrations.ros2.run", "ros_gz_bridge", "parameter_bridge",
+        owned.start_process("gz_bridge", [wrapper, sys.executable, "-m", "vehicle_autonomy.app.bootstrap.ros2_run", "ros_gz_bridge", "parameter_bridge",
             "--ros-args", "-p", f"config_file:={bridge}"])
-        sidecar = owned.start_process("mapping_sidecar", [wrapper, sys.executable, "-m", "integrations.ros2.mapping_node",
+        sidecar = owned.start_process("mapping_sidecar", [wrapper, sys.executable, "-m", "vehicle_autonomy.world.mapping.ros2_node",
             "--config", str(config), "--control-socket", str(endpoint)])
         slam = start_slam("slam")
         ros_command("slam_activate", "lifecycle", "set", "--no-daemon", "/slam_toolbox", "activate")
@@ -180,7 +180,7 @@ def run(directory, *, smoke=False, planning_probe=None):
             origin = oracle.latest()
             initial_pose = ready["vehicle"]["pose"]["position"]
             environment = Environment.load(ROOT / "simulation/environments/rover.toml").bind(ready["world_version"]["generation"])
-            cli = subprocess.run([sys.executable, "-m", "app.main", "ctl", "--profile", "rover_sim",
+            cli = subprocess.run([sys.executable, "-m", "vehicle_autonomy.app.cli", "ctl", "--profile", "rover_sim",
                 "--control-socket", str(endpoint), "start", "--mission", "basic_route"], capture_output=True, text=True, timeout=4)
             if cli.returncode:
                 raise RuntimeError(cli.stdout)

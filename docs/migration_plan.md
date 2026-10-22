@@ -44,7 +44,7 @@
 
 ### 阶段 0：建立可核对的迁移清单
 
-P0 已按 `contracts/`、`telemetry_link` 的 state/frame/time、依赖这些合同的 `application/core/` 文件和相关测试完成限定范围审计；邻接的 Execution/writer 仅用于确认安全边界。见[基线与测试记录](migration/p0_baseline.md)、[候选归属及依赖表](migration/p0_inventory.md)。此完成状态不覆盖旧应用的全部模块，也不表示任何代码已经迁移。
+P0 已按 `src/vehicle_autonomy/contracts/`、`telemetry_link` 的 state/frame/time、依赖这些合同的 `application/core/` 文件和相关测试完成限定范围审计；邻接的 Execution/writer 仅用于确认安全边界。见[基线与测试记录](migration/p0_baseline.md)、[候选归属及依赖表](migration/p0_inventory.md)。此完成状态不覆盖旧应用的全部模块，也不表示任何代码已经迁移。
 
 从旧系统的实际生产入口、调用方、配置和测试出发，不以目录名推断复用性。每个候选至少记录：
 
@@ -57,7 +57,7 @@ P0 已按 `contracts/`、`telemetry_link` 的 state/frame/time、依赖这些合
 
 ### 阶段 1：先统一合同
 
-以 [V1 基础合同冻结规范](foundation_contracts_v1.md) 为阶段 1 的语义依据，对照根目录现有 `Effect(operation: str, parameters)`、最小 `WorldSnapshot` 和 `VehicleCommandPort.submit(effect)`，逐项记录并消除差异；不直接复制旧 `contracts/`。先落实单位、坐标系、时钟域、来源、质量和失效含义，再让适配器使用合同。车辆能力描述与运行时许可分开；合同不能暗含 SEND 授权。规范中的基础语义如需修改，应记录无法由 Adapter 或迁移层解决的具体问题。
+以 [V1 基础合同冻结规范](foundation_contracts_v1.md) 为阶段 1 的语义依据，对照根目录现有 `Effect(operation: str, parameters)`、最小 `WorldSnapshot` 和 `VehicleCommandPort.submit(effect)`，逐项记录并消除差异；不直接复制旧 `src/vehicle_autonomy/contracts/`。先落实单位、坐标系、时钟域、来源、质量和失效含义，再让适配器使用合同。车辆能力描述与运行时许可分开；合同不能暗含 SEND 授权。规范中的基础语义如需修改，应记录无法由 Adapter 或迁移层解决的具体问题。
 
 **P1 实际实现（2026-09-30）：** 新根目录新增经过校验的 ID、`SchemaVersion`、`ResourceVersion`、`FrozenJson`、`TimePoint`/三类时间事实、`FrameId` 与 SI 几何、`Stamped`、质量/新鲜度、Typed `Observation`、车辆自报 `VehicleStateSnapshot`、独立 `LocalizationEstimate` 和独立 `LinkStateSnapshot`。`WorldSnapshot` 现在不可变、版本化，含车辆/定位、资源引用、固定新鲜度与输入版本依赖。新增请求型 Typed Vehicle Effect 与 `EffectEnvelope`，以及分离的 `VehicleCommandEnvelope`、命令状态/取消值和 `submit/cancel/status` 窄端口；车辆状态查询、定位查询、世界查询、Transform Resolver 均为只读/纯接口。合同仅依赖 Python 标准库和同层合同。
 
@@ -73,7 +73,7 @@ P0 已按 `contracts/`、`telemetry_link` 的 state/frame/time、依赖这些合
 
 **失效语义：** 发布时根据相同 `clock_domain_id` 的 monotonic 时间计算固定新鲜度；车辆/定位的发布及 Stamped 采集时间、观测的采集及接收时间均参与检查。超过注入的纳秒 TTL 为 `STALE`；缺失、未来时间或不同 clock domain 为 `UNKNOWN`。不可用、无效质量及非新鲜输入不会成为快照中的当前车辆、定位或对象，但仍保留已有输入版本依赖；质量与新鲜度各自判断。状态源明确变为缺失时下一版快照立即清除车辆及该投影定位。`WorldModel` 拒绝回退的状态版本/发布时间、复用版本但改变内容、倒退的观测序号及同域倒置的时间事实。
 
-**旧实现判断与剩余边界：** 审核了归档 `world_model/service.py`、`projection.py` 和 `application/core/snapshot_collector.py`。其单次发布切面值得保留，但它们直接依赖旧 platform/perception DTO、NED 标量、比赛 Environment/Field 及混入 SEND 的运行快照，因此 P2 按新合同重写，未复制旧模块。当前检测由假源直接构造，不声称相机或感知模型接入；没有地图、Environment、Transform 求解器、跨 Frame 变换、真实车辆/传感器适配器或设备连接。旧系统基于接收时间和固定 2 秒的感知新鲜度规则没有带入 Core；P2 使用显式、注入的 TTL 与采集时间。状态链没有车辆命令端口，P3/P4 的 Mission/Action 与控制行为均未开始。
+**旧实现判断与剩余边界：** 审核了归档 `src/vehicle_autonomy/world/model/service.py`、`projection.py` 和 `application/core/snapshot_collector.py`。其单次发布切面值得保留，但它们直接依赖旧 platform/perception DTO、NED 标量、比赛 Environment/Field 及混入 SEND 的运行快照，因此 P2 按新合同重写，未复制旧模块。当前检测由假源直接构造，不声称相机或感知模型接入；没有地图、Environment、Transform 求解器、跨 Frame 变换、真实车辆/传感器适配器或设备连接。旧系统基于接收时间和固定 2 秒的感知新鲜度规则没有带入 Core；P2 使用显式、注入的 TTL 与采集时间。状态链没有车辆命令端口，P3/P4 的 Mission/Action 与控制行为均未开始。
 
 **P2 验证：** `/usr/bin/time -p python -m unittest discover -s tests -v`：21 passed、0 failed、0 skipped；测试运行 0.026 s，墙钟 0.10 s。新增 7 项覆盖端到端离线组合、时间/Frame/来源与序列化、缺失/过期/未来/跨域、质量独立、版本回退、只读查询、无控制字段及无命令端口依赖；P1 原有 14 项全部通过。`python -m compileall -q application contracts localization sensors vehicles world_model tests` 通过。根目录 Python import 搜索未发现 `legacy`、`pymavlink`、`telemetry_link` 或 `protocols` 导入；依赖测试通过。无失败需归因于既有 baseline 或新问题。未修改归档树，故未运行旧树测试。
 
@@ -87,7 +87,7 @@ P0 已按 `contracts/`、`telemetry_link` 的 state/frame/time、依赖这些合
 
 **验证与边界：** `/usr/bin/time -p python -m unittest discover -s tests -v`：32 passed、0 failed、0 skipped，测试 0.044 s，墙钟 0.12 s。新增 8 项 P3 与 3 项 Transform 测试，覆盖编译拒绝、运行结果、重试、取消与 stop 请求、退出异常、效果白名单、静态/动态 Frame 和失败路径；原 21 项通过。`python -m compileall -q contracts core application world_model tests` 通过。P3 不分派 Effect、不持有 `VehicleCommandPort`，也不实现 P4 授权、Safety、队列、回执和连续命令物理停止；离线退出屏障完成不等于车辆已停止。真实设备适配与物理验证仍按设备阶段单独记录。
 
-**附加只读设备状态适配（ArduPilot 假设）：** 用户要求继续处理真实设备适配，但未给出设备型号；根据旧仓库的 ArduPilot/MAVLink 遥测链，先实现 `protocols/mavlink/telemetry.py` 对真实 parsed message 形状的接收侧解码，及 `vehicles/multirotor/mavlink_state.py` 到 P1 `VehicleStateSnapshot` 的规范化。NED 位置/速度转换为 ENU，FRD/NED 姿态与角速度转换为 FLU/ENU；保留独立采集、接收、发布时间，并只在位置/姿态采样差处于显式上限内组合 Pose/Twist。GPS fix、协议缺失值、心跳时效、来源 system/component 与 LinkState 分开处理。调用方必须提供可信的 `captured_at` 与 `received_at`；飞控 boot time 未被冒充为本机单调时间。适配器可作为 P2 `VehicleStatePort` 输入，但没有打开物理连接、`pymavlink` writer 或命令提交方法。旧 `MavlinkClient` 含 `send_raw_message`，故未迁入。此项是**已验证的消息到状态适配**，不是实机连接或设备验收；具体设备若非 ArduPilot，需按实际协议调整。P4 安全边界及 P5 设备组合门槛仍未完成。`/usr/bin/time -p python -m unittest discover -s tests -v`：37 passed、0 failed、0 skipped，测试 0.143 s、墙钟 0.24 s，其中 5 项新适配测试覆盖实际 `pymavlink` 消息对象、坐标与缺失值；编译检查通过，生产包未导入 `legacy`、`telemetry_link` 或 `pymavlink`。
+**附加只读设备状态适配（ArduPilot 假设）：** 用户要求继续处理真实设备适配，但未给出设备型号；根据旧仓库的 ArduPilot/MAVLink 遥测链，先实现 `src/vehicle_autonomy/vehicles/ardupilot/mavlink/telemetry.py` 对真实 parsed message 形状的接收侧解码，及 `src/vehicle_autonomy/vehicles/ardupilot/telemetry_state.py` 到 P1 `VehicleStateSnapshot` 的规范化。NED 位置/速度转换为 ENU，FRD/NED 姿态与角速度转换为 FLU/ENU；保留独立采集、接收、发布时间，并只在位置/姿态采样差处于显式上限内组合 Pose/Twist。GPS fix、协议缺失值、心跳时效、来源 system/component 与 LinkState 分开处理。调用方必须提供可信的 `captured_at` 与 `received_at`；飞控 boot time 未被冒充为本机单调时间。适配器可作为 P2 `VehicleStatePort` 输入，但没有打开物理连接、`pymavlink` writer 或命令提交方法。旧 `MavlinkClient` 含 `send_raw_message`，故未迁入。此项是**已验证的消息到状态适配**，不是实机连接或设备验收；具体设备若非 ArduPilot，需按实际协议调整。P4 安全边界及 P5 设备组合门槛仍未完成。`/usr/bin/time -p python -m unittest discover -s tests -v`：37 passed、0 failed、0 skipped，测试 0.143 s、墙钟 0.24 s，其中 5 项新适配测试覆盖实际 `pymavlink` 消息对象、坐标与缺失值；编译检查通过，生产包未导入 `legacy`、`telemetry_link` 或 `pymavlink`。
 
 ### 阶段 4：证明控制边界
 
@@ -141,13 +141,13 @@ P6 已在 **localhost ArduCopter SITL** 接通状态发布、Typed Mission、Eff
 
 | 旧代码候选 | 目标归属 | 主要审查点 |
 | --- | --- | --- |
-| `contracts/core/`、`contracts/platform/`、`contracts/sensors/` | `contracts/` | 与新类型的语义差异、时钟/坐标、是否引入旧平台 DTO |
-| `sensors/camera/`、`perception/fusion/`、`guidance/` 的纯计算 | `sensors/`、`perception/`、`localization/` 或 `guidance/` | 设备依赖、相机标定、场地坐标及比赛默认值 |
-| `world_model/` | `world_model/` | 快照来源、新鲜度、线程模型和旧合同依赖 |
-| `missions/core/`、`application/core/` | `core/mission/`、`core/action/`、`core/runtime/` | 旧候选 Core 与旧生产运行时的双 owner、取消与退出语义 |
-| `execution/`、`telemetry_link/command_broker.py` | `core/execution/`、`core/safety/` 及受控设备边界 | 双 SEND、Safety 配置、代际、stop/zero、回执和唯一 writer |
-| `vehicles/multirotor/`、`protocols/mavlink/`、`infrastructure/transports/` | 对应插件、协议、传输包 | 车辆语义与协议/字节 I/O 分离，禁止提前生产接线 |
-| `applications/cuadc_2026/`、`environments/cuadc_2026/` | 具体应用或环境示例，默认保留归档 | 比赛业务语义不得进入通用 Core |
+| `src/vehicle_autonomy/contracts/core/`、`src/vehicle_autonomy/contracts/platform/`、`src/vehicle_autonomy/contracts/sensors/` | `src/vehicle_autonomy/contracts/` | 与新类型的语义差异、时钟/坐标、是否引入旧平台 DTO |
+| `src/vehicle_autonomy/world/sensors/camera/`、`src/vehicle_autonomy/world/perception/fusion/`、`src/vehicle_autonomy/autonomy/guidance/` 的纯计算 | `src/vehicle_autonomy/world/sensors/`、`src/vehicle_autonomy/world/perception/`、`src/vehicle_autonomy/world/localization/` 或 `src/vehicle_autonomy/autonomy/guidance/` | 设备依赖、相机标定、场地坐标及比赛默认值 |
+| `src/vehicle_autonomy/world/model/` | `src/vehicle_autonomy/world/model/` | 快照来源、新鲜度、线程模型和旧合同依赖 |
+| `missions/core/`、`application/core/` | `src/vehicle_autonomy/engine/mission/`、`src/vehicle_autonomy/engine/action/`、`src/vehicle_autonomy/engine/runtime/` | 旧候选 Core 与旧生产运行时的双 owner、取消与退出语义 |
+| `execution/`、`telemetry_link/command_broker.py` | `src/vehicle_autonomy/engine/execution/`、`src/vehicle_autonomy/engine/safety/` 及受控设备边界 | 双 SEND、Safety 配置、代际、stop/zero、回执和唯一 writer |
+| `src/vehicle_autonomy/vehicles/multirotor/`、`protocols/mavlink/`、`infrastructure/transports/` | 对应插件、协议、传输包 | 车辆语义与协议/字节 I/O 分离，禁止提前生产接线 |
+| `applications/cuadc_2026/`、`src/vehicle_autonomy/world/environment/cuadc_2026/` | 具体应用或环境示例，默认保留归档 | 比赛业务语义不得进入通用 Core |
 
 ## 单项迁移记录模板
 

@@ -3,8 +3,8 @@ import argparse,json,math,time
 from pathlib import Path
 import cv2
 import numpy as np
-from perception.vision.yolox import YoloXDetector
-from perception.vision.projection import PlaneCalibration
+from vehicle_autonomy.world.perception.vision.yolox import YoloXDetector
+from vehicle_autonomy.world.perception.vision.projection import PlaneCalibration
 from scripts.prepare_vision_fixture import prepare,WEIGHTS_SHA
 
 def iou(a,b):

@@ -13,8 +13,8 @@ import sys
 import time
 from uuid import uuid4
 
-from app.control import request
-from intelligence.proposals import LlmAdapter
+from vehicle_autonomy.app.api.control import request
+from vehicle_autonomy.autonomy.intelligence.proposals import LlmAdapter
 from tests.simulation.launch import OwnedSimulation, ROOT, install_signal_cleanup
 from tests.simulation.oracle import GazeboTruthOracle
 
@@ -31,7 +31,7 @@ def run(directory, llm_config, *, route=True):
         profile=directory/'profile.toml'
         profile.write_text((ROOT/'simulation/profiles/rover.toml').read_text().replace('port = 5760',f'port = {owned.port}'))
         def launch(send,suffix):
-            return owned.start_process('application'+suffix,[sys.executable,'-m','app.main','run',
+            return owned.start_process('application'+suffix,[sys.executable,'-m','vehicle_autonomy.app.cli','run',
                 '--profile','rover_sim','--config',str(profile),'--control-socket',str(endpoint),
                 *(['--allow-send'] if send else [])])
         def wait(predicate,timeout=30):
@@ -62,7 +62,7 @@ def run(directory, llm_config, *, route=True):
         with socket.socket() as listener:
             listener.bind(('127.0.0.1',0));port=listener.getsockname()[1]
         token_file=directory/'token'
-        web=owned.start_process('web',[sys.executable,'-m','app.web','--control-socket',str(endpoint),
+        web=owned.start_process('web',[sys.executable,'-m','vehicle_autonomy.app.web.cli','--control-socket',str(endpoint),
             '--port',str(port),'--data-dir',str(directory/'console'),'--token-file',str(token_file),
             '--llm-config',str(llm_config),'--missions','disarmed_mode,basic_route'])
         until=time.monotonic()+10

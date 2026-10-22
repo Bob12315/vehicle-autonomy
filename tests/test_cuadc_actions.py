@@ -1,18 +1,18 @@
 from dataclasses import replace
 import unittest
-from contracts.core.geometry import Vector3
-from contracts.core.quality import QualityState
-from contracts.core.stamped import Stamped
-from contracts.decision import ActionOutcome,EffectPhase,EffectResult,ExitReason
-from applications.cuadc.actions import TargetParameters,TargetAction,candidates,register_targets
-from applications.cuadc.catalog import build
-from applications.basic_catalog import capabilities
-from contracts.vehicle.ports import VehicleCapabilities
-from core.action_registry import ActionRegistry
-from core.mission import MissionValidator
-from core.sitl_mode_action import SITL_MODE_SPEC,SitlModeAction
-from actions.basic import register_basic
-from world_model.models import WorldObject
+from vehicle_autonomy.contracts.core.geometry import Vector3
+from vehicle_autonomy.contracts.core.quality import QualityState
+from vehicle_autonomy.contracts.core.stamped import Stamped
+from vehicle_autonomy.contracts.decision import ActionOutcome,EffectPhase,EffectResult,ExitReason
+from vehicle_autonomy.actions.composite.cuadc import TargetParameters,TargetAction,candidates,register_targets
+from vehicle_autonomy.app.scenarios.cuadc.catalog import build
+from vehicle_autonomy.app.scenarios.basic_catalog import capabilities
+from vehicle_autonomy.contracts.vehicle.ports import VehicleCapabilities
+from vehicle_autonomy.engine.action.registry import ActionRegistry
+from vehicle_autonomy.engine.mission.compiler import MissionValidator
+from vehicle_autonomy.actions.common.sitl_mode import SITL_MODE_SPEC,SitlModeAction
+from vehicle_autonomy.actions.common.basic import register_basic
+from vehicle_autonomy.world.model.models import WorldObject
 from tests import test_basic_actions as helpers
 
 class CuadcActionTests(unittest.TestCase):

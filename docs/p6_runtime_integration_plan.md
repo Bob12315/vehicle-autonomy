@@ -27,7 +27,7 @@
 
 配置的文件格式（例如 TOML 或 YAML）可在 P6.1 选定；不要把示例数字当成通用飞行限值。当前只建立 SITL profile，**不提前创建可发送的 onboard profile**。配置本身不能永久开启 SEND；每次启动由显式操作、有效 Lease、Action SEND 和 Safety 检查共同决定。首个 SITL 组合还需要在最终车辆翻译/写入边界限制为未解锁模式请求，不能只靠 Mission 名称或界面隐藏 Arm/运动命令。
 
-**责任归属：** `runtime/` 放配置 schema 与 SITL profile；`contracts/`、`core/` 只补必要的结果语义，不引入 MAVLink；`application/` 提供 Mission 用例和只读状态接口，不持有 VehicleCommandPort；`deployment/` 的外层协调器负责实例装配、周期和设备会话；`app/` 只解析启动参数并调用装配入口；`tests/` 留下离线与 SITL 验收。外层协调器可以持有 Execution 和 Session，但所有车辆字节写入仍只经过现有 ArduPilotCommandPort。
+**责任归属：** `configs/` 放配置 schema 与 SITL profile；`src/vehicle_autonomy/contracts/`、`src/vehicle_autonomy/engine/` 只补必要的结果语义，不引入 MAVLink；`application/` 提供 Mission 用例和只读状态接口，不持有 VehicleCommandPort；`deployment/` 的外层协调器负责实例装配、周期和设备会话；`app/` 只解析启动参数并调用装配入口；`tests/` 留下离线与 SITL 验收。外层协调器可以持有 Execution 和 Session，但所有车辆字节写入仍只经过现有 ArduPilotCommandPort。
 
 ## 3. 运行顺序与结果语义
 
@@ -61,9 +61,9 @@ P6 完成时，至少留下以下可复现证据：
 
 ## 6. P6 实施与验收记录（2026-10-01）
 
-`runtime/sitl.toml` 只允许数值 loopback TCP、ArduCopter 四旋翼、单个目标模式及显式 Safety 限值；周期小于 deadman，读超时小于周期。配置不含可永久开启 SEND 的字段。`app.main run-sitl` 是显式入口，`--allow-send` 才为此 Run/Action 授予新 Lease 并开启双 SEND。`SitlModeTranslator` 在最终车辆翻译边界只接受 ModeCommand；唯一 writer 的额外写前 guard 再检查目标模式、未解锁和心跳新鲜度。Action 不持有车辆端口，只读 Effect 结果；`COMPLETED` 与同一轮新鲜未解锁目标模式 WorldSnapshot 同时成立才成功。失联、状态过期和周期延误撤权并阻止重放。取消已传输的模式命令后，同一会话不允许启动第二个模式任务，以免旧 ACK 混同；重连后需重新授权。
+`configs/sitl.toml` 只允许数值 loopback TCP、ArduCopter 四旋翼、单个目标模式及显式 Safety 限值；周期小于 deadman，读超时小于周期。配置不含可永久开启 SEND 的字段。`vehicle_autonomy.app.cli run-sitl` 是显式入口，`--allow-send` 才为此 Run/Action 授予新 Lease 并开启双 SEND。`SitlModeTranslator` 在最终车辆翻译边界只接受 ModeCommand；唯一 writer 的额外写前 guard 再检查目标模式、未解锁和心跳新鲜度。Action 不持有车辆端口，只读 Effect 结果；`COMPLETED` 与同一轮新鲜未解锁目标模式 WorldSnapshot 同时成立才成功。失联、状态过期和周期延误撤权并阻止重放。取消已传输的模式命令后，同一会话不允许启动第二个模式任务，以免旧 ACK 混同；重连后需重新授权。
 
-可复现命令：先启动本机 ArduCopter SITL TCP 5760，再执行 `tests/manual_p6_sitl.sh runtime/sitl.toml 'ArduCopter V4.8.0-dev (b5fbe265)'`。本次本机二进制内含版本字符串 `ArduCopter V4.8.0-dev (b5fbe265)`；操作者报告的版本在日志中标记为 `version_source=operator`，不是飞控遥测证明。实际运行得到单个 Effect 的 `REQUESTED → ACCEPTED → TRANSMITTED → ACKNOWLEDGED → COMPLETED`，最终 `SUCCEEDED`，WorldSnapshot 修订号 14，车辆质量 `VALID`、新鲜度 `FRESH`，未解锁。相同 SITL 上运行 `python -m app.main run-sitl`（无 `--allow-send`）得到 `system_send_disabled`、最终 `FAILED`，没有命令写入。`python -m unittest discover -s tests -q`：75 项通过；`python -m compileall -q app application contracts core deployment runtime vehicles tests` 和 `git diff --check` 通过。离线测试覆盖取消后新 Run、在途取消隔离、拒绝、未知写入、断链重连、状态过期、Effect 过期、周期延误、最终模式写入限制。没有修改归档树。
+可复现命令：先启动本机 ArduCopter SITL TCP 5760，再执行 `tests/manual_p6_sitl.sh configs/sitl.toml 'ArduCopter V4.8.0-dev (b5fbe265)'`。本次本机二进制内含版本字符串 `ArduCopter V4.8.0-dev (b5fbe265)`；操作者报告的版本在日志中标记为 `version_source=operator`，不是飞控遥测证明。实际运行得到单个 Effect 的 `REQUESTED → ACCEPTED → TRANSMITTED → ACKNOWLEDGED → COMPLETED`，最终 `SUCCEEDED`，WorldSnapshot 修订号 14，车辆质量 `VALID`、新鲜度 `FRESH`，未解锁。相同 SITL 上运行 `python -m vehicle_autonomy.app.cli run-sitl`（无 `--allow-send`）得到 `system_send_disabled`、最终 `FAILED`，没有命令写入。`python -m unittest discover -s tests -q`：75 项通过；`python -m compileall -q app application contracts core deployment runtime vehicles tests` 和 `git diff --check` 通过。离线测试覆盖取消后新 Run、在途取消隔离、拒绝、未知写入、断链重连、状态过期、Effect 过期、周期延误、最终模式写入限制。没有修改归档树。
 
 P6 **不包含**真实机体解锁/起飞、物理 stop、真实设备时间同步、onboard/server/hybrid 部署、Camera/LiDAR、Perception、复杂 Localization、Mapping、Planning、Guidance、Intelligence、Gateway、Web、固定翼或 VTOL。P6 之后先评审首个实际业务 Mission，再按它所需的输入和算法扩展。若要声明整车生产支持，仍须完成 P5 所列机架、校准、真实时间、运动、失联保护、日志和物理停止的独立设备验收。
 

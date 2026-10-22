@@ -8,20 +8,20 @@ from datetime import datetime, timezone
 from pathlib import Path
 import unittest
 
-from contracts.core.geometry import Twist3, Vector3
-from contracts.core.primitives import ResourceVersion, SchemaVersion, thaw_json
-from contracts.core.time import TimePoint
-from contracts.decision import (
+from vehicle_autonomy.contracts.core.geometry import Twist3, Vector3
+from vehicle_autonomy.contracts.core.primitives import ResourceVersion, SchemaVersion, thaw_json
+from vehicle_autonomy.contracts.core.time import TimePoint
+from vehicle_autonomy.contracts.decision import (
     ActionDecision, ActionOutcome, ActionSpec, ExitDecision, ExitReason,
     FailurePolicy, MissionPlan, MissionStep,
 )
-from contracts.effects import StopMotionEffect, TwistTargetEffect
-from contracts.vehicle.ports import VehicleCapabilities
-from contracts.world.models import WorldSnapshot
-from core.action_registry import ActionRegistry
-from core.actions import WORLD_SUMMARY_SPEC, WorldSummaryAction, WorldSummaryParameters
-from core.mission import MissionValidator
-from core.mission_runtime import MissionRuntime, RunStatus
+from vehicle_autonomy.contracts.effects import StopMotionEffect, TwistTargetEffect
+from vehicle_autonomy.contracts.vehicle.ports import VehicleCapabilities
+from vehicle_autonomy.contracts.world.models import WorldSnapshot
+from vehicle_autonomy.engine.action.registry import ActionRegistry
+from vehicle_autonomy.engine.action.runtime import WORLD_SUMMARY_SPEC, WorldSummaryAction, WorldSummaryParameters
+from vehicle_autonomy.engine.mission.compiler import MissionValidator
+from vehicle_autonomy.engine.mission.runtime import MissionRuntime, RunStatus
 
 
 def at(ns: int, domain: str = "clock") -> TimePoint:
@@ -226,8 +226,8 @@ class P3DecisionTests(unittest.TestCase):
 
     def test_decision_chain_cannot_import_command_port_or_protocol(self):
         root = Path(__file__).resolve().parents[1]
-        for relative in ("contracts/decision.py", "core/actions.py", "core/action_registry.py",
-                         "core/mission.py", "core/mission_runtime.py", "core/transform.py"):
+        for relative in ("src/vehicle_autonomy/contracts/decision.py", "src/vehicle_autonomy/engine/action/runtime.py", "src/vehicle_autonomy/engine/action/registry.py",
+                         "src/vehicle_autonomy/engine/mission/compiler.py", "src/vehicle_autonomy/engine/mission/runtime.py", "src/vehicle_autonomy/world/transform/tree.py"):
             tree = ast.parse((root / relative).read_text(encoding="utf-8"))
             imports = []
             for node in ast.walk(tree):
@@ -236,8 +236,8 @@ class P3DecisionTests(unittest.TestCase):
                 elif isinstance(node, ast.Import):
                     imports.extend((alias.name, set()) for alias in node.names)
             self.assertFalse(any(
-                module.startswith(("contracts.vehicle.command", "core.execution", "protocols", "pymavlink", "legacy"))
-                or (module == "contracts.vehicle.ports" and "VehicleCommandPort" in names)
+                module.startswith(("vehicle_autonomy.contracts.vehicle.command", "vehicle_autonomy.engine.control.execution", "vehicle_autonomy.vehicles.ardupilot.mavlink", "pymavlink", "legacy"))
+                or (module == "vehicle_autonomy.contracts.vehicle.ports" and "VehicleCommandPort" in names)
                 for module, names in imports
             ), relative)
 

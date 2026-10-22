@@ -3,13 +3,13 @@ set -euo pipefail
 
 # Start a local ArduCopter SITL TCP 5760 endpoint separately before this check.
 repo_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-profile="${1:-$repo_dir/runtime/sitl.toml}"
+profile="${1:-$repo_dir/configs/sitl.toml}"
 sitl_version="${2:-unreported}"
 log_file="$(mktemp)"
 trap 'rm -f "$log_file"' EXIT
 
 cd "$repo_dir"
-python -m app.main run-sitl --config "$profile" --allow-send --sitl-version "$sitl_version" | tee "$log_file"
+python -m vehicle_autonomy.app.cli run-sitl --config "$profile" --allow-send --sitl-version "$sitl_version" | tee "$log_file"
 python - "$log_file" <<'PY'
 import json
 import sys

@@ -7,21 +7,21 @@ from datetime import datetime, timezone
 from pathlib import Path
 import unittest
 
-from contracts.core.geometry import FrameId, Pose3, Quaternion, Twist3, Vector3
-from contracts.core.primitives import ResourceVersion, SchemaVersion
-from contracts.core.quality import ComponentFreshness, FreshnessState, QualityState
-from contracts.core.time import TimePoint
-from contracts.effects.vehicle import (
+from vehicle_autonomy.contracts.core.geometry import FrameId, Pose3, Quaternion, Twist3, Vector3
+from vehicle_autonomy.contracts.core.primitives import ResourceVersion, SchemaVersion
+from vehicle_autonomy.contracts.core.quality import ComponentFreshness, FreshnessState, QualityState
+from vehicle_autonomy.contracts.core.time import TimePoint
+from vehicle_autonomy.contracts.effects.vehicle import (
     ArmEffect, EffectEnvelope, ModeEffect, PoseTargetEffect, StopMotionEffect,
     TakeoffEffect, TwistTargetEffect,
 )
-from contracts.vehicle.command import CommandPhase, StopMotionCommand
-from contracts.vehicle.models import VehicleHealth, VehicleStateSnapshot
-from contracts.world.models import WorldSnapshot
-from core.control_authority import ControlAuthority, ControlLease
-from core.fake_command_port import FakeVehicleCommandPort
-from core.vehicle_execution import StopState, VehicleExecution
-from core.vehicle_safety import SafetyLimits, VehicleSafetyPolicy
+from vehicle_autonomy.contracts.vehicle.command import CommandPhase, StopMotionCommand
+from vehicle_autonomy.contracts.vehicle.models import VehicleHealth, VehicleStateSnapshot
+from vehicle_autonomy.contracts.world.models import WorldSnapshot
+from vehicle_autonomy.engine.control.control_authority import ControlAuthority, ControlLease
+from vehicle_autonomy.engine.control.fake_command_port import FakeVehicleCommandPort
+from vehicle_autonomy.engine.control.vehicle_execution import StopState, VehicleExecution
+from vehicle_autonomy.engine.control.vehicle_safety import SafetyLimits, VehicleSafetyPolicy
 
 
 def time_at(ns: int, domain: str = "host") -> TimePoint:
@@ -157,7 +157,7 @@ class ControlBoundaryTests(unittest.TestCase):
         with self.assertRaises(FrozenInstanceError):
             result.receipt.phase = CommandPhase.REJECTED
         another = self.execution.dispatch(effect(2, ArmEffect()), self.snapshot, time_at(105)).receipt
-        from contracts.vehicle.command import CancelCommandRequest
+        from vehicle_autonomy.contracts.vehicle.command import CancelCommandRequest
         self.assertEqual(self.port.cancel(CancelCommandRequest(another.command_id, time_at(106))).phase, CommandPhase.CANCELLED)
         self.assertIsNone(self.port.transmit_next(time_at(107)))
 
@@ -240,11 +240,11 @@ class ControlBoundaryTests(unittest.TestCase):
     def test_v1_command_port_is_owned_only_by_execution_and_fake_writer(self):
         root = Path(__file__).resolve().parents[1]
         owners = {
-            path.name for path in (root / "core").glob("*.py")
-            if "from contracts.vehicle.ports import VehicleCommandPort" in path.read_text(encoding="utf-8")
+            path.name for path in (root / "src/vehicle_autonomy/engine").rglob("*.py")
+            if "from vehicle_autonomy.contracts.vehicle.ports import VehicleCommandPort" in path.read_text(encoding="utf-8")
         }
         self.assertEqual(owners, {"vehicle_execution.py"})
-        self.assertNotIn("VehicleCommandPort", (root / "core" / "mission_runtime.py").read_text(encoding="utf-8"))
+        self.assertNotIn("VehicleCommandPort", (root / "src/vehicle_autonomy/engine/mission/runtime.py").read_text(encoding="utf-8"))
 
 
 if __name__ == "__main__":

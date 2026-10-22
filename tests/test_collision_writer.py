@@ -2,13 +2,13 @@ from dataclasses import replace
 import math
 import unittest
 
-from contracts.core.primitives import SchemaVersion
-from contracts.core.quality import QualityState
-from contracts.sensor import Observation
-from contracts.effects.vehicle import StopMotionEffect, TwistTargetEffect
-from contracts.core.geometry import Twist3, Vector3
-from deployment.collision_guard import ScanWriteGuard
-from sensors.lidar.scan import PlanarScan
+from vehicle_autonomy.contracts.core.primitives import SchemaVersion
+from vehicle_autonomy.contracts.core.quality import QualityState
+from vehicle_autonomy.contracts.sensor import Observation
+from vehicle_autonomy.contracts.effects.vehicle import StopMotionEffect, TwistTargetEffect
+from vehicle_autonomy.contracts.core.geometry import Twist3, Vector3
+from vehicle_autonomy.autonomy.guidance.collision_guard import ScanWriteGuard
+from vehicle_autonomy.world.sensors.lidar.scan import PlanarScan
 from tests import test_simulation_runtime as helpers
 
 
@@ -42,7 +42,7 @@ class CollisionWriterTests(unittest.TestCase):
 
     def test_slowdown_turning_and_guard_composition(self):
         from types import SimpleNamespace
-        from contracts.vehicle.command import TwistTargetCommand
+        from vehicle_autonomy.contracts.vehicle.command import TwistTargetCommand
         h=helpers.SimulationRuntimeTests();h.setUp();self.addCleanup(h.runtime.shutdown)
         h.runtime.connect();h.cycle(h.heartbeat(mode=4,armed=True)+h.state_messages())
         state=h.runtime.world_snapshot().vehicle;now=h.clock()

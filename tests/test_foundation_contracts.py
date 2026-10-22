@@ -8,28 +8,28 @@ import json
 import math
 import unittest
 
-from contracts.core.geometry import FrameId, GeoPoint, Pose3, Quaternion, Transform3, Twist3, Vector3
-from contracts.core.primitives import (
+from vehicle_autonomy.contracts.core.geometry import FrameId, GeoPoint, Pose3, Quaternion, Transform3, Twist3, Vector3
+from vehicle_autonomy.contracts.core.primitives import (
     ResourceVersion, SchemaVersion, VehicleId, freeze_json, thaw_json,
 )
-from contracts.core.quality import ComponentFreshness, FreshnessState, QualityState
-from contracts.core.serialization import to_json_value
-from contracts.core.stamped import Stamped
-from contracts.core.time import TimeFacts, TimePoint
-from contracts.effects import (
+from vehicle_autonomy.contracts.core.quality import ComponentFreshness, FreshnessState, QualityState
+from vehicle_autonomy.contracts.core.serialization import to_json_value
+from vehicle_autonomy.contracts.core.stamped import Stamped
+from vehicle_autonomy.contracts.core.time import TimeFacts, TimePoint
+from vehicle_autonomy.contracts.effects import (
     ArmEffect, EffectEnvelope, EffectMode, PoseTargetEffect, StopMotionEffect,
     TakeoffEffect, TwistTargetEffect,
 )
-from contracts.localization.models import LocalizationEstimate
-from contracts.sensor.observation import Observation
-from contracts.vehicle.command import (
+from vehicle_autonomy.contracts.localization.models import LocalizationEstimate
+from vehicle_autonomy.contracts.sensor.observation import Observation
+from vehicle_autonomy.contracts.vehicle.command import (
     ArmCommand, CancelCommandRequest, CommandPhase, CommandReceipt, CommandStatus,
     VehicleCommandEnvelope,
 )
-from contracts.vehicle.models import BatteryState, VehicleHealth, VehicleStateSnapshot
-from contracts.vehicle.ports import VehicleCommandPort, VehicleStatePort
-from contracts.world.models import ResourceDependency, ResourceReference, WorldSnapshot
-from contracts.world.ports import LocalizationPort, TransformResolver, WorldQueryPort
+from vehicle_autonomy.contracts.vehicle.models import BatteryState, VehicleHealth, VehicleStateSnapshot
+from vehicle_autonomy.contracts.vehicle.ports import VehicleCommandPort, VehicleStatePort
+from vehicle_autonomy.contracts.world.models import ResourceDependency, ResourceReference, WorldSnapshot
+from vehicle_autonomy.contracts.world.ports import LocalizationPort, TransformResolver, WorldQueryPort
 
 
 def instant(ns: int = 10, domain: str = "clock-a") -> TimePoint:

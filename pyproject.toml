@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vehicle-autonomy"
+version = "0.1.0"
+description = "Vehicle Autonomy Framework; explicit safety-gated simulation and read-only hardware compositions"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = ["tomli==2.2.1; python_version < '3.11'"]
+
+[project.optional-dependencies]
+mavlink = ["pymavlink==2.4.49", "pyserial==3.5"]
+
+[project.scripts]
+vehicle-autonomy = "vehicle_autonomy.app.cli:main"
+vehicle-autonomy-hardware = "vehicle_autonomy.app.bootstrap.hardware:main"
+vehicle-autonomy-web = "vehicle_autonomy.app.web.cli:main"
+vehicle-autonomy-plan = "vehicle_autonomy.app.planning:main"
+vehicle-autonomy-anchor = "vehicle_autonomy.app.anchor:main"
+vehicle-autonomy-onboard = "vehicle_autonomy.app.bootstrap.onboard:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"vehicle_autonomy.app.web" = ["static/*"]
+"vehicle_autonomy.world.mapping" = ["native/*"]
+"vehicle_autonomy.world.sensors.lidar" = ["robosense/*.cpp"]
+
+[tool.setuptools.data-files]
+"share/vehicle-autonomy/configs" = ["configs/llm.server-tunnel.json", "configs/rs16-scan.json", "configs/sitl.toml", "configs/sitl_arm.toml"]
+"share/vehicle-autonomy/configs/deployment" = ["configs/deployment/hardware-controlled.json", "configs/deployment/hardware-readonly.json", "configs/deployment/simulation.json"]
+"share/vehicle-autonomy/configs/rviz" = ["configs/rviz/navigation-readonly.rviz", "configs/rviz/rs16-readonly.rviz"]
+"share/vehicle-autonomy/docs" = ["docs/HARDWARE_READY_AUDIT.md"]
+"share/vehicle-autonomy/scripts" = ["scripts/with_ros2.sh", "scripts/with_ros2_humble.sh"]
+"share/vehicle-autonomy/simulation/environments" = ["simulation/environments/copter.toml", "simulation/environments/rover.toml", "simulation/environments/yard.toml"]
+"share/vehicle-autonomy/simulation/mapping" = ["simulation/mapping/slam_toolbox.yaml"]
+"share/vehicle-autonomy/simulation/missions" = ["simulation/missions/copter.toml", "simulation/missions/rover.toml"]
+"share/vehicle-autonomy/simulation/models/compact_rover" = ["simulation/models/compact_rover/model.sdf"]
+"share/vehicle-autonomy/simulation/models/target_rover" = ["simulation/models/target_rover/model.config", "simulation/models/target_rover/model.sdf", "simulation/models/target_rover/navigation.sdf"]
+"share/vehicle-autonomy/simulation/params" = ["simulation/params/compact_rover_navigation.parm", "simulation/params/copter_telemetry.parm", "simulation/params/rover_navigation.parm", "simulation/params/rover_telemetry.parm"]
+"share/vehicle-autonomy/simulation/planning" = ["simulation/planning/recorded_map.json"]
+"share/vehicle-autonomy/simulation/planning/maps" = ["simulation/planning/maps/e0e7a625e27ed2ac86b9621543cd9fd934af395b04431efd884e63f71af34081.json"]
+"share/vehicle-autonomy/simulation/profiles" = ["simulation/profiles/compact_rover.toml", "simulation/profiles/copter.toml", "simulation/profiles/rover.toml", "simulation/profiles/rover_yard.toml"]
+"share/vehicle-autonomy/simulation/scenarios" = ["simulation/scenarios/acceptance-v1.json"]
+"share/vehicle-autonomy/simulation/scenes" = ["simulation/scenes/yard.json"]
+"share/vehicle-autonomy/simulation/worlds" = ["simulation/worlds/rover_runway.sdf"]

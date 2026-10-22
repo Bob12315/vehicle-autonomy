@@ -36,7 +36,7 @@ SLAM 的 map→odom 与 base_link_in_map 只作地图诊断，**没有替代 P10
 | 运动中 ROS sidecar 中断 | 地图撤下，公开取消 **3.002 s** 达到原物理停车稳定判据（期限 8 s，速度 ≤0.10 m/s 持续 2 s）；双 SEND 撤销，safe_recovery 确认 Disarm。 |
 | ROS 正常关闭 | sidecar 退出码 0；App shutdown 成功，socket 消失，所有自有进程和端口清理通过。 |
 | 不加载 ROS 的 Copter 兼容 | 原 basic_route **1/1 PASS**，原物理阈值和执行链不变，自有进程/端口清理通过。 |
-| 默认入口与依赖边界 | status 仍 disconnected/SEND=false；contracts/core/mapping/world_model/actions/application 无 ROS 或 legacy 导入。 |
+| 默认入口与依赖边界 | status 仍 disconnected/SEND=false；src/vehicle_autonomy/contracts/core/mapping/world_model/actions/application 无 ROS 或 legacy 导入。 |
 
 - Mapping 原报告：[summary](../../artifacts/simulation/ros2-mapping-30501ec0/summary.json)、[manifest](../../artifacts/simulation/ros2-mapping-30501ec0/manifest.json)。命令：`VAF_SIMULATION_SITL_BIN_DIR="$PWD/artifacts/simulation/suite-e8ba09fa/build/ardupilot/sitl/bin" python -m tests.simulation.ros2_mapping --allow-send`。
 - Copter 原报告：[summary](../../artifacts/simulation/autonomy-copter-7523f8ef/summary.json)、[manifest](../../artifacts/simulation/autonomy-copter-7523f8ef/manifest.json)。命令：同一 SITL bin 环境下 `python -m tests.simulation.autonomy_process --kind copter --mission basic_route --allow-send`。

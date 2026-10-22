@@ -4,16 +4,16 @@ from dataclasses import replace
 from datetime import datetime, timezone
 import unittest
 
-from contracts.core.geometry import FrameId, Pose3, Quaternion, Twist3, Vector3
-from contracts.core.primitives import ResourceVersion, SchemaVersion
-from contracts.core.quality import ComponentFreshness, FreshnessState, QualityState
-from contracts.core.stamped import Stamped
-from contracts.core.time import TimePoint
-from contracts.effects.vehicle import EffectEnvelope, TwistTargetEffect
-from contracts.vehicle.models import VehicleHealth, VehicleOperation, VehicleStateSnapshot
-from contracts.world.models import WorldSnapshot
-from core.vehicle_safety import SafetyLimits
-from deployment.simulation_safety import SimulationSafetyPolicy
+from vehicle_autonomy.contracts.core.geometry import FrameId, Pose3, Quaternion, Twist3, Vector3
+from vehicle_autonomy.contracts.core.primitives import ResourceVersion, SchemaVersion
+from vehicle_autonomy.contracts.core.quality import ComponentFreshness, FreshnessState, QualityState
+from vehicle_autonomy.contracts.core.stamped import Stamped
+from vehicle_autonomy.contracts.core.time import TimePoint
+from vehicle_autonomy.contracts.effects.vehicle import EffectEnvelope, TwistTargetEffect
+from vehicle_autonomy.contracts.vehicle.models import VehicleHealth, VehicleOperation, VehicleStateSnapshot
+from vehicle_autonomy.contracts.world.models import WorldSnapshot
+from vehicle_autonomy.engine.control.vehicle_safety import SafetyLimits
+from vehicle_autonomy.engine.control.simulation_safety import SimulationSafetyPolicy
 
 
 def at(ns: int, domain: str = "host") -> TimePoint:

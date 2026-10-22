@@ -13,12 +13,12 @@
 ssh -NT -L 127.0.0.1:19436:127.0.0.1:11436 bob@10.10.12.240
 ```
 
-配置 `config/llm.server-tunnel.json` 对应实际检查过的协议和模型。其他服务器须
+配置 `configs/llm.server-tunnel.json` 对应实际检查过的协议和模型。其他服务器须
 提供真实配置，不能猜地址或模型名。
 
 ```bash
 ./scripts/simulation_console.sh --scenario yard --gui --allow-send \
-  --llm-config config/llm.server-tunnel.json --lifetime-s 1800
+  --llm-config configs/llm.server-tunnel.json --lifetime-s 1800
 ```
 
 初始化后输出 `http://127.0.0.1:8766` 和本次私有 token 文件路径。

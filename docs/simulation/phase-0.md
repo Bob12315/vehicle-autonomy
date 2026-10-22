@@ -9,7 +9,7 @@ because the fault and full regression gates are pending.
 ## Baseline and versions
 
 - Framework HEAD at start: `61827b0`; clean worktree. `python -m unittest
-  discover -s tests -q`: 81 passed, 0 skipped. `python -m app.main status`:
+  discover -s tests -q`: 81 passed, 0 skipped. `python -m vehicle_autonomy.app.cli status`:
   no vehicle connection and SEND false.
 - ArduPilot local HEAD `b5fbe26515`; Copter binary present. Configured waf for
   `sitl` and built `ardurover` with `./waf rover -j4` (successful, 56.5 s).
@@ -57,7 +57,7 @@ channel-zero stream rates under `MAV1_*`. With `MAV1_POSITION=10` and
 parameters; the production command path gained no additional writer.
 
 With these parameters, the existing framework command
-`python -m app.main run-sitl-arm --allow-send --allow-arm` exited 0. Its Mode,
+`python -m vehicle_autonomy.app.cli run-sitl-arm --allow-send --allow-arm` exited 0. Its Mode,
 Arm, and Disarm Effects each progressed through transmitted, ACK, and
 completed states; final `armed=false`. During the task, 472 WorldSnapshot
 events were published and `vehicle_frame=odom` appeared after position and

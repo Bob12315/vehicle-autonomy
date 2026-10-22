@@ -5,15 +5,15 @@ import math
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
-from application.planning import ReadOnlyPlanningService
-from actions.path_following import SPEC
-from deployment.application_runtime import ApplicationRuntime
-from deployment.navigation import NavigationConfig,NavigationSupervisor
-from guidance.navigation_model import FRONT_AXLE,COMPACT_AXLE,resolve_model
-from guidance.path_following import PolylineTracker,drive_reference
-from mapping.grid import pose_to_json
-from planning.models import Pose2D
-from runtime.simulation_profile import SimulationProfile
+from vehicle_autonomy.autonomy.planning.service import ReadOnlyPlanningService
+from vehicle_autonomy.actions.navigation.path_following import SPEC
+from vehicle_autonomy.app.bootstrap.application_runtime import ApplicationRuntime
+from vehicle_autonomy.autonomy.planning.navigation import NavigationConfig,NavigationSupervisor
+from vehicle_autonomy.autonomy.guidance.navigation_model import FRONT_AXLE,COMPACT_AXLE,resolve_model
+from vehicle_autonomy.autonomy.guidance.path_following import PolylineTracker,drive_reference
+from vehicle_autonomy.world.mapping.grid import pose_to_json
+from vehicle_autonomy.autonomy.planning.models import Pose2D
+from vehicle_autonomy.app.bootstrap.simulation_profile import SimulationProfile
 from tests.simulation.model_geometry import measure
 from tests.test_goal_navigation import Backend
 from tests import test_path_following as helpers
@@ -96,8 +96,8 @@ class ModelTests(unittest.TestCase):
         self.assertFalse(h.harness.runtime.authority.system_send)
 
     def test_navigation_writer_rejects_unmodelled_motion_axes(self):
-        from contracts.core.geometry import Twist3,Vector3
-        from contracts.vehicle.command import TwistTargetCommand
+        from vehicle_autonomy.contracts.core.geometry import Twist3,Vector3
+        from vehicle_autonomy.contracts.vehicle.command import TwistTargetCommand
         from types import SimpleNamespace
         h=helpers.NavigationTests();h.setUp();self.addCleanup(h.doCleanups)
         h.admit()
@@ -125,8 +125,8 @@ class ModelTests(unittest.TestCase):
         self.assertEqual(default.speed_mps,0)
 
     def test_final_writer_reverse_range_requires_frozen_explicit_permission(self):
-        from contracts.core.geometry import Twist3,Vector3
-        from contracts.vehicle.command import TwistTargetCommand
+        from vehicle_autonomy.contracts.core.geometry import Twist3,Vector3
+        from vehicle_autonomy.contracts.vehicle.command import TwistTargetCommand
         from types import SimpleNamespace
         for allowed,speed,expected in ((False,-.05,'navigation_velocity_bound_exceeded'),(True,-.09,None),
                                        (True,-.11,'navigation_velocity_bound_exceeded')):

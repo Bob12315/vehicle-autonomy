@@ -6,7 +6,7 @@ motion, long-running scheduling, and Rover integration remain open.
 
 ## Implemented boundary
 
-`deployment/simulation_runtime.py` composes one TCP transport, MAVLink codec,
+`src/vehicle_autonomy/app/bootstrap/simulation_runtime.py` composes one TCP transport, MAVLink codec,
 ArduPilot session, fenced command port, ControlAuthority, VehicleExecution,
 VehicleSafetyPolicy, and WorldModel for an injected vehicle translator. It
 opens a connection only on `connect()`. `begin_run()` defaults SEND off and
@@ -47,8 +47,8 @@ starting before a heartbeat now reports missing fresh state.
   released the owned processes. Evidence:
   `artifacts/simulation/phase2_runtime_live/runtime.jsonl`, `gazebo.log`,
   `sitl.log` (local ignored artifacts).
-- `python -m compileall -q deployment/simulation_runtime.py
-  deployment/simulation_safety.py vehicles/multirotor/session.py
+- `python -m compileall -q src/vehicle_autonomy/app/bootstrap/simulation_runtime.py
+  src/vehicle_autonomy/engine/control/simulation_safety.py src/vehicle_autonomy/vehicles/ardupilot/session.py
   tests/test_simulation_runtime.py` and `git diff --check` passed. Port 5760
   was free after the run.
 

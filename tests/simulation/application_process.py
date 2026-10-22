@@ -7,7 +7,7 @@ import subprocess
 import sys
 import time
 from uuid import uuid4
-from app.control import request
+from vehicle_autonomy.app.api.control import request
 from tests.simulation.launch import OwnedSimulation, ROOT, install_signal_cleanup
 from tests.simulation.oracle import GazeboTruthOracle
 
@@ -27,7 +27,7 @@ def run(run_dir, kind):
         profile_name = f"{kind}_sim"
 
         def launch(allow_send, suffix):
-            return owned.start_process("application" + suffix, [sys.executable, "-m", "app.main", "run",
+            return owned.start_process("application" + suffix, [sys.executable, "-m", "vehicle_autonomy.app.cli", "run",
                 "--profile", profile_name, "--config", str(config), "--control-socket", str(endpoint),
                 *(["--allow-send"] if allow_send else [])])
 
@@ -55,7 +55,7 @@ def run(run_dir, kind):
             raise TimeoutError(f"application condition unmet: {last}")
 
         def cli(operation, *flags):
-            result = subprocess.run([sys.executable, "-m", "app.main", "ctl", "--profile", profile_name,
+            result = subprocess.run([sys.executable, "-m", "vehicle_autonomy.app.cli", "ctl", "--profile", profile_name,
                 "--control-socket", str(endpoint), operation, *flags], capture_output=True, text=True, timeout=4)
             response = json.loads(result.stdout)
             if (result.returncode == 0) != response["ok"]:

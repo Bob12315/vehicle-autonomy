@@ -186,7 +186,7 @@ localhost Gazebo/SITL 场景，以及独立原始轨迹审计全部 PASS**。包
 cd /home/pi/vehicle-autonomy/current
 export VAF_PYTHON=/home/pi/vehicle-autonomy/venv/bin/python
 ./scripts/onboard.sh status
-./scripts/onboard.sh start --llm-config config/llm.server-tunnel.json
+./scripts/onboard.sh start --llm-config configs/llm.server-tunnel.json
 ./scripts/onboard.sh stop
 
 # PC：

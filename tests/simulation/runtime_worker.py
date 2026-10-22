@@ -6,13 +6,13 @@ from pathlib import Path
 import signal
 import time
 
-from contracts.core.geometry import Twist3, Vector3
-from contracts.effects.vehicle import TwistTargetEffect
-from deployment.simulation_runtime import SimulationRuntime
-from runtime.simulation_profile import SimulationProfile
+from vehicle_autonomy.contracts.core.geometry import Twist3, Vector3
+from vehicle_autonomy.contracts.effects.vehicle import TwistTargetEffect
+from vehicle_autonomy.app.bootstrap.simulation_runtime import SimulationRuntime
+from vehicle_autonomy.app.bootstrap.simulation_profile import SimulationProfile
 from tests.simulation.launch import ROOT
-from vehicles.multirotor.ardupilot_commands import ArduPilotCommandTranslator
-from vehicles.rover.ardupilot_commands import ArduRoverCommandTranslator
+from vehicle_autonomy.vehicles.ardupilot.commands import ArduPilotCommandTranslator
+from vehicle_autonomy.vehicles.rover.ardupilot_commands import ArduRoverCommandTranslator
 
 
 def main():

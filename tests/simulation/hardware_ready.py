@@ -83,7 +83,7 @@ def main():
         unit = runner.run_stage('unit', [sys.executable, '-m', 'tests.simulation.harness',
                                       '--unit-report', str(directory / 'unit.json')], timeout=120)
         native = runner.run_stage('native', ['./scripts/with_ros2.sh', sys.executable,
-            '-m', 'integrations.ros2.build_slam_boundary', '--output-dir', str(library.parent)], timeout=120)
+            '-m', 'vehicle_autonomy.world.mapping.build_slam_boundary', '--output-dir', str(library.parent)], timeout=120)
         report['preflight'] = preflight['passed']
         report['unit'] = json.loads((directory / 'unit.json').read_text()) if (directory / 'unit.json').exists() else {}
         report['native'] = native['passed']

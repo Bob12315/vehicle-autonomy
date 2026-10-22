@@ -1,14 +1,14 @@
 from dataclasses import dataclass,replace
 import unittest
-from contracts.core.geometry import Vector3
-from contracts.core.primitives import SchemaVersion
-from contracts.decision import ActionDecision,ActionOutcome,ActionSpec,MissionPlan,MissionStep,ExitDecision
-from contracts.effects.vehicle import EffectEnvelope
-from contracts.effects.payload import ReleasePayloadEffect,PayloadEffectEnvelope
-from contracts.vehicle.ports import VehicleCapabilities
-from core.action_registry import ActionRegistry
-from core.mission import MissionValidator
-from core.mission_runtime import MissionRuntime
+from vehicle_autonomy.contracts.core.geometry import Vector3
+from vehicle_autonomy.contracts.core.primitives import SchemaVersion
+from vehicle_autonomy.contracts.decision import ActionDecision,ActionOutcome,ActionSpec,MissionPlan,MissionStep,ExitDecision
+from vehicle_autonomy.contracts.effects.vehicle import EffectEnvelope
+from vehicle_autonomy.contracts.effects.payload import ReleasePayloadEffect,PayloadEffectEnvelope
+from vehicle_autonomy.contracts.vehicle.ports import VehicleCapabilities
+from vehicle_autonomy.engine.action.registry import ActionRegistry
+from vehicle_autonomy.engine.mission.compiler import MissionValidator
+from vehicle_autonomy.engine.mission.runtime import MissionRuntime
 from tests import test_basic_actions as helpers
 
 @dataclass(frozen=True,slots=True)

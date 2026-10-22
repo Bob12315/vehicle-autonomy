@@ -12,14 +12,14 @@ import sys
 import time
 from uuid import uuid4
 
-from application.planning import ReadOnlyPlanningService
-from contracts.core.geometry import Pose3,Quaternion,Vector3
-from contracts.core.primitives import ResourceVersion
-from contracts.core.time import TimePoint
-from contracts.world.models import ResourceReference
-from integrations.ros2.nav2_planner import Nav2Planner
-from mapping.grid import MapStore,OccupancyGrid,atomic_json
-from planning.models import MapContext,Pose2D,PlanningError
+from vehicle_autonomy.autonomy.planning.service import ReadOnlyPlanningService
+from vehicle_autonomy.contracts.core.geometry import Pose3,Quaternion,Vector3
+from vehicle_autonomy.contracts.core.primitives import ResourceVersion
+from vehicle_autonomy.contracts.core.time import TimePoint
+from vehicle_autonomy.contracts.world.models import ResourceReference
+from vehicle_autonomy.autonomy.planning.nav2_planner import Nav2Planner
+from vehicle_autonomy.world.mapping.grid import MapStore,OccupancyGrid,atomic_json
+from vehicle_autonomy.autonomy.planning.models import MapContext,Pose2D,PlanningError
 
 ROOT = Path(__file__).resolve().parents[2]
 IDENTITY = Pose3(Vector3(0,0,0),Quaternion(0,0,0,1))
@@ -109,7 +109,7 @@ def run(directory):
             report['cases'][name]['nav2_version']=response['nav2_version']
 
         # Test the public CLI independently of the Python application use case.
-        command=[sys.executable,'-m','app.plan','--map-store',str(ROOT/'simulation/planning/maps'),
+        command=[sys.executable,'-m','vehicle_autonomy.app.planning','--map-store',str(ROOT/'simulation/planning/maps'),
             '--map-sha256',fixture['sha256'],'--start','0','0','--goal','1.9','3.5',
             '--evidence-directory',str(directory/'cli-backend'),'--output',str(directory/'cli.json')]
         cli=subprocess.run(command,capture_output=True,text=True,timeout=22)

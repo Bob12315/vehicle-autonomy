@@ -60,13 +60,13 @@ allow_reverse = true
 启动 Application 时显式传入上述配置：
 
 ```bash
-python -m app.main run --profile rover_sim \
+python -m vehicle_autonomy.app.cli run --profile rover_sim \
   --config /absolute/run/profile.toml \
   --control-socket /absolute/run/app.sock \
   --ros2-mapping-config /absolute/run/mapping.toml \
   --navigation-config /absolute/run/navigation.toml --allow-send
 
-python -m app.main ctl --profile rover_sim \
+python -m vehicle_autonomy.app.cli ctl --profile rover_sim \
   --control-socket /absolute/run/app.sock start --mission navigate:POINT_A
 ```
 
@@ -95,7 +95,7 @@ SLAM Toolbox 边界修复的构建、ABI 限制及独立墙面证据见 [P23](au
 `map` 目标须在目标目录顶层声明 `anchor_path="/absolute/run/anchor.json"`，目标 `frame="map"`。在当前 App/地图会话 READY、原点核对完成、停稳且 Disarm 时登记：
 
 ```bash
-python -m app.anchor --control-socket /absolute/run/app.sock \
+python -m vehicle_autonomy.app.anchor --control-socket /absolute/run/app.sock \
   --output /absolute/run/anchor.json
 ```
 

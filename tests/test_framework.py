@@ -7,15 +7,15 @@ from datetime import datetime, timezone
 from pathlib import Path
 import unittest
 
-from application.service import FrameworkService
-from contracts.core.models import ActionDefinition, ActionStep, Effect, MissionDefinition
-from contracts.core.primitives import ResourceVersion, SchemaVersion
-from contracts.core.time import TimePoint
-from contracts.vehicle.ports import VehicleCapabilities
-from contracts.world.models import WorldSnapshot
-from core.action_registry import ActionRegistry
-from core.execution import ExecutionGateway, SendGate
-from core.mission import MissionValidator
+from vehicle_autonomy.app.api.service import FrameworkService
+from vehicle_autonomy.contracts.core.models import ActionDefinition, ActionStep, Effect, MissionDefinition
+from vehicle_autonomy.contracts.core.primitives import ResourceVersion, SchemaVersion
+from vehicle_autonomy.contracts.core.time import TimePoint
+from vehicle_autonomy.contracts.vehicle.ports import VehicleCapabilities
+from vehicle_autonomy.contracts.world.models import WorldSnapshot
+from vehicle_autonomy.engine.action.registry import ActionRegistry
+from vehicle_autonomy.engine.control.execution import ExecutionGateway, SendGate
+from vehicle_autonomy.engine.mission.compiler import MissionValidator
 
 
 class _Action:
@@ -87,9 +87,9 @@ class FrameworkTests(unittest.TestCase):
 
     def test_new_root_does_not_import_archived_implementation(self):
         root = Path(__file__).resolve().parents[1]
-        for directory in ("app", "application", "contracts", "core", "vehicles", "sensors",
-                          "perception", "world_model", "planning", "guidance", "intelligence",
-                          "environments", "protocols", "infrastructure", "gateway", "deployment", "web_ui"):
+        root = root / "src" / "vehicle_autonomy"
+        for directory in ("contracts", "engine", "actions", "vehicles", "world", "autonomy", "app"):
+            self.assertTrue((root / directory).is_dir())
             for path in (root / directory).rglob("*.py"):
                 tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
                 imports = []
@@ -99,10 +99,10 @@ class FrameworkTests(unittest.TestCase):
                     elif isinstance(node, ast.ImportFrom) and node.module:
                         imports.append(node.module)
                 self.assertFalse(any(name.split(".")[0] in {"legacy", "telemetry_link"} for name in imports), str(path))
-                if not path.is_relative_to(root / "protocols" / "mavlink"):
+                if not path.is_relative_to(root / "vehicles" / "ardupilot" / "mavlink"):
                     self.assertFalse(any(name.split(".")[0] == "pymavlink" for name in imports), str(path))
-                if directory in {"contracts", "core"}:
-                    self.assertFalse(any(name.split(".")[0] == "protocols" for name in imports), str(path))
+                if directory in {"contracts", "engine"}:
+                    self.assertFalse(any(name.startswith("vehicle_autonomy.vehicles.ardupilot.mavlink") for name in imports), str(path))
 
 
 if __name__ == "__main__":

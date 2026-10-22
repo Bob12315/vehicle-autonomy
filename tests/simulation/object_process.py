@@ -2,7 +2,7 @@
 import argparse,json,sys,time
 from pathlib import Path
 from uuid import uuid4
-from app.control import request
+from vehicle_autonomy.app.api.control import request
 from tests.simulation.launch import ROOT,OwnedSimulation,install_signal_cleanup
 from tests.simulation.object_fixture import add_objects,service
 from tests.simulation.oracle import GazeboTruthOracle
@@ -13,7 +13,7 @@ def run(directory):
         sensor=add_objects(owned);owned.start()
         oracle=GazeboTruthOracle(owned.world,'target_1')
         config=directory/'profile.toml';config.write_text((ROOT/'simulation/profiles/copter.toml').read_text().replace('port = 5760',f'port = {owned.port}'))
-        endpoint=directory/'app.sock';app=owned.start_process('application',[sys.executable,'-m','app.main','run','--profile','copter_sim','--config',str(config),'--control-socket',str(endpoint),'--sim-sensor-config',str(sensor)])
+        endpoint=directory/'app.sock';app=owned.start_process('application',[sys.executable,'-m','vehicle_autonomy.app.cli','run','--profile','copter_sim','--config',str(config),'--control-socket',str(endpoint),'--sim-sensor-config',str(sensor)])
         def wait(predicate,timeout=30):
             until=time.monotonic()+timeout
             while time.monotonic()<until:

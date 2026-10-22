@@ -4,7 +4,7 @@ import tempfile
 import time
 import unittest
 
-from sensors.camera.live import CameraSource
+from vehicle_autonomy.world.sensors.camera.live import CameraSource
 
 
 class CameraTests(unittest.TestCase):

@@ -4,11 +4,11 @@
 
 ## 输入、几何与控制边界
 
-`sensors/camera/recorded.py` 只读普通 JSON 清单与普通图像文件，有限时间线最多 2000 帧、严格递增 PTS、模型/图像 SHA256、明确类映射和来源。不会打开 VideoCapture、相机设备或串口。按 host monotonic epoch 回放源 PTS，capture UTC 与其相关；健康记录 capture、帧接收、推理结束、延迟、丢帧、置信度、EOS、来源/校准版本和曝光来源。fixture 为瞬时虚拟曝光（0 ns），原照片真实曝光未知。
+`src/vehicle_autonomy/world/sensors/camera/recorded.py` 只读普通 JSON 清单与普通图像文件，有限时间线最多 2000 帧、严格递增 PTS、模型/图像 SHA256、明确类映射和来源。不会打开 VideoCapture、相机设备或串口。按 host monotonic epoch 回放源 PTS，capture UTC 与其相关；健康记录 capture、帧接收、推理结束、延迟、丢帧、置信度、EOS、来源/校准版本和曝光来源。fixture 为瞬时虚拟曝光（0 ns），原照片真实曝光未知。
 
 有界异步 worker 只保留最新待处理帧和输出，CPU OpenCV DNN YOLOX 实际推理。结果超过 1 s 为 INVALID，保留原 capture 年龄；漏检/同类多目标无法唯一定位时不采用旧目标，已知目标产 UNAVAILABLE，EOS 后自然过期。图像校验失败留明确健康错误，不能刷新旧目标年龄。重连生成新的 source/world epoch。
 
-`perception/vision/projection.py` 校验分辨率、内参、显式 camera→odom 刚体变换、平面和最大距离，用检测框下沿中点射线与已知平面求交。错误 Frame 或无效标定配置拒绝加载；缺标定、分辨率不符、越界、朝上/水平/超距射线或歧义只保留 camera_optical 像素检测，不向运动 WorldModel 发布位置。普通像素标签不能触发 Goto。
+`src/vehicle_autonomy/world/perception/vision/projection.py` 校验分辨率、内参、显式 camera→odom 刚体变换、平面和最大距离，用检测框下沿中点射线与已知平面求交。错误 Frame 或无效标定配置拒绝加载；缺标定、分辨率不符、越界、朝上/水平/超距射线或歧义只保留 camera_optical 像素检测，不向运动 WorldModel 发布位置。普通像素标签不能触发 Goto。
 
 正式 App 通过 `--recorded-vision-config` 替换 `--sim-sensor-config`，二者互斥；Action/Mission 和受控载荷执行器不因传感器改变。所有导航和投放仍经原授权/Safety/租约/最终写前复核。shutdown 先收束车辆/撤权，再关闭视觉 worker；worker 关闭失败不能阻止车辆隔离，状态记录 shutdown_error、进程非零退出。
 

@@ -24,7 +24,7 @@ elif command -v pkg-config >/dev/null && pkg-config --exists libpcap; then
   rs16_libs=(-lpcap)
 fi
 g++ -std=c++14 -O2 -pthread "${rs16_flags[@]}" -I "$sdk_root/src" \
-  integrations/robosense/rs16_capture.cpp "${rs16_libs[@]}" -o "$adapter_output/rs16_capture"
+  src/vehicle_autonomy/world/sensors/lidar/robosense/rs16_capture.cpp "${rs16_libs[@]}" -o "$adapter_output/rs16_capture"
 cp "$sdk_root/LICENSE" "$adapter_output/RS_DRIVER_LICENSE"
 printf '%s\n' "$sdk_sha" > "$adapter_output/sdk-commit.txt"
 sha256sum "$adapter_output/rs16_capture" > "$adapter_output/binary.sha256"

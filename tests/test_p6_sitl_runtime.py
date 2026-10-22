@@ -12,15 +12,15 @@ from unittest.mock import patch
 
 from pymavlink.dialects.v20 import ardupilotmega as mavlink
 
-from contracts.core.time import TimePoint
-from contracts.vehicle.command import ArmCommand, ModeCommand
-from deployment.sitl_runtime import SitlRuntime, run_sitl
-from protocols.mavlink.constants import TYPE_QUADROTOR, CMD_SET_MODE
-from runtime.sitl import SitlProfile
-from vehicles.multirotor.sitl_guard import SitlModeTranslator
+from vehicle_autonomy.contracts.core.time import TimePoint
+from vehicle_autonomy.contracts.vehicle.command import ArmCommand, ModeCommand
+from vehicle_autonomy.app.bootstrap.sitl_runtime import SitlRuntime, run_sitl
+from vehicle_autonomy.vehicles.ardupilot.mavlink.constants import TYPE_QUADROTOR, CMD_SET_MODE
+from vehicle_autonomy.app.bootstrap.sitl import SitlProfile
+from vehicle_autonomy.vehicles.copter.sitl_guard import SitlModeTranslator
 
 
-PROFILE = Path(__file__).resolve().parents[1] / "runtime" / "sitl.toml"
+PROFILE = Path(__file__).resolve().parents[1] / "configs" / "sitl.toml"
 
 
 class Clock:
@@ -269,7 +269,7 @@ class P6SitlRuntimeTests(unittest.TestCase):
                 self.closed = True
 
         fake = InterruptedRuntime()
-        with patch("deployment.sitl_runtime.SitlRuntime", return_value=fake):
+        with patch("vehicle_autonomy.app.bootstrap.sitl_runtime.SitlRuntime", return_value=fake):
             self.assertEqual(run_sitl(self.profile)["status"], "CANCELLED")
         self.assertTrue(fake.cancelled)
         self.assertTrue(fake.closed)

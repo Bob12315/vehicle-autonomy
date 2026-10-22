@@ -1,9 +1,9 @@
 """Mission identity, authorization and reconnection through the actual writer."""
 from dataclasses import replace
 import unittest
-from contracts.core.primitives import SchemaVersion
-from contracts.effects.vehicle import EffectEnvelope, ModeEffect
-from deployment.application_runtime import ApplicationRuntime
+from vehicle_autonomy.contracts.core.primitives import SchemaVersion
+from vehicle_autonomy.contracts.effects.vehicle import EffectEnvelope, ModeEffect
+from vehicle_autonomy.app.bootstrap.application_runtime import ApplicationRuntime
 from tests.test_simulation_runtime import SimulationRuntimeTests
 
 

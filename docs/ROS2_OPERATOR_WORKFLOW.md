@@ -76,7 +76,7 @@ Humble 的跨版本 DDS 不默认认定可用，也没有自动扩大 ROS 网络
 将其显示到公共导航图需要显式、保留 frame/epoch 的诊断适配，本次未假装已有该输出。
 RViz 必须使用数据源的 ROS_DOMAIN_ID；仿真/rosbag 时还需启用 use_sim_time 并提供
 /clock。显示脚本不自动猜测或修改私有仿真 job 的域和时钟配置；可直接通过相应
-ROS wrapper 启动 `rviz2 -d config/rviz/navigation-readonly.rviz --ros-args -p use_sim_time:=true`。
+ROS wrapper 启动 `rviz2 -d configs/rviz/navigation-readonly.rviz --ros-args -p use_sim_time:=true`。
 
 两个配置均只带相机移动、选择和聚焦工具，没有 Nav2 Goal、初始定位发布或车辆
 控制面板。未来 RViz 点选目标应作为目标提案进入 Application，经过地图/车辆会话

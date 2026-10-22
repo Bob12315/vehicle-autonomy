@@ -8,8 +8,8 @@ import sys
 import time
 from uuid import uuid4
 
-from app.control import request
-from intelligence.proposals import LlmAdapter
+from vehicle_autonomy.app.api.control import request
+from vehicle_autonomy.autonomy.intelligence.proposals import LlmAdapter
 from tests.simulation.launch import OwnedSimulation, ROOT
 
 
@@ -43,7 +43,7 @@ def main():
         owned.start()
         profile=directory/'profile.toml'
         profile.write_text((ROOT/('simulation/profiles/rover_yard.toml' if args.scenario=='yard' else 'simulation/profiles/rover.toml')).read_text().replace('port = 5760',f'port = {owned.port}'))
-        app=owned.start_process('application',[sys.executable,'-m','app.main','run','--profile','rover_sim',
+        app=owned.start_process('application',[sys.executable,'-m','vehicle_autonomy.app.cli','run','--profile','rover_sim',
             '--config',str(profile),'--control-socket',str(endpoint),*(['--allow-send'] if args.allow_send else []),
             *(['--environment-config',str(ROOT/'simulation/environments/yard.toml'),'--scenario-scene',str(ROOT/'simulation/scenes/yard.json')] if args.scenario=='yard' else [])])
         deadline=time.monotonic()+90
@@ -57,7 +57,7 @@ def main():
         else:raise TimeoutError('stable simulation preflight not ready')
         if args.gui:owned.start_process('gazebo-gui',['gz','sim','-g','-v3'])
         token=directory/'token'
-        web=owned.start_process('web',[sys.executable,'-m','app.web','--control-socket',str(endpoint),
+        web=owned.start_process('web',[sys.executable,'-m','vehicle_autonomy.app.web.cli','--control-socket',str(endpoint),
             '--port',str(args.port),'--data-dir',str(directory/'console'),'--token-file',str(token),
             '--missions',('disarmed_mode,motion:drive,motion:turn,motion:circle,motion:wait,motion:visit' if args.scenario=='yard' else 'disarmed_mode,basic_route'),
             *(['--llm-config',str(args.llm_config.resolve())] if args.llm_config else [])])

@@ -34,12 +34,12 @@ P9–P15 以 localhost SITL/Gazebo 为主要验收环境。P16 是**单独解冻
 
 ## 2. 当前基线、全程约束与交付方式
 
-当前仓库为 `/home/level6/vehicle-autonomy-framework`。以下现状描述为制定计划时的基线，新增实现与证据以完成审计为准。现有可复用接口：`deployment/simulation_runtime.py::SimulationRuntime`、`runtime/simulation_profile.py::SimulationProfile`、`localization/reported.py::ReportedPoseLocalization`、`core/transform.py::TransformTree`、`world_model/service.py::WorldModel`、`core/mission_runtime.py::MissionRuntime`、`core/action_registry.py`、`core/vehicle_execution.py`、`application/mission_service.py`。当前缺口：正式 App 长运行入口、Localization/Transform 在线组合、Environment、通用运动 Action 和业务 Mission。`WorldSnapshot` 已有 `vehicle`、`localization`、`objects`、`map`、`environment` 字段；字段存在不等于在线生产者已接入。现有 `WorldModel.publish()` 会选用 vehicle/localization/objects，尚未发布 Environment 引用。当前 `SimulationRuntime.cycle()` 只更新车辆状态后发布 WorldSnapshot。
+当前仓库为 `/home/level6/vehicle-autonomy-framework`。以下现状描述为制定计划时的基线，新增实现与证据以完成审计为准。现有可复用接口：`src/vehicle_autonomy/app/bootstrap/simulation_runtime.py::SimulationRuntime`、`src/vehicle_autonomy/app/bootstrap/simulation_profile.py::SimulationProfile`、`src/vehicle_autonomy/world/localization/reported.py::ReportedPoseLocalization`、`src/vehicle_autonomy/world/transform/tree.py::TransformTree`、`src/vehicle_autonomy/world/model/service.py::WorldModel`、`src/vehicle_autonomy/engine/mission/runtime.py::MissionRuntime`、`src/vehicle_autonomy/engine/action/registry.py`、`src/vehicle_autonomy/engine/control/vehicle_execution.py`、`src/vehicle_autonomy/app/api/mission_service.py`。当前缺口：正式 App 长运行入口、Localization/Transform 在线组合、Environment、通用运动 Action 和业务 Mission。`WorldSnapshot` 已有 `vehicle`、`localization`、`objects`、`map`、`environment` 字段；字段存在不等于在线生产者已接入。现有 `WorldModel.publish()` 会选用 vehicle/localization/objects，尚未发布 Environment 引用。当前 `SimulationRuntime.cycle()` 只更新车辆状态后发布 WorldSnapshot。
 
 所有阶段必须保持：
 
 1. 上层 Action/Mission 只读取只读 Snapshot 并产生 Typed Effect；车辆命令始终通过 `VehicleExecution → VehicleSafetyPolicy → ControlAuthority → Vehicle Plugin → MAVLink 唯一 writer → Transport`。系统 SEND、Action SEND 默认关闭，Lease/Session/期限在写入前复核。禁止 Application、Environment、Sensor、Perception 直接持有车辆端口。
-2. `contracts/` 视为冻结。确有语义缺口时先记录理由、最小变更和兼容性，增加合同测试，独立提交。不同时间域/Frame/来源的数据不能默认为可互换；缺失、过期、未来时间、会话切换都要显式处理。
+2. `src/vehicle_autonomy/contracts/` 视为冻结。确有语义缺口时先记录理由、最小变更和兼容性，增加合同测试，独立提交。不同时间域/Frame/来源的数据不能默认为可互换；缺失、过期、未来时间、会话切换都要显式处理。
 3. `/home/level6/uav_ws/cuadc2026/` 是**绝对只读参考**；新根目录不导入 `legacy/`。迁移时审依赖和安全行为，重写到相应新边界，不复制整个旧运行时。当前真实设备接入继续冻结；不打开 `/dev/tty*`，不把 SITL PASS 宣称为实机安全。
 4. 每阶段先看 `git status`、保留已有未提交工作；检查相关测试和 SITL/Gazebo 场景后提交一个稳定里程碑，不自动 push。新增验收保留原数值门槛，不能 `skip`/`xfail` 核心场景、删失败测试或降低容差求绿。
 5. 每阶段在 `docs/autonomy/phase-<编号>.md` 留下命令、提交 SHA、场景/配置版本、单元和 E2E 结果、日志/真值报告、失败诊断、限制。大型日志留在忽略的 `artifacts/`。只停止本阶段自己创建的进程，并验证端口和进程组已清理。
@@ -62,17 +62,17 @@ P9–P15 以 localhost SITL/Gazebo 为主要验收环境。P16 是**单独解冻
 
 ## 4. P9 — Application Runtime
 
-**目标。** 将目前主要由 `tests/simulation/*` 驱动的 `SimulationRuntime` 装配成 `python -m app.main run --profile copter_sim|rover_sim` 可持续运行的本机仿真进程，提供状态、已注册任务启动/取消及安全 shutdown。详细规格、候选文件、CLI 协议和 P9.0–P9.5 顺序见 [P9 专项计划](p9_application_runtime_plan.md)。
+**目标。** 将目前主要由 `tests/simulation/*` 驱动的 `SimulationRuntime` 装配成 `python -m vehicle_autonomy.app.cli run --profile copter_sim|rover_sim` 可持续运行的本机仿真进程，提供状态、已注册任务启动/取消及安全 shutdown。详细规格、候选文件、CLI 协议和 P9.0–P9.5 顺序见 [P9 专项计划](p9_application_runtime_plan.md)。
 
 **实现。** 复用现有车辆 Runtime；解决 `MissionRuntime` 的 `EffectEnvelope` 与 `SimulationRuntime.submit_effect()` 自建 Envelope/固定 Action ID 的身份不一致，保留 Run/Action/Effect ID 和期限，经 Execution 分派并回流结果。应用进程持续 `cycle()`，无 SITL 时保持可查询的连接中状态并有界重试；失联撤销授权、终止旧任务、重连只读。首个任务仅为现有受限 `disarmed_mode` Typed Mission：Copter GUIDED、Rover HOLD，不在 CLI 暴露任意 Effect 或运动命令。默认双 SEND 关闭，显式 `--allow-send` 也仅允许注册任务的分步授权。
 
-**测试与门槛。** 单元测试身份链、门控、幂等、期限、失联和关闭；真实应用进程分别连接两车 SITL/Gazebo，连续查询新鲜快照，验证模式 ACK 加后续状态、取消/SIGTERM/重连/旧命令隔离。保留 `app.main status` 默认断连语义；完整 `./scripts/test_simulation_v1.sh` 无退化，新增进程场景不得只由测试脚本私有 Runtime 代替。P9 PASS 后才能把 App 入口写成已支持；仍不宣称 onboard 或真实车辆。
+**测试与门槛。** 单元测试身份链、门控、幂等、期限、失联和关闭；真实应用进程分别连接两车 SITL/Gazebo，连续查询新鲜快照，验证模式 ACK 加后续状态、取消/SIGTERM/重连/旧命令隔离。保留 `vehicle_autonomy.app.cli status` 默认断连语义；完整 `./scripts/test_simulation_v1.sh` 无退化，新增进程场景不得只由测试脚本私有 Runtime 代替。P9 PASS 后才能把 App 入口写成已支持；仍不宣称 onboard 或真实车辆。
 
 ## 5. P10 — Localization + Transform + WorldModel 在线链
 
 **目标。** 在 P9 的长运行进程内形成 `VehicleState → ReportedPoseLocalization → TransformTree → WorldModel → WorldSnapshot`。第一版使用 ArduPilot EKF/SITL 自报位置，不做 GPS/VIO/SLAM 融合，不把 reported pose 称为独立真值。
 
-**现有证据与落点。** `localization/reported.py::ReportedPoseLocalization.estimate()` 已能离线产出 `LocalizationEstimate`；`core/transform.py::TransformTree` 有按时间查询、插值和无外推规则；`world_model/service.py::WorldModel.update_localization()` 已存在。改动主要在 `deployment/simulation_runtime.py` 或 P9 组合器、`localization/`、`core/transform.py` 的接线与测试；尽量不动冻结合同。
+**现有证据与落点。** `src/vehicle_autonomy/world/localization/reported.py::ReportedPoseLocalization.estimate()` 已能离线产出 `LocalizationEstimate`；`src/vehicle_autonomy/world/transform/tree.py::TransformTree` 有按时间查询、插值和无外推规则；`src/vehicle_autonomy/world/model/service.py::WorldModel.update_localization()` 已存在。改动主要在 `src/vehicle_autonomy/app/bootstrap/simulation_runtime.py` 或 P9 组合器、`src/vehicle_autonomy/world/localization/`、`src/vehicle_autonomy/world/transform/tree.py` 的接线与测试；尽量不动冻结合同。
 
 **实施顺序。** 先写 Frame 图：`odom` 是局部 ENU，`base_link` 是车体 FLU，`odom → base_link` 来自同一 VehicleState 的位姿并按采样时间更新；`map`/Gazebo world 到 `odom` 不能凭名字假设单位变换，只有测得/配置并附版本后才加入。每次有效车辆状态更新时产出独立 LocalizationEstimate，再将**同一源版本**的 vehicle/localization 和动态 transform 纳入发布周期。记录 source capture、receive、publish 时间和 clock domain；按原 WorldModel 规则拒绝未来、过期、异域或逆序样本。定位不可用时 WorldSnapshot 的 localization 为空或状态明确降级，不能沿用上次有效 pose 冒充当前。重连须新 generation/Transform epoch，不能跨 SITL 重启外推旧姿态。
 
@@ -82,7 +82,7 @@ P9–P15 以 localhost SITL/Gazebo 为主要验收环境。P16 是**单独解冻
 
 **目标。** 为任务提供静态/半静态的 `origin`、`home`、`geofence`、命名地点、区域和任务点，让上层引用名称与版本，不在 Mission 内散落裸坐标。Environment 是数据源，不做路径规划或发送命令。
 
-**现状与落点。** 根仓库还没有 `environment/` 包；`WorldSnapshot.environment` 已有 `ResourceReference` 类型，但 `WorldModel.publish()` 尚不填该字段。建议 `environment/` 定义不可变资源和只读解析接口，`simulation/environments/{copter,rover}.toml` 或 YAML 存仿真场景，`world_model/service.py` 接入环境引用；`runtime/` 校验配置。配置格式、版本/加载错误必须在实施前冻结。与现有 `core/vehicle_safety.py` 的围栏边界要校验一致；Environment 的围栏信息不能替代 SafetyPolicy 的强制检查。
+**现状与落点。** 根仓库还没有 `environment/` 包；`WorldSnapshot.environment` 已有 `ResourceReference` 类型，但 `WorldModel.publish()` 尚不填该字段。建议 `environment/` 定义不可变资源和只读解析接口，`simulation/environments/{copter,rover}.toml` 或 YAML 存仿真场景，`src/vehicle_autonomy/world/model/service.py` 接入环境引用；`configs/` 校验配置。配置格式、版本/加载错误必须在实施前冻结。与现有 `src/vehicle_autonomy/engine/control/vehicle_safety.py` 的围栏边界要校验一致；Environment 的围栏信息不能替代 SafetyPolicy 的强制检查。
 
 **实施顺序。** 明确每个位置的 Frame、坐标单位、原点来源和版本。`home` 不应无证据地写死为 `(0,0)`：可来自明确配置或飞控上报，来源变化时生成新版本。命名点解析输出带 Environment 版本的目标；任务启动时锁定使用版本，运行中配置变化应拒绝/重新预检，不能把旧任务静默指向新坐标。区域/围栏多边形或矩形按当前任务需求最小实现；安全配置与场景地图不一致时启动失败或显式阻止任务。WorldSnapshot 引用实际发布的环境版本，并记录依赖。
 
@@ -94,7 +94,7 @@ P9–P15 以 localhost SITL/Gazebo 为主要验收环境。P16 是**单独解冻
 
 **建议最小目录。** Copter：`ArmAction`、`TakeoffAction`、`GotoAction`、`HoldAction`、`ReturnHomeAction`、`LandAction`、`DisarmAction`。Rover：`ArmAction`、`GotoAction`、`Hold/StopAction`、`ReturnHomeAction`、`DisarmAction`；前进/转向/速度如通用 Mission 需要，可另建带 deadman 的有限动作，不能把原始无限速度流暴露为无退出条件 Action。两车同名 Action 是否共享实现，由能力、参数和安全语义决定，不因名称相同就强行合并。
 
-**落点与实现。** 基于 `contracts/decision.py`、`core/action_registry.py`、`core/mission_runtime.py`、现有 `core/sitl_mode_action.py` 的结果模式，在 `actions/` 或具体车辆插件中注册 `ActionSpec`、参数 Schema、能力与 Effect allowlist。Goto 参数应是 P11 的命名地点/已解析且带版本的目标；ReturnHome 必须验证 home 来源、新鲜定位及模式语义。每个动作有 deadline、成功判据、失败原因和 `exit()`；起飞/落地不能因 ACK 就完成，要看后续新鲜车辆状态，Gazebo E2E 再验证高度和接地。Hold/Stop、取消、异常退出优先走受控 Stop；失联时标 `UNKNOWN/UNCONFIRMED`，不谎称物理停车。
+**落点与实现。** 基于 `src/vehicle_autonomy/contracts/decision.py`、`src/vehicle_autonomy/engine/action/registry.py`、`src/vehicle_autonomy/engine/mission/runtime.py`、现有 `src/vehicle_autonomy/actions/common/sitl_mode.py` 的结果模式，在 `src/vehicle_autonomy/actions/` 或具体车辆插件中注册 `ActionSpec`、参数 Schema、能力与 Effect allowlist。Goto 参数应是 P11 的命名地点/已解析且带版本的目标；ReturnHome 必须验证 home 来源、新鲜定位及模式语义。每个动作有 deadline、成功判据、失败原因和 `exit()`；起飞/落地不能因 ACK 就完成，要看后续新鲜车辆状态，Gazebo E2E 再验证高度和接地。Hold/Stop、取消、异常退出优先走受控 Stop；失联时标 `UNKNOWN/UNCONFIRMED`，不谎称物理停车。
 
 **测试/验收。** 离线用伪 WorldSnapshot/EffectResult 验证每个 Action 的请求、等待、成功、拒绝、超时、取消、退出；集成测试证明 Action 没有 `VehicleCommandPort`/MAVLink/Transport 依赖，所有 Effect 经 P9 桥接与双 SEND/Lease/Safety。Copter/Rover 分别执行单 Action 的 SITL/Gazebo 验收，复用原物理 Oracle 和固定门槛，不只看 ACK。**退出**：最小动作集可注册、可由 Application 调用、失败与取消安全收束，旧车辆与 P9/P10/P11 测试全绿；P12 记录并提交。
 
@@ -104,15 +104,15 @@ P9–P15 以 localhost SITL/Gazebo 为主要验收环境。P16 是**单独解冻
 
 **首次场景。** Copter：`Arm → Takeoff → Goto A → Hold → Goto B → ReturnHome/RTL → Land → Disarm`；Rover：`Arm → Goto A → Goto B → ReturnHome → Stop → Disarm`。具体点位须在安全围栏内并留物理余量。Mission 配置位于 `applications/`/`simulation/missions/`，经 `MissionValidator` 检查 Action 注册、参数、车辆能力、环境版本、Home/Localization 新鲜度后才运行。失败策略、取消顺序和退出屏障写入编译结果；不默认重试非幂等 Arm/Takeoff/Release。
 
-**实现。** 复用 `core/mission.py` 和 `core/mission_runtime.py`，在 Application 任务目录中注册两条 Mission。P9 控制协议只接受这些目录名与校验过的参数；多任务并发先拒绝，避免控制权争用。每一步产出的 EffectResult 与 WorldSnapshot 反馈推动下一步；若定位/环境版本丢失、链路断开或 Safety 拒绝，任务失败/取消并安全退出，不能跳到下一步或自动恢复旧动作。
+**实现。** 复用 `src/vehicle_autonomy/engine/mission/compiler.py` 和 `src/vehicle_autonomy/engine/mission/runtime.py`，在 Application 任务目录中注册两条 Mission。P9 控制协议只接受这些目录名与校验过的参数；多任务并发先拒绝，避免控制权争用。每一步产出的 EffectResult 与 WorldSnapshot 反馈推动下一步；若定位/环境版本丢失、链路断开或 Safety 拒绝，任务失败/取消并安全退出，不能跳到下一步或自动恢复旧动作。
 
-**测试/验收。** 单元测编译、能力/参数/环境版本、分支/失败/取消、幂等结果；进程级两车 E2E 必须从 `app.main ctl start --mission ...` 发起，记录完整 `Environment → WorldModel → Mission → Action → Effect → Vehicle → Gazebo → WorldModel` 时序。每个物理动作由车辆状态、独立 Gazebo truth、原固定误差/Stop 超时共同验收；任一步失败要返回非零场景结果且清理自己的进程。**退出**：两条 Mission 连续两次正常通过，至少覆盖中途取消和状态过期失败；P9–P12 回归全绿，形成“基础自主系统完成”审计与提交。
+**测试/验收。** 单元测编译、能力/参数/环境版本、分支/失败/取消、幂等结果；进程级两车 E2E 必须从 `vehicle_autonomy.app.cli ctl start --mission ...` 发起，记录完整 `Environment → WorldModel → Mission → Action → Effect → Vehicle → Gazebo → WorldModel` 时序。每个物理动作由车辆状态、独立 Gazebo truth、原固定误差/Stop 超时共同验收；任一步失败要返回非零场景结果且清理自己的进程。**退出**：两条 Mission 连续两次正常通过，至少覆盖中途取消和状态过期失败；P9–P12 回归全绿，形成“基础自主系统完成”审计与提交。
 
 ## 9. P14 — Sim Sensor / Sim Object
 
 **目标。** 建立一个**显式仿真适配器**，从 Gazebo 中的已知对象实体生成标准 `Observation[DetectedObject]`，让 WorldModel 处理目标出现、移动、消失和过期；暂不接 Camera/YOLO。
 
-**现状与实现。** `contracts/sensor/observation.py`、`contracts/sensor/data.py`、`world_model/service.py::ingest_observation()` 已有类型与对象新鲜度处理；`sensors/fake.py` 是离线输入。新建 `sensors/simulation/` 的只读 Gazebo 对象源，给定白名单模型名、Frame、capture/receive 时间、producer ID、sequence、quality 和仿真来源标识；转换为 Observation 后经正常 WorldModel 输入。**测试 Oracle 的 truth 订阅与 Sim Sensor 的输入必须是两个隔离角色**：Oracle 独立判定物理结果；Sim Sensor 在仿真环境中扮演可替换传感器，Mission 只能看 Observation/WorldSnapshot，不直接订阅 Gazebo。生产/硬件 profile 不能加载 Sim Sensor。
+**现状与实现。** `src/vehicle_autonomy/contracts/sensor/observation.py`、`src/vehicle_autonomy/contracts/sensor/data.py`、`src/vehicle_autonomy/world/model/service.py::ingest_observation()` 已有类型与对象新鲜度处理；`src/vehicle_autonomy/world/sensors/fake.py` 是离线输入。新建 `src/vehicle_autonomy/world/sensors/simulation/` 的只读 Gazebo 对象源，给定白名单模型名、Frame、capture/receive 时间、producer ID、sequence、quality 和仿真来源标识；转换为 Observation 后经正常 WorldModel 输入。**测试 Oracle 的 truth 订阅与 Sim Sensor 的输入必须是两个隔离角色**：Oracle 独立判定物理结果；Sim Sensor 在仿真环境中扮演可替换传感器，Mission 只能看 Observation/WorldSnapshot，不直接订阅 Gazebo。生产/硬件 profile 不能加载 Sim Sensor。
 
 **场景与故障。** 在 Gazebo 场景放置 `target_1`、`target_2`、`target_3`，测试搜索/选择/接近所需的对象状态表达；注入漏检、延迟、重复、坐标不匹配、目标离场、同 ID 新旧版本、时钟回退和过期。对象消失时 WorldModel 不得继续把旧位置列为当前目标；多目标选择必须基于版本化观察而非硬编码模型真值。不得让 Sim Sensor 的“完美真值”掩盖质量/时间判断。
 

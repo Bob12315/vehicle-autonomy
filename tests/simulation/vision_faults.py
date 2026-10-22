@@ -8,7 +8,7 @@ import sys
 import time
 from uuid import uuid4
 
-from app.control import request
+from vehicle_autonomy.app.api.control import request
 from tests.simulation.launch import ROOT, OwnedSimulation, install_signal_cleanup
 from tests.simulation.oracle import GazeboTruthOracle
 
@@ -39,7 +39,7 @@ def run(directory, recording):
         config = directory / 'profile.toml'
         config.write_text((ROOT / 'simulation/profiles/copter.toml').read_text().replace(
             'port = 5760', f'port = {owned.port}'))
-        app = owned.start_process('application', [sys.executable, '-m', 'app.main', 'run',
+        app = owned.start_process('application', [sys.executable, '-m', 'vehicle_autonomy.app.cli', 'run',
             '--profile', 'copter_sim', '--config', str(config), '--control-socket', str(endpoint),
             '--allow-send', '--recorded-vision-config', str(local_recording), '--sim-payload'])
 
@@ -67,7 +67,7 @@ def run(directory, recording):
             raise TimeoutError('public state deadline')
 
         def ctl(operation, *flags):
-            result = subprocess.run([sys.executable, '-m', 'app.main', 'ctl', '--profile',
+            result = subprocess.run([sys.executable, '-m', 'vehicle_autonomy.app.cli', 'ctl', '--profile',
                 'copter_sim', '--control-socket', str(endpoint), operation, *flags],
                 capture_output=True, text=True, timeout=4)
             response = json.loads(result.stdout)

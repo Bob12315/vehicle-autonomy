@@ -24,7 +24,7 @@ physical scenarios and zero failed/not-run/core-skipped scenarios. Unit counts
 were 124, 125 and 125 respectively; the added case verifies independent world
 epochs when stage names repeat. The second suite preserved occupied TCP 5770;
 all scenes used TCP 5780. The third verified stricter single request-to-truth
-deadlines. Final suite `artifacts/simulation/suite-015782bd/summary.json` returned 0 with **125 unit tests, 11 stages, five scenarios, zero failures/not-run/core skips**. Its build directory began empty. Every scene reports released ports and no remaining owned groups. `artifacts/simulation/suite-015782bd/audit-verification.json` additionally checks original numeric limits, all request-to-truth Stop deadlines, runtime logs, revisions and unchanged contracts/legacy.
+deadlines. Final suite `artifacts/simulation/suite-015782bd/summary.json` returned 0 with **125 unit tests, 11 stages, five scenarios, zero failures/not-run/core skips**. Its build directory began empty. Every scene reports released ports and no remaining owned groups. `artifacts/simulation/suite-015782bd/audit-verification.json` additionally checks original numeric limits, all request-to-truth Stop deadlines, runtime logs, revisions and unchanged src/vehicle_autonomy/contracts/legacy.
 
 ## Mandatory DoD mapping
 
@@ -32,7 +32,7 @@ deadlines. Final suite `artifacts/simulation/suite-015782bd/summary.json` return
 | --- | --- | --- |
 | One command from clean build, twice complete, own cleanup and trustworthy exit | `scripts/test_simulation_v1.sh`; empty owned build directories; suites above; manifests; 8 harness tests | passed |
 | Both SEND/lease/session/deadline/Safety/unique-writer fences | deterministic tests for both kinds, live unauthorized/duplicate checks; final write guard | passed |
-| Fresh state, stale/link/clock blocks, new session and no replay | source-clock tests, proxy physical faults, runtime/SITL restart reports | passed |
+| Fresh state, stale/link/clock blocks, new session and no replay | source-clock tests, proxy physical faults, configs/SITL restart reports | passed |
 | All required Copter and target Rover motions including Goto | normal reports plus fault Cancel/deadman; independent fresh Gazebo truth | passed |
 | Result + state + truth + bounded time; no core skips | unit/scene JSON; telemetry-confirmed stops plus stable truth; ACK-only commands need physical oracle | passed |
 
@@ -85,7 +85,7 @@ Gazebo speed. **At transport loss the physical-stop outcome is UNCONFIRMED.**
 ArduPilot may independently slow/stop, but software does not label a zero
 setpoint delivered or a vehicle stopped without evidence. Runtime resets
 fence old queues and statuses; ambiguous transmitted/ACK-only outcomes stay
-UNKNOWN. Default `python -m app.main status` still reports disconnected and
+UNKNOWN. Default `python -m vehicle_autonomy.app.cli status` still reports disconnected and
 `send_commands=false`.
 
 ## Process/build evidence

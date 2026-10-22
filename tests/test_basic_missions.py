@@ -1,12 +1,12 @@
 import math
 import unittest
-from actions.basic import BasicParameters, register_basic
-from applications.basic_catalog import build, capabilities
-from environments.resources import Environment
-from contracts.vehicle.ports import VehicleCapabilities
-from core.action_registry import ActionRegistry
-from core.mission import MissionValidator
-from core.sitl_mode_action import SITL_MODE_SPEC, SitlModeAction
+from vehicle_autonomy.actions.common.basic import BasicParameters, register_basic
+from vehicle_autonomy.app.scenarios.basic_catalog import build, capabilities
+from vehicle_autonomy.world.environment.resources import Environment
+from vehicle_autonomy.contracts.vehicle.ports import VehicleCapabilities
+from vehicle_autonomy.engine.action.registry import ActionRegistry
+from vehicle_autonomy.engine.mission.compiler import MissionValidator
+from vehicle_autonomy.actions.common.sitl_mode import SITL_MODE_SPEC, SitlModeAction
 from pathlib import Path
 
 class BasicMissionTests(unittest.TestCase):

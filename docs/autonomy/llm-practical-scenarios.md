@@ -91,7 +91,7 @@ world.sdf碰撞盒与被动Gazebo真值，另检路径、车体净空、站点�
 
 ```bash
 ./scripts/simulation_console.sh --scenario yard --gui --allow-send \
-  --llm-config config/llm.server-tunnel.json --lifetime-s 1800
+  --llm-config configs/llm.server-tunnel.json --lifetime-s 1800
 ./scripts/test_practical_scenarios.sh artifacts/simulation/yard-suite-NEW
 python -m tests.simulation.practical_evidence --run-dir artifacts/simulation/yard-suite-NEW
 ```

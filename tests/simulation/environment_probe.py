@@ -6,14 +6,14 @@ import math
 from pathlib import Path
 import time
 from uuid import uuid4
-from contracts.core.geometry import Pose3, Quaternion, Twist3, Vector3
-from contracts.effects.vehicle import ArmEffect, DisarmEffect, LandEffect, ModeEffect, PoseTargetEffect, StopMotionEffect, TakeoffEffect, TwistTargetEffect
-from deployment.simulation_runtime import SimulationRuntime
-from environments.resources import Environment
+from vehicle_autonomy.contracts.core.geometry import Pose3, Quaternion, Twist3, Vector3
+from vehicle_autonomy.contracts.effects.vehicle import ArmEffect, DisarmEffect, LandEffect, ModeEffect, PoseTargetEffect, StopMotionEffect, TakeoffEffect, TwistTargetEffect
+from vehicle_autonomy.app.bootstrap.simulation_runtime import SimulationRuntime
+from vehicle_autonomy.world.environment.resources import Environment
 from tests.simulation.launch import ROOT, OwnedSimulation, install_signal_cleanup
 from tests.simulation.oracle import GazeboTruthOracle
-from vehicles.multirotor.ardupilot_commands import ArduPilotCommandTranslator
-from vehicles.rover.ardupilot_commands import ArduRoverCommandTranslator
+from vehicle_autonomy.vehicles.ardupilot.commands import ArduPilotCommandTranslator
+from vehicle_autonomy.vehicles.rover.ardupilot_commands import ArduRoverCommandTranslator
 
 
 def run(directory, kind):

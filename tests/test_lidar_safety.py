@@ -6,12 +6,12 @@ from pathlib import Path
 import tempfile
 from dataclasses import replace
 
-from contracts.core.primitives import SchemaVersion
-from contracts.core.time import TimePoint
-from contracts.core.quality import QualityState
-from contracts.sensor import Observation
-from sensors.lidar.scan import ScanConfig, ScanProcessor, PlanarScan
-from perception.obstacles import CollisionMonitor
+from vehicle_autonomy.contracts.core.primitives import SchemaVersion
+from vehicle_autonomy.contracts.core.time import TimePoint
+from vehicle_autonomy.contracts.core.quality import QualityState
+from vehicle_autonomy.contracts.sensor import Observation
+from vehicle_autonomy.world.sensors.lidar.scan import ScanConfig, ScanProcessor, PlanarScan
+from vehicle_autonomy.world.perception.obstacles import CollisionMonitor
 
 
 def stamp(value, domain='test'):
@@ -20,7 +20,7 @@ def stamp(value, domain='test'):
 
 class LidarTests(unittest.TestCase):
     def test_fresh_previous_receiver_file_cannot_poison_owned_epoch_admission(self):
-        from sensors.lidar.exchange import ExchangeMonitor
+        from vehicle_autonomy.world.sensors.lidar.exchange import ExchangeMonitor
         base={'schema':1,'source':'robosense.rs_driver','epoch':'old',
               'clock_domain':Path('/proc/sys/kernel/random/boot_id').read_text().strip(),
               'frame':'lidar','sequence':1,'capture_ns':100,'receive_ns':200,
@@ -34,7 +34,7 @@ class LidarTests(unittest.TestCase):
             self.assertTrue(monitor.poll(path,1000)['online'])
 
     def test_sdk_exchange_loss_reorder_boot_and_expiry(self):
-        from sensors.lidar.exchange import ExchangeMonitor
+        from vehicle_autonomy.world.sensors.lidar.exchange import ExchangeMonitor
         base={'schema':1,'source':'robosense.rs_driver','epoch':'test','clock_domain':Path('/proc/sys/kernel/random/boot_id').read_text().strip(),
               'frame':'lidar','sequence':1,'capture_ns':100,'receive_ns':200,'source_timestamp_s':1.,
               'provenance':'pcap_replay','points':[[1.,0.,0.]]}

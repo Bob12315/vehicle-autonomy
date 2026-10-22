@@ -7,10 +7,10 @@
 先单独启动本机 ArduCopter SITL，使 TCP 5760 可连接。然后运行：
 
 ```bash
-tests/manual_sitl_arm.sh runtime/sitl_arm.toml 'ArduCopter V4.8.0-dev (b5fbe265)'
+tests/manual_sitl_arm.sh configs/sitl_arm.toml 'ArduCopter V4.8.0-dev (b5fbe265)'
 ```
 
-直接入口为 `python -m app.main run-sitl-arm --config runtime/sitl_arm.toml --allow-send --allow-arm`。两个授权开关缺一时，CLI 在连接前拒绝。独立的 profile 强制 `127.0.0.1` 或 `::1`、ArduCopter 四旋翼、显式 Safety、周期和最长时限；配置文件不能开启 SEND。此 profile 在任务前等待 45 秒，给本机 SITL 的位置估计建立时间。等待并不绕过飞控预解锁检查：飞控仍可拒绝 Arm，任务会报告 `REJECTED`。
+直接入口为 `python -m vehicle_autonomy.app.cli run-sitl-arm --config configs/sitl_arm.toml --allow-send --allow-arm`。两个授权开关缺一时，CLI 在连接前拒绝。独立的 profile 强制 `127.0.0.1` 或 `::1`、ArduCopter 四旋翼、显式 Safety、周期和最长时限；配置文件不能开启 SEND。此 profile 在任务前等待 45 秒，给本机 SITL 的位置估计建立时间。等待并不绕过飞控预解锁检查：飞控仍可拒绝 Arm，任务会报告 `REJECTED`。
 
 任务按顺序执行 `GUIDED` 模式 → Arm → Disarm。三个 Action 均只发一次 Typed Effect。每一步须由唯一 writer 写出，先得到 ACK，再看到**后续**未解锁目标模式、已解锁状态或未解锁状态，才进入下一步。新一步使用单独的 Run/Action Lease；双 SEND、Safety、会话、TTL 和写前栅栏继续生效。最终 SITL 翻译器只允许 Mode/Arm/Disarm，不提供 Takeoff、Land 或运动目标。模式任务原入口 `run-sitl` 仍只允许 Mode。
 

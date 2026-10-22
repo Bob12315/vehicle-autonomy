@@ -15,7 +15,7 @@ SLAM Toolbox → map/odom TF + /map
     → MappingInput → WorldModel → WorldSnapshot.map
 ```
 
-ROS 2 在单独进程内运行，`contracts/`、Core、Action、Mission、WorldModel 不依赖 rclpy 或 ROS 消息。`integrations/ros2/mapping_node.py` 只查询 App 的公开 `status` 用例，发布遥测 TF/扫描并接收地图；不存在车辆命令订阅或第二个 MAVLink writer。车辆运动仍从正式 `app.main ctl start --mission basic_route` 发起。
+ROS 2 在单独进程内运行，`src/vehicle_autonomy/contracts/`、Core、Action、Mission、WorldModel 不依赖 rclpy 或 ROS 消息。`src/vehicle_autonomy/world/mapping/ros2_node.py` 只查询 App 的公开 `status` 用例，发布遥测 TF/扫描并接收地图；不存在车辆命令订阅或第二个 MAVLink writer。车辆运动仍从正式 `vehicle_autonomy.app.cli ctl start --mission basic_route` 发起。
 
 ROS 的 `map→odom` 校正由 SLAM Toolbox 提供，`odom→base_link` 由遥测适配器提供，`base_link→laser` 来自明确的仿真安装外参（z=0.2 m，相对 base_link）。现有导航 Action 使用原 P10 遥测定位；SLAM 的地图位姿随地图版本作为只读诊断提供，尚未被选择为车辆控制反馈。这避免将回环校正直接套到原有 odom 目标上。地图资源可供下一阶段 Planning/地图查询消费，当前不据此声称已实现避障或 Nav2 导航。
 
@@ -83,9 +83,9 @@ max_age_ns = 10000000000
 先启动自己的本机仿真，再运行 App 与 ROS sidecar：
 
 ```bash
-python -m app.main run --profile rover_sim --control-socket /path/to/app.sock \
+python -m vehicle_autonomy.app.cli run --profile rover_sim --control-socket /path/to/app.sock \
   --ros2-mapping-config /path/mapping.toml
-scripts/with_ros2.sh python -m integrations.ros2.mapping_node \
+scripts/with_ros2.sh python -m vehicle_autonomy.world.mapping.ros2_node \
   --config /path/mapping.toml --control-socket /path/to/app.sock
 ```
 

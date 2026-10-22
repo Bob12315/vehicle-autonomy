@@ -3,8 +3,8 @@ import hashlib
 from pathlib import Path
 import xml.etree.ElementTree as ET
 
-from application.scenario_planning import StaticScene
-from environments.resources import Environment
+from vehicle_autonomy.app.mission_designer.scenario_planning import StaticScene
+from vehicle_autonomy.world.environment.resources import Environment
 from tests.simulation.launch import ROOT
 
 

@@ -1404,9 +1404,9 @@ Transport
 V1 基础合同建议最终组织为：
 
 ```text
-contracts/
+src/vehicle_autonomy/contracts/
 │
-├── core/
+├── src/vehicle_autonomy/engine/
 │   ├── identity.py
 │   ├── version.py
 │   ├── time.py
@@ -1423,7 +1423,7 @@ contracts/
 │   ├── command.py
 │   └── ports.py
 │
-├── localization/
+├── src/vehicle_autonomy/world/localization/
 │   ├── estimate.py
 │   └── ports.py
 │
@@ -1472,7 +1472,7 @@ Perception DTO
 ### 不进入新基础合同
 
 ```text
-contracts/state.py 旧 RuntimeSnapshot
+src/vehicle_autonomy/contracts/state.py 旧 RuntimeSnapshot
 Mapping[str, Any] Effect
 功能方法式 VehicleCommandPort
 MAVLink frame constants
