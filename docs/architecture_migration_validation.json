@@ -1,0 +1,463 @@
+{
+  "scope": "file architecture migration only",
+  "baseline": {
+    "original_head": "6df9fe91819f430c7a0d8f153ff2b06b86895915",
+    "python": "Python 3.12.3",
+    "unit": {
+      "tests": 340,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "elapsed_s": 31.629
+    },
+    "legacy_p0": {
+      "tests": 138,
+      "failures": 0,
+      "elapsed_s": 1.18
+    },
+    "preflight": {
+      "checks": {
+        "copter_binary": true,
+        "copter_telemetry_params": true,
+        "copter_world": true,
+        "gazebo_plugin": true,
+        "gazebo_version": "Gazebo Sim, version 8.15.0\nCopyright (C) 2018 Open Source Robotics Foundation.\nReleased under the Apache 2.0 License.",
+        "isolated_instance": 1,
+        "plugin_dependencies": true,
+        "python_pymavlink": "2.4.49",
+        "python_pyserial": "3.5",
+        "rover_binary": true,
+        "rover_model": true,
+        "rover_telemetry_params": true,
+        "rover_world": true,
+        "tcp_5760_free": true,
+        "tcp_5762_free": true,
+        "tool_gz": true,
+        "tool_python": true,
+        "tool_ss": true,
+        "udp_9002_free": true
+      },
+      "passed": true,
+      "phase0": false
+    },
+    "external_revisions": {
+      "ardupilot": "b5fbe26515eddb9277e1b5e7a4fcf3f37cf449a6",
+      "gazebo_plugin": "3ec51428fd43deb7b71137192ba16394b450d78e"
+    },
+    "simulation": [
+      {
+        "name": "copter_full",
+        "exit": 0
+      },
+      {
+        "name": "rover_full",
+        "exit": 0
+      },
+      {
+        "name": "copter_faults",
+        "exit": 0
+      },
+      {
+        "name": "rover_faults",
+        "exit": 0
+      }
+    ]
+  },
+  "structure": {
+    "source_modules": 182,
+    "internal_import_edges": 489,
+    "old_import_leaks": 0,
+    "native_files": {
+      "src/vehicle_autonomy/world/sensors/lidar/robosense/rs16_capture.cpp": "f9ada36cdbffad4e5fbfb350ac1967923b81ff42b6e5cc5e7abe5a6780293410",
+      "src/vehicle_autonomy/world/mapping/native/boundary_test.cpp": "7b5d0e7c5d5cab4f94ad98ef3d39d50cca93dd7189557887bb007e7b16b54664",
+      "src/vehicle_autonomy/world/mapping/native/NATIVE_NOTICES.md": "461b7153a67f3caa5db7784c32a3058ef92bcbd9c8e434f6ac87f884688d73b0",
+      "src/vehicle_autonomy/world/mapping/native/SLAM_TOOLBOX_LICENSE": "20c17d8b8c48a600800dfd14f95d5cb9ff47066a9641ddeab48dc54aec96e331",
+      "src/vehicle_autonomy/world/mapping/native/UPSTREAM_SLAM_MAPPER_NOTICE": "0b5f30d82d4a154d45aa28f251589b07302019c7ffaa24a76b0d9ece3fe2bf12",
+      "src/vehicle_autonomy/world/mapping/native/GPL-3": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "src/vehicle_autonomy/world/mapping/native/slam_boundary.cpp": "ca47ab5adcfa30c22b5d02799f3dc7ff1928d06f24d376d4470ace25a5ceddd4",
+      "src/vehicle_autonomy/world/mapping/native/KARTO_SDK_LICENSE": "da7eabb7bafdf7d3ae5e9f223aa5bdc1eece45ac569dc21b3b037520b4464768"
+    },
+    "critical_ast_equivalent_files": 63,
+    "authoritative_spec_sha256": {
+      "Vehicle_Autonomy_V1.0.md": "ca17bbcdd95ed25738c60d25a640008af4696769120ff3738f27613abc33629d",
+      "Vehicle_Autonomy_File_Structure_V1.1.md": "b48a51b20aee90466fd56cf603a7cad34eedc07cd257e22dd59e70217cb4ae35"
+    }
+  },
+  "equivalence": {
+    "unchanged_except_imports_docstrings": [
+      "actions/__init__.py",
+      "actions/basic.py",
+      "actions/path_following.py",
+      "actions/rover_maneuver.py",
+      "app/anchor.py",
+      "app/control.py",
+      "app/plan.py",
+      "app/web.py",
+      "application/autonomy_recipes.py",
+      "application/design_proposals.py",
+      "application/mission_service.py",
+      "application/navigation_goals.py",
+      "application/operator_service.py",
+      "application/planning.py",
+      "application/proposals.py",
+      "application/reports.py",
+      "application/scenario_planning.py",
+      "application/service.py",
+      "application/state_chain.py",
+      "applications/cuadc/__init__.py",
+      "applications/cuadc/actions.py",
+      "applications/cuadc/catalog.py",
+      "applications/navigation.py",
+      "contracts/__init__.py",
+      "contracts/core/__init__.py",
+      "contracts/core/geometry.py",
+      "contracts/core/models.py",
+      "contracts/core/ports.py",
+      "contracts/core/primitives.py",
+      "contracts/core/quality.py",
+      "contracts/core/serialization.py",
+      "contracts/core/stamped.py",
+      "contracts/core/time.py",
+      "contracts/decision.py",
+      "contracts/effects/__init__.py",
+      "contracts/effects/payload.py",
+      "contracts/effects/vehicle.py",
+      "contracts/localization/__init__.py",
+      "contracts/localization/models.py",
+      "contracts/payload/__init__.py",
+      "contracts/payload/ports.py",
+      "contracts/sensor/__init__.py",
+      "contracts/sensor/data.py",
+      "contracts/sensor/observation.py",
+      "contracts/vehicle/__init__.py",
+      "contracts/vehicle/command.py",
+      "contracts/vehicle/models.py",
+      "contracts/vehicle/ports.py",
+      "contracts/world/__init__.py",
+      "contracts/world/models.py",
+      "contracts/world/ports.py",
+      "core/action_registry.py",
+      "core/actions.py",
+      "core/control_authority.py",
+      "core/execution.py",
+      "core/fake_command_port.py",
+      "core/mission.py",
+      "core/mission_runtime.py",
+      "core/payload_execution.py",
+      "core/sitl_mode_action.py",
+      "core/transform.py",
+      "core/vehicle_execution.py",
+      "core/vehicle_safety.py",
+      "deployment/autonomy_business.py",
+      "deployment/collision_guard.py",
+      "deployment/copter_cycle.py",
+      "deployment/design_sequence.py",
+      "deployment/goal_navigation.py",
+      "deployment/hardware_profile.py",
+      "deployment/hardware_runtime.py",
+      "deployment/navigation_job.py",
+      "deployment/scenario_guard.py",
+      "deployment/simulation_clock.py",
+      "deployment/simulation_runtime.py",
+      "deployment/simulation_safety.py",
+      "deployment/sitl_runtime.py",
+      "environments/__init__.py",
+      "environments/resources.py",
+      "guidance/__init__.py",
+      "guidance/navigation_model.py",
+      "guidance/path_following.py",
+      "infrastructure/simulation/payload.py",
+      "infrastructure/transports/__init__.py",
+      "infrastructure/transports/bytes.py",
+      "infrastructure/transports/readonly.py",
+      "integrations/ros2/build_slam_boundary.py",
+      "integrations/ros2/mapping_node.py",
+      "integrations/ros2/nav2_worker.py",
+      "integrations/ros2/rs16_scan.py",
+      "integrations/ros2/verify_lidar.py",
+      "intelligence/__init__.py",
+      "intelligence/designs.py",
+      "intelligence/proposals.py",
+      "localization/__init__.py",
+      "localization/online.py",
+      "localization/reported.py",
+      "localization/slam_candidate.py",
+      "mapping/__init__.py",
+      "mapping/anchors.py",
+      "mapping/clock.py",
+      "mapping/exchange.py",
+      "mapping/grid.py",
+      "perception/__init__.py",
+      "perception/obstacles.py",
+      "perception/vision/__init__.py",
+      "perception/vision/projection.py",
+      "perception/vision/yolox.py",
+      "planning/__init__.py",
+      "planning/collision.py",
+      "planning/models.py",
+      "protocols/mavlink/__init__.py",
+      "protocols/mavlink/codec.py",
+      "protocols/mavlink/constants.py",
+      "protocols/mavlink/readonly.py",
+      "protocols/mavlink/telemetry.py",
+      "runtime/simulation_profile.py",
+      "runtime/sitl.py",
+      "sensors/__init__.py",
+      "sensors/camera/__init__.py",
+      "sensors/camera/recorded.py",
+      "sensors/fake.py",
+      "sensors/lidar/__init__.py",
+      "sensors/lidar/exchange.py",
+      "sensors/lidar/scan.py",
+      "sensors/simulation/__init__.py",
+      "sensors/simulation/objects.py",
+      "vehicles/__init__.py",
+      "vehicles/fake.py",
+      "vehicles/multirotor/__init__.py",
+      "vehicles/multirotor/ardupilot_commands.py",
+      "vehicles/multirotor/diagnostic.py",
+      "vehicles/multirotor/mavlink_port.py",
+      "vehicles/multirotor/mavlink_state.py",
+      "vehicles/multirotor/session.py",
+      "vehicles/multirotor/sitl_guard.py",
+      "vehicles/rover/__init__.py",
+      "vehicles/rover/ardupilot_commands.py",
+      "vehicles/rover/diagnostic.py",
+      "vehicles/rover/mavlink_state.py",
+      "vehicles/rover/readonly.py",
+      "web_ui/__init__.py",
+      "web_ui/server.py",
+      "world_model/__init__.py",
+      "world_model/models.py",
+      "world_model/service.py"
+    ],
+    "reviewed_resource_module_path_changes": [
+      "app/hardware.py",
+      "app/main.py",
+      "application/runtime_service.py",
+      "application/simulation_designs.py",
+      "applications/basic_catalog.py",
+      "deployment/application_runtime.py",
+      "deployment/navigation.py",
+      "deployment/onboard.py",
+      "deployment/rs16_profile.py",
+      "integrations/ros2/nav2_planner.py",
+      "integrations/ros2/run.py",
+      "runtime/application_profile.py",
+      "sensors/camera/live.py"
+    ]
+  },
+  "validation": {
+    "compileall": {
+      "status": "PASS",
+      "command": "python -m compileall -q src tests scripts"
+    },
+    "python310_syntax": {
+      "status": "PASS",
+      "files": 279,
+      "runtime_tested": false
+    },
+    "unit_after_move": {
+      "status": "PASS",
+      "tests": 340,
+      "skipped": 0,
+      "seconds": 31.612
+    },
+    "unit_after_legacy_deletion": {
+      "status": "PASS",
+      "tests": 342,
+      "skipped": 0,
+      "seconds": 31.767
+    },
+    "editable_install": {
+      "status": "PASS",
+      "environment": ".venv-migration; explicit .pth reusing baseline dependency site-packages"
+    },
+    "wheel_minimal": {
+      "status": "PASS",
+      "core_child_modules_imported": 41,
+      "ros_installed": false,
+      "pymavlink_installed": false,
+      "cwd": "/tmp",
+      "resource_root": ".venv-wheel-check/share/vehicle-autonomy"
+    },
+    "wheel_nav2": {
+      "status": "PASS",
+      "initial_setup_failure": "clean environment lacked optional ROS Python dependency yaml",
+      "resolved_by": "explicit baseline optional dependency PYTHONPATH; no source change",
+      "map_kind": "recorded_map",
+      "executable": false
+    },
+    "nav2_readonly": {
+      "passed": true,
+      "cases": {
+        "wall_detour": {
+          "passed": true,
+          "length_m": 8.876955568540808,
+          "points": 81,
+          "samples": 602,
+          "verified_clearance_m": 0.55,
+          "backend_directory": "/home/level6/vehicle-autonomy-framework/artifacts/migration/nav2/wall_detour/backend/6ebd4dbab93a41e5801b919f1289bc8d",
+          "nav2_version": "1.3.13"
+        },
+        "sealed_wall": {
+          "passed": true,
+          "expected_rejection": "NO_PATH",
+          "message": "PlanningError: Nav2 planning failed: status=6, error_code=208, ",
+          "backend_directory": "/home/level6/vehicle-autonomy-framework/artifacts/migration/nav2/sealed_wall/backend/060a4c29d20c4712a787ebaa81768d01",
+          "nav2_version": "1.3.13"
+        },
+        "unknown_barrier": {
+          "passed": true,
+          "expected_rejection": "NO_PATH",
+          "message": "PlanningError: Nav2 planning failed: status=6, error_code=208, ",
+          "backend_directory": "/home/level6/vehicle-autonomy-framework/artifacts/migration/nav2/unknown_barrier/backend/0346e6c01cde4129ae1aab979d1e72c7",
+          "nav2_version": "1.3.13"
+        },
+        "narrow_gate": {
+          "passed": true,
+          "expected_rejection": "NO_PATH",
+          "message": "PlanningError: Nav2 planning failed: status=6, error_code=208, ",
+          "backend_directory": "/home/level6/vehicle-autonomy-framework/artifacts/migration/nav2/narrow_gate/backend/bd1c2d88076a4aa4b7bcb6fa8111c145",
+          "nav2_version": "1.3.13"
+        },
+        "rotated_origin": {
+          "passed": true,
+          "length_m": 8.876955568540806,
+          "points": 81,
+          "samples": 602,
+          "verified_clearance_m": 0.55,
+          "backend_directory": "/home/level6/vehicle-autonomy-framework/artifacts/migration/nav2/rotated_origin/backend/4d1dacfb92ae4559b0f01721247d7c6a",
+          "nav2_version": "1.3.13"
+        },
+        "recorded_p18": {
+          "passed": true,
+          "length_m": 4.302252105721086,
+          "points": 73,
+          "samples": 538,
+          "verified_clearance_m": 0.55,
+          "backend_directory": "/home/level6/vehicle-autonomy-framework/artifacts/migration/nav2/recorded_p18/backend/d782b7b602b04accb9b7c3e1ab25dcba",
+          "nav2_version": "1.3.13"
+        },
+        "recorded_invalid_goal": {
+          "passed": true,
+          "expected_rejection": "INVALID_GOAL",
+          "message": "path footprint intersects occupied, uncertain or unknown cells"
+        },
+        "recorded_conservative_goal": {
+          "passed": true,
+          "expected_rejection": "NO_PATH",
+          "message": "PlanningError: Nav2 planning failed: status=6, error_code=206, ",
+          "backend_directory": "/home/level6/vehicle-autonomy-framework/artifacts/migration/nav2/recorded_conservative_goal/backend/d0a1489ab3df4837aba07975ff36f340",
+          "nav2_version": "1.3.13"
+        },
+        "public_cli_oracle": {
+          "samples": 538,
+          "verified_clearance_m": 0.55
+        }
+      },
+      "public_cli": true,
+      "deadline_rejection": "TIMEOUT"
+    },
+    "slam_native_boundary": {
+      "status": "PASS",
+      "manifest": {
+        "schema": 1,
+        "upstream_version": "2.8.5",
+        "upstream_commit": "ec8f7635dea317b531c419f798f87d90a336f32e",
+        "header_sha256": "277fd3ddbb4c655408660e7bab8ff39f49875af709bd7a83ff3d029190d44052",
+        "patched_header_sha256": "e884490858f4bcf32bf58f370ad1e5b227e69ca13bdbf8d6b9686a75c6d8b8f8",
+        "library_sha256": "71dedea10ee5eb2a067ea43d09c786a76f8280868c24b6de1babb41c38c9fd37",
+        "runtime_libraries": {
+          "libtoolbox_common.so": "d58bd64e1141e1e40432b722da27770bcee5d3b5e827e81c4cb696ebf23574db",
+          "libkartoSlamToolbox.so": "6712930cf9918eb63add40e25706f6fca64d5e8d584313decaa1c07cac5fa1ac"
+        },
+        "sources": {
+          "boundary_test.cpp": "7b5d0e7c5d5cab4f94ad98ef3d39d50cca93dd7189557887bb007e7b16b54664",
+          "NATIVE_NOTICES.md": "461b7153a67f3caa5db7784c32a3058ef92bcbd9c8e434f6ac87f884688d73b0",
+          "SLAM_TOOLBOX_LICENSE": "20c17d8b8c48a600800dfd14f95d5cb9ff47066a9641ddeab48dc54aec96e331",
+          "UPSTREAM_SLAM_MAPPER_NOTICE": "0b5f30d82d4a154d45aa28f251589b07302019c7ffaa24a76b0d9ece3fe2bf12",
+          "GPL-3": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+          "slam_boundary.cpp": "ca47ab5adcfa30c22b5d02799f3dc7ff1928d06f24d376d4470ace25a5ceddd4",
+          "KARTO_SDK_LICENSE": "da7eabb7bafdf7d3ae5e9f223aa5bdc1eece45ac569dc21b3b037520b4464768"
+        },
+        "native_probes": {
+          "upstream": {
+            "width": 156,
+            "height": 156,
+            "dropped_endpoints": 2
+          },
+          "fixed": {
+            "width": 157,
+            "height": 157,
+            "dropped_endpoints": 0
+          }
+        }
+      }
+    },
+    "rs16_ros_synthetic": {
+      "passed": true,
+      "accepted": 6,
+      "rejected": 2,
+      "scope": "synthetic PointCloud2 ROS software chain, not real RS16 or PCAP"
+    },
+    "rs16_cpp_build": {
+      "status": "PASS",
+      "sdk_commit": "897b14d3bdb6186a75df27ba51b65b5bd5557723",
+      "pcap_enabled": false
+    },
+    "shell_syntax": {
+      "status": "PASS"
+    },
+    "simulation_full": {
+      "status": "FAIL",
+      "passed_cases": 4,
+      "failed_case": "copter_actions",
+      "error": "RuntimeError: physical oracle stale",
+      "not_run_due_to_fail_fast": 16,
+      "reference_original_head": "6df9fe91819f430c7a0d8f153ff2b06b86895915",
+      "reference_result": {
+        "passed": false,
+        "runs": [],
+        "error": "RuntimeError: physical oracle stale"
+      },
+      "classification": "reproduced unchanged on pre-migration commit; retain as existing startup/physical oracle failure; no thresholds changed",
+      "continuation_status": "RUNNING; original remaining cases and retry preserved in separate evidence"
+    },
+    "web_js_behavior": {
+      "status": "PASS",
+      "checks": 11,
+      "runner": "connected Node REPL CommonJS VM; shell node unavailable",
+      "report": {
+        "passed": true,
+        "source_sha256": "00f8bac67d7f61b1353860855241e488598dd379dabead1c3956d8fcd236fab8",
+        "checks": [
+          "syntax",
+          "design_button_route",
+          "reviewable_steps",
+          "explicit_confirmation",
+          "design_approval_route",
+          "csrf_header",
+          "example_does_not_execute",
+          "parameterized_preview",
+          "failed_preflight_disabled",
+          "readonly_disabled",
+          "token_input_cleared"
+        ],
+        "visual_qa": false
+      }
+    }
+  },
+  "not_executed": [
+    "Python 3.10 runtime and ARM64/board execution: no matching local interpreter/hardware; CI matrix configured",
+    "Real flight controller/sensors/motion: intentionally not connected; hardware_controlled remains rejected",
+    "Actual recorded PCAP replay: native adapter built without optional system libpcap",
+    "P26 unified navigation/endurance and external server LLM practical suite: historical failures retained; not claimed fixed"
+  ],
+  "git_commits": [
+    "78d86fb",
+    "3cb42d9",
+    "2e90a49",
+    "e0c2ca9"
+  ]
+}

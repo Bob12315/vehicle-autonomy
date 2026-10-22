@@ -77,3 +77,14 @@ Legacy 删除后 `python -m unittest discover -s tests -v`：342 tests，0 failu
   仅合成 PointCloud2 软件链，不能当成真实雷达/PCAP 或 ARM64 实测。
 - 原先直接执行 preflight 时 tests 不在脚本 sys.path，现显式定位本仓库测试 harness；
   `.venv-migration/bin/python scripts/preflight_simulation.py --isolated` PASS。
+
+最终非 Python 路径审计发现 `tests/web_console_smoke.cjs` 的默认静态脚本路径尚未迁移，
+已改为基于 `__dirname` 定位新静态资源，并加入 CI。主机 PATH 无 node，使用连接的
+Node REPL 以 CommonJS/VM 执行原脚本，11 个行为检查 PASS（包括人工确认、CSRF、
+只读禁用和输入 token 清除）；不是浏览器视觉验收。未改任何行为断言。
+
+完整双车套件首次在第 5 个 `copter_actions` 场景启动阶段 FAIL：`physical oracle stale`，
+前 4 个场景 PASS，后 16 个因原有 fail-fast 未执行。用临时只读参考 clone 的原始
+`6df9fe9`、同一组仿真二进制/插件，执行相同 Copter Action 场景，复现相同错误；
+正式包独立重跑也复现。此项归为已有启动/真值观测故障，保留全部失败证据和原阈值。
+正在独立运行原场景表剩余项；不能将首轮套件标为 PASS。

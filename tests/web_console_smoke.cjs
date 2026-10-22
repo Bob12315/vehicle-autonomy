@@ -1,8 +1,9 @@
 // Synthetic DOM behavioral checks; deliberately not a browser visual acceptance.
 const fs = require('node:fs');
 const vm = require('node:vm');
+const path = require('node:path');
 const crypto = require('node:crypto');
-const source = fs.readFileSync(process.argv[2] || 'web_ui/static/console.js', 'utf8');
+const source = fs.readFileSync(process.argv[2] || path.resolve(__dirname, '../src/vehicle_autonomy/app/web/static/console.js'), 'utf8');
 const nodes = new Map(), calls = [], responses = [], timers = [];
 const node = () => ({value:'',checked:false,disabled:false,textContent:'',children:[],
   append(x) { this.children.push(x); if(x.value && !this.value)this.value=x.value; },
