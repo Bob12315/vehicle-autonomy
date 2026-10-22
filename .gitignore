@@ -25,3 +25,10 @@ runtime/*
 !runtime/sitl_arm.toml
 !runtime/simulation_profile.py
 !runtime/application_profile.py
+
+# Local migration evidence and isolated packaging checks
+artifacts/migration/
+.venv*/
+*.egg-info/
+build/
+dist/
