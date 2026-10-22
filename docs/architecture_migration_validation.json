@@ -422,7 +422,7 @@
         "error": "RuntimeError: physical oracle stale"
       },
       "classification": "reproduced unchanged on pre-migration commit; retain as existing startup/physical oracle failure; no thresholds changed",
-      "continuation_status": "RUNNING; original remaining cases and retry preserved in separate evidence"
+      "continuation_status": "COMPLETE"
     },
     "web_js_behavior": {
       "status": "PASS",
@@ -457,6 +457,363 @@
       ],
       "initial_fixture_issue": "wheelhouse omitted packaging transitive dependency; completed wheelhouse then passed",
       "hardware_deployed": false
+    },
+    "simulation_continuation": {
+      "status": "FAIL",
+      "expected_cases": 21,
+      "passed_cases": 19,
+      "failed_cases": 2,
+      "not_run_cases": 0,
+      "scenarios": [
+        {
+          "name": "copter_application",
+          "passed": true,
+          "report": "/home/level6/vehicle-autonomy-framework/artifacts/migration/sim/copter_application/summary.json",
+          "manifest": "/home/level6/vehicle-autonomy-framework/artifacts/migration/sim/copter_application/manifest.json",
+          "result_sha256": "22baaee9e07fbe5c051b309508362708cf314d1b540480e9dec5f23b2507ff26",
+          "manifest_sha256": "6f6205b2f4a53762f88dba4633c6a533134688960824f2a5f00ff0a1973f7ff8",
+          "ports_released": true,
+          "remaining_process_groups": [],
+          "source_sha256": "58b20077d7a5198a122a85bb29a567fa7dc91d286b3e0e8b5c827d57b96feb16",
+          "framework_commit": "e0c2ca9baa6577c61aa522e9700ef47b8e8ef9b8",
+          "checks": [
+            "readonly_freshness_sigterm",
+            "typed_mode_ack_and_observation_idempotence",
+            "cancel_revoke",
+            "reconnect_readonly_new_epoch",
+            "shutdown_cleanup"
+          ],
+          "runs": 0
+        },
+        {
+          "name": "rover_application",
+          "passed": true,
+          "report": "/home/level6/vehicle-autonomy-framework/artifacts/migration/sim/rover_application/summary.json",
+          "manifest": "/home/level6/vehicle-autonomy-framework/artifacts/migration/sim/rover_application/manifest.json",
+          "result_sha256": "22baaee9e07fbe5c051b309508362708cf314d1b540480e9dec5f23b2507ff26",
+          "manifest_sha256": "e740eb52d17de8ee53621903677f3734f18992d29f8d5c0fa6d1c474d682299b",
+          "ports_released": true,
+          "remaining_process_groups": [],
+          "source_sha256": "58b20077d7a5198a122a85bb29a567fa7dc91d286b3e0e8b5c827d57b96feb16",
+          "framework_commit": "e0c2ca9baa6577c61aa522e9700ef47b8e8ef9b8",
+          "checks": [
+            "readonly_freshness_sigterm",
+            "typed_mode_ack_and_observation_idempotence",
+            "cancel_revoke",
+            "reconnect_readonly_new_epoch",
+            "shutdown_cleanup"
+          ],
+          "runs": 0
+        },
+        {
+          "name": "copter_environment",
+          "passed": true,
+          "report": "/home/level6/vehicle-autonomy-framework/artifacts/migration/sim/copter_environment/summary.json",
+          "manifest": "/home/level6/vehicle-autonomy-framework/artifacts/migration/sim/copter_environment/manifest.json",
+          "result_sha256": "0d7f34b8003b792bffbaec05ec834fbf1242144d286160ee53e65a03be66c1e2",
+          "manifest_sha256": "16e351c8c80830603564bfa855a10e4f9f546ad977e474049ae69e99d82030fe",
+          "ports_released": true,
+          "remaining_process_groups": [],
+          "source_sha256": "58b20077d7a5198a122a85bb29a567fa7dc91d286b3e0e8b5c827d57b96feb16",
+          "framework_commit": "e0c2ca9baa6577c61aa522e9700ef47b8e8ef9b8",
+          "checks": null,
+          "runs": 0
+        },
+        {
+          "name": "rover_environment",
+          "passed": true,
+          "report": "/home/level6/vehicle-autonomy-framework/artifacts/migration/sim/rover_environment/summary.json",
+          "manifest": "/home/level6/vehicle-autonomy-framework/artifacts/migration/sim/rover_environment/manifest.json",
+          "result_sha256": "402e40dfbc36ff5384ad23cc629802b17cdd2d1d4f6fd932df5a2b2c64c525b4",
+          "manifest_sha256": "38532f3385f8e7ba2842f6c52bb824e0de89b7e5cf97e6e92f9658954ebb21b1",
+          "ports_released": true,
+          "remaining_process_groups": [],
+          "source_sha256": "58b20077d7a5198a122a85bb29a567fa7dc91d286b3e0e8b5c827d57b96feb16",
+          "framework_commit": "e0c2ca9baa6577c61aa522e9700ef47b8e8ef9b8",
+          "checks": null,
+          "runs": 0
+        },
+        {
+          "name": "copter_actions",
+          "passed": false,
+          "report": "/home/level6/vehicle-autonomy-framework/artifacts/migration/cont/04/summary.json",
+          "manifest": "/home/level6/vehicle-autonomy-framework/artifacts/migration/cont/04/manifest.json",
+          "error": "RuntimeError: physical oracle stale",
+          "result_sha256": "6eebaecbe03e7e4f0587cae93a3a9e6cf8dfa2a5a85576e5ac1e43837514e0ef",
+          "manifest_sha256": "1d8cf417e4c17f3c9677ea866d05127b7504c5a13635ea5e9b7817afb587f50e",
+          "ports_released": true,
+          "remaining_process_groups": [],
+          "source_sha256": "58b20077d7a5198a122a85bb29a567fa7dc91d286b3e0e8b5c827d57b96feb16",
+          "framework_commit": "e0c2ca9baa6577c61aa522e9700ef47b8e8ef9b8",
+          "checks": null,
+          "runs": 0
+        },
+        {
+          "name": "rover_actions",
+          "passed": true,
+          "report": "/home/level6/vehicle-autonomy-framework/artifacts/migration/cont/05/summary.json",
+          "manifest": "/home/level6/vehicle-autonomy-framework/artifacts/migration/cont/05/manifest.json",
+          "error": null,
+          "result_sha256": "f6e503cc5e2e1266437f4816fe2d4d8ce1f026d2a415436c9ff46fba2dcf396a",
+          "manifest_sha256": "69896433249d90133ba6da05ee6d8f54575347f7d2e274261606d05dd3b823bc",
+          "ports_released": true,
+          "remaining_process_groups": [],
+          "source_sha256": "58b20077d7a5198a122a85bb29a567fa7dc91d286b3e0e8b5c827d57b96feb16",
+          "framework_commit": "e0c2ca9baa6577c61aa522e9700ef47b8e8ef9b8",
+          "checks": null,
+          "runs": 1
+        },
+        {
+          "name": "copter_route",
+          "passed": false,
+          "report": "/home/level6/vehicle-autonomy-framework/artifacts/migration/cont/06/summary.json",
+          "manifest": "/home/level6/vehicle-autonomy-framework/artifacts/migration/cont/06/manifest.json",
+          "error": "RuntimeError: physical oracle stale",
+          "result_sha256": "6eebaecbe03e7e4f0587cae93a3a9e6cf8dfa2a5a85576e5ac1e43837514e0ef",
+          "manifest_sha256": "e16b07e13ac2dbe9c4a419f7c10e1599064cffbbe1e61ed792c2107517715272",
+          "ports_released": true,
+          "remaining_process_groups": [],
+          "source_sha256": "58b20077d7a5198a122a85bb29a567fa7dc91d286b3e0e8b5c827d57b96feb16",
+          "framework_commit": "e0c2ca9baa6577c61aa522e9700ef47b8e8ef9b8",
+          "checks": null,
+          "runs": 0
+        },
+        {
+          "name": "rover_route",
+          "passed": true,
+          "report": "/home/level6/vehicle-autonomy-framework/artifacts/migration/cont/07/summary.json",
+          "manifest": "/home/level6/vehicle-autonomy-framework/artifacts/migration/cont/07/manifest.json",
+          "error": null,
+          "result_sha256": "bff70a62b11efae5f3549f0283150bc586e2106c46d3d92d26c52237cb21cb48",
+          "manifest_sha256": "466d6465398dbe3268436dc1f6eaa81e6ff3fe3d625287d5c904e928ef5a095b",
+          "ports_released": true,
+          "remaining_process_groups": [],
+          "source_sha256": "58b20077d7a5198a122a85bb29a567fa7dc91d286b3e0e8b5c827d57b96feb16",
+          "framework_commit": "875e8027fd771223061ea30634ce033f2e9fbfa0",
+          "checks": null,
+          "runs": 2
+        },
+        {
+          "name": "copter_mission_faults",
+          "passed": true,
+          "report": "/home/level6/vehicle-autonomy-framework/artifacts/migration/cont/08/summary.json",
+          "manifest": "/home/level6/vehicle-autonomy-framework/artifacts/migration/cont/08/manifest.json",
+          "error": null,
+          "result_sha256": "1b12829d6f8786b125d9a4522b0605daae54312a9d544e24e12d4e8121810bc5",
+          "manifest_sha256": "06457bcdef396983889b414b557d91bcb2308e5a36246f04011c34404b57a240",
+          "ports_released": true,
+          "remaining_process_groups": [],
+          "source_sha256": "58b20077d7a5198a122a85bb29a567fa7dc91d286b3e0e8b5c827d57b96feb16",
+          "framework_commit": "875e8027fd771223061ea30634ce033f2e9fbfa0",
+          "checks": {
+            "cancel_confirmed": true,
+            "stale_failed": "vehicle_state_or_link_stale",
+            "reconnect_readonly": true,
+            "stop_results": {
+              "action:5260d52c99b647cba9355c26301be809": "UNCONFIRMED"
+            }
+          },
+          "runs": 0
+        },
+        {
+          "name": "rover_mission_faults",
+          "passed": true,
+          "report": "/home/level6/vehicle-autonomy-framework/artifacts/migration/cont/09/summary.json",
+          "manifest": "/home/level6/vehicle-autonomy-framework/artifacts/migration/cont/09/manifest.json",
+          "error": null,
+          "result_sha256": "a294ab3795612e4dcc03876522cb0734c2d3bd7c5fb8ef2a5094c848761a19ad",
+          "manifest_sha256": "33ba23cd4c25d3aeab9ee14eb2e8c99625128f318a67b3d02009f2454a6d54dd",
+          "ports_released": true,
+          "remaining_process_groups": [],
+          "source_sha256": "58b20077d7a5198a122a85bb29a567fa7dc91d286b3e0e8b5c827d57b96feb16",
+          "framework_commit": "875e8027fd771223061ea30634ce033f2e9fbfa0",
+          "checks": {
+            "cancel_confirmed": true,
+            "stale_failed": "vehicle_state_or_link_stale",
+            "reconnect_readonly": true,
+            "stop_results": {
+              "action:fbccb86e3c8946b694215bd6f7bc5e9a": "UNCONFIRMED"
+            }
+          },
+          "runs": 0
+        },
+        {
+          "name": "objects",
+          "passed": true,
+          "report": "/home/level6/vehicle-autonomy-framework/artifacts/migration/cont/10/summary.json",
+          "manifest": "/home/level6/vehicle-autonomy-framework/artifacts/migration/cont/10/manifest.json",
+          "error": null,
+          "result_sha256": "087c6788e72335975f24ce15d2bdf15d984e676bd42a416035127f03315bbf7c",
+          "manifest_sha256": "9d5d0e4b98a7e5c182d7c446ed3c75643ae850bbe1365218d64fe0a1e9f3bd83",
+          "ports_released": true,
+          "remaining_process_groups": [],
+          "source_sha256": "58b20077d7a5198a122a85bb29a567fa7dc91d286b3e0e8b5c827d57b96feb16",
+          "framework_commit": "875e8027fd771223061ea30634ce033f2e9fbfa0",
+          "checks": null,
+          "runs": 0
+        },
+        {
+          "name": "cuadc_first",
+          "passed": true,
+          "report": "/home/level6/vehicle-autonomy-framework/artifacts/migration/cont/11/summary.json",
+          "manifest": "/home/level6/vehicle-autonomy-framework/artifacts/migration/cont/11/manifest.json",
+          "error": null,
+          "result_sha256": "9fc70f8a65b3ca823836c185b82aea89a8e3f5178287070b601a9a5d4f6e9f59",
+          "manifest_sha256": "e1c946bafee15d474f0a37f8386b3135ff9773abaa549237dbbc29225cc53c73",
+          "ports_released": true,
+          "remaining_process_groups": [],
+          "source_sha256": "58b20077d7a5198a122a85bb29a567fa7dc91d286b3e0e8b5c827d57b96feb16",
+          "framework_commit": "875e8027fd771223061ea30634ce033f2e9fbfa0",
+          "checks": null,
+          "runs": 1
+        },
+        {
+          "name": "cuadc_second",
+          "passed": true,
+          "report": "/home/level6/vehicle-autonomy-framework/artifacts/migration/cont/12/summary.json",
+          "manifest": "/home/level6/vehicle-autonomy-framework/artifacts/migration/cont/12/manifest.json",
+          "error": null,
+          "result_sha256": "41908ea3ab3f4b0fca936cfd248f29c04ef54486b6778683a0c1485acad6aa64",
+          "manifest_sha256": "aae1464b29dd92f5f7fec8800225afaa6ab21953bb6e50d973870ef82467a554",
+          "ports_released": true,
+          "remaining_process_groups": [],
+          "source_sha256": "58b20077d7a5198a122a85bb29a567fa7dc91d286b3e0e8b5c827d57b96feb16",
+          "framework_commit": "875e8027fd771223061ea30634ce033f2e9fbfa0",
+          "checks": null,
+          "runs": 1
+        },
+        {
+          "name": "rover_inspection",
+          "passed": true,
+          "report": "/home/level6/vehicle-autonomy-framework/artifacts/migration/cont/13/summary.json",
+          "manifest": "/home/level6/vehicle-autonomy-framework/artifacts/migration/cont/13/manifest.json",
+          "error": null,
+          "result_sha256": "c747ac9cc6d7f23d7921347d0484e03bfb29ab0c32e6ba9f0c2309a210e934d6",
+          "manifest_sha256": "69a4ada159a4c4e0c7de86341decf984635315e84131e77173b67c62d3b0b839",
+          "ports_released": true,
+          "remaining_process_groups": [],
+          "source_sha256": "58b20077d7a5198a122a85bb29a567fa7dc91d286b3e0e8b5c827d57b96feb16",
+          "framework_commit": "875e8027fd771223061ea30634ce033f2e9fbfa0",
+          "checks": null,
+          "runs": 1
+        },
+        {
+          "name": "business_faults",
+          "passed": true,
+          "report": "/home/level6/vehicle-autonomy-framework/artifacts/migration/cont/14/summary.json",
+          "manifest": "/home/level6/vehicle-autonomy-framework/artifacts/migration/cont/14/manifest.json",
+          "error": null,
+          "result_sha256": "6d8c963cbc0c756c06cc88bf8bed67aadcd63c85f03ecf7c550bfe1419ecf8f5",
+          "manifest_sha256": "4efcb084461802ad9170f44adda4e125af9f0c29f81b2db9d0c04cfc23dca660",
+          "ports_released": true,
+          "remaining_process_groups": [],
+          "source_sha256": "01dcc2a5286864c2c5c36d58e8c8ab194beda85dfe65910331d7315631ef2955",
+          "framework_commit": "875e8027fd771223061ea30634ce033f2e9fbfa0",
+          "checks": {
+            "no_target_failed": true,
+            "target_loss_stopped": true
+          },
+          "runs": 0
+        },
+        {
+          "name": "visual_business",
+          "passed": true,
+          "report": "/home/level6/vehicle-autonomy-framework/artifacts/migration/cont/15/summary.json",
+          "manifest": "/home/level6/vehicle-autonomy-framework/artifacts/migration/cont/15/manifest.json",
+          "error": null,
+          "result_sha256": "133d3f960183c5b8c44414371b0d0b9c0f44a1155e383f9c3a70cb3c9236ed1e",
+          "manifest_sha256": "cb2eaf89864bfb5dd2e4d01330750bb798bf1148652d523a586b16fee21734ac",
+          "ports_released": true,
+          "remaining_process_groups": [],
+          "source_sha256": "01dcc2a5286864c2c5c36d58e8c8ab194beda85dfe65910331d7315631ef2955",
+          "framework_commit": "8b2893a4f23334a363c6b1fd1c0e24e58769839c",
+          "checks": null,
+          "runs": 1
+        },
+        {
+          "name": "copter_full",
+          "passed": true,
+          "report": "/home/level6/vehicle-autonomy-framework/artifacts/migration/cont/16/summary.json",
+          "manifest": "/home/level6/vehicle-autonomy-framework/artifacts/migration/cont/16/manifest.json",
+          "error": null,
+          "result_sha256": "54451a6a9531683367bb19bfd9a62b43966d2a5d3fbbd8595263686caad802a4",
+          "manifest_sha256": "4f16da146f62862f5196b3e2f3e9fb994402d35805b3a61d55a0ee5f2c470d1c",
+          "ports_released": true,
+          "remaining_process_groups": [],
+          "source_sha256": "01dcc2a5286864c2c5c36d58e8c8ab194beda85dfe65910331d7315631ef2955",
+          "framework_commit": "8b2893a4f23334a363c6b1fd1c0e24e58769839c",
+          "checks": null,
+          "runs": 0
+        },
+        {
+          "name": "copter_land",
+          "passed": true,
+          "report": "/home/level6/vehicle-autonomy-framework/artifacts/migration/cont/17/summary.json",
+          "manifest": "/home/level6/vehicle-autonomy-framework/artifacts/migration/cont/17/manifest.json",
+          "error": null,
+          "result_sha256": "381ec2db62ed0da5adad3675be8af15aa0bffc2163cde3762a30beca59aff0ae",
+          "manifest_sha256": "584755305b644a92e4c924fc185776fb4380ca9746ab2fcfa87be85de95740a1",
+          "ports_released": true,
+          "remaining_process_groups": [],
+          "source_sha256": "01dcc2a5286864c2c5c36d58e8c8ab194beda85dfe65910331d7315631ef2955",
+          "framework_commit": "8b2893a4f23334a363c6b1fd1c0e24e58769839c",
+          "checks": null,
+          "runs": 0
+        },
+        {
+          "name": "rover_full",
+          "passed": true,
+          "report": "/home/level6/vehicle-autonomy-framework/artifacts/migration/cont/18/summary.json",
+          "manifest": "/home/level6/vehicle-autonomy-framework/artifacts/migration/cont/18/manifest.json",
+          "error": null,
+          "result_sha256": "97deef024f7dd40843de13555d8bdee58b967d2c953ef089cfa343cf5f401fad",
+          "manifest_sha256": "dad456d55fca2d6ce76d6be60d799a651538ae212507d36922d7e5f17c64db1c",
+          "ports_released": true,
+          "remaining_process_groups": [],
+          "source_sha256": "01dcc2a5286864c2c5c36d58e8c8ab194beda85dfe65910331d7315631ef2955",
+          "framework_commit": "8b2893a4f23334a363c6b1fd1c0e24e58769839c",
+          "checks": null,
+          "runs": 0
+        },
+        {
+          "name": "copter_faults",
+          "passed": true,
+          "report": "/home/level6/vehicle-autonomy-framework/artifacts/migration/cont/19/summary.json",
+          "manifest": "/home/level6/vehicle-autonomy-framework/artifacts/migration/cont/19/manifest.json",
+          "error": null,
+          "result_sha256": "1b89f77fd3990e6527ddbdcde56d7ced68dd2e5d00f02e7e6fcca517123d37e3",
+          "manifest_sha256": "4c6ea278da1501b84ed214e8a670055cda68ef51460769d6ecfa6a3f6a6a440c",
+          "ports_released": true,
+          "remaining_process_groups": [],
+          "source_sha256": "01dcc2a5286864c2c5c36d58e8c8ab194beda85dfe65910331d7315631ef2955",
+          "framework_commit": "8b2893a4f23334a363c6b1fd1c0e24e58769839c",
+          "checks": null,
+          "runs": 0
+        },
+        {
+          "name": "rover_faults",
+          "passed": true,
+          "report": "/home/level6/vehicle-autonomy-framework/artifacts/migration/cont/20/summary.json",
+          "manifest": "/home/level6/vehicle-autonomy-framework/artifacts/migration/cont/20/manifest.json",
+          "error": null,
+          "result_sha256": "317b9552e072ca004fa9e41ac3662adf2896c1d6fb2f526a9d797657c51cc705",
+          "manifest_sha256": "9a8e76202e74ac9227258b0bb77ea786523aa4a3dd7d1292fb3ab78016314f35",
+          "ports_released": true,
+          "remaining_process_groups": [],
+          "source_sha256": "01dcc2a5286864c2c5c36d58e8c8ab194beda85dfe65910331d7315631ef2955",
+          "framework_commit": "8b2893a4f23334a363c6b1fd1c0e24e58769839c",
+          "checks": null,
+          "runs": 0
+        }
+      ],
+      "per_case_timeout_s": 360,
+      "assertions_and_thresholds_unchanged": true,
+      "raw_evidence": "artifacts/migration/cont/"
+    },
+    "reference_copter_route": {
+      "passed": false,
+      "runs": [],
+      "error": "RuntimeError: physical oracle stale"
     }
   },
   "not_executed": [
@@ -470,6 +827,22 @@
     "3cb42d9",
     "2e90a49",
     "e0c2ca9",
-    "875e802"
-  ]
+    "875e802",
+    "8b2893a"
+  ],
+  "final_checks": {
+    "legacy_directory_absent": true,
+    "legacy_tracked_files": 0,
+    "native_and_license_hashes_unchanged": true,
+    "authoritative_specs_unchanged": true,
+    "scope": "no new behavior or real hardware control",
+    "raw_evidence_preserved": true,
+    "process_cleanup": {
+      "recorded_processes_checked": 89,
+      "remaining_owned": []
+    },
+    "unchanged_non_python_runtime_resources": 20,
+    "simulation_models_and_profiles_unchanged": true,
+    "current_runtime_document_local_links": "PASS"
+  }
 }
