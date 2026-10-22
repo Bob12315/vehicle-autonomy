@@ -88,3 +88,8 @@ Node REPL 以 CommonJS/VM 执行原脚本，11 个行为检查 PASS（包括人�
 `6df9fe9`、同一组仿真二进制/插件，执行相同 Copter Action 场景，复现相同错误；
 正式包独立重跑也复现。此项归为已有启动/真值观测故障，保留全部失败证据和原阈值。
 正在独立运行原场景表剩余项；不能将首轮套件标为 PASS。
+
+离线部署补充：新包在原板卡旧 setuptools 环境构建前，需要从离线 wheelhouse 显式安装
+`setuptools>=61`、`wheel` 及其依赖（如 packaging）。已在全新 venv 模拟离线 build/install
+并执行 readonly --check，PASS；首次测试 wheelhouse 漏装 wheel 的 packaging 依赖，补齐
+完整依赖后通过。未连接板卡。此项仅安装构建工具，不改变运行依赖或车辆能力。

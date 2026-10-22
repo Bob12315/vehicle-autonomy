@@ -69,6 +69,7 @@ def main():
         remote('tar -xf '+q(base+'/incoming/wheels.tar')+' -C '+q(base+'/wheels'))
         remote('test -x '+q(base+'/venv/bin/python')+' || python3 -m venv --system-site-packages '+q(base+'/venv'))
         remote(q(base+'/venv/bin/python')+' -m pip install --no-index --find-links '+q(base+'/wheels')+' -r '+q(release+'/requirements-hardware.txt'))
+        remote(q(base+'/venv/bin/python')+' -m pip install --no-index --find-links '+q(base+'/wheels')+' '+q('setuptools>=61')+' wheel')
         remote(q(base+'/venv/bin/python')+' -m pip install --no-index --find-links '+q(base+'/wheels')+' --no-build-isolation --no-deps '+q(release))
         remote('cd '+q(release)+' && '+q(base+'/venv/bin/python')+' -m vehicle_autonomy.app.bootstrap.hardware --check')
         remote('if test -e '+q(base+'/current')+' && ! test -L '+q(base+'/current')+'; then exit 3; fi; ln -sfn '+q(release)+' '+q(base+'/current'))

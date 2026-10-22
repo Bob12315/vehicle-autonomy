@@ -446,6 +446,17 @@
         ],
         "visual_qa": false
       }
+    },
+    "offline_source_install": {
+      "status": "PASS",
+      "environment": ".venv-build-check with no inherited dependencies",
+      "steps": [
+        "offline install setuptools>=61, wheel and resolved packaging dependency",
+        "pip install --no-index --no-build-isolation --no-deps .",
+        "vehicle-autonomy-hardware --check"
+      ],
+      "initial_fixture_issue": "wheelhouse omitted packaging transitive dependency; completed wheelhouse then passed",
+      "hardware_deployed": false
     }
   },
   "not_executed": [
@@ -458,6 +469,7 @@
     "78d86fb",
     "3cb42d9",
     "2e90a49",
-    "e0c2ca9"
+    "e0c2ca9",
+    "875e802"
   ]
 }

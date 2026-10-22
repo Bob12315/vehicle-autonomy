@@ -22,7 +22,11 @@ Python 3.10. The new installation is `/home/pi/vehicle-autonomy/`, outside the
 existing CUADC installations. Versioned source archives, offline ARM64 wheels
 and a separate `venv --system-site-packages` preserve the system and existing
 applications. Passwords and console tokens are never in Git. Deployer checks
-existing SSH host keys and records archive/wheel hashes.
+existing SSH host keys and records archive/wheel hashes. The offline wheelhouse must also
+contain `setuptools>=61`, `wheel`, and their resolved dependencies to build/install the new src package;
+these are isolated build tools, not vehicle runtime dependencies. The deployer
+installs them from that wheelhouse before its no-build-isolation package install.
+This migration has not been deployed or revalidated on the ARM64 board.
 
 ```bash
 cd /home/pi/vehicle-autonomy/current
