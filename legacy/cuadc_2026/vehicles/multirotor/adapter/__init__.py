@@ -1,1 +1,0 @@
-"""Multirotor backend adapters."""

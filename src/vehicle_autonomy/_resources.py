@@ -18,9 +18,11 @@ def resource_root() -> Path:
         if not all((root / name).is_dir() for name in ('configs', 'simulation', 'scripts', 'docs')):
             raise ValueError('VAF_RESOURCE_ROOT must contain configs, simulation, scripts and docs')
         return root
-    for root in Path(__file__).resolve().parents:
-        if (root / 'pyproject.toml').is_file() and (root / 'simulation').is_dir() and (root / 'configs').is_dir():
-            return root
+    package = Path(__file__).resolve().parent
+    root = package.parent.parent
+    if (package.parent.name == 'src' and (root / 'pyproject.toml').is_file()
+            and (root / 'simulation').is_dir() and (root / 'configs').is_dir()):
+        return root
     root = Path(sys.prefix) / 'share' / 'vehicle-autonomy'
     if all((root / name).is_dir() for name in ('configs', 'simulation', 'scripts', 'docs')):
         return root

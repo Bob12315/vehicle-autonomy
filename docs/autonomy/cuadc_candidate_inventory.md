@@ -1,5 +1,10 @@
 # CUADC 只读迁移候选清单
 
+> 历史记录：本文件中的 Legacy 路径及旧测试命令仅描述迁移前事件；归档已于
+> 2026-10-23 删除，不能作为当前运行入口。历史文件可从 `6df9fe9` Git 树查看；
+> 现行源码归属、命令与删除保护记录见 `docs/ARCHITECTURE_MIGRATION_REPORT.md`。
+
+
 外部只读参考 `/home/level6/uav_ws/cuadc2026/` HEAD `9af97f440f086e81192e5ef9cc31cefda47a26af`；归档 `legacy/cuadc_2026/` 保持不变。仅读源文件和 git 元数据，不运行旧测试/应用，也不生成旧树文件。两个版本并不相同；原始 actions 位于 missions/common/actions，归档重新分包且部分逻辑版本不同，不能当作逐字同一版本。
 
 | 模块 | 输入/输出 | 依赖、时间/Frame、安全 | 决定 |

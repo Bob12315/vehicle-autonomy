@@ -1,1 +1,0 @@
-"""Current multirotor vehicle plugin."""

@@ -4,8 +4,9 @@ Description=Vehicle Autonomy receive-only diagnostics
 
 [Service]
 Type=simple
+Environment=VAF_RESOURCE_ROOT=/home/pi/vehicle-autonomy/current
 WorkingDirectory=/home/pi/vehicle-autonomy/current
-ExecStart=/home/pi/vehicle-autonomy/venv/bin/python -m deployment.onboard supervise
+ExecStart=/home/pi/vehicle-autonomy/venv/bin/python -m vehicle_autonomy.app.bootstrap.onboard supervise
 Restart=no
 NoNewPrivileges=true
 UMask=0077

@@ -25,6 +25,7 @@ vehicle-autonomy-onboard = "vehicle_autonomy.app.bootstrap.onboard:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
+"vehicle_autonomy.app.bootstrap" = ["*.example"]
 "vehicle_autonomy.app.web" = ["static/*"]
 "vehicle_autonomy.world.mapping" = ["native/*"]
 "vehicle_autonomy.world.sensors.lidar" = ["robosense/*.cpp"]

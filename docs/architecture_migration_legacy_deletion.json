@@ -1,0 +1,2210 @@
+{
+  "scope": "/home/level6/vehicle-autonomy-framework/legacy",
+  "original_head": "6df9fe91819f430c7a0d8f153ff2b06b86895915",
+  "tracked_count": 548,
+  "files": [
+    {
+      "path": "legacy/README.md",
+      "sha256": "f760ce64044b6eeb9822d5d54671065785f2521fd9ad67005e7fe094590b05e2"
+    },
+    {
+      "path": "legacy/cuadc_2026/.github/refresh-contributors.txt",
+      "sha256": "9555ac1fd04eb6e61fefea16f5b18dfa961084931de70a774883e1b53d2c93da"
+    },
+    {
+      "path": "legacy/cuadc_2026/.github/workflows/ci.yml",
+      "sha256": "a2b6e3a8317d6a8ecbf44736e7b69f8a4eab26b25133f0ca6dec3a61a15b2685"
+    },
+    {
+      "path": "legacy/cuadc_2026/.gitignore",
+      "sha256": "213e279ef2eb9d29dde64517f05be0f82e13e980fcf5cf9456c6cfc4e7f33bdc"
+    },
+    {
+      "path": "legacy/cuadc_2026/AGENTS.md",
+      "sha256": "b42c26353a703229d6b50c829ede5a264738a2d53d87780ce1a2a88d8b2aa2c3"
+    },
+    {
+      "path": "legacy/cuadc_2026/README.md",
+      "sha256": "5187f1666674cf75b6d82114491776c3621e8f1434ce12e1c190e571955979ee"
+    },
+    {
+      "path": "legacy/cuadc_2026/app/README.md",
+      "sha256": "964cc00e700e0071447806aba9922a83870329b4a2b74017f1b4205c1561234b"
+    },
+    {
+      "path": "legacy/cuadc_2026/app/__init__.py",
+      "sha256": "4714e8b96b2db76e3342889c5c91c8f4ed490b503ae66bb81ff4f28057fa4d4e"
+    },
+    {
+      "path": "legacy/cuadc_2026/app/bootstrap.py",
+      "sha256": "f551dc2d8151bbf2945a52a7a90282f729f1c03a788de910a2a7d78d968df559"
+    },
+    {
+      "path": "legacy/cuadc_2026/app/config.py",
+      "sha256": "177f77f7f91333912341e5f1287a533ed100f9bf8405f93d94ada5ac889f58d0"
+    },
+    {
+      "path": "legacy/cuadc_2026/app/main.py",
+      "sha256": "ed9ecb5fcf7a00d92d57902dfe9083863377dc9c8aa95c9fc839835b8db0e2b7"
+    },
+    {
+      "path": "legacy/cuadc_2026/application/__init__.py",
+      "sha256": "4c49a0377f94e77b7b19296b1a2d742becff5dd7d1b3337df61cf80ff9c07f8f"
+    },
+    {
+      "path": "legacy/cuadc_2026/application/action_runtime.py",
+      "sha256": "ae834a0ef7009fc3c9e9cb33f283837305e1151423e2797885b2cfed368abc71"
+    },
+    {
+      "path": "legacy/cuadc_2026/application/adapters/__init__.py",
+      "sha256": "a0b3b2afb4bc7daa03757961444236f1821eaa59b71b3a2edbde441e8fafb849"
+    },
+    {
+      "path": "legacy/cuadc_2026/application/adapters/yolo_udp.py",
+      "sha256": "dd8b772e5875334d47acb63d81d2a27b705f66884ca1a872bf94c0ff2eba2daa"
+    },
+    {
+      "path": "legacy/cuadc_2026/application/command_observer.py",
+      "sha256": "86481885bcb85ce2f427ad11dad7948172ba19cf303d6ae8181bf1945ebc3c84"
+    },
+    {
+      "path": "legacy/cuadc_2026/application/core/__init__.py",
+      "sha256": "f8d348a00d359688aca472c410ab4f87f1a1f64fada2d2f9e8d04dc7ada95e85"
+    },
+    {
+      "path": "legacy/cuadc_2026/application/core/cycle_driver.py",
+      "sha256": "8ec82b01c6206ab5af720d2892bb6b35498c6b98fd44022c3d8ba265a75a3914"
+    },
+    {
+      "path": "legacy/cuadc_2026/application/core/effect_delivery.py",
+      "sha256": "778078bad4d070a413f77484da49125834562f4ae8f32880320ffaa456e7d32e"
+    },
+    {
+      "path": "legacy/cuadc_2026/application/core/effect_status_projection.py",
+      "sha256": "6ffd0f6aa3c3556878347b9379587533c2bafc44f4b8e8546d3b9d28017621be"
+    },
+    {
+      "path": "legacy/cuadc_2026/application/core/execution_fence_authority.py",
+      "sha256": "468ac82e8b84c7d5854a1152f77b5fc14bbe2514eb8dd8ea27070441ac214b2a"
+    },
+    {
+      "path": "legacy/cuadc_2026/application/core/run_aggregate.py",
+      "sha256": "f0239df01d43978aa965b7f5856355b2aa66e25ae3a5de8d2805113a99105a92"
+    },
+    {
+      "path": "legacy/cuadc_2026/application/core/run_coordinator.py",
+      "sha256": "f795b4a5ee57baaec8c64c3c4b5377cfa67ac55e59c7d8a0a414298f10b6a2e8"
+    },
+    {
+      "path": "legacy/cuadc_2026/application/core/run_io_aggregate.py",
+      "sha256": "7980e4f4ff6cc8017ce5404469a6beac1d25e785e0c6c754369cbfd6d396226d"
+    },
+    {
+      "path": "legacy/cuadc_2026/application/core/runtime.py",
+      "sha256": "c3fc6b8310f3398eb892b856e160dabc2db28ee3688ba7d7446331ef54db5a5a"
+    },
+    {
+      "path": "legacy/cuadc_2026/application/core/scheduler.py",
+      "sha256": "1cd57bf87fff23cce79723234f4ddcc739603dd7dfc51fe1d41fb749cb317af8"
+    },
+    {
+      "path": "legacy/cuadc_2026/application/core/snapshot_collector.py",
+      "sha256": "ec438dfcc7367ab5b32c382df5a39c6a2556cafe168bf7ed62cf74693a5d9ce4"
+    },
+    {
+      "path": "legacy/cuadc_2026/application/core/state_store.py",
+      "sha256": "24ea4c516b3324c8c227d580f4f65bf4e6b597047bc96ce6c0387f7b95ec7255"
+    },
+    {
+      "path": "legacy/cuadc_2026/application/core/system_control_aggregate.py",
+      "sha256": "6092bb9f498390d12812bae3a4075191bfd6f4b91fee527e0dfdcf0df10f80d7"
+    },
+    {
+      "path": "legacy/cuadc_2026/application/core/system_send_state.py",
+      "sha256": "a594e030189585b65730b12ac40081c7f9eeeebba9142eb48a206def496e1c66"
+    },
+    {
+      "path": "legacy/cuadc_2026/application/mission_service.py",
+      "sha256": "dd5c5bbf648bb9755b29fc6fb20885b6a7e965a11e9ffa1eed75854b2b92ce6e"
+    },
+    {
+      "path": "legacy/cuadc_2026/application/perception_session.py",
+      "sha256": "15342bd90a2665ae25fc453bc5ded1f0a2fad1d0ea45ee0fa493658d523534f0"
+    },
+    {
+      "path": "legacy/cuadc_2026/application/result_service.py",
+      "sha256": "e008fb7e04b0d2f4184a3bb9fd758bc3aadc9a5917fd35826d0ac919a43df151"
+    },
+    {
+      "path": "legacy/cuadc_2026/application/runner.py",
+      "sha256": "15ba3ffccfd0cbcac96c9e7bf736a1bf10614970e3eaf234144ba359d06dab7b"
+    },
+    {
+      "path": "legacy/cuadc_2026/application/send_state.py",
+      "sha256": "429cbba893c8d26ba75a3668d1ec05eb946d0e7b68c810230a69b3b71cedbc87"
+    },
+    {
+      "path": "legacy/cuadc_2026/application/state_store.py",
+      "sha256": "cd61558350600c6abc1888e21975df68059bde5494e21d65ab68b1f9b2efe135"
+    },
+    {
+      "path": "legacy/cuadc_2026/application/system_control.py",
+      "sha256": "e2af8c434508a9e2116a92b0e4b52b95964fcfcde508a20c8f75960e94f8bccd"
+    },
+    {
+      "path": "legacy/cuadc_2026/application/vehicle_projection.py",
+      "sha256": "2262527607aefad0c7f3d43ffcde33af4453d61747dec69e194604cb054a8970"
+    },
+    {
+      "path": "legacy/cuadc_2026/application/web_services.py",
+      "sha256": "38e3664ea255369a32287a5ac13214d6918547fe6ad68d74bf61ba7c67b3bf8e"
+    },
+    {
+      "path": "legacy/cuadc_2026/application/world_projection.py",
+      "sha256": "3a1dda67668f1a874e645aaa41cb1965d356f0333c0728884d2f30fe9d511b8b"
+    },
+    {
+      "path": "legacy/cuadc_2026/application/yolo_command_client.py",
+      "sha256": "9dc6f9426668bbe207125e9272b311fde29c5ad9f272c063f739794e83ee701d"
+    },
+    {
+      "path": "legacy/cuadc_2026/applications/__init__.py",
+      "sha256": "b834b5a7b4a1f4b0ced976199b9bee3638fcca3b9baa5fe5b43e5feb3820ec32"
+    },
+    {
+      "path": "legacy/cuadc_2026/applications/cuadc_2026/__init__.py",
+      "sha256": "d39057d4c2f8541a688acb89f0bf275afb90707d793c21139ccf8b0cc66d4d7e"
+    },
+    {
+      "path": "legacy/cuadc_2026/applications/cuadc_2026/actions/__init__.py",
+      "sha256": "8949be135e660de158d65be54d32e12e4954599c8c0f2abf84b9f8f166390656"
+    },
+    {
+      "path": "legacy/cuadc_2026/applications/cuadc_2026/actions/align_descend.py",
+      "sha256": "acaf40f1156453fc079ff753bf269d2967b63305491aa174b4e818b8325a6aa8"
+    },
+    {
+      "path": "legacy/cuadc_2026/applications/cuadc_2026/actions/definitions.py",
+      "sha256": "13331a3fe950675e7c6117248f30e02f4e441e51cc50e97bcbce9b71118e4637"
+    },
+    {
+      "path": "legacy/cuadc_2026/applications/cuadc_2026/actions/goto_waypoint.py",
+      "sha256": "6affba08350dac384512e56ce237dbb2f0271eb1bd78808d3a61180c15339e0f"
+    },
+    {
+      "path": "legacy/cuadc_2026/applications/cuadc_2026/actions/gps_capture_view.py",
+      "sha256": "9322d265a4a46525cbd78a5b37a7f1f229f415317d8a8e7fa1bb5abd1f5ba234"
+    },
+    {
+      "path": "legacy/cuadc_2026/applications/cuadc_2026/actions/gps_fuse_views.py",
+      "sha256": "8d210729e2e2b01c88ae7b40974405b7c6dff7b72c4318aff59f0e40861dbc37"
+    },
+    {
+      "path": "legacy/cuadc_2026/applications/cuadc_2026/actions/gps_target_lock.py",
+      "sha256": "1c9ea602e565df0f5b2be0881976d34d80d667078b4ff7568be3c5f3c5762319"
+    },
+    {
+      "path": "legacy/cuadc_2026/applications/cuadc_2026/actions/payload_release.py",
+      "sha256": "680cac71de92edaf4cd7e84f5cbdd9d23b367b15a767a57abb7ec60725a3969a"
+    },
+    {
+      "path": "legacy/cuadc_2026/applications/cuadc_2026/actions/select_drop_targets.py",
+      "sha256": "98cd8556bfedc9af72b625cd2d1f28e73aef93deeece0a83a052b7704c95b3f9"
+    },
+    {
+      "path": "legacy/cuadc_2026/applications/cuadc_2026/actions/target_lock.py",
+      "sha256": "759289c566c953b9d39f4758fb5016b09d99daeabed98780306cee9049f2a57e"
+    },
+    {
+      "path": "legacy/cuadc_2026/applications/cuadc_2026/calibration_session.py",
+      "sha256": "4a03b0d80bb8dd6822072fbfbde1f6a67e0a0e14c4666e396e57c70214fc3b93"
+    },
+    {
+      "path": "legacy/cuadc_2026/applications/cuadc_2026/calibration_transaction.py",
+      "sha256": "a5adb189f12f3dc17d433891a873a9b8febd1d4b23489690f87ecf5adabe9a7a"
+    },
+    {
+      "path": "legacy/cuadc_2026/applications/cuadc_2026/composition.py",
+      "sha256": "6678b976426dc54b16820f364e6a2244aa64431c63041b9ee7690b99f4f7fe28"
+    },
+    {
+      "path": "legacy/cuadc_2026/applications/cuadc_2026/field_service.py",
+      "sha256": "218d46fd20e547b30b6b9ff2d17e6f77a257f7e8975b9ba9f9bea0e9dde1ce06"
+    },
+    {
+      "path": "legacy/cuadc_2026/applications/cuadc_2026/gps_derived_enu_fusion.py",
+      "sha256": "711b3517428549da96d3c76ce3d33766c82f9eb09ac01aeecf252506239c03bb"
+    },
+    {
+      "path": "legacy/cuadc_2026/applications/cuadc_2026/profile.py",
+      "sha256": "215461e37e52a19d4e56701e29bb896af9e0c4c84c5754caf6f032e6be9c5c37"
+    },
+    {
+      "path": "legacy/cuadc_2026/applications/cuadc_2026/runtime_context.py",
+      "sha256": "1649a40ed371221f1f988e4b77c76b18096282cec7de37dc8dfacc1670366b3d"
+    },
+    {
+      "path": "legacy/cuadc_2026/applications/profile.py",
+      "sha256": "036ad115c8dcf9f0c32637020c464ab3e5509484be91d1ea6f09eb115c95c705"
+    },
+    {
+      "path": "legacy/cuadc_2026/assets/legacy_docs/hardware/lowcost-battery-strap-20x380.png",
+      "sha256": "21a93c363df210073572f031bf917f939e3496f9ad5d3d7f13d7202f423c35e4"
+    },
+    {
+      "path": "legacy/cuadc_2026/assets/legacy_docs/hardware/lowcost-camera-720p-2-8mm.png",
+      "sha256": "70428e9b934ca81497232d28eb8aaec05fd45ae7895d68b2edb1b7b95b9948c8"
+    },
+    {
+      "path": "legacy/cuadc_2026/assets/legacy_docs/hardware/lowcost-esc-45a.png",
+      "sha256": "118dc34d380755ebd119b109133a788dfa611e61a6d4c2b74b5db381475f0294"
+    },
+    {
+      "path": "legacy/cuadc_2026/assets/legacy_docs/hardware/lowcost-flight-battery-21700-6s2p.png",
+      "sha256": "90e8a77a3708bb0827f9aed7327f2c30a82907236e827a1a2bb46dc4b880f8d6"
+    },
+    {
+      "path": "legacy/cuadc_2026/assets/legacy_docs/hardware/lowcost-flight-controller-cuav-7nano.png",
+      "sha256": "24e09b9c4cd33e8b95bb1e623c0aaab06eb21f24bdbf1a3ff2842ebb3ca11928"
+    },
+    {
+      "path": "legacy/cuadc_2026/assets/legacy_docs/hardware/lowcost-frame-standoff-m3x55.png",
+      "sha256": "7f7b880166a061b1cd933165d04ab68de0c4068f83f7dfec31531f1fe38fd85d"
+    },
+    {
+      "path": "legacy/cuadc_2026/assets/legacy_docs/hardware/lowcost-frame-zd550.png",
+      "sha256": "e3fa7f87c32bc5b14165f388709ffe38ce0fbd7bc531c4912b24e85f25ff6d4c"
+    },
+    {
+      "path": "legacy/cuadc_2026/assets/legacy_docs/hardware/lowcost-gps-cuav-neo-3x.png",
+      "sha256": "b33bd36d76b42d1ac7eb14714320fefcc1200aa055a6d57ce39cd5f653b3ac9a"
+    },
+    {
+      "path": "legacy/cuadc_2026/assets/legacy_docs/hardware/lowcost-landing-gear-tube.png",
+      "sha256": "3f5d3def8f0f98835bc43a31e19ac269055f7a688d34b298a5a327904c013052"
+    },
+    {
+      "path": "legacy/cuadc_2026/assets/legacy_docs/hardware/lowcost-motor-3115-900kv.png",
+      "sha256": "865beaf5370b4b04b8d707ce561624eccaf82e86fe4f927d8ffe5f7668c40842"
+    },
+    {
+      "path": "legacy/cuadc_2026/assets/legacy_docs/hardware/lowcost-payload-release.png",
+      "sha256": "06412fa8a22b3ed75fb35aeb7d3acd381e762443eec82b4977f61b44da4788e3"
+    },
+    {
+      "path": "legacy/cuadc_2026/assets/legacy_docs/hardware/lowcost-payload-servo-20kg.png",
+      "sha256": "f3bb408409ba3ed35ffaebe745d3fbfef3c76e20e2798e59f4faaea2accd2137"
+    },
+    {
+      "path": "legacy/cuadc_2026/assets/legacy_docs/hardware/lowcost-propellers.png",
+      "sha256": "99427a8728c72a787cf9c70e8fb475f9b37ed4b74b76514b8ac3c6fa5fd759bb"
+    },
+    {
+      "path": "legacy/cuadc_2026/assets/legacy_docs/hardware/lowcost-receiver-elrs.png",
+      "sha256": "6bb7772de83b728c4f5fcaef96e93c1317b54993042e5fb30a0eff7c9e6c19f6"
+    },
+    {
+      "path": "legacy/cuadc_2026/assets/legacy_docs/hardware/lowcost-rk3588-battery-3s-500mah.png",
+      "sha256": "59ce0347b85aec0d350d37bc0fee20373ac06b56a80d29d7f4b4a5b68be60a43"
+    },
+    {
+      "path": "legacy/cuadc_2026/assets/legacy_docs/hardware/lowcost-rk3588-nanopi-t6.png",
+      "sha256": "bb238c4b6d8d6644255013e1bae453535f130eeeaa9acf3b9e04b6dd7c185af3"
+    },
+    {
+      "path": "legacy/cuadc_2026/assets/legacy_docs/hardware/lowcost-rk3588-power-cable.png",
+      "sha256": "55bce3879386a590acb3b61206b1100eb6553dfb2e54aff6504bbeeee4ea557d"
+    },
+    {
+      "path": "legacy/cuadc_2026/assets/legacy_docs/hardware/reference-nanopi-r6c-not-current-bom.png",
+      "sha256": "a7708e99abb133da1b1ba08f697c99e29ee4be384d9d6c31307330331b388c96"
+    },
+    {
+      "path": "legacy/cuadc_2026/assets/legacy_docs/hardware/stable-motor-lanyu-x4112s-kv450.png",
+      "sha256": "40fa897007fa019b6b24d92d268406f1f7a80ce16b2a13365285c429455c2dc3"
+    },
+    {
+      "path": "legacy/cuadc_2026/assets/legacy_docs/hardware/stable-propeller-14-inch.png",
+      "sha256": "dcfd2b2b54617367e278bdcac85d24ea8255c4e6023fe3aae96d667fa91a5fb7"
+    },
+    {
+      "path": "legacy/cuadc_2026/assets/legacy_docs/hardware/stable-rtk-gnss.png",
+      "sha256": "f96cc62fe1259f76516780fcb71fbf2b1a3499c4c41286cf417cbf50cbda2e23"
+    },
+    {
+      "path": "legacy/cuadc_2026/assets/legacy_docs/readme/drone-in-flight.webp",
+      "sha256": "decf68e0ce442db296a1acf07e72eaebd33bd17252d69c4243c77dec7fb4a3e1"
+    },
+    {
+      "path": "legacy/cuadc_2026/assets/legacy_docs/readme/flight-demo-preview.gif",
+      "sha256": "a0aa013c1cae7246caa63df9b1b09aa0b4642e8230a593d0e631ab132df6c004"
+    },
+    {
+      "path": "legacy/cuadc_2026/assets/legacy_docs/readme/flight-demo.mp4",
+      "sha256": "1d9343c1fae41b9f7c4cdbcc1f5ca9423a486c9efa18ac4129d3f4708a7f9b9c"
+    },
+    {
+      "path": "legacy/cuadc_2026/assets/legacy_docs/readme/gazebo-sitl.webp",
+      "sha256": "45c8a1bba39311b641f22d907021a5509ef8bffa7a850f54e319561dfeb9c558"
+    },
+    {
+      "path": "legacy/cuadc_2026/assets/legacy_docs/readme/team-and-uav.webp",
+      "sha256": "2ab9b0207569f3fab840bcaf1e4ee97e4539cdd407983082987737736c77c17a"
+    },
+    {
+      "path": "legacy/cuadc_2026/assets/legacy_docs/readme/web-ui-dashboard.webp",
+      "sha256": "f5fa2f0c1f2857d63a062d4bfaba29c4a5b0c82981bdafa647a60c50d246cd90"
+    },
+    {
+      "path": "legacy/cuadc_2026/assets/legacy_docs/readme/yolo-target-detection.webp",
+      "sha256": "4ff57cb5cda3fb4f2e91d1c7a39f21a659444050f602e652dcf98459d5d96098"
+    },
+    {
+      "path": "legacy/cuadc_2026/config/README.md",
+      "sha256": "aabbef48fe6dc91751b5bb804f569e4c3e2f1a0b11588589739525b631cb530e"
+    },
+    {
+      "path": "legacy/cuadc_2026/config/action_missions/drop_two_targets.json",
+      "sha256": "d41789dc6e1b65eb5109938774bc529eab27d4fb4463d2d4fffd7a38cb866413"
+    },
+    {
+      "path": "legacy/cuadc_2026/config/action_missions/recon_gps.json",
+      "sha256": "8a714b2e1e47cccc664e52855388a7e495d2cb13088c2e9cd0541ece1ca25456"
+    },
+    {
+      "path": "legacy/cuadc_2026/config/action_missions/rescue_2026_full_auto.json",
+      "sha256": "c2e01ac166d545b442526394c6b380c222ed1513e6f52a7836bb43f5d8784c77"
+    },
+    {
+      "path": "legacy/cuadc_2026/config/app.yaml",
+      "sha256": "41125772c40d3c254ff88f6761bc617e436975564772ba5c0bf449fee696bc81"
+    },
+    {
+      "path": "legacy/cuadc_2026/config/field_profiles/competition_runtime.json",
+      "sha256": "8430068578213a4e8f51823200c73206e80c441ac1d7b7bc55c20178ab7d8c6e"
+    },
+    {
+      "path": "legacy/cuadc_2026/config/profiles/rk3588-real/profile.yaml",
+      "sha256": "9b394a5302292fd98ec48e56ba0738dfec489eb5ae5a5836023b54ecf472c195"
+    },
+    {
+      "path": "legacy/cuadc_2026/config/profiles/rk3588-sitl/profile.yaml",
+      "sha256": "0fcaa5cb4030a5b0a29a0b9ce7c492ac5f4425c7577256076f6ea8796ee7d066"
+    },
+    {
+      "path": "legacy/cuadc_2026/config/safety.yaml",
+      "sha256": "31a22e0af65fa3f7842aa55c49302f699e17f417efe3b571a24bc5152819703f"
+    },
+    {
+      "path": "legacy/cuadc_2026/config/telemetry.yaml",
+      "sha256": "3d65267b5a363ef2682bea801127b736372f4d55ccf3074769de48f1848d0012"
+    },
+    {
+      "path": "legacy/cuadc_2026/config/yolo.yaml",
+      "sha256": "a2ecba7a7ce204ed099589c264e6f6141cd51a1ad7b684a813c9c8c632f4d4f3"
+    },
+    {
+      "path": "legacy/cuadc_2026/contracts/__init__.py",
+      "sha256": "0631681ec79b210ecc333c20c404d31c26d8b8301ca4f7f0a70e06ab1faac824"
+    },
+    {
+      "path": "legacy/cuadc_2026/contracts/action.py",
+      "sha256": "97f6619c1189762bed7c0c4ba8403c2ee243e1671f733f3d4d60009bc7c5bbaf"
+    },
+    {
+      "path": "legacy/cuadc_2026/contracts/core/__init__.py",
+      "sha256": "eccee380b9354ff896a5dca8c99ba6a2a25858843b741987cb00762851f9d962"
+    },
+    {
+      "path": "legacy/cuadc_2026/contracts/core/action.py",
+      "sha256": "18004b9ca125763f1b81869dd818c24fa26e7a149f3415cba39a7e748d11f6a6"
+    },
+    {
+      "path": "legacy/cuadc_2026/contracts/core/common.py",
+      "sha256": "068ebbd00b704c62a29aa6ca7f10037ba4d6d535e62622c8e9c07af76417c822"
+    },
+    {
+      "path": "legacy/cuadc_2026/contracts/core/cycle.py",
+      "sha256": "08389d12fe366359cdaa2d96a904877df1ec070d391f6709ddcd15aff28d4647"
+    },
+    {
+      "path": "legacy/cuadc_2026/contracts/core/effects.py",
+      "sha256": "bbfbe0becf67198fff3b24522c47248e5908920c663a5b7413f5a443871b427a"
+    },
+    {
+      "path": "legacy/cuadc_2026/contracts/core/execution.py",
+      "sha256": "510181a67660b935fea70fe5bbd1eaf444e7483e14c7e9aeae96c59d2d5e40a4"
+    },
+    {
+      "path": "legacy/cuadc_2026/contracts/core/input_state.py",
+      "sha256": "253197e0c6707635592dbf085faaaacb2b3c01dddaa464ed1bbd74ec31d3142f"
+    },
+    {
+      "path": "legacy/cuadc_2026/contracts/core/mission.py",
+      "sha256": "55a8789f016e0e96487881588b6b141d3f3574e87bc97a67e2a50f58319c963d"
+    },
+    {
+      "path": "legacy/cuadc_2026/contracts/core/run.py",
+      "sha256": "c3285c6b973ec2544a4687c23116090b5f64fb16e564d3eb9e0c3b0a0e77ff1b"
+    },
+    {
+      "path": "legacy/cuadc_2026/contracts/core/run_io.py",
+      "sha256": "ccc8749e0bb75b94f5c4431f736f23d0d368b0237ffd7321c4b3ed92727eb874"
+    },
+    {
+      "path": "legacy/cuadc_2026/contracts/core/system.py",
+      "sha256": "c696da15077173582cd89a71b748b214906d36581f6af8a3f0b626be62a1f48d"
+    },
+    {
+      "path": "legacy/cuadc_2026/contracts/core/time.py",
+      "sha256": "e1a1006d5ccfab9aab5e2c262bdd679a90b3e1bbef8d7386e0084930e2d271f2"
+    },
+    {
+      "path": "legacy/cuadc_2026/contracts/core/world.py",
+      "sha256": "8c822a7f6f0f2fc49cf5a2c4f12372e37a91908f6cc9e246893407a1049ace8b"
+    },
+    {
+      "path": "legacy/cuadc_2026/contracts/effects.py",
+      "sha256": "6b4c0f581ef5b5c9e7dda2d457d56ba7f8c4b9849e4a551cffebf0603f7b4542"
+    },
+    {
+      "path": "legacy/cuadc_2026/contracts/environment/__init__.py",
+      "sha256": "e67f0cc48bebb9f7446d0448f3caa97b52b61b65ba75c420a7d6d1a9518cf69a"
+    },
+    {
+      "path": "legacy/cuadc_2026/contracts/environment/model.py",
+      "sha256": "147ad34a0537449009a65248cc4ca92f76662d8799ed4f6b26b5d6db4c72b9e7"
+    },
+    {
+      "path": "legacy/cuadc_2026/contracts/field.py",
+      "sha256": "bf684eab85339afb5f127593b21aa98617c27e688acedb2eba24632d4da14734"
+    },
+    {
+      "path": "legacy/cuadc_2026/contracts/frames.py",
+      "sha256": "8c1ec18311d7ab866aedb790779900f7490d63046ec962d9bbc4786c056ffd88"
+    },
+    {
+      "path": "legacy/cuadc_2026/contracts/intelligence/__init__.py",
+      "sha256": "bfe9fa3a92851443258529ef7a18518ad47dc03006cf86ded1560150b3692300"
+    },
+    {
+      "path": "legacy/cuadc_2026/contracts/perception.py",
+      "sha256": "e9f67d31829099575f2d4e5322fe8ae87a1b6096d58fd498f0d38653604ba702"
+    },
+    {
+      "path": "legacy/cuadc_2026/contracts/perception_protocol.py",
+      "sha256": "369709ba178889497b6c2076f11ae4cc7fe99f9bf61387e8131517dcd1a69d97"
+    },
+    {
+      "path": "legacy/cuadc_2026/contracts/platform/__init__.py",
+      "sha256": "a4cad4b0312fa82a36cf1be2e124fe38d5a85357cf35c5239b2f849cef1c419f"
+    },
+    {
+      "path": "legacy/cuadc_2026/contracts/platform/common.py",
+      "sha256": "30341cec501716071392179edde9ce3e14ac4900c5ae60758ecb91d334913310"
+    },
+    {
+      "path": "legacy/cuadc_2026/contracts/platform/field.py",
+      "sha256": "c4457a00861e10d4a7fb343328635ed92056b0e49a62d53decd178f55466315e"
+    },
+    {
+      "path": "legacy/cuadc_2026/contracts/platform/observability.py",
+      "sha256": "49d60089171b77c848d2129e8e37123d0e871eab4c97ab52908e266332088b32"
+    },
+    {
+      "path": "legacy/cuadc_2026/contracts/platform/perception.py",
+      "sha256": "0204835aa6936e3c573fc8768aa0413f89a089c9e40bbdc4d2b16846f57646b1"
+    },
+    {
+      "path": "legacy/cuadc_2026/contracts/platform/ports.py",
+      "sha256": "3c5fd6fd776ef04bdb3536354eca055aea62dc7234e4bd7d697dcdd9e5a90f72"
+    },
+    {
+      "path": "legacy/cuadc_2026/contracts/platform/vehicle_commands.py",
+      "sha256": "ef1242a084b8a8d3ee4a8cd014b7a55df57f3055716e7cfb6b273f21a596378a"
+    },
+    {
+      "path": "legacy/cuadc_2026/contracts/platform/vehicle_state.py",
+      "sha256": "6a7120b6463723a73dd3121a92c3cc1d68fbc04b663857a94afa397bbe89c6af"
+    },
+    {
+      "path": "legacy/cuadc_2026/contracts/ports.py",
+      "sha256": "c822ceb0a3563be47774f8b28600b1404bee7ed545f613ff48eebab95d95edc9"
+    },
+    {
+      "path": "legacy/cuadc_2026/contracts/sensors/__init__.py",
+      "sha256": "66f77ba513f1560ebd71934803840d9043d364d401b7bc61ac77ba8072167f87"
+    },
+    {
+      "path": "legacy/cuadc_2026/contracts/sensors/camera.py",
+      "sha256": "713da157ea946fac203350911440edb634573d85a2e97fe96318abd8af0d00b8"
+    },
+    {
+      "path": "legacy/cuadc_2026/contracts/sensors/health.py",
+      "sha256": "68b77a48da411ca76676cc1f8b2b58a9aefcb7ef4c46bedaa1625cc04b42f481"
+    },
+    {
+      "path": "legacy/cuadc_2026/contracts/sensors/pointcloud.py",
+      "sha256": "23771fd925142f1b4a8a204497c8da6c74148c32198cebcb8249228cccdcc7fc"
+    },
+    {
+      "path": "legacy/cuadc_2026/contracts/state.py",
+      "sha256": "5d119e7adae0385be16848abd2f0cdb94f8b4e5ca9e66da4456886826f646884"
+    },
+    {
+      "path": "legacy/cuadc_2026/contracts/vehicle/__init__.py",
+      "sha256": "e424c6d7f848317f953d3dbe2377a2b952909e8433cd07ad7be68164cd914db9"
+    },
+    {
+      "path": "legacy/cuadc_2026/contracts/vehicle/plugin.py",
+      "sha256": "6114e65fb660018ab821412fa201c1756338034dd54a89e36118ff6c5d5e2aba"
+    },
+    {
+      "path": "legacy/cuadc_2026/data/models/cuadc-fp16.rknn",
+      "sha256": "347bc25fac71f06d2a6e81dfce155b82980e315b8a337b34ad7bc97913fdaadf"
+    },
+    {
+      "path": "legacy/cuadc_2026/data/models/cuadc2026-fp16.rknn",
+      "sha256": "4c5f7cea13e2df55b9b79ce5d153d040949fbc5c6fd107463072b361de3a2338"
+    },
+    {
+      "path": "legacy/cuadc_2026/data/models/cuadc2026-fp16.rknn.backup-20260913-165537",
+      "sha256": "d083cdce8a01207eafdc047e6ef34484f75cf95b28295d9719c698d2c4c80048"
+    },
+    {
+      "path": "legacy/cuadc_2026/data/models/gazebo_dataset-fp16.rknn",
+      "sha256": "2ddc8a11ebd82f3e2ae413dbae73a0748d08f205518b028f2e20f059d244ef0f"
+    },
+    {
+      "path": "legacy/cuadc_2026/data/terrain/S36E149.DAT",
+      "sha256": "57e32ecf6a63be296608ed4375a5b5fd958c4c615f30567f081a8da8f8c315c3"
+    },
+    {
+      "path": "legacy/cuadc_2026/deploy/systemd/uav-app.service",
+      "sha256": "0545a25b79a64642fd1204213a0309eec6501d5d6db0531b75d3d9f3c4d404fd"
+    },
+    {
+      "path": "legacy/cuadc_2026/deploy/systemd/uav-yolo.service",
+      "sha256": "89b7bc8979776c26bbcb8cfa4669106ea7f938cf3b13d59332df6a8f13240fc0"
+    },
+    {
+      "path": "legacy/cuadc_2026/deployment/__init__.py",
+      "sha256": "c855ac6389a29f58393623e9e03b4811e21f4e6c9a4120c5c02cf402843fdbf3"
+    },
+    {
+      "path": "legacy/cuadc_2026/deployment/profiles.py",
+      "sha256": "d6352ddabff973fe569159355d4f58b3108a594773900780f0d483c7fb594d93"
+    },
+    {
+      "path": "legacy/cuadc_2026/docs/README.md",
+      "sha256": "32c7122d8d0b4c95ef1e6bce52bf7fb2863e83ef6b0039427e9e0dc39f261fa9"
+    },
+    {
+      "path": "legacy/cuadc_2026/docs/architecture/data_flow.md",
+      "sha256": "14c3979a2ecbe564c894d661cb32c83685a6c95a595a2a39b38d855d864eb2de"
+    },
+    {
+      "path": "legacy/cuadc_2026/docs/architecture/dependency_rules.md",
+      "sha256": "ce7490e50a47efbdc9a18b9db4adfa93d5afcd5e23b8f0f5f48477bab5655a4d"
+    },
+    {
+      "path": "legacy/cuadc_2026/docs/architecture/overview.md",
+      "sha256": "2659a4bdf359057c9867918dc202f3a89f98f34a1c7e9148a93d5909b55fc6cb"
+    },
+    {
+      "path": "legacy/cuadc_2026/docs/architecture/principles.md",
+      "sha256": "3be32fb248b4040fc9bdea51d4b0798cd47e3d42499a0b9e0e3d051513cfeee5"
+    },
+    {
+      "path": "legacy/cuadc_2026/docs/architecture/target_structure.md",
+      "sha256": "fd68850b8a0f8cf8c8bbb429766f1f4666d2d915b0089099f3a9aa97464ee4bb"
+    },
+    {
+      "path": "legacy/cuadc_2026/docs/core/execution_safety.md",
+      "sha256": "b06d394102b8f5ce3f43c0bc484fa557533bbc046be8a35d9e5c3125bc6f0f0c"
+    },
+    {
+      "path": "legacy/cuadc_2026/docs/core/mission_action.md",
+      "sha256": "c249a326c113dde7c0815b1cac8b0cb8350b8e3fa47e1f2cbadf5af3d14b9457"
+    },
+    {
+      "path": "legacy/cuadc_2026/docs/core/world_model.md",
+      "sha256": "87844570db35bd79f234c705f2bc1ed18acf3c2378adcfd7781ca02a82f53121"
+    },
+    {
+      "path": "legacy/cuadc_2026/docs/examples/cuadc_2026.md",
+      "sha256": "d21f70a5efeacdf2827c11651e090238a6b83602808542d5247f1e24855dcf6b"
+    },
+    {
+      "path": "legacy/cuadc_2026/docs/intelligence/boundaries.md",
+      "sha256": "09a953e95bb5d1c12addb33687c8b95ff275b371a4bc0e253da803bc5bf49ebb"
+    },
+    {
+      "path": "legacy/cuadc_2026/docs/migration/current_code_map.md",
+      "sha256": "4ac5c1d7e5421dabdf6e866232d937be2a894034dbecf94b028a384e846a8d76"
+    },
+    {
+      "path": "legacy/cuadc_2026/docs/migration/current_state.md",
+      "sha256": "0f9fc2c031c5392f9e9fc309deb7948dfaf4670499b942ba703bdceeaaf6c733"
+    },
+    {
+      "path": "legacy/cuadc_2026/docs/migration/dependency_audit.md",
+      "sha256": "d18fa2ec53374a202ef8d217d7ef8c9262d449cd084aa276afa24de71159d962"
+    },
+    {
+      "path": "legacy/cuadc_2026/docs/migration/migration_principles.md",
+      "sha256": "eda4abe4c55a0c6f2cefab85a1918856e4be91ddb827b200768bcd4057fdfe32"
+    },
+    {
+      "path": "legacy/cuadc_2026/docs/migration/p10_legacy_cleanup.md",
+      "sha256": "a4df432480850cffd7657cd1315de8341164dda4cbc398b25a9447692abaf964"
+    },
+    {
+      "path": "legacy/cuadc_2026/docs/migration/p11_intelligence_reservation.md",
+      "sha256": "b86b717159ea11fc46fcbc5d29b232a55fa8e862d65c196b60fbd2f54fc099b8"
+    },
+    {
+      "path": "legacy/cuadc_2026/docs/migration/p2_01_core_common_types.md",
+      "sha256": "4051414ea253fbc35602a13e07f54c26ba3921bf7cb82043616f64bdd1344a5c"
+    },
+    {
+      "path": "legacy/cuadc_2026/docs/migration/p2_02_effect_boundary.md",
+      "sha256": "e4f3a6a76d643e3bd3cf897308c9d21d093470f2e74bcb46111e4a8ea1201d08"
+    },
+    {
+      "path": "legacy/cuadc_2026/docs/migration/p2_p3_acceptance.md",
+      "sha256": "7abd87781a9c6d2bf5bc8c415a4ae7f91e4ecad65ef4bc7ed95960e6b36f575c"
+    },
+    {
+      "path": "legacy/cuadc_2026/docs/migration/p4_01_telemetry_responsibility_map.md",
+      "sha256": "09c4397454d929eda2ebe8fec438dad6e4f77e00a755a65b5be42f090d39fc68"
+    },
+    {
+      "path": "legacy/cuadc_2026/docs/migration/p4_protocol_transport.md",
+      "sha256": "e59cb953ad756d18433f3c32cb9bbe3535e6663ba857a7ee88e844c0a3d9dab4"
+    },
+    {
+      "path": "legacy/cuadc_2026/docs/migration/p4_writer_audit.md",
+      "sha256": "81e49ca655b285bcc1dbb407cf2de5d98cd73cc111380bc585ff7bf235eb0252"
+    },
+    {
+      "path": "legacy/cuadc_2026/docs/migration/p5_sensors_perception_world.md",
+      "sha256": "d01fa9818dbb61e210a09e7114e59a9f3402449a6ad49d2125512c1aea0147dc"
+    },
+    {
+      "path": "legacy/cuadc_2026/docs/migration/p6_environment_framework.md",
+      "sha256": "bc2db8223c1eed8afecb0e7ec8c895fa7c1e453a3de03fa6afe55d37e233f0c1"
+    },
+    {
+      "path": "legacy/cuadc_2026/docs/migration/p7_deployment_gateway_framework.md",
+      "sha256": "ba6c7f22bd73c5ecdb4e9b1c4514ffe47acc3c7d8607aece00b390347bf9c6f4"
+    },
+    {
+      "path": "legacy/cuadc_2026/docs/migration/p8_cuadc_application_framework.md",
+      "sha256": "071268ea475abf4109dfe8fbf2a6c6431ddcc1ee060b2944d4d6d94c3702d4f2"
+    },
+    {
+      "path": "legacy/cuadc_2026/docs/migration/p9_second_vehicle_proof.md",
+      "sha256": "acfb2eafbcc81a4fb74b4bfd4d3fada124fdd05704231852da2bdcf6f3d33325"
+    },
+    {
+      "path": "legacy/cuadc_2026/docs/migration/refactor_plan_v1.md",
+      "sha256": "d0fb4fd0bf96b8e5bbeae18f8e2af85e55888dd225d1e9536e02614a41f6a795"
+    },
+    {
+      "path": "legacy/cuadc_2026/docs/migration/reusable_detail_migration.md",
+      "sha256": "3717d929edd0b1f5d7a10bc9ddbcb401c8640751e7e5d9df49e6f6b06d0d721a"
+    },
+    {
+      "path": "legacy/cuadc_2026/docs/migration/safety_baseline.md",
+      "sha256": "00b22e0085cccbc6ab005d4156dcc3a58fb3baf067f4078457f56f78b38b1266"
+    },
+    {
+      "path": "legacy/cuadc_2026/docs/platform/deployment_gateway.md",
+      "sha256": "8e48dc015d086c95ee8e68adbb29c4b6262ffb4f8b9d2435af67335e146414e0"
+    },
+    {
+      "path": "legacy/cuadc_2026/docs/platform/environment.md",
+      "sha256": "3985e73ed8dc4d32b42375592e2c402986640b72883471ea9e356276b96af81f"
+    },
+    {
+      "path": "legacy/cuadc_2026/docs/platform/protocol_transport.md",
+      "sha256": "649f069508990504d17a9c18dbaded147f134478db6c3c6e2707687a2166a517"
+    },
+    {
+      "path": "legacy/cuadc_2026/docs/platform/sensors_perception.md",
+      "sha256": "59562f59094a597540bbbd9c4e01424e4e0db3fd03ff7c058c65c76308b1b9a1"
+    },
+    {
+      "path": "legacy/cuadc_2026/docs/platform/vehicle_plugin.md",
+      "sha256": "3969e0440347444cfc23b0b45c2f4214e4003a066ea1e5062297640472e25825"
+    },
+    {
+      "path": "legacy/cuadc_2026/environment-app.yml",
+      "sha256": "a37214f1b56644e6979b736f5a4e50b2986d56714f70c39334a32e0f629bf368"
+    },
+    {
+      "path": "legacy/cuadc_2026/environment-dev.yml",
+      "sha256": "d5f65207794d5ad7436f87c40fc0dcb7a2ddb2cb8f958355971fa70b757f1381"
+    },
+    {
+      "path": "legacy/cuadc_2026/environment-rk3588-yolo.yml",
+      "sha256": "d2119c132bbf2d49d9ecc24c292949d3e2fc91a118f08b79a189d8a5ee1a034a"
+    },
+    {
+      "path": "legacy/cuadc_2026/environments/__init__.py",
+      "sha256": "e2fd2adf1c94f0450cff762b4d3c9b165fd01643544ff044427614acd36a9377"
+    },
+    {
+      "path": "legacy/cuadc_2026/environments/catalog.py",
+      "sha256": "81ae7ae522526c9aa4b18eadbacf4d1360f45db648a678039c1af14496286a68"
+    },
+    {
+      "path": "legacy/cuadc_2026/environments/cuadc_2026/__init__.py",
+      "sha256": "c24e29d32c4139393432e1275386ffa9cee3728f37eceb5cd21df0247485b65e"
+    },
+    {
+      "path": "legacy/cuadc_2026/environments/cuadc_2026/adapter.py",
+      "sha256": "3eaf1948e6c5470c0593d8a573990299b284c5f4c7942c3e405c812e3bbcc2ca"
+    },
+    {
+      "path": "legacy/cuadc_2026/environments/cuadc_2026/field/__init__.py",
+      "sha256": "f3300611d2d92a3e9b1f345818823f57e7458796ba36c442c03f40a6e4d06ad7"
+    },
+    {
+      "path": "legacy/cuadc_2026/environments/cuadc_2026/field/_reference_store.py",
+      "sha256": "0fff251059d38edc1d2b631852d45b6c0059d6636b4d37686c108237856e49b0"
+    },
+    {
+      "path": "legacy/cuadc_2026/environments/cuadc_2026/field/calibration.py",
+      "sha256": "199d9491a456d8b33395c6fefa98824270d373f99cb450bd4405528258a0066c"
+    },
+    {
+      "path": "legacy/cuadc_2026/environments/cuadc_2026/field/coordinates.py",
+      "sha256": "be1cc14572e9f707084c4bc51d4cffc9efcdfb7a62490f5df73f0c736f6da711"
+    },
+    {
+      "path": "legacy/cuadc_2026/environments/cuadc_2026/field/geometry.py",
+      "sha256": "f46a00fe7a7c121d9f29dfe598e42371ebf388855768f392454c5cc8b99fadec"
+    },
+    {
+      "path": "legacy/cuadc_2026/environments/cuadc_2026/field/models.py",
+      "sha256": "ef7bce51cc3382cae1c6541ee93a69190a632008f9d31aff505add361e90ac01"
+    },
+    {
+      "path": "legacy/cuadc_2026/environments/cuadc_2026/field/profile.py",
+      "sha256": "3c4877913920ce15a1d53ff7678b3d58c23a8ca2a4bd1709fbc8149572d74d81"
+    },
+    {
+      "path": "legacy/cuadc_2026/environments/cuadc_2026/field/profile_service.py",
+      "sha256": "5fe74beaa4dc24b0ad3ab36cd8d3ae6dcc952f495277ee9a8f141a486111601a"
+    },
+    {
+      "path": "legacy/cuadc_2026/environments/cuadc_2026/field/target_resolver.py",
+      "sha256": "d59e8b023621bd86ac03cf9a434f04146490fbccfd514f56c9b364ca7726a215"
+    },
+    {
+      "path": "legacy/cuadc_2026/execution/__init__.py",
+      "sha256": "d04f8e2512cff2d611e2c3666c5e59656097bd678ed7de63eb722c8cd556e62e"
+    },
+    {
+      "path": "legacy/cuadc_2026/execution/authorization.py",
+      "sha256": "4b483cf368eea31c52a2643c9626dc67ed09d0c3ec7bf98d51b2145d8696a95b"
+    },
+    {
+      "path": "legacy/cuadc_2026/execution/capability_policy.py",
+      "sha256": "e16a45ddd905f070c949d3802a40c39f8b1711709612218d87413253297c5594"
+    },
+    {
+      "path": "legacy/cuadc_2026/execution/dispatcher.py",
+      "sha256": "fcc9f5c7a000dcca15d152c45df5e4d7783e6e062d035325e0aeb5dbfc42a5dd"
+    },
+    {
+      "path": "legacy/cuadc_2026/execution/dispatcher_v2.py",
+      "sha256": "ea9bcc4793693dab45939c464a0ecb88e6036ed025554d4d2f52f8ee239916ab"
+    },
+    {
+      "path": "legacy/cuadc_2026/execution/effect_registry.py",
+      "sha256": "0d7d08ff08772072c7f100ed967e344efec97675c25daab7b4991206c956bba2"
+    },
+    {
+      "path": "legacy/cuadc_2026/execution/handlers/__init__.py",
+      "sha256": "83fb8bbdb370426431c8f056f67d41ef38f8d98b0b480a7932aa52f7cdfde221"
+    },
+    {
+      "path": "legacy/cuadc_2026/execution/handlers/flight_mode.py",
+      "sha256": "ce4b310c7e568b2bf47dfffd20dd15ffe1e5feb96478f4b51d180c08406201a1"
+    },
+    {
+      "path": "legacy/cuadc_2026/execution/handlers/global_position.py",
+      "sha256": "e5d652471d9e8175291d41cbe45ef4848bd95185979920432f500b0175edc335"
+    },
+    {
+      "path": "legacy/cuadc_2026/execution/handlers/servo.py",
+      "sha256": "db60e388cebdef3da39775f65dcbbcf0a4289c074d6e84c7ebadccf07ba22043"
+    },
+    {
+      "path": "legacy/cuadc_2026/execution/handlers/submission.py",
+      "sha256": "35385277c05e21da075435ef20baa63d5baaef079567315f96da457ecaede8e3"
+    },
+    {
+      "path": "legacy/cuadc_2026/execution/normalizer.py",
+      "sha256": "37696afd2e4bcc47ec861f0c3db0c7f7fb03bfdd91f08a96da1410721d34340b"
+    },
+    {
+      "path": "legacy/cuadc_2026/execution/policy.py",
+      "sha256": "214a52a863176950a1dbc45f4fa3ac117eaf5518476102a5d6a342e92fce5434"
+    },
+    {
+      "path": "legacy/cuadc_2026/execution/safety_config.py",
+      "sha256": "9d2db383d46086445d3aec280ec57a4a0d3099823ec62c678ce9158d0c6d2aeb"
+    },
+    {
+      "path": "legacy/cuadc_2026/execution/safety_pipeline.py",
+      "sha256": "df0ffaad5e1b367ef32a9a3d0562f25d030b46f414c6be8b5922b5bf766be70a"
+    },
+    {
+      "path": "legacy/cuadc_2026/execution/safety_policy.py",
+      "sha256": "d297d1092ede621bbeda04b1e09bec3f4d923daed8d9ccd5bec1e0623022a47d"
+    },
+    {
+      "path": "legacy/cuadc_2026/execution/types.py",
+      "sha256": "cbae199f83195298a3b86eba96c00d3cb86fc38ecc308fa4e06cafbf96086cf3"
+    },
+    {
+      "path": "legacy/cuadc_2026/gateway/__init__.py",
+      "sha256": "b8e7e8818e3f5bdc40a4e4424ef4eafedba9464737fe0f1fc387bbc4d9d3917b"
+    },
+    {
+      "path": "legacy/cuadc_2026/gateway/contracts.py",
+      "sha256": "e398c209d1ffd631ef4da0cff2dd8182579361f843e5f1459f4be15ced9006f9"
+    },
+    {
+      "path": "legacy/cuadc_2026/gateway/remote.py",
+      "sha256": "6642b2dd1c3c0e958435a4563f7fe9b999716273b3ca6f4cb478f743bc31b252"
+    },
+    {
+      "path": "legacy/cuadc_2026/guidance/__init__.py",
+      "sha256": "b843ee73739355c1d1fac699081ff41e709335667aec13ac14a58e2469f5dbe8"
+    },
+    {
+      "path": "legacy/cuadc_2026/guidance/capture_projection.py",
+      "sha256": "3f52722e9715e5f595d214304e6740584527450932c5131662ed94dc0cb75b56"
+    },
+    {
+      "path": "legacy/cuadc_2026/guidance/target_fusion.py",
+      "sha256": "254fa7df8bac62f1f8d326b2705f8af57b5564605d2cf0fdd585f3c162e3afd8"
+    },
+    {
+      "path": "legacy/cuadc_2026/guidance/target_localization.py",
+      "sha256": "04b250ce83051efb7083b7421fd068c4e6ead63d39e500556286b37a1c3a5f3c"
+    },
+    {
+      "path": "legacy/cuadc_2026/guidance/target_projection.py",
+      "sha256": "bbdee5ccb60baad0d9ea112a54b36bb7d6794a47a6eaa0192c2d272a5a26cd15"
+    },
+    {
+      "path": "legacy/cuadc_2026/guidance/waypoint_math.py",
+      "sha256": "7206c9ea46b84ff58ccb4db4a04d2d496f795ca8ed420c7d9a8c2c09bec1c625"
+    },
+    {
+      "path": "legacy/cuadc_2026/infrastructure/__init__.py",
+      "sha256": "24507c8e658c567d212c74d49f1f751ef3e714c92ce9491f9e479189a3f5318e"
+    },
+    {
+      "path": "legacy/cuadc_2026/infrastructure/transports/__init__.py",
+      "sha256": "cd71cfbff5691d8480c0dd6c846d263bb1f381e00dbc490c455260a5884e13f8"
+    },
+    {
+      "path": "legacy/cuadc_2026/infrastructure/transports/base.py",
+      "sha256": "b7f97b82cc319af98cfbe0da6bb8b6db7d9ba8845d13835334b74b963f0dece0"
+    },
+    {
+      "path": "legacy/cuadc_2026/infrastructure/transports/serial.py",
+      "sha256": "850d4e406a619ef916caa6bf353be0d7b2048ba18274cca048fdbb742edc86e4"
+    },
+    {
+      "path": "legacy/cuadc_2026/infrastructure/transports/spec.py",
+      "sha256": "c2eb556d832cc5a912dd5412e3bebe4dfcfb0a15fa25abaab86077cd4114a2b6"
+    },
+    {
+      "path": "legacy/cuadc_2026/infrastructure/transports/tcp.py",
+      "sha256": "371a681111b52963abd9a2be5b5d43de0fcc3c888960e46f5d98229926798400"
+    },
+    {
+      "path": "legacy/cuadc_2026/infrastructure/transports/udp.py",
+      "sha256": "b4d9125c271fd9c365e196056ddae41cf8a9ee55d929723a0d8c62f39039e807"
+    },
+    {
+      "path": "legacy/cuadc_2026/intelligence/__init__.py",
+      "sha256": "96a7e17391ff9f530a4c27a848f7d811f7f8ecd753133f9d61d27d3f269f786b"
+    },
+    {
+      "path": "legacy/cuadc_2026/mav.parm",
+      "sha256": "4da5ab7331960ebf8fac349a5d88cf20f6b802259c87228b9720f2104211ab05"
+    },
+    {
+      "path": "legacy/cuadc_2026/missions/action_definition_builder.py",
+      "sha256": "3cfb3dc2b557d16a3be56aac330dcdbd6d07052a820938a4483133209850950f"
+    },
+    {
+      "path": "legacy/cuadc_2026/missions/common/actions/__init__.py",
+      "sha256": "3b0986d984dc2e4172e235ebcd4710a383607e6fffe2ef71f3a9c569d4cb8d5b"
+    },
+    {
+      "path": "legacy/cuadc_2026/missions/common/actions/base.py",
+      "sha256": "82947105b63d3d2c689f4380666d4a00ad7b43528473b31395a0ef3b45f4fa98"
+    },
+    {
+      "path": "legacy/cuadc_2026/missions/common/actions/registry.py",
+      "sha256": "0115680aef7522cd04783efc30fec37fdc084eb40e4a17fde64467af3f89b726"
+    },
+    {
+      "path": "legacy/cuadc_2026/missions/common/actions/result.py",
+      "sha256": "8f2d9ea11e95a1b98c944697a8359a10831e60b67604930dc5bb892c503632c3"
+    },
+    {
+      "path": "legacy/cuadc_2026/missions/common/actions/runner.py",
+      "sha256": "df0c94813c1a65383904ab342951a47c463b287758751f17f93d546fc5481a4b"
+    },
+    {
+      "path": "legacy/cuadc_2026/missions/core/__init__.py",
+      "sha256": "8e278a16b548d244738212f458ed34108cc934b85e6932048a3cf28395ed1cfd"
+    },
+    {
+      "path": "legacy/cuadc_2026/missions/core/action_catalog.py",
+      "sha256": "a981101c4e29ff2684c8e43d061550e93d1de2683f73d7bdcec3f9227e1a5853"
+    },
+    {
+      "path": "legacy/cuadc_2026/missions/core/action_runner.py",
+      "sha256": "90d00b258064b88f22ac123c1c2b383538fa49ec144d07aeb68ac43a305c33e4"
+    },
+    {
+      "path": "legacy/cuadc_2026/missions/core/blackboard.py",
+      "sha256": "5a5af73725216af33a104cefc6b0ca66e69e5c68562906536945dc63bdb617b0"
+    },
+    {
+      "path": "legacy/cuadc_2026/missions/core/codecs.py",
+      "sha256": "d3ba72774f8f59e9777066068219ee8797ab10befd2fc3d22f17a8e4d32c0151"
+    },
+    {
+      "path": "legacy/cuadc_2026/missions/core/legacy_action_adapter.py",
+      "sha256": "31f1b5a3f684435ee3c13cf57d6127e8f197633b8e1eccd978f66c8a25cb7237"
+    },
+    {
+      "path": "legacy/cuadc_2026/missions/core/mission_compiler.py",
+      "sha256": "7b180c2972dc1a14a815b4ac1fbbad2ed49ccf9e286751e0bfd3534d1623e348"
+    },
+    {
+      "path": "legacy/cuadc_2026/missions/core/mission_orchestrator.py",
+      "sha256": "ccb9908ae0547a867c221abeb634b950e5e03644158019b34d7d2cd046662e46"
+    },
+    {
+      "path": "legacy/cuadc_2026/missions/core/native_one_shot_actions.py",
+      "sha256": "c2908214452595622a65265418eb13265cb04d0d4286253a4f77bae7c931580e"
+    },
+    {
+      "path": "legacy/cuadc_2026/missions/core/production_catalog.py",
+      "sha256": "5e3650f445c9ae4aee700c37fd84fc195af133af7312b844022bc10a4415287c"
+    },
+    {
+      "path": "legacy/cuadc_2026/missions/definitions.py",
+      "sha256": "3b01def2fc12a1eb6b9a4165d9fba5fde7a2211d5571eddda4021daaad23d595"
+    },
+    {
+      "path": "legacy/cuadc_2026/missions/engine.py",
+      "sha256": "a7ff77da0438d7a144faa3d91a9970e0a389d936ec49d1f6c6bae9d744d76652"
+    },
+    {
+      "path": "legacy/cuadc_2026/observability/__init__.py",
+      "sha256": "fcb423fa878f36d40518d7ff6794ef908023074e5f361618758b8c252d65bd1f"
+    },
+    {
+      "path": "legacy/cuadc_2026/observability/blackbox.py",
+      "sha256": "4873cacdd455307f5acfc85cdebbc682736b9e68cf1fe6a94c9069d6d4a91236"
+    },
+    {
+      "path": "legacy/cuadc_2026/observability/cycle_recorder.py",
+      "sha256": "0d2e8cbaaabba3ec8749d0cd4d35b8f1e01926225b5884de767db9f3efccd5e4"
+    },
+    {
+      "path": "legacy/cuadc_2026/observability/event_publisher.py",
+      "sha256": "790c14280d5d4912898527dfdb74234e68abfc6a1b8597ef1f9cdf5421ec37c5"
+    },
+    {
+      "path": "legacy/cuadc_2026/observability/jsonl_audit_adapter.py",
+      "sha256": "eb44ba5edacddd99a4230beb521c34af8bfaa2227330a78d754f7b6f1beddaf9"
+    },
+    {
+      "path": "legacy/cuadc_2026/observability/jsonl_cycle_store.py",
+      "sha256": "ecc0f00bc1644eed8d95fe56ce36b2517c26bb42577d4a651b1e4a3201e2be0c"
+    },
+    {
+      "path": "legacy/cuadc_2026/observability/v1_cycle_writer_adapter.py",
+      "sha256": "76090cc160cb88194be123a8eed02079a977a339cbafa60bb7482094ad2d7b7b"
+    },
+    {
+      "path": "legacy/cuadc_2026/perception/__init__.py",
+      "sha256": "6b2dd15e2703c5cd0ddb82ed33581ebb36fa75a720f2e03e02d17013c13c73b0"
+    },
+    {
+      "path": "legacy/cuadc_2026/perception/fusion/__init__.py",
+      "sha256": "19a1d9ebafb42fff85da7ec03dc30c88f72534ae5aa25e37e21996276a4396e0"
+    },
+    {
+      "path": "legacy/cuadc_2026/perception/fusion/fusion_manager.py",
+      "sha256": "6d039c9e9b05b13560d7161055c98c0b99a6645e3921b5ef49eca1f65712c7fa"
+    },
+    {
+      "path": "legacy/cuadc_2026/perception/fusion/models.py",
+      "sha256": "3fc8169eb9109de93a97b48a1c27106cc4dc0e6fa33037bb6d9ae6b9e1e2a7d9"
+    },
+    {
+      "path": "legacy/cuadc_2026/perception/fusion/rules.py",
+      "sha256": "4f5b0361871c0b2ef03e76097146780b9128c7d229d8a5f53a671990b78ab82b"
+    },
+    {
+      "path": "legacy/cuadc_2026/perception/yolo_rknn/__init__.py",
+      "sha256": "4ad163f2a9e9dee5574c7fc9bc229fa49e27e0bb222bb66b87e2e52d46d1416b"
+    },
+    {
+      "path": "legacy/cuadc_2026/perception/yolo_rknn/config.py",
+      "sha256": "9d450fde7c4cac0b5db15a03e8f5b8f0658f07656ca4839f033ab559ff7ecb1a"
+    },
+    {
+      "path": "legacy/cuadc_2026/perception/yolo_rknn/models.py",
+      "sha256": "3a959d09f3f2b92017d16634bd5be2179fa4d7abdf7a1653b1caee3a4f964790"
+    },
+    {
+      "path": "legacy/cuadc_2026/perception/yolo_rknn/perception_pipeline.py",
+      "sha256": "27d917298fb793883ef2e227193ac9ab2225992d3f0be3870c1b8ee87fb3e418"
+    },
+    {
+      "path": "legacy/cuadc_2026/perception/yolo_rknn/rknn_detector.py",
+      "sha256": "82a75683407813cf3ea1eb480ea2e8a8609aa5fe2dbed7ed8e1f3bb1c7c2688d"
+    },
+    {
+      "path": "legacy/cuadc_2026/perception/yolo_rknn/target_manager.py",
+      "sha256": "b8d81792f692b61e16937dc88c1d2fa3d0ae37cd078d57e7fda73dd694355957"
+    },
+    {
+      "path": "legacy/cuadc_2026/perception/yolo_rknn/tracker_runner.py",
+      "sha256": "5c892ec00b3cf5ac814d09a1efe1c53547d57cfec85a2346a00316ff52a6e69b"
+    },
+    {
+      "path": "legacy/cuadc_2026/perception/yolo_rknn/utils.py",
+      "sha256": "1480d30d12dde28dd65fa11409dbbe22d05ce6a66a51fa0f868141cc8c75d12b"
+    },
+    {
+      "path": "legacy/cuadc_2026/protocols/__init__.py",
+      "sha256": "56b42762b98c09120476e30a530f68809ca3bcc78e37a56b079514e0d22d6128"
+    },
+    {
+      "path": "legacy/cuadc_2026/protocols/mavlink/__init__.py",
+      "sha256": "6e158ef7487b5b49ca4b98b50fd57e0e3ec838ac1010eb3092ec6a5ea18479ad"
+    },
+    {
+      "path": "legacy/cuadc_2026/protocols/mavlink/ack.py",
+      "sha256": "499ed490cee84ddcfa9f13f86cc58d7d2e027406d51c1e4a3283b9734eccf62b"
+    },
+    {
+      "path": "legacy/cuadc_2026/protocols/mavlink/codec.py",
+      "sha256": "879a8e13b6e6cc9df78c4e4e126f058e6396951438e3aff30e234f0ba3dbeca0"
+    },
+    {
+      "path": "legacy/cuadc_2026/protocols/mavlink/commands.py",
+      "sha256": "d91f5a45db6c303d8bb1b9d77694a361915674e49888d0944a5f1df3a5ce75b0"
+    },
+    {
+      "path": "legacy/cuadc_2026/protocols/mavlink/connection.py",
+      "sha256": "e0a9ed64fa0b4065517f8f272a2007c2f4448c37ba0733422e53542527c00b6b"
+    },
+    {
+      "path": "legacy/cuadc_2026/protocols/mavlink/heartbeat.py",
+      "sha256": "bfd5f82db9cf0de8947d258eaeed9323156aea7167c2e6797dddbc206badbc9d"
+    },
+    {
+      "path": "legacy/cuadc_2026/protocols/mavlink/messages.py",
+      "sha256": "098b7e45fad496dd4ffec89919c4dd64bae5d6a3b85659db701f89cb2a9aa07f"
+    },
+    {
+      "path": "legacy/cuadc_2026/pytest.ini",
+      "sha256": "c809c969ec7e11b9ff37784e9c6fcc0b7c5148d168e18b05aed797e03fbd6ead"
+    },
+    {
+      "path": "legacy/cuadc_2026/requirements/README.md",
+      "sha256": "fb41935e7a89e1deef8576b82f6c89fa5d1153b2ce6d9fc1d5a8875cab56f9ba"
+    },
+    {
+      "path": "legacy/cuadc_2026/requirements/app.txt",
+      "sha256": "88c6ee4170d0e0e5c1ea9f2d8ab790e41c75385771388e8926563ffc67c139e2"
+    },
+    {
+      "path": "legacy/cuadc_2026/requirements/core.txt",
+      "sha256": "80336e21a8986fa55b54906bd75e222a125d4fd48c873af33dad0a7bef6805ea"
+    },
+    {
+      "path": "legacy/cuadc_2026/requirements/dev.txt",
+      "sha256": "e2c8213af7b1d574caaefe6f02ed47c4ceac4a825d94afb134d868d84b6255c6"
+    },
+    {
+      "path": "legacy/cuadc_2026/requirements/locks/linux-64.txt",
+      "sha256": "7d30a3f57d80598cff90ee3c922e012e8c4cad6a1a61e98d568b56edf9191294"
+    },
+    {
+      "path": "legacy/cuadc_2026/requirements/locks/linux-aarch64.txt",
+      "sha256": "4f0a95bd8772383ae5ab1b99c75d3f265e4ed800d71c89bca5e3ce9194742b73"
+    },
+    {
+      "path": "legacy/cuadc_2026/requirements/locks/rk3588-yolo.txt",
+      "sha256": "5c1cb623691008e00373310e02bbf35397c0fd9c84210cfea0db7a23986016e3"
+    },
+    {
+      "path": "legacy/cuadc_2026/requirements/rk3588-yolo.txt",
+      "sha256": "7379a647a1714ec1ae74c15b9c615f8f865fda2afffe2006488d320360b18e95"
+    },
+    {
+      "path": "legacy/cuadc_2026/requirements/telemetry.txt",
+      "sha256": "1507525ae652db28c09798496f87459cdc6128bd2472e3ee48bd438e0d2130a2"
+    },
+    {
+      "path": "legacy/cuadc_2026/requirements/web.txt",
+      "sha256": "a0e0f558f45d6429f8537d7892c1c382db4eb51c6caba92264ed2f57e61d5471"
+    },
+    {
+      "path": "legacy/cuadc_2026/runtime/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "legacy/cuadc_2026/scripts/README.md",
+      "sha256": "de212741cec53448ecabcc7be000f2266465645bdcfd26ce831d683fe6b796da"
+    },
+    {
+      "path": "legacy/cuadc_2026/scripts/audit_release_readiness.py",
+      "sha256": "bb046fa77dd617596244b20581238eca3a7cb558e174a6450b33e54d4dd0f85f"
+    },
+    {
+      "path": "legacy/cuadc_2026/scripts/config/apply_rk3588_real.sh",
+      "sha256": "3cee733e5fdc57665da4ba7abdc4e3fce2159e3301e55226fa4eab16d36d3739"
+    },
+    {
+      "path": "legacy/cuadc_2026/scripts/config/apply_rk3588_sitl.sh",
+      "sha256": "2f2360bcfd912b224edad1bc193b666fec8f7d66be4fdb98a348b458b19c1b80"
+    },
+    {
+      "path": "legacy/cuadc_2026/scripts/config/profile_common.sh",
+      "sha256": "855a9b8f8ae3080ea14a52bd75eae6f0696ecb6f28c08a94870b35e9521681ae"
+    },
+    {
+      "path": "legacy/cuadc_2026/scripts/config/render_profile.py",
+      "sha256": "d73e44c1ef963834ae96a8540b0ffd6f9cb90f70dc1c8eede833ab286f1f6b71"
+    },
+    {
+      "path": "legacy/cuadc_2026/scripts/config/save_rk3588_real.sh",
+      "sha256": "32d478fa32c1a006b226f2cf13f2438ef8fe21bb466e9d939678a21073326020"
+    },
+    {
+      "path": "legacy/cuadc_2026/scripts/config/save_rk3588_sitl.sh",
+      "sha256": "60c4ca61affaa01a076eb93346bd2cd93502dcf2ebd33c5c61373350d86ff7b4"
+    },
+    {
+      "path": "legacy/cuadc_2026/scripts/deploy/install_systemd_user_services.sh",
+      "sha256": "85bf9605e8191ab90da06748eb935ba97c8e13ea2ebe4d8fa59e47da1165fc8d"
+    },
+    {
+      "path": "legacy/cuadc_2026/scripts/find_ssh_hosts.py",
+      "sha256": "5a61ce4e0a45b9dba5483aa317f12e1068c92e3213408bc6ea48985d6d09ffc7"
+    },
+    {
+      "path": "legacy/cuadc_2026/scripts/healthcheck/check_app.sh",
+      "sha256": "dd125319e413b3995b8cf00c5a90aa671bd8b364e60d569c287dc4c480b158e7"
+    },
+    {
+      "path": "legacy/cuadc_2026/scripts/healthcheck/check_rk3588.sh",
+      "sha256": "5f51ab2a3b9c765386d266b15007f5bd1632cf5f072d0066b0b7db2bb3bb244a"
+    },
+    {
+      "path": "legacy/cuadc_2026/scripts/install/install_app_env.sh",
+      "sha256": "80585e99d8975acfd4b29819fa373ed7508894cf85e4b9380cb501d264390a6e"
+    },
+    {
+      "path": "legacy/cuadc_2026/scripts/install/install_system_deps_ubuntu.sh",
+      "sha256": "9ecc870901710ab3712590dc230856a4c6fb6dfc362ef4298b6575aa3830924a"
+    },
+    {
+      "path": "legacy/cuadc_2026/scripts/install/install_yolo_env.sh",
+      "sha256": "57aac0a6ce0296bc012048a9144f903c747d2a8d2027f7e2ecb383d69d2df3f1"
+    },
+    {
+      "path": "legacy/cuadc_2026/scripts/license_scan.py",
+      "sha256": "11e88b723c56efb09e0fc345c0e3a9d2c7d29823c202d9da755a7ff61662c0a2"
+    },
+    {
+      "path": "legacy/cuadc_2026/scripts/lock_requirements.sh",
+      "sha256": "50fd0574117f6182bf6d6a0d510b98296a76d415388a18024f78bc40f66a1deb"
+    },
+    {
+      "path": "legacy/cuadc_2026/scripts/run_iris_gimbal_sitl.sh",
+      "sha256": "49f59cddc5b7c4a7c8658dc3857c7e05cda91cd6e1eddaad3ecd917827d7d0cc"
+    },
+    {
+      "path": "legacy/cuadc_2026/scripts/smoke_test_envs.sh",
+      "sha256": "80e7b471d5435b608d30d01325f58e6b5d168082840a56c8dda60052202d8b91"
+    },
+    {
+      "path": "legacy/cuadc_2026/scripts/validate_action_missions.py",
+      "sha256": "49965b3f3e2382654a37f124eb7818cd995f3c863b7a68833436c49518fa92f1"
+    },
+    {
+      "path": "legacy/cuadc_2026/scripts/validate_architecture_boundaries.py",
+      "sha256": "c783430cd80c43fb7ff5208c01a80b39cb0ba890b9cc2284a12633b677c10378"
+    },
+    {
+      "path": "legacy/cuadc_2026/scripts/validate_p0_sitl.py",
+      "sha256": "b017e1e7da41d0ddbf5823e8b84da82aacfcf3f6f891c01a710ac9a1f71bee21"
+    },
+    {
+      "path": "legacy/cuadc_2026/scripts/validate_p2_field_reference.py",
+      "sha256": "4fa6a5eff36acc055b3a362a497cba47118d32d97c97db450481b66b849723a6"
+    },
+    {
+      "path": "legacy/cuadc_2026/scripts/validate_stable_core.py",
+      "sha256": "ecd073c87d973a70e3d6def66b83433039dc6dcc417a33e4e2c91c868034dc47"
+    },
+    {
+      "path": "legacy/cuadc_2026/sensors/__init__.py",
+      "sha256": "2285ea0986e35e1ee59e3cf5c55f985fc00b95995622b0b10bd9d5d89692af13"
+    },
+    {
+      "path": "legacy/cuadc_2026/sensors/camera/__init__.py",
+      "sha256": "06787f1af7c40a4e3b916e20fdc7c51e53ccf2ed7edba9108292e5cd1a672e0b"
+    },
+    {
+      "path": "legacy/cuadc_2026/sensors/camera/camera_adapter.py",
+      "sha256": "6952b81100f24844c4c194414a8a5d8dc6bcd3f8ff7f045763c9752edc9ec0c9"
+    },
+    {
+      "path": "legacy/cuadc_2026/sensors/camera/frame_packet.py",
+      "sha256": "d64b145af62d030534c9328b1b5377c23fa7cc0dc54cd1b12b53633a99d45101"
+    },
+    {
+      "path": "legacy/cuadc_2026/sensors/camera/udp_gst_bridge_helper.py",
+      "sha256": "6dbb137f8b17ae1f9b56434d68eeb0a975f02652b1a9efb21b9d0b482194c2cf"
+    },
+    {
+      "path": "legacy/cuadc_2026/sensors/camera/video_source.py",
+      "sha256": "8b125d9e24b66dc89aea1cd03d8ebaeab930757a67b068359320324718d744d8"
+    },
+    {
+      "path": "legacy/cuadc_2026/telemetry_link/COMMAND_AUDIT.md",
+      "sha256": "cdf91bb032f0b92f4d24f2431486c0b95f2e5bf5fbd6a55f501098502cee155e"
+    },
+    {
+      "path": "legacy/cuadc_2026/telemetry_link/README.md",
+      "sha256": "5f16ef6664f6bb24e677b8602b6395a10bbfa5391acc6804fd4252c76f1b0e40"
+    },
+    {
+      "path": "legacy/cuadc_2026/telemetry_link/__init__.py",
+      "sha256": "d1c9b82e40bfb49535ba6a16038161608bf958427366cbf6b48cb9c4eaac0ed5"
+    },
+    {
+      "path": "legacy/cuadc_2026/telemetry_link/ack_router.py",
+      "sha256": "146e8904aea0222393a23aea193b4c4b549da5fb2e47991f3ebabdd8810cc79b"
+    },
+    {
+      "path": "legacy/cuadc_2026/telemetry_link/attitude_udp_publisher.py",
+      "sha256": "59e597b73bc84e232a661a8b2e96380c36ed423f6ee9999c865eba2d82749ed1"
+    },
+    {
+      "path": "legacy/cuadc_2026/telemetry_link/command_broker.py",
+      "sha256": "f22fcd1cbb192ad7e1ba032c2e8f2723ee3d74047aa0f1064d95753ec7f426c4"
+    },
+    {
+      "path": "legacy/cuadc_2026/telemetry_link/command_dispatcher.py",
+      "sha256": "87d6556d0688df30b549ab869117c7cb7b3d911c3f2af294c0a266d67a70c719"
+    },
+    {
+      "path": "legacy/cuadc_2026/telemetry_link/command_events.py",
+      "sha256": "9fe3d5aee5675e1bc3329a784a230b5d93e6ab6708caec92a18f30b931bd4078"
+    },
+    {
+      "path": "legacy/cuadc_2026/telemetry_link/command_queue.py",
+      "sha256": "5534295b82017dd3424d30588751a5029086260f44cc500578a7bbc86348ff8f"
+    },
+    {
+      "path": "legacy/cuadc_2026/telemetry_link/command_sender.py",
+      "sha256": "4ac1866547fd2624d234ba2d35a34bbf754163a23f162a636e264a28c61fd7da"
+    },
+    {
+      "path": "legacy/cuadc_2026/telemetry_link/command_shadow.py",
+      "sha256": "0d3be229331fb01b23735d2868e4275e1cefab6a7a9df02ea06f7853f69aa0df"
+    },
+    {
+      "path": "legacy/cuadc_2026/telemetry_link/config.py",
+      "sha256": "6e0f5e0d32a7491f290e4382ba32602799bb06f292c73e0fed305026aa604441"
+    },
+    {
+      "path": "legacy/cuadc_2026/telemetry_link/frames.py",
+      "sha256": "c7c0b7417fcfde96b7951f8370e8e86a4e8d8665984571309dd9dd7657f998e4"
+    },
+    {
+      "path": "legacy/cuadc_2026/telemetry_link/link_manager.py",
+      "sha256": "55cf539b4c8535df2e2674cb82fdbc4508f14e5f1c5ecc1cf794545a54e65816"
+    },
+    {
+      "path": "legacy/cuadc_2026/telemetry_link/mavlink_client.py",
+      "sha256": "4e6663395e65c6be5efb7c6ffe4de3c57e52f8cb8f033e180105bffcf1309897"
+    },
+    {
+      "path": "legacy/cuadc_2026/telemetry_link/mavlink_command_adapter.py",
+      "sha256": "dbfd45dbae7f47948c04662bab8bb796aca377dab094530acf48f648f44f10b7"
+    },
+    {
+      "path": "legacy/cuadc_2026/telemetry_link/mavlink_encoder.py",
+      "sha256": "c3f6a2440eb0f817948ada57958b678df2ea7a8e45d115965eb51aabf6e5a03e"
+    },
+    {
+      "path": "legacy/cuadc_2026/telemetry_link/models.py",
+      "sha256": "10537588a4354d2582e2f40c8e8ffb08e190e0dd8744859c27d8ac76d6e2c27f"
+    },
+    {
+      "path": "legacy/cuadc_2026/telemetry_link/ports.py",
+      "sha256": "e9812d87fbd707f5558b143f3e9397cce11a7f2ab19ca336dcfa1817d6daae0f"
+    },
+    {
+      "path": "legacy/cuadc_2026/telemetry_link/rate_controller.py",
+      "sha256": "41082e415a36eef1941256656a53d60aac74cb48d40ec1b55fdfc44c338f1848"
+    },
+    {
+      "path": "legacy/cuadc_2026/telemetry_link/state_cache.py",
+      "sha256": "6cd8aeb24a459c3542718816ecc67dc0e19525a77f5129ecefce25bbdfcac39a"
+    },
+    {
+      "path": "legacy/cuadc_2026/telemetry_link/state_publisher.py",
+      "sha256": "09e17066dacba9941ce6b61a5e12530e339a72f50ea64a7a1ad4110ef9c34b7d"
+    },
+    {
+      "path": "legacy/cuadc_2026/telemetry_link/telemetry_receiver.py",
+      "sha256": "fb972fbf0db30cd1093f2dca9c48bf6198621f63c5c6266f8088704a8030b7be"
+    },
+    {
+      "path": "legacy/cuadc_2026/telemetry_link/utils.py",
+      "sha256": "dd775da36a9ed644436476e102bd57ae011c6f69e2e3a65ddd5e689b786b299e"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/LEGACY_TEST_RETIREMENT.md",
+      "sha256": "6c9254ce773dc9bda237d7bf70890b4648b27768c873517a8e99a67481b8802f"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/README.md",
+      "sha256": "cac19b2121953a0f04fd95bd5076b887ea3dab6a13cfce5ab89a0efb893db420"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/conftest.py",
+      "sha256": "ca7d2c299030daf585cd86a1128fb701fd8b23f913565e1d5551e5413dc14dc5"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/contracts/core/test_common_contracts.py",
+      "sha256": "0dc93bca6ee0dc00c19834a7e227a9d3e835701c8084e815557f993c4bd8557e"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/contracts/core/test_dependency_boundary.py",
+      "sha256": "e569e24a8f58e711efa0855b31e34ff874b6bdad9d05fd93277dd9a140c8ceb1"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/contracts/core/test_effect_boundary.py",
+      "sha256": "fd7b8adea1b638da5f571b7159b33fb060f293609f66c0d56525ba2549389dfa"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/contracts/test_action_contract_v1.py",
+      "sha256": "eda7b54a56787d5a004754eb8de78392010606c8acd2b5b125975547a2fbce4e"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/contracts/test_contracts.py",
+      "sha256": "d4300973ee986dfcc050d701b5dbf2eb01be0eca55d16a1fb62b5fd765a7a93e"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/contracts/test_environment_p6.py",
+      "sha256": "52fb06bcc0eba2e49fa1bcc76e3d0e9c086240ab2f2795e0d7a6a6aa3b476a87"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/contracts/test_field_schema_v3_contract.py",
+      "sha256": "2a841fdbffeddedb7e661ae48f2425e1beaa8e607d3962783dffdabfa96b1f19"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/contracts/test_p2_field_profile_retirement.py",
+      "sha256": "29785eba52d00ebdbd0bf783bc09df1be9e980650b028d91bbb49e9d2c029833"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/contracts/test_p5_architecture_boundaries.py",
+      "sha256": "9c8b80d1defad54b16a4151d58977023f3bcbc64c9e8e84bc8525e4dc2430c4b"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/contracts/test_p6_environment_boundaries.py",
+      "sha256": "c78d46c4539842fced4d4356fb8a430bc129bf33f4a8ef43274bf8a4c9ae31f6"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/contracts/test_p7_deployment_gateway.py",
+      "sha256": "7ede8abf51aac216602114a65ae6cc7ddc18840982690386b75b7b51ce3a86b2"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/contracts/test_p8_application_boundary.py",
+      "sha256": "bb7a1a32bf3d58eeeb9b29cd8a479fd25910674cf0ed845598d078bffbad4fe5"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/contracts/test_p9_rover_boundaries.py",
+      "sha256": "417aee60a044d80226fdb3510464bda9c5be7c3e49d0abfba72b1eee76b84a6f"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/contracts/test_perception_platform_contract.py",
+      "sha256": "ac14a0b62c4372da3cb7b5e49117c0fda020052185486e5f65551cbaff2a168b"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/contracts/test_platform_common.py",
+      "sha256": "c706a3c66b5839314bd3abd1a7dab2a7c4e085c79dbcdc1aaaf18a382cde0fb9"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/contracts/test_sensor_camera_contract.py",
+      "sha256": "9d49e003cf71fd1f7e1ccad5e1393bbc824d1fdf2381d7be4c446558b4c0f7d8"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/contracts/test_strict_app_config.py",
+      "sha256": "1753340a8816ce8e5d3a4f8891bed0a01de9d051964ef794c86398e98e9d3e55"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/contracts/test_subflow_architecture.py",
+      "sha256": "b7f442460b86dcf9d543f1879438c35b71c3158aeb2e3bf3afd398a6b02df1a5"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/contracts/test_vehicle_command_contract.py",
+      "sha256": "404d1eed2bbe6fa0fd56c12fc9ea5103934d6751fa69537ee35165d692f3bf72"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/contracts/test_web_module_boundaries.py",
+      "sha256": "dd6b2c59995afa9593f0b965841749a02ce2ef13b89e579b0eed3ae03558c002"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/contracts/vehicle/test_vehicle_contract.py",
+      "sha256": "7f42d2aeaa07aa0b1dd7fe6d96e0156880c6dffa63c3844a4f6e71695bdf6f2c"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/fakes/__init__.py",
+      "sha256": "efb597dc57ce1b91be0e883cee2a4d7d822123a1fe4c8e74c39ab48d5b530885"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/fakes/fake_mavlink.py",
+      "sha256": "052d9e76070606ddff2c2d9e72460d3fa5e568acba7d451a662d3b4017271bd9"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/fakes/fake_udp_peer.py",
+      "sha256": "1b7869060ea5a10b7122227b17714147ae350541a8080f3063af34a0c355159e"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/fakes/faulting_store.py",
+      "sha256": "79871ef450e84afa4b00fd98aa3411e3bc869b8bf0037ac728058f3ab8f2a542"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/fakes/manual_clock.py",
+      "sha256": "70faa9b30a989a3d5045029577f0b96e090908b4f8979e2f2a49e91771f14716"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/fakes/pausable_writer.py",
+      "sha256": "36f774a28efe244c21f0630f68e9fec4a7f536ff6393184bdfec0f5d0ecf4d5e"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/fixtures/observability/cycle_record_envelope_v1.expected.json",
+      "sha256": "9c0d57589f0883c59c407d3a52f4999b4ecea0b38cab75f6f69033f8b97b7d16"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/fixtures/observability/cycle_record_envelope_v1.json",
+      "sha256": "46ca558a6556f0df3a74a6fe4e2bf1727a683cb7fb04422e170506482fb3a7fd"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/integration/__init__.py",
+      "sha256": "d8d0fe624a4aa9b7f25b85e2983ec4ee02b3268c320de8df0f22db567dee9281"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/integration/core/test_core_run_lifecycle.py",
+      "sha256": "a505cad8f9b8113b8e40b0518e5a2b3315b306f3d9d88b7fce2f8f49b89f269b"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/integration/core/test_core_runtime_composition.py",
+      "sha256": "a93fc79c55465b3bd23cbb7a5effd9837aaff7a92ddf13b7fcd4daa101b92c7f"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/integration/core/test_fake_rover_p9.py",
+      "sha256": "2d496b65c369abd0efb0c40680661d58b33caf86c31bc9a90fe67bae3f23a6b8"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/integration/test_action_lab_dispatch.py",
+      "sha256": "b235c4f737c44754d4414c11b3bfeea86836e94370d05a94a143ccff958c3d5c"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/integration/test_action_lab_only_startup.py",
+      "sha256": "22e2ee825747fa8607253027c3602c6058825c8bc8a2b34cdbeaa69b649a5cd1"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/integration/test_p0_web_security.py",
+      "sha256": "9bedec4ca6c2b76d452873dadc71829d09a18d65158740ef18ad216bc19945c1"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/integration/test_telemetry_link.py",
+      "sha256": "785f108ec560a1df2dd2667c3573a8ebcbde8a4057d45c224a24aaf5709c5a3c"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/integration/test_telemetry_link_interfaces.py",
+      "sha256": "9a3d58a0d0245e5f85477ed586ab9dd8012662a4c47119e419185006752183b8"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/js/test_competition_field_setup.js",
+      "sha256": "81080de6f1777a239cf04162ab9b97079e6a435b98c8c3b2ca287dfbe93c5a36"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/legacy/__init__.py",
+      "sha256": "657490745bfbb5cd8c8d118942ae8a1caef612d87cffd8973af3127dde71efa6"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/sitl/README.md",
+      "sha256": "701373880cc8eb08e03b275eff84008da1d7c7a10864cb332657d73238259814"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/adapters/test_command_broker.py",
+      "sha256": "c1043cadf4c0e02cfa710dafccddc3ea2e3939332a2579182c73ae5f4bb7800f"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/adapters/test_command_shadow.py",
+      "sha256": "feb24a4a436e3a875d68c2c751e80b7ba4ea8924f856319a7bdfc335a312c68a"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/adapters/test_drop_workflow_status.py",
+      "sha256": "0aab5f30e6fa7ed021992591bd2e4a407810985e021104feea32037725a50025"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/adapters/test_field_platform_ports.py",
+      "sha256": "4011b3ab964c19b56a53b621a2db0632b918e05616c5db5ebb1c4067033e65c7"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/adapters/test_link_control_port.py",
+      "sha256": "c892e6e52bc95f15beab9e618f9a07a24ba4bb260781527312f423851f470d85"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/adapters/test_observability_platform.py",
+      "sha256": "6204c1526b4a33986c4aba8a5d73ffa3121c89511359b1c155689a16ee770e59"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/adapters/test_p4_protocol_transport.py",
+      "sha256": "0d25de61a7a85c8165edb635eae1ad2cb31b2c789bc6eabb88d8e0006fea4393"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/adapters/test_perception_port_p5.py",
+      "sha256": "5cf9ad3be25c0ef6386ae624f256d0830d9ec0070027d3de647fabd1b5c83a06"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/adapters/test_perception_session_gate.py",
+      "sha256": "cd34105c348b6ba52e50e96ed638aaa8c149d06aa99762a2c91dcbe0695aed0b"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/adapters/test_platform_test_fakes.py",
+      "sha256": "f8cf78dcb929947de72060455877fca85c86ec05b11d0760bdb4d595e65cabea"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/adapters/test_raw_frame_recorder_state.py",
+      "sha256": "c20da0b72fdc9759c16ab6890070394d5cb0d30c1e22d3f643793f90741e73c8"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/adapters/test_runtime_stability_config.py",
+      "sha256": "516a1c5bb1e35ded44e1a76bb80bd8b9c83cd95954c38b238ea57edcd985dc50"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/adapters/test_service_manager.py",
+      "sha256": "ad96fa2dc09f4b0b6f3498e2ca2ec9dc337e1838148a84df4d1e080abb26515a"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/adapters/test_v2_mavlink_backend.py",
+      "sha256": "ab2e3ab51bc6933efbfa191768571c6391b1e3eec07a4fa456b3d38f7cbb81bd"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/adapters/test_vehicle_state_snapshot.py",
+      "sha256": "899135c86254c0632daaa8df9585739b9b25d47c05af9b56f9ab3819ef7dc87f"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/adapters/test_virtual_nadir_attitude.py",
+      "sha256": "b4f519dffd62692ef66b69d9112de664c5d4f5cc4418885168552f300d634172"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/adapters/test_virtual_nadir_perception_safety.py",
+      "sha256": "fd7deec781c070a7fb32612bb56e015e783f4983cd8d37b013a911223c40abde"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/adapters/test_virtual_nadir_rectifier.py",
+      "sha256": "3d4325b2a37b3dbabb093296b785b02149325c3ea2bafbf5f04b80157f621fdb"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/adapters/test_web_status_stability.py",
+      "sha256": "37377d286b9919525718587d986f4a4e1964ebe1588fe2cfd77e065528b640ad"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/adapters/test_web_ui_templates.py",
+      "sha256": "37af37713a8b15e8f420dccd01513a7756ec53ec92d49257e342a9e6fdc39bf6"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/adapters/test_yolo_command_client_v2.py",
+      "sha256": "9dd8cb049f21fb17432f4b7483fad099d6283ca7b27133cdba8eaa84c4c68f99"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/adapters/test_yolo_command_receiver.py",
+      "sha256": "babb98ad7941cb900f8272be2714bbcf7164af4a95e1339149660886613a2234"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/adapters/test_yolo_config.py",
+      "sha256": "620126e4c62f8c716f11d952f9f190bfb5ea750879dc7d36f305b1b9987649d5"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/adapters/test_yolo_rknn_detector.py",
+      "sha256": "617793d88a926effe92b044d41e10ff2a3cc604fedc06f814190136abeac5616"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/adapters/test_yolo_scene_detections.py",
+      "sha256": "a39427115a0d93b96047af7cf6a20a5a152f52bbec7f2317a5101f55f3c65643"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/adapters/test_yolo_udp_receiver_v2.py",
+      "sha256": "270e97e0607c7bbb251c6074ca35de9e7eb556a279bc93d36389afe55d26ed98"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/application/test_command_completion_observer.py",
+      "sha256": "28ede1bc0e3dd0ec02e0f7158146d77fdede97e50b2e8d22bd660d5b08973776"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/core/test_core_scheduler.py",
+      "sha256": "1f3679ea31e574537dd3133ce6bb7e5431fb349ce2430eef9fe2b8e62ce5cac2"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/core/test_effect_status_projection.py",
+      "sha256": "c069698a5cf706b94654a6f9fed363817ace19f49febb6ee6dd27a4907aa1c04"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/core/test_environment_mission_reference_p6.py",
+      "sha256": "c03eb4f5a7512f9c63a5c205be00074247fff8217f50f2b6523ca51c6339b82b"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/core/test_execution_fence_authority.py",
+      "sha256": "9c6737c74cd78c9b58886d9e94a3bffc5a36bc3e20db7c724aa14920d5eacecd"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/core/test_mission_compiler_v3.py",
+      "sha256": "e17ba26118cfae121783abb59527ba886e105e87f2d17def6548539101f36d0e"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/core/test_mission_orchestrator_v3.py",
+      "sha256": "e8767ae664c92b1a62f6bdc37823674d01c69d38856b2c9fb51a5c5d6635d44a"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/core/test_native_one_shot_actions.py",
+      "sha256": "d68131fe4b1eeae91b8cd5b52025e6d5b5f23cbf9f6baaa806ce1206b0e1d1ea"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/core/test_run_aggregate.py",
+      "sha256": "f451bb3636225dfa740566a1a87f43fae525805828c35d8a96666c0c90201a22"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/core/test_run_io_aggregate.py",
+      "sha256": "dc36bba9c8f986e6a6faaba5b3842e035ccd2f59026661f3a05ff95515392dff"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/core/test_runtime_input_boundary.py",
+      "sha256": "01adf0d86968554ebebdbed0e7f7cbdc1a17fe25594b368cf566ad964967c55e"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/core/test_safety_policy_v2.py",
+      "sha256": "a3ea63614be5dcf8dc9fcac2c7433526b3e26c08f5eef01f959ad90a1e3ebbf0"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/core/test_stable_core_models.py",
+      "sha256": "d0ea62fea377730822b905fe88621960496d6de84c1b43c825b46da785aa8c7e"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/core/test_system_control_aggregate.py",
+      "sha256": "8c4516e478f62f25fd46c31eb655cddbd43ab51b5fb1582c0d5fc07a7b845d50"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/core/test_world_model_p5.py",
+      "sha256": "73cbcfc1e7bb5f3ab89631283a4ad1c68c515b90fd1b527d96dcb297417239fa"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/domain/test_fusion.py",
+      "sha256": "cc8d06d429e97221b985341536099f7ef3bfba1b49babcba1cbb7a260fdc93f6"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/domain/test_multi_photo_fusion.py",
+      "sha256": "cae42722cc54f03c9286c556f55d8718e533198921fe22ad4472a24811f687d9"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/domain/test_system_runner_field_reference_deadlock.py",
+      "sha256": "ab1d6003b8f753a3ff1aeb49dccf681eb352aecca77967d9b061da37fde019d0"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/domain/test_target_localization.py",
+      "sha256": "c50193a352f1cb14aa1bd6e4612459735b7f0efd2ee18fa1b6824743f943cfde"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/execution/test_atomic_dispatch_policy.py",
+      "sha256": "f8783af5cfd30be99c78284b7f15167dcac8e522b920a2cd9cd568bfb40d9b19"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/execution/test_dispatcher_state_command_separation.py",
+      "sha256": "5e90bd91d39da340c8503da473a2e5d4ba1f3e3b085adc67e4f50041f439a135"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/execution/test_p0_safety_pipeline.py",
+      "sha256": "867354ed20a61d25c0124b079734470417198535242dc34fc613f29acb1e7d18"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/execution/test_payload_release_action.py",
+      "sha256": "f98dba251a05eb4b9814887c95ce2f7eeeab9d4daf73bbc6ddec482431dbc806"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/mission/__init__.py",
+      "sha256": "a846676a3d8f76c4eee2619bcf8a19c2f292cf375a4933776785eb6db4b060a3"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/mission/test_action_framework.py",
+      "sha256": "7f5b0975ac0fec65b43e58ff602b7086306349332967e61ffb36d8aae872cb9a"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/mission/test_action_lab_background_tick.py",
+      "sha256": "7438d369b216f770868a275adaae4806ad0f2a5ccb9c716aa3641185ee940481"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/mission/test_action_lab_registry.py",
+      "sha256": "4b111e75d14f39c5aff75d82bbb0112881ae60351d116e0517a68ca98c978678"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/mission/test_action_mission_templates.py",
+      "sha256": "44d38eddbda790428d11a09b6045d53dfb0a705516aa77dccfdf9a37d1af8cc1"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/mission/test_action_runtime.py",
+      "sha256": "16834da09a47483ae1446500d8da796a6480e35b20ac1727839edc9ec432020e"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/mission/test_align_descend_action.py",
+      "sha256": "b2cdc00aa70c13b7759a14987e3aa61bd0d3e70b089f465fabca33e904d7e06e"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/mission/test_application_state_store.py",
+      "sha256": "54a97e16f9e85929cbe634c01ba7d55c2c5cd4689a9c18f68848654010ed64a8"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/mission/test_atomic_capture_actions.py",
+      "sha256": "9ca6b6aefeaa000cc1fef2aabe50f5235a63059589b090265c784f71867c753f"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/mission/test_atomic_mission_tuning.py",
+      "sha256": "bff67f382a91b8506e7179c8992f7ea7558c64ebbaa72c623d146be544beadcc"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/mission/test_blackbox_recorder.py",
+      "sha256": "b797f77aa6746e7387cbdb7aaebb98fb5358d45413f18e2dcc5084ccadfff6c4"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/mission/test_change_speed_action.py",
+      "sha256": "3ec48105fbd89b0c5eb0d280b66879e2b62c98ac0b8ecc8e872e20857375609b"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/mission/test_goto_waypoint_completion_lifecycle.py",
+      "sha256": "e1defa096b00613e1e1ecbb675959e1ecd1f3d033b92e1a1867bde5d4040a329"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/mission/test_goto_waypoint_yaw_mode.py",
+      "sha256": "8d914b5b95908af765444f04b219c5cd2af596055e63cafd2c60eab261a76ada"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/mission/test_gps_target_lock_require_track_id.py",
+      "sha256": "cc4c0d20d5407577a2c7e55df6713206fd2273c2f0ebcb67b1550479a15bf495"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/mission/test_healthcheck_script.py",
+      "sha256": "51d4629eb0912c4b743f3fe7e713d321766c218beca2c6e3e2140e18826dcaac"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/mission/test_land_action.py",
+      "sha256": "65edbe6042e03addfbee266046c0db9493a33d04290d09d565e951a2ae0d68be"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/mission/test_mission_blackboard.py",
+      "sha256": "44eb2f5d94663c9b5067935c24a2f64cec1cb4fffce277c2a472e5ac6d5ebf44"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/mission/test_mission_orchestrator.py",
+      "sha256": "e0bc05c105c8ddf7fff50b1cbbf04dbe14ca3378ad7b14f14facf94a450a4676"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/mission/test_mjpeg_stream.py",
+      "sha256": "7279aaba68ee9f7052698d26682ffcc984e9428d2dfc2e69bb86c7bb5294e6ba"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/mission/test_p1_platform_boundaries.py",
+      "sha256": "806957363325e4b012c28cad17df5e422ef8f0d1333cba91da6e0c0a00424712"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/mission/test_raw_frame_recorder.py",
+      "sha256": "ac8083883931d9ddabbb42efea129a907f1659300f4a6631ab326f72d61ae124"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/mission/test_result_service.py",
+      "sha256": "1fee10139b0b0bbc2f5fb628c78267370d810f816e4d91e0f36e774c88a67f28"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/mission/test_select_drop_targets_action.py",
+      "sha256": "a6004f8b0ea99dfb44c345503f5b9004589ef48b68cdd6284f0501721ab90b75"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/mission/test_system_runner_action_orchestrator.py",
+      "sha256": "ba9110cc42f81306cfaf5b25ee2eb0ebc39c38f381f31b382dc052c7f86d6739"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/mission/test_takeoff_action.py",
+      "sha256": "da9657f8af3797256ada1aabf77956e27411ab2631236b9d8815b3724eb9868f"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/mission/test_target_lock_action.py",
+      "sha256": "5a3d626efbae56c6fc6bc45537a1cb9b99d778b7a75c5a5203f72379cdd3e7d4"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/mission/test_validate_action_missions_script.py",
+      "sha256": "f07cac179d20d516ac1d5aa1364ed4ad51d3f82ab63f11587ebbdff3f84f8c14"
+    },
+    {
+      "path": "legacy/cuadc_2026/tests/unit/mission/test_vehicle_plugin_composition.py",
+      "sha256": "065779bfac760eb12d9a8835296d67ff6f77d3995b163a4be3a1eccdee7cc747"
+    },
+    {
+      "path": "legacy/cuadc_2026/tools/fusion_debug.py",
+      "sha256": "33a365069a50277d1df8c312c913b55b0564ca09e4d099e441428d6ef9b0a311"
+    },
+    {
+      "path": "legacy/cuadc_2026/tools/telemetry_debug.py",
+      "sha256": "484df08456bf6d598ccff24cefae26c5f168f2ff0f5661a7bdb6af2d60668f5f"
+    },
+    {
+      "path": "legacy/cuadc_2026/vehicles/__init__.py",
+      "sha256": "2472d8f4ec8e09f3e6a8757f5867958e941456527ed7e898c80a3e29bf1c7fa5"
+    },
+    {
+      "path": "legacy/cuadc_2026/vehicles/multirotor/__init__.py",
+      "sha256": "6c1b1db7ddd455e7776eb5bc97a7cd38ed11e93f9fa079d7511c69ed02e0dd2e"
+    },
+    {
+      "path": "legacy/cuadc_2026/vehicles/multirotor/actions/__init__.py",
+      "sha256": "192a98956b07e31a376fac55f1aad57971ca861a1a71f307bab9d8319dc0001c"
+    },
+    {
+      "path": "legacy/cuadc_2026/vehicles/multirotor/actions/change_speed.py",
+      "sha256": "664029cad7b3c9140e7ee8dce7ba0e6c87df32298084a1f09393f324b4ee2da0"
+    },
+    {
+      "path": "legacy/cuadc_2026/vehicles/multirotor/actions/definitions.py",
+      "sha256": "4be5d9745ad57465b33010a0cafd36ec299842424eb28d82a97b24fe0a81ccbb"
+    },
+    {
+      "path": "legacy/cuadc_2026/vehicles/multirotor/actions/land.py",
+      "sha256": "288996301ccd580354a0b342e497aeab11256de7c1d2f1120e4ce4f2bb856606"
+    },
+    {
+      "path": "legacy/cuadc_2026/vehicles/multirotor/actions/takeoff.py",
+      "sha256": "eccc81f1d2543114768ea1e683eebece982ed92f4fe4b12817d4a995f7857c6b"
+    },
+    {
+      "path": "legacy/cuadc_2026/vehicles/multirotor/adapter/__init__.py",
+      "sha256": "ddb2157a46cf940e0e36b865408e422facbf6de6aef8b5833d5d22ff8f0c74f8"
+    },
+    {
+      "path": "legacy/cuadc_2026/vehicles/multirotor/adapter/mavlink.py",
+      "sha256": "e961e810a43b3a84a6d5d6e6d2944846d146311bacbb43ed1829fae4a33b875e"
+    },
+    {
+      "path": "legacy/cuadc_2026/vehicles/multirotor/capabilities.py",
+      "sha256": "b30249e2e20c442d8ec0d75505f75334d21278ed2766e1879d3af6f5293948ee"
+    },
+    {
+      "path": "legacy/cuadc_2026/vehicles/multirotor/commands/__init__.py",
+      "sha256": "8bfc536e6eb6822df9f8aef92aed46821a8a1e3195b57757c8017ccee8c20bf2"
+    },
+    {
+      "path": "legacy/cuadc_2026/vehicles/multirotor/commands/translator.py",
+      "sha256": "70a7721091e40e0d21944688a613a0c88d926633c7e693df4af1f6ea98de7c58"
+    },
+    {
+      "path": "legacy/cuadc_2026/vehicles/multirotor/plugin.py",
+      "sha256": "e233fec30e1ba4204d44dceb7d7c898bb0485601a4657152b5a826f6ca1fad61"
+    },
+    {
+      "path": "legacy/cuadc_2026/vehicles/multirotor/safety/__init__.py",
+      "sha256": "6c6d9dfcc9eb4436c0b80a534a8a623f317eca1c48fe1a3381ce671c22ef6bc7"
+    },
+    {
+      "path": "legacy/cuadc_2026/vehicles/multirotor/safety/policy.py",
+      "sha256": "1dd5c5a7ec44da460ba54e27add0f42b528c9d892bfb6f21fe6e4d1110aa5f61"
+    },
+    {
+      "path": "legacy/cuadc_2026/vehicles/multirotor/state/__init__.py",
+      "sha256": "7df232a393bc0336713bb4dced245122d54a017638bab3f96268e07107d59edc"
+    },
+    {
+      "path": "legacy/cuadc_2026/vehicles/multirotor/state/health.py",
+      "sha256": "c5903ef877a27edf2c59954d26e5fe198fbd50da20467d419afd0474f5cb1b8b"
+    },
+    {
+      "path": "legacy/cuadc_2026/vehicles/multirotor/state/mavlink_adapter.py",
+      "sha256": "a925b01df987a2f183c00377d1df980956f053a4f3a583ddda13b199bfdd752b"
+    },
+    {
+      "path": "legacy/cuadc_2026/vehicles/multirotor/state/mavlink_fields.py",
+      "sha256": "7e830de81df6851d001495bce456d1cb101138bb8c107d0e256bb59b7b45d339"
+    },
+    {
+      "path": "legacy/cuadc_2026/vehicles/rover/__init__.py",
+      "sha256": "bb88906691150a03c715c5c6edf603be4c85821d1a9520ece907c324f544299b"
+    },
+    {
+      "path": "legacy/cuadc_2026/vehicles/rover/actions.py",
+      "sha256": "8608c7197c4f50e5b5381966933ce8f83f99e35f6f0d87925766c0131119122e"
+    },
+    {
+      "path": "legacy/cuadc_2026/vehicles/rover/capabilities.py",
+      "sha256": "d6eda8476480566224ff761258dfa2914cc79dbc5dea910ff986d5a96a15807c"
+    },
+    {
+      "path": "legacy/cuadc_2026/vehicles/rover/fake_adapter.py",
+      "sha256": "4ac6a7cb17c7dc12d201f00bfe5e60b81659a995d81892db712492c97c3746b5"
+    },
+    {
+      "path": "legacy/cuadc_2026/vehicles/rover/plugin.py",
+      "sha256": "2ea772f220d309806d574a63f53fb36f50e4f09f77f57179ae31d3e079cd3941"
+    },
+    {
+      "path": "legacy/cuadc_2026/vehicles/rover/safety.py",
+      "sha256": "b33a1a3c758625329425db285c95b439a101db08b87da56b98f527146063a43c"
+    },
+    {
+      "path": "legacy/cuadc_2026/vehicles/rover/state.py",
+      "sha256": "14aaeebfe068f00fd5e86957ab9191d702214ff3b32edf598f583a13d29a5e58"
+    },
+    {
+      "path": "legacy/cuadc_2026/web_ui/__init__.py",
+      "sha256": "b6bab6fe72b9735b7890ce693b0ae27f3edcb7e46df78e636e0c77f4f3ca632b"
+    },
+    {
+      "path": "legacy/cuadc_2026/web_ui/api_routers.py",
+      "sha256": "e70da5fab6e544436529732ee8c70b4beba3710df71ef5a459b8607facc8852b"
+    },
+    {
+      "path": "legacy/cuadc_2026/web_ui/audit.py",
+      "sha256": "2f39df3cb23ff0c5028552a700ab8f7363f5bdc4fa826b057a02293b952d3941"
+    },
+    {
+      "path": "legacy/cuadc_2026/web_ui/config_store.py",
+      "sha256": "1f6abda825560c639a1482dd3f68bcb845f7ad9b43be4adf297953628824aef8"
+    },
+    {
+      "path": "legacy/cuadc_2026/web_ui/context.py",
+      "sha256": "8ecfc35150415fe3f9f49430f62bea7b8c01baa66552cb1c32d3d71ad3d4e877"
+    },
+    {
+      "path": "legacy/cuadc_2026/web_ui/dto.py",
+      "sha256": "3ed3a79051752d1a6ffd8a8f8aec82dfaeb5749e379f725df1a81b0c6006d7bc"
+    },
+    {
+      "path": "legacy/cuadc_2026/web_ui/routers/__init__.py",
+      "sha256": "e17e324ecd0124ba55a3786d10bca797e35256899d79fa5fcbeef8b0b98a77ca"
+    },
+    {
+      "path": "legacy/cuadc_2026/web_ui/routers/actions.py",
+      "sha256": "24dae5108e89e38edf795ab6b4a2167c1e674da3375b50b7eacdb6186f0db39d"
+    },
+    {
+      "path": "legacy/cuadc_2026/web_ui/routers/auth.py",
+      "sha256": "0cf70121d13e5d37c34fe2e46a5e0aa7abf8d8cadc9acb50a87cc76e2f6fc498"
+    },
+    {
+      "path": "legacy/cuadc_2026/web_ui/routers/config.py",
+      "sha256": "6b724dd7d96b1e77f931690e5d218e26500e41964cb70daaa22a12942960ef72"
+    },
+    {
+      "path": "legacy/cuadc_2026/web_ui/routers/control.py",
+      "sha256": "e8938c884cbf13a2a1ba13166b47aab9ac9f07cf2b3facc8a54af889b7bdc09e"
+    },
+    {
+      "path": "legacy/cuadc_2026/web_ui/routers/field.py",
+      "sha256": "663aaa1ab2b32919cf14200da4a08233a0f7f4ccb38428a39fe45625d340027c"
+    },
+    {
+      "path": "legacy/cuadc_2026/web_ui/routers/missions.py",
+      "sha256": "3c3698797540a09d8c9c444d9f81bcf91b53ea81fc900c4c117ed063dfdaa267"
+    },
+    {
+      "path": "legacy/cuadc_2026/web_ui/routers/services.py",
+      "sha256": "f12a591f00f70c778dc39eae9672c6ced0e8763bdda71bdd7e3c6e2fb4911b78"
+    },
+    {
+      "path": "legacy/cuadc_2026/web_ui/routers/status.py",
+      "sha256": "5c0bb53f218581ded8135feb7d41c5872c5f416af43f974a26e0078817ecd478"
+    },
+    {
+      "path": "legacy/cuadc_2026/web_ui/routers/vision.py",
+      "sha256": "41ad4fa66db6a187615a5e83fa3ae41d99797bc93fc1a76139a914a10a64a2f4"
+    },
+    {
+      "path": "legacy/cuadc_2026/web_ui/security.py",
+      "sha256": "9360d0403a06c55f535493533c5e985e0052e5d42193b59e7dc2f2d8d0cc0d0d"
+    },
+    {
+      "path": "legacy/cuadc_2026/web_ui/server.py",
+      "sha256": "aa05207ebd2c611be54af539c8f9f687d2115cac2bed633c27b2cd9d48bbc683"
+    },
+    {
+      "path": "legacy/cuadc_2026/web_ui/static/app.js",
+      "sha256": "a73352996c88d8aac6a8df5e24670f7b4cc8ccba422176a112495836df1797a3"
+    },
+    {
+      "path": "legacy/cuadc_2026/web_ui/static/index.html",
+      "sha256": "b5a013c9e4b5917d593dbdaf9eb2c94589eef03fec32080f306603a812647d9d"
+    },
+    {
+      "path": "legacy/cuadc_2026/web_ui/static/js/action_lab.js",
+      "sha256": "6b645957dea6ff24889bda8252b80081881e1286c78ee55d48a3d2b5832868fa"
+    },
+    {
+      "path": "legacy/cuadc_2026/web_ui/static/js/api_client.js",
+      "sha256": "0e44a70751a8ce2f26ad258bbd94d0ad97f880f103c0ee99b29adbfc5c098867"
+    },
+    {
+      "path": "legacy/cuadc_2026/web_ui/static/js/app_state.js",
+      "sha256": "b818646a1d5096b55bb6d7f0884e00d53ef0175a4ec3c9b68a0d5ba3eeda7920"
+    },
+    {
+      "path": "legacy/cuadc_2026/web_ui/static/js/control.js",
+      "sha256": "34979213e7af660f2b38c52378c4c3fd40c310b89a3284dd0e5d8af0903ef1a3"
+    },
+    {
+      "path": "legacy/cuadc_2026/web_ui/static/js/dom_utils.js",
+      "sha256": "a71fec4683531a0ffc7f55f1d79120d4971e4cdeb7ea3b88c84d967f4c1445bd"
+    },
+    {
+      "path": "legacy/cuadc_2026/web_ui/static/js/field/interaction.js",
+      "sha256": "5df62bcf9d1a483ba28047d58756b013872a22f1dcb3a523ad3ba4bfe76e8ef2"
+    },
+    {
+      "path": "legacy/cuadc_2026/web_ui/static/js/field/model.js",
+      "sha256": "c088f5b540a70ba2f5f63f75b1caeb7844fd2721f89b1f5a33a5b5bd52ff6bd8"
+    },
+    {
+      "path": "legacy/cuadc_2026/web_ui/static/js/field/render.js",
+      "sha256": "b40d6f1ee44716ba622e0276ec057e1ec32af13c74e965c86e3a9c181048080f"
+    },
+    {
+      "path": "legacy/cuadc_2026/web_ui/static/js/field_profile.js",
+      "sha256": "807ee60ca4ec2b1df8e5d8cf29f95c47c72c672979ee3852f4ae1693d674fbab"
+    },
+    {
+      "path": "legacy/cuadc_2026/web_ui/static/js/field_reference.js",
+      "sha256": "8cfa83fe3188dd0977b9a32fbe0fa794a98523d5d50f942cc17e02600b92bae4"
+    },
+    {
+      "path": "legacy/cuadc_2026/web_ui/static/js/format_utils.js",
+      "sha256": "b0d3db63a78ebce0003c4104c8d27e242d64a0571b84b93a2f6724e79a1fd2d2"
+    },
+    {
+      "path": "legacy/cuadc_2026/web_ui/static/js/mission.js",
+      "sha256": "626ff374e900ba7312ee41f64f0d6bcf8dc95c81972c5bf510807c9602942bf5"
+    },
+    {
+      "path": "legacy/cuadc_2026/web_ui/static/js/status.js",
+      "sha256": "9eec4e4d68c3c116fbad8d5f11ffd58935446f9de3c3dc38c5c99a7e4565278d"
+    },
+    {
+      "path": "legacy/cuadc_2026/web_ui/static/js/video_panel.js",
+      "sha256": "eebf180f9ac0e83fa26c6bcea28e287d1769057b40400410be57ab7234fee641"
+    },
+    {
+      "path": "legacy/cuadc_2026/web_ui/static/style.css",
+      "sha256": "1b89b7b99b7e1e0c775583e54ac534f20b631a484dd88611aa8eba9dd3cafaee"
+    },
+    {
+      "path": "legacy/cuadc_2026/web_ui/status_adapter.py",
+      "sha256": "256c3ae45255c6137e2eb11e914d470b392d6579c947e0d64963da3d94cd37ee"
+    },
+    {
+      "path": "legacy/cuadc_2026/web_ui/templates.py",
+      "sha256": "e401f1e9b9c5606e63777d45835a3a628ae7bb39db4fe468e0b18dae09b13ee6"
+    },
+    {
+      "path": "legacy/cuadc_2026/world_model/__init__.py",
+      "sha256": "c511040313e33589c59648ac147305e5209b82f1729cff90f8dfad219e40f4f3"
+    },
+    {
+      "path": "legacy/cuadc_2026/world_model/projection.py",
+      "sha256": "357628fdbf096533110091e51c79b5d13fee4b81e525f792162633a49239f990"
+    },
+    {
+      "path": "legacy/cuadc_2026/world_model/service.py",
+      "sha256": "73e6412a310cdecbed1cf7405345fe3cd3f390b1138d740bf37f2f20f7e8053a"
+    },
+    {
+      "path": "legacy/cuadc_2026/yolo_app/README.md",
+      "sha256": "3daa2bb678ce90d2b4fae339321f83c7f4d38fc0d1ee11375d9a3e8bed0a638a"
+    },
+    {
+      "path": "legacy/cuadc_2026/yolo_app/__init__.py",
+      "sha256": "26a6c3f6c7f113188926d0a7f3289d57c95dc77bb09876104f4d1231e4c34259"
+    },
+    {
+      "path": "legacy/cuadc_2026/yolo_app/annotator.py",
+      "sha256": "3a1b8c47100c7b8bcedf1cd311072346e0ff7100b8037fe3c0b1c0a7c49f9d4e"
+    },
+    {
+      "path": "legacy/cuadc_2026/yolo_app/attitude_history.py",
+      "sha256": "c167ad6b3ccc2630f2dfb94c8746d957064b861b4640df322f0f8623787e0a64"
+    },
+    {
+      "path": "legacy/cuadc_2026/yolo_app/attitude_receiver.py",
+      "sha256": "ec3ea7dc0b7618b8b20fa6ae2b67ca11ea661040551796e1caa643fc7249ddbb"
+    },
+    {
+      "path": "legacy/cuadc_2026/yolo_app/command_receiver.py",
+      "sha256": "15d8def05a2f7381a7ab595ed0c8df672e16ebe3021e378d7c71bb505618225e"
+    },
+    {
+      "path": "legacy/cuadc_2026/yolo_app/main.py",
+      "sha256": "341a87ae976315170dfcd9ed1aefeb4ca279e2bcdb61ee76dfaf55b64cca608d"
+    },
+    {
+      "path": "legacy/cuadc_2026/yolo_app/mjpeg_stream.py",
+      "sha256": "b0b34e8905dda4d2ee56f71fdc689fa80bf8810112fbb820ae355824dbecb3c0"
+    },
+    {
+      "path": "legacy/cuadc_2026/yolo_app/raw_frame_recorder.py",
+      "sha256": "366917f63a624ea0792b0dd347a085b7e2180969a4ddca017962163b7ecef110"
+    },
+    {
+      "path": "legacy/cuadc_2026/yolo_app/udp_publisher.py",
+      "sha256": "c90039c205eee51deb040c6d0f914ef7eced1af15bad3a023c271b336bb71523"
+    },
+    {
+      "path": "legacy/cuadc_2026/yolo_app/virtual_nadir.py",
+      "sha256": "6b41c49159f9a73e7ca4ac589bad2998a807d4c584e40de807024faaa7ea1a3c"
+    }
+  ],
+  "backup": "/home/level6/vehicle-autonomy-migration-backups/6df9fe9-legacy/legacy-complete.tar.gz",
+  "backup_sha256": "caf07cd225814a95a14c836075be6589831dc14c37d791bcfd3896c7794e3784",
+  "ignored_count_before_tests": 923,
+  "untracked_count": 0,
+  "local_data_preserved": [
+    {
+      "path": "legacy/cuadc_2026/runtime/eeprom.bin",
+      "size": 16384,
+      "sha256": "4fe7b59af6de3b665b67788cc2f99892ab827efae3a467342b3bb4e3bc8e5bfe"
+    }
+  ]
+}

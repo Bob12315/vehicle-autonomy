@@ -1,5 +1,10 @@
 # P0 baseline: legacy system and command writer audit
 
+> 历史记录：本文件中的 Legacy 路径及旧测试命令仅描述迁移前事件；归档已于
+> 2026-10-23 删除，不能作为当前运行入口。历史文件可从 `6df9fe9` Git 树查看；
+> 现行源码归属、命令与删除保护记录见 `docs/ARCHITECTURE_MIGRATION_REPORT.md`。
+
+
 Date: 2026-09-30 (workspace date, Asia/Ulaanbaatar)
 
 ## 1. Repository baseline

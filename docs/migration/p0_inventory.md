@@ -1,5 +1,10 @@
 # P0 inventory: foundation contract migration candidates
 
+> 历史记录：本文件中的 Legacy 路径及旧测试命令仅描述迁移前事件；归档已于
+> 2026-10-23 删除，不能作为当前运行入口。历史文件可从 `6df9fe9` Git 树查看；
+> 现行源码归属、命令与删除保护记录见 `docs/ARCHITECTURE_MIGRATION_REPORT.md`。
+
+
 Status: P0 scoped audit complete on 2026-09-30. This inventory records the archived implementation under `legacy/cuadc_2026/` against the frozen target in [foundation_contracts_v1.md](../foundation_contracts_v1.md). A decision describes migration suitability, not permission to copy code. No implementation was changed or migrated.
 
 ## 1. Scope

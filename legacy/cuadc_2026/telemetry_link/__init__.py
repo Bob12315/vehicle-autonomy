@@ -1,2 +1,0 @@
-"""MAVLink telemetry service package."""
-
