@@ -65,3 +65,15 @@ Legacy 删除后 `python -m unittest discover -s tests -v`：342 tests，0 failu
 布局使用源码资源，安装包使用其自身 `sys.prefix/share/vehicle-autonomy`。
 
 阶段提交：`78d86fb` 审计与保护，`3cb42d9` 七模块迁移。后续提交与物理回归结果待补充。
+
+## 安装与可选环境的实际验证
+
+- 普通 wheel 安装到 `.venv-wheel-check`，不安装 ROS/PyMAVLink；从 `/tmp` 执行
+  status 与 hardware --check PASS，41 个合同/Engine 子模块导入 PASS；Web 静态资源、
+  原生许可证、systemd 样例和可执行 ROS 包装脚本均存在，资源根确为安装 prefix 下的 share。
+- 迁移后的 `world.mapping.build_slam_boundary` 在本机隔离 Jazzy 构建 PASS；原生探针
+  原版本 dropped_endpoints=2、显式 overlay=0，保持原始上游版本/ABI/哈希门槛。
+- `world.sensors.lidar.rs16_scan --self-test` 在 Jazzy PASS：accepted=6、rejected=2；
+  仅合成 PointCloud2 软件链，不能当成真实雷达/PCAP 或 ARM64 实测。
+- 原先直接执行 preflight 时 tests 不在脚本 sys.path，现显式定位本仓库测试 harness；
+  `.venv-migration/bin/python scripts/preflight_simulation.py --isolated` PASS。

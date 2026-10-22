@@ -76,6 +76,8 @@ def main() -> int:
     if not args.phase0:
         required.update({"rover_world", "rover_model", "rover_telemetry_params"})
     if args.isolated:
+        # This source-only preflight imports the colocated test harness.
+        sys.path.insert(0, str(ROOT))
         from tests.simulation.launch import choose_instance
         checks["isolated_instance"] = choose_instance()
         required.difference_update({"tcp_5760_free", "tcp_5762_free", "udp_9002_free"})

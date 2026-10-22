@@ -23,7 +23,7 @@ The legacy tree is a substantial operational application, not just a library. It
 
 ## 2. Environment
 
-The active Python environment has, among many system packages, `pymavlink==2.4.49`, `numpy==2.5.2`, `opencv-python==5.0.0.93`, `PyYAML==6.0.3`, `pyserial==3.5`, and `requests==2.31.0`. The new root has no dependency manifest; the archived application has dependency profiles under [`legacy/cuadc_2026/requirements/`](../../legacy/cuadc_2026/requirements/README.md). `pytest` is absent from the active Python environment; an existing isolated pytest executable at `/home/level6/agent-bridge/.venv/bin/pytest` was used for legacy tests, with the legacy root and active environment site-packages on `PYTHONPATH`. The legacy app also reads YAML configuration and runtime files; the inspected test group used fakes and did not open a vehicle link.
+The active Python environment has, among many system packages, `pymavlink==2.4.49`, `numpy==2.5.2`, `opencv-python==5.0.0.93`, `PyYAML==6.0.3`, `pyserial==3.5`, and `requests==2.31.0`. The new root has no dependency manifest; the archived application has dependency profiles under `legacy/cuadc_2026/requirements/` (historical Git tree `6df9fe9`). `pytest` is absent from the active Python environment; an existing isolated pytest executable at `/home/level6/agent-bridge/.venv/bin/pytest` was used for legacy tests, with the legacy root and active environment site-packages on `PYTHONPATH`. The legacy app also reads YAML configuration and runtime files; the inspected test group used fakes and did not open a vehicle link.
 
 ## 3. Current main architecture facts
 
