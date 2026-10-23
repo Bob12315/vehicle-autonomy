@@ -27,3 +27,6 @@ dist/
 
 # V1.1 phase-one raw simulation evidence
 artifacts/phase1-control/
+
+# Independent Phase 1 remediation evidence
+artifacts/phase1-remediation/

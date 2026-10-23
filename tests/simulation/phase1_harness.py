@@ -26,13 +26,14 @@ def main():
     parser=argparse.ArgumentParser()
     parser.add_argument('--run-dir',type=Path)
     parser.add_argument('--allow-send',action='store_true')
+    parser.add_argument('--remediation',action='store_true')
     parser.add_argument('--unit-report',type=Path,help=argparse.SUPPRESS)
     args=parser.parse_args()
     if args.unit_report:
         return unit_suite(args.unit_report)
     if not args.allow_send:
         parser.error('--allow-send required; targets are exclusively newly owned loopback SITL fixtures')
-    path=(args.run_dir or ROOT/'artifacts/phase1-control'/('suite-'+datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')+'-'+uuid4().hex[:8])).resolve()
+    path=(args.run_dir or ROOT/('artifacts/phase1-remediation' if args.remediation else 'artifacts/phase1-control')/('suite-'+datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')+'-'+uuid4().hex[:8])).resolve()
     path.mkdir(parents=True,exist_ok=False)
     runner=StageRunner(path,total_timeout=5400)
     summary=dict(passed=False,run_id=path.name,started_at=stamp(),run_dir=str(path),
@@ -61,7 +62,7 @@ def main():
                 vehicle=dict(passed=False,stages={},groups={})
                 record['vehicles'][kind]=vehicle
                 specifications=(
-                    ('probe','tests.simulation.phase1_probe',['--kind',kind]),
+                    ('probe','tests.simulation.phase1_probe',['--kind',kind,*(['--review-remediation'] if args.remediation else [])]),
                     ('physical','tests.simulation.rover_protocol' if kind=='rover' else 'tests.simulation.copter_scenario',['--full']),
                     ('faults','tests.simulation.fault_scenario',['--kind',kind]),
                 )
@@ -78,6 +79,10 @@ def main():
                              and all(p.get('stopped') and p.get('exit_code') is not None for p in manifest['processes']))
                     passed=(status['passed'] and result.get('passed') is True and cleanup
                             and not any(key.endswith('_error') for key in result))
+                    if args.remediation and case=='probe':
+                        required_review={'old_ack_heartbeat_replay','normal_continuous_arm_disarm',
+                                         'lock_expiry','guard_expiry','valid_after_rejections','wire_order'}
+                        passed=passed and all(result.get('remediation',{}).get(key,{}).get('passed') is True for key in required_review)
                     vehicle['stages'][case]=dict(passed=passed,summary=str(stage_dir/'summary.json'),
                         manifest=str(stage_dir/'manifest.json'),log=status['log'],cleanup=cleanup)
                     print(f'[{name}] {"PASS" if passed else "FAIL"}',flush=True)
@@ -106,6 +111,8 @@ def main():
     finally:
         if runner.current is not None:
             runner.stop(runner.current)
+        if args.remediation:
+            summary['status']='READY FOR RE-AUDIT' if summary['passed'] else 'FAIL'
         summary['ended_at']=stamp()
         (path/'summary.json').write_text(json.dumps(summary,indent=2))
         print(json.dumps(summary,indent=2),flush=True)

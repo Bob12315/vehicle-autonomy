@@ -1,4 +1,6 @@
 """Motion admission, frame binding, live fences and observed stop semantics."""
+
+from tests.mavlink_fixture import pack
 from dataclasses import replace
 import hashlib
 import json
@@ -281,9 +283,9 @@ class SoleWriterTests(unittest.TestCase):
             transport_factory=lambda *a,**k:transport,clock=clock,motion_guard=lambda *args:fault[0])
         self.addCleanup(runtime.shutdown)
         sender=mavlink.MAVLink(None,srcSystem=1,srcComponent=1)
-        data=(sender.heartbeat_encode(mavlink.MAV_TYPE_GROUND_ROVER,3,128,15,4).pack(sender)
-              +sender.local_position_ned_encode(0,0,0,0,0,0,0).pack(sender)
-              +sender.attitude_encode(0,0,0,0,0,0,0).pack(sender))
+        data=(pack(sender.heartbeat_encode(mavlink.MAV_TYPE_GROUND_ROVER,3,128,15,4), sender)
+              +pack(sender.local_position_ned_encode(0,0,0,0,0,0,0), sender)
+              +pack(sender.attitude_encode(0,0,0,0,0,0,0), sender))
         runtime.connect();transport.incoming.append(data);clock.advance();runtime.cycle()
         runtime.begin_run(allow_send=True)
         effect=TwistTargetEffect("base_link",Twist3(Vector3(.1,0,0),Vector3(0,0,0)),"stream")

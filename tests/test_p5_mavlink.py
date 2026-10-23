@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+from tests.mavlink_fixture import pack, heartbeat_evidence
+
+
 import ast
 from datetime import datetime, timezone
 import os
@@ -75,10 +78,12 @@ class MemoryTransport:
     def __init__(self):
         self.incoming = []
         self.writes = []
+        self.attempts = []
         self.fail_write = False
         self.closed = False
 
     def write(self, data):
+        self.attempts.append(data)
         if self.fail_write:
             raise ConnectionError("uncertain write")
         self.writes.append(data)
@@ -113,17 +118,19 @@ class P5MavlinkTests(unittest.TestCase):
                 max_field_age_ns=1000, link_timeout_ns=50,
             ),
             captured_at=lambda message, received: received,
+            confirmation_time_qualified=True,
         )
         self.ids = iter(f"cmd-{n}" for n in range(100))
         self.execution = VehicleExecution(self.port, self.authority, policy(), lambda: next(self.ids))
 
     def heartbeat(self, *, armed=False, mode=4, sender=None, vehicle_type=TYPE_QUADROTOR):
         maker = sender or self.sender
-        return maker.heartbeat_encode(vehicle_type, 3, 128 if armed else 0, mode, 4).pack(maker)
+        self._fixture_boot = getattr(self, "_fixture_boot", 0) + 10
+        return heartbeat_evidence(maker, vehicle_type, mode, armed, self._fixture_boot)
 
     def ack(self, command, result=0, *, sender=None):
         maker = sender or self.sender
-        return maker.command_ack_encode(command, result).pack(maker)
+        return pack(maker.command_ack_encode(command, result), maker)
 
     def connect(self):
         self.transport.incoming.append(self.heartbeat())
@@ -131,6 +138,10 @@ class P5MavlinkTests(unittest.TestCase):
         self.authority.grant(ControlLease("lease", "run", "action", at(200)), at(100))
         self.authority.set_system_send(True)
         self.authority.set_action_send(True)
+
+    def write(self, ns):
+        self.now_ns = ns
+        return self.session.write_next(at(ns))
 
     def test_default_closed_and_protocol_bytes_only_after_writer(self):
         self.transport.incoming.append(self.heartbeat())
@@ -145,7 +156,7 @@ class P5MavlinkTests(unittest.TestCase):
         receipt = self.execution.dispatch(effect(2, ArmEffect()), world(), at(101)).receipt
         self.assertEqual(receipt.phase, CommandPhase.ACCEPTED)
         self.assertEqual(self.transport.writes, [])
-        self.assertEqual(self.session.write_next(at(102)).phase, CommandPhase.TRANSMITTED)
+        self.assertEqual(self.write(102).phase, CommandPhase.TRANSMITTED)
         decoded = MavlinkCodec(source_system=1, source_component=1, target_system=250, target_component=191).feed(self.transport.writes[0])
         self.assertEqual(decoded[0].get_type(), "COMMAND_LONG")
         self.assertEqual(decoded[0].command, mavlink.MAV_CMD_COMPONENT_ARM_DISARM)
@@ -164,15 +175,15 @@ class P5MavlinkTests(unittest.TestCase):
         self.connect()
         self.now_ns = 101
         receipt = self.execution.dispatch(effect(1, ArmEffect()), world(), at(101)).receipt
-        self.session.write_next(at(102))
+        self.write(102)
         wrong = self.sender.command_ack_encode(mavlink.MAV_CMD_COMPONENT_ARM_DISARM, 0,
                                                target_system=249, target_component=191)
-        self.transport.incoming.append(wrong.pack(self.sender))
+        self.transport.incoming.append(pack(wrong, self.sender))
         self.session.poll(at(103))
         self.assertEqual(self.port.status(receipt.command_id).phase, CommandPhase.TRANSMITTED)
         correct = self.sender.command_ack_encode(mavlink.MAV_CMD_COMPONENT_ARM_DISARM, 0,
                                                  target_system=250, target_component=191)
-        self.transport.incoming.append(correct.pack(self.sender))
+        self.transport.incoming.append(pack(correct, self.sender))
         self.session.poll(at(104))
         self.assertEqual(self.port.status(receipt.command_id).phase, CommandPhase.ACKNOWLEDGED)
 
@@ -180,11 +191,11 @@ class P5MavlinkTests(unittest.TestCase):
         self.connect()
         self.now_ns = 101
         first = self.execution.dispatch(effect(1, ModeEffect("GUIDED"), deadline=180), world(), at(101)).receipt
-        self.session.write_next(at(102))
+        self.write(102)
         self.now_ns = 103
         queued = self.execution.dispatch(effect(2, ModeEffect("GUIDED"), deadline=110), world(), at(103)).receipt
         self.assertEqual(self.port.status(first.command_id).phase, CommandPhase.TRANSMITTED)
-        self.assertEqual(self.session.write_next(at(111)).phase, CommandPhase.REJECTED)
+        self.assertEqual(self.write(111).phase, CommandPhase.REJECTED)
         self.assertEqual(self.port.reasons[queued.command_id], "expired")
         self.assertEqual(len(self.transport.writes), 1)
 
@@ -222,7 +233,7 @@ class P5MavlinkTests(unittest.TestCase):
         self.now_ns = 101
         pose = Pose3(Vector3(2, 3, 4), Quaternion(0, 0, 0, 1))
         self.execution.dispatch(effect(1, PoseTargetEffect("odom", pose, "pose")), world(), at(101))
-        self.session.write_next(at(102))
+        self.write(102)
         msg = MavlinkCodec(source_system=1, source_component=1, target_system=250, target_component=191).feed(self.transport.writes[-1])[0]
         self.assertEqual(msg.coordinate_frame, mavlink.MAV_FRAME_LOCAL_NED)
         self.assertEqual(msg.type_mask, 2552)
@@ -230,7 +241,7 @@ class P5MavlinkTests(unittest.TestCase):
         self.now_ns = 103
         twist = Twist3(Vector3(1, 1, 0.5), Vector3(0, 0, 0.2))
         self.execution.dispatch(effect(2, TwistTargetEffect("base_link", twist, "body")), world(), at(103))
-        self.session.write_next(at(104))
+        self.write(104)
         msg = MavlinkCodec(source_system=1, source_component=1, target_system=250, target_component=191).feed(self.transport.writes[-1])[0]
         self.assertEqual(msg.coordinate_frame, mavlink.MAV_FRAME_BODY_NED)
         self.assertEqual((msg.vx, msg.vy, msg.vz), (1, -1, -0.5))
@@ -263,18 +274,18 @@ class P5MavlinkTests(unittest.TestCase):
         self.now_ns = 101
         target = TwistTargetEffect("odom", Twist3(Vector3(1, 0, 0), Vector3(0, 0, 0)), "stream")
         motion = self.execution.dispatch(effect(1, target), world(), at(101)).receipt
-        self.session.write_next(at(102))
+        self.write(102)
         self.now_ns = 112
         stop = self.execution.tick(at(112))[0]
         self.assertEqual(stop.state, StopState.ACCEPTED)
         self.assertEqual(self.port.status(motion.command_id).phase, CommandPhase.CANCELLED)
-        self.assertEqual(self.session.write_next(at(113)).phase, CommandPhase.TRANSMITTED)
+        self.assertEqual(self.write(113).phase, CommandPhase.TRANSMITTED)
         msg = MavlinkCodec(source_system=1, source_component=1, target_system=250, target_component=191).feed(self.transport.writes[-1])[0]
         self.assertEqual((msg.vx, msg.vy, msg.vz, msg.yaw_rate), (0, 0, 0, 0))
         self.assertEqual(self.execution.stop_status("stream").state, StopState.TRANSMITTED)
-        sample = self.sender.local_position_ned_encode(0, 0, 0, 0, 0, 0, 0)
-        attitude = self.sender.attitude_encode(0, 0, 0, 0, 0, 0, 0)
-        self.transport.incoming.append(sample.pack(self.sender) + attitude.pack(self.sender))
+        sample = self.sender.local_position_ned_encode(114, 0, 0, 0, 0, 0, 0)
+        attitude = self.sender.attitude_encode(114, 0, 0, 0, 0, 0, 0)
+        self.transport.incoming.append(pack(sample, self.sender) + pack(attitude, self.sender))
         self.session.poll(at(114))
         self.assertEqual(self.execution.stop_status("stream").state, StopState.CONFIRMED)
 
@@ -300,7 +311,7 @@ class P5MavlinkTests(unittest.TestCase):
         self.now_ns = 101
         first = self.execution.dispatch(effect(1, ArmEffect()), world(), at(101)).receipt
         self.authority.revoke()
-        self.assertEqual(self.session.write_next(at(102)).phase, CommandPhase.REJECTED)
+        self.assertEqual(self.write(102).phase, CommandPhase.REJECTED)
         self.assertEqual(self.transport.writes, [])
         self.assertEqual(self.port.reasons[first.command_id], "lease_revoked")
         self.authority.grant(ControlLease("second", "run", "action", at(200)), at(103))
@@ -308,9 +319,9 @@ class P5MavlinkTests(unittest.TestCase):
         self.now_ns = 104
         second = self.execution.dispatch(effect(2, ArmEffect()), world(), at(104)).receipt
         self.transport.fail_write = True
-        self.assertEqual(self.session.write_next(at(105)).phase, CommandPhase.UNKNOWN)
+        self.assertEqual(self.write(105).phase, CommandPhase.UNKNOWN)
         self.assertIn("transport_write_uncertain", self.port.reasons[second.command_id])
-        self.assertIsNone(self.session.write_next(at(106)))
+        self.assertIsNone(self.write(106))
         self.session.tick(at(200))
         self.assertIsNone(self.authority.link_session_id)
         self.assertEqual(self.port.status(second.command_id).phase, CommandPhase.UNKNOWN)
@@ -319,12 +330,12 @@ class P5MavlinkTests(unittest.TestCase):
         self.connect()
         self.now_ns = 101
         first = self.execution.dispatch(effect(1, ArmEffect(), deadline=110), world(), at(101)).receipt
-        self.session.write_next(at(102))
+        self.write(102)
         self.assertEqual(self.session.tick(at(110))[0].phase, CommandPhase.UNKNOWN)
         self.now_ns = 111
         second = self.execution.dispatch(effect(2, ArmEffect()), world(), at(111)).receipt
         self.assertEqual(second.phase, CommandPhase.ACCEPTED)
-        self.assertIsNone(self.session.write_next(at(112)))
+        self.assertIsNone(self.write(112))
         self.transport.incoming.append(self.ack(mavlink.MAV_CMD_COMPONENT_ARM_DISARM))
         self.session.poll(at(113))
         self.assertEqual(self.port.status(first.command_id).phase, CommandPhase.UNKNOWN)

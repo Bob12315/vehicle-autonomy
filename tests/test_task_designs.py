@@ -1,4 +1,6 @@
 """Design admission, bounded sequencing and sole-writer lifecycle assertions."""
+
+from tests.mavlink_fixture import pack
 import json
 import threading
 import unittest
@@ -42,7 +44,7 @@ class DesignRuntimeTests(ApplicationRuntimeTests):
         return self.app.start_design_checked(document(*missions),catalog['context'],catalog['session_id'])
 
     def telemetry(self,ack=False):
-        self.app_cycle((self.sender.command_ack_encode(176,0).pack(self.sender) if ack else b'')
+        self.app_cycle((pack(self.sender.command_ack_encode(176,0), self.sender) if ack else b'')
                        +self.heartbeat(mode=4)+self.state_messages())
 
     def test_two_steps_distinct_ids_ack_boundary_and_release(self):

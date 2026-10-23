@@ -1,4 +1,6 @@
 """Mission identity, authorization and reconnection through the actual writer."""
+
+from tests.mavlink_fixture import pack
 from dataclasses import replace
 import unittest
 from vehicle_autonomy.contracts.core.primitives import SchemaVersion
@@ -60,7 +62,7 @@ class ApplicationRuntimeTests(SimulationRuntimeTests):
                 monotonic_ns=envelope.deadline.monotonic_ns + 1)))
         self.app_cycle()
         self.assertEqual(len(self.transports[-1].writes), 1)
-        self.app_cycle(self.sender.command_ack_encode(176, 0).pack(self.sender))
+        self.app_cycle(pack(self.sender.command_ack_encode(176, 0), self.sender))
         self.assertEqual(self.app.task_status()["status"], "RUNNING")
         self.app_cycle(self.heartbeat(mode=4))
         self.app_cycle()

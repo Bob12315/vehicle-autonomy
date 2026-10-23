@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+from tests.mavlink_fixture import pack, heartbeat_evidence
+
+
 from datetime import datetime, timezone
 from dataclasses import replace
 from pathlib import Path
@@ -64,11 +67,11 @@ class P6SitlRuntimeTests(unittest.TestCase):
         self.profile = SitlProfile.load(PROFILE)
 
     def heartbeat(self, *, mode=0, armed=False):
-        return self.sender.heartbeat_encode(TYPE_QUADROTOR, 3, 128 if armed else 0,
-                                             mode, 4).pack(self.sender)
+        self._fixture_boot = max(self.clock.ns // 1_000_000, getattr(self, "_fixture_boot", 0) + 10)
+        return heartbeat_evidence(self.sender, TYPE_QUADROTOR, mode, armed, self._fixture_boot)
 
     def ack(self):
-        return self.sender.command_ack_encode(CMD_SET_MODE, 0).pack(self.sender)
+        return pack(self.sender.command_ack_encode(CMD_SET_MODE, 0), self.sender)
 
     def make_runtime(self, allow_send=True):
         runtime = SitlRuntime(self.profile, allow_send=allow_send,

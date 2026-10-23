@@ -89,6 +89,8 @@ class SitlRuntime:
             now=self.clock,
             write_guard=self._write_guard,
         )
+        from vehicle_autonomy.vehicles.ardupilot.simulation_clock import SimulationSourceClock
+        source_clock = SimulationSourceClock()
         self._session = ArduPilotSession(
             transport=self._transport, codec=self._codec, authority=self.authority,
             commands=self._port, link_timeout_ns=profile.link_timeout_ns,
@@ -100,8 +102,9 @@ class SitlRuntime:
                 max_sample_skew_ns=500_000_000,
                 max_field_age_ns=profile.safety.max_snapshot_age_ns,
                 link_timeout_ns=profile.link_timeout_ns),
-            # Loopback simulation receive-time proxy, never a vehicle capture clock.
-            captured_at=lambda message, received: received,
+            # Explicit speed-one SITL source clock, not heartbeat receive time.
+            captured_at=source_clock.capture,
+            confirmation_time_qualified=True,
         )
         self._execution = VehicleExecution(self._port, self.authority,
                                            VehicleSafetyPolicy(profile.safety),
@@ -114,7 +117,7 @@ class SitlRuntime:
                    mission="arm_then_disarm" if arm_then_disarm else "mode_only",
                    host=profile.host, port=profile.port,
                    mode=profile.mode, clock_domain=profile.clock_domain_id,
-                   capture_time="loopback_receive_proxy", config_sha256=config_digest,
+                   capture_time="speed_one_sitl_source_mapping", config_sha256=config_digest,
                    sitl_version=sitl_version, version_source="operator" if sitl_version else "unreported")
 
     def _write_guard(self, command) -> str | None:

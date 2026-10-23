@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from dataclasses import replace
+from dataclasses import dataclass, replace
+import time
 
 from vehicle_autonomy.contracts.core.primitives import CommandId, IdempotencyKey, LinkSessionId
 from vehicle_autonomy.contracts.core.quality import QualityState
@@ -22,13 +23,24 @@ from vehicle_autonomy.vehicles.ardupilot.mavlink import constants as mavlink
 from vehicle_autonomy.vehicles.ardupilot.commands import ArduPilotCommandTranslator
 
 
+@dataclass(frozen=True, slots=True)
+class WriteGuardApproval:
+    """Bound the lifetime of the immutable facts examined by a guard."""
+    valid_until: TimePoint
+
+    def __post_init__(self):
+        if not isinstance(self.valid_until, TimePoint):
+            raise TypeError("guard approval requires a qualified expiry TimePoint")
+
+
 class ArduPilotCommandPort:
     """The only P5 transport writer. An external scheduler calls `write_next`."""
 
     def __init__(self, *, authority: ControlAuthority, transport: ByteTransport,
                  codec: MavlinkCodec, translator: ArduPilotCommandTranslator,
                  now: Callable[[], TimePoint], stop_speed_tolerance: float = 0.05,
-                 write_guard: Callable[[VehicleCommandEnvelope], str | None] | None = None) -> None:
+                 write_guard: Callable[[VehicleCommandEnvelope], str | WriteGuardApproval | None] | None = None,
+                 max_guard_duration_ns: int = 50_000_000) -> None:
         if not isinstance(authority, ControlAuthority) or not isinstance(codec, MavlinkCodec) or not isinstance(translator, ArduPilotCommandTranslator):
             raise TypeError("authority, codec and translator are required")
         if not callable(now) or not 0 <= stop_speed_tolerance < 1:
@@ -39,18 +51,28 @@ class ArduPilotCommandPort:
         self._translator = translator
         self._now = now
         self._stop_speed_tolerance = stop_speed_tolerance
+        if isinstance(max_guard_duration_ns, bool) or not isinstance(max_guard_duration_ns, int) or max_guard_duration_ns <= 0:
+            raise ValueError("positive synchronous guard budget required")
         self._write_guard = write_guard
+        self._max_guard_duration_ns = max_guard_duration_ns
         self._commands: dict[CommandId, VehicleCommandEnvelope] = {}
         self._statuses: dict[CommandId, CommandStatus] = {}
         self._keys: dict[IdempotencyKey, CommandId] = {}
         self._queue: list[CommandId] = []
-        self._encoded: dict[CommandId, bytes] = {}
+        self._instructions: dict[CommandId, CommandLong | LocalSetpoint] = {}
         self._ack_id: dict[CommandId, int] = {}
         self._inflight: dict[int, CommandId] = {}
+        self._state_pending: dict[int, CommandId] = {}
         self._ambiguous: set[int] = set()
         self._streams: dict[str, tuple[int, LinkSessionId, str]] = {}
         self.reasons: dict[CommandId, str] = {}
         self._write_uncertain = False
+        self._receive_ticket = -1
+        self._sent_ticket: dict[CommandId, int] = {}
+        self._transmitted_at: dict[CommandId, TimePoint] = {}
+        self._state_matches: dict[CommandId, int] = {}
+        self._last_match_boot: dict[CommandId, int] = {}
+        self.ack_evidence: dict[CommandId, dict] = {}
 
     def uses(self, *, authority: ControlAuthority, transport: ByteTransport, codec: MavlinkCodec) -> bool:
         return self._authority is authority and self._transport is transport and self._codec is codec
@@ -76,9 +98,6 @@ class ArduPilotCommandPort:
                             raise ValueError("stop stream has no current session/lease")
                         stop_frame = current[0]
                     instruction = self._translator.translate(command.command, stop_frame=stop_frame)
-                    if isinstance(instruction, LocalSetpoint):
-                        instruction = replace(instruction, time_boot_ms=(now.monotonic_ns // 1_000_000) & 0xFFFFFFFF)
-                    data = self._codec.encode(instruction)
                 except (TypeError, ValueError) as exc:
                     reason = str(exc)
             self._commands[command.command_id] = command
@@ -88,7 +107,7 @@ class ArduPilotCommandPort:
             if reason:
                 self.reasons[command.command_id] = reason
             else:
-                self._encoded[command.command_id] = data
+                self._instructions[command.command_id] = instruction
                 self._queue.append(command.command_id)
                 if isinstance(instruction, CommandLong):
                     self._ack_id[command.command_id] = instruction.command
@@ -114,7 +133,14 @@ class ArduPilotCommandPort:
         with self._authority.lock:
             return self._statuses.get(command_id)
 
-    def write_next(self, now: TimePoint) -> CommandStatus | None:
+    def write_next(self, now: TimePoint | None = None) -> CommandStatus | None:
+        """The caller's time is a scheduling hint, never the write fence.
+
+        Synchronous guards execute under the authority lock. An over-budget or
+        non-returning guard cannot send; no orphan background guard is spawned.
+        Transport.write must have its own bounded timeout (TCP/serial do).
+        A partial/late/failed transport call is UNKNOWN, never execution proof.
+        """
         with self._authority.lock:
             if self._write_uncertain:
                 return None
@@ -122,37 +148,89 @@ class ArduPilotCommandPort:
                 if self._statuses[command_id].phase is not CommandPhase.ACCEPTED:
                     self._queue.remove(command_id)
                     continue
-                ack_id = self._ack_id.get(command_id)
+                checked_at = self._now()  # after acquiring the lock
                 command = self._commands[command_id]
-                reason = self._authority.write_reason(command, now)
-                # An ACK fence must not keep an expired/revoked request queued
-                # forever. Reject it without ever opening the writer boundary.
-                if reason is None and ack_id is not None and (ack_id in self._inflight or ack_id in self._ambiguous):
+                ack_id = self._ack_id.get(command_id)
+                reason = self._authority.write_reason(command, checked_at)
+                state_pending = self._state_pending.get(ack_id)
+                waiting_state = state_pending is not None and self._statuses[state_pending].phase is CommandPhase.ACKNOWLEDGED
+                if reason is None and ack_id is not None and (ack_id in self._inflight or ack_id in self._ambiguous or waiting_state):
                     continue
                 self._queue.remove(command_id)
+                approval = None
                 if reason is None and self._write_guard is not None:
-                    reason = self._write_guard(command)
+                    wall_start = time.monotonic_ns()
+                    try:
+                        decision = self._write_guard(command)
+                        if isinstance(decision, WriteGuardApproval):
+                            approval = decision
+                        elif decision is not None:
+                            reason = decision if isinstance(decision, str) and decision else "invalid_write_guard_result"
+                    except Exception as exc:
+                        reason = f"write_guard_exception:{type(exc).__name__}"
+                    if time.monotonic_ns() - wall_start > self._max_guard_duration_ns:
+                        reason = "write_guard_timeout"
+                if reason is None:
+                    instruction = self._instructions[command_id]
+                    if isinstance(instruction, LocalSetpoint):
+                        instruction = replace(instruction, time_boot_ms=(self._now().monotonic_ns // 1_000_000) & 0xFFFFFFFF)
+                    try:
+                        # Prepare, without consuming a packet sequence. A rejected
+                        # or cancelled queue entry never allocates a wire number.
+                        data = self._codec.encode(instruction, advance_sequence=False)
+                    except Exception as exc:
+                        reason = f"encode_failed:{type(exc).__name__}"
+                final_at = self._now()  # after guard AND encoding, immediately before write
+                if reason is None:
+                    try:
+                        elapsed = final_at.elapsed_ns_since(checked_at)
+                        if elapsed < 0:
+                            reason = "write_clock_regressed"
+                        elif self._write_guard is not None and elapsed > self._max_guard_duration_ns:
+                            reason = "write_guard_timeout"
+                        elif approval is not None and final_at.elapsed_ns_since(approval.valid_until) > 0:
+                            reason = "write_guard_evidence_expired"
+                    except ValueError:
+                        reason = "write_clock_domain_changed"
+                if reason is None:
+                    reason = self._authority.write_reason(command, final_at)
+                observed_at = final_at
                 if reason is not None:
                     self.reasons[command_id] = reason
                     phase = CommandPhase.REJECTED
                 else:
                     try:
-                        # Fence and transport write stay under the same authority lock.
-                        self._transport.write(self._encoded[command_id])
+                        # No user callback between final fence and physical call;
+                        # the entire operation remains under the authority lock.
+                        self._codec.commit_sequence()
+                        self._transport.write(data)
                     except (OSError, ConnectionError) as exc:
                         self._write_uncertain = True
                         self.reasons[command_id] = f"transport_write_uncertain:{type(exc).__name__}"
                         phase = CommandPhase.UNKNOWN
                     else:
-                        phase = CommandPhase.TRANSMITTED
-                        if ack_id is not None:
-                            self._inflight[ack_id] = command_id
-                status = CommandStatus(command_id, phase, now)
+                        observed_at = self._now()
+                        reason = self._authority.write_reason(command, observed_at)
+                        if reason is not None:
+                            self._write_uncertain = True
+                            self.reasons[command_id] = "transport_returned_after_fence:" + reason
+                            phase = CommandPhase.UNKNOWN
+                        else:
+                            phase = CommandPhase.TRANSMITTED
+                            self._sent_ticket[command_id] = self._receive_ticket
+                            self._transmitted_at[command_id] = observed_at
+                            if ack_id is not None:
+                                self._inflight[ack_id] = command_id
+                status = CommandStatus(command_id, phase, observed_at)
                 self._statuses[command_id] = status
                 return status
             return None
 
-    def handle_ack(self, message: object, now: TimePoint) -> CommandStatus | None:
+    def observe_receive_ticket(self, ticket: int) -> None:
+        with self._authority.lock:
+            self._receive_ticket = ticket
+
+    def handle_ack(self, message: object, now: TimePoint, *, ticket: int | None = None) -> CommandStatus | None:
         if message.get_type() != "COMMAND_ACK":
             return None
         if (message.get_srcSystem(), message.get_srcComponent()) != (self._codec.target_system, self._codec.target_component):
@@ -170,7 +248,21 @@ class ArduPilotCommandPort:
             command = self._commands[command_id]
             if command.expected_link_session_id != self._authority.link_session_id:
                 return None
+            current_time = self._now()
+            try:
+                expired = current_time.elapsed_ns_since(command.deadline) >= 0
+            except ValueError:
+                expired = True
+            if expired:
+                self.expire_unknown(current_time)
+                return None
             current = self._statuses[command_id]
+            if ticket is None or ticket <= self._sent_ticket.get(command_id, -1):
+                return None
+            # ACK has no request UUID, particularly shared ARM/DISARM command 400.
+            # Record a candidate, never infer goal completion from ACK ordering.
+            self.ack_evidence[command_id] = {"packet_ticket": ticket,
+                "correlation": "unproven_mav_cmd_only", "command": command_number, "result": int(message.result)}
             if current.phase is not CommandPhase.TRANSMITTED:
                 del self._inflight[command_number]
                 return None
@@ -180,6 +272,8 @@ class ArduPilotCommandPort:
             del self._inflight[command_number]
             if result == mavlink.RESULT_ACCEPTED:
                 phase = CommandPhase.ACKNOWLEDGED
+                if isinstance(command.command, (ArmCommand, DisarmCommand, ModeCommand)):
+                    self._state_pending[command_number] = command_id
             else:
                 phase = CommandPhase.REJECTED
                 self.reasons[command_id] = f"mav_result_{result}"
@@ -208,13 +302,22 @@ class ArduPilotCommandPort:
                         and command.deadline.clock_domain_id == now.clock_domain_id
                         and command.deadline <= now):
                     self.reasons[command_id] = "state_confirmation_timeout_outcome_unknown"
+                    self._ambiguous.add(self._ack_id[command_id])
                     final = CommandStatus(command_id, CommandPhase.UNKNOWN, now)
                     self._statuses[command_id] = final
                     results.append(final)
         return tuple(results)
 
-    def observe_heartbeat(self, message: object, received_at: TimePoint) -> tuple[CommandStatus, ...]:
-        """A later heartbeat, rather than an ACK, confirms arm/mode state."""
+    def observe_heartbeat(self, message: object, received_at: TimePoint, *,
+                          ticket: int | None = None, before_capture: TimePoint | None = None,
+                          after_capture: TimePoint | None = None, before_boot: int | None = None,
+                          after_boot: int | None = None) -> tuple[CommandStatus, ...]:
+        """Two distinct target states, each bracketed by source-timed progress.
+
+        Session supplies strictly ordered receive tickets and trusted capture
+        evidence. Local receive time and an 8-bit header alone prove neither
+        state freshness nor ACK correlation. Insufficient evidence times out.
+        """
         if message.get_type() != "HEARTBEAT" or (
             message.get_srcSystem(), message.get_srcComponent()
         ) != (self._codec.target_system, self._codec.target_component):
@@ -224,20 +327,44 @@ class ArduPilotCommandPort:
             for command_id, status in tuple(self._statuses.items()):
                 if status.phase is not CommandPhase.ACKNOWLEDGED:
                     continue
-                if self._commands[command_id].expected_link_session_id != self._authority.link_session_id:
+                envelope = self._commands[command_id]
+                if envelope.expected_link_session_id != self._authority.link_session_id:
+                    continue
+                current_time = self._now()
+                try:
+                    expired = current_time.elapsed_ns_since(envelope.deadline) >= 0
+                except ValueError:
+                    expired = True
+                if expired:
+                    self.expire_unknown(current_time)
+                    continue
+                command = envelope.command
+                if not isinstance(command, (ArmCommand, DisarmCommand, ModeCommand)):
+                    continue
+                sent = self._sent_ticket.get(command_id)
+                written = self._transmitted_at.get(command_id)
+                if (ticket is None or sent is None or ticket <= sent or written is None
+                        or before_capture is None or after_capture is None or before_boot is None
+                        or after_boot is None or after_boot <= before_boot):
                     continue
                 try:
-                    if received_at.elapsed_ns_since(status.observed_at) <= 0:
-                        continue
+                    fresh = (before_capture.elapsed_ns_since(written) > 0
+                             and after_capture.elapsed_ns_since(before_capture) >= 0
+                             and received_at.elapsed_ns_since(status.observed_at) > 0)
                 except ValueError:
+                    fresh = False
+                if not fresh:
                     continue
-                command = self._commands[command_id].command
                 observed = (
                     isinstance(command, ArmCommand) and bool(message.base_mode & 128)
                     or isinstance(command, DisarmCommand) and not bool(message.base_mode & 128)
                     or isinstance(command, ModeCommand) and message.custom_mode == self._translator.mode_id(command.native_mode)
                 )
-                if observed:
+                if before_boot <= self._last_match_boot.get(command_id, -1):
+                    continue
+                self._last_match_boot[command_id] = before_boot
+                self._state_matches[command_id] = self._state_matches.get(command_id, 0) + 1 if observed else 0
+                if self._state_matches[command_id] >= 2:
                     final = CommandStatus(command_id, CommandPhase.COMPLETED, received_at)
                     self._statuses[command_id] = final
                     completed.append(final)
@@ -282,6 +409,12 @@ class ArduPilotCommandPort:
                     self.reasons[command_id] = "link_session_lost_outcome_unknown"
             self._queue.clear()
             self._inflight.clear()
+            self._state_pending.clear()
             self._ambiguous.clear()
             self._streams.clear()
+            self._receive_ticket = -1
+            self._state_matches.clear()
+            self._last_match_boot.clear()
+            self._sent_ticket.clear()
+            self._transmitted_at.clear()
             self._write_uncertain = False

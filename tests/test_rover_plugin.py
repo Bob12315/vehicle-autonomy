@@ -1,5 +1,7 @@
 """Rover protocol and common-runtime safety checks."""
 
+from tests.mavlink_fixture import pack, heartbeat_evidence
+
 from pathlib import Path
 import unittest
 
@@ -50,7 +52,7 @@ class RoverPluginTests(unittest.TestCase):
             transport_factory=lambda *a, **kw: transport, clock=clock)
         sender = mavlink.MAVLink(None, srcSystem=1, srcComponent=1)
         runtime.connect()
-        transport.incoming.append(sender.heartbeat_encode(mavlink.MAV_TYPE_GROUND_ROVER, 3, 0, 4, 4).pack(sender))
+        transport.incoming.append(heartbeat_evidence(sender, mavlink.MAV_TYPE_GROUND_ROVER, 4, False, 10))
         clock.advance()
         runtime.cycle()
         self.assertIsNotNone(runtime.session_id)
@@ -66,9 +68,9 @@ class RoverPluginTests(unittest.TestCase):
         runtime = SimulationRuntime(self.profile, translator=self.translator,
             transport_factory=lambda *a, **kw: transport, clock=clock)
         sender = mavlink.MAVLink(None, srcSystem=1, srcComponent=1)
-        heartbeat = sender.heartbeat_encode(mavlink.MAV_TYPE_GROUND_ROVER, 3, 128, 15, 4).pack(sender)
-        state = (sender.local_position_ned_encode(0, 0, 0, 0, 0, 0, 0).pack(sender)
-                 + sender.attitude_encode(0, 0, 0, 0, 0, 0, 0).pack(sender))
+        heartbeat = pack(sender.heartbeat_encode(mavlink.MAV_TYPE_GROUND_ROVER, 3, 128, 15, 4), sender)
+        state = (pack(sender.local_position_ned_encode(0, 0, 0, 0, 0, 0, 0), sender)
+                 + pack(sender.attitude_encode(0, 0, 0, 0, 0, 0, 0), sender))
         runtime.connect()
         transport.incoming.append(heartbeat + state)
         clock.advance()
@@ -108,11 +110,11 @@ class RoverPluginTests(unittest.TestCase):
             self.assertIsNotNone(message)
             receiver.ingest(message, captured_at=clock(), received_at=clock())
 
-        feed(sender.gps_global_origin_encode(-353632600, 1491652000, 584000).pack(sender))
-        feed(sender.global_position_int_encode(0, -353632510, 1491652110, 584000,
-                                               0, 100, 50, 0, 0).pack(sender))
-        feed(sender.attitude_encode(0, 0, 0, 0, 0, 0, 0).pack(sender))
-        feed(sender.heartbeat_encode(mavlink.MAV_TYPE_GROUND_ROVER, 3, 0, 15, 4).pack(sender))
+        feed(pack(sender.gps_global_origin_encode(-353632600, 1491652000, 584000), sender))
+        feed(pack(sender.global_position_int_encode(0, -353632510, 1491652110, 584000,
+                                               0, 100, 50, 0, 0), sender))
+        feed(pack(sender.attitude_encode(0, 0, 0, 0, 0, 0, 0), sender))
+        feed(pack(sender.heartbeat_encode(mavlink.MAV_TYPE_GROUND_ROVER, 3, 0, 15, 4), sender))
         state = receiver.publish(clock())
         self.assertIsNotNone(state.reported_pose)
         self.assertAlmostEqual(state.reported_pose.value.position.x, 1.0, delta=.2)

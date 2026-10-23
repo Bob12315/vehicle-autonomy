@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+from tests.mavlink_fixture import pack, heartbeat_evidence
+
+
 from pathlib import Path
 from types import SimpleNamespace
 import unittest
@@ -28,11 +31,11 @@ class SitlArmMissionTests(unittest.TestCase):
         self.profile = SitlProfile.load(ARM_PROFILE)
 
     def heartbeat(self, *, mode=0, armed=False):
-        return self.sender.heartbeat_encode(TYPE_QUADROTOR, 3, 128 if armed else 0,
-                                             mode, 4).pack(self.sender)
+        self._fixture_boot = max(self.clock.ns // 1_000_000, getattr(self, "_fixture_boot", 0) + 10)
+        return heartbeat_evidence(self.sender, TYPE_QUADROTOR, mode, armed, self._fixture_boot)
 
     def ack(self):
-        return self.sender.command_ack_encode(CMD_SET_MODE, 0).pack(self.sender)
+        return pack(self.sender.command_ack_encode(CMD_SET_MODE, 0), self.sender)
 
     def make_runtime(self):
         runtime = SitlRuntime(self.profile, allow_send=True, allow_arm=True,
@@ -85,12 +88,12 @@ class SitlArmMissionTests(unittest.TestCase):
         self.assertEqual(runtime.get_status()["step_id"], "arm")
         self.assertEqual(runtime.authority.lease.action_instance_id,
                          f"{runtime.get_status()['run_id']}:arm:1")
-        self.transport.incoming.append(self.sender.command_ack_encode(CMD_ARM_DISARM, 0).pack(self.sender))
+        self.transport.incoming.append(pack(self.sender.command_ack_encode(CMD_ARM_DISARM, 0), self.sender))
         self.cycle(runtime, heartbeat=False)
         self.assertEqual(runtime.get_status()["step_id"], "arm")
         self.advance_until_writes(runtime, 3, armed=True)
         self.assertEqual(runtime.get_status()["step_id"], "disarm")
-        self.transport.incoming.append(self.sender.command_ack_encode(CMD_ARM_DISARM, 0).pack(self.sender))
+        self.transport.incoming.append(pack(self.sender.command_ack_encode(CMD_ARM_DISARM, 0), self.sender))
         self.cycle(runtime, heartbeat=False)
         for _ in range(10):
             status = self.cycle(runtime, armed=False)
@@ -109,7 +112,7 @@ class SitlArmMissionTests(unittest.TestCase):
         self.transport.incoming.append(self.ack())
         self.cycle(runtime, mode=0, heartbeat=False)
         self.advance_until_writes(runtime, 2)
-        self.transport.incoming.append(self.sender.command_ack_encode(CMD_ARM_DISARM, 4).pack(self.sender))
+        self.transport.incoming.append(pack(self.sender.command_ack_encode(CMD_ARM_DISARM, 4), self.sender))
         self.cycle(runtime, heartbeat=False)
         for _ in range(4):
             status = self.cycle(runtime, armed=False)
@@ -126,7 +129,7 @@ class SitlArmMissionTests(unittest.TestCase):
         self.transport.incoming.append(self.ack())
         self.cycle(runtime, mode=0, heartbeat=False)
         self.advance_until_writes(runtime, 2)
-        self.transport.incoming.append(self.sender.command_ack_encode(CMD_ARM_DISARM, 0).pack(self.sender))
+        self.transport.incoming.append(pack(self.sender.command_ack_encode(CMD_ARM_DISARM, 0), self.sender))
         self.cycle(runtime, heartbeat=False)
         for _ in range(5):
             status = self.cycle(runtime, armed=True)
@@ -145,7 +148,7 @@ class SitlArmMissionTests(unittest.TestCase):
             original_write(data)
             cleanup_written = True
             self.transport.incoming.append(
-                self.sender.command_ack_encode(CMD_ARM_DISARM, 0).pack(self.sender))
+                pack(self.sender.command_ack_encode(CMD_ARM_DISARM, 0), self.sender))
 
         def read(max_bytes=4096):
             nonlocal ack_read
@@ -169,7 +172,7 @@ class SitlArmMissionTests(unittest.TestCase):
         self.transport.incoming.append(self.ack())
         self.cycle(runtime, mode=0, heartbeat=False)
         self.advance_until_writes(runtime, 2)
-        self.transport.incoming.append(self.sender.command_ack_encode(CMD_ARM_DISARM, 0).pack(self.sender))
+        self.transport.incoming.append(pack(self.sender.command_ack_encode(CMD_ARM_DISARM, 0), self.sender))
         self.cycle(runtime, heartbeat=False)
         self.cycle(runtime, armed=True)
         self.transport.disconnect = True

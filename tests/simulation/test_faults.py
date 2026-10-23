@@ -1,5 +1,7 @@
 """Deterministic fault matrix at the real configs/codec/writer boundary."""
 
+from tests.mavlink_fixture import pack
+
 from dataclasses import replace
 from datetime import datetime, timezone
 from pathlib import Path
@@ -83,20 +85,20 @@ class Rig:
 
     def heartbeat(self, *, mode=None, armed=True, vehicle_type=None):
         mode = self.profile.mode_ids["GUIDED"] if mode is None else mode
-        return self.sender.heartbeat_encode(vehicle_type or self.profile.mav_type, 3,
-                                            128 if armed else 0, mode, 4).pack(self.sender)
+        return pack(self.sender.heartbeat_encode(vehicle_type or self.profile.mav_type, 3,
+                                            128 if armed else 0, mode, 4), self.sender)
 
     def position(self, *, origin=False, speed=0.0):
         data = b""
         boot_ms = self.clock.ns // 1_000_000
         if self.kind == "rover":
             if origin:
-                data += self.sender.gps_global_origin_encode(-353632620, 1491652370, 584000).pack(self.sender)
-            data += self.sender.global_position_int_encode(boot_ms, -353632620, 1491652370,
-                584000, 0, 0, int(speed * 100), 0, 0).pack(self.sender)
+                data += pack(self.sender.gps_global_origin_encode(-353632620, 1491652370, 584000), self.sender)
+            data += pack(self.sender.global_position_int_encode(boot_ms, -353632620, 1491652370,
+                584000, 0, 0, int(speed * 100), 0, 0), self.sender)
         else:
-            data += self.sender.local_position_ned_encode(boot_ms, 0, 0, 0, 0, speed, 0).pack(self.sender)
-        return data + self.sender.attitude_encode(boot_ms, 0, 0, 0, 0, 0, 0).pack(self.sender)
+            data += pack(self.sender.local_position_ned_encode(boot_ms, 0, 0, 0, 0, speed, 0), self.sender)
+        return data + pack(self.sender.attitude_encode(boot_ms, 0, 0, 0, 0, 0, 0), self.sender)
 
     def step(self, data=None, *, advance=100_000_000):
         self.clock.ns += advance
@@ -257,7 +259,7 @@ class DualVehicleFaultTests(unittest.TestCase):
                 target = "HOLD" if rig.kind == "rover" else "LOITER"
                 rig.runtime.submit_effect(ModeEffect(target), effect_id="mode")
                 rig.fresh()
-                ack = rig.sender.command_ack_encode(mav.MAV_CMD_DO_SET_MODE, 0).pack(rig.sender)
+                ack = pack(rig.sender.command_ack_encode(mav.MAV_CMD_DO_SET_MODE, 0), rig.sender)
                 rig.step(ack + rig.heartbeat() + rig.position())
                 self.assertEqual(rig.runtime.effect_status("mode")["phase"], "ACKNOWLEDGED")
                 for _ in range(51):

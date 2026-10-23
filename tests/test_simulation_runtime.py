@@ -1,5 +1,7 @@
 """Common simulation loop: authority, telemetry, writer and session epochs."""
 
+from tests.mavlink_fixture import pack, heartbeat_evidence
+
 from datetime import datetime, timezone
 from pathlib import Path
 import unittest
@@ -90,13 +92,13 @@ class SimulationRuntimeTests(unittest.TestCase):
         return transport
 
     def heartbeat(self, mode=0, armed=False):
-        return self.sender.heartbeat_encode(mavlink.MAV_TYPE_QUADROTOR, 3,
-                                            128 if armed else 0, mode, 4).pack(self.sender)
+        self._fixture_boot = max(self.clock.ns // 1_000_000, getattr(self, "_fixture_boot", 0) + 10)
+        return heartbeat_evidence(self.sender, self.runtime.profile.mav_type, mode, armed, self._fixture_boot)
 
     def state_messages(self):
-        boot_ms = self.clock.ns // 1_000_000
-        return (self.sender.local_position_ned_encode(boot_ms, 0, 0, 0, 0, 0, 0).pack(self.sender)
-                + self.sender.attitude_encode(boot_ms, 0, 0, 0, 0, 0, 0).pack(self.sender))
+        boot_ms = max(self.clock.ns // 1_000_000, getattr(self, "_fixture_boot", 0) + 3)
+        return (pack(self.sender.local_position_ned_encode(boot_ms, 0, 0, 0, 0, 0, 0), self.sender)
+                + pack(self.sender.attitude_encode(boot_ms, 0, 0, 0, 0, 0, 0), self.sender))
 
     def cycle(self, data=None):
         self.clock.advance()
@@ -121,7 +123,7 @@ class SimulationRuntimeTests(unittest.TestCase):
         self.cycle()
         self.assertEqual(len(self.transports[0].writes), 1)
         self.assertEqual(self.runtime.effect_status("mode")["phase"], "TRANSMITTED")
-        self.cycle(self.sender.command_ack_encode(mavlink.MAV_CMD_DO_SET_MODE, 0).pack(self.sender))
+        self.cycle(pack(self.sender.command_ack_encode(mavlink.MAV_CMD_DO_SET_MODE, 0), self.sender))
         self.assertEqual(self.runtime.effect_status("mode")["phase"], "ACKNOWLEDGED")
         self.cycle(self.heartbeat(mode=4))
         self.assertEqual(self.runtime.effect_status("mode")["phase"], "COMPLETED")

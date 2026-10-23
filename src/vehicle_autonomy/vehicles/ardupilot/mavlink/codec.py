@@ -47,7 +47,7 @@ class MavlinkCodec:
         self._sender = mavlink.MAVLink(None, srcSystem=source_system, srcComponent=source_component)
         self._receiver = mavlink.MAVLink(None)
 
-    def encode(self, instruction: Instruction) -> bytes:
+    def encode(self, instruction: Instruction, *, advance_sequence: bool = True) -> bytes:
         if isinstance(instruction, CommandLong):
             message = self._sender.command_long_encode(
                 self.target_system, self.target_component, instruction.command, 0,
@@ -62,7 +62,14 @@ class MavlinkCodec:
             )
         else:
             raise TypeError("unsupported MAVLink instruction")
-        return message.pack(self._sender)
+        data = message.pack(self._sender)
+        if advance_sequence:
+            self.commit_sequence()
+        return data
+
+    def commit_sequence(self) -> None:
+        """Consume one wire attempt; not a command identity or receipt."""
+        self._sender.seq = (self._sender.seq + 1) & 0xFF
 
     def feed(self, data: bytes) -> tuple[object, ...]:
         if not isinstance(data, bytes):

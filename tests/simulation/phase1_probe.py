@@ -45,7 +45,7 @@ def socket_ids():
     return result
 
 
-def run(run_dir, kind):
+def run(run_dir, kind, *, review_remediation=False):
     run_dir.mkdir(parents=True, exist_ok=False)
     owned = OwnedSimulation(run_dir, kind)
     runtime = proxy = None
@@ -210,6 +210,9 @@ def run(run_dir, kind):
             evidence='actual transport.write attempts plus loopback proxy raw TX; stale world and queued identity explicitly injected')
 
         runtime.end_run()
+        if review_remediation:
+            from tests.simulation.remediation_cases import run as review_cases
+            summary["remediation"] = review_cases(runtime, proxy, pump, writes)
 
         # Duplicated real AP packets retain their original capture AND receive age.
         proxy.inject(duplicate_rx={'ATTITUDE'})
@@ -313,11 +316,12 @@ def main():
     parser.add_argument('--kind',choices=('copter','rover'),required=True)
     parser.add_argument('--run-dir',type=Path,required=True)
     parser.add_argument('--allow-send',action='store_true')
+    parser.add_argument('--review-remediation',action='store_true')
     args=parser.parse_args()
     if not args.allow_send:
         parser.error('explicit --allow-send required for the owned localhost fixture')
     install_signal_cleanup()
-    result=run(args.run_dir.resolve(),args.kind)
+    result=run(args.run_dir.resolve(),args.kind,review_remediation=args.review_remediation)
     print(json.dumps(result))
     return 0 if result['passed'] else 1
 

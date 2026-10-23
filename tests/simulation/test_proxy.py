@@ -1,4 +1,6 @@
 """Transparent frame forwarding and connection-scoped fault controls."""
+
+from tests.mavlink_fixture import pack
 from pathlib import Path
 import socket
 import tempfile
@@ -19,10 +21,10 @@ class ProxyTests(unittest.TestCase):
 
     def test_forward_filter_delay_and_discard_old_epoch_bytes(self):
         sender = mav.MAVLink(None, srcSystem=1, srcComponent=1)
-        hb = sender.heartbeat_encode(2, 3, 0, 4, 4).pack(sender)
-        pose = sender.attitude_encode(1000, 0, 0, 0, 0, 0, 0).pack(sender)
-        ack_mode = sender.command_ack_encode(176, 0).pack(sender)
-        ack_arm = sender.command_ack_encode(400, 0).pack(sender)
+        hb = pack(sender.heartbeat_encode(2, 3, 0, 4, 4), sender)
+        pose = pack(sender.attitude_encode(1000, 0, 0, 0, 0, 0, 0), sender)
+        ack_mode = pack(sender.command_ack_encode(176, 0), sender)
+        ack_arm = pack(sender.command_ack_encode(400, 0), sender)
         with tempfile.TemporaryDirectory() as directory, socket.socket() as server:
             server.bind(('127.0.0.1', 0))
             server.listen(2)
@@ -65,3 +67,42 @@ class ProxyTests(unittest.TestCase):
                 for connection in (client, upstream, second, new_upstream):
                     if connection is not None:
                         connection.close()
+
+
+    def test_repeat_pose_received_forwarded_and_replayed_metadata_are_exact(self):
+        sender=mav.MAVLink(None,srcSystem=1,srcComponent=1)
+        first=pack(sender.attitude_encode(1000,0,0,0,0,0,0),sender)
+        second=pack(sender.attitude_encode(1100,.2,0,0,0,0,0),sender)
+        import time
+        with tempfile.TemporaryDirectory() as directory, socket.socket() as server:
+            server.bind(('127.0.0.1',0));server.listen(1);server.settimeout(2)
+            proxy=TcpFaultProxy(server.getsockname()[1],Path(directory)/'proxy.jsonl',capture_payload=True)
+            client=upstream=None
+            try:
+                client=socket.create_connection(('127.0.0.1',proxy.port),timeout=2)
+                upstream,_=server.accept();upstream.settimeout(2)
+                proxy.inject(repeat_pose=True)
+                upstream.sendall(first);self.assertEqual(self.receive(client,len(first)),first)
+                upstream.sendall(second);self.assertEqual(self.receive(client,len(first)),first)
+                time.sleep(.03)
+                rx=[r for r in proxy.records if r.get('direction')=='rx']
+                self.assertEqual(len(rx),2)
+                # This assertion reproduces the old raw_hex/payload mismatch.
+                for record in rx:
+                    parsed=mav.MAVLink(None).parse_buffer(bytes.fromhex(record['raw_hex']))[0]
+                    self.assertEqual(record['payload'],parsed.to_dict())
+                    self.assertEqual(record['sequence'],parsed.get_seq())
+                self.assertEqual(rx[1]['raw_hex'],second.hex())
+                forwarded=[r for r in proxy.records if r.get('direction')=='rx_forward']
+                self.assertEqual([r['raw_hex'] for r in forwarded],[first.hex(),first.hex()])
+                self.assertEqual(forwarded[-1]['cause'],'repeat_pose')
+                proxy.replay_rx(second)
+                self.assertEqual(self.receive(client,len(second)),second)
+                time.sleep(.03)
+                replay=[r for r in proxy.records if r.get('cause')=='explicit_replay'][-1]
+                self.assertEqual(replay['payload']['time_boot_ms'],1100)
+                self.assertEqual(replay['raw_hex'],second.hex())
+            finally:
+                proxy.close()
+                for connection in (client,upstream):
+                    if connection is not None:connection.close()

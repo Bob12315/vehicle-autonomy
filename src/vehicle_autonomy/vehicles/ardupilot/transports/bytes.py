@@ -9,6 +9,11 @@ import serial
 
 
 class ByteTransport(Protocol):
+    """write is bounded by an implementation timeout; return is not execution proof.
+
+    A timeout/error may follow a partial write. The caller must report UNKNOWN
+    and fence further writes, rather than retrying an uncertain command.
+    """
     def write(self, data: bytes) -> None: ...
     def read(self, max_bytes: int = 4096) -> bytes | None: ...
     def close(self) -> None: ...
@@ -19,6 +24,8 @@ class TcpByteTransport:
 
     def __init__(self, connection: socket.socket) -> None:
         self._connection = connection
+        if connection.gettimeout() is None:
+            connection.settimeout(1.0)  # explicitly injected blocking sockets remain bounded
         self._closed = False
 
     @classmethod

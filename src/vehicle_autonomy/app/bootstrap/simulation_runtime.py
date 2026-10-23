@@ -25,7 +25,7 @@ from vehicle_autonomy.vehicles.ardupilot.mavlink.codec import MavlinkCodec
 from vehicle_autonomy.world.localization.online import OnlineLocalization
 from vehicle_autonomy.app.bootstrap.simulation_profile import SimulationProfile
 from vehicle_autonomy.vehicles.ardupilot.commands import ArduPilotCommandTranslator
-from vehicle_autonomy.vehicles.ardupilot.command_port import ArduPilotCommandPort
+from vehicle_autonomy.vehicles.ardupilot.command_port import ArduPilotCommandPort, WriteGuardApproval
 from vehicle_autonomy.vehicles.ardupilot.telemetry_state import ArduPilotTelemetryState
 from vehicle_autonomy.vehicles.ardupilot.session import ArduPilotSession
 from vehicle_autonomy.vehicles.rover.mavlink_state import RoverTelemetryState
@@ -179,6 +179,7 @@ class SimulationRuntime:
                 max_field_age_ns=self.profile.safety.max_snapshot_age_ns,
                 link_timeout_ns=self.profile.link_timeout_ns),
             captured_at=lambda message, received: self._capture(capture_clock, message, received),
+            confirmation_time_qualified=True,
         )
         self._transport, self._port, self._session = transport, port, session
         safety_class = RoverSimulationSafetyPolicy if self.profile.kind == "rover" else SimulationSafetyPolicy
@@ -219,8 +220,10 @@ class SimulationRuntime:
                 return "vehicle_state_stale"
         except ValueError:
             return "vehicle_clock_domain_mismatch"
+        evidence_deadlines = [_later(heartbeat, self.profile.link_timeout_ns),
+                              _later(state.published_at, self.profile.safety.max_snapshot_age_ns)]
         if isinstance(command.command, StopMotionCommand):
-            return None  # A connected stop remains possible if localization is stale.
+            return WriteGuardApproval(min(evidence_deadlines))  # Localization is not required for Stop.
         if isinstance(command.command, (PoseTargetCommand, TwistTargetCommand, TakeoffCommand)):
             if state.reported_pose is None or state.reported_twist is None:
                 return "motion_state_unavailable"
@@ -230,13 +233,16 @@ class SimulationRuntime:
                         return "motion_state_stale"
                 except ValueError:
                     return "motion_clock_domain_mismatch"
+                evidence_deadlines.append(_later(sample.captured_at, self.profile.safety.max_snapshot_age_ns))
             if not state.operation.armed:
                 return "motion_requires_armed"
             if state.operation.native_mode != f"ARDUPILOT_CUSTOM_{self.profile.mode_ids['GUIDED']}":
                 return "motion_requires_guided_mode"
             if self.motion_guard is not None:
-                return self.motion_guard(command, state, now)
-        return None
+                reason = self.motion_guard(command, state, now)
+                if reason is not None:
+                    return reason
+        return WriteGuardApproval(min(evidence_deadlines))
 
     def _close_link(self, reason: str) -> None:
         self._fault = reason
@@ -268,6 +274,13 @@ class SimulationRuntime:
                 continue
             value = {"phase": status.phase.value, "command_id": str(command_id),
                      "reason": self._port.reasons.get(command_id)}
+            if command_id in self._port.ack_evidence:
+                value["ack_evidence"] = dict(self._port.ack_evidence[command_id])
+                value["state_confirmation"] = {
+                    "qualified_heartbeats": self._port._state_matches.get(command_id, 0),
+                    "last_source_boot_ms": self._port._last_match_boot.get(command_id),
+                    "session_id": self.session_id,
+                }
             if self._results.get(effect_id) != value:
                 self._results[effect_id] = value
                 self._emit("effect_status", effect_id=effect_id, **value)

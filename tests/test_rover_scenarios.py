@@ -1,3 +1,4 @@
+from tests.mavlink_fixture import pack
 import json
 import math
 from pathlib import Path
@@ -224,10 +225,12 @@ class ParameterAdmissionTests(unittest.TestCase):
         app=ApplicationRuntime(profile,profile_name='rover_sim',allow_send=True,runtime=runtime,
             environment_config='simulation/environments/yard.toml',scenario_scene='simulation/scenes/yard.json')
         runtime.connect();fx.clock.advance();boot=fx.clock.ns//1_000_000
-        hb=fx.sender.heartbeat_encode(TYPE_GROUND_ROVER,3,0,4,4).pack(fx.sender)
-        global_position=fx.sender.global_position_int_encode(boot,-353632620,1491652370,584000,0,0,0,0,9000).pack(fx.sender)
-        gps=fx.sender.gps_raw_int_encode(boot*1000,3,-353632620,1491652370,584000,100,100,0,9000,12).pack(fx.sender)
-        fx.transports[-1].incoming.append(hb+fx.state_messages()+global_position+gps);app.cycle()
+        hb=pack(fx.sender.heartbeat_encode(TYPE_GROUND_ROVER,3,0,4,4), fx.sender)
+        state_messages=fx.state_messages()
+        global_position=pack(fx.sender.global_position_int_encode(boot,-353632620,1491652370,584000,0,0,0,0,9000), fx.sender)
+        gps=pack(fx.sender.gps_raw_int_encode(boot*1000,3,-353632620,1491652370,584000,100,100,0,9000,12), fx.sender)
+        closing_sample=pack(fx.sender.attitude_encode(boot+1,0,0,0,0,0,0),fx.sender)
+        fx.transports[-1].incoming.append(hb+state_messages+global_position+gps+closing_sample);app.cycle()
         app.connected_at_ns=fx.clock.ns-profile.warmup_ns
         catalog_=app.design_catalog();doc=design(('motion:drive',{'distance_m':1,'speed_mps':.15}))
         check=app.design_preflight(doc,catalog_['context']);self.assertTrue(check['eligible'],check)

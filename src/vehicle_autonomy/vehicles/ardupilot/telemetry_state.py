@@ -134,6 +134,16 @@ class ArduPilotTelemetryState:
             self._last_received = received_at
             return True
 
+    def note_rejected_telemetry(self, message: object, reason: str) -> None:
+        with self._lock:
+            sample = self._monitor.samples.get(message.get_type())
+            if sample is not None:
+                sample.observations += 1
+                if reason == "duplicate":
+                    sample.duplicates += 1
+                else:
+                    sample.out_of_order += 1
+
     def observe_telemetry(self, message: object, *, captured_at: TimePoint | None, received_at: TimePoint) -> None:
         """Receive diagnostics independently from control-qualified sample timing."""
         with self._lock:
