@@ -12,6 +12,7 @@ import time
 import unittest
 from uuid import uuid4
 from tests.simulation.launch import ARDUPILOT, PLUGIN, ROOT, output
+from tests.simulation.credentials import OwnedCredentials
 
 
 def stamp():
@@ -43,7 +44,9 @@ class StageRunner:
         manifest = stage_dir / 'manifest.json'
         if not manifest.exists():
             return
-        for record in reversed(json.loads(manifest.read_text()).get('processes', [])):
+        data = json.loads(manifest.read_text())
+        owned_groups = []
+        for record in reversed(data.get('processes', [])):
             stat = Path(f"/proc/{record['pid']}/stat")
             if not stat.exists():
                 continue
@@ -52,8 +55,35 @@ class StageRunner:
                 if ticks != record.get('start_ticks') or os.getpgid(record['pid']) != record['pgid']:
                     continue
                 os.killpg(record['pgid'], signal.SIGTERM)
+                owned_groups.append(record['pgid'])
             except (ProcessLookupError, FileNotFoundError):
                 pass
+        if 'credential_root_identity' not in data:
+            return  # historical/unregistered directories are never adopted
+        # A killed scenario cannot execute its finally. Stop its verified owned
+        # writers first, then use the persisted inode registry (no path glob).
+        for pgid in owned_groups:
+            end = time.monotonic() + 5
+            while time.monotonic() < end:
+                try:
+                    os.killpg(pgid, 0)
+                except ProcessLookupError:
+                    break
+                time.sleep(.05)
+            else:
+                os.killpg(pgid, signal.SIGKILL)
+        for record in data.get('processes', []):
+            end = time.monotonic() + 5
+            while True:
+                try:
+                    os.killpg(record['pgid'], 0)
+                except ProcessLookupError:
+                    break
+                if time.monotonic() >= end:
+                    raise RuntimeError('credential cleanup blocked by remaining process group')
+                time.sleep(.05)
+        OwnedCredentials(stage_dir, data).destroy()
+        manifest.write_text(json.dumps(data, indent=2))
 
     def run_stage(self, name, command, *, timeout=300, cwd=ROOT, stage_dir=None):
         record = {'name': name, 'command': command, 'started_at': stamp(), 'timeout_s': timeout,

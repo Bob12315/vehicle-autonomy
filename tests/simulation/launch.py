@@ -18,6 +18,7 @@ from uuid import uuid4
 import xml.etree.ElementTree as ET
 
 from vehicle_autonomy.app.bootstrap.simulation_profile import SimulationProfile
+from tests.simulation.credentials import OwnedCredentials
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -112,6 +113,7 @@ class OwnedSimulation:
         self.params.append(ROOT / f"simulation/params/{kind}_telemetry.parm")
         self.manifest["parameters"] = [str(p) for p in self.params]
         self.manifest["parameter_files_sha256"] = {str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in self.params}
+        self.credentials = OwnedCredentials(run_dir, self.manifest)
         self._save()
 
     def _save(self):
@@ -127,7 +129,7 @@ class OwnedSimulation:
         process = subprocess.Popen(command, cwd=cwd or ROOT, env=env, stdout=handle,
                                    stderr=subprocess.STDOUT, start_new_session=True)
         record = {"name": name, "command": command, "pid": process.pid, "pgid": process.pid,
-                  "log": str(logfile), "exit_code": None}
+                  "log": str(logfile), "cwd": str(Path(cwd or ROOT).absolute()), "exit_code": None}
         record["start_ticks"] = Path(f"/proc/{process.pid}/stat").read_text().rsplit(")", 1)[1].split()[19]
         self.processes.append((process, handle, record))
         self.manifest["processes"].append(record)
@@ -139,8 +141,8 @@ class OwnedSimulation:
         self.start_sitl()
 
     def start_sitl(self, suffix=""):
-        state_dir = self.run_dir / ("sitl_state" + suffix)
-        state_dir.mkdir(mode=0o700)  # AP persists its key; keep owned state private
+        state_dir = self.credentials.create_state(suffix)
+        self._save()  # parent can clean up even if this scenario is killed
         binary = Path(os.environ.get("VAF_SIMULATION_SITL_BIN_DIR", str(ARDUPILOT / "build/sitl/bin"))) / ("arducopter" if self.kind == "copter" else "ardurover")
         plugin_library = Path(os.environ.get("VAF_SIMULATION_PLUGIN_DIR", str(PLUGIN / "build"))) / "libArduPilotPlugin.so"
         self.manifest["binary_path"] = str(binary)
@@ -224,6 +226,8 @@ class OwnedSimulation:
                 raise AssertionError('independent pymavlink signature verification failed')
         self.signing_config_path = self.run_dir / ('receive-signing'+suffix+'.private')
         with os.fdopen(os.open(self.signing_config_path,os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600),'w') as private:
+            self.credentials.register_private(self.signing_config_path.name, private.fileno())
+            self._save()  # persist ownership BEFORE writing any credential
             json.dump(dict(key=self.signing_key.hex(),floor=self.receive_signing.watermark),private)
         proof = dict(method='public SETUP_SIGNING + read-only MAV_CMD_REQUEST_MESSAGE',
                      independent_pymavlink_verified=True, initial_timestamp=seed, frames=seen)
@@ -260,13 +264,13 @@ class OwnedSimulation:
         self._save()
 
     def close(self):
+        errors = []
         for process, _, record in reversed(self.processes):
             if not record.get("stopped"):
-                self.stop_process(process)
-        for private in self.run_dir.glob('receive-signing*.private'):
-            private.unlink()
-        self.manifest['ephemeral_signing_config_removed']=True
-        self.manifest["ended_at"] = datetime.now(timezone.utc).isoformat()
+                try:
+                    self.stop_process(process)
+                except Exception as exc:
+                    errors.append(type(exc).__name__)
         remaining = []
         for process, _, record in self.processes:
             try:
@@ -276,9 +280,18 @@ class OwnedSimulation:
             remaining.append(record["pgid"])
         self.manifest["remaining_process_groups"] = remaining
         self.manifest["ports_released"] = all(available(p) for p in (self.port, self.port + 2, self.port + 3)) and available(self.json_port, socket.SOCK_DGRAM)
-        self._save()
-        if not self.manifest["ports_released"] or remaining:
-            raise RuntimeError("owned simulation processes or ports not released")
+        try:
+            if remaining:
+                raise RuntimeError("credential writers still alive; refusing concurrent destruction")
+            self.credentials.destroy()
+            self.manifest['ephemeral_signing_config_removed'] = True
+        finally:
+            # Drop parent references; Python bytes cannot promise RAM zeroization.
+            self.signing_key = self.receive_signing = None
+            self.manifest["ended_at"] = datetime.now(timezone.utc).isoformat()
+            self._save()
+        if not self.manifest["ports_released"] or remaining or errors:
+            raise RuntimeError("owned simulation cleanup failed: " + ",".join(errors))
 
 
 def install_signal_cleanup():

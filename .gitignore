@@ -31,3 +31,7 @@ artifacts/phase1-control/
 # Independent Phase 1 remediation evidence
 artifacts/phase1-remediation/
 artifacts/phase1-round3/
+
+# Ephemeral simulation credentials and cleanup evidence
+receive-signing*.private
+artifacts/phase1-credential-cleanup/
