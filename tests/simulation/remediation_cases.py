@@ -51,15 +51,25 @@ def run(runtime, proxy, pump, writes):
     pump(.4)
     status=runtime.effect_status('review-disarm')
     state=runtime.world_snapshot().vehicle
-    if status['phase']=='COMPLETED' or not state.operation.armed or len(writes)!=before+1:
+    with proxy._lock:
+        upstream_hb=next(dict(r) for r in reversed(proxy.records) if r.get('direction')=='rx' and r.get('type')=='HEARTBEAT')
+    if (status['phase']=='COMPLETED' or not state.operation.armed or len(writes)!=before+1
+            or not upstream_hb['payload']['base_mode'] & 128):
         raise AssertionError(f'old frames falsely completed Disarm: {status}')
     result['old_ack_heartbeat_replay']={'passed':True,'old_ack_hex':old_ack.hex(),
         'old_heartbeat_hex':old_heartbeat.hex(),'before_release':status,
-        'last_qualified_state_armed':state.operation.armed,'writer_calls':len(writes)-before,
+        'last_qualified_state_armed':state.operation.armed,'last_real_upstream_heartbeat':upstream_hb,
+        'writer_calls':len(writes)-before,
         'receive_rejections':dict(runtime._session.receive_rejections)}
     proxy.inject(hold_tx_commands=set())
+    released_at=time.monotonic_ns()
     proxy.release_tx()
     disarm=wait('review-disarm')
+    with proxy._lock:
+        actual_new_acks=[dict(r) for r in proxy.records if r.get('direction')=='rx'
+            and r.get('type')=='COMMAND_ACK' and r['payload']['command']==400 and r['host_ns']>=released_at]
+    if not actual_new_acks:raise AssertionError('real AP Disarm ACK after held-frame release missing')
+    result['old_ack_heartbeat_replay']['real_new_ack_after_release']=actual_new_acks[-1]
     if runtime.world_snapshot().vehicle.operation.armed:raise AssertionError('Disarm state not confirmed')
     # Legitimate consecutive use of command 400 must continue working.
     arm2=command('review-arm-2',ArmEffect())
@@ -73,11 +83,14 @@ def run(runtime, proxy, pump, writes):
                                 now,later(now,20_000_000),ModeEffect('GUIDED'))
         admitted=runtime.dispatch_envelope(envelope)
         if admitted.reason:raise AssertionError(f'{name}: {admitted.reason}')
-        return admitted
+        return envelope
     # Actual host monotonic expiration while queued behind the authority lock.
-    before=len(writes);short_request('review-lock-expiry')
-    entered=Event();finished=Event();errors=[];stale_now=runtime.clock()
+    before=len(writes);lock_request=short_request('review-lock-expiry')
+    entered=Event();finished=Event();errors=[];stale_now=runtime.clock();lock_trace={}
+    if stale_now.monotonic_ns>=lock_request.deadline.monotonic_ns:
+        raise AssertionError('lock-expiry fixture already expired before scheduling')
     def worker():
+        lock_trace['attempted_at_ns']=runtime.clock().monotonic_ns
         entered.set()
         try:runtime._port.write_next(stale_now)
         except BaseException as exc:errors.append(str(exc))
@@ -85,30 +98,43 @@ def run(runtime, proxy, pump, writes):
     with runtime.authority.lock:
         thread=Thread(target=worker);thread.start()
         if not entered.wait(1):raise AssertionError('writer thread not started')
+        if lock_trace['attempted_at_ns']>=lock_request.deadline.monotonic_ns:
+            raise AssertionError('lock-expiry fixture started after expiry')
         time.sleep(.03)
+        lock_trace['released_at_ns']=runtime.clock().monotonic_ns
     if not finished.wait(1):raise AssertionError('writer thread stuck')
     thread.join()
     status=runtime.effect_status('review-lock-expiry')
     if errors or len(writes)!=before or status['phase']!='REJECTED' or status['reason']!='expired':
         raise AssertionError(f'lock expiry wrote: {status}, {errors}')
-    result['lock_expiry']={'passed':True,'status':status,'writer_calls':0,'wait_s':.03,'request_ttl_s':.02}
+    result['lock_expiry']={'passed':True,'status':status,'writer_calls':0,'wait_s':.03,'request_ttl_s':.02,
+        'deadline_ns':lock_request.deadline.monotonic_ns,'trace':lock_trace}
     pump(.1)
 
     original=runtime._port._write_guard
+    guard_trace={}
     def slow_guard(command):
+        guard_trace['started_at_ns']=runtime.clock().monotonic_ns
         approval=original(command)
         time.sleep(.03)
+        guard_trace['finished_at_ns']=runtime.clock().monotonic_ns
         return approval
-    before=len(writes);short_request('review-guard-expiry')
+    before=len(writes);guard_request=short_request('review-guard-expiry')
     runtime._port._write_guard=slow_guard
     try:
-        pump(.1)
+        # Schedule the prepared Execution request directly at the sole writer;
+        # a preceding socket read must not expire it before Guard even starts.
+        runtime._port.write_next(runtime.clock())
     finally:
         runtime._port._write_guard=original
+    if not (guard_trace.get('started_at_ns',2**64)<guard_request.deadline.monotonic_ns
+            <=guard_trace.get('finished_at_ns',0)):
+        raise AssertionError(f'Guard did not actually straddle deadline: {guard_trace}')
     status=runtime.effect_status('review-guard-expiry')
     if len(writes)!=before or status['phase']!='REJECTED' or status['reason'] not in ('expired','write_guard_timeout'):
         raise AssertionError(f'guard expiry wrote: {status}')
-    result['guard_expiry']={'passed':True,'status':status,'writer_calls':0,'guard_s':.03,'request_ttl_s':.02}
+    result['guard_expiry']={'passed':True,'status':status,'writer_calls':0,'guard_s':.03,'request_ttl_s':.02,
+        'deadline_ns':guard_request.deadline.monotonic_ns,'trace':guard_trace}
     result['valid_after_rejections']={'passed':True,'status':command('review-fresh',ModeEffect('GUIDED'))}
     # Every attempted wire frame is independently decoded, including across wraps.
     frames=[proxy.frame_metadata(bytes.fromhex(w['raw_hex'])) for w in writes]
