@@ -133,6 +133,13 @@ class SimulationRuntime:
     def connected(self) -> bool:
         return self._transport is not None
 
+    def telemetry_snapshot(self):
+        """Read-only normalized AP diagnostics, available with SEND disabled."""
+        return None if self._session is None else self._session.telemetry_snapshot(self.clock())
+
+    def link_snapshot(self):
+        return None if self._session is None else self._session.link_snapshot(self.clock())
+
     def world_reader(self):
         return RuntimeWorldReader(self.world_snapshot)
 

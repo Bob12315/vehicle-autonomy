@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import math
 from threading import Lock
 
 from vehicle_autonomy.contracts.core.geometry import FrameId, GeoPoint, Pose3, Quaternion, Twist3, Vector3
@@ -13,33 +12,15 @@ from vehicle_autonomy.contracts.core.time import TimePoint
 from vehicle_autonomy.contracts.vehicle.models import (
     BatteryState, LinkStateSnapshot, VehicleHealth, VehicleOperation, VehicleStateSnapshot,
 )
-from vehicle_autonomy.world.transform.tree import multiply_quaternions, rotate_vector
+from vehicle_autonomy.world.transform.tree import rotate_vector
 from vehicle_autonomy.vehicles.ardupilot.mavlink.telemetry import (
     AttitudeFrdNed, GlobalPositionInt, GpsFix, Heartbeat, LocalPositionNed,
     SystemPower, decode_telemetry,
 )
 
 
-_SQRT_HALF = math.sqrt(0.5)
-_NED_TO_ENU = Quaternion(_SQRT_HALF, _SQRT_HALF, 0, 0)
-_FLU_TO_FRD = Quaternion(1, 0, 0, 0)
-
-
-def _ned_to_enu(north: float, east: float, down: float) -> Vector3:
-    return Vector3(east, north, -down)
-
-
-def _euler_frd_ned_to_flu_enu(roll: float, pitch: float, yaw: float) -> Quaternion:
-    cr, sr = math.cos(roll / 2), math.sin(roll / 2)
-    cp, sp = math.cos(pitch / 2), math.sin(pitch / 2)
-    cy, sy = math.cos(yaw / 2), math.sin(yaw / 2)
-    original = Quaternion(
-        sr * cp * cy - cr * sp * sy,
-        cr * sp * cy + sr * cp * sy,
-        cr * cp * sy - sr * sp * cy,
-        cr * cp * cy + sr * sp * sy,
-    )
-    return multiply_quaternions(multiply_quaternions(_NED_TO_ENU, original), _FLU_TO_FRD)
+from vehicle_autonomy.vehicles.ardupilot.coordinates import _ned_to_enu, _euler_frd_ned_to_flu_enu
+from vehicle_autonomy.vehicles.ardupilot.telemetry_monitor import TelemetryMonitor
 
 
 def _close_enough(first: TimePoint, second: TimePoint, limit_ns: int) -> bool:
@@ -88,6 +69,10 @@ class ArduPilotTelemetryState:
         self._power: tuple[BatteryState, TimePoint] | None = None
         self._heartbeat: tuple[VehicleOperation, TimePoint] | None = None
         self._last_received: TimePoint | None = None
+        self._monitor = TelemetryMonitor(link_session_id=self._link_session,
+                                        source_system=source_system, source_component=source_component,
+                                        max_age_ns=max_field_age_ns, frame_id=str(self._frame))
+        self._source_captures: dict[str, TimePoint] = {}
 
     def ingest(self, message: object, *, captured_at: TimePoint, received_at: TimePoint) -> bool:
         if not isinstance(captured_at, TimePoint) or not isinstance(received_at, TimePoint):
@@ -100,6 +85,7 @@ class ArduPilotTelemetryState:
             raise ValueError("MAVLink message requires source IDs") from exc
         if source != (self._source_system, self._source_component):
             return False
+        self.observe_telemetry(message, captured_at=captured_at, received_at=received_at)
         fact = decode_telemetry(message)
         if fact is None:
             return False
@@ -109,6 +95,14 @@ class ArduPilotTelemetryState:
                 and received_at < self._last_received
             ):
                 raise ValueError("MAVLink receive time regressed")
+            kind = message.get_type()
+            # A receive event must not renew an old sensor sample or replace it
+            # with reordered payload. Session source-clock regressions fail closed.
+            if kind in ("LOCAL_POSITION_NED", "GLOBAL_POSITION_INT", "ATTITUDE", "GPS_RAW_INT"):
+                previous = self._source_captures.get(kind)
+                if previous is not None and captured_at.clock_domain_id == previous.clock_domain_id and captured_at <= previous:
+                    return False
+                self._source_captures[kind] = captured_at
             if isinstance(fact, LocalPositionNed):
                 self._position = (
                     _ned_to_enu(fact.north_m, fact.east_m, fact.down_m),
@@ -139,6 +133,15 @@ class ArduPilotTelemetryState:
                 ), captured_at)
             self._last_received = received_at
             return True
+
+    def observe_telemetry(self, message: object, *, captured_at: TimePoint | None, received_at: TimePoint) -> None:
+        """Receive diagnostics independently from control-qualified sample timing."""
+        with self._lock:
+            self._monitor.ingest(message, captured_at=captured_at, received_at=received_at)
+
+    def telemetry_snapshot(self, at_time: TimePoint):
+        with self._lock:
+            return self._monitor.publish(at_time)
 
     def publish(self, published_at: TimePoint) -> VehicleStateSnapshot:
         if not isinstance(published_at, TimePoint):
@@ -186,9 +189,10 @@ class ArduPilotTelemetryState:
                 battery = self._power[0]
             next_revision = self._revision + 1
             candidate = VehicleStateSnapshot(
-                SchemaVersion(1, 0), self._vehicle_id,
+                SchemaVersion(1, 1), self._vehicle_id,
                 ResourceVersion(self._generation, next_revision), published_at,
                 VehicleHealth(quality), pose, twist, global_position, operation, battery,
+                self._monitor.publish(published_at),
             )
             self._revision = next_revision
             self._latest = candidate

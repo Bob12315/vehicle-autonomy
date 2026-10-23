@@ -123,11 +123,13 @@ class ArduPilotCommandPort:
                     self._queue.remove(command_id)
                     continue
                 ack_id = self._ack_id.get(command_id)
-                if ack_id is not None and (ack_id in self._inflight or ack_id in self._ambiguous):
-                    continue
-                self._queue.remove(command_id)
                 command = self._commands[command_id]
                 reason = self._authority.write_reason(command, now)
+                # An ACK fence must not keep an expired/revoked request queued
+                # forever. Reject it without ever opening the writer boundary.
+                if reason is None and ack_id is not None and (ack_id in self._inflight or ack_id in self._ambiguous):
+                    continue
+                self._queue.remove(command_id)
                 if reason is None and self._write_guard is not None:
                     reason = self._write_guard(command)
                 if reason is not None:
@@ -154,6 +156,11 @@ class ArduPilotCommandPort:
         if message.get_type() != "COMMAND_ACK":
             return None
         if (message.get_srcSystem(), message.get_srcComponent()) != (self._codec.target_system, self._codec.target_component):
+            return None
+        # MAVLink2 ACK target extensions identify the requester; zero means
+        # broadcast/old dialect. Another controller's ACK cannot complete ours.
+        if (int(getattr(message, "target_system", 0)) not in (0, self._codec.source_system)
+                or int(getattr(message, "target_component", 0)) not in (0, self._codec.source_component)):
             return None
         command_number = int(message.command)
         with self._authority.lock:

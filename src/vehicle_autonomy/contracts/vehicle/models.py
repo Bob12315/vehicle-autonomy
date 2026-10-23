@@ -10,6 +10,7 @@ from vehicle_autonomy.contracts.core.primitives import LinkSessionId, ResourceVe
 from vehicle_autonomy.contracts.core.quality import QualityState
 from vehicle_autonomy.contracts.core.stamped import Stamped
 from vehicle_autonomy.contracts.core.time import TimePoint
+from vehicle_autonomy.contracts.vehicle.telemetry import VehicleTelemetrySnapshot
 
 
 @dataclass(frozen=True, slots=True)
@@ -77,6 +78,7 @@ class VehicleStateSnapshot:
     global_position: Stamped[GeoPoint] | None = None
     operation: VehicleOperation = field(default_factory=VehicleOperation)
     battery: BatteryState | None = None
+    telemetry: VehicleTelemetrySnapshot | None = None
 
     def __post_init__(self) -> None:
         if not isinstance(self.schema_version, SchemaVersion) or not isinstance(self.version, ResourceVersion):
@@ -97,6 +99,8 @@ class VehicleStateSnapshot:
             raise TypeError("reported_twist must contain Twist3")
         if self.global_position is not None and not isinstance(self.global_position.value, GeoPoint):
             raise TypeError("global_position must contain GeoPoint")
+        if self.telemetry is not None and not isinstance(self.telemetry, VehicleTelemetrySnapshot):
+            raise TypeError("telemetry must be VehicleTelemetrySnapshot")
         if self.battery is not None and not isinstance(self.battery, BatteryState):
             raise TypeError("battery must be BatteryState")
 

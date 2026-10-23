@@ -32,11 +32,15 @@ class GlobalPositionInt:
     latitude_e7: int
     longitude_e7: int
     altitude_mm: int
+    velocity_ned_cms: tuple[int, int, int] | None = None
 
 
 @dataclass(frozen=True, slots=True)
 class GpsFix:
     fix_type: int
+    satellites: int | None = None
+    eph: int | None = None
+    epv: int | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -50,9 +54,34 @@ class SystemPower:
 class Heartbeat:
     base_mode: int
     custom_mode: int
+    vehicle_type: int | None = None
+    autopilot: int | None = None
+    system_status: int | None = None
 
 
-TelemetryFact: TypeAlias = LocalPositionNed | AttitudeFrdNed | GlobalPositionInt | GpsFix | SystemPower | Heartbeat
+@dataclass(frozen=True, slots=True)
+class EkfStatus:
+    flags: int
+    variances: tuple[float, float, float, float, float]
+
+
+@dataclass(frozen=True, slots=True)
+class CommandAck:
+    command: int
+    result: int
+    progress: int | None
+
+
+@dataclass(frozen=True, slots=True)
+class StatusText:
+    severity: int
+    text: str
+    message_id: int
+    chunk_sequence: int
+
+
+TelemetryFact: TypeAlias = (LocalPositionNed | AttitudeFrdNed | GlobalPositionInt | GpsFix
+                            | SystemPower | Heartbeat | EkfStatus | CommandAck | StatusText)
 
 
 def _finite(message: object, name: str) -> float:
@@ -80,15 +109,39 @@ def decode_telemetry(message: object) -> TelemetryFact | None:
                 "roll", "pitch", "yaw", "rollspeed", "pitchspeed", "yawspeed",
             )))
         if message_type == "GLOBAL_POSITION_INT":
-            return GlobalPositionInt(*(_integer(message, name) for name in ("lat", "lon", "alt")))
+            latitude, longitude, altitude = (_integer(message, name) for name in ("lat", "lon", "alt"))
+            if not -900_000_000 <= latitude <= 900_000_000 or not -1_800_000_000 <= longitude <= 1_800_000_000:
+                raise ValueError("invalid geographic coordinates")
+            velocity = tuple(_integer(message, name) for name in ("vx", "vy", "vz")) if hasattr(message, "vx") else None
+            return GlobalPositionInt(latitude, longitude, altitude, velocity)
         if message_type == "GPS_RAW_INT":
-            return GpsFix(_integer(message, "fix_type"))
+            fix = _integer(message, "fix_type")
+            if not 0 <= fix <= 8:
+                raise ValueError("invalid GPS fix")
+            return GpsFix(fix, *(_integer(message, name) if hasattr(message, name) else None
+                                 for name in ("satellites_visible", "eph", "epv")))
         if message_type == "SYS_STATUS":
             return SystemPower(*(_integer(message, name) for name in (
                 "voltage_battery", "current_battery", "battery_remaining",
             )))
         if message_type == "HEARTBEAT":
-            return Heartbeat(_integer(message, "base_mode"), _integer(message, "custom_mode"))
+            return Heartbeat(_integer(message, "base_mode"), _integer(message, "custom_mode"),
+                             *(_integer(message, name) if hasattr(message, name) else None
+                               for name in ("type", "autopilot", "system_status")))
+        if message_type == "EKF_STATUS_REPORT":
+            return EkfStatus(_integer(message, "flags"), tuple(_finite(message, name) for name in (
+                "velocity_variance", "pos_horiz_variance", "pos_vert_variance", "compass_variance", "terrain_alt_variance")))
+        if message_type == "COMMAND_ACK":
+            return CommandAck(_integer(message, "command"), _integer(message, "result"),
+                              _integer(message, "progress") if hasattr(message, "progress") else None)
+        if message_type == "STATUSTEXT":
+            text = message.text
+            if isinstance(text, bytes):
+                text = text.decode("utf-8", errors="replace")
+            if not isinstance(text, str):
+                raise ValueError("invalid status text")
+            return StatusText(_integer(message, "severity"), text.rstrip("\0"),
+                              int(getattr(message, "id", 0)), int(getattr(message, "chunk_seq", 0)))
         return None
     except (AttributeError, TypeError, ValueError, OverflowError) as exc:
         raise ValueError("invalid MAVLink telemetry message") from exc

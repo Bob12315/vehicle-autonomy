@@ -99,6 +99,8 @@ class ArduPilotSession:
                     ingested |= self._state.ingest(
                         message, captured_at=sample_time, received_at=received_at,
                     )
+                else:
+                    self._state.observe_telemetry(message, captured_at=None, received_at=received_at)
         if ingested and self._state is not None:
             state = self._state.publish(received_at)
             self._commands.observe_state(state)
@@ -120,6 +122,13 @@ class ArduPilotSession:
 
     def snapshot(self) -> VehicleStateSnapshot | None:
         return None if self._state is None else self._state.snapshot()
+
+    def telemetry_snapshot(self, at_time: TimePoint):
+        """Current diagnostic ages; never refreshes the control state timestamp."""
+        return None if self._state is None else self._state.telemetry_snapshot(at_time)
+
+    def link_snapshot(self, at_time: TimePoint):
+        return None if self._state is None else self._state.link_snapshot(at_time)
 
     def _disconnect(self, now: TimePoint) -> None:
         # Link loss invalidates a run's authority, not just its command queue.

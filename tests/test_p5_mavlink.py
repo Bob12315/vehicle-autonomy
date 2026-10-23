@@ -160,6 +160,34 @@ class P5MavlinkTests(unittest.TestCase):
         self.session.poll(at(105))
         self.assertEqual(self.port.status(receipt.command_id).phase, CommandPhase.COMPLETED)
 
+    def test_ack_for_another_controller_cannot_confirm_our_command(self):
+        self.connect()
+        self.now_ns = 101
+        receipt = self.execution.dispatch(effect(1, ArmEffect()), world(), at(101)).receipt
+        self.session.write_next(at(102))
+        wrong = self.sender.command_ack_encode(mavlink.MAV_CMD_COMPONENT_ARM_DISARM, 0,
+                                               target_system=249, target_component=191)
+        self.transport.incoming.append(wrong.pack(self.sender))
+        self.session.poll(at(103))
+        self.assertEqual(self.port.status(receipt.command_id).phase, CommandPhase.TRANSMITTED)
+        correct = self.sender.command_ack_encode(mavlink.MAV_CMD_COMPONENT_ARM_DISARM, 0,
+                                                 target_system=250, target_component=191)
+        self.transport.incoming.append(correct.pack(self.sender))
+        self.session.poll(at(104))
+        self.assertEqual(self.port.status(receipt.command_id).phase, CommandPhase.ACKNOWLEDGED)
+
+    def test_expired_queue_is_rejected_even_behind_an_ack_fence(self):
+        self.connect()
+        self.now_ns = 101
+        first = self.execution.dispatch(effect(1, ModeEffect("GUIDED"), deadline=180), world(), at(101)).receipt
+        self.session.write_next(at(102))
+        self.now_ns = 103
+        queued = self.execution.dispatch(effect(2, ModeEffect("GUIDED"), deadline=110), world(), at(103)).receipt
+        self.assertEqual(self.port.status(first.command_id).phase, CommandPhase.TRANSMITTED)
+        self.assertEqual(self.session.write_next(at(111)).phase, CommandPhase.REJECTED)
+        self.assertEqual(self.port.reasons[queued.command_id], "expired")
+        self.assertEqual(len(self.transport.writes), 1)
+
     def test_link_timeout_revokes_both_sends_and_old_lease(self):
         self.connect()
         old_session = self.session.session_id
