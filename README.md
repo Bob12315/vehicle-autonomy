@@ -40,9 +40,13 @@ python -m unittest discover -s tests -v
 该入口不连接串口或实车；缺少显式参数不会启动控制测试。默认应用 SEND 仍关闭。
 不包含阶段二或外部感知/导航/智能功能。
 
-阶段一已通过：350 项单元测试，Rover/Copter 两轮真实仿真的 A–F 全部 PASS
-（12/12 场景）。量化结果、保留的失败与安全范围见
-[阶段一报告](docs/PHASE1_MAVLINK_CONTROL_REPORT.md)。
+此前开发侧记录为 350 项单元测试、两轮 Rover/Copter A–F 和 12/12 仿真场景通过，
+原始结果保留在[历史阶段一报告](docs/PHASE1_MAVLINK_CONTROL_REPORT.md)。随后独立审查
+结论为 FAIL；本轮修复两个 P1 和两个 P2 问题后，365 项单元测试及两次完整真实
+SITL/Gazebo 回归均通过，当前状态为 **READY FOR RE-AUDIT**，等待独立审查。
+根因、协议限制、新证据和提交见[修复报告](docs/PHASE1_REMEDIATION_REPORT.md)。
+修复回归入口为 `./scripts/test_phase1_control.sh --remediation --allow-send`，
+本轮原始证据另存于 `artifacts/phase1-remediation/`。未开始阶段二。
 
 ## 当前实现
 
