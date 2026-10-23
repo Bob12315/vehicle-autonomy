@@ -35,3 +35,6 @@ artifacts/phase1-round3/
 # Ephemeral simulation credentials and cleanup evidence
 receive-signing*.private
 artifacts/phase1-credential-cleanup/
+
+# Isolated three-vehicle builds and raw Phase 2 evidence
+artifacts/phase2-control/
