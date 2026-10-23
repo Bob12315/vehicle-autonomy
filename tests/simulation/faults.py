@@ -153,6 +153,7 @@ class TcpFaultProxy:
                                     self.record(record)
                                 else:
                                     self.record(record)
+                                    self.record({"direction": "tx_discard", "cause": "drop_tx", **self.frame_metadata(raw)})
                             else:
                                 dropped = "*" in self.drop_rx or kind in self.drop_rx or (
                                     kind == "COMMAND_ACK" and int(message.command) == self.drop_ack_command)
@@ -160,16 +161,21 @@ class TcpFaultProxy:
                                 if kind == "COMMAND_ACK":
                                     delay = self.delay_ack_s
                                 received_raw = raw
-                                self.record({"direction": "rx", "dropped": dropped, "delay_s": delay,
-                                             "epoch": epoch, **self.frame_metadata(received_raw)})
                                 if self.repeat_pose and kind in ("ATTITUDE", "GLOBAL_POSITION_INT", "LOCAL_POSITION_NED"):
                                     raw = repeated.setdefault(kind, raw)
                                 elif not self.repeat_pose:
                                     repeated.clear()
-                                cause = "repeat_pose" if raw != received_raw else "live"
+                                substituted = raw != received_raw
+                                cause = "repeat_pose" if substituted else "live"
+                                self.record({"direction": "rx", "dropped": dropped or substituted,
+                                             "filter_dropped": dropped, "delay_s": delay,
+                                             "epoch": epoch, **self.frame_metadata(received_raw)})
+                                if dropped or substituted:
+                                    self.record({"direction": "rx_discard",
+                                                 "cause": "filter" if dropped else "repeat_pose_substitution",
+                                                 "epoch": epoch, **self.frame_metadata(received_raw)})
                                 if dropped:
-                                    self.record({"direction": "rx_discard", "cause": "filter", "epoch": epoch,
-                                                 **self.frame_metadata(received_raw)})
+                                    continue
                                 elif delay:
                                     pending.append((time.monotonic() + delay, raw, cause, received_raw.hex()))
                                 else:
@@ -216,6 +222,11 @@ class TcpFaultProxy:
                     lost = [item for item in self._held_tx + self._release_tx if item[0] == self._epoch]
                     self._held_tx = [item for item in self._held_tx if item[0] != self._epoch]
                     self._release_tx = [item for item in self._release_tx if item[0] != self._epoch]
+                with self._lock:
+                    unforwarded = [item for item in self._replays if item[0] == self._epoch]
+                    self._replays = [item for item in self._replays if item[0] != self._epoch]
+                for _, raw in unforwarded:
+                    self.record({"direction": "rx_discard", "cause": "connection_closed_replay", **self.frame_metadata(raw)})
                 for _, raw in lost:
                     self.record({"direction": "tx_discard", "cause": "connection_closed", **self.frame_metadata(raw)})
                 self.record({"direction": "connection_closed"})

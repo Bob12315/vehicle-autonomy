@@ -93,6 +93,9 @@ class ProxyTests(unittest.TestCase):
                     self.assertEqual(record['payload'],parsed.to_dict())
                     self.assertEqual(record['sequence'],parsed.get_seq())
                 self.assertEqual(rx[1]['raw_hex'],second.hex())
+                self.assertTrue(rx[1]['dropped'])
+                discarded=[r for r in proxy.records if r.get('cause')=='repeat_pose_substitution']
+                self.assertEqual([r['raw_hex'] for r in discarded],[second.hex()])
                 forwarded=[r for r in proxy.records if r.get('direction')=='rx_forward']
                 self.assertEqual([r['raw_hex'] for r in forwarded],[first.hex(),first.hex()])
                 self.assertEqual(forwarded[-1]['cause'],'repeat_pose')
