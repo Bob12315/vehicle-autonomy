@@ -22,6 +22,7 @@ from vehicle_autonomy.engine.control.control_authority import ControlAuthority, 
 from vehicle_autonomy.engine.control.vehicle_execution import DispatchResult, StopState, VehicleExecution
 from vehicle_autonomy.vehicles.ardupilot.transports.bytes import TcpByteTransport
 from vehicle_autonomy.vehicles.ardupilot.mavlink.codec import MavlinkCodec
+from vehicle_autonomy.vehicles.ardupilot.mavlink.signing import ReceiveSigning
 from vehicle_autonomy.world.localization.online import OnlineLocalization
 from vehicle_autonomy.app.bootstrap.simulation_profile import SimulationProfile
 from vehicle_autonomy.vehicles.ardupilot.commands import ArduPilotCommandTranslator
@@ -68,6 +69,7 @@ class SimulationRuntime:
                  clock: Callable[[], TimePoint] | None = None,
                  event_sink: Callable[[dict], None] | None = None,
                  motion_guard: Callable[..., str | None] | None = None,
+                 receive_signing: ReceiveSigning | None = None,
                  sleep: Callable[[float], None] = time.sleep) -> None:
         if not isinstance(profile, SimulationProfile):
             raise TypeError("validated SimulationProfile required")
@@ -79,6 +81,7 @@ class SimulationRuntime:
         self.clock = clock or (lambda: TimePoint(time.monotonic_ns(), datetime.now(timezone.utc),
                                                  profile.clock_domain_id))
         self._transport_factory = transport_factory or TcpByteTransport.connect
+        self._receive_signing = receive_signing  # retain replay floor across reconnect
         self._event_sink = event_sink
         self.motion_guard = motion_guard
         self._sleep = sleep
@@ -162,7 +165,7 @@ class SimulationRuntime:
         transport = self._transport_factory(self.profile.host, self.profile.port,
                                             timeout_s=self.profile.period_ns / 2e9)
         codec = MavlinkCodec(source_system=250, source_component=191,
-                             target_system=1, target_component=1)
+                             target_system=1, target_component=1, receive_signing=self._receive_signing)
         port = ArduPilotCommandPort(authority=self.authority, transport=transport, codec=codec,
                                     translator=self._translator, now=self.clock,
                                     stop_speed_tolerance=0.1 if self.profile.kind == "rover" else 0.05,
@@ -278,7 +281,8 @@ class SimulationRuntime:
                 value["ack_evidence"] = dict(self._port.ack_evidence[command_id])
                 value["state_confirmation"] = {
                     "qualified_heartbeats": self._port._state_matches.get(command_id, 0),
-                    "last_source_boot_ms": self._port._last_match_boot.get(command_id),
+                    "last_signature_timestamp": self._port._last_match_signature.get(command_id),
+                    "freshness_basis": "verified_mavlink2_signing_order",
                     "session_id": self.session_id,
                 }
             if self._results.get(effect_id) != value:

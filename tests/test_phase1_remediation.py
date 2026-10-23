@@ -140,6 +140,7 @@ class ReviewReproductions(unittest.TestCase):
         f=self.fx;f.session._confirmation_time_qualified=False
         receipt=self.submit(1,ArmEffect());f.now_ns=102;f.session.write_next(at(102))
         f.transport.incoming.append(pack(f.sender.command_ack_encode(400,0),f.sender));f.session.poll(at(103))
+        f.sender.signing.sign_outgoing=False  # actual unqualified state, not a capture-clock flag
         f.transport.incoming.append(f.heartbeat(armed=True));f.session.poll(at(104))
         self.assertEqual(f.port.status(receipt.command_id).phase,CommandPhase.ACKNOWLEDGED)
         f.session.tick(at(180))
@@ -259,7 +260,9 @@ class ReviewReproductions(unittest.TestCase):
         # 255 AP frames were lost; the next header has the SAME 8-bit seq.
         f.sender.seq=(f.sender.seq+255)&255
         second=pack(f.sender.attitude_encode(1100,0,0,0,0,0,0),f.sender)
-        self.assertEqual(f.codec.feed(first)[0].get_seq(),f.codec.feed(second)[0].get_seq())
+        # Inspection must not advance the authenticated receiver's watermark.
+        inspector=mav.MAVLink(None)
+        self.assertEqual(inspector.parse_buffer(first)[0].get_seq(),inspector.parse_buffer(second)[0].get_seq())
         f.transport.incoming.append(second);f.session.poll(at(102))
         self.assertEqual(f.session._rx_ticket,previous+256)
         f.transport.incoming.append(second);f.session.poll(at(103))

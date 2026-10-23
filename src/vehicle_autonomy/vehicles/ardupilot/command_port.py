@@ -69,9 +69,10 @@ class ArduPilotCommandPort:
         self._write_uncertain = False
         self._receive_ticket = -1
         self._sent_ticket: dict[CommandId, int] = {}
+        self._sent_signature: dict[CommandId, int] = {}
         self._transmitted_at: dict[CommandId, TimePoint] = {}
         self._state_matches: dict[CommandId, int] = {}
-        self._last_match_boot: dict[CommandId, int] = {}
+        self._last_match_signature: dict[CommandId, int] = {}
         self.ack_evidence: dict[CommandId, dict] = {}
 
     def uses(self, *, authority: ControlAuthority, transport: ByteTransport, codec: MavlinkCodec) -> bool:
@@ -203,6 +204,8 @@ class ArduPilotCommandPort:
                         # No user callback between final fence and physical call;
                         # the entire operation remains under the authority lock.
                         self._codec.commit_sequence()
+                        if self._codec.receive_signing is not None:
+                            self._sent_signature[command_id] = self._codec.receive_signing.watermark
                         self._transport.write(data)
                     except (OSError, ConnectionError) as exc:
                         self._write_uncertain = True
@@ -257,12 +260,14 @@ class ArduPilotCommandPort:
                 self.expire_unknown(current_time)
                 return None
             current = self._statuses[command_id]
-            if ticket is None or ticket <= self._sent_ticket.get(command_id, -1):
+            signature = getattr(message, '_vaf_signature_timestamp', None)
+            if (signature is None or signature <= self._sent_signature.get(command_id, 2**48)):
                 return None
             # ACK has no request UUID, particularly shared ARM/DISARM command 400.
             # Record a candidate, never infer goal completion from ACK ordering.
             self.ack_evidence[command_id] = {"packet_ticket": ticket,
-                "correlation": "unproven_mav_cmd_only", "command": command_number, "result": int(message.result)}
+                "correlation": "unproven_mav_cmd_only", "signature_timestamp": signature,
+                "command": command_number, "result": int(message.result)}
             if current.phase is not CommandPhase.TRANSMITTED:
                 del self._inflight[command_number]
                 return None
@@ -312,11 +317,11 @@ class ArduPilotCommandPort:
                           ticket: int | None = None, before_capture: TimePoint | None = None,
                           after_capture: TimePoint | None = None, before_boot: int | None = None,
                           after_boot: int | None = None) -> tuple[CommandStatus, ...]:
-        """Two distinct target states, each bracketed by source-timed progress.
+        """Require independently authenticated ACK and newer authenticated state.
 
-        Session supplies strictly ordered receive tickets and trusted capture
-        evidence. Local receive time and an 8-bit header alone prove neither
-        state freshness nor ACK correlation. Insufficient evidence times out.
+        Packet sequence, neighboring source clocks and receive time are NOT
+        evidence of heartbeat generation. Counts only retain the existing
+        debounce; they never qualify an unauthenticated observation.
         """
         if message.get_type() != "HEARTBEAT" or (
             message.get_srcSystem(), message.get_srcComponent()
@@ -341,28 +346,19 @@ class ArduPilotCommandPort:
                 command = envelope.command
                 if not isinstance(command, (ArmCommand, DisarmCommand, ModeCommand)):
                     continue
-                sent = self._sent_ticket.get(command_id)
-                written = self._transmitted_at.get(command_id)
-                if (ticket is None or sent is None or ticket <= sent or written is None
-                        or before_capture is None or after_capture is None or before_boot is None
-                        or after_boot is None or after_boot <= before_boot):
-                    continue
-                try:
-                    fresh = (before_capture.elapsed_ns_since(written) > 0
-                             and after_capture.elapsed_ns_since(before_capture) >= 0
-                             and received_at.elapsed_ns_since(status.observed_at) > 0)
-                except ValueError:
-                    fresh = False
-                if not fresh:
+                signature = getattr(message, '_vaf_signature_timestamp', None)
+                ack_signature = self.ack_evidence.get(command_id, {}).get('signature_timestamp')
+                if (signature is None or ack_signature is None or signature <= ack_signature
+                        or signature <= self._sent_signature.get(command_id, 2**48)):
                     continue
                 observed = (
                     isinstance(command, ArmCommand) and bool(message.base_mode & 128)
                     or isinstance(command, DisarmCommand) and not bool(message.base_mode & 128)
                     or isinstance(command, ModeCommand) and message.custom_mode == self._translator.mode_id(command.native_mode)
                 )
-                if before_boot <= self._last_match_boot.get(command_id, -1):
+                if signature <= self._last_match_signature.get(command_id, -1):
                     continue
-                self._last_match_boot[command_id] = before_boot
+                self._last_match_signature[command_id] = signature
                 self._state_matches[command_id] = self._state_matches.get(command_id, 0) + 1 if observed else 0
                 if self._state_matches[command_id] >= 2:
                     final = CommandStatus(command_id, CommandPhase.COMPLETED, received_at)
@@ -414,7 +410,8 @@ class ArduPilotCommandPort:
             self._streams.clear()
             self._receive_ticket = -1
             self._state_matches.clear()
-            self._last_match_boot.clear()
+            self._last_match_signature.clear()
             self._sent_ticket.clear()
+            self._sent_signature.clear()
             self._transmitted_at.clear()
             self._write_uncertain = False

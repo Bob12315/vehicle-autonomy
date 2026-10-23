@@ -47,7 +47,7 @@ def socket_ids():
 
 def run(run_dir, kind, *, review_remediation=False):
     run_dir.mkdir(parents=True, exist_ok=False)
-    owned = OwnedSimulation(run_dir, kind)
+    owned = OwnedSimulation(run_dir, kind, confirmation_signing=True)
     runtime = proxy = None
     writes = []
     evidence = (run_dir / 'telemetry.jsonl').open('w')
@@ -64,10 +64,11 @@ def run(run_dir, kind, *, review_remediation=False):
         class ObservedTransport:
             def __init__(self, transport):
                 self.transport = transport
+                self.epoch = len({w['transport_epoch'] for w in writes})+1
             def read(self, *args):
                 return self.transport.read(*args)
             def write(self, data):
-                writes.append({'host_ns': time.monotonic_ns(), 'bytes': len(data), 'raw_hex': data.hex()})
+                writes.append({'host_ns': time.monotonic_ns(), 'bytes': len(data), 'raw_hex': data.hex(), 'transport_epoch':self.epoch})
                 self.transport.write(data)
             def close(self):
                 self.transport.close()
@@ -79,7 +80,7 @@ def run(run_dir, kind, *, review_remediation=False):
 
         def new_runtime():
             translator = (ArduRoverCommandTranslator if kind == 'rover' else ArduPilotCommandTranslator)(mode_ids=profile.mode_ids)
-            selected = SimulationRuntime(profile, translator=translator, transport_factory=connect,
+            selected = SimulationRuntime(profile, receive_signing=owned.receive_signing, translator=translator, transport_factory=connect,
                 event_sink=lambda e: (events.write(json.dumps(e)+'\n'), events.flush()))
             selected.connect()
             return selected

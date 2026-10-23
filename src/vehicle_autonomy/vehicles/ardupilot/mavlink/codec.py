@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from typing import TypeAlias
 
 from pymavlink.dialects.v20 import ardupilotmega as mavlink
+from .signing import ReceiveSigning
 
 
 @dataclass(frozen=True, slots=True)
@@ -36,16 +37,20 @@ class MavlinkCodec:
     """Message construction/parsing only; never owns a socket or writer."""
 
     def __init__(self, *, source_system: int, source_component: int,
-                 target_system: int, target_component: int) -> None:
+                 target_system: int, target_component: int,
+                 receive_signing: ReceiveSigning | None = None) -> None:
         for value in (source_system, source_component, target_system, target_component):
             if isinstance(value, bool) or not isinstance(value, int) or not 1 <= value <= 255:
                 raise ValueError("MAVLink system/component IDs must be 1..255")
+        if receive_signing is not None and not isinstance(receive_signing, ReceiveSigning):
+            raise TypeError('explicit ReceiveSigning verifier required')
         self.source_system = source_system
         self.source_component = source_component
         self.target_system = target_system
         self.target_component = target_component
         self._sender = mavlink.MAVLink(None, srcSystem=source_system, srcComponent=source_component)
         self._receiver = mavlink.MAVLink(None)
+        self.receive_signing = receive_signing
 
     def encode(self, instruction: Instruction, *, advance_sequence: bool = True) -> bytes:
         if isinstance(instruction, CommandLong):
@@ -81,5 +86,7 @@ class MavlinkCodec:
             except mavlink.MAVError:
                 continue
             if message is not None and message.get_type() != "BAD_DATA":
+                message._vaf_signature_timestamp = (None if self.receive_signing is None else
+                    self.receive_signing.verify(message, system=self.target_system, component=self.target_component))
                 messages.append(message)
         return tuple(messages)

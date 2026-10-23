@@ -1,4 +1,4 @@
-from tests.mavlink_fixture import pack
+from tests.mavlink_fixture import receive_signing, pack
 import json
 import math
 from pathlib import Path
@@ -220,7 +220,7 @@ class ParameterAdmissionTests(unittest.TestCase):
         from vehicle_autonomy.vehicles.ardupilot.mavlink.constants import TYPE_GROUND_ROVER
         fx=helpers.SimulationRuntimeTests();fx.setUp()
         profile=SimulationProfile.load('simulation/profiles/rover_yard.toml')
-        runtime=SimulationRuntime(profile,translator=ArduRoverCommandTranslator(mode_ids=profile.mode_ids),
+        runtime=SimulationRuntime(profile, receive_signing=receive_signing(),translator=ArduRoverCommandTranslator(mode_ids=profile.mode_ids),
             transport_factory=fx.make_transport,clock=fx.clock)
         app=ApplicationRuntime(profile,profile_name='rover_sim',allow_send=True,runtime=runtime,
             environment_config='simulation/environments/yard.toml',scenario_scene='simulation/scenes/yard.json')

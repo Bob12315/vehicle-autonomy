@@ -19,7 +19,7 @@ from vehicle_autonomy.vehicles.rover.ardupilot_commands import ArduRoverCommandT
 
 def run(run_dir: Path, *, gazebo: bool = False, full: bool = False) -> dict:
     run_dir.mkdir(parents=True, exist_ok=False)
-    owned = OwnedSimulation(run_dir, "rover")
+    owned = OwnedSimulation(run_dir, "rover", confirmation_signing=True)
     runtime = None
     trajectory = (run_dir / "trajectory.jsonl").open("w")
     events = (run_dir / "runtime.jsonl").open("w")
@@ -28,7 +28,7 @@ def run(run_dir: Path, *, gazebo: bool = False, full: bool = False) -> dict:
         owned.start()
         oracle = GazeboTruthOracle(owned.world, owned.model)
         profile = owned.profile
-        runtime = SimulationRuntime(profile, translator=ArduRoverCommandTranslator(mode_ids=profile.mode_ids),
+        runtime = SimulationRuntime(profile, receive_signing=owned.receive_signing, translator=ArduRoverCommandTranslator(mode_ids=profile.mode_ids),
             event_sink=lambda event: (events.write(json.dumps(event) + "\n"), events.flush()))
         runtime.connect()
         warmup_deadline = time.monotonic() + profile.warmup_ns / 1e9

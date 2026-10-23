@@ -23,7 +23,7 @@ from vehicle_autonomy.vehicles.rover.ardupilot_commands import ArduRoverCommandT
 
 def run(run_dir: Path, kind: str) -> dict:
     run_dir.mkdir(parents=True, exist_ok=False)
-    owned = OwnedSimulation(run_dir, kind)
+    owned = OwnedSimulation(run_dir, kind, confirmation_signing=True)
     runtime = proxy = oracle = None
     events = (run_dir / "runtime.jsonl").open("w")
     trajectory = (run_dir / "trajectory.jsonl").open("w")
@@ -37,7 +37,7 @@ def run(run_dir: Path, kind: str) -> dict:
 
         def new_runtime():
             translator = (ArduRoverCommandTranslator if kind == "rover" else ArduPilotCommandTranslator)(mode_ids=profile.mode_ids)
-            selected = SimulationRuntime(profile, translator=translator,
+            selected = SimulationRuntime(profile, receive_signing=owned.receive_signing, translator=translator,
                 event_sink=lambda event: (events.write(json.dumps(event) + "\n"), events.flush()))
             selected.connect()
             return selected
@@ -227,9 +227,12 @@ def run(run_dir: Path, kind: str) -> dict:
 
         # Restart an actual Runtime process, and deliver an actual SIGTERM
         # while its typed velocity stream is moving the Gazebo vehicle.
+        signing_config=json.loads(owned.signing_config_path.read_text())
+        signing_config['floor']=owned.receive_signing.watermark
+        owned.signing_config_path.write_text(json.dumps(signing_config))
         worker_report = run_dir / "runtime-process-motion.json"
         worker_args = [sys.executable, "-m", "tests.simulation.runtime_worker", "--kind", kind,
-                       "--port", str(proxy.port), "--report", str(worker_report), "--allow-send"]
+                       "--port", str(proxy.port), "--receive-signing", str(owned.signing_config_path), "--report", str(worker_report), "--allow-send"]
         worker = owned.start_process("runtime_motion", worker_args)
         start = oracle.latest()
         deadline = time.monotonic() + 15
@@ -259,6 +262,7 @@ def run(run_dir: Path, kind: str) -> dict:
         readonly.wait(timeout=20)
         owned.stop_process(readonly)
         restarted = json.loads(readonly_report.read_text())
+        owned.receive_signing.watermark=max(owned.receive_signing.watermark,restarted['receive_highwater'])
         if (readonly.returncode != 0 or not restarted["passed"] or restarted["initial_send"]
                 or restarted["initial_lease"] is not None or len(proxy.tx()) != count):
             raise AssertionError("restarted Runtime process retained authority or sent commands")

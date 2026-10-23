@@ -1,6 +1,6 @@
 """Common simulation loop: authority, telemetry, writer and session epochs."""
 
-from tests.mavlink_fixture import pack, heartbeat_evidence
+from tests.mavlink_fixture import receive_signing, pack, heartbeat_evidence
 
 from datetime import datetime, timezone
 from pathlib import Path
@@ -81,7 +81,7 @@ class SimulationRuntimeTests(unittest.TestCase):
         self.transports = []
         self.sender = mavlink.MAVLink(None, srcSystem=1, srcComponent=1)
         profile = SimulationProfile.load(PROFILE)
-        self.runtime = SimulationRuntime(profile,
+        self.runtime = SimulationRuntime(profile, receive_signing=receive_signing(),
             translator=ArduPilotCommandTranslator(mode_ids=profile.mode_ids),
             transport_factory=self.make_transport, clock=self.clock)
 

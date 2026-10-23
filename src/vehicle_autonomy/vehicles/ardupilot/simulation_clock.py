@@ -20,6 +20,10 @@ class SimulationSourceClock:
 
     def capture(self, message: object, received: TimePoint) -> TimePoint | None:
         kind = message.get_type()
+        if kind in ('HEARTBEAT', 'COMMAND_ACK'):
+            # These messages carry no capture clock. Neighboring source time
+            # and host receipt cannot create one, even on localhost SITL.
+            return None
         if kind not in ("LOCAL_POSITION_NED", "GLOBAL_POSITION_INT", "ATTITUDE", "GPS_RAW_INT"):
             return received
         if kind=='GPS_RAW_INT':

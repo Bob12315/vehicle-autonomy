@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from tests.mavlink_fixture import pack, heartbeat_evidence
+from tests.mavlink_fixture import receive_signing, pack, heartbeat_evidence
 
 
 from datetime import datetime, timezone
@@ -74,7 +74,7 @@ class P6SitlRuntimeTests(unittest.TestCase):
         return pack(self.sender.command_ack_encode(CMD_SET_MODE, 0), self.sender)
 
     def make_runtime(self, allow_send=True):
-        runtime = SitlRuntime(self.profile, allow_send=allow_send,
+        runtime = SitlRuntime(self.profile, receive_signing=receive_signing(), allow_send=allow_send,
                               transport=self.transport, clock=self.clock)
         self.transport.incoming.append(self.heartbeat())
         runtime.cycle()
@@ -83,7 +83,7 @@ class P6SitlRuntimeTests(unittest.TestCase):
         return runtime
 
     def test_start_without_heartbeat_reports_missing_state(self):
-        runtime = SitlRuntime(self.profile, transport=self.transport, clock=self.clock)
+        runtime = SitlRuntime(self.profile, receive_signing=receive_signing(), transport=self.transport, clock=self.clock)
         with self.assertRaisesRegex(RuntimeError, "fresh SITL vehicle state required"):
             runtime.start_mission()
         runtime.shutdown()
@@ -172,7 +172,7 @@ class P6SitlRuntimeTests(unittest.TestCase):
 
     def test_stale_state_and_expired_effect_are_distinct(self):
         profile = replace(self.profile, link_timeout_ns=5_000_000_000)
-        runtime = SitlRuntime(profile, allow_send=True,
+        runtime = SitlRuntime(profile, receive_signing=receive_signing(), allow_send=True,
                               transport=self.transport, clock=self.clock)
         self.transport.incoming.append(self.heartbeat())
         runtime.cycle()
@@ -198,7 +198,7 @@ class P6SitlRuntimeTests(unittest.TestCase):
         translator = SitlModeTranslator(mode_ids={"GUIDED": 4})
         with self.assertRaisesRegex(ValueError, "only a mode"):
             translator.translate(ArmCommand())
-        runtime = SitlRuntime(self.profile, allow_send=True,
+        runtime = SitlRuntime(self.profile, receive_signing=receive_signing(), allow_send=True,
                               transport=self.transport, clock=self.clock)
         self.transport.incoming.append(self.heartbeat(armed=True))
         runtime.cycle()

@@ -11,6 +11,7 @@ from vehicle_autonomy.contracts.effects.vehicle import TwistTargetEffect
 from vehicle_autonomy.app.bootstrap.simulation_runtime import SimulationRuntime
 from vehicle_autonomy.app.bootstrap.simulation_profile import SimulationProfile
 from tests.simulation.launch import ROOT
+from vehicle_autonomy.vehicles.ardupilot.mavlink.signing import ReceiveSigning
 from vehicle_autonomy.vehicles.ardupilot.commands import ArduPilotCommandTranslator
 from vehicle_autonomy.vehicles.rover.ardupilot_commands import ArduRoverCommandTranslator
 
@@ -19,6 +20,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--kind', required=True, choices=('copter', 'rover'))
     parser.add_argument('--port', type=int, required=True)
+    parser.add_argument('--receive-signing', type=Path, required=True)
     parser.add_argument('--report', type=Path, required=True)
     parser.add_argument('--allow-send', action='store_true')
     args = parser.parse_args()
@@ -31,7 +33,9 @@ def main():
     profile = replace(SimulationProfile.load(ROOT / f'simulation/profiles/{args.kind}.toml'), port=args.port)
     translator = (ArduRoverCommandTranslator if args.kind == 'rover' else ArduPilotCommandTranslator)(mode_ids=profile.mode_ids)
     events = []
-    runtime = SimulationRuntime(profile, translator=translator, event_sink=events.append)
+    config=json.loads(args.receive_signing.read_text())
+    verifier=ReceiveSigning(bytes.fromhex(config['key']),initial_timestamp=config['floor'])
+    runtime = SimulationRuntime(profile, translator=translator, event_sink=events.append, receive_signing=verifier)
     report = {'passed': False, 'initial_send': runtime.authority.system_send,
               'initial_lease': runtime.authority.lease, 'kind': args.kind}
     def save():
@@ -86,6 +90,9 @@ def main():
         report['error'] = f'{type(exc).__name__}: {exc}'
     finally:
         report['stops'] = runtime.shutdown()
+        config['floor']=verifier.watermark
+        args.receive_signing.write_text(json.dumps(config))
+        report['receive_highwater']=verifier.watermark
         report['final_send'] = runtime.authority.system_send
         report['final_lease'] = runtime.authority.lease
         if args.allow_send and report['stops'] != {'signal-motion': 'CONFIRMED'}:

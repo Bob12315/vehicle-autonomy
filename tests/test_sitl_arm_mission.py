@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from tests.mavlink_fixture import pack, heartbeat_evidence
+from tests.mavlink_fixture import receive_signing, pack, heartbeat_evidence
 
 
 from pathlib import Path
@@ -38,7 +38,7 @@ class SitlArmMissionTests(unittest.TestCase):
         return pack(self.sender.command_ack_encode(CMD_SET_MODE, 0), self.sender)
 
     def make_runtime(self):
-        runtime = SitlRuntime(self.profile, allow_send=True, allow_arm=True,
+        runtime = SitlRuntime(self.profile, receive_signing=receive_signing(), allow_send=True, allow_arm=True,
                               arm_then_disarm=True, transport=self.transport,
                               clock=self.clock)
         self.transport.incoming.append(self.heartbeat())
@@ -61,7 +61,7 @@ class SitlArmMissionTests(unittest.TestCase):
 
     def test_permission_and_translator_restrict_scope_before_connection(self):
         with self.assertRaisesRegex(ValueError, "explicit SEND"):
-            SitlRuntime(self.profile, arm_then_disarm=True, allow_send=False,
+            SitlRuntime(self.profile, receive_signing=receive_signing(), arm_then_disarm=True, allow_send=False,
                         allow_arm=True, transport=self.transport, clock=self.clock)
         translator = SitlArmTranslator(mode_ids={"GUIDED": 4})
         self.assertIsNotNone(translator.translate(ArmCommand()))

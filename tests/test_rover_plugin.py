@@ -1,6 +1,6 @@
 """Rover protocol and common-runtime safety checks."""
 
-from tests.mavlink_fixture import pack, heartbeat_evidence
+from tests.mavlink_fixture import receive_signing, pack, heartbeat_evidence
 
 from pathlib import Path
 import unittest
@@ -45,10 +45,10 @@ class RoverPluginTests(unittest.TestCase):
         clock = Clock()
         transport = Transport()
         with self.assertRaises(ValueError):
-            SimulationRuntime(self.profile,
+            SimulationRuntime(self.profile, receive_signing=receive_signing(),
                 translator=ArduPilotCommandTranslator(mode_ids={"GUIDED": 4}),
                 transport_factory=lambda *a, **kw: transport, clock=clock)
-        runtime = SimulationRuntime(self.profile, translator=self.translator,
+        runtime = SimulationRuntime(self.profile, receive_signing=receive_signing(), translator=self.translator,
             transport_factory=lambda *a, **kw: transport, clock=clock)
         sender = mavlink.MAVLink(None, srcSystem=1, srcComponent=1)
         runtime.connect()
@@ -65,7 +65,7 @@ class RoverPluginTests(unittest.TestCase):
     def test_guided_drive_uses_only_fenced_writer(self):
         clock = Clock()
         transport = Transport()
-        runtime = SimulationRuntime(self.profile, translator=self.translator,
+        runtime = SimulationRuntime(self.profile, receive_signing=receive_signing(), translator=self.translator,
             transport_factory=lambda *a, **kw: transport, clock=clock)
         sender = mavlink.MAVLink(None, srcSystem=1, srcComponent=1)
         heartbeat = pack(sender.heartbeat_encode(mavlink.MAV_TYPE_GROUND_ROVER, 3, 128, 15, 4), sender)

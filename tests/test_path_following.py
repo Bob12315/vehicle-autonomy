@@ -1,6 +1,6 @@
 """Motion admission, frame binding, live fences and observed stop semantics."""
 
-from tests.mavlink_fixture import pack
+from tests.mavlink_fixture import receive_signing, pack
 from dataclasses import replace
 import hashlib
 import json
@@ -279,7 +279,7 @@ class SoleWriterTests(unittest.TestCase):
         clock, transport = helpers.Clock(),helpers.Transport()
         fault = [None]
         profile=SimulationProfile.load("simulation/profiles/rover.toml")
-        runtime=SimulationRuntime(profile,translator=ArduRoverCommandTranslator(mode_ids=profile.mode_ids),
+        runtime=SimulationRuntime(profile, receive_signing=receive_signing(),translator=ArduRoverCommandTranslator(mode_ids=profile.mode_ids),
             transport_factory=lambda *a,**k:transport,clock=clock,motion_guard=lambda *args:fault[0])
         self.addCleanup(runtime.shutdown)
         sender=mavlink.MAVLink(None,srcSystem=1,srcComponent=1)

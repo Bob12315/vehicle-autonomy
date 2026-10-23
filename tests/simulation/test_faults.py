@@ -1,6 +1,6 @@
 """Deterministic fault matrix at the real configs/codec/writer boundary."""
 
-from tests.mavlink_fixture import pack
+from tests.mavlink_fixture import receive_signing, pack
 
 from dataclasses import replace
 from datetime import datetime, timezone
@@ -68,7 +68,7 @@ class Rig:
         self.events = []
         translator = (ArduRoverCommandTranslator if kind == "rover" else ArduPilotCommandTranslator)(
             mode_ids=self.profile.mode_ids)
-        self.runtime = SimulationRuntime(self.profile, translator=translator, clock=self.clock,
+        self.runtime = SimulationRuntime(self.profile, receive_signing=receive_signing(), translator=translator, clock=self.clock,
             transport_factory=self.transport, event_sink=self.events.append,
             sleep=lambda _: self.supply_zero())
         self.runtime.connect()
@@ -278,7 +278,7 @@ class DualVehicleFaultTests(unittest.TestCase):
                 status = rig.runtime._execution.stop_status("drive")
                 self.assertEqual(status.state.value, "TRANSMITTED")
                 self.assertEqual(len(rig.wire.writes), 2)
-                codec = MavlinkCodec(source_system=1, source_component=1, target_system=250, target_component=191)
+                codec = MavlinkCodec(receive_signing=receive_signing(), source_system=1, source_component=1, target_system=250, target_component=191)
                 stop = codec.feed(rig.wire.writes[-1])[0]
                 self.assertEqual((stop.vx, stop.vy, stop.vz, stop.yaw_rate), (0, 0, 0, 0))
                 rig.fresh()

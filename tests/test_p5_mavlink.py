@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from tests.mavlink_fixture import pack, heartbeat_evidence
+from tests.mavlink_fixture import receive_signing, pack, heartbeat_evidence
 
 
 import ast
@@ -99,7 +99,7 @@ class P5MavlinkTests(unittest.TestCase):
     def setUp(self):
         self.transport = MemoryTransport()
         self.authority = ControlAuthority()
-        self.codec = MavlinkCodec(source_system=250, source_component=191, target_system=1, target_component=1)
+        self.codec = MavlinkCodec(receive_signing=receive_signing(), source_system=250, source_component=191, target_system=1, target_component=1)
         self.translator = ArduPilotCommandTranslator(mode_ids={"GUIDED": 4})
         self.now_ns = 100
         self.port = ArduPilotCommandPort(
@@ -157,7 +157,7 @@ class P5MavlinkTests(unittest.TestCase):
         self.assertEqual(receipt.phase, CommandPhase.ACCEPTED)
         self.assertEqual(self.transport.writes, [])
         self.assertEqual(self.write(102).phase, CommandPhase.TRANSMITTED)
-        decoded = MavlinkCodec(source_system=1, source_component=1, target_system=250, target_component=191).feed(self.transport.writes[0])
+        decoded = MavlinkCodec(receive_signing=receive_signing(), source_system=1, source_component=1, target_system=250, target_component=191).feed(self.transport.writes[0])
         self.assertEqual(decoded[0].get_type(), "COMMAND_LONG")
         self.assertEqual(decoded[0].command, mavlink.MAV_CMD_COMPONENT_ARM_DISARM)
         self.assertEqual(decoded[0].param1, 1)
@@ -234,7 +234,7 @@ class P5MavlinkTests(unittest.TestCase):
         pose = Pose3(Vector3(2, 3, 4), Quaternion(0, 0, 0, 1))
         self.execution.dispatch(effect(1, PoseTargetEffect("odom", pose, "pose")), world(), at(101))
         self.write(102)
-        msg = MavlinkCodec(source_system=1, source_component=1, target_system=250, target_component=191).feed(self.transport.writes[-1])[0]
+        msg = MavlinkCodec(receive_signing=receive_signing(), source_system=1, source_component=1, target_system=250, target_component=191).feed(self.transport.writes[-1])[0]
         self.assertEqual(msg.coordinate_frame, mavlink.MAV_FRAME_LOCAL_NED)
         self.assertEqual(msg.type_mask, 2552)
         self.assertEqual((msg.x, msg.y, msg.z), (3, 2, -4))
@@ -242,7 +242,7 @@ class P5MavlinkTests(unittest.TestCase):
         twist = Twist3(Vector3(1, 1, 0.5), Vector3(0, 0, 0.2))
         self.execution.dispatch(effect(2, TwistTargetEffect("base_link", twist, "body")), world(), at(103))
         self.write(104)
-        msg = MavlinkCodec(source_system=1, source_component=1, target_system=250, target_component=191).feed(self.transport.writes[-1])[0]
+        msg = MavlinkCodec(receive_signing=receive_signing(), source_system=1, source_component=1, target_system=250, target_component=191).feed(self.transport.writes[-1])[0]
         self.assertEqual(msg.coordinate_frame, mavlink.MAV_FRAME_BODY_NED)
         self.assertEqual((msg.vx, msg.vy, msg.vz), (1, -1, -0.5))
         self.assertAlmostEqual(msg.yaw_rate, -0.2, places=6)
@@ -264,7 +264,7 @@ class P5MavlinkTests(unittest.TestCase):
             with self.subTest(command=type(command).__name__):
                 instruction = self.translator.translate(command)
                 packet = self.codec.encode(instruction)
-                parsed = MavlinkCodec(source_system=1, source_component=1, target_system=250, target_component=191).feed(packet)[0]
+                parsed = MavlinkCodec(receive_signing=receive_signing(), source_system=1, source_component=1, target_system=250, target_component=191).feed(packet)[0]
                 self.assertEqual(parsed.command, command_number)
                 self.assertEqual(parsed.param1, param1)
                 self.assertEqual(parsed.param7, param7)
@@ -280,7 +280,7 @@ class P5MavlinkTests(unittest.TestCase):
         self.assertEqual(stop.state, StopState.ACCEPTED)
         self.assertEqual(self.port.status(motion.command_id).phase, CommandPhase.CANCELLED)
         self.assertEqual(self.write(113).phase, CommandPhase.TRANSMITTED)
-        msg = MavlinkCodec(source_system=1, source_component=1, target_system=250, target_component=191).feed(self.transport.writes[-1])[0]
+        msg = MavlinkCodec(receive_signing=receive_signing(), source_system=1, source_component=1, target_system=250, target_component=191).feed(self.transport.writes[-1])[0]
         self.assertEqual((msg.vx, msg.vy, msg.vz, msg.yaw_rate), (0, 0, 0, 0))
         self.assertEqual(self.execution.stop_status("stream").state, StopState.TRANSMITTED)
         sample = self.sender.local_position_ned_encode(114, 0, 0, 0, 0, 0, 0)

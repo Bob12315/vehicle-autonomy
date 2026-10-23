@@ -31,9 +31,10 @@ def run(runtime, proxy, pump, writes):
         return wait(name)
     command('review-guided',ModeEffect('GUIDED'))
     with proxy._lock:
-        previous=next(r for r in reversed(proxy.records) if r.get('direction')=='rx_forward'
-                      and r.get('type')=='HEARTBEAT' and not r['payload']['base_mode'] & 128)
-        old_heartbeat=bytes.fromhex(previous['raw_hex'])
+        previous=[r for r in proxy.records if r.get('direction')=='rx_forward'
+                      and r.get('type')=='HEARTBEAT' and not r['payload']['base_mode'] & 128][-2:]
+        old_heartbeats=[bytes.fromhex(r['raw_hex']) for r in previous]
+        old_heartbeat=old_heartbeats[-1]
     arm=command('review-arm',ArmEffect())
     with proxy._lock:
         old_ack=bytes.fromhex(next(r for r in reversed(proxy.records) if r.get('direction')=='rx_forward'
@@ -76,6 +77,64 @@ def run(runtime, proxy, pump, writes):
     disarm2=command('review-disarm-2',DisarmEffect())
     result['normal_continuous_arm_disarm']={'passed':True,'statuses':[arm,disarm,arm2,disarm2],
                                           'final_armed':False}
+
+    # Three REAL AP 8-bit sequence wraps while the actual Disarm frame is
+    # withheld. Sources/HBs continue progressing; exact historical ACK/HBs
+    # remain ineligible even when the headers alias. Allow the ORIGINAL TTL
+    # to expire, report UNKNOWN, then discard (never release) its held frame.
+    command('review-wrap-arm',ArmEffect())
+    before=len(writes)
+    proxy.inject(hold_tx_commands={400})
+    admitted=runtime.submit_effect(DisarmEffect(),effect_id='review-wrap-disarm')
+    if admitted.reason:raise AssertionError(admitted.reason)
+    pump(.2)
+    with proxy._lock:cursor=len(proxy.records)
+    wraps=0;last_seq=None;trace=[];deadline=time.monotonic()+15
+    initial_rejects=dict(runtime._receive_signing.rejected)
+    while wraps<3 and time.monotonic()<deadline:
+        pump(.1)
+        with proxy._lock:
+            batch=list(proxy.records[cursor:]);cursor=len(proxy.records)
+        for record in batch:
+            if record.get('direction')!='rx':continue
+            seq=record['sequence']
+            if last_seq is not None and seq<last_seq:
+                wraps+=1
+                proxy.replay_rx(old_ack)
+                for raw in old_heartbeats:proxy.replay_rx(raw)
+                trace.append(dict(wrap=wraps,host_ns=time.monotonic_ns(),sequence=seq))
+            last_seq=seq
+        state=runtime.world_snapshot().vehicle
+        status=runtime.effect_status('review-wrap-disarm')
+        if (status['phase']=='COMPLETED' or state is None or not state.operation.armed
+                or len(writes)!=before+1):
+            raise AssertionError(f'wrap replay corrupted request/world/writer: {status}')
+    if wraps<3:raise AssertionError('three actual AP sequence wraps not observed')
+    until=time.monotonic()+6
+    while runtime.effect_status('review-wrap-disarm')['phase']!='UNKNOWN' and time.monotonic()<until:
+        pump(.1)
+    pump(.2)  # ensure final queued replay actually traversed the proxy
+    final=runtime.effect_status('review-wrap-disarm')
+    if final['phase']!='UNKNOWN':raise AssertionError(f'missing evidence did not remain UNKNOWN: {final}')
+    if runtime._effects['review-wrap-disarm'] in runtime._port.ack_evidence:
+        raise AssertionError('old ACK acquired new confirmation eligibility')
+    if runtime._receive_signing.rejected['replay']-initial_rejects['replay']<wraps*3:
+        raise AssertionError('replay bytes were not actually delivered/rejected')
+    result['wraparound_replay']=dict(passed=True,full_wraps=wraps,trace=trace,
+        final=final,world_armed=runtime.world_snapshot().vehicle.operation.armed,
+        actual_writer_calls=len(writes)-before,ack_accepted=False,
+        signature_rejections=dict(runtime._receive_signing.rejected),
+        signature_rejections_before=initial_rejects,old_ack_hex=old_ack.hex(),
+        old_heartbeat_hex=[raw.hex() for raw in old_heartbeats])
+    runtime._close_link('review_ambiguous_epoch_end')
+    proxy.disconnect()
+    time.sleep(.2)
+    proxy.inject(hold_tx_commands=set())
+    runtime.connect();pump(1.2)
+    runtime.begin_run(allow_send=True)
+    result['wraparound_replay']['new_session_disarm']=command('review-wrap-recovery',DisarmEffect())
+    if runtime.world_snapshot().vehicle.operation.armed:
+        raise AssertionError('new-session legitimate Disarm did not update World')
 
     def short_request(name):
         now=runtime.clock()
@@ -139,8 +198,12 @@ def run(runtime, proxy, pump, writes):
     # Every attempted wire frame is independently decoded, including across wraps.
     frames=[proxy.frame_metadata(bytes.fromhex(w['raw_hex'])) for w in writes]
     sequences=[frame['sequence'] for frame in frames]
-    if any(b!=(a+1)&255 for a,b in zip(sequences,sequences[1:])):
-        raise AssertionError(f'wire sequence differs from writer order: {sequences}')
-    result['wire_order']={'passed':True,'sequences':sequences,'frames':frames}
+    epochs={}
+    for write,frame in zip(writes,frames):
+        epochs.setdefault(write['transport_epoch'],[]).append(frame['sequence'])
+    for values in epochs.values():
+        if values[0]!=0 or any(b!=(a+1)&255 for a,b in zip(values,values[1:])):
+            raise AssertionError(f'wire sequence differs from writer order: {epochs}')
+    result['wire_order']={'passed':True,'sequences':sequences,'frames':frames,'transport_epochs':epochs}
     runtime.end_run()
     return result

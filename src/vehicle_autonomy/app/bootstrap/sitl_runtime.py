@@ -49,7 +49,7 @@ class SitlRuntime:
     def __init__(self, profile: SitlProfile, *, allow_send: bool = False,
                  transport=None, clock=None, event_sink=None,
                  sitl_version: str | None = None, arm_then_disarm: bool = False,
-                 allow_arm: bool = False) -> None:
+                 allow_arm: bool = False, receive_signing=None) -> None:
         if not isinstance(profile, SitlProfile):
             raise TypeError("validated SITL profile required")
         if arm_then_disarm and (not allow_send or not allow_arm or profile.arm_ready_wait_ns <= 0):
@@ -81,7 +81,7 @@ class SitlRuntime:
             profile.host, profile.port, timeout_s=profile.read_timeout_ns / 1e9)
         self._codec = MavlinkCodec(source_system=250, source_component=191,
                                   target_system=profile.target_system,
-                                  target_component=profile.target_component)
+                                  target_component=profile.target_component, receive_signing=receive_signing)
         self._port = ArduPilotCommandPort(
             authority=self.authority, transport=self._transport, codec=self._codec,
             translator=(SitlArmTranslator if arm_then_disarm else SitlModeTranslator)(

@@ -25,7 +25,7 @@ def yaw_only(pose: Pose3) -> Pose3:
 
 def run(run_dir: Path, *, goto: bool = False, full: bool = False) -> dict:
     run_dir.mkdir(parents=True, exist_ok=False)
-    owned = OwnedSimulation(run_dir, "copter")
+    owned = OwnedSimulation(run_dir, "copter", confirmation_signing=True)
     runtime = None
     observations = (run_dir / "observations.jsonl").open("w")
     events = (run_dir / "runtime.jsonl").open("w")
@@ -35,7 +35,7 @@ def run(run_dir: Path, *, goto: bool = False, full: bool = False) -> dict:
         oracle = GazeboTruthOracle(owned.world, owned.model)
         profile = owned.profile
         scenario = json.loads((ROOT / "simulation/scenarios/acceptance-v1.json").read_text())["copter"]
-        runtime = SimulationRuntime(profile,
+        runtime = SimulationRuntime(profile, receive_signing=owned.receive_signing,
             translator=ArduPilotCommandTranslator(mode_ids=profile.mode_ids),
             event_sink=lambda event: (events.write(json.dumps(event) + "\n"), events.flush()))
         runtime.connect()

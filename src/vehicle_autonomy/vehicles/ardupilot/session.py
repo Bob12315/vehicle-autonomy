@@ -22,8 +22,9 @@ class ArduPilotSession:
     """One receiver and one writer over an injected transport.
 
     Capture timing is mandatory for state publication. A caller may leave it
-    absent for ACK/link handling, so unknown vehicle sample age never becomes
-    a fresh VehicleState by assumption.
+    absent for link diagnostics. ACK/operation confirmation additionally needs
+    the codec's explicit receive authenticator. Source-clock qualification is
+    only a telemetry ordering policy; it cannot authenticate a heartbeat.
     """
 
     def __init__(self, *, transport: ByteTransport, codec: MavlinkCodec,
@@ -59,10 +60,6 @@ class ArduPilotSession:
         self._boot: dict[str, int] = {}
         self._source_capture: TimePoint | None = None
         self._source_boot: int | None = None
-        self._operation = None
-        self._operation_candidate = None
-        self._operation_candidate_boot = -1
-        self._operation_matches = 0
         self._reply_interval_ambiguous = False
         self._pending_packets: list[tuple] = []
         self._delivered_ticket = -1
@@ -130,33 +127,11 @@ class ArduPilotSession:
             self._commands.observe_receive_ticket(ticket)
             if message.get_type() == "COMMAND_ACK":
                 self._commands.handle_ack(message, at, ticket=ticket)
-            elif message.get_type() == "HEARTBEAT" and self._confirmation_time_qualified:
+            elif message.get_type() == "HEARTBEAT":
                 self._commands.observe_heartbeat(message, at, ticket=ticket,
                     before_capture=before, after_capture=after,
                     before_boot=before_boot, after_boot=after_boot)
             if self._state is not None and self._captured_at is not None:
-                if message.get_type() == "HEARTBEAT" and self._confirmation_time_qualified:
-                    operation = (bool(message.base_mode & 128), int(message.custom_mode))
-                    if self._operation is None:
-                        self._operation = operation  # initial state, no command can complete from it
-                    elif operation != self._operation:
-                        if operation != self._operation_candidate:
-                            self._operation_candidate, self._operation_matches = operation, 0
-                            self._operation_candidate_boot = -1
-                        if before_boot is not None and after_boot is not None and after_boot > before_boot and before_boot > self._operation_candidate_boot:
-                            self._operation_matches += 1
-                            self._operation_candidate_boot = before_boot
-                        if self._operation_matches < 2:
-                            # A single untime-stamped state change is ambiguous.
-                            # Keep the last confirmed state at its ORIGINAL age.
-                            self._state.observe_telemetry(message, captured_at=None, received_at=at)
-                            self._delivered_ticket = ticket
-                            return
-                        self._operation = operation
-                        self._operation_candidate = None
-                    else:
-                        self._operation_candidate = None
-                        self._operation_matches = 0
                 if sample_time is not None:
                     ingested |= self._state.ingest(message, captured_at=sample_time, received_at=at)
                 else:
@@ -183,6 +158,35 @@ class ArduPilotSession:
                 # renews normalized operation state until the source bracket.
                 self._last_heartbeat = received_at
             if self._session_id is None:
+                continue
+            signature = getattr(message, '_vaf_signature_timestamp', None)
+            if self._codec.receive_signing is not None and signature is None:
+                reason = getattr(message, '_vaf_signature_rejection', 'unqualified')
+                counter = 'duplicate' if reason == 'replay' else 'unqualified_packet'
+                self.receive_rejections[counter] = self.receive_rejections.get(counter,0)+1
+                self._state.note_rejected_telemetry(message, 'duplicate' if reason == 'replay' else 'unqualified')
+                # Keep the last authenticated diagnostic value too. Raw
+                # rejected payloads remain in the caller's receive log; they
+                # must not overwrite WorldSnapshot's newer heartbeat field.
+                continue
+            if kind in ('HEARTBEAT', 'COMMAND_ACK'):
+                if signature is None:
+                    # Unauthenticated headers and other messages' timestamps
+                    # cannot establish the generation of this state/ACK.
+                    self.receive_rejections.setdefault('unqualified_confirmation', 0)
+                    self.receive_rejections['unqualified_confirmation'] += 1
+                    self._state.observe_telemetry(message, captured_at=None, received_at=received_at)
+                else:
+                    # The pinned stream's MAC and strictly increasing 48-bit
+                    # timestamp were checked by Codec, independently of seq.
+                    deliver(message, received_at, self._rx_ticket, received_at)
+                continue
+            if signature is not None and kind not in ('ATTITUDE','GLOBAL_POSITION_INT','LOCAL_POSITION_NED'):
+                # Authenticated stream order is independently proven. Don't
+                # delay these packets behind a source bracket: that would
+                # ingest their OLD receive time after a newer signed heartbeat.
+                sample = None if self._captured_at is None else self._captured_at(message,received_at)
+                deliver(message,received_at,self._rx_ticket,sample)
                 continue
             if self._confirmation_time_qualified and kind not in ("ATTITUDE", "GLOBAL_POSITION_INT", "LOCAL_POSITION_NED"):
                 if self._rx_sequence is None:
@@ -277,10 +281,6 @@ class ArduPilotSession:
         self._boot.clear()
         self._source_capture = None
         self._source_boot = None
-        self._operation = None
-        self._operation_candidate = None
-        self._operation_candidate_boot = -1
-        self._operation_matches = 0
         self._reply_interval_ambiguous = False
         self._pending_packets.clear()
         self._delivered_ticket = -1

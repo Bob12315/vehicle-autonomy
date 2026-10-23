@@ -81,7 +81,7 @@ def main():
                             and not any(key.endswith('_error') for key in result))
                     if args.remediation and case=='probe':
                         required_review={'old_ack_heartbeat_replay','normal_continuous_arm_disarm',
-                                         'lock_expiry','guard_expiry','valid_after_rejections','wire_order'}
+                                         'lock_expiry','guard_expiry','valid_after_rejections','wire_order','wraparound_replay'}
                         passed=passed and all(result.get('remediation',{}).get(key,{}).get('passed') is True for key in required_review)
                     vehicle['stages'][case]=dict(passed=passed,summary=str(stage_dir/'summary.json'),
                         manifest=str(stage_dir/'manifest.json'),log=status['log'],cleanup=cleanup)
