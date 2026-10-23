@@ -72,7 +72,13 @@ class Round3ConfirmationTests(unittest.TestCase):
         r.submit_effect(DisarmEffect(),effect_id='disarm');step(b'')
         for _ in range(wraps):
             source(253)
-            if unsigned:
+            if unsigned == 'review-bytes':
+                # Exact unsigned bytes from the supplied second-review FAIL.
+                replay_ack=bytes.fromhex('fd0a0000fe01014d00009001000000000000fabffaee')
+                replay_hbs=[bytes.fromhex(x) for x in (
+                    'fd090000010101000000040000000203000403c6e9',
+                    'fd090000030101000000040000000203000403f7fd')]
+            elif unsigned:
                 # Same ambiguous command/state content with no authentication,
                 # including new headers: no finite byte cache can solve this.
                 u=mav.MAVLink(None,srcSystem=1,srcComponent=1);u.seq=254
@@ -105,6 +111,9 @@ class Round3ConfirmationTests(unittest.TestCase):
 
     def test_exact_second_review_wrap_replay_then_real_disarm(self):
         self.replay_case(1)
+
+    def test_original_review_unsigned_wire_bytes_after_wrap(self):
+        self.replay_case(1,unsigned='review-bytes')
 
     def test_three_wraps_signed_old_ack_and_heartbeats(self):
         self.replay_case(3)
