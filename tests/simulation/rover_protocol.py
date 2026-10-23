@@ -17,9 +17,9 @@ from tests.simulation.launch import OwnedSimulation, ROOT, install_signal_cleanu
 from vehicle_autonomy.vehicles.rover.ardupilot_commands import ArduRoverCommandTranslator
 
 
-def run(run_dir: Path, *, gazebo: bool = False, full: bool = False) -> dict:
+def run(run_dir: Path, *, gazebo: bool = False, full: bool = False, native_rtl: bool = False) -> dict:
     run_dir.mkdir(parents=True, exist_ok=False)
-    owned = OwnedSimulation(run_dir, "rover", confirmation_signing=True)
+    owned = OwnedSimulation(run_dir, "rover", confirmation_signing=True, rover_native_rtl=native_rtl)
     runtime = None
     trajectory = (run_dir / "trajectory.jsonl").open("w")
     events = (run_dir / "runtime.jsonl").open("w")
@@ -60,6 +60,9 @@ def run(run_dir: Path, *, gazebo: bool = False, full: bool = False) -> dict:
                 twist = None if state is None else state.reported_twist
                 trajectory.write(json.dumps({"host_ns": time.monotonic_ns(),
                     "truth": [truth.x_m, truth.y_m, truth.z_m, truth.yaw_rad],
+                    "state_position": None if state is None or state.reported_pose is None else
+                        [state.reported_pose.value.position.x,state.reported_pose.value.position.y,state.reported_pose.value.position.z],
+                    "mode": None if state is None else state.operation.native_mode,
                     "state_velocity": None if twist is None else
                     [twist.value.linear.x, twist.value.linear.y, twist.value.angular.z]}) + "\n")
             return state
@@ -271,6 +274,46 @@ def run(run_dir: Path, *, gazebo: bool = False, full: bool = False) -> dict:
             if len(transmitted_ids) < 2:
                 raise RuntimeError("Rover Goto lacked transmitted setpoints")
             stop_and_confirm("goto", "goto")
+        if native_rtl:
+            if not full or oracle is None:raise ValueError('native RTL requires full Gazebo acceptance')
+            if command('rtl-mode',ModeEffect('RTL'))['phase']!='COMPLETED':raise RuntimeError('native RTL mode unconfirmed')
+            # Wait for actual translation after native pivot alignment, then
+            # cancel before HOME arrival. Never count a stationary attempt.
+            until=time.monotonic()+12
+            while time.monotonic()<until:
+                cycle();entry_speed=oracle.recent_speed_mps();entry_truth=oracle.latest()
+                entry_error=math.hypot(entry_truth.x_m-summary['initial_truth'][0],entry_truth.y_m-summary['initial_truth'][1])
+                if entry_speed is not None and entry_speed>.15 and entry_error>scenario['goto_max_horizontal_error_m']:
+                    break
+            else:raise AssertionError('native RTL cancellation lacked moving-before-arrival evidence')
+            stops=runtime.end_run()
+            if stops.get('native-rover-rtl')!='CONFIRMED' or any(v!='CONFIRMED' for v in stops.values()):
+                raise RuntimeError('native Rover RTL cancellation not telemetry-confirmed')
+            stable=None;end=time.monotonic()+scenario['stop_timeout_s']
+            while time.monotonic()<end:
+                cycle();speed=oracle.recent_speed_mps()
+                good=speed is not None and speed<=scenario['stop_max_horizontal_speed_mps']
+                stable=(stable or time.monotonic()) if good else None
+                if stable and time.monotonic()-stable>=scenario['stop_stable_s']:break
+            else:raise TimeoutError('native RTL cancel did not physically stop')
+            summary['native_rtl_cancel']=dict(passed=True,stops=stops,ground_speed_mps=speed,
+                speed_at_cancel_mps=entry_speed,home_error_at_cancel_m=entry_error)
+            runtime.begin_run(allow_send=True)
+            if command('rtl-resume',ModeEffect('RTL'))['phase']!='COMPLETED':raise RuntimeError('native RTL resume unconfirmed')
+            end=time.monotonic()+45;stable=None
+            while time.monotonic()<end:
+                state=cycle();truth=oracle.latest();speed=oracle.recent_speed_mps()
+                error=math.hypot(truth.x_m-summary['initial_truth'][0],truth.y_m-summary['initial_truth'][1])
+                good=(error<=scenario['goto_max_horizontal_error_m'] and speed is not None
+                    and speed<=scenario['stop_max_horizontal_speed_mps'])
+                stable=(stable or time.monotonic()) if good else None
+                if stable and time.monotonic()-stable>=scenario['stop_stable_s']:break
+            else:
+                summary['native_rtl_failure']=dict(home_error_m=error,ground_speed_mps=speed,
+                    state_position=[state.reported_pose.value.position.x,state.reported_pose.value.position.y])
+                raise TimeoutError('native Rover RTL did not return and stop under original physical tolerances')
+            summary['native_rtl']=dict(passed=True,home_error_m=error,ground_speed_mps=speed)
+            if command('rtl-hold',ModeEffect('HOLD'))['phase']!='COMPLETED':raise RuntimeError('RTL handoff HOLD unconfirmed')
         if command("disarm", DisarmEffect())["phase"] != "COMPLETED":
             raise RuntimeError("Rover Disarm failed")
         if oracle is not None:
@@ -300,13 +343,14 @@ def main() -> int:
     parser.add_argument("--allow-send", action="store_true")
     parser.add_argument("--gazebo", action="store_true")
     parser.add_argument("--full", action="store_true")
+    parser.add_argument("--native-rtl", action="store_true")
     parser.add_argument("--run-dir", type=Path)
     args = parser.parse_args()
     if not args.allow_send:
         parser.error("explicit --allow-send required")
     install_signal_cleanup()
     summary = run(args.run_dir or ROOT / "artifacts/simulation" / f"rover-protocol-{uuid4().hex[:8]}",
-                  gazebo=args.gazebo or args.full, full=args.full)
+                  gazebo=args.gazebo or args.full, full=args.full, native_rtl=args.native_rtl)
     print(json.dumps(summary, sort_keys=True))
     return 0 if summary["passed"] and "shutdown_error" not in summary and "cleanup_error" not in summary else 1
 

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import replace
 import hashlib
+import math
 from datetime import datetime, timezone
 import json
 import os
@@ -54,12 +55,13 @@ def output(command: list[str], cwd: Path = ROOT) -> str:
 
 
 class OwnedSimulation:
-    def __init__(self, run_dir: Path, kind: str, *, rover_model='target_rover', rover_actuation='baseline', confirmation_signing=False):
+    def __init__(self, run_dir: Path, kind: str, *, rover_model='target_rover', rover_actuation='baseline', confirmation_signing=False, rover_native_rtl=False):
         if rover_model not in ('target_rover','compact_rover'):raise ValueError('unregistered owned Rover fixture')
         if rover_actuation not in ('baseline','low_rate'):raise ValueError('unregistered actuation fixture')
         self.run_dir = run_dir
         self.kind = kind
         self.confirmation_signing = confirmation_signing
+        self.rover_native_rtl = rover_native_rtl
         self.instance = choose_instance()
         self.port = 5760 + 10 * self.instance
         self.json_port = 9002 + 10 * self.instance
@@ -70,6 +72,9 @@ class OwnedSimulation:
             raise ValueError("unregistered simulation kind")
         self.model = "iris_with_gimbal" if kind == "copter" else "plane_runway" if kind == "plane" else rover_model
         profile_key='compact_rover' if kind=='rover' and rover_model=='compact_rover' else kind
+        if rover_native_rtl:
+            if kind != 'rover' or rover_model != 'target_rover':raise ValueError('native RTL fixture requires the audited Rover')
+            profile_key = 'rover_phase2'
         self.profile = replace(SimulationProfile.load(ROOT / f"simulation/profiles/{profile_key}.toml"), port=self.port)
         self.processes = []
         code_hash=hashlib.sha256()
@@ -113,6 +118,7 @@ class OwnedSimulation:
         default_names = ("copter.parm", "gazebo-iris.parm") if kind == "copter" else ("gazebo-zephyr.parm",) if kind == "plane" else ("rover.parm", "rover-skid.parm")
         self.params = [ARDUPILOT / "Tools/autotest/default_params" / name for name in default_names]
         self.params.append(ROOT / f"simulation/params/{kind}_telemetry.parm")
+        if rover_native_rtl:self.params.append(ROOT / "simulation/params/rover_phase2_rtl.parm")
         self.manifest["parameters"] = [str(p) for p in self.params]
         self.manifest["parameter_files_sha256"] = {str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in self.params}
         self.credentials = OwnedCredentials(run_dir, self.manifest)
@@ -163,6 +169,8 @@ class OwnedSimulation:
                     self.provision_receive_signing(suffix)
                     if self.kind == "plane":
                         self.verify_plane_parameters()
+                    elif self.rover_native_rtl:
+                        self.verify_parameters({"RTL_SPEED": .5, "WP_SPEED": .5, "WP_RADIUS": .2, "WP_PIVOT_ANGLE": 45., "WP_PIVOT_RATE": 30.}, "rover_parameter_readback")
                 return
             time.sleep(.1)
         raise TimeoutError("owned SITL TCP listener unavailable")
@@ -243,11 +251,14 @@ class OwnedSimulation:
 
     def verify_plane_parameters(self):
         """Read-only public parameter echo; no EEPROM or key inspection."""
-        from pymavlink.dialects.v20 import ardupilotmega as mav
         expected = {"RTL_ALTITUDE": 50., "TKOFF_ALT": 50., "AUTOLAND_WP_ALT": 40.,
                     "AUTOLAND_WP_DIST": 400., "SERVO3_MIN": 1100., "SERVO3_MAX": 1900.,
                     "FENCE_ENABLE": 1., "FENCE_TYPE": 3., "FENCE_ACTION": 1.,
                     "FENCE_RADIUS": 2000., "FENCE_ALT_MAX": 150., "FENCE_ALT_MAX_TP": 1.}
+        self.verify_parameters(expected, 'plane_parameter_readback')
+
+    def verify_parameters(self, expected, label):
+        from pymavlink.dialects.v20 import ardupilotmega as mav
         peer = mav.MAVLink(None, srcSystem=250, srcComponent=191)
         parser = mav.MAVLink(None); parser.robust_parsing = True
         observed = {}
@@ -268,11 +279,11 @@ class OwnedSimulation:
                     name=str(message.param_id).rstrip('\0')
                     if name in expected:
                         value=float(message.param_value)
-                        if abs(value-expected[name])>1e-6:
-                            raise RuntimeError('owned Plane parameter readback mismatch: '+name)
+                        if not math.isfinite(value) or abs(value-expected[name])>1e-6:
+                            raise RuntimeError('owned simulation parameter readback mismatch: '+name)
                         observed[name]=value
-        if observed.keys()!=expected.keys(): raise TimeoutError('owned Plane parameter readback incomplete')
-        self.manifest['plane_parameter_readback'] = observed
+        if observed.keys()!=expected.keys(): raise TimeoutError('owned simulation parameter readback incomplete')
+        self.manifest[label] = observed
         # Provisioning floor must include all verified traffic, including reads.
         self.signing_config_path.write_text(json.dumps(dict(key=self.signing_key.hex(),floor=self.receive_signing.watermark)))
         self._save()

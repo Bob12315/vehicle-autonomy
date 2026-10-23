@@ -40,8 +40,9 @@ def main():
                 vehicle=dict(passed=False,stages={});record['vehicles'][kind]=vehicle
                 cases=([('control','tests.simulation.plane_scenario',[])] if kind=='plane' else [
                     ('probe','tests.simulation.phase1_probe',['--kind',kind,'--review-remediation']),
-                    ('physical','tests.simulation.rover_protocol' if kind=='rover' else 'tests.simulation.copter_scenario',['--full']),
+                    ('physical','tests.simulation.rover_protocol' if kind=='rover' else 'tests.simulation.copter_scenario',['--full',*(['--native-rtl'] if kind=='rover' else [])]),
                     ('faults','tests.simulation.fault_scenario',['--kind',kind])])
+                if kind=='rover':cases.insert(1,('legacy_physical','tests.simulation.rover_protocol',['--full']))
                 for case,module,extra in cases:
                     name=f'{index}_{kind}_{case}';path=run/f'{kind}-{case}'
                     print(name+' starting',flush=True)
@@ -69,8 +70,14 @@ def main():
                     vehicle['groups']={group: bool(vehicle['stages']['probe']['passed'] and
                         probe.get('groups',{}).get(group,{}).get('passed')) for group in 'ABDEF'}
                     vehicle['groups']['C']=vehicle['stages']['physical']['passed']
+                    if kind=='rover':
+                        physical=json.loads(Path(vehicle['stages']['physical']['summary']).read_text())
+                        vehicle['groups']['C'] &= physical.get('native_rtl',{}).get('passed') is True and vehicle['stages']['legacy_physical']['passed']
+                        physical_manifest=json.loads(Path(vehicle['stages']['physical']['manifest']).read_text())
+                        vehicle['groups']['C'] &= len(physical_manifest.get('rover_parameter_readback',{}))==5
                     vehicle['groups']['D'] &= all(probe.get('remediation',{}).get(k,{}).get('passed') for k in required_review)
                     vehicle['groups']['E'] &= vehicle['stages']['faults']['passed'] and all(faults.get('faults',{}).get(k,{}).get('passed') for k in required_faults)
+                    if kind=='rover':vehicle['groups']['E'] &= physical.get('native_rtl_cancel',{}).get('passed') is True
                     vehicle['groups']['F'] &= all(stage['cleanup'] for stage in vehicle['stages'].values())
                 else:
                     control=json.loads(Path(vehicle['stages']['control']['summary']).read_text())

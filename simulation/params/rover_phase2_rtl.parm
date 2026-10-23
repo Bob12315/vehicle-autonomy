@@ -1,0 +1,8 @@
+# Dedicated native RTL fixture; original Phase 1 parameters remain unchanged.
+RTL_SPEED 0.5
+WP_SPEED 0.5
+WP_RADIUS 0.2
+# Align before the short final leg; avoid crossing the native finish line off-track.
+# 30 deg/s remains below the unchanged 0.7 rad/s Rover angular envelope.
+WP_PIVOT_ANGLE 45
+WP_PIVOT_RATE 30

@@ -69,7 +69,8 @@ class SimulationProfile:
         if port > 65535:
             raise ValueError("port out of range")
         modes = document["modes"]
-        if type(modes) is not dict or modes != _MODE_IDS[kind] or any(type(v) is not int for v in modes.values()):
+        audited_maps = (_MODE_IDS[kind], {"HOLD": 4, "GUIDED": 15, "RTL": 11}) if kind == "rover" else (_MODE_IDS[kind],)
+        if type(modes) is not dict or modes not in audited_maps or any(type(v) is not int for v in modes.values()):
             raise ValueError(f"{kind} mode IDs must match the audited ArduPilot map")
         timing = _exact(document["timing"], {"period_ns", "link_timeout_ns", "warmup_ns", "effect_ttl_ns", "lease_ns"}, "timing")
         for name, value in timing.items():

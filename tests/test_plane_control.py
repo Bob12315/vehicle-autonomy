@@ -33,7 +33,7 @@ class PlaneControlTests(unittest.TestCase):
         self.clock.advance();boot=self.clock.ns//1_000_000
         raw=prefix
         if ack is not None:raw+=pack(self.sender.command_ack_encode(ack,0,target_system=250,target_component=191),self.sender)
-        raw+=heartbeat_evidence(self.sender,1,mode,armed,boot)
+        raw+=heartbeat_evidence(self.sender,self.profile.mav_type,mode,armed,boot)
         if not self.origin_sent:
             raw+=pack(self.sender.gps_global_origin_encode(-353632620,1491652370,584000),self.sender)
             self.origin_sent=True
@@ -196,3 +196,13 @@ class PlaneControlTests(unittest.TestCase):
         self.assertFalse(self.runtime.authority.system_send)
         self.assertIsNone(self.runtime.authority.lease)
         self.assertEqual(self.transport.writes,[])
+
+    def test_lost_native_flight_retains_unconfirmed_shutdown_outcome(self):
+        self.begin(mode=12,armed=True,height=50,speed=17)
+        self.runtime.submit_effect(ModeEffect('LOITER'),effect_id='flight')
+        self.feed(mode=12,armed=True,height=50,speed=17)
+        self.feed(mode=12,armed=True,height=50,speed=17,ack=176)
+        before=len(self.transport.writes)
+        self.runtime._close_link('injected_link_loss')
+        self.assertEqual(self.runtime.shutdown(),{'fixed-wing-flight':'UNCONFIRMED'})
+        self.assertEqual(len(self.transport.writes),before)

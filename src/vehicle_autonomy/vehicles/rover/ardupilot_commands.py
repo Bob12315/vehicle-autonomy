@@ -19,8 +19,8 @@ class ArduRoverCommandTranslator(ArduPilotCommandTranslator):
     vehicle_kind = "rover"
 
     def __init__(self, *, mode_ids: dict[str, int]) -> None:
-        if mode_ids != {"HOLD": 4, "GUIDED": 15}:
-            raise ValueError("audited ArduRover HOLD/GUIDED mode map required")
+        if mode_ids not in ({"HOLD": 4, "GUIDED": 15}, {"HOLD": 4, "GUIDED": 15, "RTL": 11}):
+            raise ValueError("audited ArduRover HOLD/GUIDED[/RTL] mode map required")
         super().__init__(mode_ids=mode_ids)
 
     def translate(self, command: VehicleCommand, *, stop_frame: int | None = None) -> Instruction:

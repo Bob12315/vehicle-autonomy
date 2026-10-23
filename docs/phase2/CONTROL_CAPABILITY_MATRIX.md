@@ -10,7 +10,7 @@ Mission Graph 开发。仅隔离 localhost SITL + Gazebo，不开放硬件控制
 | 项目 | Rover | Copter | Plane（常规固定翼，非 QuadPlane） |
 | --- | --- | --- | --- |
 | 身份 | MAV_TYPE_GROUND_ROVER=10 | MAV_TYPE_QUADROTOR=2 | MAV_TYPE_FIXED_WING=1 |
-| 模式 | HOLD=4，GUIDED=15 | GUIDED=4，LOITER=5，RTL=6，LAND=9 | MANUAL=0（仅地面）、GUIDED=15，LOITER=12，RTL=11，TAKEOFF=13，AUTOLAND=26 |
+| 模式 | HOLD=4，GUIDED=15；独立 Phase 2 配置另启用 RTL=11 | GUIDED=4，LOITER=5，RTL=6，LAND=9 | MANUAL=0（仅地面）、GUIDED=15，LOITER=12，RTL=11，TAKEOFF=13，AUTOLAND=26 |
 | Arm/Disarm | 正常 CMD400，不强制解锁 | 同左；空中禁用危险 Disarm | 正常 CMD400；新鲜地面低速状态才允许 Disarm |
 | 本地位置 | odom ENU → LOCAL_NED，平面目标 | odom ENU → LOCAL_NED 三维位置和 yaw | FixedWingTargetEffect：COMMAND_INT DO_REPOSITION，AMSL 航点；飞往后持续盘旋，非悬停流 |
 | 速度/转向 | base_link FLU 前进/后退/偏航率 | ENU/FLU 三维速度和偏航率 | 不接受零速悬停或 Copter 的速度向量接口 |
@@ -69,3 +69,14 @@ FENCE_RADIUS=2000、FENCE_ALT_MAX=150、FENCE_ALT_MAX_TP=1（相对 HOME）。
 固定翼取消先通过 Execution 请求 LOITER，再撤销权限并返回
 `fixed-wing-flight: UNCONFIRMED`；这不意味着飞机已经物理停止。低空不满足安全切换条件、
 ACK/状态不充分或链路失效时如实保留不确定结果，绝不发送零速度/强制空中 Disarm。
+
+Rover 原生 RTL 仅由 `rover_phase2.toml` 和 `--native-rtl` 显式启用；原有
+`rover.toml` 仍只允许 HOLD/GUIDED，全部原安全/物理阈值、TTL 和 Lease 不变。
+新夹具的 RTL_SPEED/WP_SPEED=0.5m/s、WP_RADIUS=0.2m 通过公开参数回读核实。
+`Rover/mode_rtl.cpp` 确认 HOME/返航/到达后停车语义；Mode COMPLETED 不冒充物理返航，
+另用原 0.75m 位置、0.10m/s 停车、连续 2s 稳定阈值检验回到 HOME。
+
+原生 Rover 返航夹具另配置 WP_PIVOT_ANGLE=45°、WP_PIVOT_RATE=30°/s 并回读；
+这是独立仿真夹具的飞控转向参数，不修改 VAF 的 0.7rad/s 安全阈值或 0.75m 误差门槛。
+取消原生 RTL 通过 Execution 请求 HOLD，必须有新签名模式确认及其之后的新鲜零运动样本，
+才能返回 `native-rover-rtl: CONFIRMED`；链路丢失后 shutdown 仍返回 UNCONFIRMED。

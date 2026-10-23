@@ -17,7 +17,7 @@ from vehicle_autonomy.contracts.core.primitives import RunId, SchemaVersion
 from vehicle_autonomy.contracts.core.quality import QualityState
 from vehicle_autonomy.contracts.core.time import TimePoint
 from vehicle_autonomy.contracts.effects.vehicle import EffectEnvelope, StopMotionEffect, VehicleEffect
-from vehicle_autonomy.contracts.vehicle.command import CommandStatus, PoseTargetCommand, StopMotionCommand, TakeoffCommand, TwistTargetCommand, VehicleCommandEnvelope
+from vehicle_autonomy.contracts.vehicle.command import CommandPhase, CommandStatus, PoseTargetCommand, StopMotionCommand, TakeoffCommand, TwistTargetCommand, VehicleCommandEnvelope
 from vehicle_autonomy.engine.control.control_authority import ControlAuthority, ControlLease
 from vehicle_autonomy.engine.control.vehicle_execution import DispatchResult, StopState, VehicleExecution
 from vehicle_autonomy.vehicles.ardupilot.transports.bytes import TcpByteTransport
@@ -27,7 +27,7 @@ from vehicle_autonomy.world.localization.online import OnlineLocalization
 from vehicle_autonomy.app.bootstrap.simulation_profile import SimulationProfile
 from vehicle_autonomy.vehicles.ardupilot.commands import ArduPilotCommandTranslator
 from vehicle_autonomy.vehicles.plane.mavlink_state import PlaneTelemetryState
-from vehicle_autonomy.vehicles.plane.safety import PlaneSimulationSafetyPolicy
+from vehicle_autonomy.engine.control.fixed_wing_safety import PlaneSimulationSafetyPolicy
 from vehicle_autonomy.vehicles.ardupilot.command_port import ArduPilotCommandPort, WriteGuardApproval
 from vehicle_autonomy.vehicles.ardupilot.telemetry_state import ArduPilotTelemetryState
 from vehicle_autonomy.vehicles.ardupilot.session import ArduPilotSession
@@ -103,6 +103,8 @@ class SimulationRuntime:
         self._dispatch_results: dict[str, DispatchResult] = {}
         self._results: dict[str, dict] = {}
         self._active_stream_ids: set[str] = set()
+        self._native_rtl_requested = False
+        self._plane_flight_requested = False
         self._last_cycle: TimePoint | None = None
         self._had_session = False
         self._fault: str | None = None
@@ -203,6 +205,7 @@ class SimulationRuntime:
         self._action_id = None
         self._fault = None
         self._active_stream_ids.clear()
+        self._native_rtl_requested = self._plane_flight_requested = False
         self._emit("connected_transport", host=self.profile.host, port=self.profile.port)
 
     def _capture(self, source_clock, message, received):
@@ -250,6 +253,15 @@ class SimulationRuntime:
             for sample in (state.reported_pose, state.reported_twist):
                 evidence_deadlines.append(_later(sample.captured_at, self.profile.safety.max_snapshot_age_ns))
             return WriteGuardApproval(min(evidence_deadlines))
+        if self.profile.kind == "rover":
+            from vehicle_autonomy.contracts.vehicle.command import ModeCommand
+            if isinstance(command.command, ModeCommand) and command.command.native_mode == 'RTL':
+                reason = RoverSimulationSafetyPolicy(self.profile.safety, motion_mode_id=15).return_home_reason(state, now)
+                if reason is not None:
+                    return reason
+                for sample in (state.reported_pose,state.reported_twist):
+                    evidence_deadlines.append(_later(sample.captured_at,self.profile.safety.max_snapshot_age_ns))
+                return WriteGuardApproval(min(evidence_deadlines))
         if isinstance(command.command, StopMotionCommand):
             return WriteGuardApproval(min(evidence_deadlines))  # Localization is not required for Stop.
         if isinstance(command.command, (PoseTargetCommand, TwistTargetCommand, TakeoffCommand)):
@@ -464,6 +476,13 @@ class SimulationRuntime:
         self._dispatch_results[selected_id] = result
         command_id = None if result.receipt is None else str(result.receipt.command_id)
         self._effects[selected_id] = command_id
+        if result.receipt is not None and result.receipt.phase is CommandPhase.ACCEPTED:
+            from vehicle_autonomy.contracts.effects.vehicle import ModeEffect, FixedWingTargetEffect
+            if self.profile.kind == 'rover' and isinstance(envelope.effect,ModeEffect) and envelope.effect.native_mode=='RTL':
+                self._native_rtl_requested = True
+            if self.profile.kind == 'plane' and (isinstance(envelope.effect,FixedWingTargetEffect) or
+                    isinstance(envelope.effect,ModeEffect) and envelope.effect.native_mode in ('TAKEOFF','GUIDED','LOITER','RTL','AUTOLAND')):
+                self._plane_flight_requested = True
         from vehicle_autonomy.contracts.effects.vehicle import PoseTargetEffect, TwistTargetEffect
         if result.receipt is not None and isinstance(envelope.effect, (PoseTargetEffect, TwistTargetEffect)):
             self._active_stream_ids.add(envelope.effect.stream_id)
@@ -490,7 +509,7 @@ class SimulationRuntime:
     def end_run(self) -> dict[str, str]:
         """Request a bounded stop before revoking the run's send authority."""
         stops: dict[str, str] = {}
-        if self.profile.kind == "plane" and self._run_id is not None:
+        if self.profile.kind == "plane" and (self._run_id is not None or self._plane_flight_requested):
             state = None if self._session is None else self._session.snapshot()
             if (state is None or state.reported_pose is None or state.reported_twist is None
                     or state.reported_pose.value.position.z > 1.5
@@ -511,6 +530,33 @@ class SimulationRuntime:
                         self._sleep(self.profile.period_ns / 1e9)
                     self._emit("fixed_wing_recovery_requested", status=self.effect_status(name))
                 stops["fixed-wing-flight"] = StopState.UNCONFIRMED.value
+            else:
+                self._plane_flight_requested = False  # actual stationary ground state
+        if self.profile.kind == 'rover' and self._native_rtl_requested:
+            stops['native-rover-rtl'] = StopState.UNCONFIRMED.value
+            if self._session is not None and self._execution is not None and self._run_id is not None:
+                from vehicle_autonomy.contracts.effects.vehicle import ModeEffect
+                name='rover-recovery:'+uuid4().hex
+                issued=self.clock()
+                request=self.submit_effect(ModeEffect('HOLD'),effect_id=name)
+                until=time.monotonic_ns()+self.profile.effect_ttl_ns
+                while request.receipt is not None and self._session is not None and time.monotonic_ns()<until:
+                    self.cycle();status=self.effect_status(name)
+                    state=None if self._session is None else self._session.snapshot()
+                    sample=None if state is None else state.reported_twist
+                    if (status and status['phase']=='COMPLETED' and sample is not None
+                            and sample.captured_at.clock_domain_id==issued.clock_domain_id and sample.captured_at>=self._port.status(request.receipt.command_id).observed_at
+                            and 0 <= self.clock().elapsed_ns_since(sample.captured_at) <= self.profile.safety.max_snapshot_age_ns
+                            and state.health.quality is QualityState.VALID and state.operation.native_mode=='ARDUPILOT_CUSTOM_4'
+                            and max(abs(v) for v in (sample.value.linear.x,sample.value.linear.y,sample.value.linear.z,
+                                                     sample.value.angular.x,sample.value.angular.y,sample.value.angular.z))<=.1):
+                        stops['native-rover-rtl']=StopState.CONFIRMED.value
+                        self._native_rtl_requested=False
+                        break
+                    if status is None or status['phase'] in ('REJECTED','UNKNOWN'):
+                        break
+                    self._sleep(self.profile.period_ns/1e9)
+                self._emit('native_rover_recovery_requested',status=self.effect_status(name),stop=stops['native-rover-rtl'])
         if self._active_stream_ids:
             if self._execution is None or self._session is None or self.session_id is None:
                 stops = {stream_id: StopState.UNCONFIRMED.value for stream_id in self._active_stream_ids}
@@ -546,7 +592,7 @@ class SimulationRuntime:
     def shutdown(self) -> dict[str, str]:
         if self._closed:
             return {}
-        stops = self.end_run() if self._run_id is not None or self._active_stream_ids else {}
+        stops = self.end_run() if self._run_id is not None or self._active_stream_ids or self._native_rtl_requested or self._plane_flight_requested else {}
         if self._session is not None:
             self._close_link("shutdown")
         self._closed = True

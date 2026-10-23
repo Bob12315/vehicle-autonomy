@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from vehicle_autonomy.contracts.core.time import TimePoint
-from vehicle_autonomy.contracts.effects.vehicle import EffectEnvelope, LandEffect, PoseTargetEffect, TakeoffEffect, TwistTargetEffect
+from vehicle_autonomy.contracts.effects.vehicle import EffectEnvelope, LandEffect, ModeEffect, PoseTargetEffect, TakeoffEffect, TwistTargetEffect
 from vehicle_autonomy.contracts.world.models import WorldSnapshot
 from vehicle_autonomy.engine.control.vehicle_safety import SafetyLimits, VehicleSafetyPolicy
 
@@ -41,6 +41,22 @@ class SimulationSafetyPolicy(VehicleSafetyPolicy):
 class RoverSimulationSafetyPolicy(SimulationSafetyPolicy):
     """Reject flight effects and non-planar/sideways Rover requests."""
 
+    def return_home_reason(self, vehicle, now):
+        if vehicle is None or vehicle.reported_pose is None or vehicle.reported_twist is None:
+            return "rover_position_unavailable"
+        if not vehicle.operation.armed:
+            return "rover_rtl_requires_armed"
+        for sample in (vehicle.reported_pose, vehicle.reported_twist):
+            try:
+                if not 0 <= now.elapsed_ns_since(sample.captured_at) <= self.limits.max_snapshot_age_ns:
+                    return "motion_state_stale"
+            except ValueError:
+                return "motion_clock_domain_mismatch"
+        p = vehicle.reported_pose.value.position
+        if not (self.limits.min_x_m <= p.x <= self.limits.max_x_m and self.limits.min_y_m <= p.y <= self.limits.max_y_m):
+            return "rover_outside_geofence"
+        return None
+
     def evaluate(self, envelope: EffectEnvelope, world: WorldSnapshot, now: TimePoint) -> str | None:
         effect = envelope.effect
         if isinstance(effect, (TakeoffEffect, LandEffect)):
@@ -53,6 +69,8 @@ class RoverSimulationSafetyPolicy(SimulationSafetyPolicy):
             if effect.frame_id != "base_link" or any(abs(x) > 1e-9 for x in (v.y, v.z, w.x, w.y)):
                 return "rover_drive_requires_planar_base_link"
         reason = super().evaluate(envelope, world, now)
+        if reason is None and isinstance(effect, ModeEffect) and effect.native_mode == 'RTL':
+            return self.return_home_reason(world.vehicle, now)
         if reason is not None or not isinstance(effect, (PoseTargetEffect, TwistTargetEffect)):
             return reason
         vehicle = world.vehicle
