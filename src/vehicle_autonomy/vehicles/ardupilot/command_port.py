@@ -382,6 +382,8 @@ class ArduPilotCommandPort:
     def _complete_native_target(self, command_id, at):
         if command_id not in self._native_target_evidence or command_id not in self._native_guided_signature:
             return None
+        if self._native_guided_signature[command_id] <= self._native_target_evidence[command_id]["signature_timestamp"]:
+            return None  # require mode evidence AFTER the current target echo
         final = CommandStatus(command_id, CommandPhase.COMPLETED, at)
         self._statuses[command_id] = final
         self.ack_evidence[command_id]['native_target'] = dict(self._native_target_evidence[command_id])
@@ -396,8 +398,9 @@ class ArduPilotCommandPort:
                 message.get_srcSystem(), message.get_srcComponent()) != (self._codec.target_system, self._codec.target_component):
             return ()
         signature = getattr(message, '_vaf_signature_timestamp', None)
-        if signature is None or int(message.coordinate_frame) != 0 or int(message.type_mask) & 7 or not math.isfinite(float(message.alt)):
+        if signature is None:
             return ()
+        valid = int(message.coordinate_frame) == 0 and not int(message.type_mask) & 7 and math.isfinite(float(message.alt))
         completed = []
         with self._authority.lock:
             self.expire_unknown(self._now())
@@ -410,6 +413,12 @@ class ArduPilotCommandPort:
                     continue
                 ack = self.ack_evidence.get(command_id,{}).get('signature_timestamp')
                 if ack is None or signature <= ack or signature <= self._sent_signature.get(command_id,2**48):
+                    continue
+                # A newer authenticated contradiction supersedes an older
+                # matching echo. Never combine stale goal A with later mode
+                # evidence after the source has already reported goal B.
+                self._native_target_evidence.pop(command_id, None)
+                if not valid:
                     continue
                 target = command.center
                 if (abs(int(message.lat_int)-round(target.latitude_deg*1e7)) > 1

@@ -80,3 +80,7 @@ Rover 原生 RTL 仅由 `rover_phase2.toml` 和 `--native-rtl` 显式启用；�
 这是独立仿真夹具的飞控转向参数，不修改 VAF 的 0.7rad/s 安全阈值或 0.75m 误差门槛。
 取消原生 RTL 通过 Execution 请求 HOLD，必须有新签名模式确认及其之后的新鲜零运动样本，
 才能返回 `native-rover-rtl: CONFIRMED`；链路丢失后 shutdown 仍返回 UNCONFIRMED。
+
+原生目标确认要求有序的独立证据：新签名 ACK → 当前匹配的新签名目标回报 →
+其后的新签名 GUIDED 心跳。任何更新的已认证目标矛盾/不可解释回报都使旧目标证据失效；
+不能把先前目标 A 与飞控已更新为 B 之后的心跳组合成 A 的完成结果。

@@ -206,3 +206,23 @@ class PlaneControlTests(unittest.TestCase):
         self.runtime._close_link('injected_link_loss')
         self.assertEqual(self.runtime.shutdown(),{'fixed-wing-flight':'UNCONFIRMED'})
         self.assertEqual(len(self.transport.writes),before)
+
+    def test_new_contradictory_signed_target_invalidates_pending_goal_evidence(self):
+        self.begin(mode=12,armed=True,height=50,speed=17)
+        target=GeoPoint(-35.363262,149.165237,634)
+        other=GeoPoint(-35.362262,149.165237,634)
+        self.runtime.submit_effect(FixedWingTargetEffect(target),effect_id='target')
+        self.feed(mode=12,armed=True,height=50,speed=17)
+        self.feed(mode=12,armed=True,height=50,speed=17,ack=192)
+        for center in (target,other):
+            self.clock.advance();self.transport.incoming.append(self.target_echo(center));self.runtime.cycle()
+        self.feed(mode=15,armed=True,height=50,speed=17)
+        self.assertEqual(self.runtime.effect_status('target')['phase'],'ACKNOWLEDGED')
+        self.assertEqual(self.runtime._port._native_target_evidence,{})
+        self.assertTrue(self.runtime.world_snapshot().vehicle.operation.armed)
+        self.assertEqual(self.runtime.world_snapshot().vehicle.operation.native_mode,'ARDUPILOT_CUSTOM_15')
+        self.assertEqual(len(self.transport.writes),1)
+        # Normal current matching evidence must still finish without another write.
+        self.feed(prefix=self.target_echo(target),mode=15,armed=True,height=50,speed=17)
+        self.assertEqual(self.runtime.effect_status('target')['phase'],'COMPLETED')
+        self.assertEqual(len(self.transport.writes),1)
