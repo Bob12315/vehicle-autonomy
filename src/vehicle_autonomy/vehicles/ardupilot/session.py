@@ -87,8 +87,12 @@ class ArduPilotSession:
             return False
         seq = message.get_seq()
         delta = 1 if self._rx_sequence is None else (seq - self._rx_sequence) & 255
-        if delta >= 128 and boot is not None and boot > self._boot.get(kind, -1):
+        if (delta == 0 or delta >= 128) and boot is not None and boot > max(self._boot.get(kind, -1), self._source_boot or -1):
+            # Equal 8-bit headers can be a COMPLETE wrap, not a duplicate.
+            # Only qualified source-clock progress permits re-anchoring.
             self._pending_packets.clear()
+            if delta == 0:
+                delta = 256
         elif delta == 0 or delta >= 128:
             reason = "duplicate" if delta == 0 else "out_of_order"
             self.receive_rejections[reason] += 1

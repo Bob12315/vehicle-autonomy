@@ -250,3 +250,18 @@ class ReviewReproductions(unittest.TestCase):
         self.assertIn('transport_returned_after_fence',f.port.reasons[receipt.command_id])
         self.assertIsNone(f.port.write_next(at(112)))
         self.assertEqual(len(f.transport.attempts),1)
+
+    def test_source_progress_reanchors_exact_full_sequence_gap_without_reply_identity(self):
+        f=self.fx
+        first=pack(f.sender.attitude_encode(1000,0,0,0,0,0,0),f.sender)
+        f.transport.incoming.append(first);f.session.poll(at(101))
+        previous=f.session._rx_ticket
+        # 255 AP frames were lost; the next header has the SAME 8-bit seq.
+        f.sender.seq=(f.sender.seq+255)&255
+        second=pack(f.sender.attitude_encode(1100,0,0,0,0,0,0),f.sender)
+        self.assertEqual(f.codec.feed(first)[0].get_seq(),f.codec.feed(second)[0].get_seq())
+        f.transport.incoming.append(second);f.session.poll(at(102))
+        self.assertEqual(f.session._rx_ticket,previous+256)
+        f.transport.incoming.append(second);f.session.poll(at(103))
+        self.assertEqual(f.session._rx_ticket,previous+256)
+        self.assertEqual(f.transport.attempts,[])
