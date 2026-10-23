@@ -111,6 +111,18 @@ across the final fence and transport write. Resource data lives in root
 `configs/` and `simulation/`, or the installed wheel's resource set.
 Optional ROS code remains deferred to explicit processes.
 
+ArduPilot operation/ACK confirmation now requires an explicitly injected
+`ReceiveSigning` verifier. It authenticates the configured source stream and
+retains a strictly increasing 48-bit signing watermark across same-key
+reconnects. Packet sequence, host receipt, neighboring sensor clocks and
+heartbeat counts cannot qualify an unsigned confirmation. Unknown evidence
+cannot complete a command; it expires as UNKNOWN after transmission. The
+Phase 1 owned SITL fixtures provision fresh keys using the public protocol
+and verify actual signed downlink ACK/HB. Unconfigured shared-Session CLI
+compositions retain diagnostics but cannot claim completion from bare ACK/HB.
+No default key or real-vehicle provisioning is enabled. See the
+[round-3 report](PHASE1_REMEDIATION_ROUND3_REPORT.md) for the trust boundary.
+
 `ArduPilotSession` requires an expected MAVLink vehicle type and ArduPilot
 autopilot heartbeat before granting a link session. Separate narrow USB
 diagnostics expose only Rover HOLD-to-HOLD or Copter STABILIZE-to-STABILIZE;
@@ -169,10 +181,12 @@ heartbeat while disarmed. The controller also reports a frame class/type
 pre-arm error, so this result is not flight readiness.
 The USB state publication uses receive time as a diagnostic proxy; source
 capture time is unknown. Those USB diagnostics do not validate real physical stopping, motion or
-link-loss behavior. The narrow P6 runtime still uses a loopback receive-time
-proxy. The shared simulation runtime separately maps source boot time per
-epoch and validates Copter/Rover motion and faults against Gazebo truth;
-real-device capture timing and physical stopping remain unvalidated.
+link-loss behavior. P6 and the shared simulation runtime map sensor source
+boot time per epoch in the explicit speed-one composition. The shared
+simulation runtime validates Copter/Rover motion and faults against Gazebo truth;
+real-device capture timing and physical stopping remain unvalidated. That
+sensor clock mapping does not qualify ACK/HB; their capture time is unknown
+and their operation evidence requires the explicit receive authenticator.
 Heartbeat-based VehicleHealth does not establish sensor calibration or arming
 readiness.
 With a temporary Quad X frame configuration, the USB Copter completed a
