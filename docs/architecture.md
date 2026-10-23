@@ -1,8 +1,7 @@
 # V1 framework boundary
 
 This page describes the **implemented root**. The reusable framework's full
-target responsibilities and dependency rules are in [Vehicle Autonomy Framework
-V1: target architecture](framework_v1.md).
+target responsibilities and dependency rules are in [V1.0 系统架构规范](../Vehicle_Autonomy_V1.0.md).
 
 ## Explicit onboard diagnostics and operator console (2026-10-21)
 
@@ -389,4 +388,4 @@ Deployment profile. The original front-drive and compact front-drive fixtures
 use distinct physical SDFs; no model branch is added to Core or contracts.
 Only separately accepted combinations are supported, not arbitrary drivetrains.
 Configuration and exact acceptance status: [autonomy guide](rover_autonomy.md)
-and [roadmap](autonomy_roadmap.md). Default composition remains unwired.
+and roadmap（历史文档：`git show bf4ea1f:docs/autonomy_roadmap.md`）. Default composition remains unwired.

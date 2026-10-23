@@ -128,4 +128,4 @@ build/config/lock output is allowed and isolated build artifacts are retained.
 
 Regression command: `./scripts/test_simulation_v1.sh`. Usage, environment and
 reports are in [simulation README](README.md). Module maturity is updated only
-for the evidenced scope in [V1 progress](../v1_progress.md).
+for the evidenced scope in V1 progress（历史文档：`git show bf4ea1f:docs/v1_progress.md`）.

@@ -2,8 +2,7 @@
 
 Vehicle Autonomy Framework 是面向多旋翼、无人车、固定翼、VTOL 及未来自主移动平台的**可复用自主系统框架**。它通过合同、插件和受控执行边界组合 Vehicle、Sensor、Perception、World Model、Mission、Action、Intelligence、Protocol、Transport 与 Deployment。通用 Core 不绑定特定比赛、机型、飞控、计算板或感知模型。
 
-完整的职责、数据流、依赖规则和目标包归属见 [V1 目标架构](docs/framework_v1.md)；时间、坐标、状态、Effect 和端口的冻结语义见 [V1 基础合同冻结规范](docs/foundation_contracts_v1.md)。这两份文档描述设计目标，不代表其中的组件已由当前代码实现。
-
+系统行为与安全边界见 [V1.0 系统规范](Vehicle_Autonomy_V1.0.md)，七模块归属见 [V1.1 文件结构规范](Vehicle_Autonomy_File_Structure_V1.1.md)，类型与端口语义见 [基础合同冻结规范](docs/foundation_contracts_v1.md)。目标设计不代表全部能力已经实现。
 
 ## 安装与七模块源码布局
 
@@ -48,10 +47,10 @@ PointCloud2/LaserScan、真实 PCAP 回放通过，隔离 Humble/Nav2/SLAM 环�
 经静态场景、完整车体、环境/会话预检和人工批准执行。Gazebo 提供 3D 场景，
 Web 审阅步骤；每步之间必须观察到停车并释放权限。已知静态场景不等于实时避障。
 不开放实车运动入口。
-本轮340项单元、8/8场景和独立轨迹审计通过；保留的原生启动崩溃及P26失败见
+历史 LLM 实用场景的 340 项单元、8/8 场景及独立轨迹审计通过；保留的原生启动崩溃及 P26 失败见
 [实用场景审计](docs/autonomy/llm-practical-scenarios.md)。
 
-车辆基础仿真新增了共享 `SimulationRuntime`、完整 Rover 插件和两主动轮/两后万向轮模型。Copter、Rover 正常动作与故障场景已通过四轮完整回归；**本轮基础车辆控制 Simulation Complete：PASS**，见[审计记录](docs/simulation/completion-audit.md)。
+车辆基础仿真使用共享 `SimulationRuntime`、Rover 插件和两主动轮/两后万向轮模型；历史完成范围见[基础车辆审计](docs/simulation/completion-audit.md)。迁移后 342 项单元测试通过，21 个仿真场景中 19 PASS、2 个既有 oracle 启动失败，见[迁移报告](docs/ARCHITECTURE_MIGRATION_REPORT.md)。
 
 后续 **P21–P25 已完成限定本机 Rover 自主导航范围**：命名目标、有限停车后重规划、地图锚点、对象巡检和两种前驱几何。260 项单元测试、最终装配 13 项物理门槛通过；见 [最新完成审计](docs/autonomy/navigation-completion-audit.md)。P26 长运行版本验收及真实硬件仍未完成。
 
@@ -63,7 +62,7 @@ Web 审阅步骤；每步之间必须观察到停车并释放权限。已知静�
 
 环境与报告位置见[仿真说明](docs/simulation/README.md)。这仅覆盖 localhost SITL + Gazebo；真实飞控和整车仍未验收。
 
-P6 的 localhost SITL 范围已完成；**当前暂缓真实飞控接入**。P5 整车实机验收仍是未完成项，后续软件工作按[模块进度文档](docs/v1_progress.md#5-p6-完成后的工作范围)推进。
+P6 的 localhost SITL 范围已完成；**当前暂缓真实飞控接入**。P5 整车实机验收仍是未完成项，当前能力与缺口以[实现边界](docs/architecture.md)和[硬件审计](docs/HARDWARE_READY_AUDIT.md)为准。
 
 车辆发送默认关闭。P5 命令端口在唯一字节写入点前重新检查系统 SEND、Action SEND、Lease、代际、会话和期限；断链时停止结果保持未确认。TCP/串口连接只能由调用方显式创建；显式 `run-sitl`/`run-sitl-arm` 和受控仿真脚本装配 localhost TCP 与专用 Safety，默认入口不连接车辆。旧演示网关仍使用旧 Effect 测试端口，不能据此宣称已支持实机飞行。
 
@@ -86,15 +85,7 @@ Copter USB 诊断使用 `PYTHONPATH=. python tests/manual_p5_copter_usb.py --por
 
 裸飞控台架曾临时配置 `FRAME_CLASS=1`、保留 `FRAME_TYPE=1`（四旋翼 X）并重启。通过受控端口验证未解锁的 `STABILIZE → ACRO → STABILIZE`；Arm 请求由飞控预解锁检查拒绝，随后 Disarm 请求获确认。测试结束已恢复 `FRAME_CLASS=0` 并重启复核。复现台架脚本须分别显式运行 `PYTHONPATH=. python tests/manual_p5_copter_bench_mode.py --port /dev/ttyACM0 --allow-mode-roundtrip` 与 `PYTHONPATH=. python tests/manual_p5_copter_bench_arm.py --port /dev/ttyACM0 --bare-controller --allow-arm-bench`；路径随重新连接可能变化，**Arm 脚本仅供确认没有执行器连接的裸飞控使用**。预解锁阻断、日志存储错误和未验收项见[迁移记录](docs/migration_plan.md)。
 
-[当前实现边界](docs/architecture.md)记录已有能力与限制。[迁移计划与记录](docs/migration_plan.md)给出从合同、状态链到控制与设备接入的阶段顺序。[历史程序说明](docs/migration.md)记录旧程序；本轮按明确要求移除了仓库内 Legacy，源码可从 Git 历史查看，本地数据已备份。
-
-[V1 模块进度与未完成项](docs/v1_progress.md)按目标架构逐项记录当前成熟度、证据与待验收工作。
-
-[P20 之后的总计划](docs/autonomy_roadmap.md)安排目标导航、受控重规划、地图/定位可靠性、业务整合、复用验证和仿真版本验收，并单列其他机型、视觉、Web、部署及暂缓的真实硬件扩展。
-
-[基础自主系统实施计划](docs/basic_autonomy_implementation_plan.md)的 P9–P15 已完成本机仿真验收：长运行 App、在线定位/Transform、Environment、基础 Action、双车命名路线、仿真对象输入及 CUADC 业务链。P17 已完成记录图像/CPU YOLOX/虚拟标定的感知替换；P16 真实硬件按计划暂缓。提交、测试和适用范围见 [自主系统完成审计](docs/autonomy/completion-audit.md)。
-
-[P6 首个持续运行组合实施计划与验收](docs/p6_runtime_integration_plan.md)记录 localhost ArduCopter SITL 的装配顺序、测试结果和未覆盖范围。
+[当前实现边界](docs/architecture.md)说明已有能力与限制；[历史迁移与台架记录](docs/migration_plan.md)保留早期合同、模式诊断和安全审计。P9–P17 的结果见[基础自主系统审计](docs/autonomy/completion-audit.md)，P21–P25 见[自主导航完成审计](docs/autonomy/navigation-completion-audit.md)。未通过的 P26 门槛见[验收规范](docs/autonomy/phase-26-plan.md)。
 
 ## 本机仿真应用进程
 
@@ -150,4 +141,4 @@ python -m vehicle_autonomy.app.cli ctl --profile copter_sim start --mission cuad
 
 导航模型显式注入参考点、几何包络和运动界限；第二种已验收车型是不同轴距/轮距/质量的紧凑前驱 Rover，不能只换配置就声称既有世界已换车。地图锚点绑定 Environment/HOME、地图源及车辆会话；SLAM 位姿仍是只读候选，活动控制继续使用遥测 Localization。
 
-配置、实际 SDF、地图边界修复及阶段验收范围见 [自主导航说明](docs/rover_autonomy.md) 和 [总计划/进展](docs/autonomy_roadmap.md)。顺序复现入口：`./scripts/test_autonomy_navigation.sh --allow-send`。各阶段以独立审计中的 PASS 为准；P26 统一版本/长运行及真实设备不由此完成。
+配置、实际 SDF、地图边界修复及阶段验收范围见 [自主导航说明](docs/rover_autonomy.md) 和 [验收记录](docs/autonomy/navigation-completion-audit.md)。顺序复现入口：`./scripts/test_autonomy_navigation.sh --allow-send`。各阶段以独立审计中的 PASS 为准；P26 统一版本/长运行及真实设备不由此完成。

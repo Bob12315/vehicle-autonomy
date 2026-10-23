@@ -218,3 +218,30 @@ Legacy 精选 138 项采用 [P0 基线中的完整历史 pytest 命令](migratio
 本地原始日志和备份保留；Git 仅提交正式源码、配置、测试与审计证据。
 
 后续工作应从新七模块路径继续。物理仿真已有故障、P26 与硬件资格单列跟进，不在本次迁移中改动其安全条件或新增能力。
+
+## 后续文档清理（2026-10-23）
+
+按用户要求移除已被取代的规划/提示词/进度/候选清单；源码、配置、测试、第三方许可证不变。
+两份根目录权威架构规范、冻结合同、运行指南、独立阶段审计、P26 FAIL/硬件限制和迁移证据保留。
+早期 `migration_plan.md` 和 P0 baseline 含独立台架/安全/测试记录，继续保留。
+已更新 README 和其余 Markdown 引用；必要的历史来源使用 `git show bf4ea1f:<path>` 查阅。
+删除清单如下，文件完整版本仍在 Git `bf4ea1f`：
+
+| 文件 | 删除依据 |
+| --- | --- |
+| `Codex_Architecture_Migration_Prompt.md` | 迁移任务已完成，结论与验证已记录在迁移报告 |
+| `SIMULATION_COMPLETION_PLAN.md` | 已完成的 Phase 0–8 实施计划，保留对应完成审计和阶段证据 |
+| `docs/framework_v1.md` | 旧版目标架构，由根目录 V1.0 系统规范与 V1.1 文件规范取代 |
+| `docs/v1_progress.md` | 旧百分比进度表和失效源码链接，由实现边界与实际验收审计取代 |
+| `docs/basic_autonomy_implementation_plan.md` | P9–P17 已完成的实施计划，保留完成审计 |
+| `docs/p6_runtime_integration_plan.md` | P6 已完成的实施计划，历史内容可从 Git 查看 |
+| `docs/p9_application_runtime_plan.md` | P9 已完成的实施计划，保留阶段审计与当前实现边界 |
+| `docs/migration.md` | Legacy 简介，与现有迁移报告重复 |
+| `docs/migration/p0_inventory.md` | 已删除 Legacy 的旧候选清单，保留原 P0 基线和测试记录 |
+| `docs/autonomy/cuadc_candidate_inventory.md` | 已完成的 Legacy 候选审查，保留业务验收审计 |
+| `docs/autonomy_roadmap.md` | 旧 P21–P25 实施路线图，保留完成审计和未通过的 P26 门槛 |
+
+本次清理验证：`.venv-migration/bin/python -m unittest discover -s tests -v`，
+342 项通过，0 失败/错误/跳过（31.759 s）；保留 Markdown 本地链接检查 0 失效，
+`git diff --check` 通过。变更仅限 Markdown，因此未重复执行物理仿真；此前 19/21
+及两项既有 oracle 失败、P26 FAIL 的记录不变。

@@ -2,7 +2,7 @@
 
 状态：**PASS，限 localhost SITL/Gazebo 仿真。**
 
-前置 P13/P14 的公开任务、对象输入和控制边界；最小非车辆合同独立提交 `ca4df82`，只读候选清单见 [迁移审查](cuadc_candidate_inventory.md)。旧源没有修改或执行，新根不导入 legacy 或外部 cuadc2026。
+前置 P13/P14 的公开任务、对象输入和控制边界；最小非车辆合同独立提交 `ca4df82`，只读候选清单见 迁移审查（历史文档：`git show bf4ea1f:docs/autonomy/cuadc_candidate_inventory.md`）。旧源没有修改或执行，新根不导入 legacy 或外部 cuadc2026。
 
 cuadc_demo：Mode→Arm→Takeoff→命名搜索点/区域→从新鲜 Observation 评分/去重/锁定→接近/Stop 稳定→仿真投放→HOME→Land→Disarm。Rover object_inspection 复用有限搜索/接近，无 flight/payload 能力。标签分数与业务步骤只在 applications/cuadc，通用 Core 不含比赛规则。目标来源白名单、odom Frame、质量、置信度、1 s 对象年龄、区域与位置变动都强制检查；无目标/过期/移动/丢失/超时明确失败，不读取 Oracle。
 

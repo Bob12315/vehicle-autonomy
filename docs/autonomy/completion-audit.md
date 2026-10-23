@@ -2,7 +2,7 @@
 
 > 本文保留 P9–P17 的历史范围和测试数。最新 P21–P25 完成范围、260 项单元测试及最终装配 13 项物理门槛见 [自主导航完成审计](navigation-completion-audit.md)；本次不把历史整车全套称为重新执行。
 
-核对日期：2026-10-04（Asia/Ulaanbaatar；报告时间为 UTC）。范围依据 [实施计划](../basic_autonomy_implementation_plan.md)。**P9–P15 localhost SITL/Gazebo 范围 PASS；P17 记录图像/CPU YOLOX/虚拟标定的软件范围 PASS；P16 真实硬件暂缓。** 基础自主闭环、非视觉业务与视觉输入替换均从正式 App 入口执行。真实飞行、现场相机标定、比赛桶模型、物理载荷、RKNN、Web/server、Planning/LLM/Agent 不在完成声明中。
+核对日期：2026-10-04（Asia/Ulaanbaatar；报告时间为 UTC）。范围依据 实施计划（历史文档：`git show bf4ea1f:docs/basic_autonomy_implementation_plan.md`）。**P9–P15 localhost SITL/Gazebo 范围 PASS；P17 记录图像/CPU YOLOX/虚拟标定的软件范围 PASS；P16 真实硬件暂缓。** 基础自主闭环、非视觉业务与视觉输入替换均从正式 App 入口执行。真实飞行、现场相机标定、比赛桶模型、物理载荷、RKNN、Web/server、Planning/LLM/Agent 不在完成声明中。
 
 ## 阶段产物与提交
 
@@ -66,6 +66,6 @@ P15 载荷是独立仿真库存及位置标记，没有 Servo/PWM、弹道或真
 
 保留失败日志，没有将失败报告改绿：P9 的 `suite-e8ba09fa` CLI 参数解析；P11 原点未就绪/早期 Rover HOME；P12/P13 Rover 控制与历史结果查询 O(n²) 周期超时；P15 `autonomy-copter-90838672` 的慢仿真对象 capture 老化；P17 早期 GPS/global 源时间配对拒绝。对应修正及复跑见各阶段审计，未降低数值保护或自动重试非幂等动作。
 
-只读迁移审查见 [CUADC 候选清单](cuadc_candidate_inventory.md)。外部 `/home/level6/uav_ws/cuadc2026/` 的六个候选及归档中的六个候选 SHA256 与初始清单完全一致，`legacy/` 无工作树差异；没有运行旧测试/旧应用，也没有从根包导入旧运行时。新业务按依赖和安全行为审查后重写。
+只读迁移审查见 CUADC 候选清单（历史文档：`git show bf4ea1f:docs/autonomy/cuadc_candidate_inventory.md`）。外部 `/home/level6/uav_ws/cuadc2026/` 的六个候选及归档中的六个候选 SHA256 与初始清单完全一致，`legacy/` 无工作树差异；没有运行旧测试/旧应用，也没有从根包导入旧运行时。新业务按依赖和安全行为审查后重写。
 
 已完成计划授权的所有可执行软件范围。P16 按计划保持暂缓；真实设备/现场相机/标定/专用模型/RKNN/物理载荷仍需独立设备与数据证据，不继承此次仿真 PASS。

@@ -52,7 +52,7 @@ The legacy run directly covers contracts and IDs/versioning, effects, vehicle co
 
 ### P0 completion verification
 
-The scoped audit was completed after checking additional tests cited by the [candidate inventory](p0_inventory.md). All additional groups below were run from `legacy/cuadc_2026/` with the same `PYTHONPATH` and pytest executable shown in the baseline command above:
+The scoped audit was completed after checking additional tests cited by the candidate inventory（历史文档：`git show bf4ea1f:docs/migration/p0_inventory.md`）. All additional groups below were run from `legacy/cuadc_2026/` with the same `PYTHONPATH` and pytest executable shown in the baseline command above:
 
 | Additional test files | Result |
 |---|---:|

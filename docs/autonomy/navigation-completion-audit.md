@@ -2,7 +2,7 @@
 
 核对日期：2026-10-19。**P21–P25 在下述限定仿真范围全部完成。最终装配的 13 项物理门槛 PASS；260 项单元测试通过。**
 
-范围是当前电脑的 ROS 2 Jazzy / SLAM Toolbox / Nav2 / ArduRover SITL / Gazebo。阶段编号沿用 [总计划](../autonomy_roadmap.md)，不重编号历史迁移、基础车辆 Phase 0–8 或暂缓的 P16。此次不是整个 Framework V1 的 100%，也不代替 P26 统一版本/长期运行验收。
+范围是当前电脑的 ROS 2 Jazzy / SLAM Toolbox / Nav2 / ArduRover SITL / Gazebo。阶段编号沿用 总计划（历史文档：`git show bf4ea1f:docs/autonomy_roadmap.md`），不重编号历史迁移、基础车辆 Phase 0–8 或暂缓的 P16。此次不是整个 Framework V1 的 100%，也不代替 P26 统一版本/长期运行验收。
 
 ## 阶段状态
 
