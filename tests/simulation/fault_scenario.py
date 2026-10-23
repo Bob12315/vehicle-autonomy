@@ -376,7 +376,10 @@ def run(run_dir: Path, kind: str) -> dict:
             raise AssertionError("pre-restart queue not isolated")
         proxy.inject(drop_ack_command=None)
         owned.start_sitl("_restart")
-        runtime.connect()
+        # A new AP process was provisioned with a NEW key epoch. Replace the
+        # composition explicitly; never silently reset an old key's watermark.
+        runtime.shutdown()
+        runtime = new_runtime()
         warm(full=True)
         count = len(proxy.tx())
         runtime.begin_run()
