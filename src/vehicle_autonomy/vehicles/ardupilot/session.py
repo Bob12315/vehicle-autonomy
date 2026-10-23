@@ -131,6 +131,8 @@ class ArduPilotSession:
                 self._commands.observe_heartbeat(message, at, ticket=ticket,
                     before_capture=before, after_capture=after,
                     before_boot=before_boot, after_boot=after_boot)
+            if message.get_type() == "POSITION_TARGET_GLOBAL_INT":
+                self._commands.observe_native_target(message, at)
             if self._state is not None and self._captured_at is not None:
                 if sample_time is not None:
                     ingested |= self._state.ingest(message, captured_at=sample_time, received_at=at)

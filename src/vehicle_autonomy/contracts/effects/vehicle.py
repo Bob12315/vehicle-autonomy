@@ -7,7 +7,7 @@ from enum import Enum
 import math
 from typing import ClassVar, TypeAlias
 
-from vehicle_autonomy.contracts.core.geometry import FrameId, Pose3, Twist3
+from vehicle_autonomy.contracts.core.geometry import FrameId, GeoPoint, Pose3, Twist3
 from vehicle_autonomy.contracts.core.primitives import ActionInstanceId, EffectId, RunId, SchemaVersion
 from vehicle_autonomy.contracts.core.time import TimePoint
 
@@ -40,6 +40,24 @@ class TakeoffEffect:
 @dataclass(frozen=True, slots=True)
 class LandEffect:
     mode: ClassVar[EffectMode] = EffectMode.ONE_SHOT
+
+
+@dataclass(frozen=True, slots=True)
+class FixedWingTargetEffect:
+    """Configure a native fixed-wing fly-to point, then continue loitering.
+
+    GeoPoint altitude is explicitly AMSL metres. Radius uses the audited
+    native configuration; no radius/arrival/physical stopping claim is made.
+
+    Completion confirms the native target configuration, never arrival/stop.
+    """
+    center: GeoPoint
+    mode: ClassVar[EffectMode] = EffectMode.ONE_SHOT
+
+    def __post_init__(self):
+        if not isinstance(self.center, GeoPoint):
+            raise TypeError("loiter center must be a GeoPoint in degrees/AMSL metres")
+
 
 
 @dataclass(frozen=True, slots=True)
@@ -95,7 +113,7 @@ class StopMotionEffect:
 
 
 VehicleEffect: TypeAlias = (
-    ArmEffect | DisarmEffect | TakeoffEffect | LandEffect | ModeEffect
+    ArmEffect | DisarmEffect | TakeoffEffect | LandEffect | ModeEffect | FixedWingTargetEffect
     | PoseTargetEffect | TwistTargetEffect | StopMotionEffect
 )
 
@@ -121,5 +139,5 @@ class EffectEnvelope:
             raise TypeError("effect times must be TimePoint values")
         if self.deadline.elapsed_ns_since(self.created_at) <= 0:
             raise ValueError("effect deadline must follow creation")
-        if not isinstance(self.effect, (ArmEffect, DisarmEffect, TakeoffEffect, LandEffect, ModeEffect, PoseTargetEffect, TwistTargetEffect, StopMotionEffect)):
+        if not isinstance(self.effect, (ArmEffect, DisarmEffect, TakeoffEffect, LandEffect, ModeEffect, FixedWingTargetEffect, PoseTargetEffect, TwistTargetEffect, StopMotionEffect)):
             raise TypeError("effect must be a typed VehicleEffect")

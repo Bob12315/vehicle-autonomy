@@ -66,7 +66,9 @@ class OwnedSimulation:
         self.world = f"{kind}_{uuid4().hex[:12]}"
         os.environ["GZ_IP"] = "127.0.0.1"
         os.environ["GZ_PARTITION"] = "vaf_" + self.world
-        self.model = "iris_with_gimbal" if kind == "copter" else rover_model
+        if kind not in ("rover", "copter", "plane"):
+            raise ValueError("unregistered simulation kind")
+        self.model = "iris_with_gimbal" if kind == "copter" else "plane_runway" if kind == "plane" else rover_model
         profile_key='compact_rover' if kind=='rover' and rover_model=='compact_rover' else kind
         self.profile = replace(SimulationProfile.load(ROOT / f"simulation/profiles/{profile_key}.toml"), port=self.port)
         self.processes = []
@@ -85,7 +87,7 @@ class OwnedSimulation:
             "gazebo_transport": {"ip": "127.0.0.1", "partition": os.environ["GZ_PARTITION"]},
             "started_at": datetime.now(timezone.utc).isoformat(), "processes": []}
         source_model = (PLUGIN / "models/iris_with_gimbal/model.sdf" if kind == "copter"
-                        else ROOT / f"simulation/models/{rover_model}/model.sdf")
+                        else ROOT / f"simulation/models/{self.model}/model.sdf")
         if kind=='rover' and rover_model=='target_rover' and rover_actuation=='low_rate':
             source_model=ROOT/'simulation/models/target_rover/navigation.sdf'
         self.manifest['actuation_profile']=rover_actuation if kind=='rover' else 'baseline'
@@ -95,7 +97,7 @@ class OwnedSimulation:
                 plugin.find("fdm_port_in").text = str(self.json_port)
         self.model_path = run_dir / "model.sdf"
         model.write(self.model_path)
-        source_world = PLUGIN / "worlds/iris_runway.sdf" if kind == "copter" else ROOT / "simulation/worlds/rover_runway.sdf"
+        source_world = PLUGIN / "worlds/iris_runway.sdf" if kind == "copter" else ROOT / f"simulation/worlds/{'plane' if kind == 'plane' else 'rover'}_runway.sdf"
         world = ET.parse(source_world)
         world.find("world").set("name", self.world)
         for uri in world.findall(".//include/uri"):
@@ -108,7 +110,7 @@ class OwnedSimulation:
         world.write(self.world_path)
         self.manifest["source_model"] = str(source_model)
         self.manifest["source_world"] = str(source_world)
-        default_names = ("copter.parm", "gazebo-iris.parm") if kind == "copter" else ("rover.parm", "rover-skid.parm")
+        default_names = ("copter.parm", "gazebo-iris.parm") if kind == "copter" else ("gazebo-zephyr.parm",) if kind == "plane" else ("rover.parm", "rover-skid.parm")
         self.params = [ARDUPILOT / "Tools/autotest/default_params" / name for name in default_names]
         self.params.append(ROOT / f"simulation/params/{kind}_telemetry.parm")
         self.manifest["parameters"] = [str(p) for p in self.params]
@@ -143,7 +145,7 @@ class OwnedSimulation:
     def start_sitl(self, suffix=""):
         state_dir = self.credentials.create_state(suffix)
         self._save()  # parent can clean up even if this scenario is killed
-        binary = Path(os.environ.get("VAF_SIMULATION_SITL_BIN_DIR", str(ARDUPILOT / "build/sitl/bin"))) / ("arducopter" if self.kind == "copter" else "ardurover")
+        binary = Path(os.environ.get("VAF_SIMULATION_SITL_BIN_DIR", str(ARDUPILOT / "build/sitl/bin"))) / ({"copter": "arducopter", "rover": "ardurover", "plane": "arduplane"}[self.kind])
         plugin_library = Path(os.environ.get("VAF_SIMULATION_PLUGIN_DIR", str(PLUGIN / "build"))) / "libArduPilotPlugin.so"
         self.manifest["binary_path"] = str(binary)
         self.manifest["binary_sha256"] = hashlib.sha256(binary.read_bytes()).hexdigest()
@@ -159,6 +161,8 @@ class OwnedSimulation:
             if not available(self.port):
                 if self.confirmation_signing:
                     self.provision_receive_signing(suffix)
+                    if self.kind == "plane":
+                        self.verify_plane_parameters()
                 return
             time.sleep(.1)
         raise TimeoutError("owned SITL TCP listener unavailable")
@@ -235,6 +239,42 @@ class OwnedSimulation:
         self.manifest.setdefault('signing_epochs',[]).append(dict(initial_timestamp=seed,
             key_sha256=hashlib.sha256(self.signing_key).hexdigest(),proof='signing-support'+suffix+'.json',
             receiver='MAC first, pinned (1,1,0), retained 48-bit watermark'))
+        self._save()
+
+    def verify_plane_parameters(self):
+        """Read-only public parameter echo; no EEPROM or key inspection."""
+        from pymavlink.dialects.v20 import ardupilotmega as mav
+        expected = {"RTL_ALTITUDE": 50., "TKOFF_ALT": 50., "AUTOLAND_WP_ALT": 40.,
+                    "AUTOLAND_WP_DIST": 400., "SERVO3_MIN": 1100., "SERVO3_MAX": 1900.,
+                    "FENCE_ENABLE": 1., "FENCE_TYPE": 3., "FENCE_ACTION": 1.,
+                    "FENCE_RADIUS": 2000., "FENCE_ALT_MAX": 150., "FENCE_ALT_MAX_TP": 1.}
+        peer = mav.MAVLink(None, srcSystem=250, srcComponent=191)
+        parser = mav.MAVLink(None); parser.robust_parsing = True
+        observed = {}
+        with socket.create_connection(('127.0.0.1',self.port),timeout=1) as connection:
+            for name in expected:
+                connection.sendall(peer.param_request_read_encode(1,1,name.encode(),-1).pack(peer))
+                peer.seq=(peer.seq+1)&255
+            end=time.monotonic()+15
+            while time.monotonic()<end and observed.keys()!=expected.keys():
+                self.assert_alive()
+                try: data=connection.recv(8192)
+                except socket.timeout: continue
+                if not data: raise ConnectionError('parameter readback connection closed')
+                for message in parser.parse_buffer(data) or []:
+                    if message.get_type()=='BAD_DATA': continue
+                    if self.receive_signing.verify(message,system=1,component=1) is None: continue
+                    if message.get_type()!='PARAM_VALUE': continue
+                    name=str(message.param_id).rstrip('\0')
+                    if name in expected:
+                        value=float(message.param_value)
+                        if abs(value-expected[name])>1e-6:
+                            raise RuntimeError('owned Plane parameter readback mismatch: '+name)
+                        observed[name]=value
+        if observed.keys()!=expected.keys(): raise TimeoutError('owned Plane parameter readback incomplete')
+        self.manifest['plane_parameter_readback'] = observed
+        # Provisioning floor must include all verified traffic, including reads.
+        self.signing_config_path.write_text(json.dumps(dict(key=self.signing_key.hex(),floor=self.receive_signing.watermark)))
         self._save()
 
     def assert_alive(self):

@@ -11,14 +11,16 @@ except ModuleNotFoundError:  # Ubuntu 22.04 / Python 3.10, isolated dependency
 
 from vehicle_autonomy.contracts.core.geometry import FrameId
 from vehicle_autonomy.engine.control.vehicle_safety import SafetyLimits
-from vehicle_autonomy.vehicles.ardupilot.mavlink.constants import TYPE_GROUND_ROVER, TYPE_QUADROTOR
+from vehicle_autonomy.vehicles.ardupilot.mavlink.constants import TYPE_GROUND_ROVER, TYPE_QUADROTOR, TYPE_FIXED_WING
+from vehicle_autonomy.vehicles.plane.ardupilot_commands import PLANE_MODES
 
 
 _MODE_IDS = {
     "copter": {"GUIDED": 4, "LOITER": 5, "RTL": 6, "LAND": 9},
     "rover": {"HOLD": 4, "GUIDED": 15},
+    "plane": PLANE_MODES,
 }
-_MAV_TYPES = {"copter": TYPE_QUADROTOR, "rover": TYPE_GROUND_ROVER}
+_MAV_TYPES = {"copter": TYPE_QUADROTOR, "rover": TYPE_GROUND_ROVER, "plane": TYPE_FIXED_WING}
 _SAFETY_KEYS = set(SafetyLimits.__dataclass_fields__)
 
 

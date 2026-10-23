@@ -5,19 +5,20 @@ from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass, replace
 import time
+import math
 
 from vehicle_autonomy.contracts.core.primitives import CommandId, IdempotencyKey, LinkSessionId
 from vehicle_autonomy.contracts.core.quality import QualityState
 from vehicle_autonomy.contracts.core.time import TimePoint
 from vehicle_autonomy.contracts.vehicle.command import (
-    ArmCommand, CancelCommandRequest, CommandPhase, CommandReceipt, CommandStatus,
+    ArmCommand, FixedWingTargetCommand, CancelCommandRequest, CommandPhase, CommandReceipt, CommandStatus,
     DisarmCommand, ModeCommand, PoseTargetCommand, StopMotionCommand,
     TwistTargetCommand, VehicleCommandEnvelope,
 )
 from vehicle_autonomy.contracts.vehicle.models import VehicleStateSnapshot
 from vehicle_autonomy.engine.control.control_authority import ControlAuthority
 from vehicle_autonomy.vehicles.ardupilot.transports.bytes import ByteTransport
-from vehicle_autonomy.vehicles.ardupilot.mavlink.codec import CommandLong, LocalSetpoint, MavlinkCodec
+from vehicle_autonomy.vehicles.ardupilot.mavlink.codec import CommandLong, CommandInt, Instruction, LocalSetpoint, MavlinkCodec
 from vehicle_autonomy.vehicles.ardupilot.mavlink import constants as mavlink
 
 from vehicle_autonomy.vehicles.ardupilot.commands import ArduPilotCommandTranslator
@@ -59,7 +60,7 @@ class ArduPilotCommandPort:
         self._statuses: dict[CommandId, CommandStatus] = {}
         self._keys: dict[IdempotencyKey, CommandId] = {}
         self._queue: list[CommandId] = []
-        self._instructions: dict[CommandId, CommandLong | LocalSetpoint] = {}
+        self._instructions: dict[CommandId, Instruction] = {}
         self._ack_id: dict[CommandId, int] = {}
         self._inflight: dict[int, CommandId] = {}
         self._state_pending: dict[int, CommandId] = {}
@@ -72,6 +73,8 @@ class ArduPilotCommandPort:
         self._sent_signature: dict[CommandId, int] = {}
         self._transmitted_at: dict[CommandId, TimePoint] = {}
         self._state_matches: dict[CommandId, int] = {}
+        self._native_target_evidence = {}
+        self._native_guided_signature = {}
         self._last_match_signature: dict[CommandId, int] = {}
         self.ack_evidence: dict[CommandId, dict] = {}
 
@@ -110,7 +113,7 @@ class ArduPilotCommandPort:
             else:
                 self._instructions[command.command_id] = instruction
                 self._queue.append(command.command_id)
-                if isinstance(instruction, CommandLong):
+                if isinstance(instruction, (CommandLong, CommandInt)):
                     self._ack_id[command.command_id] = instruction.command
                 if isinstance(command.command, (PoseTargetCommand, TwistTargetCommand)):
                     self._streams[command.command.stream_id] = (
@@ -277,7 +280,7 @@ class ArduPilotCommandPort:
             del self._inflight[command_number]
             if result == mavlink.RESULT_ACCEPTED:
                 phase = CommandPhase.ACKNOWLEDGED
-                if isinstance(command.command, (ArmCommand, DisarmCommand, ModeCommand)):
+                if isinstance(command.command, (ArmCommand, DisarmCommand, ModeCommand, FixedWingTargetCommand)):
                     self._state_pending[command_number] = command_id
             else:
                 phase = CommandPhase.REJECTED
@@ -303,7 +306,7 @@ class ArduPilotCommandPort:
             for command_id, status in tuple(self._statuses.items()):
                 command = self._commands[command_id]
                 if (status.phase is CommandPhase.ACKNOWLEDGED
-                        and isinstance(command.command, (ArmCommand, DisarmCommand, ModeCommand))
+                        and isinstance(command.command, (ArmCommand, DisarmCommand, ModeCommand, FixedWingTargetCommand))
                         and command.deadline.clock_domain_id == now.clock_domain_id
                         and command.deadline <= now):
                     self.reasons[command_id] = "state_confirmation_timeout_outcome_unknown"
@@ -344,12 +347,22 @@ class ArduPilotCommandPort:
                     self.expire_unknown(current_time)
                     continue
                 command = envelope.command
-                if not isinstance(command, (ArmCommand, DisarmCommand, ModeCommand)):
+                if not isinstance(command, (ArmCommand, DisarmCommand, ModeCommand, FixedWingTargetCommand)):
                     continue
                 signature = getattr(message, '_vaf_signature_timestamp', None)
                 ack_signature = self.ack_evidence.get(command_id, {}).get('signature_timestamp')
                 if (signature is None or ack_signature is None or signature <= ack_signature
                         or signature <= self._sent_signature.get(command_id, 2**48)):
+                    continue
+                if isinstance(command, FixedWingTargetCommand):
+                    if message.custom_mode == self._translator.mode_id('GUIDED') and message.base_mode & 128:
+                        self._native_guided_signature[command_id] = signature
+                        final = self._complete_native_target(command_id, received_at)
+                        if final is not None:
+                            completed.append(final)
+                    else:
+                        self._native_guided_signature.pop(command_id, None)
+                        self._native_target_evidence.pop(command_id, None)
                     continue
                 observed = (
                     isinstance(command, ArmCommand) and bool(message.base_mode & 128)
@@ -363,6 +376,51 @@ class ArduPilotCommandPort:
                 if self._state_matches[command_id] >= 2:
                     final = CommandStatus(command_id, CommandPhase.COMPLETED, received_at)
                     self._statuses[command_id] = final
+                    completed.append(final)
+        return tuple(completed)
+
+    def _complete_native_target(self, command_id, at):
+        if command_id not in self._native_target_evidence or command_id not in self._native_guided_signature:
+            return None
+        final = CommandStatus(command_id, CommandPhase.COMPLETED, at)
+        self._statuses[command_id] = final
+        self.ack_evidence[command_id]['native_target'] = dict(self._native_target_evidence[command_id])
+        return final
+
+    def observe_native_target(self, message, at):
+        """Only authenticated, post-ACK target echo + GUIDED HB configures a goal.
+
+        This confirms lat/lon/AMSL target adoption, not arrival or stopping.
+        """
+        if message.get_type() != 'POSITION_TARGET_GLOBAL_INT' or (
+                message.get_srcSystem(), message.get_srcComponent()) != (self._codec.target_system, self._codec.target_component):
+            return ()
+        signature = getattr(message, '_vaf_signature_timestamp', None)
+        if signature is None or int(message.coordinate_frame) != 0 or int(message.type_mask) & 7 or not math.isfinite(float(message.alt)):
+            return ()
+        completed = []
+        with self._authority.lock:
+            self.expire_unknown(self._now())
+            for command_id,status in tuple(self._statuses.items()):
+                envelope = self._commands[command_id]
+                command = envelope.command
+                if not isinstance(command, FixedWingTargetCommand) or status.phase is not CommandPhase.ACKNOWLEDGED:
+                    continue
+                if envelope.expected_link_session_id != self._authority.link_session_id:
+                    continue
+                ack = self.ack_evidence.get(command_id,{}).get('signature_timestamp')
+                if ack is None or signature <= ack or signature <= self._sent_signature.get(command_id,2**48):
+                    continue
+                target = command.center
+                if (abs(int(message.lat_int)-round(target.latitude_deg*1e7)) > 1
+                        or abs(int(message.lon_int)-round(target.longitude_deg*1e7)) > 1
+                        or abs(float(message.alt)-target.altitude_m) > .02):
+                    continue
+                self._native_target_evidence[command_id] = dict(signature_timestamp=signature,
+                    latitude_e7=int(message.lat_int),longitude_e7=int(message.lon_int),altitude_amsl_m=float(message.alt),
+                    scope='native_target_configuration_only_not_arrival')
+                final = self._complete_native_target(command_id,at)
+                if final is not None:
                     completed.append(final)
         return tuple(completed)
 
@@ -409,6 +467,8 @@ class ArduPilotCommandPort:
             self._ambiguous.clear()
             self._streams.clear()
             self._receive_ticket = -1
+            self._native_target_evidence.clear()
+            self._native_guided_signature.clear()
             self._state_matches.clear()
             self._last_match_signature.clear()
             self._sent_ticket.clear()

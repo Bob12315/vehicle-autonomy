@@ -7,7 +7,7 @@ vehicle-specific command mapping. It never reads Gazebo truth.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime, timedelta, timezone
 import time
 from typing import Callable
@@ -26,6 +26,8 @@ from vehicle_autonomy.vehicles.ardupilot.mavlink.signing import ReceiveSigning
 from vehicle_autonomy.world.localization.online import OnlineLocalization
 from vehicle_autonomy.app.bootstrap.simulation_profile import SimulationProfile
 from vehicle_autonomy.vehicles.ardupilot.commands import ArduPilotCommandTranslator
+from vehicle_autonomy.vehicles.plane.mavlink_state import PlaneTelemetryState
+from vehicle_autonomy.vehicles.plane.safety import PlaneSimulationSafetyPolicy
 from vehicle_autonomy.vehicles.ardupilot.command_port import ArduPilotCommandPort, WriteGuardApproval
 from vehicle_autonomy.vehicles.ardupilot.telemetry_state import ArduPilotTelemetryState
 from vehicle_autonomy.vehicles.ardupilot.session import ArduPilotSession
@@ -175,7 +177,7 @@ class SimulationRuntime:
             transport=transport, codec=codec, authority=self.authority,
             commands=port, link_timeout_ns=self.profile.link_timeout_ns,
             expected_vehicle_type=self.profile.mav_type,
-            state_factory=lambda session_id: (RoverTelemetryState if self.profile.kind == "rover" else ArduPilotTelemetryState)(
+            state_factory=lambda session_id: ({"rover": RoverTelemetryState, "plane": PlaneTelemetryState}.get(self.profile.kind, ArduPilotTelemetryState))(
                 vehicle_id=self.profile.vehicle_id, generation_id=str(session_id),
                 link_session_id=session_id, source_system=1, source_component=1,
                 max_sample_skew_ns=500_000_000,
@@ -186,9 +188,12 @@ class SimulationRuntime:
         )
         self._transport, self._port, self._session = transport, port, session
         safety_class = RoverSimulationSafetyPolicy if self.profile.kind == "rover" else SimulationSafetyPolicy
+        if self.profile.kind == "plane":
+            safety = PlaneSimulationSafetyPolicy(self.profile.safety)
+        else:
+            safety = safety_class(self.profile.safety, motion_mode_id=self.profile.mode_ids["GUIDED"])
         self._execution = VehicleExecution(port, self.authority,
-                                           safety_class(self.profile.safety,
-                                                        motion_mode_id=self.profile.mode_ids["GUIDED"]),
+                                           safety,
                                            lambda: f"command:{uuid4().hex}")
         self._world = self._new_world()
         self.localization = OnlineLocalization(self.profile.safety.max_snapshot_age_ns)
@@ -225,6 +230,26 @@ class SimulationRuntime:
             return "vehicle_clock_domain_mismatch"
         evidence_deadlines = [_later(heartbeat, self.profile.link_timeout_ns),
                               _later(state.published_at, self.profile.safety.max_snapshot_age_ns)]
+        if self.profile.kind == "plane":
+            from vehicle_autonomy.contracts.effects.vehicle import ArmEffect, DisarmEffect, ModeEffect, FixedWingTargetEffect
+            from vehicle_autonomy.contracts.vehicle.command import ArmCommand, DisarmCommand, ModeCommand, FixedWingTargetCommand
+            payload = command.command
+            effect = (ArmEffect() if isinstance(payload, ArmCommand) else
+                      DisarmEffect() if isinstance(payload, DisarmCommand) else
+                      ModeEffect(payload.native_mode) if isinstance(payload, ModeCommand) else
+                      FixedWingTargetEffect(payload.center) if isinstance(payload, FixedWingTargetCommand) else None)
+            if effect is None:
+                return "plane_requires_native_modes_not_hover_or_zero_velocity"
+            envelope = EffectEnvelope(SchemaVersion(1, 0), str(command.command_id), command.run_id,
+                self._action_id, command.created_at, command.deadline, effect)
+            reason = PlaneSimulationSafetyPolicy(self.profile.safety).evaluate(envelope, self._world.snapshot(), now)
+            if reason is not None:
+                return reason
+            if isinstance(payload, FixedWingTargetCommand):
+                evidence_deadlines.append(_later(state.global_position.captured_at, self.profile.safety.max_snapshot_age_ns))
+            for sample in (state.reported_pose, state.reported_twist):
+                evidence_deadlines.append(_later(sample.captured_at, self.profile.safety.max_snapshot_age_ns))
+            return WriteGuardApproval(min(evidence_deadlines))
         if isinstance(command.command, StopMotionCommand):
             return WriteGuardApproval(min(evidence_deadlines))  # Localization is not required for Stop.
         if isinstance(command.command, (PoseTargetCommand, TwistTargetCommand, TakeoffCommand)):
@@ -285,6 +310,12 @@ class SimulationRuntime:
                     "freshness_basis": "verified_mavlink2_signing_order",
                     "session_id": self.session_id,
                 }
+            if command_id in self._port._native_target_evidence:
+                value["state_confirmation"] = dict(
+                    freshness_basis="verified_signed_ack_target_echo_and_guided",
+                    target=dict(self._port._native_target_evidence[command_id]),
+                    guided_signature_timestamp=self._port._native_guided_signature.get(command_id),
+                    scope="target_configuration_only_not_arrival", session_id=self.session_id)
             if self._results.get(effect_id) != value:
                 self._results[effect_id] = value
                 self._emit("effect_status", effect_id=effect_id, **value)
@@ -330,6 +361,12 @@ class SimulationRuntime:
         if self._run_id is not None and (self._session.session_id is None or world.vehicle is None):
             self._close_link("vehicle_state_or_link_stale")
             return SimulationCycle(len(messages), None, None, False, self._fault)
+        if self.profile.kind == "plane" and self._run_id is not None:
+            reason = PlaneSimulationSafetyPolicy(self.profile.safety).state_reason(world.vehicle, now)
+            if reason is not None:
+                self._emit("fixed_wing_flight_unconfirmed", reason=reason)
+                self._close_link(reason)
+                return SimulationCycle(len(messages), None, None, False, self._fault)
         self._execution.tick(now)
         written = self._session.write_next(self.clock()) if self._session.session_id is not None else None
         self._record_results()
@@ -453,6 +490,27 @@ class SimulationRuntime:
     def end_run(self) -> dict[str, str]:
         """Request a bounded stop before revoking the run's send authority."""
         stops: dict[str, str] = {}
+        if self.profile.kind == "plane" and self._run_id is not None:
+            state = None if self._session is None else self._session.snapshot()
+            if (state is None or state.reported_pose is None or state.reported_twist is None
+                    or state.reported_pose.value.position.z > 1.5
+                    or sum(v*v for v in (state.reported_twist.value.linear.x, state.reported_twist.value.linear.y,
+                                        state.reported_twist.value.linear.z)) > 1.0):
+                # A fixed wing must keep flying. Recovery is a native mode request
+                # through Execution, never a zero-velocity or forced Disarm.
+                if self._session is not None and self._execution is not None:
+                    from vehicle_autonomy.contracts.effects.vehicle import ModeEffect
+                    name = "plane-recovery:" + uuid4().hex
+                    request = self.submit_effect(ModeEffect("LOITER"), effect_id=name)
+                    until = time.monotonic_ns() + self.profile.effect_ttl_ns
+                    while request.receipt is not None and self._session is not None and time.monotonic_ns() < until:
+                        self.cycle()
+                        status = self.effect_status(name)
+                        if status is None or status['phase'] in ('COMPLETED','UNKNOWN','REJECTED'):
+                            break
+                        self._sleep(self.profile.period_ns / 1e9)
+                    self._emit("fixed_wing_recovery_requested", status=self.effect_status(name))
+                stops["fixed-wing-flight"] = StopState.UNCONFIRMED.value
         if self._active_stream_ids:
             if self._execution is None or self._session is None or self.session_id is None:
                 stops = {stream_id: StopState.UNCONFIRMED.value for stream_id in self._active_stream_ids}

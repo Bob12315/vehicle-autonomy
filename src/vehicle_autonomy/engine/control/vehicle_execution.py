@@ -10,12 +10,12 @@ from typing import Callable
 from vehicle_autonomy.contracts.core.primitives import CommandId, IdempotencyKey, SchemaVersion
 from vehicle_autonomy.contracts.core.time import TimePoint
 from vehicle_autonomy.contracts.effects.vehicle import (
-    ArmEffect, DisarmEffect, EffectEnvelope, LandEffect, ModeEffect,
+    ArmEffect, DisarmEffect, EffectEnvelope, LandEffect, ModeEffect, FixedWingTargetEffect,
     PoseTargetEffect, StopMotionEffect, TakeoffEffect, TwistTargetEffect,
 )
 from vehicle_autonomy.contracts.vehicle.command import (
     ArmCommand, CancelCommandRequest, CommandPhase, CommandReceipt,
-    DisarmCommand, LandCommand, ModeCommand, PoseTargetCommand,
+    DisarmCommand, LandCommand, ModeCommand, PoseTargetCommand, FixedWingTargetCommand,
     StopMotionCommand, TakeoffCommand, TwistTargetCommand,
     VehicleCommandEnvelope,
 )
@@ -146,6 +146,8 @@ class VehicleExecution:
             payload = TakeoffCommand(effect.height_m)
         elif isinstance(effect, LandEffect):
             payload = LandCommand()
+        elif isinstance(effect, FixedWingTargetEffect):
+            payload = FixedWingTargetCommand(effect.center)
         elif isinstance(effect, ModeEffect):
             payload = ModeCommand(effect.native_mode)
         elif isinstance(effect, PoseTargetEffect):

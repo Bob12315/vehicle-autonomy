@@ -7,7 +7,7 @@ from enum import Enum
 import math
 from typing import TypeAlias
 
-from vehicle_autonomy.contracts.core.geometry import FrameId, Pose3, Twist3
+from vehicle_autonomy.contracts.core.geometry import FrameId, GeoPoint, Pose3, Twist3
 from vehicle_autonomy.contracts.core.primitives import (
     CommandId, IdempotencyKey, LeaseId, LinkSessionId, RunId, SchemaVersion,
 )
@@ -36,6 +36,23 @@ class TakeoffCommand:
 @dataclass(frozen=True, slots=True)
 class LandCommand:
     pass
+
+
+@dataclass(frozen=True, slots=True)
+class FixedWingTargetCommand:
+    """Configure a native fixed-wing fly-to point, then continue loitering.
+
+    GeoPoint altitude is explicitly AMSL metres. Radius uses the audited
+    native configuration; no radius/arrival/physical stopping claim is made.
+
+    Completion confirms the native target configuration, never arrival/stop.
+    """
+    center: GeoPoint
+
+    def __post_init__(self):
+        if not isinstance(self.center, GeoPoint):
+            raise TypeError("loiter center must be a GeoPoint in degrees/AMSL metres")
+
 
 
 @dataclass(frozen=True, slots=True)
@@ -87,7 +104,7 @@ class StopMotionCommand:
 
 
 VehicleCommand: TypeAlias = (
-    ArmCommand | DisarmCommand | TakeoffCommand | LandCommand | ModeCommand
+    ArmCommand | DisarmCommand | TakeoffCommand | LandCommand | ModeCommand | FixedWingTargetCommand
     | PoseTargetCommand | TwistTargetCommand | StopMotionCommand
 )
 
@@ -122,7 +139,7 @@ class VehicleCommandEnvelope:
             raise TypeError("command times must be TimePoint values")
         if self.deadline.elapsed_ns_since(self.created_at) <= 0:
             raise ValueError("command deadline must follow creation")
-        if not isinstance(self.command, (ArmCommand, DisarmCommand, TakeoffCommand, LandCommand, ModeCommand, PoseTargetCommand, TwistTargetCommand, StopMotionCommand)):
+        if not isinstance(self.command, (ArmCommand, DisarmCommand, TakeoffCommand, LandCommand, ModeCommand, FixedWingTargetCommand, PoseTargetCommand, TwistTargetCommand, StopMotionCommand)):
             raise TypeError("command must be a typed VehicleCommand")
 
 

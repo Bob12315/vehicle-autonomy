@@ -9,7 +9,7 @@ from vehicle_autonomy.contracts.core.geometry import FrameId
 from vehicle_autonomy.contracts.core.quality import FreshnessState, QualityState
 from vehicle_autonomy.contracts.core.time import TimePoint
 from vehicle_autonomy.contracts.effects.vehicle import (
-    EffectEnvelope, ModeEffect, PoseTargetEffect, StopMotionEffect,
+    EffectEnvelope, ModeEffect, PoseTargetEffect, StopMotionEffect, FixedWingTargetEffect,
     TakeoffEffect, TwistTargetEffect,
 )
 from vehicle_autonomy.contracts.world.models import WorldSnapshot
@@ -87,6 +87,8 @@ class VehicleSafetyPolicy:
         if any(item.state is not FreshnessState.FRESH for item in world.freshness if item.component_id == "vehicle"):
             return "vehicle_freshness_invalid"
         effect = envelope.effect
+        if isinstance(effect, FixedWingTargetEffect):
+            return "fixed_wing_target_requires_explicit_plane_policy"
         if isinstance(effect, ModeEffect) and effect.native_mode not in self.limits.allowed_modes:
             return "mode_not_allowed"
         if isinstance(effect, TakeoffEffect) and not 0 < effect.height_m <= self.limits.max_takeoff_m:

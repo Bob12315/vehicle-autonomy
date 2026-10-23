@@ -16,6 +16,16 @@ class CommandLong:
 
 
 @dataclass(frozen=True, slots=True)
+class CommandInt:
+    command: int
+    frame: int
+    params: tuple[float, float, float, float]
+    x: int
+    y: int
+    z: float
+
+
+@dataclass(frozen=True, slots=True)
 class LocalSetpoint:
     frame: int
     type_mask: int
@@ -30,7 +40,7 @@ class LocalSetpoint:
     yaw_rate: float = 0.0
 
 
-Instruction: TypeAlias = CommandLong | LocalSetpoint
+Instruction: TypeAlias = CommandLong | CommandInt | LocalSetpoint
 
 
 class MavlinkCodec:
@@ -58,6 +68,10 @@ class MavlinkCodec:
                 self.target_system, self.target_component, instruction.command, 0,
                 *instruction.params,
             )
+        elif isinstance(instruction, CommandInt):
+            message = self._sender.command_int_encode(
+                self.target_system, self.target_component, instruction.frame, instruction.command,
+                0, 0, *instruction.params, instruction.x, instruction.y, instruction.z)
         elif isinstance(instruction, LocalSetpoint):
             message = self._sender.set_position_target_local_ned_encode(
                 instruction.time_boot_ms, self.target_system, self.target_component, instruction.frame,
