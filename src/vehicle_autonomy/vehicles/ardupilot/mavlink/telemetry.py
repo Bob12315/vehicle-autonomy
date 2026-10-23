@@ -66,6 +66,13 @@ class EkfStatus:
 
 
 @dataclass(frozen=True, slots=True)
+class SupplyStatus:
+    vcc_mv: int
+    servo_mv: int
+    flags: int
+
+
+@dataclass(frozen=True, slots=True)
 class CommandAck:
     command: int
     result: int
@@ -81,7 +88,7 @@ class StatusText:
 
 
 TelemetryFact: TypeAlias = (LocalPositionNed | AttitudeFrdNed | GlobalPositionInt | GpsFix
-                            | SystemPower | Heartbeat | EkfStatus | CommandAck | StatusText)
+                            | SystemPower | Heartbeat | EkfStatus | SupplyStatus | CommandAck | StatusText)
 
 
 def _finite(message: object, name: str) -> float:
@@ -131,6 +138,8 @@ def decode_telemetry(message: object) -> TelemetryFact | None:
         if message_type == "EKF_STATUS_REPORT":
             return EkfStatus(_integer(message, "flags"), tuple(_finite(message, name) for name in (
                 "velocity_variance", "pos_horiz_variance", "pos_vert_variance", "compass_variance", "terrain_alt_variance")))
+        if message_type == "POWER_STATUS":
+            return SupplyStatus(*(_integer(message, name) for name in ("Vcc", "Vservo", "flags")))
         if message_type == "COMMAND_ACK":
             return CommandAck(_integer(message, "command"), _integer(message, "result"),
                               _integer(message, "progress") if hasattr(message, "progress") else None)

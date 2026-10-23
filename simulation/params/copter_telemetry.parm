@@ -10,3 +10,6 @@ RTL_ALT_FINAL_M 0
 
 # Environment origin preflight requires fresh GPS_RAW_INT fix evidence.
 MAV1_EXT_STAT 5
+
+# Phase 1 receive-only EKF diagnostics; no command or safety parameter change.
+MAV1_EXTRA3 2

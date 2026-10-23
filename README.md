@@ -27,6 +27,19 @@ python -m unittest discover -s tests -v
 相对用户输入和输出路径仍相对调用目录。完整路径变化及验证见
 [架构迁移报告](docs/ARCHITECTURE_MIGRATION_REPORT.md)。
 
+## V1.1 阶段一基础控制
+
+改造范围与增量合同见 [V1.1 记录目录](docs/v1.1/README.md)。专用入口只创建
+自己的 loopback Rover/Copter SITL + Gazebo，执行两次独立的 A–F 验收，原始证据
+保存在 `artifacts/phase1-control/`。需先按上文安装依赖并使用已配置的 Gazebo/AP 环境：
+
+```bash
+./scripts/test_phase1_control.sh --allow-send
+```
+
+该入口不连接串口或实车；缺少显式参数不会启动控制测试。默认应用 SEND 仍关闭。
+不包含阶段二或外部感知/导航/智能功能。
+
 ## 当前实现
 
 根目录目前提供 P1 基础合同、P2 离线 World Model 状态链、P3 Typed Action/Mission 决策链、P4 控制边界、P5 ArduCopter/MAVLink/TCP 插件，以及 P6 本机 SITL 单进程模式任务运行组合。通用 TransformTree 求解静态/动态 Frame 关系。P5 已在内存传输、本机 Copter SITL 和已连接 Copter 飞控的受限 USB 模式诊断中验证；此前还完成 Rover 飞控的受限 USB HOLD 诊断。P6 将 Effect 经双 SEND、Lease、Safety 和唯一 writer 分派，并等待 ACK 与后续模式状态。新增显式机载只读部署、认证 Web 控制台和 LLM 提案适配；**尚无经过整车安全验收的生产运动连接**。

@@ -71,6 +71,7 @@ class Phase1TelemetryTests(unittest.TestCase):
             Message('EKF_STATUS_REPORT', flags=19, velocity_variance=.1, pos_horiz_variance=.2,
                     pos_vert_variance=.3, compass_variance=.4, terrain_alt_variance=.5),
             Message('SYS_STATUS', voltage_battery=12000, current_battery=230, battery_remaining=80),
+            Message('POWER_STATUS', Vcc=5000, Vservo=0, flags=1),
             Message('COMMAND_ACK', command=176, result=0, progress=255),
             Message('STATUSTEXT', severity=4, text=b'Warning\0', id=2, chunk_seq=1),
         ):
@@ -78,6 +79,8 @@ class Phase1TelemetryTests(unittest.TestCase):
         view = state.telemetry_snapshot(at(12))
         self.assertEqual(view.field('EKF_STATUS_REPORT').value.flags, 19)
         self.assertEqual(view.field('SYS_STATUS').value.voltage_v, 12.)
+        self.assertEqual(view.field('POWER_STATUS').value.reported_5v_rail_v, 5.)
+        self.assertEqual(view.field('POWER_STATUS').value.reported_servo_rail_v, 0.)
         self.assertIsNone(view.field('COMMAND_ACK').value.progress_percent)
         text = view.field('STATUSTEXT')
         self.assertEqual(text.value.text, 'Warning')

@@ -12,7 +12,7 @@ contracts.vehicle，协议事实及标准化在 vehicles.ardupilot，显式装�
 - MISSING / VALID / STALE / INVALID / UNKNOWN_CAPTURE_TIME；receive_fresh 单列。
 - 观测、重复、倒序、无效计数。重复/倒序不会替换有效样本或更新时效。
 
-Heartbeat、EKF_STATUS_REPORT、SYS_STATUS、COMMAND_ACK、STATUSTEXT 没有可限定的
+Heartbeat、EKF_STATUS_REPORT、SYS_STATUS、POWER_STATUS、COMMAND_ACK、STATUSTEXT 没有可限定的
 传感器采样时间，明确保持 captured_at=null；新接收仅表示收到事件。
 STATUSTEXT 保留 id/chunk_seq，不把一个分块伪装成完整长告警。
 GPS fix/卫星/HDOP 等保留缺失与协议 sentinel。缺失 EKF 或告警不能伪造正常值。
@@ -27,3 +27,5 @@ Rover 原有 GPS_GLOBAL_ORIGIN 局部投影仍用于控制位姿；是否提供 
 
 协议修复：ACK 目标扩展字段为其他控制器时不能匹配本控制器请求；受 ACK 栅栏
 阻塞的队列项仍须按原期限拒绝。缺失 ACK 和迟到 ACK 不提升 UNKNOWN 结果。
+
+POWER_STATUS 保留飞控上报的 5V/舵机电源轨电压和 flags；不根据某个电压值推定硬件或供电正常。Copter 仿真参数增加 MAV1_EXTRA3=2，仅打开既有 EKF 状态流，不改变安全或运动参数。

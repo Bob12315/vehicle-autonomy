@@ -11,7 +11,7 @@ from pymavlink.dialects.v20 import ardupilotmega as mav
 
 
 class TcpFaultProxy:
-    def __init__(self, upstream_port: int, log_path: Path):
+    def __init__(self, upstream_port: int, log_path: Path, *, capture_payload=False):
         self.upstream_port = upstream_port
         self.listener = socket.socket()
         self.listener.bind(("127.0.0.1", 0))
@@ -21,6 +21,10 @@ class TcpFaultProxy:
         self.drop_rx = set()
         self.drop_ack_command = None
         self.delay_pose_s = 0.0
+        self.delay_ack_s = 0.0
+        self.duplicate_rx = set()
+        self.repeat_pose = False
+        self.capture_payload = capture_payload
         self.drop_tx = False
         self.error = None
         self.records = []
@@ -73,6 +77,7 @@ class TcpFaultProxy:
                     self._connections = [client, upstream]
                 parsers = {client: mav.MAVLink(None), upstream: mav.MAVLink(None)}
                 pending = []
+                repeated = {}
                 while not self._stop.is_set():
                     readable, _, _ = select.select([client, upstream], [], [], .02)
                     for source in readable:
@@ -93,6 +98,7 @@ class TcpFaultProxy:
                                 for field in ("command", "coordinate_frame", "vx", "vy", "vz", "yaw_rate"):
                                     if hasattr(message, field):
                                         record[field] = getattr(message, field)
+                                record["wire_bytes"] = len(raw)
                                 self.record(record)
                                 if not self.drop_tx:
                                     upstream.sendall(raw)
@@ -100,13 +106,26 @@ class TcpFaultProxy:
                                 dropped = "*" in self.drop_rx or kind in self.drop_rx or (
                                     kind == "COMMAND_ACK" and int(message.command) == self.drop_ack_command)
                                 delay = self.delay_pose_s if kind in ("LOCAL_POSITION_NED", "GLOBAL_POSITION_INT", "ATTITUDE") else 0
-                                self.record({"direction": "rx", "type": kind, "dropped": dropped,
-                                             "delay_s": delay})
+                                if kind == "COMMAND_ACK":
+                                    delay = self.delay_ack_s
+                                if self.repeat_pose and kind in ("ATTITUDE", "GLOBAL_POSITION_INT", "LOCAL_POSITION_NED"):
+                                    raw = repeated.setdefault(kind, raw)
+                                elif not self.repeat_pose:
+                                    repeated.clear()
+                                record = {"direction": "rx", "type": kind, "dropped": dropped, "delay_s": delay}
+                                if self.capture_payload:
+                                    record.update(payload=message.to_dict(), raw_hex=raw.hex(),
+                                                  system=message.get_srcSystem(), component=message.get_srcComponent(),
+                                                  sequence=message.get_seq())
+                                self.record(record)
                                 if not dropped:
                                     if delay:
                                         pending.append((time.monotonic() + delay, raw))
                                     else:
                                         client.sendall(raw)
+                                        if kind in self.duplicate_rx:
+                                            client.sendall(raw)
+                                            self.record({"direction": "duplicate_rx", "type": kind})
                     now = time.monotonic()
                     due = [item for item in pending if item[0] <= now]
                     pending = [item for item in pending if item[0] > now]

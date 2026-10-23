@@ -5,17 +5,17 @@ from vehicle_autonomy.contracts.core.geometry import GeoPoint, Vector3
 from vehicle_autonomy.contracts.core.quality import QualityState
 from vehicle_autonomy.contracts.vehicle.telemetry import (
     AckTelemetry, AttitudeTelemetry, EkfTelemetry, GpsTelemetry, PositionTelemetry,
-    PowerTelemetry, StatusTextTelemetry, TelemetryAvailability as Availability,
+    PowerTelemetry, SupplyTelemetry, StatusTextTelemetry, TelemetryAvailability as Availability,
     TelemetryField, VehicleIdentity, VehicleTelemetrySnapshot,
 )
 from vehicle_autonomy.vehicles.ardupilot.coordinates import _ned_to_enu, _euler_frd_ned_to_flu_enu
 from vehicle_autonomy.vehicles.ardupilot.mavlink.telemetry import (
     AttitudeFrdNed, CommandAck, EkfStatus, GlobalPositionInt, GpsFix, Heartbeat,
-    LocalPositionNed, StatusText, SystemPower, decode_telemetry,
+    LocalPositionNed, StatusText, SupplyStatus, SystemPower, decode_telemetry,
 )
 
 MESSAGE_TYPES = ("HEARTBEAT", "ATTITUDE", "GLOBAL_POSITION_INT", "LOCAL_POSITION_NED",
-                 "GPS_RAW_INT", "EKF_STATUS_REPORT", "SYS_STATUS", "COMMAND_ACK", "STATUSTEXT")
+                 "GPS_RAW_INT", "EKF_STATUS_REPORT", "SYS_STATUS", "POWER_STATUS", "COMMAND_ACK", "STATUSTEXT")
 TIMED_TYPES = frozenset(("ATTITUDE", "GLOBAL_POSITION_INT", "LOCAL_POSITION_NED", "GPS_RAW_INT"))
 
 
@@ -61,6 +61,8 @@ def _normalize(fact, frame):
         if value.remaining_percent is not None and not 0 <= value.remaining_percent <= 100:
             raise ValueError("invalid remaining battery")
         return value, None
+    if isinstance(fact, SupplyStatus):
+        return SupplyTelemetry(fact.vcc_mv / 1000, fact.servo_mv / 1000, fact.flags), None
     if isinstance(fact, CommandAck):
         return AckTelemetry(fact.command, fact.result, None if fact.progress in (None, 255) else fact.progress), None
     if isinstance(fact, StatusText):

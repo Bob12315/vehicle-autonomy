@@ -70,6 +70,13 @@ class PowerTelemetry:
 
 
 @dataclass(frozen=True, slots=True)
+class SupplyTelemetry:
+    reported_5v_rail_v: float
+    reported_servo_rail_v: float
+    flags: int
+
+
+@dataclass(frozen=True, slots=True)
 class AckTelemetry:
     command: int
     result: int
@@ -85,7 +92,7 @@ class StatusTextTelemetry:
 
 
 TelemetryValue = (VehicleIdentity | AttitudeTelemetry | PositionTelemetry | GpsTelemetry
-                  | EkfTelemetry | PowerTelemetry | AckTelemetry | StatusTextTelemetry)
+                  | EkfTelemetry | PowerTelemetry | SupplyTelemetry | AckTelemetry | StatusTextTelemetry)
 
 
 @dataclass(frozen=True, slots=True)

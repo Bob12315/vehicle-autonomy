@@ -139,6 +139,11 @@ class OwnedSimulation:
         state_dir = self.run_dir / ("sitl_state" + suffix)
         state_dir.mkdir()
         binary = Path(os.environ.get("VAF_SIMULATION_SITL_BIN_DIR", str(ARDUPILOT / "build/sitl/bin"))) / ("arducopter" if self.kind == "copter" else "ardurover")
+        plugin_library = Path(os.environ.get("VAF_SIMULATION_PLUGIN_DIR", str(PLUGIN / "build"))) / "libArduPilotPlugin.so"
+        self.manifest["binary_path"] = str(binary)
+        self.manifest["binary_sha256"] = hashlib.sha256(binary.read_bytes()).hexdigest()
+        self.manifest["plugin_library"] = str(plugin_library)
+        self.manifest["plugin_library_sha256"] = hashlib.sha256(plugin_library.read_bytes()).hexdigest()
         # Direct binary launch avoids sim_vehicle's instance-zero kill_tasks().
         self.sitl = self.start_process("sitl" + suffix, [str(binary), "--model", "JSON", "--speedup", "1",
             "--defaults", ",".join(map(str, self.params)), "--sim-address=127.0.0.1",
