@@ -48,7 +48,9 @@ python -m unittest discover -s tests -v
 接收认证、未认证链路的保守功能限制和新证据见
 [第三轮修复报告](docs/PHASE1_REMEDIATION_ROUND3_REPORT.md)。
 修复回归入口为 `./scripts/test_phase1_control.sh --remediation --allow-send`，
-第三轮原始证据另存于 `artifacts/phase1-round3/`，此前证据保持不变。未开始阶段二。
+第三轮原始证据另存于 `artifacts/phase1-round3/`。原始审查结论和非敏感证据保留；
+条件验收后的 P2 清理销毁了 30 个历史测试 EEPROM，原二进制不再可用，详情见
+[凭据清理修复报告](docs/PHASE1_CREDENTIAL_CLEANUP_REPORT.md)。未开始阶段二。
 
 ## 当前实现
 
