@@ -1,0 +1,4350 @@
+{
+  "development_failures": [
+    {
+      "path": "artifacts/phase1-control/dev-rover-probe/summary.json",
+      "passed": false,
+      "error": "RuntimeError: vehicle_state_or_link_stale",
+      "sha256": "63d1f1f3f02816af55c8195ecd49b2ce33d5af0d2fac127f70596aedaca187a7"
+    },
+    {
+      "path": "artifacts/phase1-control/dev-copter-probe/summary.json",
+      "passed": false,
+      "error": "AssertionError: EKF_STATUS_REPORT missing or fictional capture time",
+      "sha256": "fc50126d96ba521d677c645ee21ddb1858c999de0774aa9a2f12e80bad45ef2b"
+    },
+    {
+      "path": "artifacts/phase1-control/preflight-failure-proof/summary.json",
+      "passed": false,
+      "error": "RuntimeError: preflight failed",
+      "sha256": "1a689cab99bd051ae3752400f6aa456b2f5bcb0febee57fa4c916e902598e142"
+    }
+  ],
+  "schema": "phase1-evidence-v1",
+  "suite": {
+    "passed": true,
+    "run_id": "acceptance-final",
+    "started_at": "2026-10-23T03:28:25.597726+00:00",
+    "run_dir": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final",
+    "framework_sha": "371ab0c88bf6c2422c08cdf77fbf650ce0269a13",
+    "working_tree_dirty": false,
+    "source_sha256": "8c773a532f9ad80a12d6dffc3c475e2ea2c923db2d95579ef0b963b1e7062785",
+    "python": "3.12.3 (main, Jul 15 2026, 23:46:41) [GCC 13.3.0]",
+    "rounds": [
+      {
+        "run_id": "run-1-29db89c3",
+        "started_at": "2026-10-23T03:28:57.694923+00:00",
+        "vehicles": {
+          "rover": {
+            "passed": true,
+            "stages": {
+              "probe": {
+                "passed": true,
+                "summary": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-probe/summary.json",
+                "manifest": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-probe/manifest.json",
+                "log": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/1_rover_probe.log",
+                "cleanup": true
+              },
+              "physical": {
+                "passed": true,
+                "summary": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-physical/summary.json",
+                "manifest": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-physical/manifest.json",
+                "log": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/1_rover_physical.log",
+                "cleanup": true
+              },
+              "faults": {
+                "passed": true,
+                "summary": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-faults/summary.json",
+                "manifest": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-faults/manifest.json",
+                "log": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/1_rover_faults.log",
+                "cleanup": true
+              }
+            },
+            "groups": {
+              "A": "PASS",
+              "B": "PASS",
+              "D": "PASS",
+              "E": "PASS",
+              "F": "PASS",
+              "C": "PASS"
+            }
+          },
+          "copter": {
+            "passed": true,
+            "stages": {
+              "probe": {
+                "passed": true,
+                "summary": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-probe/summary.json",
+                "manifest": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-probe/manifest.json",
+                "log": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/1_copter_probe.log",
+                "cleanup": true
+              },
+              "physical": {
+                "passed": true,
+                "summary": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-physical/summary.json",
+                "manifest": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-physical/manifest.json",
+                "log": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/1_copter_physical.log",
+                "cleanup": true
+              },
+              "faults": {
+                "passed": true,
+                "summary": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-faults/summary.json",
+                "manifest": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-faults/manifest.json",
+                "log": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/1_copter_faults.log",
+                "cleanup": true
+              }
+            },
+            "groups": {
+              "A": "PASS",
+              "B": "PASS",
+              "D": "PASS",
+              "E": "PASS",
+              "F": "PASS",
+              "C": "PASS"
+            }
+          }
+        },
+        "passed": true,
+        "ended_at": "2026-10-23T03:41:09.532584+00:00"
+      },
+      {
+        "run_id": "run-2-0ad45180",
+        "started_at": "2026-10-23T03:41:09.532844+00:00",
+        "vehicles": {
+          "rover": {
+            "passed": true,
+            "stages": {
+              "probe": {
+                "passed": true,
+                "summary": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-probe/summary.json",
+                "manifest": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-probe/manifest.json",
+                "log": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/2_rover_probe.log",
+                "cleanup": true
+              },
+              "physical": {
+                "passed": true,
+                "summary": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-physical/summary.json",
+                "manifest": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-physical/manifest.json",
+                "log": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/2_rover_physical.log",
+                "cleanup": true
+              },
+              "faults": {
+                "passed": true,
+                "summary": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-faults/summary.json",
+                "manifest": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-faults/manifest.json",
+                "log": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/2_rover_faults.log",
+                "cleanup": true
+              }
+            },
+            "groups": {
+              "A": "PASS",
+              "B": "PASS",
+              "D": "PASS",
+              "E": "PASS",
+              "F": "PASS",
+              "C": "PASS"
+            }
+          },
+          "copter": {
+            "passed": true,
+            "stages": {
+              "probe": {
+                "passed": true,
+                "summary": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-probe/summary.json",
+                "manifest": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-probe/manifest.json",
+                "log": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/2_copter_probe.log",
+                "cleanup": true
+              },
+              "physical": {
+                "passed": true,
+                "summary": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-physical/summary.json",
+                "manifest": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-physical/manifest.json",
+                "log": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/2_copter_physical.log",
+                "cleanup": true
+              },
+              "faults": {
+                "passed": true,
+                "summary": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-faults/summary.json",
+                "manifest": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-faults/manifest.json",
+                "log": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/2_copter_faults.log",
+                "cleanup": true
+              }
+            },
+            "groups": {
+              "A": "PASS",
+              "B": "PASS",
+              "D": "PASS",
+              "E": "PASS",
+              "F": "PASS",
+              "C": "PASS"
+            }
+          }
+        },
+        "passed": true,
+        "ended_at": "2026-10-23T03:53:20.782548+00:00"
+      }
+    ],
+    "scope": "phase1; owned loopback SITL/Gazebo only",
+    "final_source_sha256": "8c773a532f9ad80a12d6dffc3c475e2ea2c923db2d95579ef0b963b1e7062785",
+    "ended_at": "2026-10-23T03:53:20.804500+00:00"
+  },
+  "unit": {
+    "passed": true,
+    "tests": 350,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "safety": {
+    "protected_files": {
+      "Vehicle_Autonomy_V1.0.md": {
+        "sha256": "ca17bbcdd95ed25738c60d25a640008af4696769120ff3738f27613abc33629d",
+        "unchanged_from_7444885": true
+      },
+      "Vehicle_Autonomy_File_Structure_V1.1.md": {
+        "sha256": "b48a51b20aee90466fd56cf603a7cad34eedc07cd257e22dd59e70217cb4ae35",
+        "unchanged_from_7444885": true
+      },
+      "simulation/scenarios/acceptance-v1.json": {
+        "sha256": "1caa93ee02de9793aed2451a1b206ce8afb2a58132cf82131cad8a8d88eb3165",
+        "unchanged_from_7444885": true
+      },
+      "src/vehicle_autonomy/engine/control/control_authority.py": {
+        "sha256": "d821f0cce4636e0bd24a5618163ea68495268f4f21c86e56098017605288a122",
+        "unchanged_from_7444885": true
+      },
+      "src/vehicle_autonomy/engine/control/vehicle_execution.py": {
+        "sha256": "1d521edd88d6b2d6d323deb099d04a5be274cbcd0a7de765094d27b93b8323a8",
+        "unchanged_from_7444885": true
+      },
+      "src/vehicle_autonomy/engine/control/vehicle_safety.py": {
+        "sha256": "603ad42706045823164f68a4c6697104dd70d012a2d353dfe693695fd44af352",
+        "unchanged_from_7444885": true
+      },
+      "src/vehicle_autonomy/engine/control/simulation_safety.py": {
+        "sha256": "11fe8eea718c525003933379de54c9a08ce06fe0e092629532418eca3d1a085d",
+        "unchanged_from_7444885": true
+      }
+    },
+    "default_status": {
+      "framework": "v1",
+      "mission_scheduler": "unwired",
+      "send_commands": false,
+      "vehicle_connection": "unwired"
+    },
+    "hardware_check": {
+      "valid": true,
+      "mode": "hardware_readonly",
+      "system_send": false,
+      "action_send": false
+    },
+    "production_control_motion_code_unchanged": true
+  },
+  "results": [
+    {
+      "run_id": "run-1-29db89c3",
+      "kind": "rover",
+      "groups": {
+        "A": "PASS",
+        "B": "PASS",
+        "D": "PASS",
+        "E": "PASS",
+        "F": "PASS",
+        "C": "PASS"
+      },
+      "A": {
+        "passed": true,
+        "mav_type": 10,
+        "session": "623552be89e94fec860599b244fccd00",
+        "heartbeat_observations": 45,
+        "received_cycles": 451,
+        "initial_command_writes": 0
+      },
+      "B": {
+        "yaw_error_rad": 7.549789976884905e-08,
+        "velocity_error_mps": 4.568857701645381e-08,
+        "messages": {
+          "HEARTBEAT": {
+            "availability": "UNKNOWN_CAPTURE_TIME",
+            "observations": 45,
+            "captured_at": null,
+            "value": {
+              "mav_type": 10,
+              "autopilot": 3,
+              "native_mode": 0,
+              "armed": false,
+              "system_status": 4
+            }
+          },
+          "ATTITUDE": {
+            "availability": "VALID",
+            "observations": 412,
+            "captured_at": {
+              "monotonic_ns": 41405749642254,
+              "utc": "2026-10-23T03:29:43.051621Z",
+              "clock_domain_id": "host-monotonic-simulation"
+            },
+            "value": {
+              "orientation_flu_enu": {
+                "x": -4.588929341170788e-13,
+                "y": -1.0752006941009342e-11,
+                "z": -3.774894979935439e-08,
+                "w": -0.9999999999999993
+              },
+              "angular_velocity_flu_rad_s": {
+                "x": 0.0006052081007510424,
+                "y": -0.0006314032943919301,
+                "z": -0.0005989422788843513
+              }
+            }
+          },
+          "GLOBAL_POSITION_INT": {
+            "availability": "VALID",
+            "observations": 412,
+            "captured_at": {
+              "monotonic_ns": 41405749642254,
+              "utc": "2026-10-23T03:29:43.051621Z",
+              "clock_domain_id": "host-monotonic-simulation"
+            },
+            "value": {
+              "position_enu_m": null,
+              "velocity_enu_mps": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": -0.0
+              },
+              "geographic": {
+                "latitude_deg": -35.363262,
+                "longitude_deg": 149.165237,
+                "altitude_m": 584.18
+              }
+            }
+          },
+          "LOCAL_POSITION_NED": {
+            "availability": "VALID",
+            "observations": 412,
+            "captured_at": {
+              "monotonic_ns": 41405749642254,
+              "utc": "2026-10-23T03:29:43.051621Z",
+              "clock_domain_id": "host-monotonic-simulation"
+            },
+            "value": {
+              "position_enu_m": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.18000000715255737
+              },
+              "velocity_enu_mps": {
+                "x": 4.4078410366132914e-10,
+                "y": -1.743595962055977e-10,
+                "z": -4.568611799982136e-08
+              },
+              "geographic": null
+            }
+          },
+          "GPS_RAW_INT": {
+            "availability": "VALID",
+            "observations": 206,
+            "captured_at": {
+              "monotonic_ns": 41405553642254,
+              "utc": "2026-10-23T03:29:42.855621Z",
+              "clock_domain_id": "host-monotonic-simulation"
+            },
+            "value": {
+              "fix_type": 6,
+              "satellites": 10,
+              "hdop": 1.21,
+              "vdop": 2.0
+            }
+          },
+          "EKF_STATUS_REPORT": {
+            "availability": "UNKNOWN_CAPTURE_TIME",
+            "observations": 41,
+            "captured_at": null,
+            "value": {
+              "flags": 895,
+              "velocity_variance": 0.0,
+              "horizontal_position_variance": 0.0,
+              "vertical_position_variance": 0.0,
+              "compass_variance": 0.0,
+              "terrain_altitude_variance": 0.0
+            }
+          },
+          "SYS_STATUS": {
+            "availability": "UNKNOWN_CAPTURE_TIME",
+            "observations": 206,
+            "captured_at": null,
+            "value": {
+              "voltage_v": 12.6,
+              "current_a": 0.0,
+              "remaining_percent": 100
+            }
+          },
+          "POWER_STATUS": {
+            "availability": "UNKNOWN_CAPTURE_TIME",
+            "observations": 206,
+            "captured_at": null,
+            "value": {
+              "reported_5v_rail_v": 5.0,
+              "reported_servo_rail_v": 0.0,
+              "flags": 0
+            }
+          },
+          "COMMAND_ACK": {
+            "availability": "MISSING",
+            "observations": 0,
+            "captured_at": null,
+            "value": null
+          },
+          "STATUSTEXT": {
+            "availability": "UNKNOWN_CAPTURE_TIME",
+            "observations": 20,
+            "captured_at": null,
+            "value": {
+              "severity": 6,
+              "text": "EKF3 IMU1 is using GPS",
+              "message_id": 0,
+              "chunk_sequence": 0
+            }
+          }
+        }
+      },
+      "C": {
+        "steps": {
+          "guided": {
+            "phase": "COMPLETED",
+            "command_id": "command:5392f6c97b124ee792e4f0ba00f9fd21",
+            "reason": null,
+            "armed": false,
+            "mode": "ARDUPILOT_CUSTOM_15"
+          },
+          "arm": {
+            "phase": "COMPLETED",
+            "command_id": "command:93c3bff3122440e5a1426e764d27e91a",
+            "reason": null,
+            "armed": true,
+            "mode": "ARDUPILOT_CUSTOM_15"
+          },
+          "drive": {
+            "phase": "TRANSMITTED",
+            "command_id": "command:4add45b7fb0c476e94ba882e785028c2",
+            "reason": null
+          },
+          "stop": {
+            "phase": "COMPLETED",
+            "command_id": "command:27aaeff5c0f24be4ac0399a6bf5c2158",
+            "reason": null,
+            "armed": true,
+            "mode": "ARDUPILOT_CUSTOM_15"
+          },
+          "forward": {
+            "setpoints": 15,
+            "transmitted_setpoints": 15,
+            "truth_delta_xy": [
+              1.0299375806038076,
+              3.556666864904943e-08
+            ],
+            "heading_projection_m": 1.0299375806038076,
+            "truth_delta_yaw_rad": 4.622519456098928e-07
+          },
+          "forward-stop": {
+            "phase": "COMPLETED",
+            "command_id": "command:2b28941bcaea4774911c2545293bcd21",
+            "reason": null,
+            "armed": true,
+            "mode": "ARDUPILOT_CUSTOM_15"
+          },
+          "forward-stop-truth": {
+            "speed_mps": 0.00489373193210986,
+            "yaw_rate_rad_s": 2.731746157508416e-08,
+            "elapsed_from_request_s": 6.209537634997105
+          },
+          "reverse": {
+            "setpoints": 16,
+            "transmitted_setpoints": 16,
+            "truth_delta_xy": [
+              -1.0275215305258132,
+              5.515797736743972e-07
+            ],
+            "heading_projection_m": -1.0275215305233687,
+            "truth_delta_yaw_rad": -2.377633061545481e-06
+          },
+          "reverse-stop": {
+            "phase": "COMPLETED",
+            "command_id": "command:b2da8884f7b541c38a4fe28c608d02d8",
+            "reason": null,
+            "armed": true,
+            "mode": "ARDUPILOT_CUSTOM_15"
+          },
+          "reverse-stop-truth": {
+            "speed_mps": 0.0,
+            "yaw_rate_rad_s": 0.0,
+            "elapsed_from_request_s": 4.5068211070029065
+          },
+          "left": {
+            "setpoints": 10,
+            "transmitted_setpoints": 10,
+            "truth_delta_xy": [
+              0.3617801978226285,
+              -0.08174123218983381
+            ],
+            "heading_projection_m": 0.3617800448036514,
+            "truth_delta_yaw_rad": 0.8189371365423672
+          },
+          "left-stop": {
+            "phase": "COMPLETED",
+            "command_id": "command:5294af1469964c79989b0b49b450a514",
+            "reason": null,
+            "armed": true,
+            "mode": "ARDUPILOT_CUSTOM_15"
+          },
+          "left-stop-truth": {
+            "speed_mps": 0.00577224012557323,
+            "yaw_rate_rad_s": 0.017865757802108126,
+            "elapsed_from_request_s": 2.9046501089978847
+          },
+          "right": {
+            "setpoints": 18,
+            "transmitted_setpoints": 18,
+            "truth_delta_xy": [
+              0.46424049186926664,
+              0.8122898421769721
+            ],
+            "heading_projection_m": 0.9344844710290422,
+            "truth_delta_yaw_rad": -0.795500860035312
+          },
+          "right-stop": {
+            "phase": "COMPLETED",
+            "command_id": "command:c3678055d23d48608b3b6e1a0e684ce7",
+            "reason": null,
+            "armed": true,
+            "mode": "ARDUPILOT_CUSTOM_15"
+          },
+          "right-stop-truth": {
+            "speed_mps": 2.3075327800103726e-06,
+            "yaw_rate_rad_s": -8.174302371807556e-06,
+            "elapsed_from_request_s": 5.408374986000126
+          },
+          "pivot-left": {
+            "setpoints": 15,
+            "transmitted_setpoints": 15,
+            "truth_delta_xy": [
+              -0.06940339316486366,
+              -0.2047392721096304
+            ],
+            "heading_projection_m": 0.046392602971271436,
+            "truth_delta_yaw_rad": 0.7983295390108625
+          },
+          "pivot-left-stop": {
+            "phase": "COMPLETED",
+            "command_id": "command:04c9f55462ec4505baf9b593dfa44dca",
+            "reason": null,
+            "armed": true,
+            "mode": "ARDUPILOT_CUSTOM_15"
+          },
+          "pivot-left-stop-truth": {
+            "speed_mps": 0.01611952909754856,
+            "yaw_rate_rad_s": 0.0026608183877871393,
+            "elapsed_from_request_s": 2.604431993000617
+          },
+          "pivot-right": {
+            "setpoints": 24,
+            "transmitted_setpoints": 24,
+            "truth_delta_xy": [
+              0.09925426717945052,
+              0.22924068724029378
+            ],
+            "heading_projection_m": 0.16040872001331985,
+            "truth_delta_yaw_rad": -0.8257716300830844
+          },
+          "pivot-right-stop": {
+            "phase": "COMPLETED",
+            "command_id": "command:aee531f8f25442d6ac6a0385a730909b",
+            "reason": null,
+            "armed": true,
+            "mode": "ARDUPILOT_CUSTOM_15"
+          },
+          "pivot-right-stop-truth": {
+            "speed_mps": 3.4935981491846518e-06,
+            "yaw_rate_rad_s": -8.786939965621957e-06,
+            "elapsed_from_request_s": 4.006327211005555
+          },
+          "goto": {
+            "setpoints": 36,
+            "transmitted_setpoints": 36,
+            "state_error_m": 0.5202324401654516,
+            "truth_error_m": 0.48673588979936366,
+            "target_xy": [
+              3.266665853589121,
+              1.1116600342545189
+            ],
+            "truth_xy": [
+              3.0982431024638473,
+              0.6549920987453872
+            ]
+          },
+          "goto-stop": {
+            "phase": "COMPLETED",
+            "command_id": "command:31bd047b88a445ea857eb2e6f2cc2fc0",
+            "reason": null,
+            "armed": true,
+            "mode": "ARDUPILOT_CUSTOM_15"
+          },
+          "goto-stop-truth": {
+            "speed_mps": 0.014680088956885046,
+            "yaw_rate_rad_s": 0.015626691423495973,
+            "elapsed_from_request_s": 6.309849207005755
+          },
+          "disarm": {
+            "phase": "COMPLETED",
+            "command_id": "command:04f016a26acd4a9c8eae1ce0b1c841b7",
+            "reason": null,
+            "armed": false,
+            "mode": "ARDUPILOT_CUSTOM_15"
+          }
+        },
+        "stop_truth_max_speed_mps": 0.01611952909754856,
+        "stop_truth_max_elapsed_s": 6.309849207005755
+      },
+      "D": {
+        "passed": true,
+        "cases": {
+          "default_send": {
+            "passed": true,
+            "reason": "system_send_disabled",
+            "write_attempts": 0,
+            "writer_bytes": 0,
+            "proxy_tx_delta": 0,
+            "started_ns": 41405897632681,
+            "ended_ns": 41406198391731
+          },
+          "action_send": {
+            "passed": true,
+            "reason": "action_send_disabled",
+            "write_attempts": 0,
+            "writer_bytes": 0,
+            "proxy_tx_delta": 0,
+            "started_ns": 41406198673339,
+            "ended_ns": 41406499358658
+          },
+          "missing_lease": {
+            "passed": true,
+            "reason": "no_lease",
+            "write_attempts": 0,
+            "writer_bytes": 0,
+            "proxy_tx_delta": 0,
+            "started_ns": 41406499507368,
+            "ended_ns": 41406800342152
+          },
+          "invalid_lease": {
+            "passed": true,
+            "reason": "lease_scope_mismatch",
+            "write_attempts": 0,
+            "writer_bytes": 0,
+            "proxy_tx_delta": 0,
+            "started_ns": 41406800574339,
+            "ended_ns": 41407101373108
+          },
+          "expired_command": {
+            "passed": true,
+            "reason": "invalid_effect_time",
+            "write_attempts": 0,
+            "writer_bytes": 0,
+            "proxy_tx_delta": 0,
+            "started_ns": 41407101726044,
+            "ended_ns": 41407402526600
+          },
+          "illegal_frame": {
+            "passed": true,
+            "reason": "rover_drive_requires_planar_base_link",
+            "write_attempts": 0,
+            "writer_bytes": 0,
+            "proxy_tx_delta": 0,
+            "started_ns": 41407402639715,
+            "ended_ns": 41407703443600
+          },
+          "unsupported_capability": {
+            "passed": true,
+            "reason": "rover_flight_effect_unsupported",
+            "write_attempts": 0,
+            "writer_bytes": 0,
+            "proxy_tx_delta": 0,
+            "started_ns": 41407703556426,
+            "ended_ns": 41408004411764
+          },
+          "expired_state": {
+            "passed": true,
+            "reason": "world_stale",
+            "write_attempts": 0,
+            "writer_bytes": 0,
+            "proxy_tx_delta": 0,
+            "started_ns": 41408004600522,
+            "ended_ns": 41408305387260
+          },
+          "wrong_session": {
+            "passed": true,
+            "reason": "link_session_changed",
+            "writer_bytes": 0,
+            "write_attempts": 0
+          }
+        },
+        "evidence": "actual transport.write attempts plus loopback proxy raw TX; stale world and queued identity explicitly injected"
+      },
+      "E": {
+        "probe": {
+          "passed": true,
+          "repeated_telemetry": {
+            "passed": true,
+            "duplicates": 47,
+            "capture_ns": 41409549642254,
+            "received_ns": 41409606788571,
+            "status": "STALE"
+          },
+          "delayed_ack": {
+            "passed": true,
+            "final": {
+              "phase": "UNKNOWN",
+              "command_id": "command:3fde2f2099da40808a051c1d980d186b",
+              "reason": "ack_timeout_outcome_unknown"
+            },
+            "queued": {
+              "phase": "REJECTED",
+              "command_id": "command:622ded423ad64604a5863ac61e3d5f41",
+              "reason": "expired"
+            },
+            "new_tx_under_ambiguity": 0,
+            "delay_s": 6.0
+          },
+          "heartbeat_timeout": {
+            "passed": true,
+            "fault": "link_session_lost",
+            "old_session": "623552be89e94fec860599b244fccd00"
+          },
+          "remaining_faults": "dedicated existing physical fault scenario: link cut, SITL reboot, uncertain stop, no replay"
+        },
+        "physical_faults": {
+          "unauthorized": {
+            "passed": true,
+            "reason": "system_send_disabled",
+            "tx": 0
+          },
+          "duplicate": {
+            "passed": true,
+            "tx": 1
+          },
+          "deadman": {
+            "passed": true,
+            "displacement_m": 0.3498810271235316,
+            "last_effect": "deadman-10",
+            "zero_after_s": 1.001076794,
+            "speed_mps": 0.0020383754640956957,
+            "yaw_rate_rad_s": 3.772602402038348e-09,
+            "elapsed_from_refresh_end_s": 3.303786073003721
+          },
+          "cancel": {
+            "passed": true,
+            "displacement_m": 0.3475276994710303,
+            "last_effect": "cancel-10",
+            "stops": {
+              "cancel": "CONFIRMED"
+            },
+            "speed_mps": 0.0004377504965967594,
+            "yaw_rate_rad_s": 7.344925564859252e-09,
+            "elapsed_from_request_s": 2.5081447749980725
+          },
+          "shutdown_during_motion": {
+            "passed": true,
+            "displacement_m": 0.3483508911462815,
+            "last_effect": "shutdown-10",
+            "stops": {
+              "shutdown": "CONFIRMED"
+            },
+            "speed_mps": 0.0013674881577243451,
+            "yaw_rate_rad_s": 6.101217022812345e-08,
+            "elapsed_from_request_s": 2.5092918610025663
+          },
+          "signal_shutdown": {
+            "passed": true,
+            "signal": "SIGTERM",
+            "stops": {
+              "signal-motion": "CONFIRMED"
+            },
+            "speed_mps": 0.0022370289188683857,
+            "yaw_rate_rad_s": 1.1122014057712528e-07,
+            "elapsed_from_signal_s": 2.5673891860060394
+          },
+          "runtime_process_restart": {
+            "passed": true,
+            "new_pid": 33852,
+            "old_pid": 33851,
+            "send": false,
+            "lease": null,
+            "new_tx": 0
+          },
+          "runtime_restart": {
+            "passed": true,
+            "send": false,
+            "lease": null
+          },
+          "state_timeout": {
+            "passed": true,
+            "displacement_m": 0.3475792033068551,
+            "last_effect": "state_timeout-10",
+            "fault": "vehicle_state_or_link_stale",
+            "old_session": "3251243cb84545d6a4412b89c3321e15",
+            "new_session": "e1108abbbf6b4fb6bf45fbe53b52ec8f",
+            "stops": {
+              "state_timeout": "UNCONFIRMED"
+            },
+            "physical_outcome_at_loss": "UNCONFIRMED",
+            "new_tx_without_authorization": 0,
+            "injected_at_ns": 41638747092944
+          },
+          "temporary_disconnect": {
+            "passed": true,
+            "displacement_m": 0.3486626695548995,
+            "last_effect": "temporary_disconnect-10",
+            "fault": "receive_fault:ConnectionError",
+            "old_session": "e1108abbbf6b4fb6bf45fbe53b52ec8f",
+            "new_session": "e763c3053cb34a20b4297ece1354cdef",
+            "stops": {
+              "temporary_disconnect": "UNCONFIRMED"
+            },
+            "physical_outcome_at_loss": "UNCONFIRMED",
+            "new_tx_without_authorization": 0,
+            "injected_at_ns": 41645907174685
+          },
+          "long_disconnect": {
+            "passed": true,
+            "displacement_m": 0.22295605894114084,
+            "last_effect": "long_disconnect-10",
+            "fault": "link_session_lost",
+            "old_session": "e763c3053cb34a20b4297ece1354cdef",
+            "new_session": "8a0733a993954081917e77038d432529",
+            "stops": {
+              "long_disconnect": "UNCONFIRMED"
+            },
+            "physical_outcome_at_loss": "UNCONFIRMED",
+            "new_tx_without_authorization": 0,
+            "injected_at_ns": 41649965171621
+          },
+          "delayed_telemetry": {
+            "passed": true,
+            "displacement_m": 0.3480541244844656,
+            "last_effect": "delayed_telemetry-10",
+            "fault": "vehicle_state_or_link_stale",
+            "old_session": "8a0733a993954081917e77038d432529",
+            "new_session": "cb58812c07d744f8a33ee5a4be51346b",
+            "stops": {
+              "delayed_telemetry": "UNCONFIRMED"
+            },
+            "physical_outcome_at_loss": "UNCONFIRMED",
+            "new_tx_without_authorization": 0,
+            "injected_at_ns": 41656925106661
+          },
+          "old_replay": {
+            "passed": true,
+            "fault": "receive_fault:ConnectionError",
+            "old_session": "cb58812c07d744f8a33ee5a4be51346b",
+            "new_session": "1f01b9cc30d3409e92c7123338da4a07",
+            "stops": {},
+            "physical_outcome_at_loss": "UNCONFIRMED",
+            "new_tx_without_authorization": 0,
+            "injected_at_ns": 41661081084973
+          },
+          "reconnect": {
+            "passed": true,
+            "covered_by": [
+              "temporary_disconnect",
+              "old_replay"
+            ]
+          },
+          "interrupted_velocity": {
+            "passed": true,
+            "covered_by": "temporary_disconnect"
+          },
+          "telemetry_stale": {
+            "passed": true,
+            "covered_by": "long_disconnect"
+          },
+          "ack_timeout": {
+            "passed": true,
+            "phase": "UNKNOWN",
+            "command_id": "command:76df2c992ee144a6ad1f893cc34cd06a",
+            "reason": "ack_timeout_outcome_unknown"
+          },
+          "sitl_restart": {
+            "passed": true,
+            "old_session": "1f01b9cc30d3409e92c7123338da4a07",
+            "new_session": "bd84304b35244b7286522d6f759e9270",
+            "old_queue_tx": 0,
+            "new_explicit_run_completed": true
+          }
+        }
+      },
+      "F": {
+        "passed": true,
+        "sessions": [
+          "623552be89e94fec860599b244fccd00",
+          "4c9eff933334487d981f0ab754bd5748",
+          "6db3484c448a4fae890c4d859df1bfeb",
+          "f29556305c094547ab35c7e821dcc081",
+          "c4b185f15875473fbfeb67a2f874f343"
+        ],
+        "reconnects": [
+          {
+            "session": "6db3484c448a4fae890c4d859df1bfeb",
+            "closed_socket_ids": [
+              "socket:[2325944]",
+              "socket:[2325945]",
+              "socket:[2328363]"
+            ],
+            "receive_cycles": 763,
+            "fd_count": 30
+          },
+          {
+            "session": "f29556305c094547ab35c7e821dcc081",
+            "closed_socket_ids": [
+              "socket:[2303990]",
+              "socket:[2321029]",
+              "socket:[2321030]"
+            ],
+            "receive_cycles": 794,
+            "fd_count": 30
+          },
+          {
+            "session": "c4b185f15875473fbfeb67a2f874f343",
+            "closed_socket_ids": [
+              "socket:[2321031]",
+              "socket:[2321032]",
+              "socket:[2328368]"
+            ],
+            "receive_cycles": 825,
+            "fd_count": 30
+          }
+        ],
+        "cycles": 825,
+        "closed_runtime_sockets": [
+          "socket:[2303990]",
+          "socket:[2321029]",
+          "socket:[2321030]",
+          "socket:[2321031]",
+          "socket:[2321032]",
+          "socket:[2325944]",
+          "socket:[2325945]",
+          "socket:[2328363]",
+          "socket:[2328368]"
+        ],
+        "replay_writes": 0
+      },
+      "evidence": {
+        "probe": {
+          "passed": true,
+          "summary": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-probe/summary.json",
+          "manifest": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-probe/manifest.json",
+          "log": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/1_rover_probe.log",
+          "cleanup": true
+        },
+        "physical": {
+          "passed": true,
+          "summary": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-physical/summary.json",
+          "manifest": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-physical/manifest.json",
+          "log": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/1_rover_physical.log",
+          "cleanup": true
+        },
+        "faults": {
+          "passed": true,
+          "summary": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-faults/summary.json",
+          "manifest": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-faults/manifest.json",
+          "log": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/1_rover_faults.log",
+          "cleanup": true
+        }
+      }
+    },
+    {
+      "run_id": "run-1-29db89c3",
+      "kind": "copter",
+      "groups": {
+        "A": "PASS",
+        "B": "PASS",
+        "D": "PASS",
+        "E": "PASS",
+        "F": "PASS",
+        "C": "PASS"
+      },
+      "A": {
+        "passed": true,
+        "mav_type": 2,
+        "session": "c7d460425e934864985e044aad7483a9",
+        "heartbeat_observations": 41,
+        "received_cycles": 451,
+        "initial_command_writes": 0
+      },
+      "B": {
+        "yaw_error_rad": 2.220446049250313e-16,
+        "velocity_error_mps": 5.757536202886892e-06,
+        "messages": {
+          "HEARTBEAT": {
+            "availability": "UNKNOWN_CAPTURE_TIME",
+            "observations": 41,
+            "captured_at": null,
+            "value": {
+              "mav_type": 2,
+              "autopilot": 3,
+              "native_mode": 0,
+              "armed": false,
+              "system_status": 3
+            }
+          },
+          "ATTITUDE": {
+            "availability": "VALID",
+            "observations": 390,
+            "captured_at": {
+              "monotonic_ns": 41761849643657,
+              "utc": "2026-10-23T03:35:39.586589Z",
+              "clock_domain_id": "host-monotonic-simulation"
+            },
+            "value": {
+              "orientation_flu_enu": {
+                "x": 4.737184473704767e-10,
+                "y": -4.5943703724236235e-10,
+                "z": -0.7071067811865468,
+                "w": -0.7071067811865483
+              },
+              "angular_velocity_flu_rad_s": {
+                "x": 0.0006199895869940519,
+                "y": -0.0006489360239356756,
+                "z": -0.0006276785861700773
+              }
+            }
+          },
+          "GLOBAL_POSITION_INT": {
+            "availability": "VALID",
+            "observations": 390,
+            "captured_at": {
+              "monotonic_ns": 41761849643657,
+              "utc": "2026-10-23T03:35:39.586589Z",
+              "clock_domain_id": "host-monotonic-simulation"
+            },
+            "value": {
+              "position_enu_m": null,
+              "velocity_enu_mps": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": -0.0
+              },
+              "geographic": {
+                "latitude_deg": -35.363262,
+                "longitude_deg": 149.165237,
+                "altitude_m": 584.19
+              }
+            }
+          },
+          "LOCAL_POSITION_NED": {
+            "availability": "VALID",
+            "observations": 390,
+            "captured_at": {
+              "monotonic_ns": 41761849643657,
+              "utc": "2026-10-23T03:35:39.586589Z",
+              "clock_domain_id": "host-monotonic-simulation"
+            },
+            "value": {
+              "position_enu_m": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.1899999976158142
+              },
+              "velocity_enu_mps": {
+                "x": -2.4317334170603777e-12,
+                "y": 1.5902985872617847e-10,
+                "z": 5.757536200690083e-06
+              },
+              "geographic": null
+            }
+          },
+          "GPS_RAW_INT": {
+            "availability": "VALID",
+            "observations": 195,
+            "captured_at": {
+              "monotonic_ns": 41761656643657,
+              "utc": "2026-10-23T03:35:39.393589Z",
+              "clock_domain_id": "host-monotonic-simulation"
+            },
+            "value": {
+              "fix_type": 6,
+              "satellites": 10,
+              "hdop": 1.21,
+              "vdop": 2.0
+            }
+          },
+          "EKF_STATUS_REPORT": {
+            "availability": "UNKNOWN_CAPTURE_TIME",
+            "observations": 78,
+            "captured_at": null,
+            "value": {
+              "flags": 895,
+              "velocity_variance": 0.0,
+              "horizontal_position_variance": 0.0,
+              "vertical_position_variance": 0.0,
+              "compass_variance": 0.0,
+              "terrain_altitude_variance": 0.0
+            }
+          },
+          "SYS_STATUS": {
+            "availability": "UNKNOWN_CAPTURE_TIME",
+            "observations": 195,
+            "captured_at": null,
+            "value": {
+              "voltage_v": 12.6,
+              "current_a": 0.0,
+              "remaining_percent": 100
+            }
+          },
+          "POWER_STATUS": {
+            "availability": "UNKNOWN_CAPTURE_TIME",
+            "observations": 195,
+            "captured_at": null,
+            "value": {
+              "reported_5v_rail_v": 5.0,
+              "reported_servo_rail_v": 0.0,
+              "flags": 0
+            }
+          },
+          "COMMAND_ACK": {
+            "availability": "MISSING",
+            "observations": 0,
+            "captured_at": null,
+            "value": null
+          },
+          "STATUSTEXT": {
+            "availability": "STALE",
+            "observations": 16,
+            "captured_at": null,
+            "value": {
+              "severity": 6,
+              "text": "EKF3 IMU0 origin set",
+              "message_id": 0,
+              "chunk_sequence": 0
+            }
+          }
+        }
+      },
+      "C": {
+        "steps": {
+          "mode": {
+            "phase": "COMPLETED",
+            "command_id": "command:a6309ff80ab248f493600c7e28fbae88",
+            "reason": null
+          },
+          "arm": {
+            "phase": "COMPLETED",
+            "command_id": "command:6e8c7219347947febcc6f0ec9d966a17",
+            "reason": null
+          },
+          "takeoff": {
+            "phase": "ACKNOWLEDGED",
+            "state_rise_m": 1.4899999499320984,
+            "truth_rise_m": 1.4948977681717222,
+            "state_vertical_mps": -0.0011933466885238886,
+            "truth_vertical_mps": -0.001724649259277611
+          },
+          "hold": {
+            "setpoints": 7,
+            "truth_xy": [
+              0.004406666841567475,
+              0.0022854359251663434
+            ],
+            "truth_z_m": 1.6812682233186518
+          },
+          "goto": {
+            "setpoints": 9,
+            "transmitted_setpoints": 9,
+            "state_error_m": 0.1369327994586966,
+            "truth_error_m": 0.11727627524243618,
+            "truth_xy": [
+              2.1130395458079922,
+              1.046542471097205
+            ],
+            "target_xy": [
+              2.0043954753398685,
+              1.002381507714858
+            ]
+          },
+          "goto-stop": {
+            "status": {
+              "phase": "COMPLETED",
+              "command_id": "command:6ac57f3492eb4218ab264ad58d796cb8",
+              "reason": null
+            },
+            "truth_speed_mps": 0.06512561273502258
+          },
+          "velocity-x": {
+            "setpoints": 10,
+            "transmitted_setpoints": 10,
+            "truth_delta_xy": [
+              1.1657726799848147,
+              0.013742434309527707
+            ],
+            "truth_delta_yaw_rad": 0.000385856812906038,
+            "peak_horizontal_speed_mps": 0.5458669653948445,
+            "peak_positive_yaw_rate_rad_s": 0.0005140985680457073
+          },
+          "velocity-x-stop": {
+            "phase": "COMPLETED",
+            "truth_speed_mps": 0.03573920165152001,
+            "truth_yaw_rate_rad_s": 0.00013742789169533237
+          },
+          "velocity-y": {
+            "setpoints": 10,
+            "transmitted_setpoints": 10,
+            "truth_delta_xy": [
+              -0.006619554240083314,
+              1.172915421691041
+            ],
+            "truth_delta_yaw_rad": -0.00010574913500360772,
+            "peak_horizontal_speed_mps": 0.5314661634318929,
+            "peak_positive_yaw_rate_rad_s": 0.0007986847189685637
+          },
+          "velocity-y-stop": {
+            "phase": "COMPLETED",
+            "truth_speed_mps": 0.015175169795812082,
+            "truth_yaw_rate_rad_s": -6.315107645399875e-05
+          },
+          "yaw-positive": {
+            "setpoints": 10,
+            "transmitted_setpoints": 10,
+            "truth_delta_xy": [
+              0.005008415813013922,
+              -0.008938331870426808
+            ],
+            "truth_delta_yaw_rad": 0.9871659549880447,
+            "peak_horizontal_speed_mps": 0.02061321584867173,
+            "peak_positive_yaw_rate_rad_s": 0.3540434831494901
+          },
+          "yaw-positive-stop": {
+            "phase": "COMPLETED",
+            "truth_speed_mps": 0.004308480700606555,
+            "truth_yaw_rate_rad_s": -0.0020385777272515083
+          },
+          "body-forward": {
+            "setpoints": 10,
+            "transmitted_setpoints": 10,
+            "truth_delta_xy": [
+              -1.012575246087391,
+              0.5754151344407994
+            ],
+            "truth_delta_yaw_rad": -0.0037025336407312537,
+            "peak_horizontal_speed_mps": 0.5298759129279056,
+            "peak_positive_yaw_rate_rad_s": 0.0,
+            "heading_projection_m": 1.1646377068443148
+          },
+          "cancel": {
+            "stops": {
+              "body-forward": "CONFIRMED"
+            },
+            "elapsed_from_request_s": 3.9266950499950326
+          },
+          "rtl": {
+            "phase": "COMPLETED",
+            "command_id": "command:10751f63249c405985aabe0e2d432306",
+            "reason": null
+          },
+          "rtl_truth": {
+            "home_error_m": 0.0015243948375727096,
+            "height_m": 3.509118339517503e-07,
+            "armed": false,
+            "elapsed_from_request_s": 26.425953085999936
+          }
+        },
+        "stop_truth_max_speed_mps": 0.06512561273502258,
+        "stop_truth_max_elapsed_s": null
+      },
+      "D": {
+        "passed": true,
+        "cases": {
+          "default_send": {
+            "passed": true,
+            "reason": "system_send_disabled",
+            "write_attempts": 0,
+            "writer_bytes": 0,
+            "proxy_tx_delta": 0,
+            "started_ns": 41761983296680,
+            "ended_ns": 41762284275853
+          },
+          "action_send": {
+            "passed": true,
+            "reason": "action_send_disabled",
+            "write_attempts": 0,
+            "writer_bytes": 0,
+            "proxy_tx_delta": 0,
+            "started_ns": 41762284636299,
+            "ended_ns": 41762585591522
+          },
+          "missing_lease": {
+            "passed": true,
+            "reason": "no_lease",
+            "write_attempts": 0,
+            "writer_bytes": 0,
+            "proxy_tx_delta": 0,
+            "started_ns": 41762585725534,
+            "ended_ns": 41762886620633
+          },
+          "invalid_lease": {
+            "passed": true,
+            "reason": "lease_scope_mismatch",
+            "write_attempts": 0,
+            "writer_bytes": 0,
+            "proxy_tx_delta": 0,
+            "started_ns": 41762886881447,
+            "ended_ns": 41763187784570
+          },
+          "expired_command": {
+            "passed": true,
+            "reason": "invalid_effect_time",
+            "write_attempts": 0,
+            "writer_bytes": 0,
+            "proxy_tx_delta": 0,
+            "started_ns": 41763188143328,
+            "ended_ns": 41763488951662
+          },
+          "illegal_frame": {
+            "passed": true,
+            "reason": "frame_not_allowed",
+            "write_attempts": 0,
+            "writer_bytes": 0,
+            "proxy_tx_delta": 0,
+            "started_ns": 41763489071749,
+            "ended_ns": 41763790169969
+          },
+          "unsupported_capability": {
+            "passed": true,
+            "reason": "mode_not_allowed",
+            "write_attempts": 0,
+            "writer_bytes": 0,
+            "proxy_tx_delta": 0,
+            "started_ns": 41763790360775,
+            "ended_ns": 41764091290688
+          },
+          "expired_state": {
+            "passed": true,
+            "reason": "world_stale",
+            "write_attempts": 0,
+            "writer_bytes": 0,
+            "proxy_tx_delta": 0,
+            "started_ns": 41764091492457,
+            "ended_ns": 41764392250542
+          },
+          "wrong_session": {
+            "passed": true,
+            "reason": "link_session_changed",
+            "writer_bytes": 0,
+            "write_attempts": 0
+          }
+        },
+        "evidence": "actual transport.write attempts plus loopback proxy raw TX; stale world and queued identity explicitly injected"
+      },
+      "E": {
+        "probe": {
+          "passed": true,
+          "repeated_telemetry": {
+            "passed": true,
+            "duplicates": 48,
+            "capture_ns": 41765549643657,
+            "received_ns": 41765593604365,
+            "status": "STALE"
+          },
+          "delayed_ack": {
+            "passed": true,
+            "final": {
+              "phase": "UNKNOWN",
+              "command_id": "command:71e3b33def7b4e11af30d7913ece2960",
+              "reason": "ack_timeout_outcome_unknown"
+            },
+            "queued": {
+              "phase": "REJECTED",
+              "command_id": "command:607db43d4bfc4484b7f7a3dae6774840",
+              "reason": "expired"
+            },
+            "new_tx_under_ambiguity": 0,
+            "delay_s": 6.0
+          },
+          "heartbeat_timeout": {
+            "passed": true,
+            "fault": "link_session_lost",
+            "old_session": "c7d460425e934864985e044aad7483a9"
+          },
+          "remaining_faults": "dedicated existing physical fault scenario: link cut, SITL reboot, uncertain stop, no replay"
+        },
+        "physical_faults": {
+          "unauthorized": {
+            "passed": true,
+            "reason": "system_send_disabled",
+            "tx": 0
+          },
+          "duplicate": {
+            "passed": true,
+            "tx": 1
+          },
+          "deadman": {
+            "passed": true,
+            "displacement_m": 0.7367526888527326,
+            "last_effect": "deadman-10",
+            "zero_after_s": 1.000836633,
+            "speed_mps": 0.00988086395047693,
+            "yaw_rate_rad_s": -7.60233016939598e-05,
+            "elapsed_from_refresh_end_s": 4.20501270800014
+          },
+          "cancel": {
+            "passed": true,
+            "displacement_m": 0.7461048303095824,
+            "last_effect": "cancel-10",
+            "stops": {
+              "cancel": "CONFIRMED"
+            },
+            "speed_mps": 0.021013740246236944,
+            "yaw_rate_rad_s": 2.3748311174656755e-05,
+            "elapsed_from_request_s": 3.3183651750005083
+          },
+          "shutdown_during_motion": {
+            "passed": true,
+            "displacement_m": 0.7495867566240813,
+            "last_effect": "shutdown-10",
+            "stops": {
+              "shutdown": "CONFIRMED"
+            },
+            "speed_mps": 0.012660009223673323,
+            "yaw_rate_rad_s": 3.2507457760045255e-05,
+            "elapsed_from_request_s": 3.3202528440015158
+          },
+          "signal_shutdown": {
+            "passed": true,
+            "signal": "SIGTERM",
+            "stops": {
+              "signal-motion": "CONFIRMED"
+            },
+            "speed_mps": 0.023217364169753493,
+            "yaw_rate_rad_s": 5.661258973418905e-05,
+            "elapsed_from_signal_s": 3.4691515559970867
+          },
+          "runtime_process_restart": {
+            "passed": true,
+            "new_pid": 34274,
+            "old_pid": 34273,
+            "send": false,
+            "lease": null,
+            "new_tx": 0
+          },
+          "runtime_restart": {
+            "passed": true,
+            "send": false,
+            "lease": null
+          },
+          "state_timeout": {
+            "passed": true,
+            "displacement_m": 0.7409195436217781,
+            "last_effect": "state_timeout-10",
+            "fault": "vehicle_state_or_link_stale",
+            "old_session": "3190339817fb4be6b0be943434672c56",
+            "new_session": "01f1d999a4324b6cbf43becb54b33ed7",
+            "stops": {
+              "state_timeout": "UNCONFIRMED"
+            },
+            "physical_outcome_at_loss": "UNCONFIRMED",
+            "new_tx_without_authorization": 0,
+            "injected_at_ns": 42000859734709
+          },
+          "temporary_disconnect": {
+            "passed": true,
+            "displacement_m": 0.7477650757707394,
+            "last_effect": "temporary_disconnect-10",
+            "fault": "receive_fault:ConnectionError",
+            "old_session": "01f1d999a4324b6cbf43becb54b33ed7",
+            "new_session": "533dc5ccecb24baf8f4ae2227491f1ee",
+            "stops": {
+              "temporary_disconnect": "UNCONFIRMED"
+            },
+            "physical_outcome_at_loss": "UNCONFIRMED",
+            "new_tx_without_authorization": 0,
+            "injected_at_ns": 42008019682518
+          },
+          "long_disconnect": {
+            "passed": true,
+            "displacement_m": 0.5470774274125133,
+            "last_effect": "long_disconnect-10",
+            "fault": "link_session_lost",
+            "old_session": "533dc5ccecb24baf8f4ae2227491f1ee",
+            "new_session": "a0aa5ffbc0074ea7bb1bd78abf63bec6",
+            "stops": {
+              "long_disconnect": "UNCONFIRMED"
+            },
+            "physical_outcome_at_loss": "UNCONFIRMED",
+            "new_tx_without_authorization": 0,
+            "injected_at_ns": 42012078626005
+          },
+          "delayed_telemetry": {
+            "passed": true,
+            "displacement_m": 0.7450889374511376,
+            "last_effect": "delayed_telemetry-10",
+            "fault": "vehicle_state_or_link_stale",
+            "old_session": "a0aa5ffbc0074ea7bb1bd78abf63bec6",
+            "new_session": "a185a377ec2044debe583c3c4a2b20a4",
+            "stops": {
+              "delayed_telemetry": "UNCONFIRMED"
+            },
+            "physical_outcome_at_loss": "UNCONFIRMED",
+            "new_tx_without_authorization": 0,
+            "injected_at_ns": 42019039355456
+          },
+          "old_replay": {
+            "passed": true,
+            "fault": "receive_fault:ConnectionError",
+            "old_session": "a185a377ec2044debe583c3c4a2b20a4",
+            "new_session": "5f9a55686e4d4d3fbff893619286d170",
+            "stops": {},
+            "physical_outcome_at_loss": "UNCONFIRMED",
+            "new_tx_without_authorization": 0,
+            "injected_at_ns": 42023195670960
+          },
+          "reconnect": {
+            "passed": true,
+            "covered_by": [
+              "temporary_disconnect",
+              "old_replay"
+            ]
+          },
+          "interrupted_velocity": {
+            "passed": true,
+            "covered_by": "temporary_disconnect"
+          },
+          "telemetry_stale": {
+            "passed": true,
+            "covered_by": "long_disconnect"
+          },
+          "ack_timeout": {
+            "passed": true,
+            "phase": "UNKNOWN",
+            "command_id": "command:73b5f4464998489bb3b5be8fdb8aa0d5",
+            "reason": "ack_timeout_outcome_unknown"
+          },
+          "sitl_restart": {
+            "passed": true,
+            "old_session": "5f9a55686e4d4d3fbff893619286d170",
+            "new_session": "2785dccaab1c4be08b2d5adb584546d5",
+            "old_queue_tx": 0,
+            "new_explicit_run_completed": true
+          }
+        }
+      },
+      "F": {
+        "passed": true,
+        "sessions": [
+          "c7d460425e934864985e044aad7483a9",
+          "dafae8d9280c453781536f70d7bd1e67",
+          "cabcd2174bde4ee88d280df330465dbe",
+          "c5fd7f3562924cdf8ebb30cdbe14f653",
+          "102af87cd47748b9a40bea39d7b1fb83"
+        ],
+        "reconnects": [
+          {
+            "session": "cabcd2174bde4ee88d280df330465dbe",
+            "closed_socket_ids": [
+              "socket:[2331942]",
+              "socket:[2334087]",
+              "socket:[2334088]"
+            ],
+            "receive_cycles": 765,
+            "fd_count": 30
+          },
+          {
+            "session": "c5fd7f3562924cdf8ebb30cdbe14f653",
+            "closed_socket_ids": [
+              "socket:[2324036]",
+              "socket:[2324037]",
+              "socket:[2329310]"
+            ],
+            "receive_cycles": 796,
+            "fd_count": 30
+          },
+          {
+            "session": "102af87cd47748b9a40bea39d7b1fb83",
+            "closed_socket_ids": [
+              "socket:[2324038]",
+              "socket:[2324039]",
+              "socket:[2329314]"
+            ],
+            "receive_cycles": 827,
+            "fd_count": 30
+          }
+        ],
+        "cycles": 827,
+        "closed_runtime_sockets": [
+          "socket:[2324036]",
+          "socket:[2324037]",
+          "socket:[2324038]",
+          "socket:[2324039]",
+          "socket:[2329310]",
+          "socket:[2329314]",
+          "socket:[2331942]",
+          "socket:[2334087]",
+          "socket:[2334088]"
+        ],
+        "replay_writes": 0
+      },
+      "evidence": {
+        "probe": {
+          "passed": true,
+          "summary": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-probe/summary.json",
+          "manifest": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-probe/manifest.json",
+          "log": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/1_copter_probe.log",
+          "cleanup": true
+        },
+        "physical": {
+          "passed": true,
+          "summary": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-physical/summary.json",
+          "manifest": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-physical/manifest.json",
+          "log": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/1_copter_physical.log",
+          "cleanup": true
+        },
+        "faults": {
+          "passed": true,
+          "summary": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-faults/summary.json",
+          "manifest": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-faults/manifest.json",
+          "log": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/1_copter_faults.log",
+          "cleanup": true
+        }
+      }
+    },
+    {
+      "run_id": "run-2-0ad45180",
+      "kind": "rover",
+      "groups": {
+        "A": "PASS",
+        "B": "PASS",
+        "D": "PASS",
+        "E": "PASS",
+        "F": "PASS",
+        "C": "PASS"
+      },
+      "A": {
+        "passed": true,
+        "mav_type": 10,
+        "session": "f020728050b2470eb7483ff70780deb7",
+        "heartbeat_observations": 45,
+        "received_cycles": 451,
+        "initial_command_writes": 0
+      },
+      "B": {
+        "yaw_error_rad": 7.549789976884905e-08,
+        "velocity_error_mps": 4.568857701645381e-08,
+        "messages": {
+          "HEARTBEAT": {
+            "availability": "UNKNOWN_CAPTURE_TIME",
+            "observations": 45,
+            "captured_at": null,
+            "value": {
+              "mav_type": 10,
+              "autopilot": 3,
+              "native_mode": 0,
+              "armed": false,
+              "system_status": 4
+            }
+          },
+          "ATTITUDE": {
+            "availability": "VALID",
+            "observations": 412,
+            "captured_at": {
+              "monotonic_ns": 42137144068827,
+              "utc": "2026-10-23T03:41:54.881014Z",
+              "clock_domain_id": "host-monotonic-simulation"
+            },
+            "value": {
+              "orientation_flu_enu": {
+                "x": -4.588929341170788e-13,
+                "y": -1.0752006941009342e-11,
+                "z": -3.774894979935439e-08,
+                "w": -0.9999999999999993
+              },
+              "angular_velocity_flu_rad_s": {
+                "x": 0.0006052081007510424,
+                "y": -0.0006314032943919301,
+                "z": -0.0005989422788843513
+              }
+            }
+          },
+          "GLOBAL_POSITION_INT": {
+            "availability": "VALID",
+            "observations": 412,
+            "captured_at": {
+              "monotonic_ns": 42137144068827,
+              "utc": "2026-10-23T03:41:54.881014Z",
+              "clock_domain_id": "host-monotonic-simulation"
+            },
+            "value": {
+              "position_enu_m": null,
+              "velocity_enu_mps": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": -0.0
+              },
+              "geographic": {
+                "latitude_deg": -35.363262,
+                "longitude_deg": 149.165237,
+                "altitude_m": 584.18
+              }
+            }
+          },
+          "LOCAL_POSITION_NED": {
+            "availability": "VALID",
+            "observations": 412,
+            "captured_at": {
+              "monotonic_ns": 42137144068827,
+              "utc": "2026-10-23T03:41:54.881014Z",
+              "clock_domain_id": "host-monotonic-simulation"
+            },
+            "value": {
+              "position_enu_m": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.18000000715255737
+              },
+              "velocity_enu_mps": {
+                "x": 4.4078410366132914e-10,
+                "y": -1.743595962055977e-10,
+                "z": -4.568611799982136e-08
+              },
+              "geographic": null
+            }
+          },
+          "GPS_RAW_INT": {
+            "availability": "VALID",
+            "observations": 206,
+            "captured_at": {
+              "monotonic_ns": 42136948068827,
+              "utc": "2026-10-23T03:41:54.685015Z",
+              "clock_domain_id": "host-monotonic-simulation"
+            },
+            "value": {
+              "fix_type": 6,
+              "satellites": 10,
+              "hdop": 1.21,
+              "vdop": 2.0
+            }
+          },
+          "EKF_STATUS_REPORT": {
+            "availability": "UNKNOWN_CAPTURE_TIME",
+            "observations": 42,
+            "captured_at": null,
+            "value": {
+              "flags": 895,
+              "velocity_variance": 0.0,
+              "horizontal_position_variance": 0.0,
+              "vertical_position_variance": 0.0,
+              "compass_variance": 0.0,
+              "terrain_altitude_variance": 0.0
+            }
+          },
+          "SYS_STATUS": {
+            "availability": "UNKNOWN_CAPTURE_TIME",
+            "observations": 206,
+            "captured_at": null,
+            "value": {
+              "voltage_v": 12.6,
+              "current_a": 0.0,
+              "remaining_percent": 100
+            }
+          },
+          "POWER_STATUS": {
+            "availability": "UNKNOWN_CAPTURE_TIME",
+            "observations": 206,
+            "captured_at": null,
+            "value": {
+              "reported_5v_rail_v": 5.0,
+              "reported_servo_rail_v": 0.0,
+              "flags": 0
+            }
+          },
+          "COMMAND_ACK": {
+            "availability": "MISSING",
+            "observations": 0,
+            "captured_at": null,
+            "value": null
+          },
+          "STATUSTEXT": {
+            "availability": "UNKNOWN_CAPTURE_TIME",
+            "observations": 20,
+            "captured_at": null,
+            "value": {
+              "severity": 6,
+              "text": "EKF3 IMU1 is using GPS",
+              "message_id": 0,
+              "chunk_sequence": 0
+            }
+          }
+        }
+      },
+      "C": {
+        "steps": {
+          "guided": {
+            "phase": "COMPLETED",
+            "command_id": "command:57502b33123b4f398847aac44db3859a",
+            "reason": null,
+            "armed": false,
+            "mode": "ARDUPILOT_CUSTOM_15"
+          },
+          "arm": {
+            "phase": "COMPLETED",
+            "command_id": "command:381d5016608e44a0a97cf65e61d8365f",
+            "reason": null,
+            "armed": true,
+            "mode": "ARDUPILOT_CUSTOM_15"
+          },
+          "drive": {
+            "phase": "TRANSMITTED",
+            "command_id": "command:d83003ee273e407d9720356423f1a7e7",
+            "reason": null
+          },
+          "stop": {
+            "phase": "COMPLETED",
+            "command_id": "command:006b6407597749eb91226db4ac6746bb",
+            "reason": null,
+            "armed": true,
+            "mode": "ARDUPILOT_CUSTOM_15"
+          },
+          "forward": {
+            "setpoints": 15,
+            "transmitted_setpoints": 15,
+            "truth_delta_xy": [
+              1.0041368432486617,
+              3.0480528745481315e-08
+            ],
+            "heading_projection_m": 1.0041368432486617,
+            "truth_delta_yaw_rad": 4.3612507960588687e-07
+          },
+          "forward-stop": {
+            "phase": "COMPLETED",
+            "command_id": "command:fccb3dfccd414ee4a4b11ff3ae2e3131",
+            "reason": null,
+            "armed": true,
+            "mode": "ARDUPILOT_CUSTOM_15"
+          },
+          "forward-stop-truth": {
+            "speed_mps": 0.0047729273122671485,
+            "yaw_rate_rad_s": 2.5885891328107482e-08,
+            "elapsed_from_request_s": 6.209763175000262
+          },
+          "reverse": {
+            "setpoints": 16,
+            "transmitted_setpoints": 16,
+            "truth_delta_xy": [
+              -1.027225031131997,
+              5.715562078867742e-07
+            ],
+            "heading_projection_m": -1.0272250311297633,
+            "truth_delta_yaw_rad": -2.273242065253811e-06
+          },
+          "reverse-stop": {
+            "phase": "COMPLETED",
+            "command_id": "command:b0e9df98381f43e8a09e55c643c00ae7",
+            "reason": null,
+            "armed": true,
+            "mode": "ARDUPILOT_CUSTOM_15"
+          },
+          "reverse-stop-truth": {
+            "speed_mps": 0.0,
+            "yaw_rate_rad_s": 0.0,
+            "elapsed_from_request_s": 4.506370455004799
+          },
+          "left": {
+            "setpoints": 10,
+            "transmitted_setpoints": 10,
+            "truth_delta_xy": [
+              0.3606852101511935,
+              -0.08196006720050063
+            ],
+            "heading_projection_m": 0.3606850553137139,
+            "truth_delta_yaw_rad": 0.8201478450189033
+          },
+          "left-stop": {
+            "phase": "COMPLETED",
+            "command_id": "command:3c9b7b67d49f4cc2a73622692dc98a85",
+            "reason": null,
+            "armed": true,
+            "mode": "ARDUPILOT_CUSTOM_15"
+          },
+          "left-stop-truth": {
+            "speed_mps": 0.005696379725123421,
+            "yaw_rate_rad_s": 0.017618715185216786,
+            "elapsed_from_request_s": 2.904598230001284
+          },
+          "right": {
+            "setpoints": 18,
+            "transmitted_setpoints": 18,
+            "truth_delta_xy": [
+              0.4676506305166769,
+              0.8201601977553128
+            ],
+            "heading_projection_m": 0.9430152324853042,
+            "truth_delta_yaw_rad": -0.8213933502802515
+          },
+          "right-stop": {
+            "phase": "COMPLETED",
+            "command_id": "command:b3a88015e1694d24bcbecd7e7e9cdf3f",
+            "reason": null,
+            "armed": true,
+            "mode": "ARDUPILOT_CUSTOM_15"
+          },
+          "right-stop-truth": {
+            "speed_mps": 2.2897277073960943e-06,
+            "yaw_rate_rad_s": -8.163074281454654e-06,
+            "elapsed_from_request_s": 5.307506001001457
+          },
+          "pivot-left": {
+            "setpoints": 15,
+            "transmitted_setpoints": 15,
+            "truth_delta_xy": [
+              -0.04480750953184387,
+              -0.19768739915998368
+            ],
+            "heading_projection_m": 0.06632144844290236,
+            "truth_delta_yaw_rad": 0.7927553051797576
+          },
+          "pivot-left-stop": {
+            "phase": "COMPLETED",
+            "command_id": "command:7eef5ca74cc041eb8f2b15d9bb3c7775",
+            "reason": null,
+            "armed": true,
+            "mode": "ARDUPILOT_CUSTOM_15"
+          },
+          "pivot-left-stop-truth": {
+            "speed_mps": 2.1021008887199403e-06,
+            "yaw_rate_rad_s": 8.381446943237982e-06,
+            "elapsed_from_request_s": 5.408433338001487
+          },
+          "pivot-right": {
+            "setpoints": 15,
+            "transmitted_setpoints": 15,
+            "truth_delta_xy": [
+              -0.07071637419038224,
+              0.1681961993845843
+            ],
+            "heading_projection_m": 0.05775621196430843,
+            "truth_delta_yaw_rad": -0.7980137760628709
+          },
+          "pivot-right-stop": {
+            "phase": "COMPLETED",
+            "command_id": "command:0ea297879c5849baa449f5119864f80f",
+            "reason": null,
+            "armed": true,
+            "mode": "ARDUPILOT_CUSTOM_15"
+          },
+          "pivot-right-stop-truth": {
+            "speed_mps": 1.2682352554232017e-06,
+            "yaw_rate_rad_s": -4.164969560741462e-06,
+            "elapsed_from_request_s": 5.208275680000952
+          },
+          "goto": {
+            "setpoints": 36,
+            "transmitted_setpoints": 36,
+            "state_error_m": 0.5471201677700307,
+            "truth_error_m": 0.5104231185882506,
+            "target_xy": [
+              3.187871846680663,
+              0.9809354311259729
+            ],
+            "truth_xy": [
+              3.237839419847369,
+              0.47296397363925036
+            ]
+          },
+          "goto-stop": {
+            "phase": "COMPLETED",
+            "command_id": "command:e2b505bb7dd947528b21d43c0bad2ded",
+            "reason": null,
+            "armed": true,
+            "mode": "ARDUPILOT_CUSTOM_15"
+          },
+          "goto-stop-truth": {
+            "speed_mps": 0.013839013216226445,
+            "yaw_rate_rad_s": 0.019584109270079635,
+            "elapsed_from_request_s": 6.309643193002557
+          },
+          "disarm": {
+            "phase": "COMPLETED",
+            "command_id": "command:c9fd9cff603140929bdf43d1a4f7b69d",
+            "reason": null,
+            "armed": false,
+            "mode": "ARDUPILOT_CUSTOM_15"
+          }
+        },
+        "stop_truth_max_speed_mps": 0.013839013216226445,
+        "stop_truth_max_elapsed_s": 6.309643193002557
+      },
+      "D": {
+        "passed": true,
+        "cases": {
+          "default_send": {
+            "passed": true,
+            "reason": "system_send_disabled",
+            "write_attempts": 0,
+            "writer_bytes": 0,
+            "proxy_tx_delta": 0,
+            "started_ns": 42137292327968,
+            "ended_ns": 42137593157194
+          },
+          "action_send": {
+            "passed": true,
+            "reason": "action_send_disabled",
+            "write_attempts": 0,
+            "writer_bytes": 0,
+            "proxy_tx_delta": 0,
+            "started_ns": 42137593459756,
+            "ended_ns": 42137894290660
+          },
+          "missing_lease": {
+            "passed": true,
+            "reason": "no_lease",
+            "write_attempts": 0,
+            "writer_bytes": 0,
+            "proxy_tx_delta": 0,
+            "started_ns": 42137894416070,
+            "ended_ns": 42138195246545
+          },
+          "invalid_lease": {
+            "passed": true,
+            "reason": "lease_scope_mismatch",
+            "write_attempts": 0,
+            "writer_bytes": 0,
+            "proxy_tx_delta": 0,
+            "started_ns": 42138195421433,
+            "ended_ns": 42138496349863
+          },
+          "expired_command": {
+            "passed": true,
+            "reason": "invalid_effect_time",
+            "write_attempts": 0,
+            "writer_bytes": 0,
+            "proxy_tx_delta": 0,
+            "started_ns": 42138496764576,
+            "ended_ns": 42138797567241
+          },
+          "illegal_frame": {
+            "passed": true,
+            "reason": "rover_drive_requires_planar_base_link",
+            "write_attempts": 0,
+            "writer_bytes": 0,
+            "proxy_tx_delta": 0,
+            "started_ns": 42138797684710,
+            "ended_ns": 42139098504959
+          },
+          "unsupported_capability": {
+            "passed": true,
+            "reason": "rover_flight_effect_unsupported",
+            "write_attempts": 0,
+            "writer_bytes": 0,
+            "proxy_tx_delta": 0,
+            "started_ns": 42139098621780,
+            "ended_ns": 42139399488170
+          },
+          "expired_state": {
+            "passed": true,
+            "reason": "world_stale",
+            "write_attempts": 0,
+            "writer_bytes": 0,
+            "proxy_tx_delta": 0,
+            "started_ns": 42139399674832,
+            "ended_ns": 42139700525504
+          },
+          "wrong_session": {
+            "passed": true,
+            "reason": "link_session_changed",
+            "writer_bytes": 0,
+            "write_attempts": 0
+          }
+        },
+        "evidence": "actual transport.write attempts plus loopback proxy raw TX; stale world and queued identity explicitly injected"
+      },
+      "E": {
+        "probe": {
+          "passed": true,
+          "repeated_telemetry": {
+            "passed": true,
+            "duplicates": 47,
+            "capture_ns": 42140944068827,
+            "received_ns": 42141002113464,
+            "status": "STALE"
+          },
+          "delayed_ack": {
+            "passed": true,
+            "final": {
+              "phase": "UNKNOWN",
+              "command_id": "command:01e7c8ac7c6546799134615bf261aa74",
+              "reason": "ack_timeout_outcome_unknown"
+            },
+            "queued": {
+              "phase": "REJECTED",
+              "command_id": "command:1ebeab400d7045e1869be5e2b85c3ea4",
+              "reason": "expired"
+            },
+            "new_tx_under_ambiguity": 0,
+            "delay_s": 6.0
+          },
+          "heartbeat_timeout": {
+            "passed": true,
+            "fault": "link_session_lost",
+            "old_session": "f020728050b2470eb7483ff70780deb7"
+          },
+          "remaining_faults": "dedicated existing physical fault scenario: link cut, SITL reboot, uncertain stop, no replay"
+        },
+        "physical_faults": {
+          "unauthorized": {
+            "passed": true,
+            "reason": "system_send_disabled",
+            "tx": 0
+          },
+          "duplicate": {
+            "passed": true,
+            "tx": 1
+          },
+          "deadman": {
+            "passed": true,
+            "displacement_m": 0.35205057553008323,
+            "last_effect": "deadman-10",
+            "zero_after_s": 1.001069862,
+            "speed_mps": 0.0020321584885223815,
+            "yaw_rate_rad_s": 4.223152545203357e-09,
+            "elapsed_from_refresh_end_s": 3.4038662900056806
+          },
+          "cancel": {
+            "passed": true,
+            "displacement_m": 0.34688988399450765,
+            "last_effect": "cancel-10",
+            "stops": {
+              "cancel": "CONFIRMED"
+            },
+            "speed_mps": 0.00042749800999149386,
+            "yaw_rate_rad_s": 7.55101463099459e-09,
+            "elapsed_from_request_s": 2.508674095995957
+          },
+          "shutdown_during_motion": {
+            "passed": true,
+            "displacement_m": 0.34775277102474705,
+            "last_effect": "shutdown-10",
+            "stops": {
+              "shutdown": "CONFIRMED"
+            },
+            "speed_mps": 0.0013746500197884372,
+            "yaw_rate_rad_s": 6.15506689812802e-08,
+            "elapsed_from_request_s": 2.5086720530016464
+          },
+          "signal_shutdown": {
+            "passed": true,
+            "signal": "SIGTERM",
+            "stops": {
+              "signal-motion": "CONFIRMED"
+            },
+            "speed_mps": 0.0022418353992514793,
+            "yaw_rate_rad_s": 1.1235297367480013e-07,
+            "elapsed_from_signal_s": 2.566897456003062
+          },
+          "runtime_process_restart": {
+            "passed": true,
+            "new_pid": 34537,
+            "old_pid": 34534,
+            "send": false,
+            "lease": null,
+            "new_tx": 0
+          },
+          "runtime_restart": {
+            "passed": true,
+            "send": false,
+            "lease": null
+          },
+          "state_timeout": {
+            "passed": true,
+            "displacement_m": 0.34741341640938905,
+            "last_effect": "state_timeout-10",
+            "fault": "vehicle_state_or_link_stale",
+            "old_session": "9f96a200efca403189dc2b8e9aa3a2b1",
+            "new_session": "83d3c654054f4929be5ec4ef296cca15",
+            "stops": {
+              "state_timeout": "UNCONFIRMED"
+            },
+            "physical_outcome_at_loss": "UNCONFIRMED",
+            "new_tx_without_authorization": 0,
+            "injected_at_ns": 42371254364197
+          },
+          "temporary_disconnect": {
+            "passed": true,
+            "displacement_m": 0.3485040702782533,
+            "last_effect": "temporary_disconnect-10",
+            "fault": "receive_fault:ConnectionError",
+            "old_session": "83d3c654054f4929be5ec4ef296cca15",
+            "new_session": "bc408a56c5714c4089c4eaede51c938a",
+            "stops": {
+              "temporary_disconnect": "UNCONFIRMED"
+            },
+            "physical_outcome_at_loss": "UNCONFIRMED",
+            "new_tx_without_authorization": 0,
+            "injected_at_ns": 42378414368872
+          },
+          "long_disconnect": {
+            "passed": true,
+            "displacement_m": 0.22502988743390756,
+            "last_effect": "long_disconnect-10",
+            "fault": "link_session_lost",
+            "old_session": "bc408a56c5714c4089c4eaede51c938a",
+            "new_session": "ee8d919c1d914666aae5dc8ef11844f0",
+            "stops": {
+              "long_disconnect": "UNCONFIRMED"
+            },
+            "physical_outcome_at_loss": "UNCONFIRMED",
+            "new_tx_without_authorization": 0,
+            "injected_at_ns": 42382472329193
+          },
+          "delayed_telemetry": {
+            "passed": true,
+            "displacement_m": 0.3478746455071941,
+            "last_effect": "delayed_telemetry-10",
+            "fault": "vehicle_state_or_link_stale",
+            "old_session": "ee8d919c1d914666aae5dc8ef11844f0",
+            "new_session": "f930d106c17b485d86fd679f1e1fa021",
+            "stops": {
+              "delayed_telemetry": "UNCONFIRMED"
+            },
+            "physical_outcome_at_loss": "UNCONFIRMED",
+            "new_tx_without_authorization": 0,
+            "injected_at_ns": 42389432606644
+          },
+          "old_replay": {
+            "passed": true,
+            "fault": "receive_fault:ConnectionError",
+            "old_session": "f930d106c17b485d86fd679f1e1fa021",
+            "new_session": "13c916ac30f049d4aeec510859c741e0",
+            "stops": {},
+            "physical_outcome_at_loss": "UNCONFIRMED",
+            "new_tx_without_authorization": 0,
+            "injected_at_ns": 42393488716445
+          },
+          "reconnect": {
+            "passed": true,
+            "covered_by": [
+              "temporary_disconnect",
+              "old_replay"
+            ]
+          },
+          "interrupted_velocity": {
+            "passed": true,
+            "covered_by": "temporary_disconnect"
+          },
+          "telemetry_stale": {
+            "passed": true,
+            "covered_by": "long_disconnect"
+          },
+          "ack_timeout": {
+            "passed": true,
+            "phase": "UNKNOWN",
+            "command_id": "command:78a11cc645ae42ff99bdba65027562a4",
+            "reason": "ack_timeout_outcome_unknown"
+          },
+          "sitl_restart": {
+            "passed": true,
+            "old_session": "13c916ac30f049d4aeec510859c741e0",
+            "new_session": "c853c571f6c84b97b62aa062abe7ba5f",
+            "old_queue_tx": 0,
+            "new_explicit_run_completed": true
+          }
+        }
+      },
+      "F": {
+        "passed": true,
+        "sessions": [
+          "f020728050b2470eb7483ff70780deb7",
+          "6fbf29621d934a25b2d1f5ad944c79d5",
+          "4bbf290caea944a585eded7b2305070b",
+          "40c6df54fd814ddc967a5ed8bd5fcbfc",
+          "3c2f2cb4f2d542dfb653b3c8c437596d"
+        ],
+        "reconnects": [
+          {
+            "session": "4bbf290caea944a585eded7b2305070b",
+            "closed_socket_ids": [
+              "socket:[2321283]",
+              "socket:[2332947]",
+              "socket:[2332948]"
+            ],
+            "receive_cycles": 763,
+            "fd_count": 30
+          },
+          {
+            "session": "40c6df54fd814ddc967a5ed8bd5fcbfc",
+            "closed_socket_ids": [
+              "socket:[2321287]",
+              "socket:[2335839]",
+              "socket:[2335840]"
+            ],
+            "receive_cycles": 794,
+            "fd_count": 30
+          },
+          {
+            "session": "3c2f2cb4f2d542dfb653b3c8c437596d",
+            "closed_socket_ids": [
+              "socket:[2335842]",
+              "socket:[2335843]",
+              "socket:[2337903]"
+            ],
+            "receive_cycles": 825,
+            "fd_count": 30
+          }
+        ],
+        "cycles": 825,
+        "closed_runtime_sockets": [
+          "socket:[2321283]",
+          "socket:[2321287]",
+          "socket:[2332947]",
+          "socket:[2332948]",
+          "socket:[2335839]",
+          "socket:[2335840]",
+          "socket:[2335842]",
+          "socket:[2335843]",
+          "socket:[2337903]"
+        ],
+        "replay_writes": 0
+      },
+      "evidence": {
+        "probe": {
+          "passed": true,
+          "summary": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-probe/summary.json",
+          "manifest": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-probe/manifest.json",
+          "log": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/2_rover_probe.log",
+          "cleanup": true
+        },
+        "physical": {
+          "passed": true,
+          "summary": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-physical/summary.json",
+          "manifest": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-physical/manifest.json",
+          "log": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/2_rover_physical.log",
+          "cleanup": true
+        },
+        "faults": {
+          "passed": true,
+          "summary": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-faults/summary.json",
+          "manifest": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-faults/manifest.json",
+          "log": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/2_rover_faults.log",
+          "cleanup": true
+        }
+      }
+    },
+    {
+      "run_id": "run-2-0ad45180",
+      "kind": "copter",
+      "groups": {
+        "A": "PASS",
+        "B": "PASS",
+        "D": "PASS",
+        "E": "PASS",
+        "F": "PASS",
+        "C": "PASS"
+      },
+      "A": {
+        "passed": true,
+        "mav_type": 2,
+        "session": "0c395019915d429f83ba2fbeb45d2ea6",
+        "heartbeat_observations": 41,
+        "received_cycles": 451,
+        "initial_command_writes": 0
+      },
+      "B": {
+        "yaw_error_rad": 2.220446049250313e-16,
+        "velocity_error_mps": 5.757536202886892e-06,
+        "messages": {
+          "HEARTBEAT": {
+            "availability": "UNKNOWN_CAPTURE_TIME",
+            "observations": 41,
+            "captured_at": null,
+            "value": {
+              "mav_type": 2,
+              "autopilot": 3,
+              "native_mode": 0,
+              "armed": false,
+              "system_status": 3
+            }
+          },
+          "ATTITUDE": {
+            "availability": "VALID",
+            "observations": 389,
+            "captured_at": {
+              "monotonic_ns": 42494346972893,
+              "utc": "2026-10-23T03:47:52.124203Z",
+              "clock_domain_id": "host-monotonic-simulation"
+            },
+            "value": {
+              "orientation_flu_enu": {
+                "x": 4.737184473704767e-10,
+                "y": -4.5943703724236235e-10,
+                "z": -0.7071067811865468,
+                "w": -0.7071067811865483
+              },
+              "angular_velocity_flu_rad_s": {
+                "x": 0.0005355720059014857,
+                "y": -0.0006272089667618275,
+                "z": -0.0005386776756495237
+              }
+            }
+          },
+          "GLOBAL_POSITION_INT": {
+            "availability": "VALID",
+            "observations": 389,
+            "captured_at": {
+              "monotonic_ns": 42494346972893,
+              "utc": "2026-10-23T03:47:52.124203Z",
+              "clock_domain_id": "host-monotonic-simulation"
+            },
+            "value": {
+              "position_enu_m": null,
+              "velocity_enu_mps": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": -0.0
+              },
+              "geographic": {
+                "latitude_deg": -35.363262,
+                "longitude_deg": 149.165237,
+                "altitude_m": 584.19
+              }
+            }
+          },
+          "LOCAL_POSITION_NED": {
+            "availability": "VALID",
+            "observations": 389,
+            "captured_at": {
+              "monotonic_ns": 42494346972893,
+              "utc": "2026-10-23T03:47:52.124203Z",
+              "clock_domain_id": "host-monotonic-simulation"
+            },
+            "value": {
+              "position_enu_m": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.1899999976158142
+              },
+              "velocity_enu_mps": {
+                "x": -2.4317334170603777e-12,
+                "y": 1.5902985872617847e-10,
+                "z": 5.757536200690083e-06
+              },
+              "geographic": null
+            }
+          },
+          "GPS_RAW_INT": {
+            "availability": "VALID",
+            "observations": 194,
+            "captured_at": {
+              "monotonic_ns": 42494053972893,
+              "utc": "2026-10-23T03:47:51.831203Z",
+              "clock_domain_id": "host-monotonic-simulation"
+            },
+            "value": {
+              "fix_type": 6,
+              "satellites": 10,
+              "hdop": 1.21,
+              "vdop": 2.0
+            }
+          },
+          "EKF_STATUS_REPORT": {
+            "availability": "UNKNOWN_CAPTURE_TIME",
+            "observations": 78,
+            "captured_at": null,
+            "value": {
+              "flags": 895,
+              "velocity_variance": 0.0,
+              "horizontal_position_variance": 0.0,
+              "vertical_position_variance": 0.0,
+              "compass_variance": 0.0,
+              "terrain_altitude_variance": 0.0
+            }
+          },
+          "SYS_STATUS": {
+            "availability": "UNKNOWN_CAPTURE_TIME",
+            "observations": 195,
+            "captured_at": null,
+            "value": {
+              "voltage_v": 12.6,
+              "current_a": 0.0,
+              "remaining_percent": 100
+            }
+          },
+          "POWER_STATUS": {
+            "availability": "UNKNOWN_CAPTURE_TIME",
+            "observations": 194,
+            "captured_at": null,
+            "value": {
+              "reported_5v_rail_v": 5.0,
+              "reported_servo_rail_v": 0.0,
+              "flags": 0
+            }
+          },
+          "COMMAND_ACK": {
+            "availability": "MISSING",
+            "observations": 0,
+            "captured_at": null,
+            "value": null
+          },
+          "STATUSTEXT": {
+            "availability": "STALE",
+            "observations": 16,
+            "captured_at": null,
+            "value": {
+              "severity": 6,
+              "text": "EKF3 IMU0 origin set",
+              "message_id": 0,
+              "chunk_sequence": 0
+            }
+          }
+        }
+      },
+      "C": {
+        "steps": {
+          "mode": {
+            "phase": "COMPLETED",
+            "command_id": "command:ba89f9383f6d4ae0806d6d42af1cd24c",
+            "reason": null
+          },
+          "arm": {
+            "phase": "COMPLETED",
+            "command_id": "command:e7195a201fa4471a8d29334948ae0bd1",
+            "reason": null
+          },
+          "takeoff": {
+            "phase": "ACKNOWLEDGED",
+            "state_rise_m": 1.4899999499320984,
+            "truth_rise_m": 1.4948993845478151,
+            "state_vertical_mps": -0.0013934654416516423,
+            "truth_vertical_mps": -0.0013968426974592216
+          },
+          "hold": {
+            "setpoints": 7,
+            "truth_xy": [
+              0.004225720143182737,
+              0.0026415089370612757
+            ],
+            "truth_z_m": 1.6812044931074055
+          },
+          "goto": {
+            "setpoints": 9,
+            "transmitted_setpoints": 9,
+            "state_error_m": 0.14522088966698588,
+            "truth_error_m": 0.12984272655523824,
+            "truth_xy": [
+              2.124181903354971,
+              1.0522584101208006
+            ],
+            "target_xy": [
+              2.004141144692643,
+              1.0027675028845102
+            ]
+          },
+          "goto-stop": {
+            "status": {
+              "phase": "COMPLETED",
+              "command_id": "command:21a4627a8d984aa187c1fa8c458da020",
+              "reason": null
+            },
+            "truth_speed_mps": 0.05316254608052787
+          },
+          "velocity-x": {
+            "setpoints": 10,
+            "transmitted_setpoints": 10,
+            "truth_delta_xy": [
+              1.1681326965072147,
+              0.015075795274149484
+            ],
+            "truth_delta_yaw_rad": 0.0004754572286596037,
+            "peak_horizontal_speed_mps": 0.5448971443385593,
+            "peak_positive_yaw_rate_rad_s": 0.000413482820856042
+          },
+          "velocity-x-stop": {
+            "phase": "COMPLETED",
+            "truth_speed_mps": 0.04382100136148412,
+            "truth_yaw_rate_rad_s": 2.9669599723463842e-05
+          },
+          "velocity-y": {
+            "setpoints": 10,
+            "transmitted_setpoints": 10,
+            "truth_delta_xy": [
+              0.016377287572665544,
+              1.1681701936364397
+            ],
+            "truth_delta_yaw_rad": -6.4427547605827576e-06,
+            "peak_horizontal_speed_mps": 0.5305610808293716,
+            "peak_positive_yaw_rate_rad_s": 0.0007211746565705113
+          },
+          "velocity-y-stop": {
+            "phase": "COMPLETED",
+            "truth_speed_mps": 0.020011707214593787,
+            "truth_yaw_rate_rad_s": -0.00030910150991623895
+          },
+          "yaw-positive": {
+            "setpoints": 10,
+            "transmitted_setpoints": 10,
+            "truth_delta_xy": [
+              0.0010165049025263606,
+              -0.021376615703561086
+            ],
+            "truth_delta_yaw_rad": 0.9841073031216396,
+            "peak_horizontal_speed_mps": 0.019021836425646678,
+            "peak_positive_yaw_rate_rad_s": 0.35404203252073835
+          },
+          "yaw-positive-stop": {
+            "phase": "COMPLETED",
+            "truth_speed_mps": 0.007585489543482009,
+            "truth_yaw_rate_rad_s": -0.0020280637839033195
+          },
+          "body-forward": {
+            "setpoints": 10,
+            "transmitted_setpoints": 10,
+            "truth_delta_xy": [
+              -1.0300884546067826,
+              0.5783979012638105
+            ],
+            "truth_delta_yaw_rad": -0.003578282322516113,
+            "peak_horizontal_speed_mps": 0.53664293570166,
+            "peak_positive_yaw_rate_rad_s": 0.0,
+            "heading_projection_m": 1.1813663091070628
+          },
+          "cancel": {
+            "stops": {
+              "body-forward": "CONFIRMED"
+            },
+            "elapsed_from_request_s": 4.537185783003224
+          },
+          "rtl": {
+            "phase": "COMPLETED",
+            "command_id": "command:45e875f36e7a4e0cbce557d6d97d2481",
+            "reason": null
+          },
+          "rtl_truth": {
+            "home_error_m": 0.0011965508407341084,
+            "height_m": 5.582273093773793e-07,
+            "armed": false,
+            "elapsed_from_request_s": 26.024227654997958
+          }
+        },
+        "stop_truth_max_speed_mps": 0.05316254608052787,
+        "stop_truth_max_elapsed_s": null
+      },
+      "D": {
+        "passed": true,
+        "cases": {
+          "default_send": {
+            "passed": true,
+            "reason": "system_send_disabled",
+            "write_attempts": 0,
+            "writer_bytes": 0,
+            "proxy_tx_delta": 0,
+            "started_ns": 42494579821940,
+            "ended_ns": 42494880667201
+          },
+          "action_send": {
+            "passed": true,
+            "reason": "action_send_disabled",
+            "write_attempts": 0,
+            "writer_bytes": 0,
+            "proxy_tx_delta": 0,
+            "started_ns": 42494880974233,
+            "ended_ns": 42495181722477
+          },
+          "missing_lease": {
+            "passed": true,
+            "reason": "no_lease",
+            "write_attempts": 0,
+            "writer_bytes": 0,
+            "proxy_tx_delta": 0,
+            "started_ns": 42495181842323,
+            "ended_ns": 42495482604305
+          },
+          "invalid_lease": {
+            "passed": true,
+            "reason": "lease_scope_mismatch",
+            "write_attempts": 0,
+            "writer_bytes": 0,
+            "proxy_tx_delta": 0,
+            "started_ns": 42495482788657,
+            "ended_ns": 42495783649733
+          },
+          "expired_command": {
+            "passed": true,
+            "reason": "invalid_effect_time",
+            "write_attempts": 0,
+            "writer_bytes": 0,
+            "proxy_tx_delta": 0,
+            "started_ns": 42495783982586,
+            "ended_ns": 42496084813156
+          },
+          "illegal_frame": {
+            "passed": true,
+            "reason": "frame_not_allowed",
+            "write_attempts": 0,
+            "writer_bytes": 0,
+            "proxy_tx_delta": 0,
+            "started_ns": 42496084925720,
+            "ended_ns": 42496385966619
+          },
+          "unsupported_capability": {
+            "passed": true,
+            "reason": "mode_not_allowed",
+            "write_attempts": 0,
+            "writer_bytes": 0,
+            "proxy_tx_delta": 0,
+            "started_ns": 42496386119939,
+            "ended_ns": 42496687621117
+          },
+          "expired_state": {
+            "passed": true,
+            "reason": "world_stale",
+            "write_attempts": 0,
+            "writer_bytes": 0,
+            "proxy_tx_delta": 0,
+            "started_ns": 42496687851028,
+            "ended_ns": 42496988614067
+          },
+          "wrong_session": {
+            "passed": true,
+            "reason": "link_session_changed",
+            "writer_bytes": 0,
+            "write_attempts": 0
+          }
+        },
+        "evidence": "actual transport.write attempts plus loopback proxy raw TX; stale world and queued identity explicitly injected"
+      },
+      "E": {
+        "probe": {
+          "passed": true,
+          "repeated_telemetry": {
+            "passed": true,
+            "duplicates": 47,
+            "capture_ns": 42498146972893,
+            "received_ns": 42498290103261,
+            "status": "STALE"
+          },
+          "delayed_ack": {
+            "passed": true,
+            "final": {
+              "phase": "UNKNOWN",
+              "command_id": "command:c7a431c035d048b08c821c803cb84be7",
+              "reason": "ack_timeout_outcome_unknown"
+            },
+            "queued": {
+              "phase": "REJECTED",
+              "command_id": "command:6ec7cc94c9724b5d870b18b0cb68b214",
+              "reason": "expired"
+            },
+            "new_tx_under_ambiguity": 0,
+            "delay_s": 6.0
+          },
+          "heartbeat_timeout": {
+            "passed": true,
+            "fault": "link_session_lost",
+            "old_session": "0c395019915d429f83ba2fbeb45d2ea6"
+          },
+          "remaining_faults": "dedicated existing physical fault scenario: link cut, SITL reboot, uncertain stop, no replay"
+        },
+        "physical_faults": {
+          "unauthorized": {
+            "passed": true,
+            "reason": "system_send_disabled",
+            "tx": 0
+          },
+          "duplicate": {
+            "passed": true,
+            "tx": 1
+          },
+          "deadman": {
+            "passed": true,
+            "displacement_m": 0.7385866664197608,
+            "last_effect": "deadman-10",
+            "zero_after_s": 1.000921442,
+            "speed_mps": 0.012410124416313811,
+            "yaw_rate_rad_s": 5.5291866940314536e-05,
+            "elapsed_from_refresh_end_s": 4.1044693190051476
+          },
+          "cancel": {
+            "passed": true,
+            "displacement_m": 0.7481172613798868,
+            "last_effect": "cancel-10",
+            "stops": {
+              "cancel": "CONFIRMED"
+            },
+            "speed_mps": 0.017678003888257132,
+            "yaw_rate_rad_s": 4.554508436537721e-05,
+            "elapsed_from_request_s": 3.3196289440020337
+          },
+          "shutdown_during_motion": {
+            "passed": true,
+            "displacement_m": 0.7516574236564783,
+            "last_effect": "shutdown-10",
+            "stops": {
+              "shutdown": "CONFIRMED"
+            },
+            "speed_mps": 0.011809715441411385,
+            "yaw_rate_rad_s": -5.2068943200662335e-06,
+            "elapsed_from_request_s": 3.3195120050004334
+          },
+          "signal_shutdown": {
+            "passed": true,
+            "signal": "SIGTERM",
+            "stops": {
+              "signal-motion": "CONFIRMED"
+            },
+            "speed_mps": 0.024451781674860645,
+            "yaw_rate_rad_s": 0.0001001553596476324,
+            "elapsed_from_signal_s": 3.4687675579989445
+          },
+          "runtime_process_restart": {
+            "passed": true,
+            "new_pid": 34942,
+            "old_pid": 34940,
+            "send": false,
+            "lease": null,
+            "new_tx": 0
+          },
+          "runtime_restart": {
+            "passed": true,
+            "send": false,
+            "lease": null
+          },
+          "state_timeout": {
+            "passed": true,
+            "displacement_m": 0.7434327153566819,
+            "last_effect": "state_timeout-10",
+            "fault": "vehicle_state_or_link_stale",
+            "old_session": "6008cc520a0f4f13aa22c12434fefac1",
+            "new_session": "10918087afbb486a9c2b32f6ee9f8cca",
+            "stops": {
+              "state_timeout": "UNCONFIRMED"
+            },
+            "physical_outcome_at_loss": "UNCONFIRMED",
+            "new_tx_without_authorization": 0,
+            "injected_at_ns": 42732076878393
+          },
+          "temporary_disconnect": {
+            "passed": true,
+            "displacement_m": 0.749674534232286,
+            "last_effect": "temporary_disconnect-10",
+            "fault": "receive_fault:ConnectionError",
+            "old_session": "10918087afbb486a9c2b32f6ee9f8cca",
+            "new_session": "98d02b653b15410588a9a4bbdb72d094",
+            "stops": {
+              "temporary_disconnect": "UNCONFIRMED"
+            },
+            "physical_outcome_at_loss": "UNCONFIRMED",
+            "new_tx_without_authorization": 0,
+            "injected_at_ns": 42739236909839
+          },
+          "long_disconnect": {
+            "passed": true,
+            "displacement_m": 0.5509722008350703,
+            "last_effect": "long_disconnect-10",
+            "fault": "link_session_lost",
+            "old_session": "98d02b653b15410588a9a4bbdb72d094",
+            "new_session": "73e3673007094519819c38caae267487",
+            "stops": {
+              "long_disconnect": "UNCONFIRMED"
+            },
+            "physical_outcome_at_loss": "UNCONFIRMED",
+            "new_tx_without_authorization": 0,
+            "injected_at_ns": 42743295525583
+          },
+          "delayed_telemetry": {
+            "passed": true,
+            "displacement_m": 0.7422943394621629,
+            "last_effect": "delayed_telemetry-10",
+            "fault": "vehicle_state_or_link_stale",
+            "old_session": "73e3673007094519819c38caae267487",
+            "new_session": "dc2e8cd88d354b84af7536eae7570256",
+            "stops": {
+              "delayed_telemetry": "UNCONFIRMED"
+            },
+            "physical_outcome_at_loss": "UNCONFIRMED",
+            "new_tx_without_authorization": 0,
+            "injected_at_ns": 42750255990969
+          },
+          "old_replay": {
+            "passed": true,
+            "fault": "receive_fault:ConnectionError",
+            "old_session": "dc2e8cd88d354b84af7536eae7570256",
+            "new_session": "2105e223dffc409982c4ebec46ea307e",
+            "stops": {},
+            "physical_outcome_at_loss": "UNCONFIRMED",
+            "new_tx_without_authorization": 0,
+            "injected_at_ns": 42754412851774
+          },
+          "reconnect": {
+            "passed": true,
+            "covered_by": [
+              "temporary_disconnect",
+              "old_replay"
+            ]
+          },
+          "interrupted_velocity": {
+            "passed": true,
+            "covered_by": "temporary_disconnect"
+          },
+          "telemetry_stale": {
+            "passed": true,
+            "covered_by": "long_disconnect"
+          },
+          "ack_timeout": {
+            "passed": true,
+            "phase": "UNKNOWN",
+            "command_id": "command:879be411aa7d4587a16fbf688aaef09d",
+            "reason": "ack_timeout_outcome_unknown"
+          },
+          "sitl_restart": {
+            "passed": true,
+            "old_session": "2105e223dffc409982c4ebec46ea307e",
+            "new_session": "38bc91c4e3894b16b82c36a202825117",
+            "old_queue_tx": 0,
+            "new_explicit_run_completed": true
+          }
+        }
+      },
+      "F": {
+        "passed": true,
+        "sessions": [
+          "0c395019915d429f83ba2fbeb45d2ea6",
+          "2791e9904c2a4f8c8a9897a478788a13",
+          "ea7b622641804579b905f5444d70f52a",
+          "a74dd49e75d9466284b053fcd45c85f4",
+          "d11dae4b03aa4b1d91a9f052f9de9ed0"
+        ],
+        "reconnects": [
+          {
+            "session": "ea7b622641804579b905f5444d70f52a",
+            "closed_socket_ids": [
+              "socket:[2337117]",
+              "socket:[2337118]",
+              "socket:[2340086]"
+            ],
+            "receive_cycles": 765,
+            "fd_count": 30
+          },
+          {
+            "session": "a74dd49e75d9466284b053fcd45c85f4",
+            "closed_socket_ids": [
+              "socket:[2339012]",
+              "socket:[2340108]",
+              "socket:[2340109]"
+            ],
+            "receive_cycles": 796,
+            "fd_count": 30
+          },
+          {
+            "session": "d11dae4b03aa4b1d91a9f052f9de9ed0",
+            "closed_socket_ids": [
+              "socket:[2335294]",
+              "socket:[2336052]",
+              "socket:[2346371]"
+            ],
+            "receive_cycles": 827,
+            "fd_count": 30
+          }
+        ],
+        "cycles": 827,
+        "closed_runtime_sockets": [
+          "socket:[2335294]",
+          "socket:[2336052]",
+          "socket:[2337117]",
+          "socket:[2337118]",
+          "socket:[2339012]",
+          "socket:[2340086]",
+          "socket:[2340108]",
+          "socket:[2340109]",
+          "socket:[2346371]"
+        ],
+        "replay_writes": 0
+      },
+      "evidence": {
+        "probe": {
+          "passed": true,
+          "summary": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-probe/summary.json",
+          "manifest": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-probe/manifest.json",
+          "log": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/2_copter_probe.log",
+          "cleanup": true
+        },
+        "physical": {
+          "passed": true,
+          "summary": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-physical/summary.json",
+          "manifest": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-physical/manifest.json",
+          "log": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/2_copter_physical.log",
+          "cleanup": true
+        },
+        "faults": {
+          "passed": true,
+          "summary": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-faults/summary.json",
+          "manifest": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-faults/manifest.json",
+          "log": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/2_copter_faults.log",
+          "cleanup": true
+        }
+      }
+    }
+  ],
+  "resources": {
+    "manifests": 12,
+    "processes": [
+      {
+        "pid": 33625,
+        "pgid": 33625,
+        "name": "gazebo",
+        "exit_code": 0,
+        "same_process_alive": false
+      },
+      {
+        "pid": 33626,
+        "pgid": 33626,
+        "name": "sitl",
+        "exit_code": 0,
+        "same_process_alive": false
+      },
+      {
+        "pid": 33719,
+        "pgid": 33719,
+        "name": "gazebo",
+        "exit_code": 0,
+        "same_process_alive": false
+      },
+      {
+        "pid": 33720,
+        "pgid": 33720,
+        "name": "sitl",
+        "exit_code": 0,
+        "same_process_alive": false
+      },
+      {
+        "pid": 33802,
+        "pgid": 33802,
+        "name": "gazebo",
+        "exit_code": 0,
+        "same_process_alive": false
+      },
+      {
+        "pid": 33803,
+        "pgid": 33803,
+        "name": "sitl",
+        "exit_code": 0,
+        "same_process_alive": false
+      },
+      {
+        "pid": 33851,
+        "pgid": 33851,
+        "name": "runtime_motion",
+        "exit_code": 0,
+        "same_process_alive": false
+      },
+      {
+        "pid": 33852,
+        "pgid": 33852,
+        "name": "runtime_readonly",
+        "exit_code": 0,
+        "same_process_alive": false
+      },
+      {
+        "pid": 33865,
+        "pgid": 33865,
+        "name": "sitl_restart",
+        "exit_code": 0,
+        "same_process_alive": false
+      },
+      {
+        "pid": 33905,
+        "pgid": 33905,
+        "name": "gazebo",
+        "exit_code": 0,
+        "same_process_alive": false
+      },
+      {
+        "pid": 33906,
+        "pgid": 33906,
+        "name": "sitl",
+        "exit_code": 0,
+        "same_process_alive": false
+      },
+      {
+        "pid": 34033,
+        "pgid": 34033,
+        "name": "gazebo",
+        "exit_code": 0,
+        "same_process_alive": false
+      },
+      {
+        "pid": 34034,
+        "pgid": 34034,
+        "name": "sitl",
+        "exit_code": 0,
+        "same_process_alive": false
+      },
+      {
+        "pid": 34158,
+        "pgid": 34158,
+        "name": "gazebo",
+        "exit_code": 0,
+        "same_process_alive": false
+      },
+      {
+        "pid": 34159,
+        "pgid": 34159,
+        "name": "sitl",
+        "exit_code": 0,
+        "same_process_alive": false
+      },
+      {
+        "pid": 34273,
+        "pgid": 34273,
+        "name": "runtime_motion",
+        "exit_code": 0,
+        "same_process_alive": false
+      },
+      {
+        "pid": 34274,
+        "pgid": 34274,
+        "name": "runtime_readonly",
+        "exit_code": 0,
+        "same_process_alive": false
+      },
+      {
+        "pid": 34294,
+        "pgid": 34294,
+        "name": "sitl_restart",
+        "exit_code": 0,
+        "same_process_alive": false
+      },
+      {
+        "pid": 34340,
+        "pgid": 34340,
+        "name": "gazebo",
+        "exit_code": 0,
+        "same_process_alive": false
+      },
+      {
+        "pid": 34341,
+        "pgid": 34341,
+        "name": "sitl",
+        "exit_code": 0,
+        "same_process_alive": false
+      },
+      {
+        "pid": 34397,
+        "pgid": 34397,
+        "name": "gazebo",
+        "exit_code": 0,
+        "same_process_alive": false
+      },
+      {
+        "pid": 34398,
+        "pgid": 34398,
+        "name": "sitl",
+        "exit_code": 0,
+        "same_process_alive": false
+      },
+      {
+        "pid": 34480,
+        "pgid": 34480,
+        "name": "gazebo",
+        "exit_code": 0,
+        "same_process_alive": false
+      },
+      {
+        "pid": 34481,
+        "pgid": 34481,
+        "name": "sitl",
+        "exit_code": 0,
+        "same_process_alive": false
+      },
+      {
+        "pid": 34534,
+        "pgid": 34534,
+        "name": "runtime_motion",
+        "exit_code": 0,
+        "same_process_alive": false
+      },
+      {
+        "pid": 34537,
+        "pgid": 34537,
+        "name": "runtime_readonly",
+        "exit_code": 0,
+        "same_process_alive": false
+      },
+      {
+        "pid": 34541,
+        "pgid": 34541,
+        "name": "sitl_restart",
+        "exit_code": 0,
+        "same_process_alive": false
+      },
+      {
+        "pid": 34572,
+        "pgid": 34572,
+        "name": "gazebo",
+        "exit_code": 0,
+        "same_process_alive": false
+      },
+      {
+        "pid": 34573,
+        "pgid": 34573,
+        "name": "sitl",
+        "exit_code": 0,
+        "same_process_alive": false
+      },
+      {
+        "pid": 34699,
+        "pgid": 34699,
+        "name": "gazebo",
+        "exit_code": 0,
+        "same_process_alive": false
+      },
+      {
+        "pid": 34700,
+        "pgid": 34700,
+        "name": "sitl",
+        "exit_code": 0,
+        "same_process_alive": false
+      },
+      {
+        "pid": 34829,
+        "pgid": 34829,
+        "name": "gazebo",
+        "exit_code": 0,
+        "same_process_alive": false
+      },
+      {
+        "pid": 34830,
+        "pgid": 34830,
+        "name": "sitl",
+        "exit_code": 0,
+        "same_process_alive": false
+      },
+      {
+        "pid": 34940,
+        "pgid": 34940,
+        "name": "runtime_motion",
+        "exit_code": 0,
+        "same_process_alive": false
+      },
+      {
+        "pid": 34942,
+        "pgid": 34942,
+        "name": "runtime_readonly",
+        "exit_code": 0,
+        "same_process_alive": false
+      },
+      {
+        "pid": 34964,
+        "pgid": 34964,
+        "name": "sitl_restart",
+        "exit_code": 0,
+        "same_process_alive": false
+      }
+    ],
+    "stage_processes": [
+      {
+        "name": "preflight",
+        "command": [
+          "/home/level6/vehicle-autonomy-framework/.venv-migration/bin/python",
+          "/home/level6/vehicle-autonomy-framework/scripts/preflight_simulation.py",
+          "--isolated"
+        ],
+        "started_at": "2026-10-23T03:28:25.624998+00:00",
+        "timeout_s": 30,
+        "log": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/preflight.log",
+        "passed": true,
+        "pid": 33350,
+        "pgid": 33350,
+        "exit_code": 0,
+        "ended_at": "2026-10-23T03:28:25.925780+00:00"
+      },
+      {
+        "name": "unit",
+        "command": [
+          "/home/level6/vehicle-autonomy-framework/.venv-migration/bin/python",
+          "-m",
+          "tests.simulation.phase1_harness",
+          "--unit-report",
+          "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/unit.json"
+        ],
+        "started_at": "2026-10-23T03:28:25.926002+00:00",
+        "timeout_s": 90,
+        "log": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/unit.log",
+        "passed": true,
+        "pid": 33359,
+        "pgid": 33359,
+        "exit_code": 0,
+        "ended_at": "2026-10-23T03:28:57.694595+00:00"
+      },
+      {
+        "name": "1_rover_probe",
+        "command": [
+          "/home/level6/vehicle-autonomy-framework/.venv-migration/bin/python",
+          "-m",
+          "tests.simulation.phase1_probe",
+          "--allow-send",
+          "--kind",
+          "rover",
+          "--run-dir",
+          "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-probe"
+        ],
+        "started_at": "2026-10-23T03:28:57.694950+00:00",
+        "timeout_s": 420,
+        "log": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/1_rover_probe.log",
+        "passed": true,
+        "pid": 33619,
+        "pgid": 33619,
+        "exit_code": 0,
+        "ended_at": "2026-10-23T03:30:21.196461+00:00"
+      },
+      {
+        "name": "1_rover_physical",
+        "command": [
+          "/home/level6/vehicle-autonomy-framework/.venv-migration/bin/python",
+          "-m",
+          "tests.simulation.rover_protocol",
+          "--allow-send",
+          "--full",
+          "--run-dir",
+          "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-physical"
+        ],
+        "started_at": "2026-10-23T03:30:21.196876+00:00",
+        "timeout_s": 420,
+        "log": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/1_rover_physical.log",
+        "passed": true,
+        "pid": 33713,
+        "pgid": 33713,
+        "exit_code": 0,
+        "ended_at": "2026-10-23T03:32:21.894245+00:00"
+      },
+      {
+        "name": "1_rover_faults",
+        "command": [
+          "/home/level6/vehicle-autonomy-framework/.venv-migration/bin/python",
+          "-m",
+          "tests.simulation.fault_scenario",
+          "--allow-send",
+          "--kind",
+          "rover",
+          "--run-dir",
+          "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-faults"
+        ],
+        "started_at": "2026-10-23T03:32:21.894639+00:00",
+        "timeout_s": 420,
+        "log": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/1_rover_faults.log",
+        "passed": true,
+        "pid": 33796,
+        "pgid": 33796,
+        "exit_code": 0,
+        "ended_at": "2026-10-23T03:34:54.221351+00:00"
+      },
+      {
+        "name": "1_copter_probe",
+        "command": [
+          "/home/level6/vehicle-autonomy-framework/.venv-migration/bin/python",
+          "-m",
+          "tests.simulation.phase1_probe",
+          "--allow-send",
+          "--kind",
+          "copter",
+          "--run-dir",
+          "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-probe"
+        ],
+        "started_at": "2026-10-23T03:34:54.221959+00:00",
+        "timeout_s": 420,
+        "log": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/1_copter_probe.log",
+        "passed": true,
+        "pid": 33899,
+        "pgid": 33899,
+        "exit_code": 0,
+        "ended_at": "2026-10-23T03:36:18.791319+00:00"
+      },
+      {
+        "name": "1_copter_physical",
+        "command": [
+          "/home/level6/vehicle-autonomy-framework/.venv-migration/bin/python",
+          "-m",
+          "tests.simulation.copter_scenario",
+          "--allow-send",
+          "--full",
+          "--run-dir",
+          "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-physical"
+        ],
+        "started_at": "2026-10-23T03:36:18.791994+00:00",
+        "timeout_s": 420,
+        "log": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/1_copter_physical.log",
+        "passed": true,
+        "pid": 34027,
+        "pgid": 34027,
+        "exit_code": 0,
+        "ended_at": "2026-10-23T03:38:16.789506+00:00"
+      },
+      {
+        "name": "1_copter_faults",
+        "command": [
+          "/home/level6/vehicle-autonomy-framework/.venv-migration/bin/python",
+          "-m",
+          "tests.simulation.fault_scenario",
+          "--allow-send",
+          "--kind",
+          "copter",
+          "--run-dir",
+          "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-faults"
+        ],
+        "started_at": "2026-10-23T03:38:16.789897+00:00",
+        "timeout_s": 420,
+        "log": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/1_copter_faults.log",
+        "passed": true,
+        "pid": 34152,
+        "pgid": 34152,
+        "exit_code": 0,
+        "ended_at": "2026-10-23T03:41:09.531890+00:00"
+      },
+      {
+        "name": "2_rover_probe",
+        "command": [
+          "/home/level6/vehicle-autonomy-framework/.venv-migration/bin/python",
+          "-m",
+          "tests.simulation.phase1_probe",
+          "--allow-send",
+          "--kind",
+          "rover",
+          "--run-dir",
+          "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-probe"
+        ],
+        "started_at": "2026-10-23T03:41:09.532866+00:00",
+        "timeout_s": 420,
+        "log": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/2_rover_probe.log",
+        "passed": true,
+        "pid": 34334,
+        "pgid": 34334,
+        "exit_code": 0,
+        "ended_at": "2026-10-23T03:42:32.601180+00:00"
+      },
+      {
+        "name": "2_rover_physical",
+        "command": [
+          "/home/level6/vehicle-autonomy-framework/.venv-migration/bin/python",
+          "-m",
+          "tests.simulation.rover_protocol",
+          "--allow-send",
+          "--full",
+          "--run-dir",
+          "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-physical"
+        ],
+        "started_at": "2026-10-23T03:42:32.601673+00:00",
+        "timeout_s": 420,
+        "log": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/2_rover_physical.log",
+        "passed": true,
+        "pid": 34391,
+        "pgid": 34391,
+        "exit_code": 0,
+        "ended_at": "2026-10-23T03:44:34.752548+00:00"
+      },
+      {
+        "name": "2_rover_faults",
+        "command": [
+          "/home/level6/vehicle-autonomy-framework/.venv-migration/bin/python",
+          "-m",
+          "tests.simulation.fault_scenario",
+          "--allow-send",
+          "--kind",
+          "rover",
+          "--run-dir",
+          "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-faults"
+        ],
+        "started_at": "2026-10-23T03:44:34.753247+00:00",
+        "timeout_s": 420,
+        "log": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/2_rover_faults.log",
+        "passed": true,
+        "pid": 34474,
+        "pgid": 34474,
+        "exit_code": 0,
+        "ended_at": "2026-10-23T03:47:06.869278+00:00"
+      },
+      {
+        "name": "2_copter_probe",
+        "command": [
+          "/home/level6/vehicle-autonomy-framework/.venv-migration/bin/python",
+          "-m",
+          "tests.simulation.phase1_probe",
+          "--allow-send",
+          "--kind",
+          "copter",
+          "--run-dir",
+          "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-probe"
+        ],
+        "started_at": "2026-10-23T03:47:06.870004+00:00",
+        "timeout_s": 420,
+        "log": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/2_copter_probe.log",
+        "passed": true,
+        "pid": 34566,
+        "pgid": 34566,
+        "exit_code": 0,
+        "ended_at": "2026-10-23T03:48:31.241368+00:00"
+      },
+      {
+        "name": "2_copter_physical",
+        "command": [
+          "/home/level6/vehicle-autonomy-framework/.venv-migration/bin/python",
+          "-m",
+          "tests.simulation.copter_scenario",
+          "--allow-send",
+          "--full",
+          "--run-dir",
+          "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-physical"
+        ],
+        "started_at": "2026-10-23T03:48:31.241901+00:00",
+        "timeout_s": 420,
+        "log": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/2_copter_physical.log",
+        "passed": true,
+        "pid": 34693,
+        "pgid": 34693,
+        "exit_code": 0,
+        "ended_at": "2026-10-23T03:50:28.139878+00:00"
+      },
+      {
+        "name": "2_copter_faults",
+        "command": [
+          "/home/level6/vehicle-autonomy-framework/.venv-migration/bin/python",
+          "-m",
+          "tests.simulation.fault_scenario",
+          "--allow-send",
+          "--kind",
+          "copter",
+          "--run-dir",
+          "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-faults"
+        ],
+        "started_at": "2026-10-23T03:50:28.140445+00:00",
+        "timeout_s": 420,
+        "log": "/home/level6/vehicle-autonomy-framework/artifacts/phase1-control/acceptance-final/2_copter_faults.log",
+        "passed": true,
+        "pid": 34823,
+        "pgid": 34823,
+        "exit_code": 0,
+        "ended_at": "2026-10-23T03:53:20.781860+00:00"
+      }
+    ]
+  },
+  "files": [
+    {
+      "path": "artifacts/phase1-control/acceptance-final/1_copter_faults.log",
+      "bytes": 4000,
+      "sha256": "9a90c32c2cfc1572bd8b813b0089b5357573cc52a8a528df6b826079df9e829d"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/1_copter_physical.log",
+      "bytes": 2983,
+      "sha256": "1b11098d01c7ee5f42ad74a3024ebaa2eab0b9bf681e4d78f9a94679f8bdbe3b"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/1_copter_probe.log",
+      "bytes": 9988,
+      "sha256": "fa606d1de135c3360b9f1ac212214aad60e7092b129f029964455929ea4fcd95"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/1_rover_faults.log",
+      "bytes": 4004,
+      "sha256": "b3d10d7c4ac4a2bda2411d77f87d3efc94cd0a628117c1f8a09862ff47cedba8"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/1_rover_physical.log",
+      "bytes": 5809,
+      "sha256": "8cc04ab5d1d0be895934d7b2f6cb5eeae9828d85fab9b8f8330f9ea0433881b6"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/1_rover_probe.log",
+      "bytes": 10045,
+      "sha256": "9e73635f7c9c916361cd9d93341c0ab0fd0ea4ce408eb1d7de890ea729f848c0"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/2_copter_faults.log",
+      "bytes": 4003,
+      "sha256": "d4d5386c3e20f3ddc5ab85fda6a886714cfa4be2001ba874da81923b2a231a12"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/2_copter_physical.log",
+      "bytes": 2986,
+      "sha256": "3adb596160206482aec68f30817998f477499c8892e20701cecdf2ad31f07bf2"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/2_copter_probe.log",
+      "bytes": 9988,
+      "sha256": "2886917f582bf732b92aa1422c2ca646600a67cd4c8b4c8b95e085b921a33503"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/2_rover_faults.log",
+      "bytes": 4006,
+      "sha256": "b4a1c20ebe79a8c46b707dc6860865e204b75aef39eec0c88ace946820187e00"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/2_rover_physical.log",
+      "bytes": 5861,
+      "sha256": "85f458fece9630292e6a8b2cd2fed9fe49fc7924c7b336b98c60385dfc2d9b63"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/2_rover_probe.log",
+      "bytes": 10045,
+      "sha256": "aee9cdbaff0cc04dd8c66c7d7cf98cb6912f5adbd7bef53b72d27c7368b8179c"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/preflight.log",
+      "bytes": 705,
+      "sha256": "115f658d164321c826ef58afbf273312e14dd1730a7f60ae88736dd1094a39e0"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-faults/gazebo.log",
+      "bytes": 11435,
+      "sha256": "0e1834d24c6fce21439fd65cedaf6ef8b8870d2c81cd75de661c4039c90da175"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-faults/manifest.json",
+      "bytes": 5746,
+      "sha256": "e9d5ef953689191e79e0fed28e630171f12310542be7612dd5f0df860a4f617f"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-faults/model.sdf",
+      "bytes": 10312,
+      "sha256": "c23f4ddba8da8e6327ffd333718c130060c6e6a9625f420afb211afda9857e94"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-faults/proxy.jsonl",
+      "bytes": 1597296,
+      "sha256": "7f6dd8d0aecd8a6793568a09442b26852a5e7a146ec155c19993ce96753c5c9e"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-faults/runtime-process-motion.json",
+      "bytes": 57076,
+      "sha256": "4587ad0aa73d845a5c829ed7281e8e0fefdd2353ec773737dbdc36129cac3449"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-faults/runtime-process-restart.json",
+      "bytes": 6385,
+      "sha256": "e3f2e0451e7f6911e2bf9a76703a29ee0e55bde3263c1c24d361154e785be02d"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-faults/runtime.jsonl",
+      "bytes": 1903420,
+      "sha256": "a90f46389462823ec6b0315667dec7e12c1a2e2377f33747e665c36a14aace70"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-faults/runtime_motion.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-faults/runtime_readonly.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-faults/sitl.log",
+      "bytes": 1931,
+      "sha256": "daa8ebfd46b4ee8a2980bd04c8c626d42b22e4feed69dc52462f6809eede52b2"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-faults/sitl_restart.log",
+      "bytes": 1420,
+      "sha256": "9a0f1e89cf6006ef50803cb9fd29f7f2d4c6d1ab7b7265251279c522d038f7e3"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-faults/summary.json",
+      "bytes": 4953,
+      "sha256": "c0efe03e9d05881b6b5d1e17472e22ccd8d5460b69740752fb9c6309a9440884"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-faults/trajectory.jsonl",
+      "bytes": 381168,
+      "sha256": "ea664eb8b3ae9c8fe385d1d6992cebcfb3ed7b6f4ec9f5f543b3c0700c3cf257"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-faults/world.sdf",
+      "bytes": 3610,
+      "sha256": "99fbd2aa5378acfa91f856f1c78e6636e729c2c3ecd43594ab9d052df4cb8fa7"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-physical/gazebo.log",
+      "bytes": 11352,
+      "sha256": "27aaa56396ffa8a55e0c713b6eae28a19cbe8900a6b6af481b59d6b853713bf2"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-physical/manifest.json",
+      "bytes": 3496,
+      "sha256": "f88d195cdb2a5f3e77a3910f60194380907e1d719a76b1840585dd34568a2f2f"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-physical/model.sdf",
+      "bytes": 10312,
+      "sha256": "c23f4ddba8da8e6327ffd333718c130060c6e6a9625f420afb211afda9857e94"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-physical/observations.jsonl",
+      "bytes": 272097,
+      "sha256": "271348755e57012b1abd5d42c1f1a82a4357ee8bf56d44b1cf4d129cdc42fa45"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-physical/runtime.jsonl",
+      "bytes": 1491483,
+      "sha256": "6d663fb3dc01d15eb4950ee49b3676590c1c76f34324b26fa58ae1742c7bf1f8"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-physical/sitl.log",
+      "bytes": 1520,
+      "sha256": "94829596638a1ef0e3ea78db873b945eb14aaf9b1b0eac32656afb7253da2fcf"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-physical/summary.json",
+      "bytes": 3762,
+      "sha256": "379cd50db41c35a58d537139d70a94eb0172d4e6653796ebe74f34592b8a771e"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-physical/world.sdf",
+      "bytes": 3612,
+      "sha256": "70d06cb55ad60bb522bb869b016a274a249078300d78d42056c36939ca1b098e"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-probe/gazebo.log",
+      "bytes": 11349,
+      "sha256": "71d5c56e89ae732f0f853ddd14143e0350188592f7edf51e63b5a8afff83708b"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-probe/manifest.json",
+      "bytes": 3487,
+      "sha256": "ff2c095ed4cc9df16bc7238ab0244fb3e7169f6b4fc8f8f62c967d31935382ea"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-probe/model.sdf",
+      "bytes": 10312,
+      "sha256": "c23f4ddba8da8e6327ffd333718c130060c6e6a9625f420afb211afda9857e94"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-probe/proxy.jsonl",
+      "bytes": 3378629,
+      "sha256": "ea93eb01aaafcdbd7fbeaa7925d2c77607b9ddba557b94ace644fb8ea3299242"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-probe/runtime.jsonl",
+      "bytes": 892929,
+      "sha256": "65b7e3211f474871e91f81d516cadef3ee19aee06f3784607d552af166b28315"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-probe/sitl.log",
+      "bytes": 1790,
+      "sha256": "b2f983ffa55b025df1c269fa7a632b5abcafc6d8c026a0245d8112b13acbba65"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-probe/summary.json",
+      "bytes": 14675,
+      "sha256": "1b286b5a9ba5d4e33a5977f610ad3222ea440be8a7713a3ca7f75f58f087d3df"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-probe/telemetry.jsonl",
+      "bytes": 9815153,
+      "sha256": "f2cdd7101295636989642dc6e12ae2d4fae31a289c4d64eec4166da9fd15241d"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-probe/world.sdf",
+      "bytes": 3609,
+      "sha256": "3c0065079e2a5f16a1a90b5f0631620df54584acc9dec551b0c0c16bd8777ff2"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-faults/gazebo.log",
+      "bytes": 4074,
+      "sha256": "cd30d5dff8964d32ef3821e13161031d3220e6b0c0c28da87b8d695fe497d70b"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-faults/manifest.json",
+      "bytes": 5733,
+      "sha256": "82925a8dbc7c3f81ba6459344f4518cdcb09cf7e0870b7d972c9c86ca34e9ef3"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-faults/model.sdf",
+      "bytes": 8025,
+      "sha256": "53c32fdc91ebbceecee1c0a72abfac86fd02e97bc241a4b17a927049ebdb40b6"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-faults/proxy.jsonl",
+      "bytes": 1350931,
+      "sha256": "a93c295d0fce60d41c4e4a0dd0768dfd24486578cef0f0789f264d11a0a0a450"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-faults/runtime-process-motion.json",
+      "bytes": 63180,
+      "sha256": "4348120de653be7e0cbeb612c2b0d12112b70a712a2930390fcff9331ec2143a"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-faults/runtime-process-restart.json",
+      "bytes": 6384,
+      "sha256": "cd1168e80bbb838369ec37464f2cb75e746572bd70e4eb5856622e3b6dbaa394"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-faults/runtime.jsonl",
+      "bytes": 1645768,
+      "sha256": "3886d5b21e0f945419f832f409d0267fda363f7492a263bd67125f171ef93fca"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-faults/runtime_motion.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-faults/runtime_readonly.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-faults/sitl.log",
+      "bytes": 1634,
+      "sha256": "cb86d54fc2c4d9762c36837e2617d94f3851c0f2df72bddbee47c2dbcd650472"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-faults/sitl_restart.log",
+      "bytes": 1173,
+      "sha256": "f28d7aea87263938a54ed72d1d7a975123818b2aa5617bf096623192c7130106"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-faults/summary.json",
+      "bytes": 4957,
+      "sha256": "a8aa761c702d89c67905819893bebb9e407b6de6554d133c96d2b9775ca65a1a"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-faults/trajectory.jsonl",
+      "bytes": 350997,
+      "sha256": "196ebdc2befe10b156dc8821ce87370c75628bfae40e39d11391e2dfd40359a9"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-faults/world.sdf",
+      "bytes": 1592,
+      "sha256": "ff33a02d0331335e6b2ee2921746c974bc7482ca49ffe659e099fc6fe0a3150d"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-physical/gazebo.log",
+      "bytes": 3991,
+      "sha256": "bb3eb9b713b1fda232770f04523e620b58005d446f1b5c21a5c19f394cce7a61"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-physical/manifest.json",
+      "bytes": 3494,
+      "sha256": "847848b51c43b447634ecfff2cadd403a08ede17143382a1a57d07d2835c9c09"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-physical/model.sdf",
+      "bytes": 8025,
+      "sha256": "53c32fdc91ebbceecee1c0a72abfac86fd02e97bc241a4b17a927049ebdb40b6"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-physical/runtime.jsonl",
+      "bytes": 1630297,
+      "sha256": "796098f378444430672c77e55a44e803173d432cd91aebd92cebe9fc5064b387"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-physical/sitl.log",
+      "bytes": 1223,
+      "sha256": "42fe4adc1f4101c6d157269a67b095203e70246ef76ee7f408cb0109956ee124"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-physical/summary.json",
+      "bytes": 7166,
+      "sha256": "1e70661fb7cd91abf2a9104b85be5244188091ed023954c122d6640e2c8a8290"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-physical/trajectory.jsonl",
+      "bytes": 255994,
+      "sha256": "074ce9f82382505e2ac72d91758805bb1bf29f6f2e1577e2ea3e2ea8a42f5b99"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-physical/world.sdf",
+      "bytes": 1594,
+      "sha256": "64da4e40b8566a73768b0202044d78017796b0835e3ab85f2bd5fdbc42dabaae"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-probe/gazebo.log",
+      "bytes": 3988,
+      "sha256": "0744db6b89ee2ce90f726d177958f89bd8465038dd4cbc306d50cce4104047d2"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-probe/manifest.json",
+      "bytes": 3485,
+      "sha256": "c4e40d825b1d495c844c44d9eb43e4a7e29d65fa080287b633173bd50a09f8f8"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-probe/model.sdf",
+      "bytes": 8025,
+      "sha256": "53c32fdc91ebbceecee1c0a72abfac86fd02e97bc241a4b17a927049ebdb40b6"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-probe/proxy.jsonl",
+      "bytes": 3334048,
+      "sha256": "26b49938359e4429a077a99c0f05e2c949af9166859bf0f4799ac4cb68e5c914"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-probe/runtime.jsonl",
+      "bytes": 913562,
+      "sha256": "3d3f545e121ccf114b4c93bf8caba329a616a94ea4a88ae67ecfe039e8b91f1a"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-probe/sitl.log",
+      "bytes": 1443,
+      "sha256": "3971cdef96b5799040b26d4b8d023a9beeb2a9a2aa2470411440d4d6ff8b5736"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-probe/summary.json",
+      "bytes": 14732,
+      "sha256": "bc38339db4784c0b7ce7a3f18606dfc8c05fb4e0818c3bcd4d30ccd59b780af5"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-probe/telemetry.jsonl",
+      "bytes": 10084149,
+      "sha256": "36b39461d721e833d12df053f0da65761403f19f914d8e96865c81c4538c1db3"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-probe/world.sdf",
+      "bytes": 1591,
+      "sha256": "67466329b1656c25cc207df0e3572972949b0b5a88288b07b47f9426b1117e37"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/summary.json",
+      "bytes": 3632,
+      "sha256": "248ee00aa943fa65093068f750f40df37692aa891f2ed701a1110eca4c816b7e"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-faults/gazebo.log",
+      "bytes": 11435,
+      "sha256": "7433d7273df5217d310658e792082db9a60fed4e23eee725f5ebbba63e907fc4"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-faults/manifest.json",
+      "bytes": 5746,
+      "sha256": "2dc618b267c7f35277e1b95aa437ca983f05ee78085398883e2149ed0c124772"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-faults/model.sdf",
+      "bytes": 10312,
+      "sha256": "c23f4ddba8da8e6327ffd333718c130060c6e6a9625f420afb211afda9857e94"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-faults/proxy.jsonl",
+      "bytes": 1597604,
+      "sha256": "e7c6299468effd16166cda9438ce9ae84ee928422e3bdfeaead59a2c4d6b4406"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-faults/runtime-process-motion.json",
+      "bytes": 56787,
+      "sha256": "67d704d1504d8b7e785cff69012f04e5091e85cfb9ea2d03912355784deacff9"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-faults/runtime-process-restart.json",
+      "bytes": 6385,
+      "sha256": "a747d3d8d3210bd9a37256ac84fc6ab85e210c51443cdc3f403039f396f69bb4"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-faults/runtime.jsonl",
+      "bytes": 1902668,
+      "sha256": "bc87829a0b5b492378b941e8a27b081b0ee68d76dfa3b87dca6db4ec475aa359"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-faults/runtime_motion.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-faults/runtime_readonly.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-faults/sitl.log",
+      "bytes": 1931,
+      "sha256": "daa8ebfd46b4ee8a2980bd04c8c626d42b22e4feed69dc52462f6809eede52b2"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-faults/sitl_restart.log",
+      "bytes": 1420,
+      "sha256": "9a0f1e89cf6006ef50803cb9fd29f7f2d4c6d1ab7b7265251279c522d038f7e3"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-faults/summary.json",
+      "bytes": 4956,
+      "sha256": "67dc6f24a0847cff5ea8b401075d66aa494a724fe5da917df951af4d37468cbe"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-faults/trajectory.jsonl",
+      "bytes": 381395,
+      "sha256": "2c59f34019e099b7b1e5618713c839cf61ad34a7ce03b50f208a266dd33ce554"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-faults/world.sdf",
+      "bytes": 3610,
+      "sha256": "f8dd99533c36964589bd162f63b49ba537496d90146d8b1caae04c2003f34b7e"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-physical/gazebo.log",
+      "bytes": 11352,
+      "sha256": "064ce26616d2a54fe27bfd78c9dbf8d96db20e93f78e836bdb34581e3ff40a50"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-physical/manifest.json",
+      "bytes": 3496,
+      "sha256": "b164222b583d6b490015aad4f4c7ebc871352216a461442de055b05a5384fbab"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-physical/model.sdf",
+      "bytes": 10312,
+      "sha256": "c23f4ddba8da8e6327ffd333718c130060c6e6a9625f420afb211afda9857e94"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-physical/observations.jsonl",
+      "bytes": 268071,
+      "sha256": "ec1e51ad81936bbefd2d69f6d29216564c367490be0953fa352fb4c0b96ac8fa"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-physical/runtime.jsonl",
+      "bytes": 1477757,
+      "sha256": "df0534393681d509cb2c2d9e6bcb901409cbab07a26f611fdd5a9416e66444e4"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-physical/sitl.log",
+      "bytes": 1520,
+      "sha256": "94829596638a1ef0e3ea78db873b945eb14aaf9b1b0eac32656afb7253da2fcf"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-physical/summary.json",
+      "bytes": 3765,
+      "sha256": "b6fc5f47b68db37d8f252009b98d15d939c5ab4d7ea81e7910bea1d3cf92461f"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-physical/world.sdf",
+      "bytes": 3612,
+      "sha256": "290c7a65d0c4ca5269a1402b757b24b59af4072fa9283749e1d346781ae2f504"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-probe/gazebo.log",
+      "bytes": 11349,
+      "sha256": "72827db3b981a7ead80ab285a34c76c4e962ad1fc1798fbc96a5b00669d3d1ce"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-probe/manifest.json",
+      "bytes": 3487,
+      "sha256": "f473de90e16cb5eb1a7fae7fd78b831f79a158eb1cb08c09da6e3111e05ec5b9"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-probe/model.sdf",
+      "bytes": 10312,
+      "sha256": "c23f4ddba8da8e6327ffd333718c130060c6e6a9625f420afb211afda9857e94"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-probe/proxy.jsonl",
+      "bytes": 3378629,
+      "sha256": "97eaea8cfdd32f1518497b9143e726906e9ea19da7b0176967d1f57b6eea9a60"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-probe/runtime.jsonl",
+      "bytes": 889306,
+      "sha256": "184e5b573352484f76cc7d4cc891b5bbb35fc988f78d31db7340f09d0c620237"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-probe/sitl.log",
+      "bytes": 1790,
+      "sha256": "b2f983ffa55b025df1c269fa7a632b5abcafc6d8c026a0245d8112b13acbba65"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-probe/summary.json",
+      "bytes": 14675,
+      "sha256": "dbc44e4b7056b0d2f97a3731309acddb6eebd618f37b93f7c8ef67c2e4056db2"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-probe/telemetry.jsonl",
+      "bytes": 9803814,
+      "sha256": "dec0e22fb60e751caef85348f2d7de23d289b033a0884d622e0fd7c9afad94ca"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-probe/world.sdf",
+      "bytes": 3609,
+      "sha256": "23c910b98fef637ef8870c9c9db35d7cd05e9892ed59950cee944f02bd8ade9b"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-faults/gazebo.log",
+      "bytes": 4074,
+      "sha256": "93ba107ebbd7fbaff760b34674f3221b6e29b9b272d1c6edc0a68e589cabe372"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-faults/manifest.json",
+      "bytes": 5733,
+      "sha256": "fb0b54ffc7d38c7f262c21964fe8173d4d07063593dafc08e7cd64209b6df162"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-faults/model.sdf",
+      "bytes": 8025,
+      "sha256": "53c32fdc91ebbceecee1c0a72abfac86fd02e97bc241a4b17a927049ebdb40b6"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-faults/proxy.jsonl",
+      "bytes": 1349790,
+      "sha256": "bc6c6e5b6ea72ce95f1b0d351741360bd5b2c2c5d8542313dc6fbb67d5cf9583"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-faults/runtime-process-motion.json",
+      "bytes": 63180,
+      "sha256": "0fb74dd085c6330335367500c63f6b35100f482fad485b0835f6694fceea712e"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-faults/runtime-process-restart.json",
+      "bytes": 6095,
+      "sha256": "ab467c920e53c45dbc07c2ed1cad1a5c50b05b1e792733ac75cdb8087c6fa20b"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-faults/runtime.jsonl",
+      "bytes": 1647549,
+      "sha256": "3b97e1f86a184ffda9678f933543c630cc56232d28dc24710f75a6a9cffa6b97"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-faults/runtime_motion.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-faults/runtime_readonly.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-faults/sitl.log",
+      "bytes": 1634,
+      "sha256": "cb86d54fc2c4d9762c36837e2617d94f3851c0f2df72bddbee47c2dbcd650472"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-faults/sitl_restart.log",
+      "bytes": 1173,
+      "sha256": "f28d7aea87263938a54ed72d1d7a975123818b2aa5617bf096623192c7130106"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-faults/summary.json",
+      "bytes": 4959,
+      "sha256": "2b4e09534886579d02c94369f664aeea4941695d6c51d61150c67e8214264176"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-faults/trajectory.jsonl",
+      "bytes": 351434,
+      "sha256": "a619f4eeafe69f2197733ddd8fd77a60048f4ff147193197ab5b046d5fd23669"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-faults/world.sdf",
+      "bytes": 1592,
+      "sha256": "cd85a2a09a0b8f388b71bd257996d9eb9fabcacfea78f49f7e807a4cedc8eff3"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-physical/gazebo.log",
+      "bytes": 3991,
+      "sha256": "0b51ad629d86c9fdaea599e6134c15a493bd4bacc8d5c39c5fb0a96b5dd56c4e"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-physical/manifest.json",
+      "bytes": 3494,
+      "sha256": "99a32f0269d3279c392da2be7e6788185d5de9d7ff34c8c39484e341b4d32318"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-physical/model.sdf",
+      "bytes": 8025,
+      "sha256": "53c32fdc91ebbceecee1c0a72abfac86fd02e97bc241a4b17a927049ebdb40b6"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-physical/runtime.jsonl",
+      "bytes": 1636305,
+      "sha256": "16e3579eb6efe97c28b0210b022ba9dec07fc18597c31726c593e03ebd3acb89"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-physical/sitl.log",
+      "bytes": 1223,
+      "sha256": "42fe4adc1f4101c6d157269a67b095203e70246ef76ee7f408cb0109956ee124"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-physical/summary.json",
+      "bytes": 7222,
+      "sha256": "1d891ebac55ab10b7262020c59dbd92af03e8be61150d663411820841b89d79c"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-physical/trajectory.jsonl",
+      "bytes": 258131,
+      "sha256": "dece3d49d7df3d4da93190e4015f2156af63b465a520d737a13d9ce07d10cc17"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-physical/world.sdf",
+      "bytes": 1594,
+      "sha256": "3bed5a8055a106c0ac4d1cc4de8e194457fe89ceadee2aac614fa9a20792d9f8"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-probe/gazebo.log",
+      "bytes": 3988,
+      "sha256": "e64e155736002f784c9785439331a7310f6a22e3505538bd2b9ad4ee9176ebf5"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-probe/manifest.json",
+      "bytes": 3485,
+      "sha256": "66c168e0987cf834cc3e4311a8d7d0504f015886c5c464964261877667276926"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-probe/model.sdf",
+      "bytes": 8025,
+      "sha256": "53c32fdc91ebbceecee1c0a72abfac86fd02e97bc241a4b17a927049ebdb40b6"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-probe/proxy.jsonl",
+      "bytes": 3334045,
+      "sha256": "3e5f07dbacd590ddf210c56c2945a64274f5e86429a9ba3f7740cd13d1aa1c05"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-probe/runtime.jsonl",
+      "bytes": 913200,
+      "sha256": "6e95cc08a95f489565b4d3318e542139e69a7ed33ecdee5c6a0a2bee5aa88e57"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-probe/sitl.log",
+      "bytes": 1443,
+      "sha256": "3971cdef96b5799040b26d4b8d023a9beeb2a9a2aa2470411440d4d6ff8b5736"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-probe/summary.json",
+      "bytes": 14732,
+      "sha256": "543fe47ddfa68e3119dc3f3d6c081c3b8d3fad2df4318789796b892a4145690a"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-probe/telemetry.jsonl",
+      "bytes": 10078536,
+      "sha256": "4c788b0d59a675d7854a5400713915fb46138bd8c0ca52e367a997e860f9a418"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-probe/world.sdf",
+      "bytes": 1591,
+      "sha256": "7c5719561e38c40b63552e998ed2f45eddf6e000c3ed3cc451227538b46d980e"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/summary.json",
+      "bytes": 3632,
+      "sha256": "ae5185196d0d7cf655e685f97b4d3c9dfffcb8457f81a91b000db2a305dc5106"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/stages.json",
+      "bytes": 9542,
+      "sha256": "9bd149360a85f68b0eb70a95eb51588722ef4f7dc47f2262cb061c75720c0472"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/summary.json",
+      "bytes": 8539,
+      "sha256": "e4b8665bb59e1f03a309568c30143e9eb0e0480bfd265c36f5964390d55094af"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/unit.json",
+      "bytes": 84,
+      "sha256": "916f949196c4cfd70fb5c4210130f28e07c56e555fc016a9ad906a5f82482412"
+    },
+    {
+      "path": "artifacts/phase1-control/acceptance-final/unit.log",
+      "bytes": 451,
+      "sha256": "8cbf3db151806a149afb263cddc5660be766f3ede78a0585682a0989d5a32662"
+    }
+  ],
+  "final_resource_audit": {
+    "path": "artifacts/phase1-control/final-resource-audit.json",
+    "sha256": "48ea41e44ac01e87c29a5fedaeeab400184f9f78059c2274cc37e425086e7ac2",
+    "manifests": [
+      {
+        "manifest": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-faults/manifest.json",
+        "processes": 5,
+        "ports_released": true,
+        "rc_udp_released": true
+      },
+      {
+        "manifest": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-physical/manifest.json",
+        "processes": 2,
+        "ports_released": true,
+        "rc_udp_released": true
+      },
+      {
+        "manifest": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/copter-probe/manifest.json",
+        "processes": 2,
+        "ports_released": true,
+        "rc_udp_released": true
+      },
+      {
+        "manifest": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-faults/manifest.json",
+        "processes": 5,
+        "ports_released": true,
+        "rc_udp_released": true
+      },
+      {
+        "manifest": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-physical/manifest.json",
+        "processes": 2,
+        "ports_released": true,
+        "rc_udp_released": true
+      },
+      {
+        "manifest": "artifacts/phase1-control/acceptance-final/run-1-29db89c3/rover-probe/manifest.json",
+        "processes": 2,
+        "ports_released": true,
+        "rc_udp_released": true
+      },
+      {
+        "manifest": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-faults/manifest.json",
+        "processes": 5,
+        "ports_released": true,
+        "rc_udp_released": true
+      },
+      {
+        "manifest": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-physical/manifest.json",
+        "processes": 2,
+        "ports_released": true,
+        "rc_udp_released": true
+      },
+      {
+        "manifest": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/copter-probe/manifest.json",
+        "processes": 2,
+        "ports_released": true,
+        "rc_udp_released": true
+      },
+      {
+        "manifest": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-faults/manifest.json",
+        "processes": 5,
+        "ports_released": true,
+        "rc_udp_released": true
+      },
+      {
+        "manifest": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-physical/manifest.json",
+        "processes": 2,
+        "ports_released": true,
+        "rc_udp_released": true
+      },
+      {
+        "manifest": "artifacts/phase1-control/acceptance-final/run-2-0ad45180/rover-probe/manifest.json",
+        "processes": 2,
+        "ports_released": true,
+        "rc_udp_released": true
+      },
+      {
+        "manifest": "artifacts/phase1-control/dev-copter-probe/manifest.json",
+        "processes": 2,
+        "ports_released": true,
+        "rc_udp_released": true
+      },
+      {
+        "manifest": "artifacts/phase1-control/dev-copter-probe-ekf/manifest.json",
+        "processes": 2,
+        "ports_released": true,
+        "rc_udp_released": true
+      },
+      {
+        "manifest": "artifacts/phase1-control/dev-rover-probe/manifest.json",
+        "processes": 2,
+        "ports_released": true,
+        "rc_udp_released": true
+      },
+      {
+        "manifest": "artifacts/phase1-control/dev-rover-probe-fixed/manifest.json",
+        "processes": 2,
+        "ports_released": true,
+        "rc_udp_released": true
+      }
+    ]
+  }
+}

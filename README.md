@@ -40,6 +40,10 @@ python -m unittest discover -s tests -v
 该入口不连接串口或实车；缺少显式参数不会启动控制测试。默认应用 SEND 仍关闭。
 不包含阶段二或外部感知/导航/智能功能。
 
+阶段一已通过：350 项单元测试，Rover/Copter 两轮真实仿真的 A–F 全部 PASS
+（12/12 场景）。量化结果、保留的失败与安全范围见
+[阶段一报告](docs/PHASE1_MAVLINK_CONTROL_REPORT.md)。
+
 ## 当前实现
 
 根目录目前提供 P1 基础合同、P2 离线 World Model 状态链、P3 Typed Action/Mission 决策链、P4 控制边界、P5 ArduCopter/MAVLink/TCP 插件，以及 P6 本机 SITL 单进程模式任务运行组合。通用 TransformTree 求解静态/动态 Frame 关系。P5 已在内存传输、本机 Copter SITL 和已连接 Copter 飞控的受限 USB 模式诊断中验证；此前还完成 Rover 飞控的受限 USB HOLD 诊断。P6 将 Effect 经双 SEND、Lease、Safety 和唯一 writer 分派，并等待 ACK 与后续模式状态。新增显式机载只读部署、认证 Web 控制台和 LLM 提案适配；**尚无经过整车安全验收的生产运动连接**。
