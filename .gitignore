@@ -38,3 +38,6 @@ artifacts/phase1-credential-cleanup/
 
 # Isolated three-vehicle builds and raw Phase 2 evidence
 artifacts/phase2-control/
+
+# Phase 3 raw acceptance runs contain large, host-specific simulation evidence.
+artifacts/phase3-actions/

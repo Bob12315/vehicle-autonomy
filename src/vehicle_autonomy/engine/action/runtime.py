@@ -6,6 +6,7 @@ from dataclasses import dataclass
 
 from vehicle_autonomy.contracts.decision import ActionDecision, ActionOutcome, ActionSpec, ExitDecision, ExitReason
 from vehicle_autonomy.contracts.world.models import WorldSnapshot
+from vehicle_autonomy.engine.action.manager import ActionRuntime
 
 
 @dataclass(frozen=True, slots=True)

@@ -4,13 +4,15 @@ from __future__ import annotations
 
 from dataclasses import dataclass, fields, is_dataclass
 from enum import Enum
+import re
 from types import UnionType
 from typing import Any, Literal, Protocol, Union, get_args, get_origin, get_type_hints
 
 from vehicle_autonomy.contracts.core.primitives import FrozenJson, freeze_json, is_deeply_immutable
+from vehicle_autonomy.contracts.action import ActionKind, ActionResource
 from vehicle_autonomy.contracts.effects.vehicle import (
     ArmEffect, DisarmEffect, LandEffect, ModeEffect, PoseTargetEffect,
-    StopMotionEffect, TakeoffEffect, TwistTargetEffect, VehicleEffect,
+    StopMotionEffect, TakeoffEffect, TwistTargetEffect, VehicleEffect, FixedWingTargetEffect,
 )
 from vehicle_autonomy.contracts.world.models import WorldSnapshot
 from vehicle_autonomy.contracts.effects.payload import ReleasePayloadEffect
@@ -20,7 +22,7 @@ DecisionEffect = VehicleEffect | ReleasePayloadEffect
 
 VEHICLE_EFFECT_TYPES = (
     ArmEffect, DisarmEffect, TakeoffEffect, LandEffect,
-    ModeEffect, PoseTargetEffect, TwistTargetEffect, StopMotionEffect,
+    ModeEffect, PoseTargetEffect, TwistTargetEffect, StopMotionEffect, FixedWingTargetEffect,
 )
 
 DECISION_EFFECT_TYPES = VEHICLE_EFFECT_TYPES + (ReleasePayloadEffect,)
@@ -61,6 +63,21 @@ class ActionSpec:
     required_capabilities: frozenset[str] = frozenset()
     effect_types: tuple[type, ...] = ()
     effect_ttl_ns: int = 1_000_000_000
+    version: str = '1.0.0'
+    description: str = ''
+    kind: ActionKind = ActionKind.ONE_SHOT
+    vehicle_types: frozenset[str] = frozenset()
+    resources: tuple[ActionResource, ...] = ()
+    required_state: tuple[str, ...] = ()
+    max_snapshot_age_ns: int = 3_000_000_000
+    default_timeout_ns: int = 15_000_000_000
+    max_timeout_ns: int = 600_000_000_000
+    exit_timeout_ns: int = 8_000_000_000
+    output_schema: FrozenJson = None
+    vehicle_parameter_overrides: FrozenJson = None
+    implementation_ref: str = ''
+    success_semantics: str = ''
+    cancel_semantics: str = 'Exit barrier; uncertain physical effects retain resources.'
 
     def __post_init__(self) -> None:
         if not isinstance(self.name, str) or not self.name.strip():
@@ -77,6 +94,25 @@ class ActionSpec:
             raise TypeError("effect_types must be registered typed decision effects")
         if isinstance(self.effect_ttl_ns, bool) or not isinstance(self.effect_ttl_ns, int) or self.effect_ttl_ns <= 0:
             raise ValueError("effect_ttl_ns must be positive")
+        if re.fullmatch(r'(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)', self.version) is None:
+            raise ValueError('Action version must be MAJOR.MINOR.PATCH')
+        if not isinstance(self.kind, ActionKind) or not isinstance(self.vehicle_types, frozenset):
+            raise TypeError('typed Action kind and immutable vehicle types required')
+        if any(not isinstance(v, str) or not v for v in self.vehicle_types):
+            raise ValueError('invalid vehicle kind')
+        if not isinstance(self.resources, tuple) or any(not isinstance(r, ActionResource) for r in self.resources):
+            raise TypeError('immutable Action resource declarations required')
+        if self.kind is ActionKind.QUERY and self.effect_types:
+            raise ValueError('Query Actions cannot declare vehicle or payload effects')
+        if not isinstance(self.required_state, tuple) or any(not isinstance(v,str) or not v for v in self.required_state):
+            raise ValueError('required state names must be immutable nonempty strings')
+        times = (self.max_snapshot_age_ns, self.default_timeout_ns, self.max_timeout_ns, self.exit_timeout_ns)
+        if any(type(v) is not int or v <= 0 for v in times) or self.default_timeout_ns > self.max_timeout_ns:
+            raise ValueError('bounded positive Action times required')
+        for name in ('description','implementation_ref','success_semantics','cancel_semantics'):
+            if not isinstance(getattr(self,name), str):raise TypeError('Action metadata must be text')
+        object.__setattr__(self,'output_schema',freeze_json(self.output_schema))
+        object.__setattr__(self,'vehicle_parameter_overrides',freeze_json(self.vehicle_parameter_overrides))
 
     def validate_parameters(self, parameters: object) -> None:
         if type(parameters) is not self.parameters_type or not is_deeply_immutable(parameters):
@@ -130,6 +166,7 @@ class ActionDecision:
     effects: tuple[DecisionEffect, ...] = ()
     result: FrozenJson = None
     error: str | None = None
+    feedback: FrozenJson = None
 
     def __post_init__(self) -> None:
         if not isinstance(self.outcome, ActionOutcome):
@@ -137,6 +174,7 @@ class ActionDecision:
         if not isinstance(self.effects, tuple) or any(not isinstance(effect, DECISION_EFFECT_TYPES) for effect in self.effects):
             raise TypeError("effects must be typed effect values")
         object.__setattr__(self, "result", freeze_json(self.result))
+        object.__setattr__(self, "feedback", freeze_json(self.feedback))
         if self.outcome is ActionOutcome.RUNNING and (self.result is not None or self.error is not None):
             raise ValueError("running Action cannot have a result or error")
         if self.outcome is ActionOutcome.FAILED and (not isinstance(self.error, str) or not self.error.strip()):
