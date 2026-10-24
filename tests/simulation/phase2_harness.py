@@ -38,7 +38,7 @@ def main():
             record=dict(passed=False,run_id=run.name,vehicles={});result['rounds'].append(record)
             for kind in ('rover','copter','plane'):
                 vehicle=dict(passed=False,stages={});record['vehicles'][kind]=vehicle
-                cases=([('control','tests.simulation.plane_scenario',[])] if kind=='plane' else [
+                cases=([('cancel_window','tests.simulation.plane_cancel_window',[]),('control','tests.simulation.plane_scenario',[])] if kind=='plane' else [
                     ('probe','tests.simulation.phase1_probe',['--kind',kind,'--review-remediation']),
                     ('physical','tests.simulation.rover_protocol' if kind=='rover' else 'tests.simulation.copter_scenario',['--full',*(['--native-rtl'] if kind=='rover' else [])]),
                     ('faults','tests.simulation.fault_scenario',['--kind',kind])])
@@ -46,14 +46,14 @@ def main():
                 for case,module,extra in cases:
                     name=f'{index}_{kind}_{case}';path=run/f'{kind}-{case}'
                     print(name+' starting',flush=True)
-                    status=runner.run_stage(name,[sys.executable,'-m',module,'--allow-send',*extra,'--run-dir',str(path)],timeout=780 if kind=='plane' else 420,stage_dir=path)
+                    status=runner.run_stage(name,[sys.executable,'-m',module,'--allow-send',*extra,'--run-dir',str(path)],timeout=120 if case=='cancel_window' else 780 if kind=='plane' else 420,stage_dir=path)
                     summary=json.loads((path/'summary.json').read_text()) if (path/'summary.json').exists() else {}
                     manifest=json.loads((path/'manifest.json').read_text()) if (path/'manifest.json').exists() else {}
                     cleanup=bool(manifest.get('credentials_removed') and manifest.get('ports_released')
                         and manifest.get('remaining_process_groups')==[] and not list(path.glob('sitl_state*'))
                         and not list(path.glob('*.private')))
                     passed=bool(status['passed'] and summary.get('passed') is True and cleanup and not any(k.endswith('_error') for k in summary))
-                    if kind=='plane':
+                    if kind=='plane' and case=='control':
                         passed=passed and all(summary.get(key,{}).get('passed') for key in ('takeoff','native_target','landing','cancel','link_loss'))
                         passed=passed and all(summary.get('regressions',{}).get(key,{}).get('passed') for key in ('lock_expiry','guard_expiry','lease_expiry','valid_after_rejections','wrap_replay','normal_arm_disarm'))
                     vehicle['stages'][case]=dict(passed=passed,summary=str(path/'summary.json'),manifest=str(path/'manifest.json'),cleanup=cleanup)
@@ -85,10 +85,10 @@ def main():
                     vehicle['groups']=dict(A=bool(len(m.get('plane_parameter_readback',{}))==12 and m.get('signing_epochs')),
                         B=bool(control.get('native_target',{}).get('passed')),
                         C=bool(control.get('takeoff',{}).get('passed') and control.get('landing',{}).get('passed')),
-                        D=all(control.get('regressions',{}).get(k,{}).get('passed') for k in ('lock_expiry','guard_expiry','lease_expiry','valid_after_rejections')),
+                        D=vehicle['stages']['cancel_window']['passed'] and all(control.get('regressions',{}).get(k,{}).get('passed') for k in ('lock_expiry','guard_expiry','lease_expiry','valid_after_rejections')),
                         E=bool(control.get('cancel',{}).get('passed') and control.get('link_loss',{}).get('passed')
                             and control.get('regressions',{}).get('wrap_replay',{}).get('passed')),
-                        F=vehicle['stages']['control']['cleanup'])
+                        F=all(stage['cleanup'] for stage in vehicle['stages'].values()))
                 vehicle['passed']=all(s['passed'] for s in vehicle['stages'].values()) and all(vehicle['groups'].values())
             record['passed']=all(v['passed'] for v in record['vehicles'].values())
         result['final_source_sha256']=source_hash()

@@ -11,7 +11,7 @@ Mission Graph 开发。仅隔离 localhost SITL + Gazebo，不开放硬件控制
 | --- | --- | --- | --- |
 | 身份 | MAV_TYPE_GROUND_ROVER=10 | MAV_TYPE_QUADROTOR=2 | MAV_TYPE_FIXED_WING=1 |
 | 模式 | HOLD=4，GUIDED=15；独立 Phase 2 配置另启用 RTL=11 | GUIDED=4，LOITER=5，RTL=6，LAND=9 | MANUAL=0（仅地面）、GUIDED=15，LOITER=12，RTL=11，TAKEOFF=13，AUTOLAND=26 |
-| Arm/Disarm | 正常 CMD400，不强制解锁 | 同左；空中禁用危险 Disarm | 正常 CMD400；新鲜地面低速状态才允许 Disarm |
+| Arm/Disarm | 正常 CMD400，不强制解锁 | 普通非强制 CMD400；AP 的飞行判定拒绝空中 Disarm | 正常 CMD400；新鲜地面低速状态才允许 Disarm |
 | 本地位置 | odom ENU → LOCAL_NED，平面目标 | odom ENU → LOCAL_NED 三维位置和 yaw | FixedWingTargetEffect：COMMAND_INT DO_REPOSITION，AMSL 航点；飞往后持续盘旋，非悬停流 |
 | 速度/转向 | base_link FLU 前进/后退/偏航率 | ENU/FLU 三维速度和偏航率 | 不接受零速悬停或 Copter 的速度向量接口 |
 | 起飞 | 明确不支持 | GUIDED + NAV_TAKEOFF，另核查物理高度 | 原生 TAKEOFF 模式，地面滑跑、旋转、爬升；目标由已核查的 TKOFF_* 仿真参数设置 |
@@ -84,3 +84,9 @@ Rover 原生 RTL 仅由 `rover_phase2.toml` 和 `--native-rtl` 显式启用；�
 原生目标确认要求有序的独立证据：新签名 ACK → 当前匹配的新签名目标回报 →
 其后的新签名 GUIDED 心跳。任何更新的已认证目标矛盾/不可解释回报都使旧目标证据失效；
 不能把先前目标 A 与飞控已更新为 B 之后的心跳组合成 A 的完成结果。
+
+TAKEOFF 写出后仍可能暂时只有静止地面遥测，不能据此清除活动飞行跟踪。活动原生飞行
+只有新鲜 VALID、未解锁且低速的地面证据才能结束；陈旧地面样本或仍已解锁的 TAKEOFF
+窗口均保持 `fixed-wing-flight: UNCONFIRMED`。低空 LOITER 被原 Safety 拒绝时不发送替代
+零速或 Disarm。断链后的 WorldSnapshot 保留原会话、原采样时间的最后已知值，不将其
+重新标记成当前状态；命令结果和当前连接会话另行表示不确定性。

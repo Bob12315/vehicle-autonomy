@@ -207,6 +207,45 @@ class PlaneControlTests(unittest.TestCase):
         self.assertEqual(self.runtime.shutdown(),{'fixed-wing-flight':'UNCONFIRMED'})
         self.assertEqual(len(self.transport.writes),before)
 
+    def _transmit_takeoff_on_stationary_ground(self):
+        self.begin(mode=0,armed=True,height=0,speed=0)
+        self.runtime.submit_effect(ModeEffect('TAKEOFF'),effect_id='takeoff-exit')
+        self.feed(mode=0,armed=True,height=0,speed=0)
+        self.assertEqual(self.runtime.effect_status('takeoff-exit')['phase'],'TRANSMITTED')
+        self.assertEqual(len(self.transport.writes),1)
+        frame=mav.MAVLink(None).parse_buffer(self.transport.writes[0])[0]
+        self.assertEqual((frame.command,frame.param2),(176,13))
+
+    def test_cancel_after_takeoff_write_before_motion_remains_unconfirmed(self):
+        self._transmit_takeoff_on_stationary_ground()
+        self.assertTrue(self.runtime.world_snapshot().vehicle.operation.armed)
+        self.assertEqual(self.runtime.end_run(),{'fixed-wing-flight':'UNCONFIRMED'})
+        self.assertTrue(self.runtime._plane_flight_requested)
+        self.assertFalse(self.runtime.authority.system_send)
+        self.assertIsNone(self.runtime.session_id)
+        self.assertEqual(self.runtime.effect_status('takeoff-exit')['phase'],'UNKNOWN')
+        # LOITER is unsafe at this height; do not substitute zero or Disarm.
+        self.assertEqual(len(self.transport.writes),1)
+        self.assertEqual(self.runtime.shutdown(),{'fixed-wing-flight':'UNCONFIRMED'})
+        self.assertEqual(len(self.transport.writes),1)
+
+    def test_stale_disarmed_ground_does_not_clear_native_flight_tracking(self):
+        self._transmit_takeoff_on_stationary_ground()
+        self.feed(mode=26,armed=False,height=0,speed=0)
+        self.assertFalse(self.runtime.world_snapshot().vehicle.operation.armed)
+        self.clock.ns+=self.profile.safety.max_snapshot_age_ns+1
+        self.assertEqual(self.runtime.end_run(),{'fixed-wing-flight':'UNCONFIRMED'})
+        self.assertTrue(self.runtime._plane_flight_requested)
+        self.assertEqual(len(self.transport.writes),1)
+
+    def test_fresh_disarmed_stationary_ground_can_clear_native_flight_tracking(self):
+        self._transmit_takeoff_on_stationary_ground()
+        self.feed(mode=26,armed=False,height=0,speed=0)
+        self.assertEqual(self.runtime.end_run(),{})
+        self.assertFalse(self.runtime._plane_flight_requested)
+        self.assertFalse(self.runtime.world_snapshot().vehicle.operation.armed)
+        self.assertEqual(len(self.transport.writes),1)
+
     def test_new_contradictory_signed_target_invalidates_pending_goal_evidence(self):
         self.begin(mode=12,armed=True,height=50,speed=17)
         target=GeoPoint(-35.363262,149.165237,634)

@@ -511,13 +511,18 @@ class SimulationRuntime:
         stops: dict[str, str] = {}
         if self.profile.kind == "plane" and (self._run_id is not None or self._plane_flight_requested):
             state = None if self._session is None else self._session.snapshot()
-            if (state is None or state.reported_pose is None or state.reported_twist is None
-                    or state.reported_pose.value.position.z > 1.5
-                    or sum(v*v for v in (state.reported_twist.value.linear.x, state.reported_twist.value.linear.y,
-                                        state.reported_twist.value.linear.z)) > 1.0):
+            ground_proven = (state is not None and state.health.quality is QualityState.VALID
+                and PlaneSimulationSafetyPolicy(self.profile.safety).state_reason(state, self.clock()) is None
+                and abs(state.reported_pose.value.position.z) <= 1.5
+                and sum(v*v for v in (state.reported_twist.value.linear.x, state.reported_twist.value.linear.y,
+                                     state.reported_twist.value.linear.z)) <= 1.0
+                # A latched TAKEOFF may start moving after the last ground
+                # sample. Only disarmed ground can end a native flight claim.
+                and not (self._plane_flight_requested and state.operation.armed))
+            if not ground_proven:
                 # A fixed wing must keep flying. Recovery is a native mode request
                 # through Execution, never a zero-velocity or forced Disarm.
-                if self._session is not None and self._execution is not None:
+                if self._session is not None and self._execution is not None and self._run_id is not None:
                     from vehicle_autonomy.contracts.effects.vehicle import ModeEffect
                     name = "plane-recovery:" + uuid4().hex
                     request = self.submit_effect(ModeEffect("LOITER"), effect_id=name)
