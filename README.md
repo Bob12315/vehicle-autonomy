@@ -50,7 +50,28 @@ python -m unittest discover -s tests -v
 修复回归入口为 `./scripts/test_phase1_control.sh --remediation --allow-send`，
 第三轮原始证据另存于 `artifacts/phase1-round3/`。原始审查结论和非敏感证据保留；
 条件验收后的 P2 清理销毁了 30 个历史测试 EEPROM，原二进制不再可用，详情见
-[凭据清理修复报告](docs/PHASE1_CREDENTIAL_CLEANUP_REPORT.md)。未开始阶段二。
+[凭据清理修复报告](docs/PHASE1_CREDENTIAL_CLEANUP_REPORT.md)。该修复未包含阶段二扩展。
+
+## Phase 2 三车型基础仿真控制
+
+已实现常规 Plane 的原生 TAKEOFF、GUIDED 航点配置、LOITER、RTL、AUTOLAND 接口，
+以及独立 Rover profile 的原生 RTL 和 HOLD 回收。默认双 SEND 仍关闭；控制经过
+Execution、Safety、Authority 和唯一 MAVLink Writer。Plane 取消保留续飞不确定性，不能用零速停车。
+模式确认、目标配置确认与物理运动验收分别记录，详见
+[能力矩阵](docs/phase2/CONTROL_CAPABILITY_MATRIX.md)。
+
+开发侧 409 项单元测试、两轮三车型共 18 个真实 SITL/Gazebo 场景通过，包含 Plane
+轮式滑跑起飞、实际 AUTOLAND 和已写出 TAKEOFF 的取消窗口。当前为 **READY FOR RE-AUDIT**；
+最终独立验收结论以[三车型报告](docs/PHASE2_THREE_VEHICLE_CONTROL_REPORT.md)及其审查记录为准。
+
+```bash
+./scripts/test_phase2_control.sh --allow-send \
+  --sitl-bin-dir artifacts/phase2-control/ardupilot-source/build/sitl/bin
+```
+
+该入口必须显式提供自有三车型 SITL 二进制；依赖与隔离构建见
+[基线记录](docs/phase2/BASELINE.md)。Plane 是专用 SimulationRuntime/仿真验收接口，
+尚未开放到 Web/业务任务目录；不包含实机或下一阶段感知/智能开发。
 
 ## 当前实现
 

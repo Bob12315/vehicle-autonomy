@@ -3,6 +3,21 @@
 This page describes the **implemented root**. The reusable framework's full
 target responsibilities and dependency rules are in [V1.0 系统架构规范](../Vehicle_Autonomy_V1.0.md).
 
+## Three-vehicle simulation control (2026-10-24)
+
+The explicit simulation runtime composes conventional Plane telemetry, native
+mode/COMMAND_INT translation and an engine-owned fixed-wing SafetyPolicy.
+Typed effects still cross Execution, dual SEND, Lease/TTL/session/generation
+fences and the existing sole writer. Plane recovery requests LOITER and reports
+physical flight UNCONFIRMED; an armed latched TAKEOFF cannot be cleared by an
+old stationary-ground sample. Native target completion confirms configuration,
+with ordered signed ACK/target echo/GUIDED evidence, rather than physical arrival.
+The opt-in Rover RTL profile retains the original motion limits and observes
+fresh post-HOLD zero motion before confirming recovery. Copter and original Rover
+profiles retain their existing behavior. [Report](PHASE2_THREE_VEHICLE_CONTROL_REPORT.md)
+records both real simulation rounds and remaining limits; hardware control,
+Plane Web/mission catalog and new perception/intelligence capabilities remain unavailable.
+
 ## Explicit onboard diagnostics and operator console (2026-10-21)
 
 `vehicle_autonomy.app.bootstrap.hardware` composes a separate `HardwareReadOnlyRuntime`, bounded sensor
