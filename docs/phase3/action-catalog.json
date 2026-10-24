@@ -1,0 +1,1547 @@
+{
+  "rover": [
+    {
+      "name": "Arm",
+      "version": "1.0.0",
+      "description": "Arm using the audited ArduPilot simulation control contract",
+      "kind": "OneShot",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {},
+        "required": []
+      },
+      "output": {
+        "type": "object"
+      },
+      "vehicle_types": [
+        "copter",
+        "plane",
+        "rover"
+      ],
+      "required_capabilities": [
+        "arm"
+      ],
+      "required_state": [
+        "vehicle",
+        "reported_pose",
+        "reported_twist"
+      ],
+      "resources": [
+        {
+          "name": "vehicle.arm",
+          "mode": "exclusive",
+          "conflict_group": "vehicle.control"
+        }
+      ],
+      "default_timeout_s": 30.0,
+      "max_timeout_s": 60.0,
+      "max_snapshot_age_s": 3.0,
+      "exit_timeout_s": 12.0,
+      "effect_ttl_s": 5.0,
+      "effect_ttl_overrides_s": {
+        "ArmEffect": 5.0
+      },
+      "implementation": "vehicle_autonomy.actions.common.standard.CommonFactory",
+      "success_semantics": "Command COMPLETED plus authenticated post-request target state; mode adoption is not arrival.",
+      "cancel_semantics": "Exit barrier; uncertain physical effects retain resources."
+    },
+    {
+      "name": "Disarm",
+      "version": "1.0.0",
+      "description": "Disarm using the audited ArduPilot simulation control contract",
+      "kind": "OneShot",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {},
+        "required": []
+      },
+      "output": {
+        "type": "object"
+      },
+      "vehicle_types": [
+        "copter",
+        "plane",
+        "rover"
+      ],
+      "required_capabilities": [
+        "disarm"
+      ],
+      "required_state": [
+        "vehicle",
+        "reported_pose",
+        "reported_twist"
+      ],
+      "resources": [
+        {
+          "name": "vehicle.arm",
+          "mode": "exclusive",
+          "conflict_group": "vehicle.control"
+        }
+      ],
+      "default_timeout_s": 30.0,
+      "max_timeout_s": 60.0,
+      "max_snapshot_age_s": 3.0,
+      "exit_timeout_s": 12.0,
+      "effect_ttl_s": 5.0,
+      "effect_ttl_overrides_s": {
+        "DisarmEffect": 5.0
+      },
+      "implementation": "vehicle_autonomy.actions.common.standard.CommonFactory",
+      "success_semantics": "Command COMPLETED plus authenticated post-request target state; mode adoption is not arrival.",
+      "cancel_semantics": "Exit barrier; uncertain physical effects retain resources."
+    },
+    {
+      "name": "Drive",
+      "version": "1.0.0",
+      "description": "Drive using the audited ArduPilot simulation control contract",
+      "kind": "Continuous",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "speed_mps": {
+            "type": "number",
+            "minimum": -0.5,
+            "maximum": 0.5,
+            "default": 0.3
+          },
+          "yaw_rate_rad_s": {
+            "type": "number",
+            "minimum": -0.35,
+            "maximum": 0.35,
+            "default": 0.0
+          }
+        },
+        "required": []
+      },
+      "output": {
+        "type": "object"
+      },
+      "vehicle_types": [
+        "rover"
+      ],
+      "required_capabilities": [
+        "drive"
+      ],
+      "required_state": [
+        "vehicle",
+        "reported_pose",
+        "reported_twist"
+      ],
+      "resources": [
+        {
+          "name": "vehicle.motion",
+          "mode": "exclusive",
+          "conflict_group": "vehicle.control"
+        }
+      ],
+      "default_timeout_s": 30.0,
+      "max_timeout_s": 60.0,
+      "max_snapshot_age_s": 3.0,
+      "exit_timeout_s": 12.0,
+      "effect_ttl_s": 1.0,
+      "effect_ttl_overrides_s": {
+        "ModeEffect": 5.0
+      },
+      "implementation": "vehicle_autonomy.actions.rover.standard.RoverStreamFactory",
+      "success_semantics": "Continuous body setpoints until explicit cancel. Exit zeros the old stream, requests native HOLD and requires the existing observed stop barrier. New movement requires GUIDED again.",
+      "cancel_semantics": "Exit barrier; uncertain physical effects retain resources."
+    },
+    {
+      "name": "GetVehicleState",
+      "version": "1.0.0",
+      "description": "GetVehicleState using the audited ArduPilot simulation control contract",
+      "kind": "Query",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {},
+        "required": []
+      },
+      "output": {
+        "type": "object"
+      },
+      "vehicle_types": [
+        "copter",
+        "plane",
+        "rover"
+      ],
+      "required_capabilities": [
+        "state"
+      ],
+      "required_state": [],
+      "resources": [
+        {
+          "name": "vehicle.state",
+          "mode": "shared",
+          "conflict_group": ""
+        }
+      ],
+      "default_timeout_s": 30.0,
+      "max_timeout_s": 60.0,
+      "max_snapshot_age_s": 3.0,
+      "exit_timeout_s": 12.0,
+      "effect_ttl_s": 5.0,
+      "effect_ttl_overrides_s": {},
+      "implementation": "vehicle_autonomy.actions.common.standard.QueryFactory",
+      "success_semantics": "Read immutable world, including freshness; grants no authority.",
+      "cancel_semantics": "Exit barrier; uncertain physical effects retain resources."
+    },
+    {
+      "name": "Goto",
+      "version": "1.0.0",
+      "description": "Goto using the audited ArduPilot simulation control contract",
+      "kind": "Goal",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "x_m": {
+            "type": "number",
+            "minimum": -15,
+            "maximum": 15
+          },
+          "y_m": {
+            "type": "number",
+            "minimum": -15,
+            "maximum": 15
+          },
+          "z_m": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 2,
+            "default": 0.0,
+            "const": 0.0
+          }
+        },
+        "required": [
+          "x_m",
+          "y_m"
+        ]
+      },
+      "output": {
+        "type": "object"
+      },
+      "vehicle_types": [
+        "copter",
+        "rover"
+      ],
+      "required_capabilities": [
+        "goto"
+      ],
+      "required_state": [
+        "vehicle",
+        "reported_pose",
+        "reported_twist"
+      ],
+      "resources": [
+        {
+          "name": "vehicle.motion",
+          "mode": "exclusive",
+          "conflict_group": "vehicle.control"
+        }
+      ],
+      "default_timeout_s": 45.0,
+      "max_timeout_s": 45.0,
+      "max_snapshot_age_s": 3.0,
+      "exit_timeout_s": 12.0,
+      "effect_ttl_s": 1.0,
+      "effect_ttl_overrides_s": {},
+      "implementation": "vehicle_autonomy.actions.copter.standard.BasicFactory",
+      "success_semantics": "Existing spatial arrival, stability and stop barriers; ACK is not arrival.",
+      "cancel_semantics": "Exit barrier; uncertain physical effects retain resources."
+    },
+    {
+      "name": "RTL",
+      "version": "1.0.0",
+      "description": "RTL using the audited ArduPilot simulation control contract",
+      "kind": "Goal",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {},
+        "required": []
+      },
+      "output": {
+        "type": "object"
+      },
+      "vehicle_types": [
+        "copter",
+        "plane",
+        "rover"
+      ],
+      "required_capabilities": [
+        "rtl"
+      ],
+      "required_state": [
+        "vehicle",
+        "reported_pose",
+        "reported_twist"
+      ],
+      "resources": [
+        {
+          "name": "vehicle.motion",
+          "mode": "exclusive",
+          "conflict_group": "vehicle.control"
+        }
+      ],
+      "default_timeout_s": 45.0,
+      "max_timeout_s": 45.0,
+      "max_snapshot_age_s": 3.0,
+      "exit_timeout_s": 12.0,
+      "effect_ttl_s": 5.0,
+      "effect_ttl_overrides_s": {
+        "ModeEffect": 5.0
+      },
+      "implementation": "vehicle_autonomy.actions.catalog.register_standard.<locals>.RtlFactory",
+      "success_semantics": "Plane: native RTL mode adoption, not arrival or landing. Rover/Copter: physical ReturnHome goal.",
+      "cancel_semantics": "Exit barrier; uncertain physical effects retain resources."
+    },
+    {
+      "name": "ReturnHome",
+      "version": "1.0.0",
+      "description": "ReturnHome using the audited ArduPilot simulation control contract",
+      "kind": "Goal",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {},
+        "required": []
+      },
+      "output": {
+        "type": "object"
+      },
+      "vehicle_types": [
+        "copter",
+        "rover"
+      ],
+      "required_capabilities": [
+        "return_home"
+      ],
+      "required_state": [
+        "vehicle",
+        "reported_pose",
+        "reported_twist"
+      ],
+      "resources": [
+        {
+          "name": "vehicle.motion",
+          "mode": "exclusive",
+          "conflict_group": "vehicle.control"
+        }
+      ],
+      "default_timeout_s": 45.0,
+      "max_timeout_s": 45.0,
+      "max_snapshot_age_s": 3.0,
+      "exit_timeout_s": 12.0,
+      "effect_ttl_s": 5.0,
+      "effect_ttl_overrides_s": {
+        "ModeEffect": 5.0
+      },
+      "implementation": "vehicle_autonomy.actions.catalog.ReturnFactory",
+      "success_semantics": "Rover: actual home <=0.75 m, <=0.1 m/s settled 2 s, native HOLD exit. Copter: observed touchdown and disarmed.",
+      "cancel_semantics": "Exit barrier; uncertain physical effects retain resources."
+    },
+    {
+      "name": "SetMode",
+      "version": "1.0.0",
+      "description": "SetMode using the audited ArduPilot simulation control contract",
+      "kind": "OneShot",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "mode": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20,
+            "enum": [
+              "HOLD",
+              "GUIDED"
+            ]
+          }
+        },
+        "required": [
+          "mode"
+        ]
+      },
+      "output": {
+        "type": "object"
+      },
+      "vehicle_types": [
+        "copter",
+        "plane",
+        "rover"
+      ],
+      "required_capabilities": [
+        "mode"
+      ],
+      "required_state": [
+        "vehicle",
+        "reported_pose",
+        "reported_twist"
+      ],
+      "resources": [
+        {
+          "name": "vehicle.mode",
+          "mode": "exclusive",
+          "conflict_group": "vehicle.control"
+        }
+      ],
+      "default_timeout_s": 30.0,
+      "max_timeout_s": 60.0,
+      "max_snapshot_age_s": 3.0,
+      "exit_timeout_s": 12.0,
+      "effect_ttl_s": 5.0,
+      "effect_ttl_overrides_s": {
+        "ModeEffect": 5.0
+      },
+      "implementation": "vehicle_autonomy.actions.common.standard.CommonFactory",
+      "success_semantics": "Command COMPLETED plus authenticated post-request target state; mode adoption is not arrival.",
+      "cancel_semantics": "Exit barrier; uncertain physical effects retain resources."
+    },
+    {
+      "name": "Stop",
+      "version": "1.0.0",
+      "description": "Stop using the audited ArduPilot simulation control contract",
+      "kind": "Goal",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {},
+        "required": []
+      },
+      "output": {
+        "type": "object"
+      },
+      "vehicle_types": [
+        "rover"
+      ],
+      "required_capabilities": [
+        "stop"
+      ],
+      "required_state": [
+        "vehicle",
+        "reported_pose",
+        "reported_twist"
+      ],
+      "resources": [
+        {
+          "name": "vehicle.motion",
+          "mode": "exclusive",
+          "conflict_group": "vehicle.control"
+        }
+      ],
+      "default_timeout_s": 30.0,
+      "max_timeout_s": 60.0,
+      "max_snapshot_age_s": 3.0,
+      "exit_timeout_s": 12.0,
+      "effect_ttl_s": 1.0,
+      "effect_ttl_overrides_s": {},
+      "implementation": "vehicle_autonomy.actions.copter.standard.BasicFactory",
+      "success_semantics": "Observed stationary state plus completed stream stop barrier.",
+      "cancel_semantics": "Exit barrier; uncertain physical effects retain resources."
+    },
+    {
+      "name": "Turn",
+      "version": "1.0.0",
+      "description": "Turn using the audited ArduPilot simulation control contract",
+      "kind": "Continuous",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "yaw_rate_rad_s": {
+            "type": "number",
+            "minimum": -0.35,
+            "maximum": 0.35,
+            "default": 0.35
+          }
+        },
+        "required": []
+      },
+      "output": {
+        "type": "object"
+      },
+      "vehicle_types": [
+        "rover"
+      ],
+      "required_capabilities": [
+        "turn"
+      ],
+      "required_state": [
+        "vehicle",
+        "reported_pose",
+        "reported_twist"
+      ],
+      "resources": [
+        {
+          "name": "vehicle.motion",
+          "mode": "exclusive",
+          "conflict_group": "vehicle.control"
+        }
+      ],
+      "default_timeout_s": 30.0,
+      "max_timeout_s": 60.0,
+      "max_snapshot_age_s": 3.0,
+      "exit_timeout_s": 12.0,
+      "effect_ttl_s": 1.0,
+      "effect_ttl_overrides_s": {
+        "ModeEffect": 5.0
+      },
+      "implementation": "vehicle_autonomy.actions.rover.standard.RoverStreamFactory",
+      "success_semantics": "Continuous body setpoints until explicit cancel. Exit zeros the old stream, requests native HOLD and requires the existing observed stop barrier. New movement requires GUIDED again.",
+      "cancel_semantics": "Exit barrier; uncertain physical effects retain resources."
+    }
+  ],
+  "copter": [
+    {
+      "name": "Arm",
+      "version": "1.0.0",
+      "description": "Arm using the audited ArduPilot simulation control contract",
+      "kind": "OneShot",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {},
+        "required": []
+      },
+      "output": {
+        "type": "object"
+      },
+      "vehicle_types": [
+        "copter",
+        "plane",
+        "rover"
+      ],
+      "required_capabilities": [
+        "arm"
+      ],
+      "required_state": [
+        "vehicle",
+        "reported_pose",
+        "reported_twist"
+      ],
+      "resources": [
+        {
+          "name": "vehicle.arm",
+          "mode": "exclusive",
+          "conflict_group": "vehicle.control"
+        }
+      ],
+      "default_timeout_s": 30.0,
+      "max_timeout_s": 60.0,
+      "max_snapshot_age_s": 3.0,
+      "exit_timeout_s": 12.0,
+      "effect_ttl_s": 5.0,
+      "effect_ttl_overrides_s": {
+        "ArmEffect": 5.0
+      },
+      "implementation": "vehicle_autonomy.actions.common.standard.CommonFactory",
+      "success_semantics": "Command COMPLETED plus authenticated post-request target state; mode adoption is not arrival.",
+      "cancel_semantics": "Exit barrier; uncertain physical effects retain resources."
+    },
+    {
+      "name": "Disarm",
+      "version": "1.0.0",
+      "description": "Disarm using the audited ArduPilot simulation control contract",
+      "kind": "OneShot",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {},
+        "required": []
+      },
+      "output": {
+        "type": "object"
+      },
+      "vehicle_types": [
+        "copter",
+        "plane",
+        "rover"
+      ],
+      "required_capabilities": [
+        "disarm"
+      ],
+      "required_state": [
+        "vehicle",
+        "reported_pose",
+        "reported_twist"
+      ],
+      "resources": [
+        {
+          "name": "vehicle.arm",
+          "mode": "exclusive",
+          "conflict_group": "vehicle.control"
+        }
+      ],
+      "default_timeout_s": 30.0,
+      "max_timeout_s": 60.0,
+      "max_snapshot_age_s": 3.0,
+      "exit_timeout_s": 12.0,
+      "effect_ttl_s": 5.0,
+      "effect_ttl_overrides_s": {
+        "DisarmEffect": 5.0
+      },
+      "implementation": "vehicle_autonomy.actions.common.standard.CommonFactory",
+      "success_semantics": "Command COMPLETED plus authenticated post-request target state; mode adoption is not arrival.",
+      "cancel_semantics": "Exit barrier; uncertain physical effects retain resources."
+    },
+    {
+      "name": "GetVehicleState",
+      "version": "1.0.0",
+      "description": "GetVehicleState using the audited ArduPilot simulation control contract",
+      "kind": "Query",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {},
+        "required": []
+      },
+      "output": {
+        "type": "object"
+      },
+      "vehicle_types": [
+        "copter",
+        "plane",
+        "rover"
+      ],
+      "required_capabilities": [
+        "state"
+      ],
+      "required_state": [],
+      "resources": [
+        {
+          "name": "vehicle.state",
+          "mode": "shared",
+          "conflict_group": ""
+        }
+      ],
+      "default_timeout_s": 30.0,
+      "max_timeout_s": 60.0,
+      "max_snapshot_age_s": 3.0,
+      "exit_timeout_s": 12.0,
+      "effect_ttl_s": 5.0,
+      "effect_ttl_overrides_s": {},
+      "implementation": "vehicle_autonomy.actions.common.standard.QueryFactory",
+      "success_semantics": "Read immutable world, including freshness; grants no authority.",
+      "cancel_semantics": "Exit barrier; uncertain physical effects retain resources."
+    },
+    {
+      "name": "Goto",
+      "version": "1.0.0",
+      "description": "Goto using the audited ArduPilot simulation control contract",
+      "kind": "Goal",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "x_m": {
+            "type": "number",
+            "minimum": -15,
+            "maximum": 15
+          },
+          "y_m": {
+            "type": "number",
+            "minimum": -15,
+            "maximum": 15
+          },
+          "z_m": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 2,
+            "default": 1.5
+          }
+        },
+        "required": [
+          "x_m",
+          "y_m"
+        ]
+      },
+      "output": {
+        "type": "object"
+      },
+      "vehicle_types": [
+        "copter",
+        "rover"
+      ],
+      "required_capabilities": [
+        "goto"
+      ],
+      "required_state": [
+        "vehicle",
+        "reported_pose",
+        "reported_twist"
+      ],
+      "resources": [
+        {
+          "name": "vehicle.motion",
+          "mode": "exclusive",
+          "conflict_group": "vehicle.control"
+        }
+      ],
+      "default_timeout_s": 45.0,
+      "max_timeout_s": 45.0,
+      "max_snapshot_age_s": 3.0,
+      "exit_timeout_s": 12.0,
+      "effect_ttl_s": 1.0,
+      "effect_ttl_overrides_s": {},
+      "implementation": "vehicle_autonomy.actions.copter.standard.BasicFactory",
+      "success_semantics": "Existing spatial arrival, stability and stop barriers; ACK is not arrival.",
+      "cancel_semantics": "Exit barrier; uncertain physical effects retain resources."
+    },
+    {
+      "name": "Hold",
+      "version": "1.0.0",
+      "description": "Hold using the audited ArduPilot simulation control contract",
+      "kind": "Continuous",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {},
+        "required": []
+      },
+      "output": {
+        "type": "object"
+      },
+      "vehicle_types": [
+        "copter"
+      ],
+      "required_capabilities": [
+        "hold"
+      ],
+      "required_state": [
+        "vehicle",
+        "reported_pose",
+        "reported_twist"
+      ],
+      "resources": [
+        {
+          "name": "vehicle.motion",
+          "mode": "exclusive",
+          "conflict_group": "vehicle.control"
+        }
+      ],
+      "default_timeout_s": 30.0,
+      "max_timeout_s": 60.0,
+      "max_snapshot_age_s": 3.0,
+      "exit_timeout_s": 12.0,
+      "effect_ttl_s": 1.0,
+      "effect_ttl_overrides_s": {},
+      "implementation": "vehicle_autonomy.actions.copter.standard.StreamFactory",
+      "success_semantics": "SetYaw: observed yaw within 0.1 rad settled 1 s; continuous operations require explicit cancellation.",
+      "cancel_semantics": "Exit barrier; uncertain physical effects retain resources."
+    },
+    {
+      "name": "Land",
+      "version": "1.0.0",
+      "description": "Land using the audited ArduPilot simulation control contract",
+      "kind": "Goal",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {},
+        "required": []
+      },
+      "output": {
+        "type": "object"
+      },
+      "vehicle_types": [
+        "copter"
+      ],
+      "required_capabilities": [
+        "land"
+      ],
+      "required_state": [
+        "vehicle",
+        "reported_pose",
+        "reported_twist"
+      ],
+      "resources": [
+        {
+          "name": "vehicle.motion",
+          "mode": "exclusive",
+          "conflict_group": "vehicle.control"
+        }
+      ],
+      "default_timeout_s": 25.0,
+      "max_timeout_s": 25.0,
+      "max_snapshot_age_s": 3.0,
+      "exit_timeout_s": 12.0,
+      "effect_ttl_s": 5.0,
+      "effect_ttl_overrides_s": {
+        "LandEffect": 5.0
+      },
+      "implementation": "vehicle_autonomy.actions.copter.standard.BasicFactory",
+      "success_semantics": "Observed ground, disarm and stability; native ACK is insufficient.",
+      "cancel_semantics": "Exit barrier; uncertain physical effects retain resources."
+    },
+    {
+      "name": "RTL",
+      "version": "1.0.0",
+      "description": "RTL using the audited ArduPilot simulation control contract",
+      "kind": "Goal",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {},
+        "required": []
+      },
+      "output": {
+        "type": "object"
+      },
+      "vehicle_types": [
+        "copter",
+        "plane",
+        "rover"
+      ],
+      "required_capabilities": [
+        "rtl"
+      ],
+      "required_state": [
+        "vehicle",
+        "reported_pose",
+        "reported_twist"
+      ],
+      "resources": [
+        {
+          "name": "vehicle.motion",
+          "mode": "exclusive",
+          "conflict_group": "vehicle.control"
+        }
+      ],
+      "default_timeout_s": 45.0,
+      "max_timeout_s": 45.0,
+      "max_snapshot_age_s": 3.0,
+      "exit_timeout_s": 12.0,
+      "effect_ttl_s": 5.0,
+      "effect_ttl_overrides_s": {
+        "ModeEffect": 5.0
+      },
+      "implementation": "vehicle_autonomy.actions.catalog.register_standard.<locals>.RtlFactory",
+      "success_semantics": "Plane: native RTL mode adoption, not arrival or landing. Rover/Copter: physical ReturnHome goal.",
+      "cancel_semantics": "Exit barrier; uncertain physical effects retain resources."
+    },
+    {
+      "name": "ReturnHome",
+      "version": "1.0.0",
+      "description": "ReturnHome using the audited ArduPilot simulation control contract",
+      "kind": "Goal",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {},
+        "required": []
+      },
+      "output": {
+        "type": "object"
+      },
+      "vehicle_types": [
+        "copter",
+        "rover"
+      ],
+      "required_capabilities": [
+        "return_home"
+      ],
+      "required_state": [
+        "vehicle",
+        "reported_pose",
+        "reported_twist"
+      ],
+      "resources": [
+        {
+          "name": "vehicle.motion",
+          "mode": "exclusive",
+          "conflict_group": "vehicle.control"
+        }
+      ],
+      "default_timeout_s": 45.0,
+      "max_timeout_s": 45.0,
+      "max_snapshot_age_s": 3.0,
+      "exit_timeout_s": 12.0,
+      "effect_ttl_s": 5.0,
+      "effect_ttl_overrides_s": {
+        "ModeEffect": 5.0
+      },
+      "implementation": "vehicle_autonomy.actions.catalog.ReturnFactory",
+      "success_semantics": "Rover: actual home <=0.75 m, <=0.1 m/s settled 2 s, native HOLD exit. Copter: observed touchdown and disarmed.",
+      "cancel_semantics": "Exit barrier; uncertain physical effects retain resources."
+    },
+    {
+      "name": "SetMode",
+      "version": "1.0.0",
+      "description": "SetMode using the audited ArduPilot simulation control contract",
+      "kind": "OneShot",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "mode": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20,
+            "enum": [
+              "GUIDED",
+              "LOITER"
+            ]
+          }
+        },
+        "required": [
+          "mode"
+        ]
+      },
+      "output": {
+        "type": "object"
+      },
+      "vehicle_types": [
+        "copter",
+        "plane",
+        "rover"
+      ],
+      "required_capabilities": [
+        "mode"
+      ],
+      "required_state": [
+        "vehicle",
+        "reported_pose",
+        "reported_twist"
+      ],
+      "resources": [
+        {
+          "name": "vehicle.mode",
+          "mode": "exclusive",
+          "conflict_group": "vehicle.control"
+        }
+      ],
+      "default_timeout_s": 30.0,
+      "max_timeout_s": 60.0,
+      "max_snapshot_age_s": 3.0,
+      "exit_timeout_s": 12.0,
+      "effect_ttl_s": 5.0,
+      "effect_ttl_overrides_s": {
+        "ModeEffect": 5.0
+      },
+      "implementation": "vehicle_autonomy.actions.common.standard.CommonFactory",
+      "success_semantics": "Command COMPLETED plus authenticated post-request target state; mode adoption is not arrival.",
+      "cancel_semantics": "Exit barrier; uncertain physical effects retain resources."
+    },
+    {
+      "name": "SetVelocity",
+      "version": "1.0.0",
+      "description": "SetVelocity using the audited ArduPilot simulation control contract",
+      "kind": "Continuous",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "vx_mps": {
+            "type": "number",
+            "minimum": -0.5,
+            "maximum": 0.5,
+            "default": 0.0
+          },
+          "vy_mps": {
+            "type": "number",
+            "minimum": -0.5,
+            "maximum": 0.5,
+            "default": 0.0
+          },
+          "vz_mps": {
+            "type": "number",
+            "minimum": -0.3,
+            "maximum": 0.3,
+            "default": 0.0
+          },
+          "yaw_rate_rad_s": {
+            "type": "number",
+            "minimum": -0.35,
+            "maximum": 0.35,
+            "default": 0.0
+          }
+        },
+        "required": []
+      },
+      "output": {
+        "type": "object"
+      },
+      "vehicle_types": [
+        "copter"
+      ],
+      "required_capabilities": [
+        "velocity"
+      ],
+      "required_state": [
+        "vehicle",
+        "reported_pose",
+        "reported_twist"
+      ],
+      "resources": [
+        {
+          "name": "vehicle.motion",
+          "mode": "exclusive",
+          "conflict_group": "vehicle.control"
+        }
+      ],
+      "default_timeout_s": 30.0,
+      "max_timeout_s": 60.0,
+      "max_snapshot_age_s": 3.0,
+      "exit_timeout_s": 12.0,
+      "effect_ttl_s": 1.0,
+      "effect_ttl_overrides_s": {},
+      "implementation": "vehicle_autonomy.actions.copter.standard.StreamFactory",
+      "success_semantics": "SetYaw: observed yaw within 0.1 rad settled 1 s; continuous operations require explicit cancellation.",
+      "cancel_semantics": "Exit barrier; uncertain physical effects retain resources."
+    },
+    {
+      "name": "SetYaw",
+      "version": "1.0.0",
+      "description": "SetYaw using the audited ArduPilot simulation control contract",
+      "kind": "Goal",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "yaw_rad": {
+            "type": "number",
+            "minimum": -3.141592653589793,
+            "maximum": 3.141592653589793
+          }
+        },
+        "required": [
+          "yaw_rad"
+        ]
+      },
+      "output": {
+        "type": "object"
+      },
+      "vehicle_types": [
+        "copter"
+      ],
+      "required_capabilities": [
+        "yaw"
+      ],
+      "required_state": [
+        "vehicle",
+        "reported_pose",
+        "reported_twist"
+      ],
+      "resources": [
+        {
+          "name": "vehicle.motion",
+          "mode": "exclusive",
+          "conflict_group": "vehicle.control"
+        }
+      ],
+      "default_timeout_s": 30.0,
+      "max_timeout_s": 60.0,
+      "max_snapshot_age_s": 3.0,
+      "exit_timeout_s": 12.0,
+      "effect_ttl_s": 1.0,
+      "effect_ttl_overrides_s": {},
+      "implementation": "vehicle_autonomy.actions.copter.standard.StreamFactory",
+      "success_semantics": "SetYaw: observed yaw within 0.1 rad settled 1 s; continuous operations require explicit cancellation.",
+      "cancel_semantics": "Exit barrier; uncertain physical effects retain resources."
+    },
+    {
+      "name": "Takeoff",
+      "version": "1.0.0",
+      "description": "Takeoff using the audited ArduPilot simulation control contract",
+      "kind": "Goal",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "height_m": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 2.0,
+            "default": 1.5
+          }
+        },
+        "required": []
+      },
+      "output": {
+        "type": "object"
+      },
+      "vehicle_types": [
+        "copter",
+        "plane"
+      ],
+      "required_capabilities": [
+        "takeoff"
+      ],
+      "required_state": [
+        "vehicle",
+        "reported_pose",
+        "reported_twist"
+      ],
+      "resources": [
+        {
+          "name": "vehicle.motion",
+          "mode": "exclusive",
+          "conflict_group": "vehicle.control"
+        }
+      ],
+      "default_timeout_s": 30.0,
+      "max_timeout_s": 30.0,
+      "max_snapshot_age_s": 3.0,
+      "exit_timeout_s": 12.0,
+      "effect_ttl_s": 1.0,
+      "effect_ttl_overrides_s": {
+        "ModeEffect": 5.0,
+        "TakeoffEffect": 5.0
+      },
+      "implementation": "vehicle_autonomy.actions.catalog.TakeoffFactory",
+      "success_semantics": "Copter: measured climb +/-0.35 m, settled 2 s. Plane: 50 +/-5 m and 8..28 m/s, settled 2 s; flight remains reserved.",
+      "cancel_semantics": "Exit barrier; uncertain physical effects retain resources."
+    }
+  ],
+  "plane": [
+    {
+      "name": "Arm",
+      "version": "1.0.0",
+      "description": "Arm using the audited ArduPilot simulation control contract",
+      "kind": "OneShot",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {},
+        "required": []
+      },
+      "output": {
+        "type": "object"
+      },
+      "vehicle_types": [
+        "copter",
+        "plane",
+        "rover"
+      ],
+      "required_capabilities": [
+        "arm"
+      ],
+      "required_state": [
+        "vehicle",
+        "reported_pose",
+        "reported_twist"
+      ],
+      "resources": [
+        {
+          "name": "vehicle.arm",
+          "mode": "exclusive",
+          "conflict_group": "vehicle.control"
+        }
+      ],
+      "default_timeout_s": 30.0,
+      "max_timeout_s": 60.0,
+      "max_snapshot_age_s": 3.0,
+      "exit_timeout_s": 12.0,
+      "effect_ttl_s": 5.0,
+      "effect_ttl_overrides_s": {
+        "ArmEffect": 5.0
+      },
+      "implementation": "vehicle_autonomy.actions.common.standard.CommonFactory",
+      "success_semantics": "Command COMPLETED plus authenticated post-request target state; mode adoption is not arrival.",
+      "cancel_semantics": "Exit barrier; uncertain physical effects retain resources."
+    },
+    {
+      "name": "AutoLand",
+      "version": "1.0.0",
+      "description": "AutoLand using the audited ArduPilot simulation control contract",
+      "kind": "Goal",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {},
+        "required": []
+      },
+      "output": {
+        "type": "object"
+      },
+      "vehicle_types": [
+        "plane"
+      ],
+      "required_capabilities": [
+        "autoland"
+      ],
+      "required_state": [
+        "vehicle",
+        "reported_pose",
+        "reported_twist"
+      ],
+      "resources": [
+        {
+          "name": "vehicle.motion",
+          "mode": "exclusive",
+          "conflict_group": "vehicle.control"
+        }
+      ],
+      "default_timeout_s": 400.0,
+      "max_timeout_s": 400.0,
+      "max_snapshot_age_s": 3.0,
+      "exit_timeout_s": 12.0,
+      "effect_ttl_s": 5.0,
+      "effect_ttl_overrides_s": {
+        "DisarmEffect": 5.0,
+        "ModeEffect": 5.0
+      },
+      "implementation": "vehicle_autonomy.actions.plane.standard.PlaneFactory",
+      "success_semantics": "AutoLand: actual ground <0.25 m, speed <1 m/s settled 3 s and authenticated disarm. Other operations confirm configuration only; flight remains reserved.",
+      "cancel_semantics": "Exit barrier; uncertain physical effects retain resources."
+    },
+    {
+      "name": "Disarm",
+      "version": "1.0.0",
+      "description": "Disarm using the audited ArduPilot simulation control contract",
+      "kind": "OneShot",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {},
+        "required": []
+      },
+      "output": {
+        "type": "object"
+      },
+      "vehicle_types": [
+        "copter",
+        "plane",
+        "rover"
+      ],
+      "required_capabilities": [
+        "disarm"
+      ],
+      "required_state": [
+        "vehicle",
+        "reported_pose",
+        "reported_twist"
+      ],
+      "resources": [
+        {
+          "name": "vehicle.arm",
+          "mode": "exclusive",
+          "conflict_group": "vehicle.control"
+        }
+      ],
+      "default_timeout_s": 30.0,
+      "max_timeout_s": 60.0,
+      "max_snapshot_age_s": 3.0,
+      "exit_timeout_s": 12.0,
+      "effect_ttl_s": 5.0,
+      "effect_ttl_overrides_s": {
+        "DisarmEffect": 5.0
+      },
+      "implementation": "vehicle_autonomy.actions.common.standard.CommonFactory",
+      "success_semantics": "Command COMPLETED plus authenticated post-request target state; mode adoption is not arrival.",
+      "cancel_semantics": "Exit barrier; uncertain physical effects retain resources."
+    },
+    {
+      "name": "GetVehicleState",
+      "version": "1.0.0",
+      "description": "GetVehicleState using the audited ArduPilot simulation control contract",
+      "kind": "Query",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {},
+        "required": []
+      },
+      "output": {
+        "type": "object"
+      },
+      "vehicle_types": [
+        "copter",
+        "plane",
+        "rover"
+      ],
+      "required_capabilities": [
+        "state"
+      ],
+      "required_state": [],
+      "resources": [
+        {
+          "name": "vehicle.state",
+          "mode": "shared",
+          "conflict_group": ""
+        }
+      ],
+      "default_timeout_s": 30.0,
+      "max_timeout_s": 60.0,
+      "max_snapshot_age_s": 3.0,
+      "exit_timeout_s": 12.0,
+      "effect_ttl_s": 5.0,
+      "effect_ttl_overrides_s": {},
+      "implementation": "vehicle_autonomy.actions.common.standard.QueryFactory",
+      "success_semantics": "Read immutable world, including freshness; grants no authority.",
+      "cancel_semantics": "Exit barrier; uncertain physical effects retain resources."
+    },
+    {
+      "name": "Loiter",
+      "version": "1.0.0",
+      "description": "Loiter using the audited ArduPilot simulation control contract",
+      "kind": "OneShot",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {},
+        "required": []
+      },
+      "output": {
+        "type": "object"
+      },
+      "vehicle_types": [
+        "plane"
+      ],
+      "required_capabilities": [
+        "loiter"
+      ],
+      "required_state": [
+        "vehicle",
+        "reported_pose",
+        "reported_twist"
+      ],
+      "resources": [
+        {
+          "name": "vehicle.motion",
+          "mode": "exclusive",
+          "conflict_group": "vehicle.control"
+        }
+      ],
+      "default_timeout_s": 20.0,
+      "max_timeout_s": 20.0,
+      "max_snapshot_age_s": 3.0,
+      "exit_timeout_s": 12.0,
+      "effect_ttl_s": 5.0,
+      "effect_ttl_overrides_s": {
+        "ModeEffect": 5.0
+      },
+      "implementation": "vehicle_autonomy.actions.plane.standard.PlaneFactory",
+      "success_semantics": "AutoLand: actual ground <0.25 m, speed <1 m/s settled 3 s and authenticated disarm. Other operations confirm configuration only; flight remains reserved.",
+      "cancel_semantics": "Exit barrier; uncertain physical effects retain resources."
+    },
+    {
+      "name": "RTL",
+      "version": "1.0.0",
+      "description": "RTL using the audited ArduPilot simulation control contract",
+      "kind": "Goal",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {},
+        "required": []
+      },
+      "output": {
+        "type": "object"
+      },
+      "vehicle_types": [
+        "copter",
+        "plane",
+        "rover"
+      ],
+      "required_capabilities": [
+        "rtl"
+      ],
+      "required_state": [
+        "vehicle",
+        "reported_pose",
+        "reported_twist"
+      ],
+      "resources": [
+        {
+          "name": "vehicle.motion",
+          "mode": "exclusive",
+          "conflict_group": "vehicle.control"
+        }
+      ],
+      "default_timeout_s": 20.0,
+      "max_timeout_s": 30.0,
+      "max_snapshot_age_s": 3.0,
+      "exit_timeout_s": 12.0,
+      "effect_ttl_s": 5.0,
+      "effect_ttl_overrides_s": {
+        "ModeEffect": 5.0
+      },
+      "implementation": "vehicle_autonomy.actions.catalog.register_standard.<locals>.RtlFactory",
+      "success_semantics": "Plane: native RTL mode adoption, not arrival or landing. Rover/Copter: physical ReturnHome goal.",
+      "cancel_semantics": "Exit barrier; uncertain physical effects retain resources."
+    },
+    {
+      "name": "SetGuidedTarget",
+      "version": "1.0.0",
+      "description": "SetGuidedTarget using the audited ArduPilot simulation control contract",
+      "kind": "OneShot",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "latitude_deg": {
+            "type": "number",
+            "minimum": -90,
+            "maximum": 90
+          },
+          "longitude_deg": {
+            "type": "number",
+            "minimum": -180,
+            "maximum": 180
+          },
+          "altitude_amsl_m": {
+            "type": "number",
+            "description": "Explicit AMSL metres; audited 20..140 m above home"
+          }
+        },
+        "required": [
+          "latitude_deg",
+          "longitude_deg",
+          "altitude_amsl_m"
+        ]
+      },
+      "output": {
+        "type": "object"
+      },
+      "vehicle_types": [
+        "plane"
+      ],
+      "required_capabilities": [
+        "guided_target"
+      ],
+      "required_state": [
+        "vehicle",
+        "reported_pose",
+        "reported_twist"
+      ],
+      "resources": [
+        {
+          "name": "vehicle.motion",
+          "mode": "exclusive",
+          "conflict_group": "vehicle.control"
+        }
+      ],
+      "default_timeout_s": 20.0,
+      "max_timeout_s": 20.0,
+      "max_snapshot_age_s": 3.0,
+      "exit_timeout_s": 12.0,
+      "effect_ttl_s": 5.0,
+      "effect_ttl_overrides_s": {
+        "FixedWingTargetEffect": 5.0
+      },
+      "implementation": "vehicle_autonomy.actions.plane.standard.PlaneFactory",
+      "success_semantics": "AutoLand: actual ground <0.25 m, speed <1 m/s settled 3 s and authenticated disarm. Other operations confirm configuration only; flight remains reserved.",
+      "cancel_semantics": "Exit barrier; uncertain physical effects retain resources."
+    },
+    {
+      "name": "SetMode",
+      "version": "1.0.0",
+      "description": "SetMode using the audited ArduPilot simulation control contract",
+      "kind": "OneShot",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "mode": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20,
+            "enum": [
+              "MANUAL",
+              "GUIDED",
+              "LOITER",
+              "RTL"
+            ]
+          }
+        },
+        "required": [
+          "mode"
+        ]
+      },
+      "output": {
+        "type": "object"
+      },
+      "vehicle_types": [
+        "copter",
+        "plane",
+        "rover"
+      ],
+      "required_capabilities": [
+        "mode"
+      ],
+      "required_state": [
+        "vehicle",
+        "reported_pose",
+        "reported_twist"
+      ],
+      "resources": [
+        {
+          "name": "vehicle.mode",
+          "mode": "exclusive",
+          "conflict_group": "vehicle.control"
+        }
+      ],
+      "default_timeout_s": 30.0,
+      "max_timeout_s": 60.0,
+      "max_snapshot_age_s": 3.0,
+      "exit_timeout_s": 12.0,
+      "effect_ttl_s": 5.0,
+      "effect_ttl_overrides_s": {
+        "ModeEffect": 5.0
+      },
+      "implementation": "vehicle_autonomy.actions.common.standard.CommonFactory",
+      "success_semantics": "Command COMPLETED plus authenticated post-request target state; mode adoption is not arrival.",
+      "cancel_semantics": "Exit barrier; uncertain physical effects retain resources."
+    },
+    {
+      "name": "Takeoff",
+      "version": "1.0.0",
+      "description": "Takeoff using the audited ArduPilot simulation control contract",
+      "kind": "Goal",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "height_m": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 50,
+            "default": 50.0,
+            "const": 50.0
+          }
+        },
+        "required": []
+      },
+      "output": {
+        "type": "object"
+      },
+      "vehicle_types": [
+        "copter",
+        "plane"
+      ],
+      "required_capabilities": [
+        "takeoff"
+      ],
+      "required_state": [
+        "vehicle",
+        "reported_pose",
+        "reported_twist"
+      ],
+      "resources": [
+        {
+          "name": "vehicle.motion",
+          "mode": "exclusive",
+          "conflict_group": "vehicle.control"
+        }
+      ],
+      "default_timeout_s": 120.0,
+      "max_timeout_s": 120.0,
+      "max_snapshot_age_s": 3.0,
+      "exit_timeout_s": 12.0,
+      "effect_ttl_s": 1.0,
+      "effect_ttl_overrides_s": {
+        "ModeEffect": 5.0,
+        "TakeoffEffect": 5.0
+      },
+      "implementation": "vehicle_autonomy.actions.catalog.TakeoffFactory",
+      "success_semantics": "Copter: measured climb +/-0.35 m, settled 2 s. Plane: 50 +/-5 m and 8..28 m/s, settled 2 s; flight remains reserved.",
+      "cancel_semantics": "Exit barrier; uncertain physical effects retain resources."
+    }
+  ]
+}

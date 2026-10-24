@@ -8,8 +8,8 @@ import re
 from types import UnionType
 from typing import Any, Literal, Protocol, Union, get_args, get_origin, get_type_hints
 
-from vehicle_autonomy.contracts.core.primitives import FrozenJson, freeze_json, is_deeply_immutable
-from vehicle_autonomy.contracts.action import ActionKind, ActionResource
+from vehicle_autonomy.contracts.core.primitives import FrozenJson, freeze_json, thaw_json, is_deeply_immutable
+from vehicle_autonomy.contracts.action import ActionKind, ActionResource, ActionSafety
 from vehicle_autonomy.contracts.effects.vehicle import (
     ArmEffect, DisarmEffect, LandEffect, ModeEffect, PoseTargetEffect,
     StopMotionEffect, TakeoffEffect, TwistTargetEffect, VehicleEffect, FixedWingTargetEffect,
@@ -75,6 +75,8 @@ class ActionSpec:
     exit_timeout_ns: int = 8_000_000_000
     output_schema: FrozenJson = None
     vehicle_parameter_overrides: FrozenJson = None
+    vehicle_timeout_overrides: FrozenJson = None
+    effect_ttl_overrides: FrozenJson = None
     implementation_ref: str = ''
     success_semantics: str = ''
     cancel_semantics: str = 'Exit barrier; uncertain physical effects retain resources.'
@@ -113,6 +115,18 @@ class ActionSpec:
             if not isinstance(getattr(self,name), str):raise TypeError('Action metadata must be text')
         object.__setattr__(self,'output_schema',freeze_json(self.output_schema))
         object.__setattr__(self,'vehicle_parameter_overrides',freeze_json(self.vehicle_parameter_overrides))
+        object.__setattr__(self,'vehicle_timeout_overrides',freeze_json(self.vehicle_timeout_overrides))
+        object.__setattr__(self,'effect_ttl_overrides',freeze_json(self.effect_ttl_overrides))
+        ttls=thaw_json(self.effect_ttl_overrides) or {}
+        if not isinstance(ttls,dict) or ttls.keys()-{t.__name__ for t in self.effect_types} or any(type(v) is not int or v<=0 for v in ttls.values()):
+            raise ValueError('declared positive per-effect TTLs required')
+        overrides=thaw_json(self.vehicle_timeout_overrides) or {}
+        if not isinstance(overrides,dict):raise TypeError('vehicle timeouts must be an object')
+        for kind,limits in overrides.items():
+            if not isinstance(limits,dict) or limits.keys()-{'default_timeout_ns','max_timeout_ns'}:raise ValueError('unknown Action timeout override')
+            default=limits.get('default_timeout_ns',self.default_timeout_ns);maximum=limits.get('max_timeout_ns',self.max_timeout_ns)
+            if type(default) is not int or type(maximum) is not int or not 0<default<=maximum<=self.max_timeout_ns:
+                raise ValueError('vehicle-specific Action timeout outside global bounds')
 
     def validate_parameters(self, parameters: object) -> None:
         if type(parameters) is not self.parameters_type or not is_deeply_immutable(parameters):
@@ -187,12 +201,14 @@ class ActionDecision:
 class ExitDecision:
     complete: bool
     effects: tuple[DecisionEffect, ...] = ()
+    safety: ActionSafety | None = None
 
     def __post_init__(self) -> None:
         if not isinstance(self.complete, bool):
             raise TypeError("complete must be bool")
         if not isinstance(self.effects, tuple) or any(not isinstance(effect, DECISION_EFFECT_TYPES) for effect in self.effects):
             raise TypeError("exit effects must be typed effect values")
+        if self.safety is not None and not isinstance(self.safety,ActionSafety):raise TypeError('typed exit safety required')
 
 
 class ActionInstance(Protocol):

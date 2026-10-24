@@ -12,11 +12,13 @@ dependencies = ["tomli==2.2.1; python_version < '3.11'"]
 
 [project.optional-dependencies]
 mavlink = ["pymavlink==2.4.49", "pyserial==3.5"]
+test-browser = ["playwright==1.55.0"]
 
 [project.scripts]
 vehicle-autonomy = "vehicle_autonomy.app.cli:main"
 vehicle-autonomy-hardware = "vehicle_autonomy.app.bootstrap.hardware:main"
 vehicle-autonomy-web = "vehicle_autonomy.app.web.cli:main"
+vehicle-autonomy-actions = "vehicle_autonomy.app.web.action_cli:main"
 vehicle-autonomy-plan = "vehicle_autonomy.app.planning:main"
 vehicle-autonomy-anchor = "vehicle_autonomy.app.anchor:main"
 vehicle-autonomy-onboard = "vehicle_autonomy.app.bootstrap.onboard:main"

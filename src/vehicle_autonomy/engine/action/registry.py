@@ -64,6 +64,7 @@ class ActionRegistry:
         entry=self.resolve_typed(name,version);s=entry.spec
         schema=parameter_schema(s.parameters_type)
         overrides=to_json_value(s.vehicle_parameter_overrides) or {}
+        times=(to_json_value(s.vehicle_timeout_overrides) or {}).get(vehicle_kind,{})
         for field,updates in overrides.get(vehicle_kind,{}).items():
             if field not in schema['properties']:raise ValueError('override for unknown Action parameter')
             schema['properties'][field].update(updates)
@@ -71,8 +72,10 @@ class ActionRegistry:
             parameters=schema,output=to_json_value(s.output_schema),vehicle_types=sorted(s.vehicle_types),
             required_capabilities=sorted(s.required_capabilities),required_state=list(s.required_state),
             resources=[dict(name=r.name,mode=r.mode.value,conflict_group=r.conflict_group) for r in s.resources],
-            default_timeout_s=s.default_timeout_ns/1e9,max_timeout_s=s.max_timeout_ns/1e9,
+            default_timeout_s=times.get('default_timeout_ns',s.default_timeout_ns)/1e9,
+            max_timeout_s=times.get('max_timeout_ns',s.max_timeout_ns)/1e9,
             max_snapshot_age_s=s.max_snapshot_age_ns/1e9,exit_timeout_s=s.exit_timeout_ns/1e9,
+            effect_ttl_s=s.effect_ttl_ns/1e9,effect_ttl_overrides_s={k:v/1e9 for k,v in (to_json_value(s.effect_ttl_overrides) or {}).items()},
             implementation=s.implementation_ref or type(entry.factory).__module__+'.'+type(entry.factory).__qualname__,
             success_semantics=s.success_semantics,cancel_semantics=s.cancel_semantics)
 

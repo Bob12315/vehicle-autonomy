@@ -44,6 +44,7 @@ class _Record:
     requested_end: ActionState | None = None
     exit_started_ns: int | None = None
     exit_complete: bool = False
+    exit_safety: ActionSafety | None = None
     error: str | None = None
     result: object = None
     safety: ActionSafety | None = None
@@ -90,10 +91,12 @@ class ActionRuntime:
             if target not in self.drivers:raise ValueError('unknown Action target')
             if type(allow_send) is not bool:raise TypeError('explicit SEND bool required')
             entry=self.registry.resolve_typed(name,version);s=entry.spec;now=self.clock()
+            ctx=self.drivers[target].context()
+            metadata=self.registry.metadata(name,version,vehicle_kind=ctx.target_kind)
             if type(wait_timeout_s) not in (int,float) or not math.isfinite(wait_timeout_s) or not 0<=wait_timeout_s<=60:
                 raise ValueError('resource wait must be 0..60 seconds')
-            timeout=s.default_timeout_ns/1e9 if timeout_s is None else timeout_s
-            if type(timeout) not in (int,float) or not math.isfinite(timeout) or not 0<timeout<=s.max_timeout_ns/1e9:
+            timeout=metadata['default_timeout_s'] if timeout_s is None else timeout_s
+            if type(timeout) not in (int,float) or not math.isfinite(timeout) or not 0<timeout<=metadata['max_timeout_s']:
                 raise ValueError('Action timeout outside declared limits')
             r=_Record('action:'+uuid4().hex,target,entry,None,now,now.monotonic_ns+int(timeout*1e9),
                 now.monotonic_ns+int(wait_timeout_s*1e9),allow_send,continuation_of)
@@ -104,9 +107,9 @@ class ActionRuntime:
                 if s.vehicle_types and ctx.target_kind not in s.vehicle_types:raise ValueError('unsupported vehicle type')
                 if not s.required_capabilities<=ctx.capabilities:raise ValueError('required Action capabilities unavailable')
                 r.parameters=self.registry.parameters(name,{} if parameters is None else parameters,s.version,vehicle_kind=ctx.target_kind)
-                self._fresh(r,self.drivers[target].snapshot(),now)
+                world=self.drivers[target].snapshot();self._fresh(r,world,now)
                 check=getattr(entry.factory,'validate_context',None)
-                if check:check(r.parameters,self.drivers[target].snapshot(),ctx)
+                if check:check(r.parameters,world,ctx)
                 if continuation_of:
                     old=self._records.get(continuation_of)
                     if (not allow_send or old is None or old.target!=target or old.state is not ActionState.SUCCEEDED
@@ -135,9 +138,12 @@ class ActionRuntime:
             r=self._records[identifier]
             if r.state in TERMINAL_ACTION_STATES:
                 if r.safety and r.safety.continuation_allowed and r.guard_stop is None:
-                    self.drivers[r.target].begin_exit(r.id)
-                    r.guard_stop=self.drivers[r.target].finish_scope(r.id,succeeded=False)
                     r.safety=ActionSafety(False,False,'retained physical effects are being cancelled')
+                    try:
+                        self.drivers[r.target].begin_exit(r.id)
+                        r.guard_stop=self.drivers[r.target].finish_scope(r.id,succeeded=False)
+                    except Exception:
+                        self.resources.retain(r.id,'retained physical exit failed; UNCONFIRMED')
                     self._event(r,'retained_guard_cancelled')
                 return self._view(r)
             self._begin_exit(r,ActionState.CANCELLED,None)
@@ -148,7 +154,11 @@ class ActionRuntime:
         r.requested_end=outcome;r.error=error;r.exit_started_ns=self.clock().monotonic_ns
         if r.state is ActionState.WAITING_RESOURCE or not r.opened and r.opening is None:
             self.resources.release(r.id);self._state(r,outcome);return
-        self.drivers[r.target].begin_exit(r.id)
+        try:self.drivers[r.target].begin_exit(r.id)
+        except Exception as exc:
+            r.requested_end=ActionState.UNKNOWN
+            self._finish(r,ActionSafety(False,False,'exit ingress fence failed: '+type(exc).__name__))
+            return
         self._state(r,ActionState.CANCELLING)
 
     def _emit(self,r,effects,now,*,cleanup):
@@ -161,7 +171,8 @@ class ActionRuntime:
             # Cleanup has its own bounded window. The final writer still enforces
             # every Lease/TTL/session/generation condition using its own clock.
             limit=(r.exit_started_ns+r.registration.spec.exit_timeout_ns) if cleanup else r.deadline_ns
-            deadline=min(now.monotonic_ns+r.registration.spec.effect_ttl_ns,limit)
+            ttl=(to_json_value(r.registration.spec.effect_ttl_overrides) or {}).get(type(effect).__name__,r.registration.spec.effect_ttl_ns)
+            deadline=min(now.monotonic_ns+ttl,limit)
             if deadline<=now.monotonic_ns:raise ValueError('Action effect deadline expired')
             at=TimePoint(deadline,now.utc,now.clock_domain_id)
             kind=PayloadEffectEnvelope if isinstance(effect,ReleasePayloadEffect) else EffectEnvelope
@@ -172,6 +183,8 @@ class ActionRuntime:
 
     def _finish(self,r,safety):
         if not isinstance(safety,ActionSafety):raise TypeError('driver must return a typed physical safety assessment')
+        if r.exit_safety is not None and not r.exit_safety.release_safe:
+            safety=ActionSafety(False,False,r.exit_safety.reason or 'Action external effects unconfirmed',r.exit_safety.evidence)
         r.safety=safety
         if safety.release_safe:self.resources.release(r.id)
         else:self.resources.retain(r.id,safety.reason or 'physical safety UNCONFIRMED')
@@ -192,8 +205,11 @@ class ActionRuntime:
                 else:self.resources.retain(r.id,r.safety.reason or 'physical stop UNCONFIRMED')
             elif r.safety and not r.safety.release_safe:
                 status=driver.guard_status(r.id)
-                if status is not None and status.release_safe:
-                    r.safety=status;self.resources.release(r.id);self._event(r,'physical_guard_reconciled')
+                if status is not None:
+                    if not isinstance(status,ActionSafety):raise TypeError('typed guard status required')
+                    r.safety=status
+                    if status.release_safe:self.resources.release(r.id);self._event(r,'physical_guard_reconciled')
+                    else:self.resources.retain(r.id,status.reason or 'physical outcome UNCONFIRMED')
             return
         if r.state is not ActionState.CANCELLING and now.monotonic_ns>=r.deadline_ns:
             self._begin_exit(r,ActionState.TIMED_OUT,'Action deadline exceeded')
@@ -201,6 +217,14 @@ class ActionRuntime:
         if r.state is ActionState.CANCELLING and now.monotonic_ns-r.exit_started_ns>=s.exit_timeout_ns:
             # A hung driver cannot freeze the global scheduler or release its
             # physical claim. The driver has already been told to close ingress.
+            abandon=getattr(r.instance,'abandon',None)
+            if abandon:
+                try:abandon()
+                except Exception:pass
+            if r.closing is None:
+                try:r.guard_stop=driver.finish_scope(r.id,succeeded=False)
+                except Exception:pass
+            else:r.guard_stop=r.closing
             self._finish(r,ActionSafety(False,False,'Action exit deadline exceeded'))
             return
         if r.state is ActionState.WAITING_RESOURCE:
@@ -214,13 +238,19 @@ class ActionRuntime:
             except Exception as exc:
                 r.error=f'admission failed: {type(exc).__name__}: {exc}'
                 if isinstance(exc,ActionAdmissionRejected):
-                    self.resources.release(r.id);self._state(r,ActionState.REJECTED)
+                    self.resources.release(r.id)
+                    self._state(r,r.requested_end if r.state is ActionState.CANCELLING else ActionState.REJECTED)
                 else:
                     r.requested_end=ActionState.UNKNOWN
                     self._finish(r,ActionSafety(False,False,'admission outcome uncertain'))
                 return
             finally:r.opening=None
-            if r.continuation_of:self.resources.release(r.continuation_of)
+            if r.continuation_of:
+                self.resources.release(r.continuation_of)
+                old=self._records[r.continuation_of]
+                old.safety=ActionSafety(True,False,'resource transferred under explicit new authorization',
+                    {'successor':r.id,'physical_stop':'UNCONFIRMED'})
+                self._event(old,'resource_transferred',successor=r.id)
         for _,future in r.effects:
             if future.done() and (future.cancelled() or future.exception() is not None):
                 if r.state is not ActionState.CANCELLING:
@@ -239,10 +269,15 @@ class ActionRuntime:
             results=driver.effect_results(r.id)
             decision=(r.instance.tick_with_results(world,results) if hasattr(r.instance,'tick_with_results') else r.instance.tick(world))
             if not isinstance(decision,ActionDecision):raise TypeError('typed Action decision required')
+            if decision.outcome is not ActionOutcome.RUNNING and decision.effects:
+                raise TypeError('terminal Action decision cannot start new effects')
             if decision.feedback is not None:r.feedback.append(dict(at_ns=now.monotonic_ns,value=to_json_value(decision.feedback)))
             self._emit(r,decision.effects,now,cleanup=False)
             if decision.outcome is not ActionOutcome.RUNNING:
                 if decision.outcome is ActionOutcome.SUCCEEDED:
+                    if s.kind is ActionKind.CONTINUOUS:
+                        self._begin_exit(r,ActionState.FAILED,'Continuous operation ended without cancellation')
+                        return
                     value=to_json_value(decision.result)
                     if s.output_schema:validate_json(value,to_json_value(s.output_schema),'result')
                     r.result=value;self._begin_exit(r,ActionState.SUCCEEDED,None)
@@ -261,7 +296,7 @@ class ActionRuntime:
                     results=driver.effect_results(r.id)
                     decision=(r.instance.exit_with_results(world,reason,results) if hasattr(r.instance,'exit_with_results') else r.instance.exit(world,reason))
                     if not isinstance(decision,ExitDecision):raise TypeError('typed Action exit required')
-                    self._emit(r,decision.effects,now,cleanup=True);r.exit_complete=decision.complete
+                    self._emit(r,decision.effects,now,cleanup=True);r.exit_complete=decision.complete;r.exit_safety=decision.safety
                 except Exception as exc:
                     r.error=f'Action exit failed: {type(exc).__name__}: {exc}';r.exit_complete=True
                     r.requested_end=ActionState.FAILED
@@ -281,7 +316,10 @@ class ActionRuntime:
             for r in tuple(self._records.values()):
                 try:self._tick(r,now)
                 except Exception as exc:
-                    self._begin_exit(r,ActionState.FAILED,f'{type(exc).__name__}: {exc}')
+                    if r.state in TERMINAL_ACTION_STATES:
+                        r.safety=ActionSafety(False,False,'physical guard query failed: '+type(exc).__name__)
+                        self.resources.retain(r.id,r.safety.reason)
+                    else:self._begin_exit(r,ActionState.FAILED,f'{type(exc).__name__}: {exc}')
 
     def _view(self,r):
         return deepcopy(dict(id=r.id,target=r.target,name=r.registration.spec.name,version=r.registration.spec.version,
@@ -297,3 +335,6 @@ class ActionRuntime:
 
     def views(self):
         with self._lock:return [self._view(r) for r in self._records.values()]
+
+    def resource_view(self):
+        with self._lock:return self.resources.view()

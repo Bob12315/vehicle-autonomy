@@ -173,5 +173,55 @@ class RuntimeTests(unittest.TestCase):
         self.assertEqual(len(self.registry.catalog(vehicle_kind='rover')),1)
         self.assertEqual(self.registry.metadata('a')['parameters']['properties']['count']['maximum'],10)
 
+    def test_exit_fence_exception_retains_unknown_without_stopping_other_targets(self):
+        self.register(kind=ActionKind.CONTINUOUS,write=True)
+        a=self.runtime.submit('a','v',allow_send=True);self.ticks(1)
+        self.driver.begin_exit=lambda _:(_ for _ in ()).throw(RuntimeError('fence lost'))
+        self.runtime.cancel(a['id']);self.ticks()
+        self.assertEqual(self.runtime.view(a['id'])['state'],'UNKNOWN')
+        b=self.runtime.submit('a','other',allow_send=True);self.ticks(1)
+        self.assertEqual(self.runtime.view(b['id'])['state'],'RUNNING')
+        self.assertEqual(self.runtime.submit('a','v',allow_send=True)['state'],'REJECTED')
+
+    def test_external_uncertainty_cannot_be_overridden_by_no_vehicle_driver(self):
+        self.register()
+        factory=self.registry.resolve_typed('a').factory
+        base=factory.start
+        def start(p,w):
+            instance=base(p,w)
+            instance.exit=lambda *_:ExitDecision(True,safety=ActionSafety(False,False,'remote cancel UNKNOWN'))
+            return instance
+        factory.start=start
+        a=self.runtime.submit('a','v');self.ticks()
+        self.assertEqual(self.runtime.view(a['id'])['state'],'UNKNOWN')
+        self.assertTrue(self.runtime.resources.view())
+
+    def test_continuous_provider_ending_early_is_not_silent_success(self):
+        self.register(kind=ActionKind.CONTINUOUS)
+        self.registry.resolve_typed('a').factory.kw['continuous']=False
+        a=self.runtime.submit('a','v');self.ticks()
+        self.assertEqual(self.runtime.view(a['id'])['state'],'FAILED')
+        self.assertIn('Continuous',self.runtime.view(a['id'])['error'])
+
+    def test_terminal_decision_cannot_race_new_motion_before_failure_cleanup(self):
+        self.register(write=True)
+        self.registry.resolve_typed('a').factory.start=lambda *_:type('Bad',(),{
+            'tick':lambda *_:ActionDecision(ActionOutcome.FAILED,(ArmEffect(),),error='already failed'),
+            'exit':lambda *_:ExitDecision(True)})()
+        a=self.runtime.submit('a','v',allow_send=True);self.ticks()
+        self.assertEqual(self.runtime.view(a['id'])['state'],'FAILED')
+        self.assertEqual(self.driver.writes,[])
+
+    def test_expired_exit_requests_independent_driver_cleanup(self):
+        self.register(kind=ActionKind.CONTINUOUS,write=True)
+        self.driver.close_future=Future()
+        a=self.runtime.submit('a','v',allow_send=True);self.ticks(1)
+        self.runtime.cancel(a['id']);self.ticks(1);self.clock.advance(8.1);self.ticks(1)
+        self.assertEqual(self.runtime.view(a['id'])['state'],'UNKNOWN')
+        self.assertEqual(len(self.driver.closed),1)
+        self.driver.close_future.set_result(ActionSafety(True));self.ticks(1)
+        self.assertEqual(self.runtime.view(a['id'])['state'],'UNKNOWN')
+        self.assertEqual(self.runtime.resources.view(),[])
+
 
 if __name__=='__main__':unittest.main()
