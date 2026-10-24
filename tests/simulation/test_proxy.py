@@ -10,6 +10,29 @@ from tests.simulation.faults import TcpFaultProxy
 
 
 class ProxyTests(unittest.TestCase):
+    def test_unknown_injection_keys_are_rejected_without_partial_mutation(self):
+        with tempfile.TemporaryDirectory() as directory:
+            proxy = TcpFaultProxy(1, Path(directory) / 'proxy.jsonl')
+            try:
+                for key in ('drop_ack_commands', 'drop_ack_commmand', 'capture_payload', 'upstream_port'):
+                    with self.subTest(key=key):
+                        original = getattr(proxy, key, None)
+                        existed = hasattr(proxy, key)
+                        try:
+                            with self.assertRaisesRegex(ValueError, 'unknown fault injection'):
+                                proxy.inject(**{'drop_tx': True, key: {176}})
+                            self.assertFalse(proxy.drop_tx)
+                            self.assertIsNone(proxy.drop_ack_command)
+                            self.assertEqual(proxy.records, [])
+                        finally:
+                            proxy.drop_tx = False
+                            if existed:
+                                setattr(proxy, key, original)
+                            elif hasattr(proxy, key):
+                                delattr(proxy, key)
+            finally:
+                proxy.close()
+
     def receive(self, connection, count):
         data = b''
         while len(data) < count:

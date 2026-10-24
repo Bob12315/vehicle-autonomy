@@ -48,6 +48,12 @@ class TcpFaultProxy:
             self._log.flush()
 
     def inject(self, **changes):
+        allowed = {'drop_rx', 'drop_ack_command', 'delay_pose_s', 'delay_ack_s',
+                   'duplicate_rx', 'repeat_pose', 'drop_tx', 'hold_tx_commands'}
+        unknown = changes.keys() - allowed
+        if unknown:
+            # Validate the entire batch before applying or recording any change.
+            raise ValueError('unknown fault injection parameters: ' + ', '.join(sorted(unknown)))
         for key, value in changes.items():
             setattr(self, key, value)
         self.record({"direction": "injection", "changes": {k: sorted(v) if isinstance(v, set) else v for k, v in changes.items()}})

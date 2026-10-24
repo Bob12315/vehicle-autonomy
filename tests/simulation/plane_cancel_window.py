@@ -5,27 +5,60 @@ import json
 import math
 from pathlib import Path
 import time
+from pymavlink.dialects.v20 import ardupilotmega as mav
 from vehicle_autonomy.app.bootstrap.simulation_runtime import SimulationRuntime
 from vehicle_autonomy.contracts.effects.vehicle import ArmEffect, ModeEffect
 from vehicle_autonomy.vehicles.ardupilot.transports.bytes import TcpByteTransport
 from vehicle_autonomy.vehicles.plane.ardupilot_commands import ArduPlaneCommandTranslator
 from tests.simulation.faults import TcpFaultProxy
 from tests.simulation.launch import OwnedSimulation, install_signal_cleanup
-from tests.simulation.oracle import GazeboTruthOracle
+
+
+def assert_ack_intercepted(records, application_rx, *, since_ns, command=176):
+    """Require real peer bytes, their explicit discard, and no ACK delivery."""
+    def target(record):
+        return (record.get('host_ns', 0) >= since_ns and record.get('type') == 'COMMAND_ACK'
+                and record.get('payload', {}).get('command') == command)
+    received = [r for r in records if r.get('direction') == 'rx' and target(r)]
+    discarded = [r for r in records if r.get('direction') == 'rx_discard' and target(r)
+                 and r.get('cause') == 'filter']
+    forwarded = [r for r in records if r.get('direction') == 'rx_forward' and target(r)]
+    delivered = [r for r in application_rx if target(r)]
+    if not any(r['payload'].get('result') == 0 for r in received):
+        raise AssertionError('real peer accepted TAKEOFF ACK not observed')
+    if (any(not r.get('filter_dropped') for r in received)
+            or any(not any(d['raw_hex'] == r['raw_hex'] and d.get('epoch') == r.get('epoch')
+                           for d in discarded) for r in received)):
+        raise AssertionError('target ACK lacks actual filter discard evidence')
+    if forwarded or delivered:
+        raise AssertionError('target ACK forwarded or received by application')
+    return dict(passed=True,command=command,received=len(received),discarded=len(discarded),
+                forwarded=len(forwarded),application_received=len(delivered),
+                discarded_frames=[r['raw_hex'] for r in discarded])
 
 
 def run(path):
     path.mkdir(parents=True, exist_ok=False)
     owned=OwnedSimulation(path,'plane',confirmation_signing=True)
-    runtime=proxy=None;writes=[];report=dict(passed=False)
+    runtime=proxy=None;writes=[];application_rx=[];fault_start=None;report=dict(passed=False)
     events=(path/'runtime.jsonl').open('w');trace=(path/'trajectory.jsonl').open('w')
+    application_log=(path/'application-rx.jsonl').open('w')
     try:
+        from tests.simulation.oracle import GazeboTruthOracle
         owned.start();oracle=GazeboTruthOracle(owned.world,owned.model)
         proxy=TcpFaultProxy(owned.port,path/'proxy.jsonl',capture_payload=True)
         profile=replace(owned.profile,port=proxy.port)
         class ObservedTransport:
-            def __init__(self,transport):self.transport=transport
-            def read(self,*a,**kw):return self.transport.read(*a,**kw)
+            def __init__(self,transport):
+                self.transport=transport;self.parser=mav.MAVLink(None)
+            def read(self,*a,**kw):
+                data=self.transport.read(*a,**kw)
+                messages=self.parser.parse_buffer(data) if data else []
+                for message in messages or []:
+                    record=dict(host_ns=time.monotonic_ns(),**proxy.frame_metadata(bytes(message.get_msgbuf())))
+                    application_rx.append(record)
+                    application_log.write(json.dumps(record)+'\n');application_log.flush()
+                return data
             def write(self,data):
                 writes.append(dict(host_ns=time.monotonic_ns(),raw_hex=data.hex()))
                 self.transport.write(data)
@@ -51,10 +84,16 @@ def run(path):
             cycle()
             if runtime.effect_status('arm')['phase']=='COMPLETED':break
         else:raise TimeoutError('normal Arm before cancellation window')
+        arm_acks=[r for r in application_rx if r.get('type')=='COMMAND_ACK'
+                  and r['payload']['command']==400 and r['payload']['result']==0]
+        if not arm_acks:raise AssertionError('application observer missed normal Arm ACK')
+        report['normal_arm']=dict(passed=True,status=runtime.effect_status('arm'),
+                                application_ack_received=len(arm_acks))
         state=runtime.world_snapshot().vehicle;origin=oracle.latest()
         if state is None or origin is None or not state.operation.armed:raise AssertionError('armed ground required')
         before=len(writes)
-        proxy.inject(drop_ack_commands={176})
+        fault_start=time.monotonic_ns()
+        proxy.inject(drop_ack_command=176)
         admitted=runtime.submit_effect(ModeEffect('TAKEOFF'),effect_id='takeoff-window')
         if admitted.reason:raise AssertionError(admitted.reason)
         # One cycle reads state BEFORE its write. Do not wait for a new
@@ -72,11 +111,21 @@ def run(path):
         until=time.monotonic()+1;accepted=False
         while time.monotonic()<until:
             with proxy._lock:
-                accepted=any(r.get('direction')=='rx' and r.get('type')=='COMMAND_ACK'
+                accepted=any(r.get('direction')=='rx_discard' and r.get('cause')=='filter'
+                    and r.get('host_ns',0)>=fault_start and r.get('type')=='COMMAND_ACK'
                     and r['payload']['command']==176 and r['payload']['result']==0 for r in proxy.records)
             if accepted:break
             time.sleep(.01)
-        if not accepted:raise AssertionError('real peer TAKEOFF ACK not observed at proxy')
+        if not accepted:raise AssertionError('real peer TAKEOFF ACK not intercepted by proxy')
+        with proxy._lock:records=list(proxy.records)
+        report['ack_interception']=assert_ack_intercepted(records,application_rx,since_ns=fault_start)
+        command_id=runtime._effects['takeoff-window'];port=runtime._port
+        if command_id in port.ack_evidence:
+            raise AssertionError('application accepted an ACK for the interrupted TAKEOFF')
+        # A second admitted intent must be cancelled without reaching the writer.
+        queued=runtime.submit_effect(ModeEffect('TAKEOFF'),effect_id='queued-takeoff-window')
+        if queued.reason or runtime.effect_status('queued-takeoff-window')['phase']!='ACCEPTED':
+            raise AssertionError('queued TAKEOFF cancellation case not admitted')
         from tests.simulation.native_boundaries import assert_handoff_blocked
         report['action_handoff']=assert_handoff_blocked(runtime)
         stops=runtime.end_run()
@@ -89,6 +138,11 @@ def run(path):
             raise AssertionError('last known World sample was rewritten as cancellation proof')
         status=runtime.effect_status('takeoff-window')
         if status['phase']!='UNKNOWN':raise AssertionError('abandoned command outcome must stay unknown')
+        queued_status=runtime.effect_status('queued-takeoff-window')
+        queued_id=runtime._effects['queued-takeoff-window']
+        if queued_status['phase']!='CANCELLED' or queued_id in port._queue or command_id in port.ack_evidence:
+            raise AssertionError('queued request survived cancel or old TAKEOFF acquired ACK evidence')
+        report['queued_cancel']=dict(passed=True,status=queued_status,writer_calls=0,removed_from_queue=True)
         # Independent observation shows why the old ground sample cannot prove
         # a stop: the already forwarded native command can start moving later.
         until=time.monotonic()+5;distance=0.;speed=0.
@@ -115,7 +169,11 @@ def run(path):
             raise AssertionError('read-only reconnect lost flight uncertainty or wrote a command')
         report['read_only_reconnect']=dict(passed=True,stops={'fixed-wing-flight':'UNCONFIRMED'},writer_calls=0,
             new_session=str(fresh.telemetry.link_session_id),armed=fresh.operation.armed)
-        report.update(passed=True,stops=stops,status=status,takeoff_writer_calls=1,recovery_writer_calls=0,peer_ack_observed_not_delivered=True,
+        frames=[proxy.frame_metadata(bytes.fromhex(w['raw_hex'])) for w in writes]
+        if [(f['payload'].get('command'),f['payload'].get('param2')) for f in frames] != [(400,0.),(176,13.)]:
+            raise AssertionError('unexpected actual writer frame; Arm and one TAKEOFF only')
+        report.update(passed=True,stops=stops,status=status,takeoff_writer_calls=1,recovery_writer_calls=0,
+            peer_ack_observed_not_delivered=True,application_ack_accepted=False,
             post_cancel_displacement_m=distance,post_cancel_ground_speed_mps=speed,
             world_after_cancel=dict(armed=after.operation.armed,native_mode=after.operation.native_mode,
                 source_session=str(after.telemetry.link_session_id),current_session=runtime.session_id,
@@ -125,8 +183,14 @@ def run(path):
         for name,close in [('runtime',lambda:runtime.shutdown() if runtime else None),('proxy',lambda:proxy.close() if proxy else None),('owned',owned.close)]:
             try:close()
             except BaseException as exc:report[name+'_cleanup_error']=type(exc).__name__
+        if report['passed']:
+            try:
+                if proxy.error:raise AssertionError('fault proxy failed: '+proxy.error)
+                report['ack_interception']=assert_ack_intercepted(proxy.records,application_rx,since_ns=fault_start)
+            except BaseException as exc:
+                report['passed']=False;report['error']=f'{type(exc).__name__}: {exc}'
         if any(k.endswith('_cleanup_error') for k in report):report['passed']=False
-        report['writer_attempts']=writes;events.close();trace.close()
+        report['writer_attempts']=writes;events.close();trace.close();application_log.close()
         (path/'summary.json').write_text(json.dumps(report,indent=2))
     return report
 
