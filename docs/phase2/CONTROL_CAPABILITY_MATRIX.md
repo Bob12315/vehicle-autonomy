@@ -70,6 +70,14 @@ FENCE_RADIUS=2000、FENCE_ALT_MAX=150、FENCE_ALT_MAX_TP=1（相对 HOME）。
 `fixed-wing-flight: UNCONFIRMED`；这不意味着飞机已经物理停止。低空不满足安全切换条件、
 ACK/状态不充分或链路失效时如实保留不确定结果，绝不发送零速度/强制空中 Disarm。
 
+取消原生运动时，必须先通过既有 Execution 撤销当前作用域尚未写出的请求，才调度恢复模式。
+已写出的命令不重新标为已取消。未解决的原生飞行/RTL 阻止 `authorize_action` 自动交接，
+拒绝时不改变原 Action、Lease 或代际；当前 Action 内的合法原生命令仍可按原确认规则完成。
+继续飞行需要显式结束旧 run、建立新鲜会话（若断链）并重新授权新 run，不能隐式继承权限。
+只读重连清除旧命令和全部正向确认/授权，不清除未解决的负向危险记录；新会话 shutdown
+仍报告 UNCONFIRMED，除非既有车辆特定的合格恢复证据已解除它。Rover 的解除仍需 HOLD
+确认及其后的新鲜零速；Plane 的解除仍需新鲜 VALID、未解锁、低速地面状态。
+
 Rover 原生 RTL 仅由 `rover_phase2.toml` 和 `--native-rtl` 显式启用；原有
 `rover.toml` 仍只允许 HOLD/GUIDED，全部原安全/物理阈值、TTL 和 Lease 不变。
 新夹具的 RTL_SPEED/WP_SPEED=0.5m/s、WP_RADIUS=0.2m 通过公开参数回读核实。

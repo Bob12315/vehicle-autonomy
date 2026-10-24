@@ -61,7 +61,8 @@ Execution、Safety、Authority 和唯一 MAVLink Writer。Plane 取消保留续�
 [能力矩阵](docs/phase2/CONTROL_CAPABILITY_MATRIX.md)。
 
 开发侧 409 项单元测试、两轮三车型共 18 个真实 SITL/Gazebo 场景通过，包含 Plane
-轮式滑跑起飞、实际 AUTOLAND 和已写出 TAKEOFF 的取消窗口。当前为 **READY FOR RE-AUDIT**；
+轮式滑跑起飞、实际 AUTOLAND 和已写出 TAKEOFF 的取消窗口。该候选版本独立审查为 **FAIL**，
+原生命令生命周期的三项问题正在修复和重新回归；
 最终独立验收结论以[三车型报告](docs/PHASE2_THREE_VEHICLE_CONTROL_REPORT.md)及其审查记录为准。
 
 ```bash

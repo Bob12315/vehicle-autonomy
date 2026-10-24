@@ -54,8 +54,10 @@ def main():
                         and not list(path.glob('*.private')))
                     passed=bool(status['passed'] and summary.get('passed') is True and cleanup and not any(k.endswith('_error') for k in summary))
                     if kind=='plane' and case=='control':
-                        passed=passed and all(summary.get(key,{}).get('passed') for key in ('takeoff','native_target','landing','cancel','link_loss'))
+                        passed=passed and all(summary.get(key,{}).get('passed') for key in ('takeoff','native_target','landing','cancel','link_loss','queued_cancel','action_handoff'))
                         passed=passed and all(summary.get('regressions',{}).get(key,{}).get('passed') for key in ('lock_expiry','guard_expiry','lease_expiry','valid_after_rejections','wrap_replay','normal_arm_disarm'))
+                    if kind=='plane' and case=='cancel_window':
+                        passed=passed and all(summary.get(key,{}).get('passed') for key in ('action_handoff','read_only_reconnect'))
                     vehicle['stages'][case]=dict(passed=passed,summary=str(path/'summary.json'),manifest=str(path/'manifest.json'),cleanup=cleanup)
                     print(name+(' PASS' if passed else ' FAIL'),flush=True)
                     (root/'summary.json').write_text(json.dumps(result,indent=2))
@@ -77,7 +79,7 @@ def main():
                         vehicle['groups']['C'] &= len(physical_manifest.get('rover_parameter_readback',{}))==5
                     vehicle['groups']['D'] &= all(probe.get('remediation',{}).get(k,{}).get('passed') for k in required_review)
                     vehicle['groups']['E'] &= vehicle['stages']['faults']['passed'] and all(faults.get('faults',{}).get(k,{}).get('passed') for k in required_faults)
-                    if kind=='rover':vehicle['groups']['E'] &= physical.get('native_rtl_cancel',{}).get('passed') is True
+                    if kind=='rover':vehicle['groups']['E'] &= all(physical.get(k,{}).get('passed') is True for k in ('native_rtl_cancel','native_action_handoff','queued_native_cancel'))
                     vehicle['groups']['F'] &= all(stage['cleanup'] for stage in vehicle['stages'].values())
                 else:
                     control=json.loads(Path(vehicle['stages']['control']['summary']).read_text())

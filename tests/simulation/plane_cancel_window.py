@@ -77,6 +77,8 @@ def run(path):
             if accepted:break
             time.sleep(.01)
         if not accepted:raise AssertionError('real peer TAKEOFF ACK not observed at proxy')
+        from tests.simulation.native_boundaries import assert_handoff_blocked
+        report['action_handoff']=assert_handoff_blocked(runtime)
         stops=runtime.end_run()
         if stops!={'fixed-wing-flight':'UNCONFIRMED'} or len(writes)!=before+1:
             raise AssertionError('latched TAKEOFF lost uncertainty or sent unsafe recovery')
@@ -100,6 +102,19 @@ def run(path):
             if distance>=.5 and speed>.5:break
             time.sleep(.1)
         else:raise AssertionError('native TAKEOFF was not actually forwarded/latched')
+        # Reconnect solely to observe; no new grant or old request may survive.
+        previous_session=str(after.telemetry.link_session_id)
+        runtime.connect();until=time.monotonic()+1.5
+        while time.monotonic()<until:cycle()
+        fresh=runtime.world_snapshot().vehicle
+        if (runtime.session_id==previous_session or runtime.authority.system_send
+                or runtime.authority.action_send or runtime.authority.lease or fresh is None
+                or str(fresh.telemetry.link_session_id)!=runtime.session_id or not fresh.operation.armed):
+            raise AssertionError('read-only reconnect carried authorization or lacks fresh state')
+        if runtime.shutdown()!={'fixed-wing-flight':'UNCONFIRMED'} or len(writes)!=before+1:
+            raise AssertionError('read-only reconnect lost flight uncertainty or wrote a command')
+        report['read_only_reconnect']=dict(passed=True,stops={'fixed-wing-flight':'UNCONFIRMED'},writer_calls=0,
+            new_session=str(fresh.telemetry.link_session_id),armed=fresh.operation.armed)
         report.update(passed=True,stops=stops,status=status,takeoff_writer_calls=1,recovery_writer_calls=0,peer_ack_observed_not_delivered=True,
             post_cancel_displacement_m=distance,post_cancel_ground_speed_mps=speed,
             world_after_cancel=dict(armed=after.operation.armed,native_mode=after.operation.native_mode,

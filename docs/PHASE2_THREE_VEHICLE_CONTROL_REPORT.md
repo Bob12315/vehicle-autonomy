@@ -170,3 +170,22 @@ ACK/HB 的 MAC 与接收新鲜度，当前 SITL 通道 0 的本机受信输入�
 独立 Codex 审查结论 **FAIL**，原文见 [5955dcb 独立审查](phase2/INDEPENDENT_REVIEW_5955dcb.md)。
 其独立运行 409 项单元通过，582 项证据哈希一致；另外复现取消旧队列写出（P1）、原生 Action
 交接缺屏障（P2）、重连丢失飞行不确定性（P2）。原始 FAIL 和探针全部保留，修复后重新回归并复审。
+
+## 独立审查缺陷修复（重新验收进行中）
+
+保留 `INDEPENDENT_REVIEW_5955dcb.md` 原始 FAIL 结论；原候选报告/索引另存于
+`artifacts/phase2-control/candidate-5955dcb-{report.md,evidence.json}`，其 936f25d 的
+物理 PASS 不代表本次修复已经完成真实回归。
+
+- 取消排序：`end_run` 在任何恢复 Writer 循环之前调用既有 `cancel_pending_requests`。
+  只撤销 ACCEPTED 请求，不改变已写出命令的真实结果。
+- Action 交接：原生飞行或 RTL 危险尚未解除时拒绝交接，拒绝不改变旧授权或代际。
+  当前 Action 内的正常确认和显式回收/新 run 继续保留。
+- 重连：保留负向的未确认原生运动记录；新会话继续清除旧 ACK、遥测和写入权限。
+  只读重连后 shutdown 仍返回相应 UNCONFIRMED 且不发送恢复指令。
+
+项目内 `tests/test_native_recovery_boundaries.py` 6 项测试修复前稳定出现 7 个失败
+（含 Plane 两种排队命令子场景），修复后全部通过。完整 415 项单元通过。
+日志位于 `artifacts/phase2-control/review-remediation/{boundaries-before,boundaries-after,unit-after}.log`。
+真实 Plane/Rover 场景新增取消旧队列、拒绝交接及只读重连的实际 Writer/状态断言；
+冻结提交后的两轮完整回归和第二次独立审查尚待执行。

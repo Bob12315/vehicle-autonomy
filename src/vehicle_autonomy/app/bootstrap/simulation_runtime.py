@@ -205,7 +205,8 @@ class SimulationRuntime:
         self._action_id = None
         self._fault = None
         self._active_stream_ids.clear()
-        self._native_rtl_requested = self._plane_flight_requested = False
+        # A new link invalidates positive confirmation and authorization, not
+        # an unresolved native-motion hazard from the previous link epoch.
         self._emit("connected_transport", host=self.profile.host, port=self.profile.port)
 
     def _capture(self, source_clock, message, received):
@@ -440,7 +441,8 @@ class SimulationRuntime:
         """Deployment selects a compiled step; a client cannot create a lease."""
         if self._run_id is None or self._execution is None or self.session_id is None:
             raise RuntimeError("active connected run required")
-        if self._execution.active_stream_ids():
+        if (self._execution.active_stream_ids() or self._native_rtl_requested
+                or self._plane_flight_requested):
             raise RuntimeError("previous Action stop barrier incomplete")
         self.authority.set_system_send(False)
         self.authority.revoke()
@@ -509,6 +511,10 @@ class SimulationRuntime:
     def end_run(self) -> dict[str, str]:
         """Request a bounded stop before revoking the run's send authority."""
         stops: dict[str, str] = {}
+        if self._native_rtl_requested or self._plane_flight_requested:
+            # Fence accepted work before cycling the writer for recovery.
+            # Already transmitted work retains its actual outcome/uncertainty.
+            self.cancel_pending_requests()
         if self.profile.kind == "plane" and (self._run_id is not None or self._plane_flight_requested):
             state = None if self._session is None else self._session.snapshot()
             ground_proven = (state is not None and state.health.quality is QualityState.VALID

@@ -286,7 +286,25 @@ def run(run_dir: Path, *, gazebo: bool = False, full: bool = False, native_rtl: 
                 if entry_speed is not None and entry_speed>.15 and entry_error>scenario['goto_max_horizontal_error_m']:
                     break
             else:raise AssertionError('native RTL cancellation lacked moving-before-arrival evidence')
+            from tests.simulation.native_boundaries import assert_handoff_blocked
+            summary['native_action_handoff']=assert_handoff_blocked(runtime)
+            recovery_writes=[];transport=runtime._transport;original_write=transport.write
+            def recovery_write(data):
+                recovery_writes.append(data)
+                original_write(data)
+            transport.write=recovery_write
+            # Queue another RTL, then cancel before any writer cycle.
+            if runtime.submit_effect(ModeEffect('RTL'),effect_id='queued-rtl-cancel').reason:
+                raise AssertionError('queued RTL cancellation request not admitted')
             stops=runtime.end_run()
+            transport.write=original_write
+            from tests.simulation.faults import TcpFaultProxy
+            frames=[TcpFaultProxy.frame_metadata(raw) for raw in recovery_writes]
+            if (runtime.effect_status('queued-rtl-cancel')['phase']!='CANCELLED' or len(frames)!=1
+                    or frames[0]['payload'].get('command')!=176 or frames[0]['payload'].get('param2')!=4):
+                raise AssertionError('queued RTL reached writer or recovery was not HOLD')
+            summary['queued_native_cancel']=dict(passed=True,status=runtime.effect_status('queued-rtl-cancel'),
+                old_writer_calls=0,recovery_frames=frames)
             if stops.get('native-rover-rtl')!='CONFIRMED' or any(v!='CONFIRMED' for v in stops.values()):
                 raise RuntimeError('native Rover RTL cancellation not telemetry-confirmed')
             stable=None;end=time.monotonic()+scenario['stop_timeout_s']

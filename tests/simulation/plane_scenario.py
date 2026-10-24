@@ -104,6 +104,29 @@ def run(path):
             raise AssertionError('wheel rollout evidence missing; cannot count hand/vertical launch')
         report['takeoff']=dict(passed=True,height=truth.z_m-baseline,
             ground_rollout_samples=len(rollout),max_ground_rollout_speed=max(s['speed'] for s in rollout))
+        from tests.simulation.native_boundaries import assert_handoff_blocked
+        report['action_handoff']=assert_handoff_blocked(runtime)
+        p=runtime.world_snapshot().vehicle.global_position.value
+        discarded=FixedWingTargetEffect(GeoPoint(p.latitude_deg+math.degrees(150/6378137.),p.longitude_deg,global_ground_alt+50))
+        before=len(writes)
+        if runtime.submit_effect(discarded,effect_id='cancelled-queued-target').reason:
+            raise AssertionError('queued cancellation target was not admitted')
+        previous_session=runtime.session_id
+        if runtime.end_run()!={'fixed-wing-flight':'UNCONFIRMED'}:
+            raise AssertionError('native queued-target cancellation lost flight uncertainty')
+        recovery=[proxy.frame_metadata(bytes.fromhex(w['raw_hex'])) for w in writes[before:]]
+        if (runtime.effect_status('cancelled-queued-target')['phase']!='CANCELLED'
+                or len(recovery)!=1 or recovery[0].get('type')!='COMMAND_LONG'
+                or recovery[0].get('payload',{}).get('command')!=176
+                or recovery[0].get('payload',{}).get('param2')!=12):
+            raise AssertionError('cancelled queued target reached writer or recovery was not LOITER')
+        report['queued_cancel']=dict(passed=True,old_phase='CANCELLED',old_writer_calls=0,recovery_frames=recovery)
+        runtime.connect();until=time.monotonic()+1.5
+        while time.monotonic()<until:state,truth=cycle()
+        if (runtime.session_id==previous_session or runtime.authority.system_send or runtime.authority.lease
+                or not runtime._plane_flight_requested):
+            raise AssertionError('reconnect lost hazard or inherited authorization')
+        runtime.begin_run(allow_send=True)
         state=runtime.world_snapshot().vehicle
         p=state.global_position.value
         target=GeoPoint(p.latitude_deg+math.degrees(150/6378137.),p.longitude_deg,global_ground_alt+50)
