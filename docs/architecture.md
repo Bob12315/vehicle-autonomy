@@ -14,7 +14,11 @@ old stationary-ground sample. Native target completion confirms configuration,
 with ordered signed ACK/target echo/GUIDED evidence, rather than physical arrival.
 The opt-in Rover RTL profile retains the original motion limits and observes
 fresh post-HOLD zero motion before confirming recovery. Copter and original Rover
-profiles retain their existing behavior. [Report](PHASE2_THREE_VEHICLE_CONTROL_REPORT.md)
+profiles retain their existing behavior. Native recovery first cancels accepted
+requests in the exiting scope. Unresolved native motion blocks Action handoff
+before authority changes, and its negative uncertainty survives receive-only
+reconnects without retaining command confirmation or write authority.
+[Report](PHASE2_THREE_VEHICLE_CONTROL_REPORT.md)
 records both real simulation rounds and remaining limits; hardware control,
 Plane Web/mission catalog and new perception/intelligence capabilities remain unavailable.
 

@@ -1,6 +1,6 @@
 # Phase 2：三车型基础仿真控制报告
 
-状态：**FAIL**。冻结版本开发侧回归通过，但独立审查发现 1 项 P1 和 2 项 P2，正在修复。
+状态：**READY FOR RE-AUDIT**。开发侧统一回归通过；独立审查记录另附，不自行宣布最终验收通过。
 
 ## 范围与基线
 
@@ -12,7 +12,7 @@
 已提交阶段：`97cddfc` 能力矩阵；`917c792` Plane 原生接口与滑跑模型；
 `0bf8a34` Rover 原生 RTL、取消回收及独立原配置回归；
 `bf5f8ea` 修复更新目标矛盾仍可能错误完成；`967d20f` 修复 TAKEOFF 取消窗口与陈旧地面状态；
-`936f25d` 补齐 wheel 的 9 项三车型仿真资源。
+`936f25d` 补齐 wheel 的 9 项三车型仿真资源；`634c30b` 修复独立审查发现的取消队列、Action 交接与只读重连生命周期问题。
 控制和仿真输入在正式回归期间冻结。旧 Phase 1 报告、结论与非敏感证据不改。
 
 ## 官方依据与源码
@@ -96,6 +96,30 @@ Pivot 触发角 45°、最大转率 30°/s。原误差 0.75m、停车 0.10m/s、
 所有失败仍原样保留，未跳过测试或改写原结论。开发态部分实现/输入处于未提交状态，
 对应 manifest 的工作树标记和当时参数回读保留；不将其冒充最终冻结版本验收。
 
+## 独立 FAIL 与最小生命周期修复
+
+原候选 `936f25d` 的 409 单元/18 物理场景开发侧通过，但 `5955dcb` 独立审查为 **FAIL**：
+取消恢复循环先写出旧目标（P1）、原生运动未确认时允许新 Action（P2）、只读重连清除危险记录（P2）。
+原始结论完整保留在 [原审查报告](phase2/INDEPENDENT_REVIEW_5955dcb.md)；原候选报告/索引保存于
+`artifacts/phase2-control/candidate-5955dcb-{report.md,evidence.json}`。不将原物理 PASS 当作缺陷未发生的证明。
+
+`634c30b` 仅改动 SimulationRuntime 中三个直接位置，复用已有 Execution/Writer 机制：
+
+- 取消：先调用 `cancel_pending_requests()` 撤销当前作用域所有尚未写出的 ACCEPTED 请求，再排队恢复模式。
+  原顺序是“排队恢复→循环 Writer→撤权”，可先排出旧目标；现为“撤销旧排队意图→恢复→撤权”。
+  已写出的命令保持真实结果及 UNKNOWN 边界，绝不改成 CANCELLED。
+- 交接：原生飞行/RTL 危险尚未解除时，`authorize_action` 在任何授权变更前拒绝。
+  拒绝保持原 Action、Lease、授权和 SEND 代际。当前 Action 内的正常签名确认仍工作。
+  本轮未实现自动的空中跨 Action 交接；继续飞行须显式结束旧 run、必要时新鲜重连并重新授权新 run。
+- 重连：重建正向会话/遥测/确认并撤销旧授权，同时保留负向的未确认原生运动记录。
+  只读重连不写命令，shutdown 仍报告 UNCONFIRMED。合格的新鲜未解锁静止地面可解除 Plane 记录；
+  Rover 仍须 HOLD 确认及其后的新鲜零速。陈旧或已解锁地面不作为解除证据。
+
+新增 6 项签名内存测试修复前稳定 7 失败（含两个 Plane 排队子场景），修复后全部通过；
+日志见 `review-remediation/boundaries-{before,after}.log`。断言包含实际帧、Writer 数量、Command/World、
+授权身份/代际及跨会话结果。独立审查员另行运行 415 单元及自编 8 组边界探针通过，
+代码阶段未发现新 P1/P2/P3；其物理证据阶段结论另附。原审查没有修改。
+
 ## 统一回归
 
 入口：
@@ -103,7 +127,7 @@ Pivot 触发角 45°、最大转率 30°/s。原误差 0.75m、停车 0.10m/s、
 ```bash
 .venv-migration/bin/python -m tests.simulation.phase2_harness --allow-send \
   --sitl-bin-dir artifacts/phase2-control/ardupilot-source/build/sitl/bin \
-  --run-dir artifacts/phase2-control/acceptance-936f25d
+  --run-dir artifacts/phase2-control/acceptance-634c30b
 ```
 
 入口必须显式授权 SEND 和指定三个 SITL 二进制。每轮 Rover 为 Probe、原配置物理场景、
@@ -112,36 +136,38 @@ Plane 分别运行 TAKEOFF 已被飞控处理、应用仍只持旧地面状态�
 物理飞行和真实代理故障的完整场景。两轮使用独立运行目录、世界/会话、
 端口选择和临时密钥。原 Rover/Copter A–F 逐组及十五类故障、七项修复回归必须全部满足。
 
-409 项单元全部通过，0 失败、0 错误、0 跳过；两轮共 18 个真实场景全部通过，三车型各轮 A–F 全通过。
+415 项单元全部通过，0 失败、0 错误、0 跳过；两轮共 18 个真实场景全部通过，三车型各轮 A–F 全通过。
 
 | 轮次 | Rover 原生 RTL HOME 误差 m | Copter RTL HOME 误差 m | Plane AUTOLAND HOME 误差 m | Plane 低高度高速滑跑样本 | Plane 最终 armed |
 | --- | --- | --- | --- | --- | --- |
-| 1 | 0.668275 | 0.001196 | 1.003219 | 20 | False |
-| 2 | 0.699508 | 0.001590 | 0.826421 | 20 | False |
+| 1 | 0.539595 | 0.001885 | 0.901217 | 20 | False |
+| 2 | 0.538737 | 0.001624 | 0.854614 | 20 | False |
 
-运行 UTC：`2026-10-24T03:42:51.278159+00:00` 至 `2026-10-24T04:27:19.748495+00:00`；代码提交 `936f25d55e163be2703a98bcff6cea44a606999f`。
-源代码与仿真输入 SHA256：`45347149aa68fd0a752bd67cfb2c59034c62dd228539deed45c82e9c3c824e46`，结束时完全一致。
-原始入口/退出状态见 `artifacts/phase2-control/acceptance-936f25d/{summary,stages,unit}.json`。
+运行 UTC：`2026-10-24T04:42:11.197101+00:00` 至 `2026-10-24T05:26:38.222297+00:00`；代码提交 `634c30b02bc7f7b94030e14c2899f3abd375c716`。
+源代码与仿真输入 SHA256：`59907b85b53f6be51175d0c40a9427a6dbd4e5f64f9165ccec7a22eaccdd9085`，结束时完全一致。
+原始入口/退出状态见 `artifacts/phase2-control/acceptance-634c30b/{summary,stages,unit}.json`。
 每个真实场景都有独立 manifest、运行日志、签名支持证明、运行事件和物理轨迹；有代理的
 场景另含收发/丢弃/重放原始帧。摘要和文件哈希见 [证据索引](phase2/phase2-evidence.json)。
+两轮独立 Gazebo 真值绘图见 [Plane 飞行轨迹](phase2/plane-flight-truth.png)。
 Plane 的 LOITER 10s、RTL 8s 为实际模式和续飞段检查，不冒充完整盘旋一圈或完整返航精度验收。
 
-新增取消窗口每轮独立启动真实 Plane：TAKEOFF 已在代理收到飞控 ACK，但不交给应用；
+每轮独立启动真实 Plane 取消窗口：TAKEOFF 已在代理收到飞控 ACK，但不交给应用；
 应用仍持原地面样本。取消后的实际运动证明旧地面样本不能证明停止。两轮均要求命令 UNKNOWN、
 飞行停止 UNCONFIRMED、TAKEOFF Writer 1 次、额外恢复 Writer 0 次，且旧 World 样本时间/会话不被刷新。
+此窗口同时实际验证 Action 交接被拒绝且原授权不变、只读重连后 shutdown 仍为 UNCONFIRMED、
+重连期间 0 次新写入。正式飞行场景及 Rover 原生 RTL 场景另外验证排队旧目标/RTL 被 CANCELLED，
+其实际 Writer 次数为 0，且恢复只有一次原生 LOITER/HOLD。原有物理阈值、取消和失联场景均保留。
 
-wheel 独立安装在忽略目录的独立虚拟环境中，从 `/tmp` 使用 `python -I` 验证：9 项新增资源全在、
-190 个生产 Python 文件与源码逐字节一致、Plane/Rover profile 可加载、原生 COMMAND_INT 编码正确。
-MAVLink 可选依赖安装为项目规定的 pymavlink 2.4.49 / pyserial 3.5；未连接任何硬件。
+新 wheel 独立安装在 `review-remediation/wheel-isolated/`，从 `/tmp` 使用 `python -I` 验证：
+9 项新增资源全在、190 个生产 Python 文件与当前源码逐字节一致、Plane/Rover profile 可加载、
+原生 COMMAND_INT 编码正确。MAVLink 可选依赖为项目规定的 pymavlink 2.4.49 / pyserial 3.5。
+未连接任何硬件。
 
 
 活动原生 TAKEOFF 即使最后状态仍在地面，也保持飞行不确定性。新鲜 VALID、低速地面
 证据方可证明已在地面；活动原生飞行还要求新的未解锁状态。低空 LOITER 被安全策略拒绝时，
 不发送零速、空中 Disarm 或其他替代指令。断链后的 WorldSnapshot 保留原会话、原采样时间
 的最后已知样本；它不是新的物理停止证据，当前会话/授权已撤销，命令 UNKNOWN。
-
-两轮物理轨迹图见 [Plane 独立真值轨迹](phase2/plane-flight-truth.png)；图源为各轮
-`trajectory.jsonl`，原 PNG/SVG 与哈希保留在证据索引。
 
 ## 边界
 
@@ -159,33 +185,17 @@ ACK/HB 的 MAC 与接收新鲜度，当前 SITL 通道 0 的本机受信输入�
 销毁后不能再用旧密钥离线重新计算旧帧的 MAC，保留的是当时在线/独立验签结果。
 普通覆盖/截断不宣称对外部快照、备份或物理介质取证的绝对擦除。
 
-历史保护复核：与起始提交逐字节比较的 9 份原报告/索引不变；去重后的 724 个已索引
-非敏感证据逐一 SHA256 一致。详见 `artifacts/phase2-control/historical-evidence-check.json`。
+历史保护复核：与起始提交逐字节比较的 9 份原报告/索引不变；去重后的 739 个已索引
+非敏感证据逐一 SHA256 一致。详见 `artifacts/phase2-control/review-remediation/historical-evidence-check.json`。
 
 ## 资源、审查与交付
 
 正式 18 场景均验证临时凭据销毁、私有配置/状态消失、自有进程组为空和端口释放。
+历史九份报告/索引字节未变，本次重新核查扩大到 739 项既有非敏感原始文件，哈希全部一致；
+已销毁的 EEPROM 不读取、不恢复、不伪称原哈希可再验证。
 最终复查、外部环境未修改及 Git 工作区记录见证据索引和 `artifacts/phase2-control/final-delivery.json`。
+外部 ArduPilot 与插件受跟踪源码保持干净；插件已有未跟踪的 CUADC 模型/世界资源另行记录，
+保留原状，不将该外部目录宣称为完全干净或清理这些用户资源。
 
-独立 Codex 审查结论 **FAIL**，原文见 [5955dcb 独立审查](phase2/INDEPENDENT_REVIEW_5955dcb.md)。
-其独立运行 409 项单元通过，582 项证据哈希一致；另外复现取消旧队列写出（P1）、原生 Action
-交接缺屏障（P2）、重连丢失飞行不确定性（P2）。原始 FAIL 和探针全部保留，修复后重新回归并复审。
-
-## 独立审查缺陷修复（重新验收进行中）
-
-保留 `INDEPENDENT_REVIEW_5955dcb.md` 原始 FAIL 结论；原候选报告/索引另存于
-`artifacts/phase2-control/candidate-5955dcb-{report.md,evidence.json}`，其 936f25d 的
-物理 PASS 不代表本次修复已经完成真实回归。
-
-- 取消排序：`end_run` 在任何恢复 Writer 循环之前调用既有 `cancel_pending_requests`。
-  只撤销 ACCEPTED 请求，不改变已写出命令的真实结果。
-- Action 交接：原生飞行或 RTL 危险尚未解除时拒绝交接，拒绝不改变旧授权或代际。
-  当前 Action 内的正常确认和显式回收/新 run 继续保留。
-- 重连：保留负向的未确认原生运动记录；新会话继续清除旧 ACK、遥测和写入权限。
-  只读重连后 shutdown 仍返回相应 UNCONFIRMED 且不发送恢复指令。
-
-项目内 `tests/test_native_recovery_boundaries.py` 6 项测试修复前稳定出现 7 个失败
-（含 Plane 两种排队命令子场景），修复后全部通过。完整 415 项单元通过。
-日志位于 `artifacts/phase2-control/review-remediation/{boundaries-before,boundaries-after,unit-after}.log`。
-真实 Plane/Rover 场景新增取消旧队列、拒绝交接及只读重连的实际 Writer/状态断言；
-冻结提交后的两轮完整回归和第二次独立审查尚待执行。
+独立 Codex 复审：[代码阶段报告](phase2/INDEPENDENT_CODE_REVIEW_634c30b.md)；
+完整证据阶段待归档。审查为代码/证据核验、单元和内存探针，未冒称审查员独立重跑全部物理场景。
