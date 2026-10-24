@@ -1,6 +1,6 @@
 {
   "schema": "phase2-three-vehicle-v1",
-  "status": "READY FOR RE-AUDIT",
+  "status": "FAIL",
   "generated_at": "2026-10-24T04:28:00.096428+00:00",
   "baseline": "148a224fae4a652b8f250be827d8e79a9e41bbf9",
   "code_commit": "936f25d55e163be2703a98bcff6cea44a606999f",
@@ -11787,6 +11787,11 @@
       "path": "artifacts/phase2-control/wheel-after/vehicle_autonomy-0.1.0-py3-none-any.whl",
       "bytes": 356540,
       "sha256": "8471df2aacb882bd01437184945f1c430220e4c42b734bf71be76cdec0d58772"
+    },
+    {
+      "path": "docs/phase2/INDEPENDENT_REVIEW_5955dcb.md",
+      "bytes": 11830,
+      "sha256": "2cda8015c7baf51b790382e775e4126d8b81b765ea593c78936f70c241bf023f"
     }
   ],
   "limitations": [
@@ -11797,7 +11802,13 @@
     "No hardware or Phase 3 work."
   ],
   "independent_review": {
-    "status": "PENDING",
-    "scope": "Independent code/evidence review; final acceptance remains with user-appointed reviewer."
+    "status": "FAIL",
+    "target": "5955dcb26d2fc712ebb980a04e07e666b0bde4e8",
+    "report": "docs/phase2/INDEPENDENT_REVIEW_5955dcb.md",
+    "findings": [
+      "P1: queued native request written during cancellation",
+      "P2: native Action handoff has no recovery barrier",
+      "P2: reconnect drops native flight uncertainty"
+    ]
   }
 }
