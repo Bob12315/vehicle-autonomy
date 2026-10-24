@@ -71,6 +71,9 @@ def run(path,kind,*,faults=False,browser=False):
             owned.assert_alive();truth=oracle.latest()
             if truth:
                 if time.monotonic_ns()-truth.host_received_ns>500_000_000:raise AssertionError('Gazebo truth stale')
+                limits=owned.profile.safety
+                if truth.z_m>limits.max_altitude_m or not limits.min_x_m<=truth.x_m<=limits.max_x_m or not limits.min_y_m<=truth.y_m<=limits.max_y_m:
+                    raise AssertionError('independent physical truth exceeded the audited safety envelope')
                 item={'host_ns':time.monotonic_ns(),'sim_ns':truth.simulation_ns,'position':[truth.x_m,truth.y_m,truth.z_m],
                     'yaw':truth.yaw_rad,'speed':oracle.recent_speed_mps()}
                 world=driver.snapshot()
@@ -181,7 +184,11 @@ def run(path,kind,*,faults=False,browser=False):
                 api('/api/cancel',{'id':a['id']});wait(a,expected='CANCELLED')
             wait(submit('SetMode',{'mode':'GUIDED'}))
             wait(submit('Goto',{'x_m':2.,'y_m':0.}),timeout=55)
+            truth=sample();error=math.hypot(truth.x_m-initial.x_m-2,truth.y_m-initial.y_m)
+            if error>.75:raise AssertionError('Rover Goto independent physical error')
+            result['goto_truth']={'passed':True,'error_m':error}
             wait(submit('Stop'))
+            if (oracle.recent_speed_mps() or 0)>.1:raise AssertionError('Rover Stop independent physical speed')
             wait(submit('ReturnHome'),timeout=65)
             wait(submit('Disarm'))
             final=sample()
@@ -217,9 +224,13 @@ def run(path,kind,*,faults=False,browser=False):
                 raise AssertionError('Copter RTL did not physically return and land')
         else:
             previous=wait(submit('Takeoff',{'height_m':50}),timeout=140)
+            truth=sample();height=truth.z_m-baseline
+            if height<45:raise AssertionError('Plane Action completed before independent Gazebo climb to 45 m')
             flight=[t for t in trajectory if t['position'][2]-baseline<1 and (t['speed'] or 0)>8]
             if not flight or max(math.hypot(t['position'][0]-initial.x_m,t['position'][1]-initial.y_m) for t in flight)<10:
                 raise AssertionError('Plane real wheel ground rollout missing')
+            result['takeoff_truth']={'passed':True,'height_m':height,'ground_rollout_samples':len(flight),
+                'max_ground_rollout_speed_mps':max(t['speed'] for t in flight)}
             if not previous['safety']['continuation_allowed']:raise AssertionError('Plane flight reservation lost')
             world=driver.snapshot();geo=world.vehicle.global_position.value
             target={'latitude_deg':geo.latitude_deg+math.degrees(150/6378137.),'longitude_deg':geo.longitude_deg,'altitude_amsl_m':584+50.}

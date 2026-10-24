@@ -16,6 +16,8 @@ class Proof:
 
 
 class DriverTests(unittest.TestCase):
+    def test_string_false_cannot_enable_deployment_send_or_open_transport(self):
+        with self.assertRaises(TypeError):VehicleActionDriver('bad',None,None,None,allow_send='false')
     def setUp(self):
         self.fixture=simulation_tests.SimulationRuntimeTests();self.fixture.setUp()
         self.r=self.fixture.runtime;self.r.connect();self.fixture.cycle(self.fixture.heartbeat(mode=4)+self.fixture.state_messages())

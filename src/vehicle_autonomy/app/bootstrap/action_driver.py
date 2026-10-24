@@ -23,6 +23,7 @@ from vehicle_autonomy.world.environment.resources import Environment
 
 class VehicleActionDriver:
     def __init__(self,target,profile,translator,ownership,*,allow_send=False,event_sink=None,transport_factory=None):
+        if type(allow_send) is not bool:raise TypeError('deployment SEND must be an explicit bool')
         if profile.kind!=ownership.kind or profile.port!=ownership.port or profile.host!='127.0.0.1':
             raise ValueError('profile must exactly match the explicit owned SITL endpoint')
         self.target=target;self.profile=profile;self.ownership=ownership;self.allow_send=allow_send
