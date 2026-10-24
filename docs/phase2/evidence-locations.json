@@ -1,0 +1,20 @@
+{
+  "schema": "phase2-evidence-location-v1",
+  "generated_at": "2026-10-24T16:37:18.085375+00:00",
+  "prior_index": "artifacts/phase2-control/candidate-5955dcb-evidence.json",
+  "old_index_entries": 582,
+  "original_paths_still_equal": 581,
+  "relocated_content_count": 1,
+  "unavailable_contents": [],
+  "prior_audit_timing": "review-remediation/prior-candidate-preservation.json was executed before the rolling docs plot path was updated; its zero-mismatch result describes that point in time.",
+  "relocated": [
+    {
+      "original_path": "docs/phase2/plane-flight-truth.png",
+      "original_bytes": 291880,
+      "original_sha256": "fc0acf370035915ffc8abc3221b7856ae39049c95a2a2bf4b81242439dfdc812",
+      "preserved_raw_path": "artifacts/phase2-control/final-plane-truth.png",
+      "preserved_git_path": "docs/phase2/plane-flight-truth-936f25d.png",
+      "reason": "Rolling report plot now depicts frozen 634c30b runs. Original plot bytes and original expected hash remain unchanged in separate locations."
+    }
+  ]
+}

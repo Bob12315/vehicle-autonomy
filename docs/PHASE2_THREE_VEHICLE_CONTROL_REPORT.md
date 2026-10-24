@@ -102,6 +102,9 @@ Pivot 触发角 45°、最大转率 30°/s。原误差 0.75m、停车 0.10m/s、
 取消恢复循环先写出旧目标（P1）、原生运动未确认时允许新 Action（P2）、只读重连清除危险记录（P2）。
 原始结论完整保留在 [原审查报告](phase2/INDEPENDENT_REVIEW_5955dcb.md)；原候选报告/索引保存于
 `artifacts/phase2-control/candidate-5955dcb-{report.md,evidence.json}`。不将原物理 PASS 当作缺陷未发生的证明。
+旧候选 582 项索引中，581 项原路径字节不变；汇总图的滚动路径已更新，旧图按原 SHA256
+另存于 [936f25d 原图](phase2/plane-flight-truth-936f25d.png) 和原始 artifact。
+[位置变更记录](phase2/evidence-locations.json)保留原路径、原哈希及新归档位置；不修改旧索引的期望哈希。
 
 `634c30b` 仅改动 SimulationRuntime 中三个直接位置，复用已有 Execution/Writer 机制：
 
