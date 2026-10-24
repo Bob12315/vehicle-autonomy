@@ -1,7 +1,7 @@
 """Rover's audited body-forward/reverse and yaw-rate setpoints."""
 from dataclasses import dataclass, field
 
-from vehicle_autonomy.actions.copter.standard import StreamFactory, StreamInstance
+from vehicle_autonomy.actions.common.stream import StreamFactory, StreamInstance
 from vehicle_autonomy.contracts.core.geometry import Twist3, Vector3
 from vehicle_autonomy.contracts.effects.vehicle import TwistTargetEffect
 from vehicle_autonomy.contracts.effects.vehicle import StopMotionEffect,ModeEffect

@@ -23,7 +23,7 @@ class DriverTests(unittest.TestCase):
         self.r=self.fixture.runtime;self.r.connect();self.fixture.cycle(self.fixture.heartbeat(mode=4)+self.fixture.state_messages())
         d=self.d=VehicleActionDriver.__new__(VehicleActionDriver)
         d.target='copter';d.profile=self.r.profile;d.ownership=Proof();d.allow_send=True;d._runtime=self.r;d.clock=self.fixture.clock
-        d._lock=RLock();d._scope=None;d._effects={};d._results={};d._cancelled=set();d._guards={};d._fault=None;d._world=None
+        d._lock=RLock();d._scope=None;d._effects={};d._results={};d._effect_sessions={};d._requested_scopes=set();d._cancelled=set();d._guards={};d._fault=None;d._world=None
         def task(function):
             f=Future()
             try:f.set_result(function())
@@ -44,6 +44,8 @@ class DriverTests(unittest.TestCase):
         self.open('valid').result();self.assertTrue(self.r.authority.system_send)
     def test_read_query_exit_cannot_revoke_motion_authority(self):
         self.open().result();lease=self.r.authority.lease
+        self.d._task=lambda _:(_ for _ in ()).throw(AssertionError('Query occupied vehicle queue'))
+        self.d.begin_exit('query')
         self.assertTrue(self.d.finish_scope('query',succeeded=True).result().release_safe)
         self.assertEqual(self.r.authority.lease,lease);self.assertTrue(self.r.authority.system_send)
         self.assertEqual(self.fixture.transports[0].writes,[])
@@ -72,6 +74,18 @@ class DriverTests(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             self.d.emit('a',EffectEnvelope(SchemaVersion(1,0),'late-arm','a','a',now,self.deadline(),ArmEffect()),cleanup=True).result()
         self.assertEqual(self.fixture.transports[0].writes,[])
+    def test_historical_effect_keeps_original_session_across_link_loss_and_reconnect(self):
+        self.open().result();now=self.d.clock();original=self.r.session_id
+        self.d.emit('a',EffectEnvelope(SchemaVersion(1,0),'arm','a','a',now,self.deadline(),ArmEffect()),cleanup=False).result()
+        self.fixture.cycle(self.fixture.heartbeat(mode=4)+self.fixture.state_messages());self.d._publish()
+        self.fixture.transports[-1].disconnected=True;self.fixture.cycle();self.d._publish()
+        self.assertEqual(self.d.effect_results('a')[0].link_session_id,original)
+        self.assertEqual(self.d.effect_results('a')[0].phase.value,'UNKNOWN')
+        self.r.connect();self.fixture.cycle(self.fixture.heartbeat(mode=4)+self.fixture.state_messages());self.d._publish()
+        self.assertNotEqual(self.r.session_id,original)
+        self.assertEqual(self.d.effect_results('a')[0].link_session_id,original)
+        self.assertEqual(self.d.effect_results('a')[0].phase.value,'UNKNOWN')
+        self.assertEqual(sum(len(t.writes) for t in self.fixture.transports),1)
 
 
 if __name__=='__main__':unittest.main()

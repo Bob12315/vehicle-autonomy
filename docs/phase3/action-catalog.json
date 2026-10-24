@@ -12,6 +12,19 @@
         "required": []
       },
       "output": {
+        "additionalProperties": false,
+        "properties": {
+          "confirmed": {
+            "type": "string"
+          },
+          "physical_arrival_claim": {
+            "const": false
+          }
+        },
+        "required": [
+          "confirmed",
+          "physical_arrival_claim"
+        ],
         "type": "object"
       },
       "vehicle_types": [
@@ -58,6 +71,19 @@
         "required": []
       },
       "output": {
+        "additionalProperties": false,
+        "properties": {
+          "confirmed": {
+            "type": "string"
+          },
+          "physical_arrival_claim": {
+            "const": false
+          }
+        },
+        "required": [
+          "confirmed",
+          "physical_arrival_claim"
+        ],
         "type": "object"
       },
       "vehicle_types": [
@@ -117,7 +143,7 @@
         "required": []
       },
       "output": {
-        "type": "object"
+        "type": "null"
       },
       "vehicle_types": [
         "rover"
@@ -161,6 +187,54 @@
         "required": []
       },
       "output": {
+        "additionalProperties": false,
+        "properties": {
+          "context": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "home": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "kind": {
+            "enum": [
+              "copter",
+              "plane",
+              "rover"
+            ]
+          },
+          "read_only": {
+            "const": true
+          },
+          "target": {
+            "type": "string"
+          },
+          "world": {
+            "description": "Immutable WorldSnapshot JSON with source/receive/publish times and quality",
+            "type": "object"
+          }
+        },
+        "required": [
+          "target",
+          "kind",
+          "world",
+          "home",
+          "context",
+          "read_only"
+        ],
         "type": "object"
       },
       "vehicle_types": [
@@ -222,6 +296,15 @@
         ]
       },
       "output": {
+        "additionalProperties": false,
+        "properties": {
+          "physical_goal_observed": {
+            "const": true
+          }
+        },
+        "required": [
+          "physical_goal_observed"
+        ],
         "type": "object"
       },
       "vehicle_types": [
@@ -265,7 +348,40 @@
         "required": []
       },
       "output": {
-        "type": "object"
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "confirmed": {
+                "type": "string"
+              },
+              "physical_arrival_claim": {
+                "const": false
+              }
+            },
+            "required": [
+              "confirmed",
+              "physical_arrival_claim"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "armed": {
+                "type": "boolean"
+              },
+              "physical_goal_observed": {
+                "const": true
+              }
+            },
+            "required": [
+              "physical_goal_observed",
+              "armed"
+            ],
+            "type": "object"
+          }
+        ]
       },
       "vehicle_types": [
         "copter",
@@ -311,6 +427,19 @@
         "required": []
       },
       "output": {
+        "additionalProperties": false,
+        "properties": {
+          "armed": {
+            "type": "boolean"
+          },
+          "physical_goal_observed": {
+            "const": true
+          }
+        },
+        "required": [
+          "physical_goal_observed",
+          "armed"
+        ],
         "type": "object"
       },
       "vehicle_types": [
@@ -368,6 +497,19 @@
         ]
       },
       "output": {
+        "additionalProperties": false,
+        "properties": {
+          "confirmed": {
+            "type": "string"
+          },
+          "physical_arrival_claim": {
+            "const": false
+          }
+        },
+        "required": [
+          "confirmed",
+          "physical_arrival_claim"
+        ],
         "type": "object"
       },
       "vehicle_types": [
@@ -414,6 +556,15 @@
         "required": []
       },
       "output": {
+        "additionalProperties": false,
+        "properties": {
+          "physical_goal_observed": {
+            "const": true
+          }
+        },
+        "required": [
+          "physical_goal_observed"
+        ],
         "type": "object"
       },
       "vehicle_types": [
@@ -463,7 +614,7 @@
         "required": []
       },
       "output": {
-        "type": "object"
+        "type": "null"
       },
       "vehicle_types": [
         "rover"
@@ -509,6 +660,19 @@
         "required": []
       },
       "output": {
+        "additionalProperties": false,
+        "properties": {
+          "confirmed": {
+            "type": "string"
+          },
+          "physical_arrival_claim": {
+            "const": false
+          }
+        },
+        "required": [
+          "confirmed",
+          "physical_arrival_claim"
+        ],
         "type": "object"
       },
       "vehicle_types": [
@@ -555,6 +719,19 @@
         "required": []
       },
       "output": {
+        "additionalProperties": false,
+        "properties": {
+          "confirmed": {
+            "type": "string"
+          },
+          "physical_arrival_claim": {
+            "const": false
+          }
+        },
+        "required": [
+          "confirmed",
+          "physical_arrival_claim"
+        ],
         "type": "object"
       },
       "vehicle_types": [
@@ -601,6 +778,54 @@
         "required": []
       },
       "output": {
+        "additionalProperties": false,
+        "properties": {
+          "context": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "home": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "kind": {
+            "enum": [
+              "copter",
+              "plane",
+              "rover"
+            ]
+          },
+          "read_only": {
+            "const": true
+          },
+          "target": {
+            "type": "string"
+          },
+          "world": {
+            "description": "Immutable WorldSnapshot JSON with source/receive/publish times and quality",
+            "type": "object"
+          }
+        },
+        "required": [
+          "target",
+          "kind",
+          "world",
+          "home",
+          "context",
+          "read_only"
+        ],
         "type": "object"
       },
       "vehicle_types": [
@@ -661,6 +886,15 @@
         ]
       },
       "output": {
+        "additionalProperties": false,
+        "properties": {
+          "physical_goal_observed": {
+            "const": true
+          }
+        },
+        "required": [
+          "physical_goal_observed"
+        ],
         "type": "object"
       },
       "vehicle_types": [
@@ -704,7 +938,7 @@
         "required": []
       },
       "output": {
-        "type": "object"
+        "type": "null"
       },
       "vehicle_types": [
         "copter"
@@ -730,7 +964,7 @@
       "exit_timeout_s": 12.0,
       "effect_ttl_s": 1.0,
       "effect_ttl_overrides_s": {},
-      "implementation": "vehicle_autonomy.actions.copter.standard.StreamFactory",
+      "implementation": "vehicle_autonomy.actions.common.stream.StreamFactory",
       "success_semantics": "SetYaw: observed yaw within 0.1 rad settled 1 s; continuous operations require explicit cancellation.",
       "cancel_semantics": "Exit barrier; uncertain physical effects retain resources."
     },
@@ -746,6 +980,15 @@
         "required": []
       },
       "output": {
+        "additionalProperties": false,
+        "properties": {
+          "physical_goal_observed": {
+            "const": true
+          }
+        },
+        "required": [
+          "physical_goal_observed"
+        ],
         "type": "object"
       },
       "vehicle_types": [
@@ -790,7 +1033,40 @@
         "required": []
       },
       "output": {
-        "type": "object"
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "confirmed": {
+                "type": "string"
+              },
+              "physical_arrival_claim": {
+                "const": false
+              }
+            },
+            "required": [
+              "confirmed",
+              "physical_arrival_claim"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "armed": {
+                "type": "boolean"
+              },
+              "physical_goal_observed": {
+                "const": true
+              }
+            },
+            "required": [
+              "physical_goal_observed",
+              "armed"
+            ],
+            "type": "object"
+          }
+        ]
       },
       "vehicle_types": [
         "copter",
@@ -836,6 +1112,19 @@
         "required": []
       },
       "output": {
+        "additionalProperties": false,
+        "properties": {
+          "armed": {
+            "type": "boolean"
+          },
+          "physical_goal_observed": {
+            "const": true
+          }
+        },
+        "required": [
+          "physical_goal_observed",
+          "armed"
+        ],
         "type": "object"
       },
       "vehicle_types": [
@@ -893,6 +1182,19 @@
         ]
       },
       "output": {
+        "additionalProperties": false,
+        "properties": {
+          "confirmed": {
+            "type": "string"
+          },
+          "physical_arrival_claim": {
+            "const": false
+          }
+        },
+        "required": [
+          "confirmed",
+          "physical_arrival_claim"
+        ],
         "type": "object"
       },
       "vehicle_types": [
@@ -964,7 +1266,7 @@
         "required": []
       },
       "output": {
-        "type": "object"
+        "type": "null"
       },
       "vehicle_types": [
         "copter"
@@ -990,7 +1292,7 @@
       "exit_timeout_s": 12.0,
       "effect_ttl_s": 1.0,
       "effect_ttl_overrides_s": {},
-      "implementation": "vehicle_autonomy.actions.copter.standard.StreamFactory",
+      "implementation": "vehicle_autonomy.actions.common.stream.StreamFactory",
       "success_semantics": "SetYaw: observed yaw within 0.1 rad settled 1 s; continuous operations require explicit cancellation.",
       "cancel_semantics": "Exit barrier; uncertain physical effects retain resources."
     },
@@ -1014,6 +1316,17 @@
         ]
       },
       "output": {
+        "additionalProperties": false,
+        "properties": {
+          "yaw_rad": {
+            "maximum": 3.141592653589793,
+            "minimum": -3.141592653589793,
+            "type": "number"
+          }
+        },
+        "required": [
+          "yaw_rad"
+        ],
         "type": "object"
       },
       "vehicle_types": [
@@ -1040,7 +1353,7 @@
       "exit_timeout_s": 12.0,
       "effect_ttl_s": 1.0,
       "effect_ttl_overrides_s": {},
-      "implementation": "vehicle_autonomy.actions.copter.standard.StreamFactory",
+      "implementation": "vehicle_autonomy.actions.common.stream.StreamFactory",
       "success_semantics": "SetYaw: observed yaw within 0.1 rad settled 1 s; continuous operations require explicit cancellation.",
       "cancel_semantics": "Exit barrier; uncertain physical effects retain resources."
     },
@@ -1063,7 +1376,36 @@
         "required": []
       },
       "output": {
-        "type": "object"
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "physical_goal_observed": {
+                "const": true
+              }
+            },
+            "required": [
+              "physical_goal_observed"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "armed": {
+                "type": "boolean"
+              },
+              "physical_goal_observed": {
+                "const": true
+              }
+            },
+            "required": [
+              "physical_goal_observed",
+              "armed"
+            ],
+            "type": "object"
+          }
+        ]
       },
       "vehicle_types": [
         "copter",
@@ -1111,6 +1453,19 @@
         "required": []
       },
       "output": {
+        "additionalProperties": false,
+        "properties": {
+          "confirmed": {
+            "type": "string"
+          },
+          "physical_arrival_claim": {
+            "const": false
+          }
+        },
+        "required": [
+          "confirmed",
+          "physical_arrival_claim"
+        ],
         "type": "object"
       },
       "vehicle_types": [
@@ -1157,6 +1512,19 @@
         "required": []
       },
       "output": {
+        "additionalProperties": false,
+        "properties": {
+          "armed": {
+            "type": "boolean"
+          },
+          "physical_goal_observed": {
+            "const": true
+          }
+        },
+        "required": [
+          "physical_goal_observed",
+          "armed"
+        ],
         "type": "object"
       },
       "vehicle_types": [
@@ -1202,6 +1570,19 @@
         "required": []
       },
       "output": {
+        "additionalProperties": false,
+        "properties": {
+          "confirmed": {
+            "type": "string"
+          },
+          "physical_arrival_claim": {
+            "const": false
+          }
+        },
+        "required": [
+          "confirmed",
+          "physical_arrival_claim"
+        ],
         "type": "object"
       },
       "vehicle_types": [
@@ -1248,6 +1629,54 @@
         "required": []
       },
       "output": {
+        "additionalProperties": false,
+        "properties": {
+          "context": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "home": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "kind": {
+            "enum": [
+              "copter",
+              "plane",
+              "rover"
+            ]
+          },
+          "read_only": {
+            "const": true
+          },
+          "target": {
+            "type": "string"
+          },
+          "world": {
+            "description": "Immutable WorldSnapshot JSON with source/receive/publish times and quality",
+            "type": "object"
+          }
+        },
+        "required": [
+          "target",
+          "kind",
+          "world",
+          "home",
+          "context",
+          "read_only"
+        ],
         "type": "object"
       },
       "vehicle_types": [
@@ -1288,6 +1717,19 @@
         "required": []
       },
       "output": {
+        "additionalProperties": false,
+        "properties": {
+          "confirmed": {
+            "type": "string"
+          },
+          "physical_arrival_claim": {
+            "const": false
+          }
+        },
+        "required": [
+          "confirmed",
+          "physical_arrival_claim"
+        ],
         "type": "object"
       },
       "vehicle_types": [
@@ -1332,7 +1774,40 @@
         "required": []
       },
       "output": {
-        "type": "object"
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "confirmed": {
+                "type": "string"
+              },
+              "physical_arrival_claim": {
+                "const": false
+              }
+            },
+            "required": [
+              "confirmed",
+              "physical_arrival_claim"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "armed": {
+                "type": "boolean"
+              },
+              "physical_goal_observed": {
+                "const": true
+              }
+            },
+            "required": [
+              "physical_goal_observed",
+              "armed"
+            ],
+            "type": "object"
+          }
+        ]
       },
       "vehicle_types": [
         "copter",
@@ -1397,6 +1872,19 @@
         ]
       },
       "output": {
+        "additionalProperties": false,
+        "properties": {
+          "confirmed": {
+            "type": "string"
+          },
+          "physical_arrival_claim": {
+            "const": false
+          }
+        },
+        "required": [
+          "confirmed",
+          "physical_arrival_claim"
+        ],
         "type": "object"
       },
       "vehicle_types": [
@@ -1455,6 +1943,19 @@
         ]
       },
       "output": {
+        "additionalProperties": false,
+        "properties": {
+          "confirmed": {
+            "type": "string"
+          },
+          "physical_arrival_claim": {
+            "const": false
+          }
+        },
+        "required": [
+          "confirmed",
+          "physical_arrival_claim"
+        ],
         "type": "object"
       },
       "vehicle_types": [
@@ -1509,7 +2010,36 @@
         "required": []
       },
       "output": {
-        "type": "object"
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "physical_goal_observed": {
+                "const": true
+              }
+            },
+            "required": [
+              "physical_goal_observed"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "armed": {
+                "type": "boolean"
+              },
+              "physical_goal_observed": {
+                "const": true
+              }
+            },
+            "required": [
+              "physical_goal_observed",
+              "armed"
+            ],
+            "type": "object"
+          }
+        ]
       },
       "vehicle_types": [
         "copter",

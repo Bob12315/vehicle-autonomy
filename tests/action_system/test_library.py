@@ -35,6 +35,9 @@ class LibraryTests(unittest.TestCase):
         for kind,p in [('plane',{'height_m':1.5}),('copter',{'height_m':50})]:
             with self.assertRaises(ValueError):self.registry.parameters('Takeoff',p,vehicle_kind=kind)
         self.assertEqual(self.registry.parameters('Goto',{'x_m':1,'y_m':0},vehicle_kind='rover').z_m,0)
+        self.assertIn('world',self.registry.metadata('GetVehicleState')['output']['required'])
+        self.assertIs(self.registry.metadata('SetMode')['output']['properties']['physical_arrival_claim']['const'],False)
+        self.assertEqual(self.registry.metadata('Drive')['output'],{'type':'null'})
     def test_plane_command_adoption_is_not_takeoff_or_landing_success(self):
         goal=NativeGoal('TAKEOFF',13,lambda w:w.vehicle.reported_pose.value.position.z>=45)
         self.assertEqual(goal.tick(self.world).effects,(ModeEffect('TAKEOFF'),))

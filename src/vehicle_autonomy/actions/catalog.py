@@ -14,6 +14,25 @@ KINDS=frozenset({'rover','copter','plane'})
 MOTION=(PoseTargetEffect,TwistTargetEffect,StopMotionEffect)
 
 
+def result_schema(name):
+    def object_schema(properties,required=None):
+        return {'type':'object','properties':properties,'required':list(properties) if required is None else required,'additionalProperties':False}
+    configuration=object_schema({'confirmed':{'type':'string'},'physical_arrival_claim':{'const':False}})
+    physical=object_schema({'physical_goal_observed':{'const':True}})
+    native=object_schema({'physical_goal_observed':{'const':True},'armed':{'type':'boolean'}})
+    if name=='GetVehicleState':
+        return object_schema({'target':{'type':'string'},'kind':{'enum':sorted(KINDS)},
+            'world':{'type':'object','description':'Immutable WorldSnapshot JSON with source/receive/publish times and quality'},
+            'home':{'anyOf':[{'type':'object'},{'type':'null'}]},
+            'context':{'anyOf':[{'type':'object'},{'type':'null'}]},'read_only':{'const':True}})
+    if name in ('Drive','Turn','SetVelocity','Hold'):return {'type':'null'}
+    if name=='SetYaw':return object_schema({'yaw_rad':{'type':'number','minimum':-math.pi,'maximum':math.pi}})
+    if name in ('Takeoff','RTL'):return {'anyOf':[physical,native] if name=='Takeoff' else [configuration,native]}
+    if name in ('ReturnHome','AutoLand'):return native
+    if name in ('Goto','Land','Stop'):return physical
+    return configuration
+
+
 def capabilities(kind):
     common={'state','mode','arm','disarm','rtl'}
     return frozenset(common|({'drive','turn','goto','stop','return_home'} if kind=='rover' else
@@ -53,7 +72,7 @@ def register_standard(registry):
                       (ActionResource('vehicle.state',ResourceMode.SHARED),),
             required_state=('vehicle','reported_pose','reported_twist') if writing else (),
             default_timeout_ns=int(timeout*1e9),max_timeout_ns=int(max_timeout*1e9),exit_timeout_ns=12_000_000_000,
-            output_schema={'type':'object'},vehicle_parameter_overrides=overrides,vehicle_timeout_overrides=timeouts,
+            output_schema=result_schema(name),vehicle_parameter_overrides=overrides,vehicle_timeout_overrides=timeouts,
             effect_ttl_overrides={e.__name__:5_000_000_000 for e in effects if e in (ArmEffect,DisarmEffect,ModeEffect,TakeoffEffect,LandEffect,FixedWingTargetEffect)},
             success_semantics=success),factory)
     add('GetVehicleState',Empty,QueryFactory(),kind=ActionKind.QUERY,cap='state',success='Read immutable world, including freshness; grants no authority.')

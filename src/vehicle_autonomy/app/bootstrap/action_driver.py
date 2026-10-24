@@ -32,7 +32,7 @@ class VehicleActionDriver:
             event_sink=self._event,transport_factory=transport_factory,motion_guard=lambda *_:self._ownership_reason())
         self.clock=self._runtime.clock
         self._queue=Queue(maxsize=128);self._lock=RLock();self._stop=Event();self._ready=Event()
-        self._world=None;self._scope=None;self._effects={};self._results={};self._cancelled=set();self._guards={};self._home=None
+        self._world=None;self._scope=None;self._effects={};self._results={};self._effect_sessions={};self._requested_scopes=set();self._cancelled=set();self._guards={};self._home=None
         self._info={};self._fault=None;self._recovery=None
         self._thread=Thread(target=self._run,name='action-owner-'+target,daemon=True);self._thread.start()
         if not self._ready.wait(5):raise TimeoutError('vehicle owner startup timed out')
@@ -59,7 +59,7 @@ class VehicleActionDriver:
             for identifier,items in self._effects.items():
                 self._results[identifier]=tuple(EffectResult(str(env.effect_id),identifier,
                     EffectPhase((status or {}).get('phase','REQUESTED')),(status or {}).get('command_id'),
-                    self._runtime.session_id,(status or {}).get('reason')) for env in items
+                    self._effect_sessions.get(str(env.effect_id)),(status or {}).get('reason')) for env in items
                     for status in [self._runtime.effect_status(str(env.effect_id))])
 
     def _bind(self):
@@ -117,6 +117,7 @@ class VehicleActionDriver:
         with self._lock:return self._results.get(identifier,())
 
     def open_scope(self,identifier,*,allow_send,continuation_of,deadline):
+        with self._lock:self._requested_scopes.add(identifier)
         def admit():
             if identifier in self._cancelled or deadline.elapsed_ns_since(self.clock())<=0:
                 raise ActionAdmissionRejected('admission cancelled or expired')
@@ -174,6 +175,7 @@ class VehicleActionDriver:
                 if not (isinstance(effect,StopMotionEffect) or zero or recovery):
                     raise RuntimeError('exit ingress permits only stopping/recovery effects')
             result=self._runtime.dispatch_envelope(envelope)
+            self._effect_sessions[str(envelope.effect_id)]=self._runtime.session_id
             # Publish one stable post-cycle cut. Exposing a transient ACCEPTED
             # replacement before its mandatory writer cycle would repeatedly
             # reset the existing Action's physical settling observation.
@@ -183,11 +185,14 @@ class VehicleActionDriver:
 
     def begin_exit(self,identifier):
         with self._lock:self._cancelled.add(identifier)
+        if identifier not in self._requested_scopes:return  # Query never occupies the vehicle task queue.
         def fence():
             if self._scope==identifier:self._runtime.cancel_pending_requests()
         self._task(fence)
 
     def finish_scope(self,identifier,*,succeeded):
+        if identifier not in self._requested_scopes:
+            future=Future();future.set_result(ActionSafety(True));return future
         def finish():
             if self._scope!=identifier:
                 if identifier in self._effects:return self._guards.get(identifier,ActionSafety(False,False,'execution scope lost'))

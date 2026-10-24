@@ -30,10 +30,11 @@ class ExternalActionDriver:
     def close(self):pass
 
 
-def register_external(registry,name,create_job,*,continuous=False,parameters_type=WaitParameters):
+def register_external(registry,name,create_job,*,continuous=False,parameters_type=WaitParameters,output_schema=None):
     registry.register_typed(ActionSpec(name,parameters_type,frozenset({'external'}),kind=ActionKind.CONTINUOUS if continuous else ActionKind.GOAL,
         vehicle_types=frozenset({'external'}),resources=(ActionResource('ai.inference'),),
         description='Explicit external job endpoint; no vehicle authority',default_timeout_ns=10_000_000_000,
+        output_schema=output_schema or {'type':'object','description':'Provider-specific JSON result; deployments may supply a stricter schema'},
         success_semantics='External terminal result; lost response retains UNKNOWN and its resource.'),ExternalFactory(create_job))
 
 
