@@ -1261,6 +1261,14 @@
             "minimum": -0.35,
             "maximum": 0.35,
             "default": 0.0
+          },
+          "frame": {
+            "enum": [
+              "odom",
+              "base_link"
+            ],
+            "description": "odom ENU or body-relative base_link FLU; SI units",
+            "default": "odom"
           }
         },
         "required": []

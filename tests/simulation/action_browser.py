@@ -46,6 +46,9 @@ def exercise(base,token,lab,oracle,path,sample,actions):
             start=sample();identifier=perform('Drive',{'speed_mps':.3});report['actions'].append(identifier)
             until=time.monotonic()+2
             while time.monotonic()<until:sample();page.wait_for_timeout(100)
+            page.reload();page.locator('#token').fill(token);page.locator('#connect').click()
+            page.locator('.instance').filter(has_text=identifier).get_by_text('RUNNING',exact=False).first.wait_for()
+            if lab.runtime.view(identifier)['state']!='RUNNING':raise AssertionError('browser refresh lost the active Action')
             finish=sample()
             import math
             distance=math.hypot(finish.x_m-start.x_m,finish.y_m-start.y_m)
@@ -66,6 +69,7 @@ def exercise(base,token,lab,oracle,path,sample,actions):
             for action_id in report['actions']:
                 r=lab.runtime.view(action_id)
                 actions.append({'name':r['name'],'id':r['id'],'source':'real Chrome UI','final':r})
-            report.update(passed=True,physical_distance_m=distance,post_cancel_speed_mps=oracle.recent_speed_mps(),javascript_errors=errors)
+            report.update(passed=True,physical_distance_m=distance,post_cancel_speed_mps=oracle.recent_speed_mps(),
+                refresh_preserved_instance=True,javascript_errors=errors)
         finally:browser.close()
     return report

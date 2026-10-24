@@ -37,6 +37,17 @@ observing the existing physical stop barrier. Select SetMode GUIDED again
 before the next movement. Copter motion reuses the existing zero/stream stop
 barrier. A terminal label alone is never parking proof; inspect `safety` and
 the command results. A Query does not revoke a concurrent motion lease.
+SetVelocity explicitly selects `odom` ENU or `base_link` FLU coordinates;
+the existing Vehicle translator performs the unchanged MAVLink conversion.
+GetVehicleState and results expose the original command session even after
+a later link epoch starts.
+
+TCP telemetry can briefly publish an incomplete position/attitude cut. The
+Action waits without emitting motion effects until a complete fresh cut is
+available. The wait is bounded by the existing freshness limit, measured from
+the last actual complete source stamps, not from other advancing telemetry.
+Initial incomplete state grants no authority. The independent Execution
+deadman and final Writer checks remain active and unchanged throughout.
 
 Successful airborne Plane operations retain the control resource and scope.
 Enter the previous successful retained Action ID as `continuation_of` and

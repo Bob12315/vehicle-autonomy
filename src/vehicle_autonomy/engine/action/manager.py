@@ -25,6 +25,10 @@ from vehicle_autonomy.engine.action.resources import ActionResources
 from vehicle_autonomy.engine.action.schema import validate_json
 
 
+class _StatePending(ValueError):
+    """A partial source cut, not evidence authorizing any new effect."""
+
+
 @dataclass
 class _Record:
     id: str
@@ -41,6 +45,8 @@ class _Record:
     opening: object = None
     closing: object = None
     opened: bool = False
+    preflight_pending: bool = True
+    last_valid_state: TimePoint | None = None
     requested_end: ActionState | None = None
     exit_started_ns: int | None = None
     exit_complete: bool = False
@@ -78,11 +84,36 @@ class ActionRuntime:
             if not 0<=now.elapsed_ns_since(world.published_at)<=s.max_snapshot_age_ns:raise ValueError('world snapshot stale or future')
             vehicle=world.vehicle
             if vehicle is None or vehicle.health.quality.value!='VALID':raise ValueError('fresh VALID vehicle required')
+            stamps=[world.published_at]
             for name in s.required_state:
                 if name=='vehicle':continue
                 sample=getattr(vehicle,name,None)
-                if sample is None or not 0<=now.elapsed_ns_since(sample.captured_at)<=s.max_snapshot_age_ns:
+                if sample is None:raise _StatePending(name)
+                if not 0<=now.elapsed_ns_since(sample.captured_at)<=s.max_snapshot_age_ns:
                     raise ValueError('fresh state required: '+name)
+                stamps.append(sample.captured_at)
+            r.last_valid_state=min(stamps,key=lambda stamp:stamp.monotonic_ns)
+
+    def _preflight(self,r):
+        driver=self.drivers[r.target];s=r.registration.spec;ctx=driver.context()
+        if s.vehicle_types and ctx.target_kind not in s.vehicle_types:raise ValueError('unsupported vehicle type')
+        if not s.required_capabilities<=ctx.capabilities:raise ValueError('required Action capabilities unavailable')
+        world=driver.snapshot();now=self.clock();self._fresh(r,world,now)
+        check=getattr(r.registration.factory,'validate_context',None)
+        if check:check(r.parameters,world,ctx)
+        if r.continuation_of:
+            old=self._records.get(r.continuation_of)
+            if (not r.allow_send or old is None or old.target!=r.target or old.state is not ActionState.SUCCEEDED
+                    or old.safety is None or not old.safety.continuation_allowed or old.guard_stop is not None):
+                raise ValueError('explicit continuation requires a successful retained scope')
+        r.preflight_pending=False;self._admit(r,now)
+
+    def _waiting_state(self,r,reason):
+        now=self.clock()
+        stamp=r.last_valid_state or r.created
+        if not 0<=now.elapsed_ns_since(stamp)<r.registration.spec.max_snapshot_age_ns:
+            raise ValueError('required state unavailable beyond freshness bound')
+        r.feedback.append(dict(at_ns=now.monotonic_ns,value={'waiting_for_state':str(reason)}))
 
     def submit(self,name,target,parameters=None,*,version=None,allow_send=False,timeout_s=None,
                wait_timeout_s=0,continuation_of=None):
@@ -103,19 +134,9 @@ class ActionRuntime:
             self._records[r.id]=r;self._event(r,'action_created',name=s.name,version=s.version)
             self._state(r,ActionState.VALIDATING)
             try:
-                ctx=self.drivers[target].context()
-                if s.vehicle_types and ctx.target_kind not in s.vehicle_types:raise ValueError('unsupported vehicle type')
-                if not s.required_capabilities<=ctx.capabilities:raise ValueError('required Action capabilities unavailable')
                 r.parameters=self.registry.parameters(name,{} if parameters is None else parameters,s.version,vehicle_kind=ctx.target_kind)
-                world=self.drivers[target].snapshot();self._fresh(r,world,now)
-                check=getattr(entry.factory,'validate_context',None)
-                if check:check(r.parameters,world,ctx)
-                if continuation_of:
-                    old=self._records.get(continuation_of)
-                    if (not allow_send or old is None or old.target!=target or old.state is not ActionState.SUCCEEDED
-                            or old.safety is None or not old.safety.continuation_allowed or old.guard_stop is not None):
-                        raise ValueError('explicit continuation requires a successful retained scope')
-                self._admit(r,now)
+                self._preflight(r)
+            except _StatePending as exc:self._waiting_state(r,exc)
             except Exception as exc:
                 r.error=f'{type(exc).__name__}: {exc}';self.resources.release(r.id);self._state(r,ActionState.REJECTED)
             return self._view(r)
@@ -214,6 +235,13 @@ class ActionRuntime:
         if r.state is not ActionState.CANCELLING and now.monotonic_ns>=r.deadline_ns:
             self._begin_exit(r,ActionState.TIMED_OUT,'Action deadline exceeded')
         if r.state in TERMINAL_ACTION_STATES:return
+        if r.state is ActionState.VALIDATING and r.preflight_pending:
+            if now.elapsed_ns_since(r.created)>=s.max_snapshot_age_ns:
+                r.error='state precondition wait expired';self._state(r,ActionState.REJECTED);return
+            try:self._preflight(r)
+            except _StatePending as exc:self._waiting_state(r,exc);return
+            except Exception as exc:
+                r.error=f'{type(exc).__name__}: {exc}';self._state(r,ActionState.REJECTED);return
         if r.state is ActionState.CANCELLING and now.monotonic_ns-r.exit_started_ns>=s.exit_timeout_ns:
             # A hung driver cannot freeze the global scheduler or release its
             # physical claim. The driver has already been told to close ingress.
@@ -228,9 +256,10 @@ class ActionRuntime:
             self._finish(r,ActionSafety(False,False,'Action exit deadline exceeded'))
             return
         if r.state is ActionState.WAITING_RESOURCE:
+            self._fresh(r,driver.snapshot(),self.clock())
             if now.monotonic_ns>=r.wait_deadline_ns:
                 r.error='resource wait deadline exceeded';self._state(r,ActionState.TIMED_OUT)
-            else:self._admit(r,now)
+            else:self._preflight(r)
             return
         if r.opening is not None:
             if not r.opening.done():return
@@ -257,7 +286,7 @@ class ActionRuntime:
                     self._begin_exit(r,ActionState.FAILED,'effect dispatch failed')
                 break
         if r.state is ActionState.VALIDATING and r.opened:
-            world=driver.snapshot();self._fresh(r,world,now)
+            world=driver.snapshot();self._fresh(r,world,self.clock())
             factory=r.registration.factory
             r.instance=(factory.start_with_context(r.parameters,world,driver.context())
                         if hasattr(factory,'start_with_context') else factory.start(r.parameters,world))
@@ -265,13 +294,16 @@ class ActionRuntime:
                 raise TypeError('Action factory returned no lifecycle instance')
             self._state(r,ActionState.RUNNING)
         if r.state is ActionState.RUNNING:
-            world=driver.snapshot();self._fresh(r,world,now)
+            world=driver.snapshot();self._fresh(r,world,self.clock())
             results=driver.effect_results(r.id)
             decision=(r.instance.tick_with_results(world,results) if hasattr(r.instance,'tick_with_results') else r.instance.tick(world))
             if not isinstance(decision,ActionDecision):raise TypeError('typed Action decision required')
             if decision.outcome is not ActionOutcome.RUNNING and decision.effects:
                 raise TypeError('terminal Action decision cannot start new effects')
             if decision.feedback is not None:r.feedback.append(dict(at_ns=now.monotonic_ns,value=to_json_value(decision.feedback)))
+            now=self.clock()
+            if now.monotonic_ns>=r.deadline_ns:
+                self._begin_exit(r,ActionState.TIMED_OUT,'Action deadline exceeded during callback');return
             self._emit(r,decision.effects,now,cleanup=False)
             if decision.outcome is not ActionOutcome.RUNNING:
                 if decision.outcome is ActionOutcome.SUCCEEDED:
@@ -296,7 +328,7 @@ class ActionRuntime:
                     results=driver.effect_results(r.id)
                     decision=(r.instance.exit_with_results(world,reason,results) if hasattr(r.instance,'exit_with_results') else r.instance.exit(world,reason))
                     if not isinstance(decision,ExitDecision):raise TypeError('typed Action exit required')
-                    self._emit(r,decision.effects,now,cleanup=True);r.exit_complete=decision.complete;r.exit_safety=decision.safety
+                    self._emit(r,decision.effects,self.clock(),cleanup=True);r.exit_complete=decision.complete;r.exit_safety=decision.safety
                 except Exception as exc:
                     r.error=f'Action exit failed: {type(exc).__name__}: {exc}';r.exit_complete=True
                     r.requested_end=ActionState.FAILED
@@ -314,7 +346,10 @@ class ActionRuntime:
                     if r.state not in TERMINAL_ACTION_STATES:self._begin_exit(r,ActionState.UNKNOWN,'Action clock regressed')
             self._last_now=now
             for r in tuple(self._records.values()):
-                try:self._tick(r,now)
+                try:self._tick(r,self.clock())
+                except _StatePending as exc:
+                    try:self._waiting_state(r,exc)
+                    except ValueError as expired:self._begin_exit(r,ActionState.FAILED,str(expired))
                 except Exception as exc:
                     if r.state in TERMINAL_ACTION_STATES:
                         r.safety=ActionSafety(False,False,'physical guard query failed: '+type(exc).__name__)

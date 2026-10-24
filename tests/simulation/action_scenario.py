@@ -23,7 +23,7 @@ from tests.simulation.oracle import GazeboTruthOracle
 from tests.simulation.faults import TcpFaultProxy
 
 
-def run(path,kind,*,faults=False,browser=False):
+def run(path,kind,*,faults=False,browser=False,return_action='ReturnHome'):
     path.mkdir(parents=True,exist_ok=False)
     owned=OwnedSimulation(path,kind,confirmation_signing=True,rover_native_rtl=kind=='rover')
     lab=server=proxy=driver=None;writer=[];trajectory=[];actions=[]
@@ -115,6 +115,8 @@ def run(path,kind,*,faults=False,browser=False):
         else:
             wait(submit('SetMode',{'mode':'MANUAL' if kind=='plane' else 'GUIDED'}))
             wait(submit('Arm'))
+            if not faults and kind in ('copter','plane'):
+                wait(submit('Disarm'));wait(submit('Arm'))
         if faults:
             if kind=='plane':
                 cutoff=time.monotonic_ns();before=len(writer)
@@ -189,7 +191,7 @@ def run(path,kind,*,faults=False,browser=False):
             result['goto_truth']={'passed':True,'error_m':error}
             wait(submit('Stop'))
             if (oracle.recent_speed_mps() or 0)>.1:raise AssertionError('Rover Stop independent physical speed')
-            wait(submit('ReturnHome'),timeout=65)
+            wait(submit(return_action),timeout=65)
             wait(submit('Disarm'))
             final=sample()
             if max(math.hypot(t['position'][0]-initial.x_m,t['position'][1]-initial.y_m) for t in trajectory)<1.2:
@@ -202,14 +204,21 @@ def run(path,kind,*,faults=False,browser=False):
             wait(submit('Goto',{'x_m':2.,'y_m':1.,'z_m':1.5}),timeout=55)
             truth=sample()
             if math.hypot(truth.x_m-initial.x_m-2,truth.y_m-initial.y_m-1)>.75:raise AssertionError('Copter Goto Gazebo error')
+            # Keep both subsequent audited velocity frames comfortably inside
+            # the unchanged +/-5 m physical fence, including arrival error.
+            wait(submit('Goto',{'x_m':0.,'y_m':0.,'z_m':1.5}),timeout=55)
             wait(submit('SetYaw',{'yaw_rad':1.0}),timeout=40)
             if abs(math.atan2(math.sin(sample().yaw_rad-1.0),math.cos(sample().yaw_rad-1.0)))>.1:raise AssertionError('Copter yaw independent truth error')
-            for name,p in [('SetVelocity',{'vx_mps':.5}),('Hold',{})]:
+            for name,p in [('SetVelocity',{'vx_mps':.5}),('SetVelocity',{'vx_mps':.5,'frame':'base_link'}),('Hold',{})]:
                 begin=sample();a=submit(name,p);pause(3)
                 if name=='SetVelocity':
                     truth=sample();distance=math.hypot(truth.x_m-begin.x_m,truth.y_m-begin.y_m);speed=oracle.recent_speed_mps()
                     if distance<.6 or speed is None or not .25<=speed<=.75:raise AssertionError('Copter velocity unchanged physical thresholds')
-                    result['velocity_truth']={'passed':True,'distance_m':distance,'speed_mps':speed}
+                    if p.get('frame')=='base_link':
+                        projection=(truth.x_m-begin.x_m)*math.cos(begin.yaw_rad)+(truth.y_m-begin.y_m)*math.sin(begin.yaw_rad)
+                        if projection<.6:raise AssertionError('Copter body-frame forward projection')
+                        result['body_velocity_truth']={'passed':True,'projection_m':projection,'speed_mps':speed}
+                    else:result['velocity_truth']={'passed':True,'distance_m':distance,'speed_mps':speed}
                 wait(submit('GetVehicleState'))
                 api('/api/cancel',{'id':a['id']});wait(a,expected='CANCELLED')
             wait(submit('Land'),timeout=60)
@@ -218,7 +227,7 @@ def run(path,kind,*,faults=False,browser=False):
             home_truth=sample()
             wait(submit('SetMode',{'mode':'GUIDED'}));wait(submit('Arm'));wait(submit('Takeoff',{'height_m':1.5}),timeout=55)
             wait(submit('Goto',{'x_m':1.,'y_m':1.,'z_m':1.5}),timeout=55)
-            wait(submit('ReturnHome'),timeout=100)
+            wait(submit(return_action),timeout=100)
             truth=sample()
             if truth.z_m-baseline>.2 or math.hypot(truth.x_m-home_truth.x_m,truth.y_m-home_truth.y_m)>.75:
                 raise AssertionError('Copter RTL did not physically return and land')
@@ -271,9 +280,10 @@ def run(path,kind,*,faults=False,browser=False):
 
 def main():
     p=argparse.ArgumentParser();p.add_argument('--allow-send',action='store_true');p.add_argument('--faults',action='store_true');p.add_argument('--browser',action='store_true');p.add_argument('--kind',choices=['rover','copter','plane'],required=True);p.add_argument('--run-dir',type=Path,required=True)
+    p.add_argument('--return-action',choices=('ReturnHome','RTL'),default='ReturnHome')
     args=p.parse_args()
     if not args.allow_send:p.error('explicit own simulation SEND required')
-    install_signal_cleanup();r=run(args.run_dir.resolve(),args.kind,faults=args.faults,browser=args.browser);print(json.dumps({'passed':r['passed'],'error':r.get('error')}),flush=True)
+    install_signal_cleanup();r=run(args.run_dir.resolve(),args.kind,faults=args.faults,browser=args.browser,return_action=args.return_action);print(json.dumps({'passed':r['passed'],'error':r.get('error')}),flush=True)
     return 0 if r['passed'] else 1
 
 

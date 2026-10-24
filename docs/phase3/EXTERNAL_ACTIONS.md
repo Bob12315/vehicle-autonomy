@@ -14,6 +14,9 @@ HTTP responses and worker lines are bounded. A lost response is UNKNOWN;
 killing a local client does not prove its remote job stopped. A Continuous
 provider that ends without cancellation fails rather than silently succeeding.
 An unknown exit retains its resource even when no vehicle scope exists.
+If job admission raises before returning a handle, the framework cannot prove
+remote rollback and records UNKNOWN. Exceptions in cancel, poll or cleanup
+also cannot turn into a claim of safe resource release.
 
 The included ROS example explicitly starts a separate worker via the installed
 `with_ros2.sh` resource. It uses a UUID namespace, a dedicated ROS_DOMAIN_ID

@@ -61,7 +61,7 @@ def main():
             record={'number':number,'passed':False,'vehicles':{},'groups':{}};report['rounds'].append(record)
             for kind in ('rover','copter','plane'):
                 normal=stage(f'{number}_{kind}_actions','tests.simulation.action_scenario',run/(kind+'-actions'),
-                    ['--allow-send','--kind',kind,*(['--browser'] if kind=='rover' else [])])
+                    ['--allow-send','--kind',kind,'--return-action','ReturnHome' if number==1 else 'RTL',*(['--browser'] if kind=='rover' else [])])
                 faults=stage(f'{number}_{kind}_faults','tests.simulation.action_scenario',run/(kind+'-faults'),
                     ['--allow-send','--kind',kind,'--faults'],timeout=180)
                 record['vehicles'][kind]={'normal':normal['passed'],'faults':faults['passed'],

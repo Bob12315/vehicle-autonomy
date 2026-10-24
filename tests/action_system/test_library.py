@@ -55,6 +55,12 @@ class LibraryTests(unittest.TestCase):
             effect=decision.effects[0];self.assertIsInstance(effect,TwistTargetEffect)
             self.assertEqual(effect.frame_id,'base_link');self.assertEqual(effect.target_twist.linear,Vector3(speed,0,0))
             self.assertEqual(decision.outcome,ActionOutcome.RUNNING)
+    def test_copter_velocity_exposes_both_audited_enu_and_flu_frames(self):
+        for frame in ('odom','base_link'):
+            instance=self.instance('SetVelocity','copter',{'vx_mps':.5,'frame':frame})
+            effect=instance.tick(self.world).effects[0]
+            self.assertEqual(effect.frame_id,frame);self.assertEqual(effect.target_twist.linear,Vector3(.5,0,0))
+        with self.assertRaises(ValueError):self.registry.parameters('SetVelocity',{'frame':'map'},vehicle_kind='copter')
     def test_arm_preconditions_and_plane_airborne_disarm_rejected(self):
         with self.assertRaises(ValueError):self.instance('Arm','copter')
         self.world=self.fixture.sample(1,Vector3(0,0,50))

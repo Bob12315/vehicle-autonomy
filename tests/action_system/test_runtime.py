@@ -2,6 +2,7 @@
 from concurrent.futures import Future
 from dataclasses import dataclass, field, replace
 from datetime import datetime, timezone
+from types import SimpleNamespace
 import unittest
 
 from vehicle_autonomy.contracts.action import ActionContext, ActionKind, ActionResource, ActionSafety, ResourceMode
@@ -211,6 +212,53 @@ class RuntimeTests(unittest.TestCase):
         a=self.runtime.submit('a','v',allow_send=True);self.ticks()
         self.assertEqual(self.runtime.view(a['id'])['state'],'FAILED')
         self.assertEqual(self.driver.writes,[])
+
+    def coherent_world(self,*,missing=False,future=False):
+        now=self.clock()
+        stamp=replace(now,monotonic_ns=now.monotonic_ns+1) if future else now
+        return SimpleNamespace(published_at=now,vehicle=SimpleNamespace(health=SimpleNamespace(quality=SimpleNamespace(value='VALID')),
+            reported_pose=None if missing else SimpleNamespace(captured_at=stamp)))
+
+    def test_partial_state_cut_waits_without_emitting_and_does_not_extend_freshness(self):
+        spec=self.register(kind=ActionKind.CONTINUOUS,write=True)
+        self.registry=ActionRegistry();self.registry.register_typed(replace(spec,required_state=('reported_pose',)),Factory(continuous=True,emit=True))
+        self.runtime.registry=self.registry
+        self.driver.snapshot=lambda:self.coherent_world()
+        a=self.runtime.submit('a','v',allow_send=True);self.ticks(1)
+        self.driver.snapshot=lambda:self.coherent_world(missing=True)
+        self.clock.advance(.1);self.ticks(1)
+        self.assertEqual(self.runtime.view(a['id'])['state'],'RUNNING');self.assertEqual(len(self.driver.writes),1)
+        self.assertIn('waiting_for_state',self.runtime.view(a['id'])['feedback'][-1]['value'])
+        self.clock.advance(.1);self.driver.snapshot=lambda:self.coherent_world();self.ticks(1)
+        self.assertEqual(self.runtime.view(a['id'])['state'],'RUNNING')
+        self.driver.snapshot=lambda:self.coherent_world(missing=True);self.driver.safety=ActionSafety(False,False,'missing state')
+        self.clock.advance(3.1);self.ticks()
+        self.assertEqual(self.runtime.view(a['id'])['state'],'UNKNOWN');self.assertTrue(self.runtime.resource_view())
+
+    def test_initial_partial_cut_does_not_grant_until_complete_or_wait_bound(self):
+        spec=self.register(write=True)
+        self.registry=ActionRegistry();self.registry.register_typed(replace(spec,required_state=('reported_pose',)),Factory(emit=True))
+        self.runtime.registry=self.registry;self.driver.snapshot=lambda:self.coherent_world(missing=True)
+        a=self.runtime.submit('a','v',allow_send=True)
+        self.assertEqual(a['state'],'VALIDATING');self.assertEqual(self.driver.opened,[]);self.assertEqual(self.driver.writes,[])
+        self.clock.advance(.1);self.driver.snapshot=lambda:self.coherent_world();self.ticks(1)
+        self.assertEqual(self.runtime.view(a['id'])['state'],'RUNNING');self.assertEqual(len(self.driver.writes),1)
+        self.driver.snapshot=lambda:self.coherent_world(missing=True)
+        b=self.runtime.submit('a','v',allow_send=True);self.clock.advance(3.1);self.ticks(1)
+        self.assertEqual(self.runtime.view(b['id'])['state'],'REJECTED')
+        self.assertEqual(len(self.driver.opened),1);self.assertEqual(len(self.driver.writes),1)
+
+    def test_newer_snapshot_is_checked_against_clock_read_after_snapshot(self):
+        spec=self.register(write=True)
+        self.registry=ActionRegistry();self.registry.register_typed(replace(spec,required_state=('reported_pose',)),Factory(emit=True))
+        self.runtime.registry=self.registry
+        def snapshot():self.clock.advance(.001);return self.coherent_world()
+        self.driver.snapshot=snapshot
+        a=self.runtime.submit('a','v',allow_send=True);self.ticks()
+        self.assertEqual(self.runtime.view(a['id'])['state'],'SUCCEEDED')
+        self.driver.snapshot=lambda:self.coherent_world(future=True)
+        b=self.runtime.submit('a','v',allow_send=True)
+        self.assertEqual(b['state'],'REJECTED');self.assertEqual(len(self.driver.writes),1)
 
     def test_expired_exit_requests_independent_driver_cleanup(self):
         self.register(kind=ActionKind.CONTINUOUS,write=True)

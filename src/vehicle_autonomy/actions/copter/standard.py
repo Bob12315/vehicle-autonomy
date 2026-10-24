@@ -2,6 +2,7 @@
 from dataclasses import dataclass, field, replace
 import math
 from uuid import uuid4
+from typing import Literal
 
 from vehicle_autonomy.actions.common.basic import BasicAction, BasicInstance, BasicParameters, yaw, BAD
 from vehicle_autonomy.actions.common.standard import ContextFactory
@@ -29,6 +30,7 @@ class VelocityParameters:
     vy_mps: float=field(default=0.,metadata={'minimum':-.5,'maximum':.5})
     vz_mps: float=field(default=0.,metadata={'minimum':-.3,'maximum':.3})
     yaw_rate_rad_s: float=field(default=0.,metadata={'minimum':-.35,'maximum':.35})
+    frame: Literal['odom','base_link']=field(default='odom',metadata={'description':'odom ENU or body-relative base_link FLU; SI units'})
 
 
 @dataclass(frozen=True,slots=True)

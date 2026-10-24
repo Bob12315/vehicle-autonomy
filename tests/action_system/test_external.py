@@ -45,6 +45,20 @@ class ExternalTests(unittest.TestCase):
         a=self.lab.runtime.submit('api','external',{})
         value=self.wait(a);self.assertEqual(value['state'],'UNKNOWN');self.assertFalse(value['safety']['release_safe'])
         self.assertEqual(self.lab.runtime.submit('native','external',{})['state'],'REJECTED')
+    def test_cancel_cleanup_exception_cannot_release_an_external_service(self):
+        calls=[]
+        class Broken:
+            def poll(self):return {'state':'RUNNING'}
+            def cancel(self):calls.append('cancel');raise RuntimeError('cancel response lost')
+            def close(self):calls.append('close');raise RuntimeError('close failed')
+        register_external(self.lab.registry,'broken',lambda _:Broken())
+        a=self.lab.runtime.submit('broken','external',{});time.sleep(.1);self.lab.runtime.cancel(a['id'])
+        value=self.wait(a);self.assertEqual(value['state'],'UNKNOWN');self.assertFalse(value['safety']['release_safe'])
+        self.assertIn('cancel',calls);self.assertIn('close',calls);self.assertTrue(self.lab.runtime.resource_view())
+    def test_opaque_admission_exception_does_not_claim_no_remote_side_effect(self):
+        register_external(self.lab.registry,'uncertain',lambda _:(_ for _ in ()).throw(RuntimeError('lost admission')))
+        value=self.wait(self.lab.runtime.submit('uncertain','external',{}))
+        self.assertEqual(value['state'],'UNKNOWN');self.assertFalse(value['safety']['release_safe'])
 
 
 if __name__=='__main__':unittest.main()

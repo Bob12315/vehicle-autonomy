@@ -40,7 +40,7 @@ class StreamInstance(BasicInstance):
     def setpoint(self):
         p=self.parameters
         if self.operation in ('Hold','SetYaw'):return PoseTargetEffect('odom',self.pose,self.stream)
-        return TwistTargetEffect('odom',Twist3(Vector3(p.vx_mps,p.vy_mps,p.vz_mps),Vector3(0,0,p.yaw_rate_rad_s)),self.stream)
+        return TwistTargetEffect(p.frame,Twist3(Vector3(p.vx_mps,p.vy_mps,p.vz_mps),Vector3(0,0,p.yaw_rate_rad_s)),self.stream)
 
 
 class StreamFactory(ContextFactory):
