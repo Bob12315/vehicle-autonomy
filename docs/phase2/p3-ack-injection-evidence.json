@@ -1,0 +1,760 @@
+{
+  "schema": "phase2-p3-ack-injection-v1",
+  "status": "READY FOR RE-AUDIT",
+  "generated_at": "2026-10-24T19:53:51.455057+00:00",
+  "baseline": "5d00ecb2891d4e3546f73416f50c356362d62a35",
+  "code_commit": "561e1785079eb1b678f1ac22463d6b0e7c8a2610",
+  "scope": "test-only P3 ACK injection fix; no production or safety-threshold changes",
+  "unit": {
+    "passed": true,
+    "tests": 420,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "targeted_tests": 36,
+  "real_suite": {
+    "passed": true,
+    "started_at": "2026-10-24T19:39:43.616074+00:00",
+    "code_commit": "561e1785079eb1b678f1ac22463d6b0e7c8a2610",
+    "source_sha256": "082122ffa7c9a1909c7b228e0523f2b30f7bece19ed91a4078d33588c6ea7bfe",
+    "stages": [
+      {
+        "name": "plane-cancel-window-1",
+        "command": [
+          "/home/level6/vehicle-autonomy-framework/.venv-migration/bin/python",
+          "-m",
+          "tests.simulation.plane_cancel_window",
+          "--allow-send",
+          "--run-dir",
+          "/home/level6/vehicle-autonomy-framework/artifacts/phase2-control/p3-ack-injection/plane-cancel-window-1"
+        ],
+        "started_at": "2026-10-24T19:39:43.643996+00:00",
+        "timeout_s": 120,
+        "log": "/home/level6/vehicle-autonomy-framework/artifacts/phase2-control/p3-ack-injection/plane-cancel-window-1.log",
+        "passed": true,
+        "pid": 155557,
+        "pgid": 155557,
+        "exit_code": 0,
+        "ended_at": "2026-10-24T19:40:36.992798+00:00"
+      },
+      {
+        "name": "plane-cancel-window-2",
+        "command": [
+          "/home/level6/vehicle-autonomy-framework/.venv-migration/bin/python",
+          "-m",
+          "tests.simulation.plane_cancel_window",
+          "--allow-send",
+          "--run-dir",
+          "/home/level6/vehicle-autonomy-framework/artifacts/phase2-control/p3-ack-injection/plane-cancel-window-2"
+        ],
+        "started_at": "2026-10-24T19:40:36.993165+00:00",
+        "timeout_s": 120,
+        "log": "/home/level6/vehicle-autonomy-framework/artifacts/phase2-control/p3-ack-injection/plane-cancel-window-2.log",
+        "passed": true,
+        "pid": 160802,
+        "pgid": 160802,
+        "exit_code": 0,
+        "ended_at": "2026-10-24T19:41:30.545406+00:00"
+      },
+      {
+        "name": "plane-control-regression",
+        "command": [
+          "/home/level6/vehicle-autonomy-framework/.venv-migration/bin/python",
+          "-m",
+          "tests.simulation.plane_scenario",
+          "--allow-send",
+          "--run-dir",
+          "/home/level6/vehicle-autonomy-framework/artifacts/phase2-control/p3-ack-injection/plane-control-regression"
+        ],
+        "started_at": "2026-10-24T19:41:30.546002+00:00",
+        "timeout_s": 780,
+        "log": "/home/level6/vehicle-autonomy-framework/artifacts/phase2-control/p3-ack-injection/plane-control-regression.log",
+        "passed": true,
+        "pid": 165819,
+        "pgid": 165819,
+        "exit_code": 0,
+        "ended_at": "2026-10-24T19:45:57.567482+00:00"
+      },
+      {
+        "name": "rover-proxy-regression",
+        "command": [
+          "/home/level6/vehicle-autonomy-framework/.venv-migration/bin/python",
+          "-m",
+          "tests.simulation.fault_scenario",
+          "--allow-send",
+          "--kind",
+          "rover",
+          "--run-dir",
+          "/home/level6/vehicle-autonomy-framework/artifacts/phase2-control/p3-ack-injection/rover-proxy-regression"
+        ],
+        "started_at": "2026-10-24T19:45:57.567965+00:00",
+        "timeout_s": 420,
+        "log": "/home/level6/vehicle-autonomy-framework/artifacts/phase2-control/p3-ack-injection/rover-proxy-regression.log",
+        "passed": true,
+        "pid": 176520,
+        "pgid": 176520,
+        "exit_code": 0,
+        "ended_at": "2026-10-24T19:48:37.998644+00:00"
+      },
+      {
+        "name": "copter-proxy-regression",
+        "command": [
+          "/home/level6/vehicle-autonomy-framework/.venv-migration/bin/python",
+          "-m",
+          "tests.simulation.fault_scenario",
+          "--allow-send",
+          "--kind",
+          "copter",
+          "--run-dir",
+          "/home/level6/vehicle-autonomy-framework/artifacts/phase2-control/p3-ack-injection/copter-proxy-regression"
+        ],
+        "started_at": "2026-10-24T19:48:37.999076+00:00",
+        "timeout_s": 420,
+        "log": "/home/level6/vehicle-autonomy-framework/artifacts/phase2-control/p3-ack-injection/copter-proxy-regression.log",
+        "passed": true,
+        "pid": 176609,
+        "pgid": 176609,
+        "exit_code": 0,
+        "ended_at": "2026-10-24T19:51:38.946433+00:00"
+      }
+    ],
+    "final_source_sha256": "082122ffa7c9a1909c7b228e0523f2b30f7bece19ed91a4078d33588c6ea7bfe",
+    "ended_at": "2026-10-24T19:51:38.969922+00:00"
+  },
+  "windows": [
+    {
+      "round": 1,
+      "summary": "artifacts/phase2-control/p3-ack-injection/plane-cancel-window-1/summary.json",
+      "manifest": "artifacts/phase2-control/p3-ack-injection/plane-cancel-window-1/manifest.json",
+      "ack_interception": {
+        "passed": true,
+        "command": 176,
+        "received": 1,
+        "discarded": 1,
+        "forwarded": 0,
+        "application_received": 0,
+        "discarded_frames": [
+          "fd0a0100e801014d0000b000000000000000fabfdddb00fadbcdefe72127c39712b282"
+        ]
+      },
+      "status": {
+        "phase": "UNKNOWN",
+        "command_id": "command:76caf1a4a8ad424aa287ac6e1674467d",
+        "reason": "link_session_lost_outcome_unknown"
+      },
+      "stops": {
+        "fixed-wing-flight": "UNCONFIRMED"
+      },
+      "queued": {
+        "passed": true,
+        "status": {
+          "phase": "CANCELLED",
+          "command_id": "command:8ecc518d95b44922845c68bc7df14e79",
+          "reason": null
+        },
+        "writer_calls": 0,
+        "removed_from_queue": true
+      },
+      "action_handoff": {
+        "passed": true,
+        "rejected": true,
+        "authority_unchanged": true
+      },
+      "readonly_reconnect": {
+        "passed": true,
+        "stops": {
+          "fixed-wing-flight": "UNCONFIRMED"
+        },
+        "writer_calls": 0,
+        "new_session": "46f85b21a99f4ade8c92f9f4cf4d9109",
+        "armed": true
+      }
+    },
+    {
+      "round": 2,
+      "summary": "artifacts/phase2-control/p3-ack-injection/plane-cancel-window-2/summary.json",
+      "manifest": "artifacts/phase2-control/p3-ack-injection/plane-cancel-window-2/manifest.json",
+      "ack_interception": {
+        "passed": true,
+        "command": 176,
+        "received": 1,
+        "discarded": 1,
+        "forwarded": 0,
+        "application_received": 0,
+        "discarded_frames": [
+          "fd0a0100e801014d0000b000000000000000fabfdddb004a601ff0e721af97dca7b278"
+        ]
+      },
+      "status": {
+        "phase": "UNKNOWN",
+        "command_id": "command:9dd5f45ff9fa4b80b78a922da5d6626f",
+        "reason": "link_session_lost_outcome_unknown"
+      },
+      "stops": {
+        "fixed-wing-flight": "UNCONFIRMED"
+      },
+      "queued": {
+        "passed": true,
+        "status": {
+          "phase": "CANCELLED",
+          "command_id": "command:4b90264cb0cd4572856eeeb3fac78ae7",
+          "reason": null
+        },
+        "writer_calls": 0,
+        "removed_from_queue": true
+      },
+      "action_handoff": {
+        "passed": true,
+        "rejected": true,
+        "authority_unchanged": true
+      },
+      "readonly_reconnect": {
+        "passed": true,
+        "stops": {
+          "fixed-wing-flight": "UNCONFIRMED"
+        },
+        "writer_calls": 0,
+        "new_session": "690628d290f848f296682f52a434f5fa",
+        "armed": true
+      }
+    }
+  ],
+  "audit": {
+    "passed": true,
+    "production_files_unchanged": 190,
+    "protected_files_unchanged": 114,
+    "prior_index_entries_preserved": 625,
+    "mismatches": [],
+    "resources": [
+      {
+        "directory": "artifacts/phase2-control/p3-ack-injection/copter-proxy-regression",
+        "credentials_removed": true,
+        "ports_released": true,
+        "registered_state_absent": true
+      },
+      {
+        "directory": "artifacts/phase2-control/p3-ack-injection/plane-cancel-window-1",
+        "credentials_removed": true,
+        "ports_released": true,
+        "registered_state_absent": true
+      },
+      {
+        "directory": "artifacts/phase2-control/p3-ack-injection/plane-cancel-window-2",
+        "credentials_removed": true,
+        "ports_released": true,
+        "registered_state_absent": true
+      },
+      {
+        "directory": "artifacts/phase2-control/p3-ack-injection/plane-control-regression",
+        "credentials_removed": true,
+        "ports_released": true,
+        "registered_state_absent": true
+      },
+      {
+        "directory": "artifacts/phase2-control/p3-ack-injection/rover-proxy-regression",
+        "credentials_removed": true,
+        "ports_released": true,
+        "registered_state_absent": true
+      }
+    ],
+    "owned_live_pids": [],
+    "private_or_state_remaining": [],
+    "owned_ports_bound": [],
+    "ports_checked": [
+      {
+        "port": 5770,
+        "kind": "tcp"
+      },
+      {
+        "port": 5772,
+        "kind": "tcp"
+      },
+      {
+        "port": 5773,
+        "kind": "tcp"
+      },
+      {
+        "port": 9012,
+        "kind": "udp"
+      },
+      {
+        "port": 35719,
+        "kind": "tcp"
+      },
+      {
+        "port": 36883,
+        "kind": "tcp"
+      },
+      {
+        "port": 39043,
+        "kind": "tcp"
+      },
+      {
+        "port": 41673,
+        "kind": "tcp"
+      },
+      {
+        "port": 52115,
+        "kind": "tcp"
+      }
+    ]
+  },
+  "files": [
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/audit.json",
+      "bytes": 1786,
+      "sha256": "38435adcf77f1ae57cd10cb9b9fdcf3cadb21c5c1aa4e7bd3a31e00bffce1cc8"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/audit.py",
+      "bytes": 2969,
+      "sha256": "e172580d5fbb26649aa08aefa8b2b1b944cf5b750a4fe494470470f83ba5aa22"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/baseline-unit.json",
+      "bytes": 84,
+      "sha256": "722447cebd7c14a4200a4b2e61663bc3cc8a48d1c7d70d9672439d607fb98930"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/baseline-unit.log",
+      "bytes": 516,
+      "sha256": "dc7c2292f6fe589b98d9457fc35d02db24be97f01801c23f5bac89db2ed40e63"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/baseline.json",
+      "bytes": 42133,
+      "sha256": "b17f2b37f3d45f372ee603b8fa9898a255b900133041c316b2d0cd01d2eeff47"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/build_report.py",
+      "bytes": 8907,
+      "sha256": "5f20a55e25c895a05d3574e11717d9f30dd5bdda901045188d62b7062334e4ad"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/copter-proxy-regression/gazebo.log",
+      "bytes": 11430,
+      "sha256": "402fda67a92700f50eaf6fc46c69efe0913e80a12cb33080a5b617fa7185bbf0"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/copter-proxy-regression/manifest.json",
+      "bytes": 10120,
+      "sha256": "b4e83ee40442495da55d04ff7e55912d4e8eaf82b01b956c777acdc3a685ab1b"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/copter-proxy-regression/model.sdf",
+      "bytes": 10312,
+      "sha256": "c23f4ddba8da8e6327ffd333718c130060c6e6a9625f420afb211afda9857e94"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/copter-proxy-regression/proxy.jsonl",
+      "bytes": 18887257,
+      "sha256": "aec179e006844dbbb626bde5a63bc8b0a4435754ea85b9834dffb6381fa21d14"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/copter-proxy-regression/runtime-process-motion.json",
+      "bytes": 56826,
+      "sha256": "e5b74bfd4ea6d5b0fa51b84be3db0bf28bb341c4f8416e24b2c6c3b90806ec73"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/copter-proxy-regression/runtime-process-restart.json",
+      "bytes": 6424,
+      "sha256": "10e2df885f96eee4b7d69104ad8ccb8ca11675743758a90835fffe8d93cb14b1"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/copter-proxy-regression/runtime.jsonl",
+      "bytes": 1992678,
+      "sha256": "61dd15e2768ae88d37658c32ce06a3577f9fdf322aeb0e44c02c6db7bf3ab3af"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/copter-proxy-regression/runtime_motion.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/copter-proxy-regression/runtime_readonly.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/copter-proxy-regression/signing-support.json",
+      "bytes": 1326,
+      "sha256": "03328be676390479313c0884a610b1ef564de56a2d94990f46162bc30a52c816"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/copter-proxy-regression/signing-support_restart.json",
+      "bytes": 1706,
+      "sha256": "9822c44778caaf287ee20f0e91499e77c3c02e078f74f51d4f6edf4e7c623ed3"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/copter-proxy-regression/sitl.log",
+      "bytes": 2036,
+      "sha256": "92e46de87a1ec67b806fa9e227f85520f7349208fcd636c5ef58296552dfc155"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/copter-proxy-regression/sitl_restart.log",
+      "bytes": 1475,
+      "sha256": "6c621dbf3b55195aec10f018569877826ff1c7c8b3589cd2b6585c327f46616d"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/copter-proxy-regression/summary.json",
+      "bytes": 4954,
+      "sha256": "122a13c61d3842eff9b1d65e8cac8155158619fcd4848b912cb0081ddd259cce"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/copter-proxy-regression/trajectory.jsonl",
+      "bytes": 392985,
+      "sha256": "571d63ecce5257ce6db6a286af354bf74bc1e88c6139d1e051934172f8ba6bb8"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/copter-proxy-regression/world.sdf",
+      "bytes": 3605,
+      "sha256": "b0953a3a0ed735408927b6771a2d7a100bc048b9a6f6554c8e9051932752605d"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/copter-proxy-regression.log",
+      "bytes": 4001,
+      "sha256": "14f12719fefa38e9a26e73c721c88f0bd30f55fe7f4aa26f3e84253b24967655"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/original-injection-defect.json",
+      "bytes": 601,
+      "sha256": "59c9e5f0ea06e0741d7d7012d1b1b9f30a5a9f6d6f17153c66aa0e96dedc80a6"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/plane-cancel-window-1/application-rx.jsonl",
+      "bytes": 2462083,
+      "sha256": "0256dbc7517da0e197c5f636d2d15875eb10ce18b10d03c3caf74a74d241b270"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/plane-cancel-window-1/gazebo.log",
+      "bytes": 4482,
+      "sha256": "57a3e217bfea20ac37bc1366dd82835f2d0553af28b675baf4e20dd0e4eb632d"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/plane-cancel-window-1/manifest.json",
+      "bytes": 5717,
+      "sha256": "8091842cb8824e7048f77107ad1580dda56ebae2d2405065dca186120a32fd8b"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/plane-cancel-window-1/model.sdf",
+      "bytes": 18449,
+      "sha256": "ca79bea85e53abedee85bfb10aafc87be462ee2020ba27bae251f4b42a94ba5f"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/plane-cancel-window-1/proxy.jsonl",
+      "bytes": 6465345,
+      "sha256": "17f09097ac3f168b7ed9b4be50499f8f7f95b4a890bba6287f0104b7f19e871a"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/plane-cancel-window-1/runtime.jsonl",
+      "bytes": 563058,
+      "sha256": "9ac6b41057bf1b32ba4e9b33d9ec897bba37ecfa51af9904048996e25d784f87"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/plane-cancel-window-1/signing-support.json",
+      "bytes": 1328,
+      "sha256": "9a86efc06a2115a568c2864f82aa1efb1cd33f46cde7677832ef4eb1af8e0ad9"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/plane-cancel-window-1/sitl.log",
+      "bytes": 1442,
+      "sha256": "7e4fba95875036a1d86a6ea5cd5b71791e6bf6271ffe0ec3b766e07e2ab96dde"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/plane-cancel-window-1/summary.json",
+      "bytes": 2543,
+      "sha256": "592962e6436b7aff5af23d1c71fc487bef6b23dbf826f06ce94b75d212547f9b"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/plane-cancel-window-1/trajectory.jsonl",
+      "bytes": 1349,
+      "sha256": "83ca36ab478e737c9cf7f94c8843f51e29fa21ee8cabe36fdd8c5f4b10ba5ef2"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/plane-cancel-window-1/world.sdf",
+      "bytes": 2465,
+      "sha256": "be5d03290259b6090bf3e995f09d66ab46cfb35bf14cceb0ee63f46278a94c1f"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/plane-cancel-window-1.log",
+      "bytes": 2130,
+      "sha256": "4778d5be88469774f563b70b2bfba33fde6750fc621ce424296b46e1183d4e3d"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/plane-cancel-window-2/application-rx.jsonl",
+      "bytes": 2462098,
+      "sha256": "b52433712b7071826a74bbea76875470aeaff15ca4a8ee22a698230243b7cabb"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/plane-cancel-window-2/gazebo.log",
+      "bytes": 4482,
+      "sha256": "d9ccce3a1111a2b03ebaaba21f84628d9481e95520131569a0fd1469c4c16886"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/plane-cancel-window-2/manifest.json",
+      "bytes": 5717,
+      "sha256": "1b994b5cbaf76458607309fc25fb9dcf7c568d121cbbb3447b114b99b9cc78f4"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/plane-cancel-window-2/model.sdf",
+      "bytes": 18449,
+      "sha256": "ca79bea85e53abedee85bfb10aafc87be462ee2020ba27bae251f4b42a94ba5f"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/plane-cancel-window-2/proxy.jsonl",
+      "bytes": 6456446,
+      "sha256": "5d3bad2c64fdb7c2457888ce2e37fc46189f613e9ee3f8294cb430e976189ce9"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/plane-cancel-window-2/runtime.jsonl",
+      "bytes": 562992,
+      "sha256": "ddc521921bdae5782b3dd133eb365bbcb72d5d4a06244a563644e0bbd651d976"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/plane-cancel-window-2/signing-support.json",
+      "bytes": 1328,
+      "sha256": "47ada0cb5d4bda9be1fc0864b700927b5225dbba09166646848bd8875c2b43dd"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/plane-cancel-window-2/sitl.log",
+      "bytes": 1442,
+      "sha256": "7e4fba95875036a1d86a6ea5cd5b71791e6bf6271ffe0ec3b766e07e2ab96dde"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/plane-cancel-window-2/summary.json",
+      "bytes": 2543,
+      "sha256": "ab3a9fdfe8d39d767c7b6fc30d664e13778de3a381caa6c65dabe50e8075d65f"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/plane-cancel-window-2/trajectory.jsonl",
+      "bytes": 1356,
+      "sha256": "acb58ddef9f30d902ced474cc1c30f2cf6512750851348500e5afa9c4c640ecf"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/plane-cancel-window-2/world.sdf",
+      "bytes": 2465,
+      "sha256": "6a7ebfd022ccae2c715d18b319a6c896f1291723057b11ac026180fa4f2be483"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/plane-cancel-window-2.log",
+      "bytes": 2130,
+      "sha256": "bad662c491ef559369845aa8d468fe153a06d4c90551afe46ab158712a5dcf91"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/plane-control-regression/gazebo.log",
+      "bytes": 4828,
+      "sha256": "d0b90d192c930a67e413bfa0bcd58992a683a6cea6859e10a3bc8aa003df6dbe"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/plane-control-regression/manifest.json",
+      "bytes": 5731,
+      "sha256": "ad833a0986249df6a1f2ccd728841e35e83404ce051487969f303d537215406a"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/plane-control-regression/model.sdf",
+      "bytes": 18449,
+      "sha256": "ca79bea85e53abedee85bfb10aafc87be462ee2020ba27bae251f4b42a94ba5f"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/plane-control-regression/proxy.jsonl",
+      "bytes": 37873938,
+      "sha256": "aaef08c085553dd59d4a9dcf07d36c4b43fe4ee21a4463a35290e46d8675f1bb"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/plane-control-regression/runtime.jsonl",
+      "bytes": 3499452,
+      "sha256": "5744504896f6db0d1d84b11ac874bceec72e6ed9a9cac70f3867b0dd5f6cfe8b"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/plane-control-regression/signing-support.json",
+      "bytes": 1328,
+      "sha256": "2290a17dd381b774a1a3f53687b5c1a6550b006cdf859eba6414f581b21e9118"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/plane-control-regression/sitl.log",
+      "bytes": 1607,
+      "sha256": "d280452b6dd963adcd565cfdaa50240379b0968055ab13cceabbcf85db1e09ba"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/plane-control-regression/summary.json",
+      "bytes": 20867,
+      "sha256": "e412589188683038374f09348ed9880541ba2438121469e3f4e384bdfed7ce6f"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/plane-control-regression/trajectory.jsonl",
+      "bytes": 3228172,
+      "sha256": "d8946fa4412313a5ccc554fc1bed0fed466300ba1015c85842ab8cd870914722"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/plane-control-regression/world.sdf",
+      "bytes": 2468,
+      "sha256": "40965e2f66fdaed1ea8ca2d463ccb54435f424e5cf37d0bb0f4cfb3d5674c1cc"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/plane-control-regression.log",
+      "bytes": 16242,
+      "sha256": "cf51195c7798449d5933ec63b504159932f34f58f667226fbb4b78de47b05e94"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/prior-index-files.json",
+      "bytes": 126914,
+      "sha256": "2c467907d062ec7096cc4a0e0ad689255390324bbcbce89a66a0cf06c8307644"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/real-summary.json",
+      "bytes": 4071,
+      "sha256": "21fd58abdb24063123d0234492731bfd948586351a82feb4474e3f12807b9cd5"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/real.log",
+      "bytes": 321,
+      "sha256": "ea09ebfb301b3512b880d26c1b8b52d3ef48f859a03889c080c45729d2cbe1f3"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/rover-proxy-regression/gazebo.log",
+      "bytes": 4069,
+      "sha256": "7602072eb00eb781f467ba3a7799583e19b87e94cd2ba87b06bdcfa57809910b"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/rover-proxy-regression/manifest.json",
+      "bytes": 9675,
+      "sha256": "73e7d368fb3702b4b5682fed13c3cd28180cd75a6a5a56b982ffe82047f9df6b"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/rover-proxy-regression/model.sdf",
+      "bytes": 8025,
+      "sha256": "53c32fdc91ebbceecee1c0a72abfac86fd02e97bc241a4b17a927049ebdb40b6"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/rover-proxy-regression/proxy.jsonl",
+      "bytes": 16257267,
+      "sha256": "9abbf7b70629bbf198f27408a02f133b43c35de0d0fef598c246e7b7f41d15d2"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/rover-proxy-regression/runtime-process-motion.json",
+      "bytes": 63219,
+      "sha256": "bc08bd3c002243afad0494eb3abeddede7eed74464c672eba529bfd2204c2e7b"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/rover-proxy-regression/runtime-process-restart.json",
+      "bytes": 6423,
+      "sha256": "312eb8c4acd3845133d563b5e360a4845ef8db43d0a4e2656b04acdbc366d7d4"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/rover-proxy-regression/runtime.jsonl",
+      "bytes": 1758825,
+      "sha256": "bb9398e2c92d48ddaefee0b6fcf2abc04797949c9bd4a323a9135eb47c72348c"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/rover-proxy-regression/runtime_motion.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/rover-proxy-regression/runtime_readonly.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/rover-proxy-regression/signing-support.json",
+      "bytes": 1330,
+      "sha256": "51856e68e7d0417f373ab34c3be0f4bd9ee6bb5e7a49fe0cbb6544104fc3cf9a"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/rover-proxy-regression/signing-support_restart.json",
+      "bytes": 1712,
+      "sha256": "d6cbf40e605b7d388bb8491b25eeda04612a2723d85a363fcded5521674027ca"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/rover-proxy-regression/sitl.log",
+      "bytes": 1689,
+      "sha256": "6763f73143516920d5dae8ed2d5eba54d3367c548dc047642395ef9112810869"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/rover-proxy-regression/sitl_restart.log",
+      "bytes": 1228,
+      "sha256": "ba56d8345c0b0a5b6af4e5759a1ae3f8bea7e0ee79426d2fe102c467aed418d9"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/rover-proxy-regression/summary.json",
+      "bytes": 4956,
+      "sha256": "b62088d370545fdd68c7573dbf488a4d242bfadb5bddce987ae915627e915faf"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/rover-proxy-regression/trajectory.jsonl",
+      "bytes": 367004,
+      "sha256": "3088584165dd5bc1afc99d21a4c0d704501d9c79dfc92e4c4e69e585e046e960"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/rover-proxy-regression/world.sdf",
+      "bytes": 1587,
+      "sha256": "34179b1805636107b961a3fa9b8050ad3b6788829c72d5ba82c3c834fa3c0aab"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/rover-proxy-regression.log",
+      "bytes": 4003,
+      "sha256": "09fbced20a78a8c4befd4d701d807cad3a8449212a6802a7192ad59a97e0a6fa"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/run_real.py",
+      "bytes": 3037,
+      "sha256": "a6066b66ff40a7a2b9e7763054d9fc67f640be546b99a0113c58889366f4ed83"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/stages.json",
+      "bytes": 3493,
+      "sha256": "46eec980c5a3b4387aec695f2114e76445af0d3d8a44a2166d50b2324397c5a0"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/strict-before-clean.log",
+      "bytes": 3728,
+      "sha256": "3a21bb47240179f5638ab2fe6974aecc9a073aaf43fff718a6613ecf6e4ddc12"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/strict-before.log",
+      "bytes": 5858,
+      "sha256": "1ca1337992375708c2cd2eaed2f90893841d4c32ffe9992c6362e91740e6fd58"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/targeted-after.log",
+      "bytes": 6568,
+      "sha256": "d8fcb688358a977aea70b5fc7b888f670547f30bae92fb4af61c6bc8976a1665"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/targeted-final.log",
+      "bytes": 6798,
+      "sha256": "e29bd5489117612acd082b645af2f87b3408af33770f9754e5f72a96ef9971b9"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/unit-verbose.log",
+      "bytes": 67681,
+      "sha256": "e959535d8e7572eb88f5fa3f26165ea5ed2d63e5c19aae1a2458d597a54329fe"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/unit.json",
+      "bytes": 84,
+      "sha256": "8ea9a9008d9e6835c3e65fbf61e9dbbfc83184b717c43705e8a39a7bbd6f0c24"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/unit.log",
+      "bytes": 521,
+      "sha256": "8f355ad644f71afc774b4c6c9e0b8dcef9ca7d82eef5b3431bd052b6aff08fa6"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/wire-audit.json",
+      "bytes": 540,
+      "sha256": "5a258d20e99a74c553e748fc7ca6e8356991d5666bf2682620a70a920a5dce39"
+    },
+    {
+      "path": "artifacts/phase2-control/p3-ack-injection/wire_audit.py",
+      "bytes": 2163,
+      "sha256": "238784e9f029056d97869461c55ba1ba84f7df9ee9109db2b4911c1ec6e97eb4"
+    }
+  ],
+  "limitations": [
+    "Development-side validation; no new independent acceptance verdict.",
+    "Historical Cancel Window ACK-interception assertions were invalid; originals preserved unchanged.",
+    "Other original acceptance/independent-review evidence is not replaced by this focused test rerun."
+  ]
+}
