@@ -12197,5 +12197,72 @@
     "Native fence parameters verified; breach recovery not certified.",
     "Ephemeral keys destroyed: retained results are online verification evidence; historical MAC cannot be recomputed with destroyed keys.",
     "No hardware or Phase 3 work."
+  ],
+  "independent_review": {
+    "recommendation": "READY FOR RE-AUDIT",
+    "code_commit": "634c30b02bc7f7b94030e14c2899f3abd375c716",
+    "reviewed_archive": "3067b2153bc1d3e4a76f99b19a706d8978a11184",
+    "unresolved_findings": [],
+    "actual_reviewer_executions": {
+      "unit_tests": 415,
+      "signed_memory_scenarios": 8,
+      "evidence_checker": true,
+      "physical_sitl_rerun": false
+    },
+    "review_report": {
+      "path": "docs/phase2/INDEPENDENT_REVIEW_634c30b.md",
+      "bytes": 12406,
+      "sha256": "e0ff72d36f6216ad056cf78e2b75654577b2b6479e3bfbc433a58987d2ddec25"
+    },
+    "raw_review": {
+      "path": "artifacts/phase2-control/independent-review-634c30b/EVIDENCE_REVIEW.md",
+      "bytes": 12406,
+      "sha256": "e0ff72d36f6216ad056cf78e2b75654577b2b6479e3bfbc433a58987d2ddec25"
+    },
+    "outputs": [
+      {
+        "path": "artifacts/phase2-control/independent-review-634c30b/final_evidence_check.py",
+        "bytes": 18636,
+        "sha256": "17bc34344cfd382483983143b8ae8df7e7dd3c0268873d2cfa505905ce1e9c27"
+      },
+      {
+        "path": "artifacts/phase2-control/independent-review-634c30b/final_evidence_check.log",
+        "bytes": 6531,
+        "sha256": "65f839c0e1bdb12287104c5eda7bc9b792dd9f16bcbb39e71145480a4fb24eab"
+      },
+      {
+        "path": "artifacts/phase2-control/independent-review-634c30b/final_evidence_check.json",
+        "bytes": 6530,
+        "sha256": "de2ca0c403fe0e15c89f6aaa069a51d5077ef21e56cc3c2797afc31a2366587d"
+      },
+      {
+        "path": "artifacts/phase2-control/independent-review-634c30b/external_provenance.json",
+        "bytes": 648,
+        "sha256": "f8b67161e43beaba3a3344d62ce45fe1a0dd26f178b7d6e54b61384a4846f81c"
+      }
+    ]
+  },
+  "pre_review_raw_index": {
+    "path": "artifacts/phase2-control/final-evidence.json",
+    "bytes": 461665,
+    "sha256": "8cf6a98e093430b3a3c01f0866fb0bf03d08bab07bfbc43f852101c0ad576f92"
+  },
+  "post_review_annotation": "The 625 indexed inputs and original expected hashes are unchanged. This tracked index adds independent-review and evidence-location metadata after the reviewer checked the pre-review raw index.",
+  "evidence_location_ledger": {
+    "path": "docs/phase2/evidence-locations.json",
+    "bytes": 1029,
+    "sha256": "aadcdbf12ec96350df2354d6adaa5130f60c35fde3eae774b65393c73d948c43"
+  },
+  "plots": [
+    {
+      "path": "docs/phase2/plane-flight-truth.png",
+      "bytes": 290120,
+      "sha256": "d8aa1959191a91ecc3254bf6dc0cb140350538be7857f3bdac874146b29030ac"
+    },
+    {
+      "path": "docs/phase2/plane-flight-truth-936f25d.png",
+      "bytes": 291880,
+      "sha256": "fc0acf370035915ffc8abc3221b7856ae39049c95a2a2bf4b81242439dfdc812"
+    }
   ]
 }
