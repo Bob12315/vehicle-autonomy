@@ -7,6 +7,37 @@ from vehicle_autonomy.contracts.core.primitives import SchemaVersion
 from vehicle_autonomy.contracts.effects.vehicle import ArmEffect, DisarmEffect, EffectEnvelope, ModeEffect
 
 
+def _wrap_replay_evidence(runtime, proxy, cycle, old_ack, old_hbs, writes, before):
+    with proxy._lock:cursor=len(proxy.records)
+    wraps=0;last=None;end=time.monotonic()+20;initial=runtime._receive_signing.rejected['replay']
+    # Three packet wraps can precede the unchanged command deadline. Continue
+    # scheduling the Runtime until it has actually observed the timeout and
+    # consumed the injected frames; packet rate is not a command timer.
+    while time.monotonic()<end:
+        cycle()
+        with proxy._lock:batch=list(proxy.records[cursor:]);cursor=len(proxy.records)
+        for r in batch:
+            if r.get('direction')!='rx':continue
+            seq=r['sequence']
+            if wraps<3 and last is not None and seq<last:
+                wraps+=1;proxy.replay_rx(old_ack)
+                for raw in old_hbs:proxy.replay_rx(raw)
+            last=seq
+        status=runtime.effect_status('plane-wrap-disarm')
+        if status['phase']=='COMPLETED' or not runtime.world_snapshot().vehicle.operation.armed:
+            raise AssertionError('old ACK/HEARTBEAT changed command or World')
+        if (wraps==3 and status['phase']=='UNKNOWN'
+                and runtime._receive_signing.rejected['replay']-initial>=wraps*3):
+            break
+    status=runtime.effect_status('plane-wrap-disarm')
+    if (wraps<3 or status['phase']!='UNKNOWN' or len(writes)!=before+1
+            or runtime._receive_signing.rejected['replay']-initial<wraps*3
+            or runtime._effects['plane-wrap-disarm'] in runtime._port.ack_evidence):
+        raise AssertionError('replay/timeout evidence incomplete')
+    return dict(passed=True,wraps=wraps,status=status,world_armed=True,
+        old_ack_accepted=False,writer_calls=1,replay_rejections=runtime._receive_signing.rejected['replay']-initial)
+
+
 def ground(runtime,proxy,cycle,command,writes):
     result={}
     def short(name):
@@ -62,28 +93,7 @@ def ground(runtime,proxy,cycle,command,writes):
     if admitted.reason:raise AssertionError(admitted.reason)
     cycle()
     if len(writes)!=before+1:raise AssertionError('one valid Disarm write required')
-    with proxy._lock:cursor=len(proxy.records)
-    wraps=0;last=None;end=time.monotonic()+20;initial=runtime._receive_signing.rejected['replay']
-    while time.monotonic()<end and wraps<3:
-        cycle()
-        with proxy._lock:batch=list(proxy.records[cursor:]);cursor=len(proxy.records)
-        for r in batch:
-            if r.get('direction')!='rx':continue
-            seq=r['sequence']
-            if last is not None and seq<last:
-                wraps+=1;proxy.replay_rx(old_ack)
-                for raw in old_hbs:proxy.replay_rx(raw)
-            last=seq
-        if runtime.effect_status('plane-wrap-disarm')['phase']=='COMPLETED' or not runtime.world_snapshot().vehicle.operation.armed:
-            raise AssertionError('old ACK/HEARTBEAT changed command or World')
-    cycle();cycle()
-    status=runtime.effect_status('plane-wrap-disarm')
-    if (wraps<3 or status['phase']!='UNKNOWN' or len(writes)!=before+1
-            or runtime._receive_signing.rejected['replay']-initial<wraps*3
-            or runtime._effects['plane-wrap-disarm'] in runtime._port.ack_evidence):
-        raise AssertionError('replay/timeout evidence incomplete')
-    result['wrap_replay']=dict(passed=True,wraps=wraps,status=status,world_armed=True,
-        old_ack_accepted=False,writer_calls=1,replay_rejections=runtime._receive_signing.rejected['replay']-initial)
+    result['wrap_replay']=_wrap_replay_evidence(runtime,proxy,cycle,old_ack,old_hbs,writes,before)
     old_session=runtime.session_id
     runtime._close_link('plane_review_epoch_end');proxy.disconnect();time.sleep(.15)
     proxy.inject(hold_tx_commands=set());runtime.connect()
