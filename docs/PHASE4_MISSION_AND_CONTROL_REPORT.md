@@ -59,6 +59,15 @@ HTTP 混合作业退出异常/超时的独立责任保留与可信终态后恢�
 
 ## 正式验收
 
+首个冻结候选 `23f9dd84a31cd34989095aab0182ec6c9f740a1b` 的正式运行
+`artifacts/phase4-mission/acceptance-23f9dd8-1/` 如实保留 FAIL：565 项单元、
+第一轮三车型 Chrome Mission/Manual、Rover/Copter 故障恢复及 Plane 续飞/重放均通过，
+混合测试第二种退出超时场景在 Driver 异步退出 Future 完成前直接解引用 `None`，导致测试异常。
+原始日志显示 UNKNOWN 后约 54 ms 车辆退出完成；外部 Job 仍活动，资源未误释放。
+只修改新测试：在 2 秒有界观察窗内要求真实 Driver release_safe 证据，同时断言外部 Job
+仍活动和 Mission 占用未解除；不延长原 Action/Execution 退出期限，不把缺失证据当安全。
+失败运行自有进程、端口及凭据已清理。修复须独立重跑，并在新冻结提交重新完成全套两轮。
+
 尚未执行完成。受测 Commit、两轮 A–J、旧 Phase 1/2/3 全量回归、wheel、
 输入哈希、历史完整性及资源/凭据清理将依据原始文件填写，不能提前声明完成。
 

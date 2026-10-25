@@ -60,7 +60,13 @@ def run(path):
             a=f.lab.runtime.view(value['action_ids'][0])
             if len(server.jobs)!=jobs_before+1 or active(server)!=1:raise AssertionError('fallback created a second actual Job')
             if len(value['action_ids'])!=1 or value['release_safe']:raise AssertionError('uncertain mixed Mission advanced/released')
-            if not f.driver.guard_status(a['id']).release_safe:raise AssertionError('test failed to establish independent vehicle safe exit')
+            # Exit timeout publishes UNKNOWN before the already queued Driver
+            # finish future necessarily resolves. Observe the independent proof
+            # explicitly; absence is never evidence of safety. This wait does
+            # not extend Action/Execution exit deadlines or release resources.
+            vehicle_guard=until(f,lambda:(g if (g:=f.driver.guard_status(a['id'])) is not None and g.release_safe else None),2)
+            if active(server)!=1 or f.lab.missions.view(r['id'])['release_safe']:
+                raise AssertionError('external responsibility lost while waiting for independent vehicle proof')
             if len(f.writer)-writer_before!=int(emit):raise AssertionError('unexpected real vehicle Writer count')
             f.pause(.8)
             if f.lab.missions.view(r['id'])['release_safe']:raise AssertionError('later tick/Driver safety cleared external responsibility')
@@ -79,6 +85,7 @@ def run(path):
                 raise AssertionError('trusted terminal failed to restore normal execution')
             result['cases'].append(dict(emit=emit,exit_timeout=timeout,unknown=a,mission=value,normal=normal,
                 actual_jobs_started=2,actual_active_during_unknown=1,vehicle_exit_independently_safe=True,
+                vehicle_exit_evidence=dict(release_safe=vehicle_guard.release_safe,reason=vehicle_guard.reason),
                 negative_writer_calls=int(emit),rejected_new_writer_calls=0))
         result.update(passed=True,mode_effect_ttl_from_standard_ns=mode_ttl,writer=f.writer,state=f.api('/api/studio/state'))
     except BaseException as exc:
