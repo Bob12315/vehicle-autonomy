@@ -11,13 +11,18 @@ from vehicle_autonomy.app.web.action_lab import ActionLab,ActionLabServer
 from vehicle_autonomy.app.web.server import load_token
 
 
-def main():
+def main(*,studio=False):
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--simulation',action='append',default=[],metavar='TARGET=MANIFEST',help='explicit live owned SITL manifest, repeat per vehicle')
     parser.add_argument('--allow-send',action='store_true',help='deployment SEND only; every writing Action additionally needs allow_send=true')
-    parser.add_argument('--port',type=int,default=8770);parser.add_argument('--data-dir',type=Path,default=Path('runtime/action-lab'))
+    parser.add_argument('--port',type=int,default=8780 if studio else 8770);parser.add_argument('--data-dir',type=Path,default=Path('runtime/mission-control' if studio else 'runtime/action-lab'))
     parser.add_argument('--token-file',type=Path,required=True)
+    parser.add_argument('--initialize-provider-registry',action='store_true',help='explicit one-time trusted Mission deployment bootstrap; never recovery')
     args=parser.parse_args();drivers={};lab=server=None
+    if args.initialize_provider_registry:
+        if not studio:parser.error('provider bootstrap only belongs to the Mission deployment entry')
+        from vehicle_autonomy.engine.action.provider_identity import ProviderRegistry
+        ProviderRegistry.initialize()
     args.data_dir.mkdir(parents=True,exist_ok=True,mode=0o700)
     try:
         for item in args.simulation:
@@ -32,8 +37,14 @@ def main():
             from vehicle_autonomy.vehicles.plane.ardupilot_commands import ArduPlaneCommandTranslator
             translator={'rover':ArduRoverCommandTranslator,'copter':ArduPilotCommandTranslator,'plane':ArduPlaneCommandTranslator}[kind](mode_ids=profile.mode_ids)
             drivers[target]=VehicleActionDriver(target,profile,translator,proof,allow_send=args.allow_send)
-        lab=ActionLab(drivers)
-        server=ActionLabServer(('127.0.0.1',args.port),lab,load_token(args.token_file),args.data_dir/'audit.jsonl')
+        if studio:
+            from vehicle_autonomy.app.web.mission_control import MissionControl,MissionControlServer
+            lab=MissionControl(drivers,args.data_dir)
+            server_class=MissionControlServer
+        else:
+            lab=ActionLab(drivers)
+            server_class=ActionLabServer
+        server=server_class(('127.0.0.1',args.port),lab,load_token(args.token_file),args.data_dir/'audit.jsonl')
         def stop(*_):raise KeyboardInterrupt
         signal.signal(signal.SIGTERM,stop);signal.signal(signal.SIGINT,stop)
         print(f'Action Lab: http://127.0.0.1:{server.server_address[1]} (token is only in the private token file)',flush=True)

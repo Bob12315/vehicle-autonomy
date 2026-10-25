@@ -24,6 +24,7 @@ from vehicle_autonomy.contracts.effects.vehicle import EffectEnvelope
 from vehicle_autonomy.engine.action.resources import ActionResources
 from vehicle_autonomy.engine.action.external_lifecycle import ExternalLifecycle
 from vehicle_autonomy.engine.action.schema import validate_json
+from vehicle_autonomy.engine.action.mission_groups import MissionGroups
 
 
 class _StatePending(ValueError):
@@ -54,6 +55,7 @@ class _Record:
     exit_safety: ActionSafety | None = None
     error: str | None = None
     result: object = None
+    result_at: TimePoint | None = None
     safety: ActionSafety | None = None
     effects: list = field(default_factory=list)
     feedback: deque = field(default_factory=lambda:deque(maxlen=100))
@@ -62,6 +64,11 @@ class _Record:
     driver_safety: ActionSafety | None = None
     provider_started: bool = False
     external: object = None
+    mission_permit: object = None
+    input_deadline_ns: int | None = None
+    input_sequence: int = 0
+    input_timeout_ns: int | None = None
+    input_updated_at: TimePoint | None = None
 
 
 class ActionRuntime:
@@ -71,6 +78,7 @@ class ActionRuntime:
         self.registry=registry;self.drivers=dict(drivers);self.clock=clock
         self.resources=ActionResources({k:d.resource_store for k,d in self.drivers.items() if hasattr(d,'resource_store')})
         self._records={};self._lock=RLock()
+        self.mission_groups=MissionGroups(self)
         self._event_sink=event_sink or (lambda event:None)
         self.max_instances=max_instances;self.max_effects=max_effects;self._last_now=None
 
@@ -121,12 +129,17 @@ class ActionRuntime:
         r.feedback.append(dict(at_ns=now.monotonic_ns,value={'waiting_for_state':str(reason)}))
 
     def submit(self,name,target,parameters=None,*,version=None,allow_send=False,timeout_s=None,
-               wait_timeout_s=0,continuation_of=None):
+               wait_timeout_s=0,continuation_of=None,input_timeout_s=None,mission_permit=None):
         with self._lock:
             if len(self._records)>=self.max_instances:raise ValueError('Action record budget exhausted; no unsafe eviction')
             if target not in self.drivers:raise ValueError('unknown Action target')
             if type(allow_send) is not bool:raise TypeError('explicit SEND bool required')
+            if mission_permit is not None:self.mission_groups.check(mission_permit,target)
             entry=self.registry.resolve_typed(name,version);s=entry.spec;now=self.clock()
+            if input_timeout_s is not None:
+                if (type(input_timeout_s) not in (int,float) or not .1<=input_timeout_s<=.5
+                        or s.kind is not ActionKind.CONTINUOUS or not getattr(entry.factory,'supports_input_updates',False)):
+                    raise ValueError('bounded managed Continuous input contract required')
             ctx=self.drivers[target].context()
             metadata=self.registry.metadata(name,version,vehicle_kind=ctx.target_kind)
             if type(wait_timeout_s) not in (int,float) or not math.isfinite(wait_timeout_s) or not 0<=wait_timeout_s<=60:
@@ -136,6 +149,10 @@ class ActionRuntime:
                 raise ValueError('Action timeout outside declared limits')
             r=_Record('action:'+uuid4().hex,target,entry,None,now,now.monotonic_ns+int(timeout*1e9),
                 now.monotonic_ns+int(wait_timeout_s*1e9),allow_send,continuation_of)
+            r.mission_permit=mission_permit
+            if input_timeout_s is not None:
+                r.input_timeout_ns=int(input_timeout_s*1e9)
+                r.input_deadline_ns=now.monotonic_ns+r.input_timeout_ns
             self._records[r.id]=r;self._event(r,'action_created',name=s.name,version=s.version)
             self._state(r,ActionState.VALIDATING)
             try:
@@ -146,6 +163,35 @@ class ActionRuntime:
                 r.error=f'{type(exc).__name__}: {exc}';self.resources.release(r.id,no_effects=True);self._state(r,ActionState.REJECTED)
             return self._view(r)
 
+    def update_input(self,identifier,parameters,*,sequence,expected_deadline_ns):
+        """Update a single explicitly managed instance; never extend its lifetime.
+
+        The previous server-issued deadline is a one-use input ticket. Delayed
+        or reordered updates cannot revive a dead session or queued setpoint.
+        """
+        with self._lock:
+            r=self._records[identifier]
+            if (r.input_timeout_ns is None or r.state is not ActionState.RUNNING
+                    or not r.allow_send or r.instance is None):raise ValueError('input session inactive')
+            if type(sequence) is not int or sequence!=r.input_sequence+1:raise ValueError('old/out-of-order input')
+            if type(expected_deadline_ns) is not int or expected_deadline_ns!=r.input_deadline_ns:
+                raise ValueError('old input ticket')
+            now=self.clock()
+            if now.elapsed_ns_since(r.input_updated_at or r.created)<0:raise ValueError('input clock regressed')
+            if now.monotonic_ns>=min(r.input_deadline_ns,r.deadline_ns):raise ValueError('input expired; new authorization required')
+            driver=self.drivers[r.target];s=r.registration.spec
+            p=self.registry.parameters(s.name,parameters,s.version,vehicle_kind=driver.context().target_kind)
+            world=driver.snapshot();self._fresh(r,world,self.clock())
+            r.registration.factory.validate_context(p,world,driver.context())
+            now=self.clock()
+            if now.monotonic_ns>=min(r.input_deadline_ns,r.deadline_ns):raise ValueError('input expired during validation')
+            if now.elapsed_ns_since(r.input_updated_at or r.created)<0:raise ValueError('input clock regressed during validation')
+            r.instance.update_input(p)
+            r.parameters=p;r.input_sequence=sequence;r.input_updated_at=now
+            r.input_deadline_ns=min(r.deadline_ns,now.monotonic_ns+r.input_timeout_ns)
+            self._event(r,'input_updated',sequence=sequence,expires_ns=r.input_deadline_ns)
+            return self._view(r)
+
     def _admit(self,r,now):
         s=r.registration.spec
         store=getattr(r.registration.factory,'resource_store',None) or getattr(self.drivers[r.target],'resource_store',None)
@@ -153,7 +199,7 @@ class ActionRuntime:
             lambda:r.provider_started and r.state in (ActionState.VALIDATING,ActionState.RUNNING)
                 and self.clock().monotonic_ns<r.deadline_ns)
         if not self.resources.acquire(r.id,r.target,s.resources,continuation_of=r.continuation_of,
-                persistent=s.kind is not ActionKind.QUERY,
+                persistent=s.kind is not ActionKind.QUERY,group_owners=self.mission_groups.owners(r),
                 metadata={'action':s.name,'version':s.version,'kind':s.kind.value},external_store=store):
             if now.monotonic_ns>=r.wait_deadline_ns:
                 r.error='resource conflict';self._state(r,ActionState.REJECTED)
@@ -204,6 +250,7 @@ class ActionRuntime:
             # Cleanup has its own bounded window. The final writer still enforces
             # every Lease/TTL/session/generation condition using its own clock.
             limit=(r.exit_started_ns+r.registration.spec.exit_timeout_ns) if cleanup else r.deadline_ns
+            if not cleanup and r.input_deadline_ns is not None:limit=min(limit,r.input_deadline_ns)
             ttl=(to_json_value(r.registration.spec.effect_ttl_overrides) or {}).get(type(effect).__name__,r.registration.spec.effect_ttl_ns)
             deadline=min(now.monotonic_ns+ttl,limit)
             if deadline<=now.monotonic_ns:raise ValueError('Action effect deadline expired')
@@ -274,6 +321,9 @@ class ActionRuntime:
             return
         if r.state is not ActionState.CANCELLING and now.monotonic_ns>=r.deadline_ns:
             self._begin_exit(r,ActionState.TIMED_OUT,'Action deadline exceeded')
+        if (r.state is not ActionState.CANCELLING and r.input_deadline_ns is not None
+                and now.monotonic_ns>=r.input_deadline_ns):
+            self._begin_exit(r,ActionState.TIMED_OUT,'managed input deadman expired; reauthorization required')
         if r.state in TERMINAL_ACTION_STATES:return
         if r.state is ActionState.VALIDATING and r.preflight_pending:
             if now.elapsed_ns_since(r.created)>=s.max_snapshot_age_ns:
@@ -364,7 +414,7 @@ class ActionRuntime:
                         return
                     value=to_json_value(decision.result)
                     if s.output_schema:validate_json(value,to_json_value(s.output_schema),'result')
-                    r.result=value;self._begin_exit(r,ActionState.SUCCEEDED,None)
+                    r.result=value;r.result_at=now;self._begin_exit(r,ActionState.SUCCEEDED,None)
                 else:self._begin_exit(r,ActionState.FAILED,decision.error)
         if r.state is ActionState.CANCELLING:
             if r.opening is not None:return
@@ -413,18 +463,41 @@ class ActionRuntime:
                         r.safety=ActionSafety(False,False,'physical guard query failed: '+type(exc).__name__)
                         self.resources.retain(r.id,r.safety.reason)
                     else:self._begin_exit(r,ActionState.FAILED,f'{type(exc).__name__}: {exc}')
+            self.mission_groups.settle()
 
     def _view(self,r):
         return deepcopy(dict(id=r.id,target=r.target,name=r.registration.spec.name,version=r.registration.spec.version,
+            mission_id=None if r.mission_permit is None else r.mission_permit.id,
             kind=r.registration.spec.kind.value,state=r.state.value,parameters=to_json_value(r.parameters),
-            result=r.result,error=r.error,feedback=list(r.feedback),history=list(r.history),
+            result=r.result,result_at=None if r.result_at is None else to_json_value(r.result_at),error=r.error,feedback=list(r.feedback),history=list(r.history),
             deadline_ns=r.deadline_ns,allow_send=r.allow_send,continuation_of=r.continuation_of,
+            input_deadline_ns=r.input_deadline_ns,input_sequence=r.input_sequence,
+            input_ticket=None if r.input_deadline_ns is None else str(r.input_deadline_ns),
             safety=None if r.safety is None else to_json_value(r.safety),
             effects=[dict(effect_id=str(e.effect_id),type=type(e.effect).__name__) for e,_ in r.effects],
             command_results=[to_json_value(x) for x in self.drivers[r.target].effect_results(r.id)]))
 
     def view(self,identifier):
         with self._lock:return self._view(self._records[identifier])
+
+    def assess(self,identifier,*,include_result=False):
+        """Small read-only scheduler cut; never polls a device or copies feedback."""
+        with self._lock:
+            r=self._records[identifier]
+            return deepcopy(dict(id=r.id,target=r.target,state=r.state.value,kind=r.registration.spec.kind.value,
+                safety=None if r.safety is None else to_json_value(r.safety),error=r.error,
+                result=r.result if include_result else None,
+                result_at=None if r.result_at is None else to_json_value(r.result_at)))
+
+    def journal_view(self,identifier):
+        """Bounded recovery metadata without the Web feedback/command history."""
+        with self._lock:
+            r=self._records[identifier]
+            return deepcopy(dict(id=r.id,target=r.target,name=r.registration.spec.name,version=r.registration.spec.version,
+                parameters=to_json_value(r.parameters),state=r.state.value,
+                safety=None if r.safety is None else to_json_value(r.safety),error=r.error,
+                deadline_ns=r.deadline_ns,input_sequence=r.input_sequence,history=list(r.history)[-16:],
+                command_results=[to_json_value(v) for v in self.drivers[r.target].effect_results(r.id)[-8:]]))
 
     def views(self):
         with self._lock:return [self._view(r) for r in self._records.values()]

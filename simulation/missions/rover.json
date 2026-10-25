@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "id": "rover-mission",
+  "name": "rover physical Mission",
+  "version": "1.0.0",
+  "target": "rover",
+  "root": "root",
+  "nodes": [
+    {
+      "id": "root",
+      "type": "Sequence",
+      "children": [
+        "step1",
+        "step2",
+        "step3",
+        "observed",
+        "step5",
+        "step6"
+      ]
+    },
+    {
+      "id": "step1",
+      "type": "Action",
+      "action": "SetMode",
+      "parameters": {
+        "mode": "GUIDED"
+      },
+      "children": []
+    },
+    {
+      "id": "step2",
+      "type": "Action",
+      "action": "Arm",
+      "parameters": {},
+      "children": []
+    },
+    {
+      "id": "step3",
+      "type": "Action",
+      "action": "Goto",
+      "parameters": {
+        "x_m": 2.0,
+        "y_m": 1.0,
+        "z_m": 0.0
+      },
+      "children": []
+    },
+    {
+      "id": "observed",
+      "type": "Condition",
+      "expression": {
+        "op": "eq",
+        "source": "world",
+        "path": "vehicle.operation.armed",
+        "value": true,
+        "max_age_s": 3
+      }
+    },
+    {
+      "id": "step5",
+      "type": "Action",
+      "action": "ReturnHome",
+      "parameters": {},
+      "children": []
+    },
+    {
+      "id": "step6",
+      "type": "Action",
+      "action": "Disarm",
+      "parameters": {},
+      "children": []
+    }
+  ],
+  "timeout_s": 180,
+  "blackboard": {}
+}

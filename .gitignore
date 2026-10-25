@@ -43,3 +43,6 @@ artifacts/phase2-control/
 artifacts/phase3-actions/
 artifacts/phase3-remediation/
 artifacts/phase3-round3/
+
+# Phase 4 isolated evidence and runtime state
+/artifacts/phase4-mission/

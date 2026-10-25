@@ -107,8 +107,27 @@ Registry 生成参数表单，可执行、取消和查询实例、反馈、命�
   --run-dir artifacts/phase3-actions/acceptance-UNIQUE
 ```
 
-没有实机、Mission Graph、AI 决策或新增感知/导航算法；Plane 取消仍保留
+该 Phase 3 入口没有实机、Mission Graph、AI 决策或新增感知/导航算法；Plane 取消仍保留
 UNKNOWN/UNCONFIRMED 和飞行资源约束。完成本阶段后停止，等待独立审查。
+
+## Phase 4 Mission Studio 与手动控制
+
+新增版本化 Mission Graph、任务级资源保留、类型化三值条件与事件接口，以及
+三车型 Web 操作台。`vehicle-autonomy-missions` 的 `/studio` 编辑、保存和运行任务，
+`/control` 操作明确自有的本机 SITL；`/` 保留 Action Lab。Rover/Copter 连续输入
+更新同一个 Action，具有服务器 deadman；Plane 使用原生控制和明确的续飞交接。
+全部运动仍经过原 Action Runtime、Execution、Authority、Safety 和唯一 Writer。
+
+默认无车辆、无 SEND；不连接实机，不包含 Phase 5 感知融合或 AI。部署前提、
+图 Schema、重启恢复及使用限制见 [Phase 4 合同和使用说明](docs/phase4/CONTRACT_AND_USAGE.md)。
+正式状态及两轮证据以 [Phase 4 报告](docs/PHASE4_MISSION_AND_CONTROL_REPORT.md) 为准，
+不能以界面可启动推定车辆验收通过。
+
+```bash
+./scripts/test_phase4_missions.sh --allow-send \
+  --sitl-bin-dir artifacts/phase2-control/ardupilot-source/build/sitl/bin \
+  --run-dir artifacts/phase4-mission/acceptance-UNIQUE
+```
 
 ## 当前实现
 

@@ -65,6 +65,8 @@ class ActionLabServer(ConsoleServer):
 
 
 class ActionLabHandler(Handler):
+    post_routes={'/api/run':'run','/api/cancel':'cancel'}
+    max_json_bytes=8192
     def do_GET(self):
         static={'/':('action-lab.html','text/html; charset=utf-8'),
             '/action-lab.js':('action-lab.js','application/javascript'),'/action-lab.css':('action-lab.css','text/css')}
@@ -79,12 +81,12 @@ class ActionLabHandler(Handler):
         self.invoke(routes[parts.path],{k:v[0] for k,v in query.items()})
     def do_POST(self):
         if not self.authorized(mutation=True):return
-        operation={'/api/run':'run','/api/cancel':'cancel'}.get(self.path)
+        operation=self.post_routes.get(self.path)
         try:
             if not operation or self.headers.get('Transfer-Encoding'):raise ValueError('unsupported route or encoding')
             if self.headers.get('Content-Type')!='application/json':raise ValueError('JSON required')
             length=int(self.headers.get('Content-Length','-1'))
-            if not 0<=length<=8192:raise ValueError('bounded JSON required')
+            if not 0<=length<=self.max_json_bytes:raise ValueError('bounded JSON required')
             payload=json.loads(self.rfile.read(length),parse_constant=lambda _:(_ for _ in ()).throw(ValueError('finite JSON required')))
             if type(payload) is not dict:raise ValueError('JSON object required')
             identifier=self.headers.get('X-VAF-Request-ID','')

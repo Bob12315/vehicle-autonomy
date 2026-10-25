@@ -42,9 +42,16 @@ class StreamInstance(BasicInstance):
         if self.operation in ('Hold','SetYaw'):return PoseTargetEffect('odom',self.pose,self.stream)
         return TwistTargetEffect(p.frame,Twist3(Vector3(p.vx_mps,p.vy_mps,p.vz_mps),Vector3(0,0,p.yaw_rate_rad_s)),self.stream)
 
+    def update_input(self,parameters):
+        if self.operation not in ('Drive','Turn','SetVelocity') or type(parameters) is not type(self.parameters):
+            raise ValueError('this Continuous Action does not accept input updates')
+        self.parameters=parameters
+
 
 class StreamFactory(ContextFactory):
     def __init__(self,name):self.name=name
+    @property
+    def supports_input_updates(self):return self.name in ('Drive','Turn','SetVelocity')
     def validate_context(self,p,world,ctx):
         if not world.vehicle.operation.armed or world.localization is None or world.environment is None:
             raise ValueError('armed localized vehicle with bound environment required')

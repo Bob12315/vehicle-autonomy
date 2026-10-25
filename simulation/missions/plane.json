@@ -1,0 +1,124 @@
+{
+  "schema_version": 1,
+  "id": "plane-mission",
+  "name": "plane physical Mission",
+  "version": "1.0.0",
+  "target": "plane",
+  "root": "root",
+  "nodes": [
+    {
+      "id": "root",
+      "type": "Sequence",
+      "children": [
+        "step1",
+        "step2",
+        "step3",
+        "step4",
+        "step5",
+        "wait5",
+        "step7",
+        "wait7",
+        "step9",
+        "wait9",
+        "step11"
+      ]
+    },
+    {
+      "id": "step1",
+      "type": "Action",
+      "action": "SetMode",
+      "parameters": {
+        "mode": "MANUAL"
+      },
+      "children": []
+    },
+    {
+      "id": "step2",
+      "type": "Action",
+      "action": "Arm",
+      "parameters": {},
+      "children": []
+    },
+    {
+      "id": "step3",
+      "type": "Action",
+      "action": "Takeoff",
+      "parameters": {
+        "height_m": 50
+      },
+      "children": []
+    },
+    {
+      "id": "step4",
+      "type": "Action",
+      "action": "GetVehicleState",
+      "parameters": {},
+      "children": [],
+      "output": "flight"
+    },
+    {
+      "id": "step5",
+      "type": "Action",
+      "action": "SetGuidedTarget",
+      "parameters": {
+        "latitude_deg": {
+          "$query": {
+            "source": "world",
+            "path": "vehicle.global_position.value.latitude_deg",
+            "frame": "earth",
+            "max_age_s": 3,
+            "offset": 0.001347472926179282
+          }
+        },
+        "longitude_deg": {
+          "$query": {
+            "source": "world",
+            "path": "vehicle.global_position.value.longitude_deg",
+            "frame": "earth",
+            "max_age_s": 3
+          }
+        },
+        "altitude_amsl_m": 634.0
+      },
+      "children": []
+    },
+    {
+      "id": "wait5",
+      "type": "Wait",
+      "duration_s": 90
+    },
+    {
+      "id": "step7",
+      "type": "Action",
+      "action": "Loiter",
+      "parameters": {},
+      "children": []
+    },
+    {
+      "id": "wait7",
+      "type": "Wait",
+      "duration_s": 5
+    },
+    {
+      "id": "step9",
+      "type": "Action",
+      "action": "RTL",
+      "parameters": {},
+      "children": []
+    },
+    {
+      "id": "wait9",
+      "type": "Wait",
+      "duration_s": 5
+    },
+    {
+      "id": "step11",
+      "type": "Action",
+      "action": "AutoLand",
+      "parameters": {},
+      "children": []
+    }
+  ],
+  "timeout_s": 900,
+  "blackboard": {}
+}

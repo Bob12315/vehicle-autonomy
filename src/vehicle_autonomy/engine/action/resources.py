@@ -201,12 +201,12 @@ class ActionResources:
     @staticmethod
     def _key(target,resource):return target,resource.conflict_group or resource.name
 
-    def acquire(self,owner,target,resources,*,continuation_of=None,persistent=False,metadata=None,external_store=None):
+    def acquire(self,owner,target,resources,*,continuation_of=None,persistent=False,metadata=None,external_store=None,group_owners=()):
         if any(not isinstance(r,ActionResource) for r in resources):raise TypeError('typed resources required')
         if any(c.owner==owner for c in self._claims):return True
         for requested in resources:
             for existing in self._claims:
-                if (existing.owner!=continuation_of and self._key(target,requested)==self._key(existing.target,existing.resource)
+                if (existing.owner!=continuation_of and existing.owner not in group_owners and self._key(target,requested)==self._key(existing.target,existing.resource)
                         and (requested.mode is ResourceMode.EXCLUSIVE or existing.resource.mode is ResourceMode.EXCLUSIVE)):
                     return False
         if persistent and (external_store is not None or resources and target in self._stores):

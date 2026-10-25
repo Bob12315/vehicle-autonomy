@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "id": "copter-mission",
+  "name": "copter physical Mission",
+  "version": "1.0.0",
+  "target": "copter",
+  "root": "root",
+  "nodes": [
+    {
+      "id": "root",
+      "type": "Sequence",
+      "children": [
+        "step1",
+        "step2",
+        "step3",
+        "step4",
+        "observed",
+        "step6"
+      ]
+    },
+    {
+      "id": "step1",
+      "type": "Action",
+      "action": "SetMode",
+      "parameters": {
+        "mode": "GUIDED"
+      },
+      "children": []
+    },
+    {
+      "id": "step2",
+      "type": "Action",
+      "action": "Arm",
+      "parameters": {},
+      "children": []
+    },
+    {
+      "id": "step3",
+      "type": "Action",
+      "action": "Takeoff",
+      "parameters": {
+        "height_m": 1.5
+      },
+      "children": []
+    },
+    {
+      "id": "step4",
+      "type": "Action",
+      "action": "Goto",
+      "parameters": {
+        "x_m": 2.0,
+        "y_m": 1.0,
+        "z_m": 1.5
+      },
+      "children": []
+    },
+    {
+      "id": "observed",
+      "type": "Condition",
+      "expression": {
+        "op": "eq",
+        "source": "world",
+        "path": "vehicle.operation.armed",
+        "value": true,
+        "max_age_s": 3
+      }
+    },
+    {
+      "id": "step6",
+      "type": "Action",
+      "action": "ReturnHome",
+      "parameters": {},
+      "children": []
+    }
+  ],
+  "timeout_s": 180,
+  "blackboard": {}
+}
