@@ -384,7 +384,10 @@ class ActionRuntime:
                     self._emit(r,decision.effects,self.clock(),cleanup=True);r.exit_complete=decision.complete;r.exit_safety=decision.safety
                 except Exception as exc:
                     r.error=f'Action exit failed: {type(exc).__name__}: {exc}';r.exit_complete=True
-                    r.requested_end=ActionState.FAILED
+                    # Preserve the primary deadline outcome. Independent
+                    # cleanup evidence still decides resource release/UNKNOWN;
+                    # an exit exception cannot turn a timeout into success.
+                    if r.requested_end is not ActionState.TIMED_OUT:r.requested_end=ActionState.FAILED
                     if s.kind is not ActionKind.QUERY and s.external_lifecycle!='typed_only':
                         r.exit_safety=ActionSafety(False,False,'Action exit raised; side effects UNCONFIRMED')
             elif r.instance is None:r.exit_complete=True

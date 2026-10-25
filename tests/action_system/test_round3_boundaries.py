@@ -112,6 +112,25 @@ class Round3LifecycleTests(unittest.TestCase):
         with self.assertRaises(ActionAdmissionRejected),port.callback():port.start(lambda:started.append(True))
         self.assertEqual(started,[])
 
+    def test_deadline_remains_timed_out_only_when_independent_driver_proves_cleanup(self):
+        for safe,expected in ((True,'TIMED_OUT'),(False,'UNKNOWN')):
+            with self.subTest(driver_safe=safe):
+                driver=Driver();driver.safety=ActionSafety(safe,False,None if safe else 'stop UNCONFIRMED')
+                class Instance:
+                    def tick(self,w):return ActionDecision(ActionOutcome.RUNNING,(ArmEffect(),))
+                    def exit(self,*_):raise RuntimeError('stop_exit_unconfirmed')
+                class Factory:
+                    def start(self,*_):return Instance()
+                reg=ActionRegistry();reg.register_typed(ActionSpec('deadline',Empty,effect_types=(ArmEffect,),
+                    external_lifecycle='typed_only',resources=(ActionResource('vehicle.motion'),)),Factory())
+                clock=Clock();rt=ActionRuntime(reg,{'v':driver},clock=clock)
+                a=rt.submit('deadline','v',allow_send=True,timeout_s=1.2);rt.tick()
+                self.assertEqual(len(driver.writes),1);clock.advance(1.3)
+                for _ in range(8):rt.tick()
+                self.assertEqual(rt.view(a['id'])['state'],expected)
+                self.assertEqual(len(driver.writes),1)  # no additional post-deadline effect/write
+                self.assertEqual(bool(rt.resource_view()),not safe)
+
 
 class Round3IdentityTests(unittest.TestCase):
     def setUp(self):
