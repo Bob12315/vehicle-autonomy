@@ -74,7 +74,7 @@ def register_standard(registry):
             default_timeout_ns=int(timeout*1e9),max_timeout_ns=int(max_timeout*1e9),exit_timeout_ns=12_000_000_000,
             output_schema=result_schema(name),vehicle_parameter_overrides=overrides,vehicle_timeout_overrides=timeouts,
             effect_ttl_overrides={e.__name__:5_000_000_000 for e in effects if e in (ArmEffect,DisarmEffect,ModeEffect,TakeoffEffect,LandEffect,FixedWingTargetEffect)},
-            success_semantics=success),factory)
+            success_semantics=success,external_lifecycle='typed_only'),factory)
     add('GetVehicleState',Empty,QueryFactory(),kind=ActionKind.QUERY,cap='state',success='Read immutable world, including freshness; grants no authority.')
     for name,p,effect,res in [('SetMode',ModeParameters,ModeEffect,'vehicle.mode'),('Arm',Empty,ArmEffect,'vehicle.arm'),('Disarm',Empty,DisarmEffect,'vehicle.arm')]:
         add(name,p,CommonFactory(name),cap='mode' if name=='SetMode' else name.lower(),effects=(effect,),resource=res,

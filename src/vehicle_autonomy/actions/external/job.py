@@ -19,9 +19,9 @@ class WaitParameters(DurationParameters):
 
 
 class ExternalFactory(ContextFactory):
-    def __init__(self,create_job):self.create_job=create_job
+    def __init__(self,create_job,*,resource_store=None):self.create_job=create_job;self.resource_store=resource_store
     def start_with_context(self,p,world,ctx):
-        try:return ExternalInstance(self.create_job(p))
+        try:return ExternalInstance(ctx.external_jobs.start(lambda:self.create_job(p)))
         except ActionAdmissionRejected:return ExternalInstance(_AdmissionDenied())
         except Exception:return ExternalInstance(_AdmissionUnknown())
 

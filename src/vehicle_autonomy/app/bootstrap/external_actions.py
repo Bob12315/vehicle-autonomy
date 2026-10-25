@@ -42,6 +42,9 @@ def reconcile_api_resource(record,*,token=None):
     the same provider credentials. A missing ID cannot be resolved this way.
     """
     descriptor=record['descriptor']
+    identity=ApiJob.identity(descriptor['endpoint'],token=token)
+    if any(identity[k]!=record['provider'][k] for k in ('provider_id','provider_epoch','resource_id')):
+        return ActionSafety(False,False,'recovery provider identity/epoch mismatch')
     value=ApiJob.query_existing(descriptor,token=token)
     terminal=value.get('state') in ('SUCCEEDED','FAILED','CANCELLED')
     return ActionSafety(terminal,False,None if terminal else 'external job still unresolved',
@@ -49,12 +52,12 @@ def reconcile_api_resource(record,*,token=None):
          'job_id':descriptor.get('job_id'),'state':value.get('state'),'verification':'read_existing_provider_job'})
 
 
-def register_external(registry,name,create_job,*,continuous=False,parameters_type=WaitParameters,output_schema=None):
+def register_external(registry,name,create_job,*,continuous=False,parameters_type=WaitParameters,output_schema=None,resource_store=None):
     registry.register_typed(ActionSpec(name,parameters_type,frozenset({'external'}),kind=ActionKind.CONTINUOUS if continuous else ActionKind.GOAL,
         vehicle_types=frozenset({'external'}),resources=(ActionResource('ai.inference'),),
         description='Explicit external job endpoint; no vehicle authority',default_timeout_ns=10_000_000_000,
         output_schema=output_schema or {'type':'object','description':'Provider-specific JSON result; deployments may supply a stricter schema'},
-        success_semantics='External terminal result; lost response retains UNKNOWN and its resource.'),ExternalFactory(create_job))
+        success_semantics='External terminal result; lost response retains UNKNOWN and its resource.',external_lifecycle='managed'),ExternalFactory(create_job,resource_store=resource_store))
 
 
 def ros_job(name,parameters,*,service=False,domain_id=172,result_timeout=40):
@@ -63,3 +66,16 @@ def ros_job(name,parameters,*,service=False,domain_id=172,result_timeout=40):
     env=dict(os.environ,ROS_DOMAIN_ID=str(domain_id),ROS_AUTOMATIC_DISCOVERY_RANGE='LOCALHOST')
     return ProcessJob([str(resource_root()/'scripts/with_ros2.sh'),'/usr/bin/python3',str(Path(ros_worker.__file__)),
         '--name',name,'--duration',str(getattr(parameters,'duration_s',.5)),'--result-timeout',str(result_timeout),*(['--service'] if service else [])],env=env)
+
+
+def initialize_http_resources(directory,endpoint,verify_inventory,*,scope='external',token=None):
+    """Trusted local deployment bootstrap using the actual public identity."""
+    identity=ApiJob.identity(endpoint,token=token)
+    def verify():
+        assessment=verify_inventory()
+        if not isinstance(assessment,ActionSafety):raise TypeError('trusted provider inventory proof required')
+        from vehicle_autonomy.contracts.core.serialization import to_json_value
+        evidence=to_json_value(assessment.evidence) or {}
+        evidence.update(identity,protocol='http_job',locator=endpoint.rstrip('/'))
+        return ActionSafety(assessment.release_safe,assessment.continuation_allowed,assessment.reason,evidence)
+    return PersistentResources.initialize(directory,verify,scope=scope)

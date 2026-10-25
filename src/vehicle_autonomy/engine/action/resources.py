@@ -11,6 +11,7 @@ from uuid import uuid4
 
 from vehicle_autonomy.contracts.action import ActionResource, ActionSafety, ResourceMode
 from vehicle_autonomy.engine.action.durable import DurableRecord,durable_directories
+from vehicle_autonomy.engine.action.provider_identity import ProviderRegistry
 
 
 class PersistentResources:
@@ -29,7 +30,7 @@ class PersistentResources:
         return DurableRecord(root.parent/('.vaf-resource-'+hashlib.sha256(str(root).encode()).hexdigest()+'.anchor'))
 
     @classmethod
-    def initialize(cls,directory,verify_quiescent,scope='external'):
+    def initialize(cls,directory,verify_quiescent,scope='external',*,resources=(ActionResource('ai.inference'),)):
         """Explicit deployment bootstrap for a verified fresh/quiescent provider.
 
         Never called by Runtime, acquisition, ordinary startup or recovery.
@@ -40,23 +41,36 @@ class PersistentResources:
         evidence=to_json_value(assessment.evidence) if isinstance(assessment,ActionSafety) else None
         if (not isinstance(assessment,ActionSafety) or not assessment.release_safe or type(evidence) is not dict
                 or evidence.get('quiescent') is not True or not isinstance(evidence.get('provider_epoch'),str)
-                or not evidence['provider_epoch']):raise ValueError('trusted provider quiescence and epoch required')
+                or not evidence['provider_epoch'] or any(not isinstance(evidence.get(k),str) or not evidence[k]
+                    for k in ('provider_id','resource_id','protocol','locator'))):raise ValueError('trusted provider identity, quiescence and epoch required')
+        if not resources or any(not isinstance(r,ActionResource) for r in resources):raise ValueError('bound resource definitions required')
         result=cls(directory,scope);root=result.root
         if root.resolve()!=root:raise ValueError('real state namespace required')
         durable_directories(root.parent);anchor=cls._anchor(root)
         if root.exists() or anchor.path.exists():raise ValueError('external state already established; cannot initialize/reset')
-        root.mkdir(mode=0o700)
-        fd=os.open(root/'owner.lock',os.O_RDWR|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600)
-        try:
-            fcntl.flock(fd,fcntl.LOCK_EX)
-            DurableRecord(root/'claims.json').write({'claims':[]},create=True)
-            anchor.write({'device':root.stat().st_dev,'inode':root.stat().st_ino,'path':str(root),
-                'provider_epoch':evidence['provider_epoch']},create=True)
-        finally:os.close(fd)
+        binding={k:evidence[k] for k in ('provider_id','provider_epoch','resource_id','protocol','locator')}
+        binding.update(ledger=str(root),scope=scope,resources=[dict(name=r.name,mode=r.mode.value,conflict_group=r.conflict_group) for r in resources])
+        # Commit the unique identity before creating its ledger. A crash in the
+        # middle blocks this identity, rather than permitting a second ledger.
+        with ProviderRegistry().transaction() as (data,store):
+            ProviderRegistry.register(data,store,binding)
+            root.mkdir(mode=0o700)
+            fd=os.open(root/'owner.lock',os.O_RDWR|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600)
+            try:
+                fcntl.flock(fd,fcntl.LOCK_EX)
+                DurableRecord(root/'claims.json').write({'claims':[]},create=True)
+                anchor.write({'device':root.stat().st_dev,'inode':root.stat().st_ino,'path':str(root),'binding':binding},create=True)
+            finally:os.close(fd)
         return result
 
     @contextmanager
     def _transaction(self):
+        with ProviderRegistry().transaction() as (data,_):
+            binding=ProviderRegistry.validate(data,self.root,self.scope)
+            with self._local_transaction(binding) as result:yield result
+
+    @contextmanager
+    def _local_transaction(self,binding):
         if self.root.resolve()!=self.root:raise ValueError('real external resource directory required')
         anchor=self._anchor(self.root)
         info=self.root.lstat()
@@ -72,19 +86,20 @@ class PersistentResources:
             store=DurableRecord(self.root/'claims.json')
             identity={'device':self.root.stat().st_dev,'inode':self.root.stat().st_ino,'path':str(self.root)}
             saved=anchor.read()
-            if (type(saved) is not dict or set(saved)!={'device','inode','path','provider_epoch'}
-                    or any(saved.get(k)!=v for k,v in identity.items()) or not isinstance(saved['provider_epoch'],str)
-                    or not saved['provider_epoch']):raise ValueError('external resource directory identity changed')
+            if (type(saved) is not dict or set(saved)!={'device','inode','path','binding'}
+                    or any(saved.get(k)!=v for k,v in identity.items()) or saved['binding']!=binding):
+                raise ValueError('external resource directory/provider identity changed')
             data=store.read()
             if type(data) is not dict or set(data)!={'claims'} or type(data['claims']) is not list or len(data['claims'])>4096:
                 raise ValueError('external resource state invalid')
             ids=set()
             for r in data['claims']:
-                if (type(r) is not dict or set(r)!={'owner','runtime','pid','start_ticks','scope','target','resources','metadata','descriptor','retained','phase'}
+                if (type(r) is not dict or set(r)!={'owner','runtime','pid','start_ticks','scope','target','resources','metadata','descriptor','retained','phase','provider'}
                         or not all(isinstance(r[k],str) and r[k] for k in ('owner','runtime','scope','target','phase'))
-                        or r['phase'] not in ('RESERVED','ACTIVE','UNKNOWN') or r['owner'] in ids
+                        or r['phase'] not in ('RESERVED','ACTIVE','UNKNOWN') or r['owner'] in ids or r['scope']!=binding['scope']
                         or type(r['pid']) is not int or r['pid']<=0 or not isinstance(r['start_ticks'],str) or not r['start_ticks'].isdigit()
                         or type(r['metadata']) is not dict or type(r['descriptor']) is not dict
+                        or r['provider']!={k:binding[k] for k in ('provider_id','provider_epoch','resource_id','protocol')}
                         or r['retained'] is not None and not isinstance(r['retained'],str)
                         or type(r['resources']) is not list or not r['resources']):raise ValueError('external claim record invalid')
                 ids.add(r['owner'])
@@ -96,12 +111,24 @@ class PersistentResources:
             yield data,store
         finally:os.close(fd)
 
+    def binding(self):
+        with ProviderRegistry().transaction() as (data,_):
+            binding=ProviderRegistry.validate(data,self.root,self.scope)
+            with self._local_transaction(binding):return binding
+
+    def bound_resources(self):
+        return tuple(ActionResource(r['name'],ResourceMode(r['mode']),r['conflict_group']) for r in self.binding()['resources'])
+
     def records(self):
         with self._transaction() as (data,_):return deepcopy([r for r in data['claims'] if r['scope']==self.scope])
 
     def acquire(self,owner,runtime,target,resources,metadata):
         requested=[dict(name=r.name,mode=r.mode.value,conflict_group=r.conflict_group) for r in resources]
         with self._transaction() as (data,store):
+            # Resource aliases cannot create a new conflict domain inside this
+            # identity. Only the pinned deployment definitions are accepted.
+            binding=self._anchor(self.root).read()['binding']
+            if requested!=binding['resources']:raise ValueError('resources do not match the provider binding')
             for old in data['claims']:
                 if old['scope']!=self.scope:continue
                 if old['owner']==owner:return old['runtime']==runtime
@@ -112,7 +139,8 @@ class PersistentResources:
             if len(data['claims'])>=4096:raise ValueError('external resource record budget exhausted')
             ticks=Path('/proc/self/stat').read_text().rsplit(')',1)[1].split()[19]
             data['claims'].append(dict(owner=owner,runtime=runtime,pid=os.getpid(),start_ticks=ticks,
-                scope=self.scope,target=target,resources=requested,metadata=metadata,descriptor={},retained=None,phase='RESERVED'))
+                scope=self.scope,target=target,resources=requested,metadata=metadata,descriptor={},retained=None,phase='RESERVED',
+                provider={k:binding[k] for k in ('provider_id','provider_epoch','resource_id','protocol')}))
             store.write(data)
             return True
 
@@ -173,7 +201,7 @@ class ActionResources:
     @staticmethod
     def _key(target,resource):return target,resource.conflict_group or resource.name
 
-    def acquire(self,owner,target,resources,*,continuation_of=None,persistent=False,metadata=None):
+    def acquire(self,owner,target,resources,*,continuation_of=None,persistent=False,metadata=None,external_store=None):
         if any(not isinstance(r,ActionResource) for r in resources):raise TypeError('typed resources required')
         if any(c.owner==owner for c in self._claims):return True
         for requested in resources:
@@ -181,11 +209,12 @@ class ActionResources:
                 if (existing.owner!=continuation_of and self._key(target,requested)==self._key(existing.target,existing.resource)
                         and (requested.mode is ResourceMode.EXCLUSIVE or existing.resource.mode is ResourceMode.EXCLUSIVE)):
                     return False
-        if persistent and resources and target in self._stores:
-            store=self._stores[target]
+        if persistent and (external_store is not None or resources and target in self._stores):
+            store=external_store or self._stores[target]
+            self._stores['provider:'+str(store.root)]=store
             if store.root in self._failed_stores:raise ValueError('external persistence failed; reconcile before reuse')
             if continuation_of:raise ValueError('external restart is not a continuation grant')
-            if not store.acquire(owner,self.runtime_id,target,resources,metadata or {}):return False
+            if not store.acquire(owner,self.runtime_id,target,store.bound_resources(),metadata or {}):return False
             self._persistent[owner]=store
         self._claims.extend(Claim(owner,target,r) for r in resources)
         return True
@@ -255,4 +284,9 @@ class ActionResources:
                     result.append(dict(owner=r['owner'],target=r['target'],**resource,
                         retained=r['retained'] or self._guards.get(r['owner']) or ('external effect from another application remains unconfirmed' if r['runtime']!=self.runtime_id else None),
                         scope=r['scope'],phase=r['phase'],metadata=r['metadata'],descriptor=r['descriptor']))
+        for c in self._claims:
+            if c.owner in self._persistent and not any(v['owner']==c.owner and v['name']==c.resource.name and
+                    v['conflict_group']==c.resource.conflict_group for v in result):
+                result.append(dict(owner=c.owner,target=c.target,name=c.resource.name,mode=c.resource.mode.value,
+                    conflict_group=c.resource.conflict_group,retained=self._guards.get(c.owner)))
         return result

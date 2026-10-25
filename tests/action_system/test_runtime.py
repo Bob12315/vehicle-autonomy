@@ -70,6 +70,7 @@ class RuntimeTests(unittest.TestCase):
         self.runtime=ActionRuntime(self.registry,{'v':self.driver,'other':Driver()},clock=self.clock)
     def register(self,name='a',kind=ActionKind.GOAL,*,write=False,resources=True,**kw):
         spec=ActionSpec(name,Parameters,kind=kind,effect_types=(ArmEffect,) if write else (),
+            external_lifecycle='typed_only' if write else 'opaque',
             resources=(ActionResource('vehicle.motion',conflict_group='vehicle.control'),) if resources else (),
             output_schema={'type':'object','properties':{'count':{'type':'integer'}},'required':['count'],'additionalProperties':False})
         self.registry.register_typed(spec,Factory(continuous=kind is ActionKind.CONTINUOUS,emit=write,**kw))

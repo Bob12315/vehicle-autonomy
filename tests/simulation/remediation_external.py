@@ -12,18 +12,19 @@ from threading import Event,Thread
 import time
 from urllib.request import urlopen
 from uuid import uuid4
+from unittest.mock import patch
 
 from vehicle_autonomy.actions.common.standard import Empty
 from vehicle_autonomy.actions.external.clients import ApiJob,ProcessJob
 from vehicle_autonomy.actions.external.job import ExternalFactory
-from vehicle_autonomy.app.bootstrap.external_actions import ExternalActionDriver,register_external,reconcile_api_resource
+from vehicle_autonomy.app.bootstrap.external_actions import ExternalActionDriver,register_external,reconcile_api_resource,initialize_http_resources
 from vehicle_autonomy.app.web.action_lab import ActionLab
 from vehicle_autonomy.contracts.action import ActionKind,ActionResource,ActionSafety
 from vehicle_autonomy.contracts.decision import ActionSpec,ActionDecision,ActionOutcome,ExitDecision
 from vehicle_autonomy.engine.action.registry import ActionRegistry
 from vehicle_autonomy.engine.action.resources import PersistentResources
 from vehicle_autonomy._resources import resource_root
-from tests.simulation.external_actions import JobHandler,timer
+from tests.simulation.external_actions import JobHandler,timer,isolated_registry,initialize_local_resources,adopt_test_registry
 
 
 def wait_for(predicate,seconds=8):
@@ -40,7 +41,7 @@ class Handler(JobHandler):
         if self.path=='/jobs' and self.server.hold_response:
             from vehicle_autonomy.actions.external.job import WaitParameters
             data=json.loads(self.rfile.read(int(self.headers['Content-Length'])))
-            identifier=uuid4().hex;self.server.jobs[identifier]=timer(WaitParameters(**data))
+            identifier=uuid4().hex;self.server.jobs[identifier]=timer(WaitParameters(**data),server=True)
             self.server.submitted.set();self.server.response_gate.wait(4)
             try:self.response({'id':identifier})
             except BrokenPipeError:pass
@@ -51,6 +52,7 @@ class Handler(JobHandler):
 
 
 def app_child(args):
+    adopt_test_registry()
     registry=ActionRegistry();register_external(registry,'remote',lambda p:ApiJob(args.endpoint,asdict(p)))
     lab=ActionLab({args.target:ExternalActionDriver(args.target,state_dir=args.state)},registry=registry)
     try:
@@ -75,8 +77,7 @@ def http_restart(root,*,before_id=False):
     server.jobs={};server.hold_response=before_id;server.submitted=Event();server.response_gate=Event();server.instance=uuid4().hex
     thread=Thread(target=server.serve_forever,daemon=True);thread.start();children=[]
     endpoint=f'http://127.0.0.1:{server.server_address[1]}';state=root/'resource-state'
-    PersistentResources.initialize(state,lambda:ActionSafety(not server.jobs,
-        evidence={'quiescent':not server.jobs,'provider_epoch':server.instance}))
+    initialize_http_resources(state,endpoint,lambda:ActionSafety(not server.jobs,evidence={'quiescent':not server.jobs}))
     def start(name,**kw):
         snapshot=root/(name+'.json')
         command=[sys.executable,'-m',__name__ if __name__!='__main__' else 'tests.simulation.remediation_external',
@@ -176,13 +177,21 @@ def ros_boundary(root):
     jobs=[];lab=None
     try:
         wait_for(lambda:(root/'ready.json').exists())
-        PersistentResources.initialize(root/'resource-state',lambda:ActionSafety(not (root/'fault-started.json').exists(),
-            evidence={'quiescent':not (root/'fault-started.json').exists(),'provider_epoch':prefix}))
+        assert not (root/'fault-started.json').exists()
+        initialize_local_resources(root/'resource-state',protocol='ros2',locator=f'ros2:184:{prefix}',provider_id=prefix,epoch=prefix)
         registry=ActionRegistry()
         def job(name):
             command=([wrapper,'/usr/bin/python3',source,'--ros-fault-worker','--run-dir',str(root),'--prefix',prefix] if name=='fault' else
                 [wrapper,'/usr/bin/python3','-m','vehicle_autonomy.actions.external.ros_worker','--name',prefix+'/'+name,'--service','--result-timeout','8'])
-            p=ProcessJob(command,env=env);jobs.append(p);return p
+            if name=='fault':
+                # Only the test worker executable differs: it runs the real
+                # ros_worker with one spin_once exception after server start.
+                # The production executable/argument validator remains covered
+                # by all normal DDS cases; identity/ledger checks are unmodified.
+                with patch.object(ProcessJob,'_locator',return_value=f'ros2:184:{prefix}/{name}'):
+                    p=ProcessJob(command,env=env)
+            else:p=ProcessJob(command,env=env)
+            jobs.append(p);return p
         for name in ('fault','normal','error','absent'):
             registry.register_typed(ActionSpec(name,Empty,kind=ActionKind.GOAL,resources=(ActionResource('ai.inference'),)),ExternalFactory(lambda _,n=name:job(n)))
         class Query:
@@ -232,6 +241,7 @@ def main():
     if args.ros_fault_worker:return ros_fault_worker(args.run_dir,args.prefix)
     root=args.run_dir.resolve();root.mkdir(parents=True,exist_ok=False);report={'passed':False,'cases':{}}
     try:
+        isolated_registry(root/'provider-registry')
         report['cases']['api_restart_known_id']=http_restart(root/'api-known')
         report['cases']['api_restart_before_id']=http_restart(root/'api-before-id',before_id=True)
         report['cases']['actual_ros_service_result_lost']=ros_boundary(root/'ros-service')

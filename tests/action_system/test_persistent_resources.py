@@ -9,11 +9,17 @@ from unittest.mock import patch
 
 from vehicle_autonomy.contracts.action import ActionResource,ActionSafety,ResourceMode
 from vehicle_autonomy.engine.action.resources import ActionResources,PersistentResources
+from vehicle_autonomy.engine.action.provider_identity import ProviderRegistry
+
+
+def isolated_test_registry(case,directory):
+    location=patch.object(ProviderRegistry,'_root',directory)
+    location.start();case.addCleanup(location.stop);ProviderRegistry.initialize()
 
 
 def initialize_test_store(root):
     return PersistentResources.initialize(root,lambda:ActionSafety(True,evidence={
-        'quiescent':True,'provider_epoch':'explicit storage-only unit-test epoch'}))
+        'quiescent':True,'provider_epoch':str(root),'provider_id':str(root),'resource_id':'jobs','protocol':'native','locator':str(root)}))
 
 
 def compete(root,barrier,results,name):
@@ -25,6 +31,7 @@ def compete(root,barrier,results,name):
 class PersistentResourceTests(unittest.TestCase):
     def setUp(self):
         self.temp=tempfile.TemporaryDirectory();self.addCleanup(self.temp.cleanup)
+        isolated_test_registry(self,Path(self.temp.name)/'provider-registry')
         self.root=Path(self.temp.name)/'state';self.store=initialize_test_store(self.root)
         self.a=ActionResources({'a':self.store});self.b=ActionResources({'alias':PersistentResources(self.root)})
         self.resource=(ActionResource('ai.inference'),)

@@ -6,7 +6,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
-from threading import Thread
+from threading import Thread,Event,RLock
 import time
 from uuid import uuid4
 
@@ -14,15 +14,35 @@ from vehicle_autonomy.actions.external.clients import ApiJob
 from vehicle_autonomy.actions.external.native import NativeJob
 from vehicle_autonomy.actions.external.job import DurationParameters
 from vehicle_autonomy.actions.common.standard import Empty
-from vehicle_autonomy.app.bootstrap.external_actions import ExternalActionDriver,register_external,ros_job
+from vehicle_autonomy.app.bootstrap.external_actions import ExternalActionDriver,register_external,ros_job,initialize_http_resources
 from vehicle_autonomy.app.web.action_lab import ActionLab
 from vehicle_autonomy.engine.action.registry import ActionRegistry
 from vehicle_autonomy._resources import resource_root
 from vehicle_autonomy.engine.action.resources import PersistentResources
 from vehicle_autonomy.contracts.action import ActionSafety
+from vehicle_autonomy.engine.action.provider_identity import ProviderRegistry
 
 
-def timer(parameters):
+class ProviderJob:
+    """Independent server-side worker; no framework client/Runtime shortcuts."""
+    def __init__(self,execute):
+        self.cancelled=Event();self.lock=RLock();self.value={'state':'RUNNING'}
+        def feedback(value):
+            with self.lock:self.value={'state':'RUNNING','feedback':value}
+        def run():
+            try:
+                result=execute(self.cancelled,feedback)
+                value={'state':'CANCELLED' if self.cancelled.is_set() else 'SUCCEEDED','result':result}
+            except Exception:value={'state':'FAILED','error':'intentional provider error'}
+            with self.lock:self.value=value
+        self.thread=Thread(target=run,daemon=True);self.thread.start()
+    def poll(self):
+        with self.lock:return dict(self.value)
+    def cancel(self):self.cancelled.set()
+    def close(self):self.thread.join(.1)
+
+
+def timer(parameters,*,server=False):
     def execute(cancel,feedback):
         start=time.monotonic()
         while time.monotonic()-start<parameters.duration_s:
@@ -30,12 +50,29 @@ def timer(parameters):
             if cancel.wait(.03):return {'cancelled':True}
         if parameters.behavior=='error':raise RuntimeError('intentional local service error')
         return {'elapsed_s':time.monotonic()-start}
-    return NativeJob(execute)
+    return ProviderJob(execute) if server else NativeJob(execute)
+
+
+def isolated_registry(path):
+    ProviderRegistry._root=path.absolute()
+    os.environ['VAF_TEST_PROVIDER_REGISTRY']=str(path.absolute());ProviderRegistry.initialize()
+
+
+def adopt_test_registry():
+    # Fixture-only location injection. Production ignores this environment
+    # variable; all applications in this test deployment share this one root.
+    ProviderRegistry._root=Path(os.environ['VAF_TEST_PROVIDER_REGISTRY'])
+
+
+def initialize_local_resources(directory,*,protocol,locator,provider_id,epoch):
+    identity=(NativeJob.identity() if protocol=='native' else {'provider_id':provider_id,'provider_epoch':epoch,
+        'resource_id':'jobs','protocol':protocol,'locator':locator})
+    return PersistentResources.initialize(directory,lambda:ActionSafety(True,evidence={'quiescent':True,**identity}))
 
 
 class JobServer(ThreadingHTTPServer):
     def __init__(self):
-        self.jobs={};super().__init__(('127.0.0.1',0),JobHandler)
+        self.jobs={};self.instance=uuid4().hex;super().__init__(('127.0.0.1',0),JobHandler)
 
 
 class JobHandler(BaseHTTPRequestHandler):
@@ -46,17 +83,21 @@ class JobHandler(BaseHTTPRequestHandler):
         from vehicle_autonomy.actions.external.job import WaitParameters
         data=json.loads(self.rfile.read(int(self.headers['Content-Length'])))
         if self.path=='/jobs':
-            identifier=uuid4().hex;self.server.jobs[identifier]=timer(WaitParameters(**data));self.response({'id':identifier})
+            identifier=uuid4().hex;self.server.jobs[identifier]=timer(WaitParameters(**data),server=True);self.response({'id':identifier})
         elif self.path.startswith('/jobs/') and self.path.endswith('/cancel'):
             self.server.jobs[self.path.split('/')[2]].cancel();self.response({'requested':True})
         else:self.send_error(404)
-    def do_GET(self):self.response(self.server.jobs[self.path.split('/')[2]].poll())
+    def do_GET(self):
+        if self.path=='/identity':self.response({'provider_id':self.server.instance,'provider_epoch':self.server.instance,'resource_id':'jobs'})
+        elif self.path=='/inventory':self.response({'instance':self.server.instance,'states':[j.poll()['state'] for j in self.server.jobs.values()]})
+        else:self.response(self.server.jobs[self.path.split('/')[2]].poll())
 
 
 def run(path):
     path.mkdir(parents=True,exist_ok=False);report={'passed':False,'cases':{}};lab=server=ros=None
     events=(path/'runtime.jsonl').open('w');roslog=(path/'ros-server.log').open('w')
     try:
+        isolated_registry(path/'provider-registry')
         prefix='/vaf_phase3_'+uuid4().hex;domain=173
         ros=subprocess.Popen([str(resource_root()/'scripts/with_ros2.sh'),'/usr/bin/python3',
             str(Path(__file__).with_name('external_ros_server.py')),'--prefix',prefix],
@@ -68,14 +109,16 @@ def run(path):
             time.sleep(.1)
         else:raise TimeoutError('actual ROS server startup')
         server=JobServer();Thread(target=server.serve_forever,daemon=True).start()
-        PersistentResources.initialize(path/'resource-state',lambda:ActionSafety(not server.jobs,
-            evidence={'quiescent':not server.jobs,'provider_epoch':prefix}))
-        registry=ActionRegistry();register_external(registry,'NativeWait',timer)
+        endpoint=f'http://127.0.0.1:{server.server_address[1]}'
+        initialize_http_resources(path/'resource-state',endpoint,lambda:ActionSafety(not server.jobs,evidence={'quiescent':not server.jobs}))
+        native=initialize_local_resources(path/'native-state',protocol='native',locator=prefix+'/native',provider_id=prefix+'/native',epoch=prefix+'/native')
+        ros_store=initialize_local_resources(path/'ros-state',protocol='ros2',locator=f'ros2:{domain}:{prefix}',provider_id=prefix,epoch=prefix)
+        registry=ActionRegistry();register_external(registry,'NativeWait',timer,resource_store=native)
         register_external(registry,'ApiWait',lambda p:ApiJob(f'http://127.0.0.1:{server.server_address[1]}',asdict(p)))
         register_external(registry,'ContinuousApi',lambda p:ApiJob(f'http://127.0.0.1:{server.server_address[1]}',asdict(p)),continuous=True)
         for action,suffix,service in [('RosWait','normal',False),('RosError','error',False),('RosUnavailable','absent',False),('RosDisconnect','disconnect',False),('RosService','trigger',True)]:
             register_external(registry,action,lambda p,s=suffix,v=service:ros_job(prefix+'/'+s,p,service=v,domain_id=domain,result_timeout=2 if s=='disconnect' else 8),
-                parameters_type=Empty if service else DurationParameters)
+                parameters_type=Empty if service else DurationParameters,resource_store=ros_store)
         lab=ActionLab({'external':ExternalActionDriver(state_dir=path/'resource-state'),
             'lost':ExternalActionDriver('lost',state_dir=path/'resource-state')},registry=registry,
             event_sink=lambda e:(events.write(json.dumps(e)+'\n'),events.flush()))

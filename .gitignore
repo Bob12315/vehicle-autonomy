@@ -42,3 +42,4 @@ artifacts/phase2-control/
 # Phase 3 raw acceptance runs contain large, host-specific simulation evidence.
 artifacts/phase3-actions/
 artifacts/phase3-remediation/
+artifacts/phase3-round3/

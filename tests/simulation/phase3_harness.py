@@ -58,6 +58,8 @@ def main():
         if not unit['passed']:raise RuntimeError('full unit regression failed')
         stage('independent_remediation_boundaries','tests.simulation.remediation_external',
             root/'independent-remediation-boundaries',timeout=120)
+        stage('round3_independent_boundaries','tests.simulation.round3_boundaries',
+            root/'round3-boundaries',timeout=300)
         for number in (1,2):
             run=root/f'round-{number}-{uuid4().hex[:8]}';run.mkdir()
             record={'number':number,'passed':False,'vehicles':{},'groups':{}};report['rounds'].append(record)

@@ -20,12 +20,13 @@ from vehicle_autonomy.contracts.decision import ActionSpec,ActionDecision,Action
 from vehicle_autonomy.engine.action.registry import ActionRegistry
 from vehicle_autonomy.engine.action.runtime import ActionRuntime
 from tests.action_system.test_runtime import Clock
-from tests.action_system.test_persistent_resources import initialize_test_store
+from tests.action_system.test_persistent_resources import initialize_test_store,isolated_test_registry
 
 
 class ExitBoundaryTests(unittest.TestCase):
     def setUp(self):
         self.state=tempfile.TemporaryDirectory();self.addCleanup(self.state.cleanup)
+        isolated_test_registry(self,Path(self.state.name)/'provider-registry')
         initialize_test_store(Path(self.state.name)/'resources')
     def driver(self):return ExternalActionDriver(state_dir=Path(self.state.name)/'resources')
     def test_exit_exception_remains_quarantined_after_many_ticks(self):

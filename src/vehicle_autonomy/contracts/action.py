@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
+from typing import Callable,Protocol
 
 from vehicle_autonomy.contracts.core.geometry import Pose3
 from vehicle_autonomy.contracts.core.primitives import FrozenJson, freeze_json
@@ -51,6 +52,11 @@ class ActionResource:
             raise TypeError('resource conflict group must be text')
 
 
+class ExternalJobPort(Protocol):
+    def start(self,create: Callable[[],object]) -> object:
+        """Start one registered job under the active Action's bound provider."""
+
+
 @dataclass(frozen=True, slots=True)
 class ActionContext:
     target_id: str
@@ -59,6 +65,7 @@ class ActionContext:
     owned_simulation: bool = False
     home: Pose3 | None = None
     metadata: FrozenJson = None
+    external_jobs: ExternalJobPort | None = None
 
     def __post_init__(self):
         if not self.target_id or not self.target_kind or not isinstance(self.capabilities, frozenset):

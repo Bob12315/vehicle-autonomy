@@ -80,6 +80,7 @@ class ActionSpec:
     implementation_ref: str = ''
     success_semantics: str = ''
     cancel_semantics: str = 'Exit barrier; uncertain physical effects retain resources.'
+    external_lifecycle: str = 'opaque'
 
     def __post_init__(self) -> None:
         if not isinstance(self.name, str) or not self.name.strip():
@@ -106,6 +107,8 @@ class ActionSpec:
             raise TypeError('immutable Action resource declarations required')
         if self.kind is ActionKind.QUERY and self.effect_types:
             raise ValueError('Query Actions cannot declare vehicle or payload effects')
+        if self.external_lifecycle not in ('typed_only','managed','opaque'):
+            raise ValueError('explicit external lifecycle contract required')
         if not isinstance(self.required_state, tuple) or any(not isinstance(v,str) or not v for v in self.required_state):
             raise ValueError('required state names must be immutable nonempty strings')
         times = (self.max_snapshot_age_ns, self.default_timeout_ns, self.max_timeout_ns, self.exit_timeout_ns)

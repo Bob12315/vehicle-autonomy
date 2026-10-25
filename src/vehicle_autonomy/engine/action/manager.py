@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from collections import deque
 from copy import deepcopy
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 import math
 from threading import RLock
 from uuid import uuid4
@@ -22,6 +22,7 @@ from vehicle_autonomy.contracts.decision import ActionDecision, ActionOutcome, E
 from vehicle_autonomy.contracts.effects.payload import PayloadEffectEnvelope, ReleasePayloadEffect
 from vehicle_autonomy.contracts.effects.vehicle import EffectEnvelope
 from vehicle_autonomy.engine.action.resources import ActionResources
+from vehicle_autonomy.engine.action.external_lifecycle import ExternalLifecycle
 from vehicle_autonomy.engine.action.schema import validate_json
 
 
@@ -60,6 +61,7 @@ class _Record:
     guard_stop: object = None
     driver_safety: ActionSafety | None = None
     provider_started: bool = False
+    external: object = None
 
 
 class ActionRuntime:
@@ -146,9 +148,13 @@ class ActionRuntime:
 
     def _admit(self,r,now):
         s=r.registration.spec
+        store=getattr(r.registration.factory,'resource_store',None) or getattr(self.drivers[r.target],'resource_store',None)
+        r.external=ExternalLifecycle(s,store,r.id,self.resources.runtime_id,
+            lambda:r.provider_started and r.state in (ActionState.VALIDATING,ActionState.RUNNING)
+                and self.clock().monotonic_ns<r.deadline_ns)
         if not self.resources.acquire(r.id,r.target,s.resources,continuation_of=r.continuation_of,
                 persistent=s.kind is not ActionKind.QUERY,
-                metadata={'action':s.name,'version':s.version,'kind':s.kind.value}):
+                metadata={'action':s.name,'version':s.version,'kind':s.kind.value},external_store=store):
             if now.monotonic_ns>=r.wait_deadline_ns:
                 r.error='resource conflict';self._state(r,ActionState.REJECTED)
             else:self._state(r,ActionState.WAITING_RESOURCE)
@@ -177,6 +183,7 @@ class ActionRuntime:
 
     def _begin_exit(self,r,outcome,error):
         if r.state is ActionState.CANCELLING:return
+        if r.external is not None:r.external.seal()
         r.requested_end=outcome;r.error=error;r.exit_started_ns=self.clock().monotonic_ns
         if r.state is ActionState.WAITING_RESOURCE or not r.opened and r.opening is None:
             self.resources.release(r.id,no_effects=True);self._state(r,outcome);return
@@ -210,11 +217,15 @@ class ActionRuntime:
     def _combined_safety(self,r,safety):
         if not isinstance(safety,ActionSafety):raise TypeError('driver must return a typed physical safety assessment')
         r.driver_safety=safety
+        if r.external is not None:
+            external=r.external.assess()
+            if not external.release_safe:return external
         if r.exit_safety is not None and not r.exit_safety.release_safe:
             return ActionSafety(False,False,r.exit_safety.reason or 'Action external effects unconfirmed',r.exit_safety.evidence)
         return safety
 
     def _finish(self,r,safety):
+        if r.external is not None:r.external.seal()
         safety=self._combined_safety(r,safety)
         r.safety=safety
         if safety.release_safe:self.resources.release(r.id,safety=safety)
@@ -228,6 +239,12 @@ class ActionRuntime:
     def _tick(self,r,now):
         driver=self.drivers[r.target];s=r.registration.spec
         if r.state in TERMINAL_ACTION_STATES:
+            if r.external is not None and s.external_lifecycle=='managed' and r.external.jobs and r.external.assess().release_safe:
+                r.exit_safety=ActionSafety(True,False,'all registered independent jobs have trusted terminal results')
+                if r.driver_safety is not None and r.safety is not None and not r.safety.release_safe:
+                    r.safety=self._combined_safety(r,r.driver_safety)
+                    if r.safety.release_safe:
+                        self.resources.release(r.id,safety=r.safety);self._event(r,'external_jobs_reconciled')
             if r.exit_safety is not None and not r.exit_safety.release_safe:
                 reconcile=getattr(r.instance,'reconcile_exit',None)
                 if reconcile:
@@ -268,7 +285,7 @@ class ActionRuntime:
         if r.state is ActionState.CANCELLING and now.monotonic_ns-r.exit_started_ns>=s.exit_timeout_ns:
             # A hung driver cannot freeze the global scheduler or release its
             # physical claim. The driver has already been told to close ingress.
-            if s.kind is not ActionKind.QUERY and not s.effect_types and (r.instance is not None or r.opening is not None):
+            if s.kind is not ActionKind.QUERY and s.external_lifecycle!='typed_only' and (r.instance is not None or r.opening is not None):
                 r.exit_safety=ActionSafety(False,False,'Action exit deadline; external/admission effects UNCONFIRMED')
             abandon=getattr(r.instance,'abandon',None)
             if abandon:
@@ -315,10 +332,11 @@ class ActionRuntime:
             factory=r.registration.factory
             self.resources.started(r.id);r.provider_started=True
             try:
-                r.instance=(factory.start_with_context(r.parameters,world,driver.context())
-                            if hasattr(factory,'start_with_context') else factory.start(r.parameters,world))
+                with r.external.callback():
+                    r.instance=(factory.start_with_context(r.parameters,world,replace(driver.context(),external_jobs=r.external))
+                                if hasattr(factory,'start_with_context') else factory.start(r.parameters,world))
             except Exception as exc:
-                if not isinstance(exc,ActionAdmissionRejected) and s.kind is not ActionKind.QUERY and not s.effect_types:
+                if not isinstance(exc,ActionAdmissionRejected) and s.kind is not ActionKind.QUERY and s.external_lifecycle!='typed_only':
                     r.exit_safety=ActionSafety(False,False,'provider admission raised; external side effects UNCONFIRMED')
                 raise
             if not callable(getattr(r.instance,'tick',None)) or not callable(getattr(r.instance,'exit',None)):
@@ -329,7 +347,8 @@ class ActionRuntime:
             if describe:self.resources.describe(r.id,describe())
             world=driver.snapshot();self._fresh(r,world,self.clock())
             results=driver.effect_results(r.id)
-            decision=(r.instance.tick_with_results(world,results) if hasattr(r.instance,'tick_with_results') else r.instance.tick(world))
+            with r.external.callback():
+                decision=(r.instance.tick_with_results(world,results) if hasattr(r.instance,'tick_with_results') else r.instance.tick(world))
             if not isinstance(decision,ActionDecision):raise TypeError('typed Action decision required')
             if decision.outcome is not ActionOutcome.RUNNING and decision.effects:
                 raise TypeError('terminal Action decision cannot start new effects')
@@ -359,13 +378,14 @@ class ActionRuntime:
                 reason={ActionState.SUCCEEDED:ExitReason.SUCCEEDED,ActionState.CANCELLED:ExitReason.CANCELLED}.get(r.requested_end,ExitReason.FAILED)
                 try:
                     results=driver.effect_results(r.id)
-                    decision=(r.instance.exit_with_results(world,reason,results) if hasattr(r.instance,'exit_with_results') else r.instance.exit(world,reason))
+                    with r.external.callback():
+                        decision=(r.instance.exit_with_results(world,reason,results) if hasattr(r.instance,'exit_with_results') else r.instance.exit(world,reason))
                     if not isinstance(decision,ExitDecision):raise TypeError('typed Action exit required')
                     self._emit(r,decision.effects,self.clock(),cleanup=True);r.exit_complete=decision.complete;r.exit_safety=decision.safety
                 except Exception as exc:
                     r.error=f'Action exit failed: {type(exc).__name__}: {exc}';r.exit_complete=True
                     r.requested_end=ActionState.FAILED
-                    if s.kind is not ActionKind.QUERY and not s.effect_types:
+                    if s.kind is not ActionKind.QUERY and s.external_lifecycle!='typed_only':
                         r.exit_safety=ActionSafety(False,False,'Action exit raised; side effects UNCONFIRMED')
             elif r.instance is None:r.exit_complete=True
             if r.exit_complete:
@@ -425,6 +445,7 @@ class ActionRuntime:
                 result=verify(record);assessments.append(result);return result
             if not self.resources.reconcile(identifier,checked):return False
             if r is not None:
+                r.external.attested=True
                 r.exit_safety=assessments[-1]
                 r.safety=self._combined_safety(r,r.driver_safety)
                 self._event(r,'external_guard_reconciled',evidence=to_json_value(r.exit_safety.evidence))

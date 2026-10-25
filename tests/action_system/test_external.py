@@ -7,21 +7,25 @@ from pathlib import Path
 import unittest
 
 from vehicle_autonomy.actions.external.clients import ApiJob
-from vehicle_autonomy.app.bootstrap.external_actions import ExternalActionDriver,register_external
+from vehicle_autonomy.app.bootstrap.external_actions import ExternalActionDriver,register_external,initialize_http_resources
 from vehicle_autonomy.app.web.action_lab import ActionLab
 from vehicle_autonomy.engine.action.registry import ActionRegistry
 from tests.simulation.external_actions import timer,JobServer
 from vehicle_autonomy.engine.action.resources import PersistentResources
 from vehicle_autonomy.contracts.action import ActionSafety
+from tests.action_system.test_persistent_resources import isolated_test_registry
+from tests.simulation.external_actions import initialize_local_resources
 
 
 class ExternalTests(unittest.TestCase):
     def setUp(self):
         self.state=tempfile.TemporaryDirectory()
+        isolated_test_registry(self,Path(self.state.name)/'provider-registry')
         self.server=JobServer();self.thread=Thread(target=self.server.serve_forever,daemon=True);self.thread.start()
-        PersistentResources.initialize(Path(self.state.name)/'resources',lambda:ActionSafety(not self.server.jobs,
-            evidence={'quiescent':not self.server.jobs,'provider_epoch':'owned unit HTTP server'}))
-        registry=ActionRegistry();register_external(registry,'native',timer)
+        initialize_http_resources(Path(self.state.name)/'resources',f'http://127.0.0.1:{self.server.server_address[1]}',
+            lambda:ActionSafety(not self.server.jobs,evidence={'quiescent':not self.server.jobs}))
+        native=initialize_local_resources(Path(self.state.name)/'native',protocol='native',locator='unit-native',provider_id='unit-native',epoch='unit-native')
+        registry=ActionRegistry();register_external(registry,'native',timer,resource_store=native)
         register_external(registry,'api',lambda p:ApiJob(f'http://127.0.0.1:{self.server.server_address[1]}',asdict(p)))
         self.lab=ActionLab({'external':ExternalActionDriver(state_dir=Path(self.state.name)/'resources')},registry=registry)
     def tearDown(self):
