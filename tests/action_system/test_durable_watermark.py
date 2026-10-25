@@ -138,3 +138,12 @@ class DurableWatermarkTests(unittest.TestCase):
         # A valid checksum cannot make a different signing epoch trusted.
         store.write({'floor':500,'epoch':'wrong-epoch'})
         with self.assertRaises(ValueError):owner(self.path)
+
+    def test_authenticated_provisioner_readback_can_only_advance_a_valid_store(self):
+        self.proof.close()
+        with (self.root/'receive-signing.private').open('w') as stream:
+            json.dump({'key':TEST_KEY.hex(),'floor':400},stream)
+        receiver=self.restart()
+        self.assertEqual(receiver.watermark,400);self.assertEqual(self.floor(),400)
+        self.assertIsNone(receiver.verify(message(101),system=1,component=1))
+        self.assertEqual(receiver.verify(message(401),system=1,component=1),401)

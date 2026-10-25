@@ -91,9 +91,13 @@ class OwnedActionSimulation:
             initial=configuration['floor']
             if (type(initial) is not int or not 0<=initial<2**48
                     or type(saved) is not dict or set(saved)!={'epoch','floor'} or saved['epoch']!=self._epoch
-                    or type(saved['floor']) is not int or not initial<=saved['floor']<2**48):
+                    or type(saved['floor']) is not int or not 0<=saved['floor']<2**48):
                 raise ValueError('receive watermark unavailable; create a fresh authentication epoch')
             self._last_floor=saved['floor']
+            # The provisioner can advance its fence with authenticated parameter
+            # readback after creating this store. Only advance a VALID existing
+            # same-epoch record; missing/corrupt state still never falls back.
+            if initial>self._last_floor:self._persist(initial)
             self.receive_signing=_DurableSigning(key,initial_timestamp=self._last_floor,persist=self._persist)
         except Exception:
             self.close();raise ValueError('owned signing epoch unavailable, already in use, or corrupt') from None
