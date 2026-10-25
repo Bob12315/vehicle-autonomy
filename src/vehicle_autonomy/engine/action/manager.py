@@ -58,6 +58,8 @@ class _Record:
     feedback: deque = field(default_factory=lambda:deque(maxlen=100))
     history: deque = field(default_factory=lambda:deque(maxlen=128))
     guard_stop: object = None
+    driver_safety: ActionSafety | None = None
+    provider_started: bool = False
 
 
 class ActionRuntime:
@@ -65,7 +67,8 @@ class ActionRuntime:
         if type(max_instances) is not int or not 1<=max_instances<=4096:raise ValueError('bounded instance budget required')
         if type(max_effects) is not int or max_effects<=0:raise ValueError('bounded effect budget required')
         self.registry=registry;self.drivers=dict(drivers);self.clock=clock
-        self.resources=ActionResources();self._records={};self._lock=RLock()
+        self.resources=ActionResources({k:d.resource_store for k,d in self.drivers.items() if hasattr(d,'resource_store')})
+        self._records={};self._lock=RLock()
         self._event_sink=event_sink or (lambda event:None)
         self.max_instances=max_instances;self.max_effects=max_effects;self._last_now=None
 
@@ -138,12 +141,14 @@ class ActionRuntime:
                 self._preflight(r)
             except _StatePending as exc:self._waiting_state(r,exc)
             except Exception as exc:
-                r.error=f'{type(exc).__name__}: {exc}';self.resources.release(r.id);self._state(r,ActionState.REJECTED)
+                r.error=f'{type(exc).__name__}: {exc}';self.resources.release(r.id,no_effects=True);self._state(r,ActionState.REJECTED)
             return self._view(r)
 
     def _admit(self,r,now):
         s=r.registration.spec
-        if not self.resources.acquire(r.id,r.target,s.resources,continuation_of=r.continuation_of):
+        if not self.resources.acquire(r.id,r.target,s.resources,continuation_of=r.continuation_of,
+                persistent=s.kind is not ActionKind.QUERY,
+                metadata={'action':s.name,'version':s.version,'kind':s.kind.value}):
             if now.monotonic_ns>=r.wait_deadline_ns:
                 r.error='resource conflict';self._state(r,ActionState.REJECTED)
             else:self._state(r,ActionState.WAITING_RESOURCE)
@@ -174,7 +179,7 @@ class ActionRuntime:
         if r.state is ActionState.CANCELLING:return
         r.requested_end=outcome;r.error=error;r.exit_started_ns=self.clock().monotonic_ns
         if r.state is ActionState.WAITING_RESOURCE or not r.opened and r.opening is None:
-            self.resources.release(r.id);self._state(r,outcome);return
+            self.resources.release(r.id,no_effects=True);self._state(r,outcome);return
         try:self.drivers[r.target].begin_exit(r.id)
         except Exception as exc:
             r.requested_end=ActionState.UNKNOWN
@@ -202,12 +207,17 @@ class ActionRuntime:
             r.effects.append((envelope,future))
             self._event(r,'effect_requested',effect_id=str(envelope.effect_id),effect_type=type(effect).__name__,cleanup=cleanup)
 
-    def _finish(self,r,safety):
+    def _combined_safety(self,r,safety):
         if not isinstance(safety,ActionSafety):raise TypeError('driver must return a typed physical safety assessment')
+        r.driver_safety=safety
         if r.exit_safety is not None and not r.exit_safety.release_safe:
-            safety=ActionSafety(False,False,r.exit_safety.reason or 'Action external effects unconfirmed',r.exit_safety.evidence)
+            return ActionSafety(False,False,r.exit_safety.reason or 'Action external effects unconfirmed',r.exit_safety.evidence)
+        return safety
+
+    def _finish(self,r,safety):
+        safety=self._combined_safety(r,safety)
         r.safety=safety
-        if safety.release_safe:self.resources.release(r.id)
+        if safety.release_safe:self.resources.release(r.id,safety=safety)
         else:self.resources.retain(r.id,safety.reason or 'physical safety UNCONFIRMED')
         state=r.requested_end
         if not safety.release_safe and not (state is ActionState.SUCCEEDED and safety.continuation_allowed):
@@ -218,19 +228,32 @@ class ActionRuntime:
     def _tick(self,r,now):
         driver=self.drivers[r.target];s=r.registration.spec
         if r.state in TERMINAL_ACTION_STATES:
+            if r.exit_safety is not None and not r.exit_safety.release_safe:
+                reconcile=getattr(r.instance,'reconcile_exit',None)
+                if reconcile:
+                    assessed=reconcile()
+                    if assessed is not None:
+                        if not isinstance(assessed,ActionSafety):raise TypeError('typed external reconciliation required')
+                        if assessed.release_safe:
+                            r.exit_safety=assessed
+                            if r.driver_safety is not None:
+                                r.safety=self._combined_safety(r,r.driver_safety)
+                                if r.safety.release_safe:
+                                    self.resources.release(r.id,safety=r.safety)
+                                    self._event(r,'external_guard_reconciled')
             if r.guard_stop is not None and r.guard_stop.done():
-                try:r.safety=r.guard_stop.result()
+                try:r.safety=self._combined_safety(r,r.guard_stop.result())
                 except Exception as exc:r.safety=ActionSafety(False,False,f'guard exit failed: {type(exc).__name__}')
                 r.guard_stop=None
-                if r.safety.release_safe:self.resources.release(r.id)
+                if r.safety.release_safe:self.resources.release(r.id,safety=r.safety)
                 else:self.resources.retain(r.id,r.safety.reason or 'physical stop UNCONFIRMED')
             elif r.safety and not r.safety.release_safe:
                 status=driver.guard_status(r.id)
                 if status is not None:
                     if not isinstance(status,ActionSafety):raise TypeError('typed guard status required')
-                    r.safety=status
-                    if status.release_safe:self.resources.release(r.id);self._event(r,'physical_guard_reconciled')
-                    else:self.resources.retain(r.id,status.reason or 'physical outcome UNCONFIRMED')
+                    r.safety=self._combined_safety(r,status)
+                    if r.safety.release_safe:self.resources.release(r.id,safety=r.safety);self._event(r,'physical_guard_reconciled')
+                    else:self.resources.retain(r.id,r.safety.reason or 'physical outcome UNCONFIRMED')
             return
         if r.state is not ActionState.CANCELLING and now.monotonic_ns>=r.deadline_ns:
             self._begin_exit(r,ActionState.TIMED_OUT,'Action deadline exceeded')
@@ -245,6 +268,8 @@ class ActionRuntime:
         if r.state is ActionState.CANCELLING and now.monotonic_ns-r.exit_started_ns>=s.exit_timeout_ns:
             # A hung driver cannot freeze the global scheduler or release its
             # physical claim. The driver has already been told to close ingress.
+            if s.kind is not ActionKind.QUERY and not s.effect_types and (r.instance is not None or r.opening is not None):
+                r.exit_safety=ActionSafety(False,False,'Action exit deadline; external/admission effects UNCONFIRMED')
             abandon=getattr(r.instance,'abandon',None)
             if abandon:
                 try:abandon()
@@ -267,7 +292,7 @@ class ActionRuntime:
             except Exception as exc:
                 r.error=f'admission failed: {type(exc).__name__}: {exc}'
                 if isinstance(exc,ActionAdmissionRejected):
-                    self.resources.release(r.id)
+                    self.resources.release(r.id,no_effects=True)
                     self._state(r,r.requested_end if r.state is ActionState.CANCELLING else ActionState.REJECTED)
                 else:
                     r.requested_end=ActionState.UNKNOWN
@@ -275,7 +300,7 @@ class ActionRuntime:
                 return
             finally:r.opening=None
             if r.continuation_of:
-                self.resources.release(r.continuation_of)
+                self.resources.release(r.continuation_of,safety=ActionSafety(True,False,'explicit successful resource transfer'))
                 old=self._records[r.continuation_of]
                 old.safety=ActionSafety(True,False,'resource transferred under explicit new authorization',
                     {'successor':r.id,'physical_stop':'UNCONFIRMED'})
@@ -288,12 +313,20 @@ class ActionRuntime:
         if r.state is ActionState.VALIDATING and r.opened:
             world=driver.snapshot();self._fresh(r,world,self.clock())
             factory=r.registration.factory
-            r.instance=(factory.start_with_context(r.parameters,world,driver.context())
-                        if hasattr(factory,'start_with_context') else factory.start(r.parameters,world))
+            self.resources.started(r.id);r.provider_started=True
+            try:
+                r.instance=(factory.start_with_context(r.parameters,world,driver.context())
+                            if hasattr(factory,'start_with_context') else factory.start(r.parameters,world))
+            except Exception as exc:
+                if not isinstance(exc,ActionAdmissionRejected) and s.kind is not ActionKind.QUERY and not s.effect_types:
+                    r.exit_safety=ActionSafety(False,False,'provider admission raised; external side effects UNCONFIRMED')
+                raise
             if not callable(getattr(r.instance,'tick',None)) or not callable(getattr(r.instance,'exit',None)):
                 raise TypeError('Action factory returned no lifecycle instance')
             self._state(r,ActionState.RUNNING)
         if r.state is ActionState.RUNNING:
+            describe=getattr(r.instance,'recovery_descriptor',None)
+            if describe:self.resources.describe(r.id,describe())
             world=driver.snapshot();self._fresh(r,world,self.clock())
             results=driver.effect_results(r.id)
             decision=(r.instance.tick_with_results(world,results) if hasattr(r.instance,'tick_with_results') else r.instance.tick(world))
@@ -332,6 +365,8 @@ class ActionRuntime:
                 except Exception as exc:
                     r.error=f'Action exit failed: {type(exc).__name__}: {exc}';r.exit_complete=True
                     r.requested_end=ActionState.FAILED
+                    if s.kind is not ActionKind.QUERY and not s.effect_types:
+                        r.exit_safety=ActionSafety(False,False,'Action exit raised; side effects UNCONFIRMED')
             elif r.instance is None:r.exit_complete=True
             if r.exit_complete:
                 r.closing=driver.finish_scope(r.id,succeeded=r.requested_end is ActionState.SUCCEEDED)
@@ -373,3 +408,24 @@ class ActionRuntime:
 
     def resource_view(self):
         with self._lock:return self.resources.view()
+
+    def reconcile_external(self,identifier,verify):
+        """Trusted, bounded provider inspection; no force flag or re-submission.
+
+        Deployment code invokes this outside normal Action execution. It may
+        resolve an old process's reservation without resuming its Action.
+        """
+        if not callable(verify):raise TypeError('provider verifier required')
+        with self._lock:
+            r=self._records.get(identifier)
+            if r is not None and (r.state not in TERMINAL_ACTION_STATES or r.driver_safety is None or not r.driver_safety.release_safe):
+                return False
+            assessments=[]
+            def checked(record):
+                result=verify(record);assessments.append(result);return result
+            if not self.resources.reconcile(identifier,checked):return False
+            if r is not None:
+                r.exit_safety=assessments[-1]
+                r.safety=self._combined_safety(r,r.driver_safety)
+                self._event(r,'external_guard_reconciled',evidence=to_json_value(r.exit_safety.evidence))
+            return True

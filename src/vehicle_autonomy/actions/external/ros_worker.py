@@ -27,11 +27,13 @@ def main():
     Thread(target=read_cancel,daemon=True).start()
     def emit(state,**kw):print(json.dumps(dict(state=state,**kw)),flush=True)
     rclpy.init();node=rclpy.create_node('vaf_action_client_'+uuid4().hex[:10])
-    client=None;accepted=False
+    client=None;submission_started=False;accepted=False
     try:
         if args.service:
             client=node.create_client(Trigger,args.name)
             if not client.wait_for_service(timeout_sec=2):emit('FAILED',error='ROS service unavailable');return 1
+            if cancelled.is_set():emit('CANCELLED',error='cancelled before ROS service submission');return 0
+            submission_started=True
             future=client.call_async(Trigger.Request());end=time.monotonic()+args.result_timeout
             while not future.done() and time.monotonic()<end:rclpy.spin_once(node,timeout_sec=.05)
             if not future.done():emit('UNKNOWN',error='ROS service response unconfirmed');return 1
@@ -43,6 +45,8 @@ def main():
         def feedback(message):
             left=message.feedback.time_left
             emit('RUNNING',feedback={'time_left_s':left.sec+left.nanosec/1e9})
+        if cancelled.is_set():emit('CANCELLED',error='cancelled before ROS goal submission');return 0
+        submission_started=True
         sent=client.send_goal_async(goal,feedback_callback=feedback);until=time.monotonic()+2
         while not sent.done() and time.monotonic()<until:rclpy.spin_once(node,timeout_sec=.05)
         if not sent.done():emit('UNKNOWN',error='ROS goal admission response lost');return 1
@@ -61,7 +65,7 @@ def main():
             'error_code':value.error_code},error=value.error_msg or None)
         return 0 if state in ('SUCCEEDED','CANCELLED') else 1
     except Exception as exc:
-        emit('UNKNOWN' if accepted else 'FAILED',error='ROS worker communication failure: '+type(exc).__name__);return 1
+        emit('UNKNOWN' if submission_started else 'FAILED',error='ROS worker communication failure: '+type(exc).__name__);return 1
     finally:
         if client is not None and not args.service:client.destroy()
         node.destroy_node();rclpy.shutdown()

@@ -13,10 +13,15 @@ from vehicle_autonomy.contracts.core.primitives import ResourceVersion,SchemaVer
 from vehicle_autonomy.contracts.core.time import TimePoint
 from vehicle_autonomy.contracts.decision import ActionSpec
 from vehicle_autonomy.contracts.world.models import WorldSnapshot
+from vehicle_autonomy.engine.action.resources import PersistentResources
 
 
 class ExternalActionDriver:
-    def __init__(self,target='external'):self.target=target
+    def __init__(self,target='external',*,state_dir=None,resource_scope='external'):
+        self.target=target
+        base=Path(os.environ.get('XDG_STATE_HOME',str(Path.home()/'.local/state')))
+        self.resource_store=PersistentResources(state_dir or os.environ.get('VAF_ACTION_RESOURCE_DIR') or
+            base/'vehicle-autonomy/action-resources',resource_scope)
     def context(self):return ActionContext(self.target,'external',frozenset({'external'}))
     def snapshot(self):
         return WorldSnapshot(SchemaVersion(1,0),'external:world',ResourceVersion('external',1),
@@ -28,6 +33,20 @@ class ExternalActionDriver:
     def finish_scope(self,identifier,**kw):f=Future();f.set_result(ActionSafety(True));return f
     def guard_status(self,identifier):return None
     def close(self):pass
+
+
+def reconcile_api_resource(record,*,token=None):
+    """Read the existing job only; never create/cancel/resubmit during recovery.
+
+    Call from trusted deployment recovery with the stable resource scope and
+    the same provider credentials. A missing ID cannot be resolved this way.
+    """
+    descriptor=record['descriptor']
+    value=ApiJob.query_existing(descriptor,token=token)
+    terminal=value.get('state') in ('SUCCEEDED','FAILED','CANCELLED')
+    return ActionSafety(terminal,False,None if terminal else 'external job still unresolved',
+        {'owner':record['owner'],'scope':record['scope'],'terminal':terminal,
+         'job_id':descriptor.get('job_id'),'state':value.get('state'),'verification':'read_existing_provider_job'})
 
 
 def register_external(registry,name,create_job,*,continuous=False,parameters_type=WaitParameters,output_schema=None):

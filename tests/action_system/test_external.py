@@ -2,6 +2,8 @@
 from dataclasses import asdict
 from threading import Thread
 import time
+import tempfile
+from pathlib import Path
 import unittest
 
 from vehicle_autonomy.actions.external.clients import ApiJob
@@ -9,17 +11,23 @@ from vehicle_autonomy.app.bootstrap.external_actions import ExternalActionDriver
 from vehicle_autonomy.app.web.action_lab import ActionLab
 from vehicle_autonomy.engine.action.registry import ActionRegistry
 from tests.simulation.external_actions import timer,JobServer
+from vehicle_autonomy.engine.action.resources import PersistentResources
+from vehicle_autonomy.contracts.action import ActionSafety
 
 
 class ExternalTests(unittest.TestCase):
     def setUp(self):
+        self.state=tempfile.TemporaryDirectory()
         self.server=JobServer();self.thread=Thread(target=self.server.serve_forever,daemon=True);self.thread.start()
+        PersistentResources.initialize(Path(self.state.name)/'resources',lambda:ActionSafety(not self.server.jobs,
+            evidence={'quiescent':not self.server.jobs,'provider_epoch':'owned unit HTTP server'}))
         registry=ActionRegistry();register_external(registry,'native',timer)
         register_external(registry,'api',lambda p:ApiJob(f'http://127.0.0.1:{self.server.server_address[1]}',asdict(p)))
-        self.lab=ActionLab({'external':ExternalActionDriver()},registry=registry)
+        self.lab=ActionLab({'external':ExternalActionDriver(state_dir=Path(self.state.name)/'resources')},registry=registry)
     def tearDown(self):
         self.lab.close();self.server.shutdown();self.server.server_close();self.thread.join(2)
         for job in self.server.jobs.values():job.cancel();job.close()
+        self.state.cleanup()
     def wait(self,a):
         until=time.monotonic()+4
         while time.monotonic()<until:

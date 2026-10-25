@@ -11,20 +11,44 @@ from pathlib import Path
 import stat
 
 from vehicle_autonomy.vehicles.ardupilot.mavlink.signing import ReceiveSigning
+from vehicle_autonomy.engine.action.durable import DurableRecord
+
+
+def initialize_receive_floor(root,key,initial_timestamp):
+    """Only the fresh-epoch provisioner calls this, before any Action receiver.
+
+    No credentials are stored here. Existing stores are never reset, including
+    an epoch whose receiver file was lost: a fresh fixture/key is required.
+    """
+    if type(key) is not bytes or len(key)!=32 or type(initial_timestamp) is not int or not 0<=initial_timestamp<2**48:
+        raise ValueError('valid fresh signing epoch required')
+    if (Path(root)/'action-owner.lock').exists():raise ValueError('used receiver epoch cannot be initialized again')
+    payload={'epoch':hashlib.sha256(key).hexdigest(),'floor':initial_timestamp}
+    DurableRecord(Path(root)/'action-receive-floor',limit=512).write(payload,create=True)
 
 
 class _DurableSigning(ReceiveSigning):
     def __init__(self,key,*,initial_timestamp,persist,reserve_steps=128):
         super().__init__(key,initial_timestamp=initial_timestamp);self._persist=persist
         if type(reserve_steps) is not int or not 0<=reserve_steps<=128:raise ValueError('bounded durable timestamp reservation required')
-        self._reserved=initial_timestamp;self._reserve_steps=reserve_steps
+        self._reserved=initial_timestamp;self._reserve_steps=reserve_steps;self._failed=False
+        self._candidate=ReceiveSigning(key,initial_timestamp=initial_timestamp)
+        self._candidate.rejected=self.rejected
     def verify(self,message,*,system,component):
-        timestamp=super().verify(message,system=system,component=component)
+        if self._failed:raise OSError('signing receiver requires safe epoch recovery')
+        self._candidate.watermark=self.watermark
+        timestamp=self._candidate.verify(message,system=system,component=component)
         # Persist BEFORE authenticated data can enter Session/World. Corrupt
         # state after an interrupted update fails closed on the next startup.
         if timestamp is not None and timestamp>self._reserved:
             reserved=min(2**48-1,timestamp+self._reserve_steps)
-            self._persist(reserved);self._reserved=reserved
+            try:self._persist(reserved)
+            except BaseException:
+                self._failed=True
+                raise
+            self._reserved=reserved
+        if timestamp is not None:
+            self.watermark=timestamp;self.accepted+=1
         return timestamp
 
 
@@ -61,14 +85,16 @@ class OwnedActionSimulation:
         try:
             self._lockfd=self._owned_file('action-owner.lock')[0]
             fcntl.flock(self._lockfd,fcntl.LOCK_EX|fcntl.LOCK_NB)
-            self._floorfd,created=self._owned_file('action-receive-floor')
+            key=bytes.fromhex(configuration['key']);self._epoch=hashlib.sha256(key).hexdigest()
+            self._store=DurableRecord(self.root/'action-receive-floor',limit=512)
+            saved=self._store.read()  # Never create, upgrade or fall back here.
             initial=configuration['floor']
-            if created:self._persist(initial)
-            else:
-                raw=os.read(self._floorfd,65)
-                if not raw.isdigit() or len(raw)>20:raise ValueError('receive watermark unavailable; create a fresh fixture')
-                initial=max(initial,int(raw))
-            self.receive_signing=_DurableSigning(bytes.fromhex(configuration['key']),initial_timestamp=initial,persist=self._persist)
+            if (type(initial) is not int or not 0<=initial<2**48
+                    or type(saved) is not dict or set(saved)!={'epoch','floor'} or saved['epoch']!=self._epoch
+                    or type(saved['floor']) is not int or not initial<=saved['floor']<2**48):
+                raise ValueError('receive watermark unavailable; create a fresh authentication epoch')
+            self._last_floor=saved['floor']
+            self.receive_signing=_DurableSigning(key,initial_timestamp=self._last_floor,persist=self._persist)
         except Exception:
             self.close();raise ValueError('owned signing epoch unavailable, already in use, or corrupt') from None
 
@@ -82,10 +108,13 @@ class OwnedActionSimulation:
         return fd,created
 
     def _persist(self,timestamp):
-        os.lseek(self._floorfd,0,os.SEEK_SET);os.ftruncate(self._floorfd,0)
-        raw=str(timestamp).encode('ascii')
-        if os.write(self._floorfd,raw)!=len(raw):raise OSError('receive watermark partial write')
-        os.fsync(self._floorfd)
+        previous=self._store.read()
+        if (type(timestamp) is not int or not self._last_floor<=timestamp<2**48
+                or previous!={'epoch':self._epoch,'floor':self._last_floor}):
+            self._store.failed=True
+            raise ValueError('receive watermark regressed or changed; new trusted epoch required')
+        self._store.write({'epoch':self._epoch,'floor':timestamp})
+        self._last_floor=timestamp
 
     def close(self):
         for name in ('_floorfd','_lockfd'):

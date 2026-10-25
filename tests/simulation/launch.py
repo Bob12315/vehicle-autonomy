@@ -247,6 +247,9 @@ class OwnedSimulation:
         self.manifest.setdefault('signing_epochs',[]).append(dict(initial_timestamp=seed,
             key_sha256=hashlib.sha256(self.signing_key).hexdigest(),proof='signing-support'+suffix+'.json',
             receiver='MAC first, pinned (1,1,0), retained 48-bit watermark'))
+        if not suffix:
+            from vehicle_autonomy.app.bootstrap.action_ownership import initialize_receive_floor
+            initialize_receive_floor(self.run_dir,self.signing_key,self.receive_signing.watermark)
         self._save()
 
     def verify_plane_parameters(self):

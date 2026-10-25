@@ -146,7 +146,9 @@ class RuntimeTests(unittest.TestCase):
         self.assertEqual(self.runtime.view(a['id'])['state'],'FAILED')
         self.register('bad_exit',exit_error=True)
         b=self.runtime.submit('bad_exit','v');self.ticks()
-        self.assertEqual(self.runtime.view(b['id'])['state'],'FAILED')
+        self.assertEqual(self.runtime.view(b['id'])['state'],'UNKNOWN')
+        self.assertFalse(self.runtime.view(b['id'])['safety']['release_safe'])
+        self.assertTrue(self.runtime.resource_view())
     def test_explicit_successful_continuation_and_immutable_views(self):
         self.register(write=True)
         self.driver.safety=ActionSafety(False,True,'native flight remains active')

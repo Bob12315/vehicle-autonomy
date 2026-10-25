@@ -18,6 +18,8 @@ from vehicle_autonomy.app.bootstrap.external_actions import ExternalActionDriver
 from vehicle_autonomy.app.web.action_lab import ActionLab
 from vehicle_autonomy.engine.action.registry import ActionRegistry
 from vehicle_autonomy._resources import resource_root
+from vehicle_autonomy.engine.action.resources import PersistentResources
+from vehicle_autonomy.contracts.action import ActionSafety
 
 
 def timer(parameters):
@@ -66,13 +68,16 @@ def run(path):
             time.sleep(.1)
         else:raise TimeoutError('actual ROS server startup')
         server=JobServer();Thread(target=server.serve_forever,daemon=True).start()
+        PersistentResources.initialize(path/'resource-state',lambda:ActionSafety(not server.jobs,
+            evidence={'quiescent':not server.jobs,'provider_epoch':prefix}))
         registry=ActionRegistry();register_external(registry,'NativeWait',timer)
         register_external(registry,'ApiWait',lambda p:ApiJob(f'http://127.0.0.1:{server.server_address[1]}',asdict(p)))
         register_external(registry,'ContinuousApi',lambda p:ApiJob(f'http://127.0.0.1:{server.server_address[1]}',asdict(p)),continuous=True)
         for action,suffix,service in [('RosWait','normal',False),('RosError','error',False),('RosUnavailable','absent',False),('RosDisconnect','disconnect',False),('RosService','trigger',True)]:
             register_external(registry,action,lambda p,s=suffix,v=service:ros_job(prefix+'/'+s,p,service=v,domain_id=domain,result_timeout=2 if s=='disconnect' else 8),
                 parameters_type=Empty if service else DurationParameters)
-        lab=ActionLab({'external':ExternalActionDriver(),'lost':ExternalActionDriver('lost')},registry=registry,
+        lab=ActionLab({'external':ExternalActionDriver(state_dir=path/'resource-state'),
+            'lost':ExternalActionDriver('lost',state_dir=path/'resource-state')},registry=registry,
             event_sink=lambda e:(events.write(json.dumps(e)+'\n'),events.flush()))
         def execute(case,name,p,expected,*,timeout_s=8,cancel=False,target='external',feedback=False):
             a=lab.runtime.submit(name,target,p,timeout_s=timeout_s)

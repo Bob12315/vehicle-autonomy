@@ -56,6 +56,8 @@ def main():
     try:
         unit=runner.run_stage('unit',[sys.executable,'-m','tests.simulation.harness','--unit-report',str(root/'unit.json')],timeout=180)
         if not unit['passed']:raise RuntimeError('full unit regression failed')
+        stage('independent_remediation_boundaries','tests.simulation.remediation_external',
+            root/'independent-remediation-boundaries',timeout=120)
         for number in (1,2):
             run=root/f'round-{number}-{uuid4().hex[:8]}';run.mkdir()
             record={'number':number,'passed':False,'vehicles':{},'groups':{}};report['rounds'].append(record)
