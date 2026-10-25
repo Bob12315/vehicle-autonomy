@@ -78,19 +78,34 @@ class JobServer(ThreadingHTTPServer):
 class JobHandler(BaseHTTPRequestHandler):
     def log_message(self,*args):pass
     def response(self,value):
-        raw=json.dumps(value).encode();self.send_response(200);self.send_header('Content-Length',str(len(raw)));self.end_headers();self.wfile.write(raw)
+        raw=json.dumps(value).encode();self.send_response(200);self.send_header('Content-Length',str(len(raw)))
+        self.send_header('X-VAF-Job-Protocol','2');self.end_headers();self.wfile.write(raw)
+    def provider_identity(self):
+        return {'provider_id':getattr(self.server,'provider_id',self.server.instance),
+            'provider_epoch':self.server.instance,'resource_id':'jobs'}
+    def job_allowed(self):
+        # Independent provider implementation: reject mismatched requests before
+        # starting/cancelling any worker, including through an endpoint alias.
+        try:expected=json.loads(self.headers.get('X-VAF-Expected-Provider','null'))
+        except ValueError:expected=None
+        if expected!=self.provider_identity():self.send_error(409,'Provider identity/epoch mismatch');return False
+        return True
+    def job_response(self,identifier,value):
+        self.response(dict(value,provider=self.provider_identity(),job_id=identifier))
     def do_POST(self):
+        if not self.job_allowed():return
         from vehicle_autonomy.actions.external.job import WaitParameters
         data=json.loads(self.rfile.read(int(self.headers['Content-Length'])))
         if self.path=='/jobs':
-            identifier=uuid4().hex;self.server.jobs[identifier]=timer(WaitParameters(**data),server=True);self.response({'id':identifier})
+            identifier=uuid4().hex;self.server.jobs[identifier]=timer(WaitParameters(**data),server=True);self.job_response(identifier,{'id':identifier})
         elif self.path.startswith('/jobs/') and self.path.endswith('/cancel'):
-            self.server.jobs[self.path.split('/')[2]].cancel();self.response({'requested':True})
+            identifier=self.path.split('/')[2];self.server.jobs[identifier].cancel();self.job_response(identifier,{'requested':True})
         else:self.send_error(404)
     def do_GET(self):
-        if self.path=='/identity':self.response({'provider_id':self.server.instance,'provider_epoch':self.server.instance,'resource_id':'jobs'})
+        if self.path=='/identity':self.response(self.provider_identity())
         elif self.path=='/inventory':self.response({'instance':self.server.instance,'states':[j.poll()['state'] for j in self.server.jobs.values()]})
-        else:self.response(self.server.jobs[self.path.split('/')[2]].poll())
+        elif self.job_allowed():
+            identifier=self.path.split('/')[2];self.job_response(identifier,self.server.jobs[identifier].poll())
 
 
 def run(path):

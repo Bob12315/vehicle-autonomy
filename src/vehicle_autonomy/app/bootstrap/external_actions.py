@@ -6,7 +6,7 @@ from pathlib import Path
 from uuid import uuid4
 
 from vehicle_autonomy._resources import resource_root
-from vehicle_autonomy.actions.external.clients import ProcessJob,ApiJob
+from vehicle_autonomy.actions.external.clients import ProcessJob,ApiJob,ProviderIdentityError
 from vehicle_autonomy.actions.external.job import ExternalFactory,WaitParameters
 from vehicle_autonomy.contracts.action import ActionContext,ActionKind,ActionResource,ActionSafety
 from vehicle_autonomy.contracts.core.primitives import ResourceVersion,SchemaVersion
@@ -42,10 +42,9 @@ def reconcile_api_resource(record,*,token=None):
     the same provider credentials. A missing ID cannot be resolved this way.
     """
     descriptor=record['descriptor']
-    identity=ApiJob.identity(descriptor['endpoint'],token=token)
-    if any(identity[k]!=record['provider'][k] for k in ('provider_id','provider_epoch','resource_id')):
-        return ActionSafety(False,False,'recovery provider identity/epoch mismatch')
-    value=ApiJob.query_existing(descriptor,token=token)
+    provider={k:record['provider'][k] for k in ApiJob.IDENTITY_FIELDS}
+    try:value=ApiJob.query_existing(descriptor,token=token,expected_provider=provider)
+    except ProviderIdentityError as exc:return ActionSafety(False,False,str(exc))
     terminal=value.get('state') in ('SUCCEEDED','FAILED','CANCELLED')
     return ActionSafety(terminal,False,None if terminal else 'external job still unresolved',
         {'owner':record['owner'],'scope':record['scope'],'terminal':terminal,

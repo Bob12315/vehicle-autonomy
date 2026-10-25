@@ -39,11 +39,12 @@ def wait_for(predicate,seconds=8):
 class Handler(JobHandler):
     def do_POST(self):
         if self.path=='/jobs' and self.server.hold_response:
+            if not self.job_allowed():return
             from vehicle_autonomy.actions.external.job import WaitParameters
             data=json.loads(self.rfile.read(int(self.headers['Content-Length'])))
             identifier=uuid4().hex;self.server.jobs[identifier]=timer(WaitParameters(**data),server=True)
             self.server.submitted.set();self.server.response_gate.wait(4)
-            try:self.response({'id':identifier})
+            try:self.job_response(identifier,{'id':identifier})
             except BrokenPipeError:pass
         else:super().do_POST()
     def do_GET(self):

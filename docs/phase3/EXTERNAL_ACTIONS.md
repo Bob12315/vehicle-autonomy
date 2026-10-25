@@ -18,6 +18,44 @@ If job admission raises before returning a handle, the framework cannot prove
 remote rollback and records UNKNOWN. Exceptions in cancel, poll or cleanup
 also cannot turn into a claim of safe resource release.
 
+## HTTP job protocol v2
+
+The provider's read-only `GET /identity` returns exactly `provider_id`,
+`provider_epoch`, and `resource_id` (the latter is `jobs`), and advertises
+`X-VAF-Job-Protocol: 2`. ApiJob rejects providers without this capability before
+submitting work. Existing deployments must implement this protocol; an old
+endpoint is not silently upgraded or treated as safe.
+
+Every job request carries `X-VAF-Expected-Provider`, an ASCII JSON object with
+those three pinned identity fields. The provider must compare it with its actual
+identity **before** creating or cancelling work, returning an error on mismatch.
+This fence must cover the side effect atomically within the provider's epoch;
+an epoch cannot change between validation and submission to its worker.
+Checking `/identity` separately is insufficient when an endpoint is replaced.
+
+Every successful job response includes `provider`, containing the actual three
+identity fields. Creation also returns `id`; status and cancel responses return
+`job_id`, which must equal the requested ID. Existing `state`, `result`,
+`feedback` and `requested` fields retain their meanings. For example:
+
+```json
+{"provider":{"provider_id":"inference-1","provider_epoch":"epoch-7","resource_id":"jobs"},"job_id":"42","state":"SUCCEEDED","result":{}}
+```
+
+The client pins this identity at admission and persists it in its recovery
+descriptor. Normal polling, cancellation and automatic/manual recovery all
+validate the response identity and Job ID. A different epoch's same-numbered
+job, absent identity, or mismatched Job ID remains UNKNOWN and retains its
+reservation. POST is never automatically retried. A verified terminal result
+cannot be overwritten by a delayed RUNNING/error response.
+
+Old durable records without a descriptor identity may be inspected only using
+the identity already pinned in their trusted reservation. They still require
+v2 response evidence; there is no fallback to endpoint/Job ID alone. A lost
+admission ID requires complete trusted inventory reconciliation. Restoring an
+old endpoint while its job is running does not make it safe; its own verified
+terminal result can restore reuse without changing UNKNOWN history.
+
 The included ROS example explicitly starts a separate worker via the installed
 `with_ros2.sh` resource. It uses a UUID namespace, a dedicated ROS_DOMAIN_ID
 and localhost discovery. The application process never imports rclpy. The

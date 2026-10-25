@@ -65,6 +65,14 @@ new ledger and changed caller labels cannot turn the same actual ID into a secon
 owner. A provider lacking this identity protocol cannot start HTTP jobs through
 this interface. Credentials are neither returned nor stored by this protocol.
 
+The third independent review found that admission-only identity validation did
+not cover normal polling and automatic recovery. HTTP jobs now require the
+[v2 request/response identity fence](EXTERNAL_ACTIONS.md#http-job-protocol-v2),
+pinning provider identity/epoch/resource and Job ID through their entire
+lifecycle. The old endpoint-only status behavior is not an accepted fallback.
+This amendment does not change the historical third-round FAIL or approve its
+tested commit for freezing.
+
 ROS identity is the canonical local domain/server namespace, pinned by trusted
 deployment to its provider epoch. Overlapping namespaces cannot create independent
 ledgers. The supported process client verifies the actual installed ROS worker,

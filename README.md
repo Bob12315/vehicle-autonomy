@@ -83,12 +83,13 @@ Registry 生成参数表单，可执行、取消和查询实例、反馈、命�
 车辆写入继续经过原 Execution、Authority、Safety 和唯一 MAVLink Writer；
 只接受明确自有的仿真 fixture，默认双 SEND 关闭。
 
-前两轮独立审查均为 **FAIL**，原报告和证据保留；原 P1 水位恢复和
-ROS Service 不确定性修复已获第二轮复审确认。本轮修复混合 Action
-退出责任与 Provider 身份/唯一 Ledger 绑定。501 项单元、真实 HTTP A–K
-与混合车辆边界、真实 ROS/API、两轮 Action/API/Chrome/SITL/Gazebo A–G、
-两轮原 Phase 1/2 完整回归及独立 wheel 安装检查均通过。
-当前开发侧状态为 **READY FOR RE-AUDIT**，等待独立复审。
+前三轮独立审查均为 **FAIL**，原报告和证据保留；第三轮确认原混合退出责任
+和目录/scope 分裂路径修复，但发现 HTTP 轮询/自动对账可误认另一 epoch
+的同号 Job 终态。本次使用 HTTP v2 请求/响应身份围栏修复，512 项单元、
+11 项新增真实 HTTP 边界、原 A–K、真实 Rover 混合边界及 ROS/API 回归通过。
+外部 HTTP Provider 必须支持新协议；不支持时拒绝启动，不能退回旧状态查询。
+详见 [HTTP 身份修复报告](docs/PHASE3_HTTP_IDENTITY_FIX_REPORT.md)。本次未重跑
+完整两轮长回归，开发侧状态为 **READY FOR RE-AUDIT**，未批准冻结 Phase 3。
 使用方式与安全限制见 [Action Lab 使用说明](docs/phase3/USAGE.md)，
 跨重启认证与资源恢复见 [恢复合同](docs/phase3/INDEPENDENT_REMEDIATION_CONTRACTS.md)，
 混合生命周期和本机身份部署见 [第三轮合同](docs/phase3/ROUND3_LIFECYCLE_AND_IDENTITY.md)。

@@ -56,6 +56,8 @@ def main():
     try:
         unit=runner.run_stage('unit',[sys.executable,'-m','tests.simulation.harness','--unit-report',str(root/'unit.json')],timeout=180)
         if not unit['passed']:raise RuntimeError('full unit regression failed')
+        stage('http_job_identity_boundaries','tests.simulation.http_job_identity',
+            root/'http-job-identity-boundaries',timeout=120)
         stage('independent_remediation_boundaries','tests.simulation.remediation_external',
             root/'independent-remediation-boundaries',timeout=120)
         stage('round3_independent_boundaries','tests.simulation.round3_boundaries',
