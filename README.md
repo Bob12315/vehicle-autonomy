@@ -83,12 +83,15 @@ Registry 生成参数表单，可执行、取消和查询实例、反馈、命�
 车辆写入继续经过原 Execution、Authority、Safety 和唯一 MAVLink Writer；
 只接受明确自有的仿真 fixture，默认双 SEND 关闭。
 
-开发侧 466 项单元测试、两轮真实三车型 Action/API/Chrome/SITL/Gazebo A–G、
-两轮原 Phase 1/2 完整回归均通过；两轮真实 ROS 2 外部接口各通过 11 个场景。
-当前状态为 **READY FOR RE-AUDIT**，等待独立审查，未宣布最终阶段通过。
+原开发候选经独立审查为 **FAIL**，原报告和证据保留。
+四项定向修复后，489 项单元、真实 ROS Service/API 重启边界、两轮
+Action/API/Chrome/SITL/Gazebo A–G、两轮原 Phase 1/2 完整回归及独立 wheel
+安装验证均通过。当前状态为 **READY FOR RE-AUDIT**，等待独立复审。
 使用方式与安全限制见 [Action Lab 使用说明](docs/phase3/USAGE.md)，
-逐项结果、原始失败记录、准确受测提交和证据索引见
-[Phase 3 报告](docs/PHASE3_ACTION_SYSTEM_REPORT.md)。
+跨重启认证与资源恢复见 [恢复合同](docs/phase3/INDEPENDENT_REMEDIATION_CONTRACTS.md)。
+逐项结果、修复前后记录、受测提交和证据索引见
+[独立 FAIL 修复报告](docs/PHASE3_INDEPENDENT_REMEDIATION_REPORT.md)；
+[原 Phase 3 开发报告](docs/PHASE3_ACTION_SYSTEM_REPORT.md)仅作历史记录。
 
 ```bash
 ./scripts/test_phase3_actions.sh --allow-send \

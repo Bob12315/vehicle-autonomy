@@ -25,6 +25,11 @@ recover a valid previously committed record; it rejects all timestamps through
 that conservative floor. A missing, truncated, corrupt, wrong-epoch or invalid
 record refuses the old epoch. No fallback to a provisioning timestamp occurs.
 
+If authenticated provisioning readbacks advanced the trusted fence after the
+record was initialized, a valid same-epoch record is advanced to that higher
+fence durably before receiver construction. This never lowers a floor, creates
+a missing record, or repairs a corrupt record by substituting a timestamp.
+
 This assumes local atomic rename/fsync semantics and a trusted OS owner. It
 does not provide protection against malicious same-user code, complete storage
 snapshot rollback or lost filesystem durability guarantees. After such loss,

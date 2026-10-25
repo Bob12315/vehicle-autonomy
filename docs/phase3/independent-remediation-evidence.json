@@ -1,0 +1,3297 @@
+{
+  "status": "READY FOR RE-AUDIT",
+  "tested_commit": "483253498ae317bc2ff6bdee53bd8ba62a76ff94",
+  "source_sha256": "c20f8db41b229c0925546432b129f7ad9b2fa5c056a581df0a4ec34f2dbafeb9",
+  "formal_root": "artifacts/phase3-remediation/acceptance-readback-1",
+  "credential_bytes_included": false,
+  "files": {
+    "artifacts/phase3-remediation/acceptance-745f208-1/1_rover_actions.log": {
+      "sha256": "a75ac53742516a5b4ae8bdf5e96749c373e2e881321b9ab999ac1529eea8c92e",
+      "bytes": 102
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/independent-remediation-boundaries/api-before-id/.vaf-resource-43425834f15283e9c531140c4c746ed510d49cfa1991576562a7db792b0d0d55.anchor": {
+      "sha256": "485ae2e51d5ab40e951f4313d23f8ed7681ee6dfa17a1b120b89ea3882c9a956",
+      "bytes": 348
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/independent-remediation-boundaries/api-before-id/concurrent.json": {
+      "sha256": "d81460e40cea7e367ac698a01f8fa531ee6caf1553766c3b612c2bf4eaed72eb",
+      "bytes": 1368
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/independent-remediation-boundaries/api-before-id/concurrent.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/independent-remediation-boundaries/api-before-id/first.json": {
+      "sha256": "2696867e8d76f5833687a9474a89d2b90befd298466cb15acb3782c366d4384f",
+      "bytes": 1290
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/independent-remediation-boundaries/api-before-id/first.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/independent-remediation-boundaries/api-before-id/positive.json": {
+      "sha256": "ca50641efbb165c85a96c30d08ef63a33645e5bf777f197ac549fd7691bbf3e7",
+      "bytes": 1813
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/independent-remediation-boundaries/api-before-id/positive.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/independent-remediation-boundaries/api-before-id/resource-state/claims.json": {
+      "sha256": "edc2583e3234d65294bfc435d880392571a268f1caf7a595f1a83de2e3549e1d",
+      "bytes": 114
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/independent-remediation-boundaries/api-before-id/resource-state/owner.lock": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/independent-remediation-boundaries/api-before-id/restart.json": {
+      "sha256": "484888bafb725c88d6c7cd8752ab04b0d0a187e587c4f457f75f8d8fc0b742b0",
+      "bytes": 1384
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/independent-remediation-boundaries/api-before-id/restart.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/independent-remediation-boundaries/api-known/.vaf-resource-754359b402f49d647932847dd82c3d8e53ac73881d3d068ceb19dba7a906f8aa.anchor": {
+      "sha256": "0095dd7440d9edf3d6045a268af0d8c4ca4ae94a2d1df70cc2c50c50f895b808",
+      "bytes": 344
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/independent-remediation-boundaries/api-known/concurrent.json": {
+      "sha256": "74794e6a4c0b5db65ec7b5a0806ce4dcfcfaa7065e50e03afc0e3a71d485fa16",
+      "bytes": 1398
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/independent-remediation-boundaries/api-known/concurrent.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/independent-remediation-boundaries/api-known/first.json": {
+      "sha256": "311041e4ddd22296da2499365575f9a30ec96d7bf705f9b991c58615db1f93ab",
+      "bytes": 1394
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/independent-remediation-boundaries/api-known/first.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/independent-remediation-boundaries/api-known/positive.json": {
+      "sha256": "c6b131939d4c32f74fb3281af72480702d01de1808441a39edde0d9801f3432a",
+      "bytes": 1816
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/independent-remediation-boundaries/api-known/positive.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/independent-remediation-boundaries/api-known/resource-state/claims.json": {
+      "sha256": "edc2583e3234d65294bfc435d880392571a268f1caf7a595f1a83de2e3549e1d",
+      "bytes": 114
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/independent-remediation-boundaries/api-known/resource-state/owner.lock": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/independent-remediation-boundaries/api-known/restart.json": {
+      "sha256": "41f0f4f8a8e6b8651043f06b55d4a3a07a0bc641605722d5974bba2b60700ae5",
+      "bytes": 1414
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/independent-remediation-boundaries/api-known/restart.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/independent-remediation-boundaries/ros-service/.vaf-resource-0b3bcd12390823f33cf2ce99a469c0f304cad65b3e389426cd80110f96f68dba.anchor": {
+      "sha256": "982a30311369d96715006fc0e4126065c8678ea313638759f0a643f1e25e9001",
+      "bytes": 358
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/independent-remediation-boundaries/ros-service/error-done.json": {
+      "sha256": "50a2d8ab8e380196763db1a4f0c1b6cf818b599558501f5a4bcd6a528864e9ff",
+      "bytes": 126
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/independent-remediation-boundaries/ros-service/error-started.json": {
+      "sha256": "3de6658faa94c026a153d1237ff6532878a0a329f97b1616678787b1a7e31f47",
+      "bytes": 108
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/independent-remediation-boundaries/ros-service/fault-done.json": {
+      "sha256": "bf386157eed09609d5e44468da7db19a35367c7cce710de5d85ee43eb2b5c0d1",
+      "bytes": 126
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/independent-remediation-boundaries/ros-service/fault-started.json": {
+      "sha256": "ddd724c89e41073cb194b6f6245bfe1bfff32243acd9cf59fe95006814b828dd",
+      "bytes": 108
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/independent-remediation-boundaries/ros-service/normal-done.json": {
+      "sha256": "5abe1f900c1bcedb88c5ddab569deba36ec8cd5441516a27fe3191fa2ebb709c",
+      "bytes": 126
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/independent-remediation-boundaries/ros-service/normal-started.json": {
+      "sha256": "134b5933b237db46c9916c8a384397f76c5d93c0c1b643d69f5a6c42dc97ac8f",
+      "bytes": 108
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/independent-remediation-boundaries/ros-service/ready.json": {
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "bytes": 2
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/independent-remediation-boundaries/ros-service/resource-state/claims.json": {
+      "sha256": "edc2583e3234d65294bfc435d880392571a268f1caf7a595f1a83de2e3549e1d",
+      "bytes": 114
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/independent-remediation-boundaries/ros-service/resource-state/owner.lock": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/independent-remediation-boundaries/ros-service/server.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/independent-remediation-boundaries/summary.json": {
+      "sha256": "d32e9da46b8fc66b0a3c3e11929dc6181e0ca84d47e778de2bc6d7b8bea691b1",
+      "bytes": 14410
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/independent_remediation_boundaries.log": {
+      "sha256": "03f21f68a39b5639f89061ef90f78e40d04f23187136fe7c49aa5343dfea602e",
+      "bytes": 32
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/round-1-b9c8d2d3/rover-actions/action-owner.lock": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/round-1-b9c8d2d3/rover-actions/action-receive-floor": {
+      "sha256": "dd81a2acd7a9527a41f4f59866266b48e32e536e8f79e8b4b05576f59d666b89",
+      "bytes": 200
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/round-1-b9c8d2d3/rover-actions/application-rx.jsonl": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/round-1-b9c8d2d3/rover-actions/gazebo.log": {
+      "sha256": "04de09549ee4a3e4d73fef14764ec9a3ea0650cd2edb0fb3523a273f30e237ce",
+      "bytes": 3915
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/round-1-b9c8d2d3/rover-actions/manifest.json": {
+      "sha256": "14aa3d06846ca819120fe5b52209ea5a934560132576064a8649cb282110430b",
+      "bytes": 5563
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/round-1-b9c8d2d3/rover-actions/model.sdf": {
+      "sha256": "53c32fdc91ebbceecee1c0a72abfac86fd02e97bc241a4b17a927049ebdb40b6",
+      "bytes": 8025
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/round-1-b9c8d2d3/rover-actions/runtime.jsonl": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/round-1-b9c8d2d3/rover-actions/signing-support.json": {
+      "sha256": "f1fb1dd624626c38a0b9d45920f569f012dc64d9c2f1a61a9bcb1292e3be6fc0",
+      "bytes": 1330
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/round-1-b9c8d2d3/rover-actions/sitl.log": {
+      "sha256": "a00f110e96c7017f22eb3ff413002d52ab0d5c0a2125f819c411ac771c1cf86a",
+      "bytes": 1116
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/round-1-b9c8d2d3/rover-actions/summary.json": {
+      "sha256": "232b97097bb2473ab02e8819bf8866bfdcb7c30c16402c5b92cad8969e30438e",
+      "bytes": 214
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/round-1-b9c8d2d3/rover-actions/trajectory.jsonl": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/round-1-b9c8d2d3/rover-actions/world.sdf": {
+      "sha256": "8e5c2b96cd6315a5f9b150a7f248249772a9f923560fbe98652d6aa93dc51c4f",
+      "bytes": 1603
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/stages.json": {
+      "sha256": "d4010e38fc445d7498958af94520e6551c9af18f8b1e3c132663a96cb5b57da6",
+      "bytes": 2165
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/summary.json": {
+      "sha256": "8e1841ba09c06478c136f71e97156c3d4d5c8b84e7f1e0ca7eef92725ca8ea59",
+      "bytes": 965
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/unit.json": {
+      "sha256": "7c77a5641f2ca8f15fc01b2c50c4911605f61d4a2587de3df9ed81ba70925795",
+      "bytes": 84
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1/unit.log": {
+      "sha256": "dd2472e0472773314ccebe78b2bb645a17669d8eeb12c7c843649be12d53ae78",
+      "bytes": 589
+    },
+    "artifacts/phase3-remediation/acceptance-745f208-1.log": {
+      "sha256": "517098e811c9d9e5aac39412999918d23e955f67e4c00ca4c053efa7bc874e0c",
+      "bytes": 135
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/1_copter_actions.log": {
+      "sha256": "03f21f68a39b5639f89061ef90f78e40d04f23187136fe7c49aa5343dfea602e",
+      "bytes": 32
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/1_copter_faults.log": {
+      "sha256": "03f21f68a39b5639f89061ef90f78e40d04f23187136fe7c49aa5343dfea602e",
+      "bytes": 32
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/1_external.log": {
+      "sha256": "03f21f68a39b5639f89061ef90f78e40d04f23187136fe7c49aa5343dfea602e",
+      "bytes": 32
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/1_plane_actions.log": {
+      "sha256": "03f21f68a39b5639f89061ef90f78e40d04f23187136fe7c49aa5343dfea602e",
+      "bytes": 32
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/1_plane_faults.log": {
+      "sha256": "03f21f68a39b5639f89061ef90f78e40d04f23187136fe7c49aa5343dfea602e",
+      "bytes": 32
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/1_rover_actions.log": {
+      "sha256": "03f21f68a39b5639f89061ef90f78e40d04f23187136fe7c49aa5343dfea602e",
+      "bytes": 32
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/1_rover_faults.log": {
+      "sha256": "03f21f68a39b5639f89061ef90f78e40d04f23187136fe7c49aa5343dfea602e",
+      "bytes": 32
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/2_copter_actions.log": {
+      "sha256": "03f21f68a39b5639f89061ef90f78e40d04f23187136fe7c49aa5343dfea602e",
+      "bytes": 32
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/2_copter_faults.log": {
+      "sha256": "03f21f68a39b5639f89061ef90f78e40d04f23187136fe7c49aa5343dfea602e",
+      "bytes": 32
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/2_external.log": {
+      "sha256": "03f21f68a39b5639f89061ef90f78e40d04f23187136fe7c49aa5343dfea602e",
+      "bytes": 32
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/2_plane_actions.log": {
+      "sha256": "03f21f68a39b5639f89061ef90f78e40d04f23187136fe7c49aa5343dfea602e",
+      "bytes": 32
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/2_plane_faults.log": {
+      "sha256": "03f21f68a39b5639f89061ef90f78e40d04f23187136fe7c49aa5343dfea602e",
+      "bytes": 32
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/2_rover_actions.log": {
+      "sha256": "03f21f68a39b5639f89061ef90f78e40d04f23187136fe7c49aa5343dfea602e",
+      "bytes": 32
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/2_rover_faults.log": {
+      "sha256": "03f21f68a39b5639f89061ef90f78e40d04f23187136fe7c49aa5343dfea602e",
+      "bytes": 32
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/independent-remediation-boundaries/api-before-id/.vaf-resource-43c2dcbd6aa28c4349a850744cf00f5f20e035dd18d99cbc1cfd9bec6c8ad06e.anchor": {
+      "sha256": "e90163c0d53c2eb8ecf4ce7c3495e26ba752291b2896602bfd38ec52f66670aa",
+      "bytes": 349
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/independent-remediation-boundaries/api-before-id/concurrent.json": {
+      "sha256": "f9649d94a301be05983b9b15712cdeaaf2d94776dc8f6c24fc4f7a75a8192cfb",
+      "bytes": 1368
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/independent-remediation-boundaries/api-before-id/concurrent.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/independent-remediation-boundaries/api-before-id/first.json": {
+      "sha256": "efa7fe621ddc011eb4750eac6cf202a523ec48e59e8d3078b1982dca69fa3006",
+      "bytes": 1290
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/independent-remediation-boundaries/api-before-id/first.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/independent-remediation-boundaries/api-before-id/positive.json": {
+      "sha256": "19415893c39277fbd7c1132dc23a3cdbf1c28316e4dcdec90767cd97c63dcf1e",
+      "bytes": 1812
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/independent-remediation-boundaries/api-before-id/positive.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/independent-remediation-boundaries/api-before-id/resource-state/claims.json": {
+      "sha256": "edc2583e3234d65294bfc435d880392571a268f1caf7a595f1a83de2e3549e1d",
+      "bytes": 114
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/independent-remediation-boundaries/api-before-id/resource-state/owner.lock": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/independent-remediation-boundaries/api-before-id/restart.json": {
+      "sha256": "46ec3a87b12b6abd419a10b7b2dba4f42c939ffbfcee83bad15ec3952aec5e45",
+      "bytes": 1384
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/independent-remediation-boundaries/api-before-id/restart.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/independent-remediation-boundaries/api-known/.vaf-resource-beb334e35cf2dc7f6e869ac3aed38b7f6a22f34bd80a76267e0099e4f86ab68a.anchor": {
+      "sha256": "2222773648d34f1f2e180e05d0268823d45a2b07fa1c55edc8533720eb638fd3",
+      "bytes": 345
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/independent-remediation-boundaries/api-known/concurrent.json": {
+      "sha256": "f4fe359fb42eb82bc4d3b70eb670920d640a9d94595faab2e8344f1fdb4c0f32",
+      "bytes": 1398
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/independent-remediation-boundaries/api-known/concurrent.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/independent-remediation-boundaries/api-known/first.json": {
+      "sha256": "06069c508aea3dbce2aec80e43c5edc9ae6312321ad37b7014f76dab4002b1f8",
+      "bytes": 1394
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/independent-remediation-boundaries/api-known/first.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/independent-remediation-boundaries/api-known/positive.json": {
+      "sha256": "512f8a31c3db75252989687c2eeca4276085c4539313048bb0d1070a02b7d585",
+      "bytes": 1814
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/independent-remediation-boundaries/api-known/positive.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/independent-remediation-boundaries/api-known/resource-state/claims.json": {
+      "sha256": "edc2583e3234d65294bfc435d880392571a268f1caf7a595f1a83de2e3549e1d",
+      "bytes": 114
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/independent-remediation-boundaries/api-known/resource-state/owner.lock": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/independent-remediation-boundaries/api-known/restart.json": {
+      "sha256": "ccf77e27d1c18c3d3dd84d95c6434781805eac5c546e75df96fcb1f94e61360e",
+      "bytes": 1414
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/independent-remediation-boundaries/api-known/restart.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/independent-remediation-boundaries/ros-service/.vaf-resource-a14d5bb3f20833a235a3ce934c4a6c1a873f5ffb2592fe73e3b6b19e1ef36ed2.anchor": {
+      "sha256": "f77d4f62207eca4291560332e8e3b97096cad8b676886e206b2fdcd567931332",
+      "bytes": 359
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/independent-remediation-boundaries/ros-service/error-done.json": {
+      "sha256": "b42a903a2da096522a4d86adbb89d3184e957b9e5537ec4353cec9c82b4959ac",
+      "bytes": 126
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/independent-remediation-boundaries/ros-service/error-started.json": {
+      "sha256": "b6a8d2853a1423b4b23779f5df90371352345521d18e06f9fec84cf1b7a53588",
+      "bytes": 108
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/independent-remediation-boundaries/ros-service/fault-done.json": {
+      "sha256": "e3cba1a4c8b3f9b257d9c1f4a5e5cb5dd4b9b37d869759d49923749b7689d333",
+      "bytes": 126
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/independent-remediation-boundaries/ros-service/fault-started.json": {
+      "sha256": "d9e72030959968c3dddb958bf6ae3eaa264c53f78c795cd5f275bd99ec4a3317",
+      "bytes": 108
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/independent-remediation-boundaries/ros-service/normal-done.json": {
+      "sha256": "6283f023ee0f98be42e1099805944c4d8faea3a3cc9edcf7604fa207fbc54974",
+      "bytes": 126
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/independent-remediation-boundaries/ros-service/normal-started.json": {
+      "sha256": "011d81f6bcdb1d81df0fc0ca1629c1906abf2bd4fcb3e649a7ddaba0aa817d28",
+      "bytes": 108
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/independent-remediation-boundaries/ros-service/ready.json": {
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "bytes": 2
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/independent-remediation-boundaries/ros-service/resource-state/claims.json": {
+      "sha256": "edc2583e3234d65294bfc435d880392571a268f1caf7a595f1a83de2e3549e1d",
+      "bytes": 114
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/independent-remediation-boundaries/ros-service/resource-state/owner.lock": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/independent-remediation-boundaries/ros-service/server.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/independent-remediation-boundaries/summary.json": {
+      "sha256": "aa21e066f74015cbc7138b6bc86eb502813574b321075b7f8076dda860cb82c1",
+      "bytes": 14410
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/independent_remediation_boundaries.log": {
+      "sha256": "03f21f68a39b5639f89061ef90f78e40d04f23187136fe7c49aa5343dfea602e",
+      "bytes": 32
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase1_phase2_regression.log": {
+      "sha256": "4f2d1d34eec483945e523e6f9510af2df3be5f009b06c429f886b2bd1aee3062",
+      "bytes": 909
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/1_copter_faults.log": {
+      "sha256": "856d884540a8585ae9b55cd0c06f67e8e3f786a1b6be27fc1d15ecfbeffe0807",
+      "bytes": 4034
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/1_copter_physical.log": {
+      "sha256": "452487e8bab9261a82d419aaa835cd0b140edcc2d69a5ce423ed451fe6755c33",
+      "bytes": 4054
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/1_copter_probe.log": {
+      "sha256": "ff42088f36dec2442b81d30fbcc6c4ed4cca13f9d07a439d79f8ace9cd40c1b1",
+      "bytes": 21352
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/1_plane_cancel_window.log": {
+      "sha256": "2bc8f18e12ccc53ae541d3f77ce5f60c159aaaa0cfd45cb160633bd53c3a2328",
+      "bytes": 2133
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/1_plane_control.log": {
+      "sha256": "cd437dec79396849d7d2046fe140746f8779a4fcfa8f6d525d98aae5c4467e5a",
+      "bytes": 16261
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/1_rover_faults.log": {
+      "sha256": "90611d28a934333a936cb9e081dcbb0da9ddad52e7f4eef8acedaa0811f1323d",
+      "bytes": 4042
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/1_rover_legacy_physical.log": {
+      "sha256": "b7f1c4aab50ad107e6af6392704960ad66beba2855aebf805a41e40ae94058d0",
+      "bytes": 6943
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/1_rover_physical.log": {
+      "sha256": "3899fc7190400d88cf134c20600d45fcb9deff8ecf96635219aa0b3f54c613d5",
+      "bytes": 9554
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/1_rover_probe.log": {
+      "sha256": "2c0166bad4a48bb790d113fff8724cb886b46cc44b8921b0c081d57bb8ef9768",
+      "bytes": 21394
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/2_copter_faults.log": {
+      "sha256": "c62fee6925e57514604998f13b40ffa361133fd698b68621f945282bab99e77e",
+      "bytes": 4036
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/2_copter_physical.log": {
+      "sha256": "65ce10036197feb224fb15af55f2ed660989837ae3fdd71fdfd31370883c454d",
+      "bytes": 4053
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/2_copter_probe.log": {
+      "sha256": "9022fa12f3afed2adf602d03cb250271a47c6836d76d1e1c96e8346be2f956f9",
+      "bytes": 21351
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/2_plane_cancel_window.log": {
+      "sha256": "56faa98a12fab9330263061bbd1455d638d4830173c64b5a62ff5fdc99fc5609",
+      "bytes": 2133
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/2_plane_control.log": {
+      "sha256": "61913718bc7f8dd527cf9769a8d5f0e2effb90046ddb753df16c412c98a2115b",
+      "bytes": 16261
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/2_rover_faults.log": {
+      "sha256": "87cd2a8e17de786827779798406fa48f92b7321df97e86744b1ba93dfe0be3f5",
+      "bytes": 4038
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/2_rover_legacy_physical.log": {
+      "sha256": "6961d8f1a22cd5c071ece739a4e081007ddb1bdc5dc9434ecb5ab7b8490dfd73",
+      "bytes": 6891
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/2_rover_physical.log": {
+      "sha256": "bd5670bf47ea6d3ddc047739c5d6bbd072c056b78d3b9315718ce76c72f9c368",
+      "bytes": 9449
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/2_rover_probe.log": {
+      "sha256": "4a3462f823dd5810e90944d925803a83750448e9578fd1dcc49ccb4575789732",
+      "bytes": 21394
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/copter-faults/action-receive-floor": {
+      "sha256": "8540ad6f9fc3d1f5f168121099fffbd0cedfca4b2705881f3cecdf55e3ef21e9",
+      "bytes": 200
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/copter-faults/gazebo.log": {
+      "sha256": "f4338338ed81544cdf1fb83b25bc8e011c507857c9f8e4e6064847c38d719e8b",
+      "bytes": 11462
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/copter-faults/manifest.json": {
+      "sha256": "9feb0bae959a094e92db41b2d35ea0d8b9c9a4b96da2d90dada638d47d05c92d",
+      "bytes": 10509
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/copter-faults/model.sdf": {
+      "sha256": "c23f4ddba8da8e6327ffd333718c130060c6e6a9625f420afb211afda9857e94",
+      "bytes": 10312
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/copter-faults/proxy.jsonl": {
+      "sha256": "5d39e81c175b44d41b740f36862b74e05da5377eafdfda56ba1ea5087c975f50",
+      "bytes": 18914104
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/copter-faults/runtime-process-motion.json": {
+      "sha256": "ac6af652ca7834ac568742c263b89e98e7154f64dbfc76e7a9fce1d9db9cfe78",
+      "bytes": 57260
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/copter-faults/runtime-process-restart.json": {
+      "sha256": "32072c4a0d44cb4a419fce36ab061f90bab0b82d159c9536b218c168ef728283",
+      "bytes": 6474
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/copter-faults/runtime.jsonl": {
+      "sha256": "ebb66a9f9fc429f876e68bd1c107048b07bfda6a49895dbdebba42f0c5d27de0",
+      "bytes": 2014490
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/copter-faults/runtime_motion.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/copter-faults/runtime_readonly.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/copter-faults/signing-support.json": {
+      "sha256": "b4c1dc010371db16a2baac5ef0f499ae495af9084a62da9d05706b4046e1869b",
+      "bytes": 1326
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/copter-faults/signing-support_restart.json": {
+      "sha256": "70ce878a8c7794b78c7f6bbd78121d4779da068a06a96b55c06530efd5808bb5",
+      "bytes": 1706
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/copter-faults/sitl.log": {
+      "sha256": "1681e3295fc0a06062551df3bc2273ad7d548a3f5bc0302a62e2624abf72bdd7",
+      "bytes": 1986
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/copter-faults/sitl_restart.log": {
+      "sha256": "6c621dbf3b55195aec10f018569877826ff1c7c8b3589cd2b6585c327f46616d",
+      "bytes": 1475
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/copter-faults/summary.json": {
+      "sha256": "6631fc2a5d1e6c7b4dcab7d6a1ed1ef16eeb94251d632103cc3c9e9d95ff4d3f",
+      "bytes": 4987
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/copter-faults/trajectory.jsonl": {
+      "sha256": "401aa5ce19538939688244cc4c7428ac5bcc7801f066d8a346f3e6264f5a3026",
+      "bytes": 395231
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/copter-faults/world.sdf": {
+      "sha256": "dfed7218814cc27cb55523e8eaf10096cbe169708f907cf93e893a6dd9ccab26",
+      "bytes": 3637
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/copter-physical/action-receive-floor": {
+      "sha256": "82aaf30a382e6af1e8c7102de89fc3151e5bc6fc6e6230ce9a511425ed588d23",
+      "bytes": 200
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/copter-physical/gazebo.log": {
+      "sha256": "d0179a31c34b4673b3569c525907ae20cd1b42efb33695688301d53fdd645b39",
+      "bytes": 11379
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/copter-physical/manifest.json": {
+      "sha256": "e9ada5e0854f5f6b76a8b185d6fab3abd480d6de00140f7dca835f6bf1904c8a",
+      "bytes": 5773
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/copter-physical/model.sdf": {
+      "sha256": "c23f4ddba8da8e6327ffd333718c130060c6e6a9625f420afb211afda9857e94",
+      "bytes": 10312
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/copter-physical/observations.jsonl": {
+      "sha256": "614b82b3a52b4fd5790d6f1705d2e7b8101f97322d87aa995ea341fe2ebdbddc",
+      "bytes": 274655
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/copter-physical/runtime.jsonl": {
+      "sha256": "aca4d378d16e8c660e181fad4a235d44b72dbd0d3d6a77f3538c519f97a94244",
+      "bytes": 1530451
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/copter-physical/signing-support.json": {
+      "sha256": "bc872fe0b6b6f1ce670518e0012004e0dbdffa499fe50c5e79f88cb635d16a7d",
+      "bytes": 1326
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/copter-physical/sitl.log": {
+      "sha256": "8fece53c347789ba8a1fa34ba42842e45ad6193dc846f11a4651ce26c29614d8",
+      "bytes": 1575
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/copter-physical/summary.json": {
+      "sha256": "7a4fc0c7d9d0e49cc1870177919d8b2337b1a994b8920c82741961fd5b664d9f",
+      "bytes": 5133
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/copter-physical/world.sdf": {
+      "sha256": "3fdb6e140032e1cafa205862b6c0bb90628d7863765197b01b4cf66ff5825330",
+      "bytes": 3639
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/copter-probe/action-receive-floor": {
+      "sha256": "2741fc3c119145ac288ab49dc569208c5106872c6f2d1cf7303bed91d8c1ebc4",
+      "bytes": 200
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/copter-probe/gazebo.log": {
+      "sha256": "c7008f1d4127c0a33acf6e5cd8d2aa62939a7061317a99cd4da76b1c66303bcd",
+      "bytes": 11376
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/copter-probe/manifest.json": {
+      "sha256": "03d08e155f39d260e95ac4f4dbd1ce091d8ee8df3fbac527dbdaf80ba928fc6b",
+      "bytes": 5761
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/copter-probe/model.sdf": {
+      "sha256": "c23f4ddba8da8e6327ffd333718c130060c6e6a9625f420afb211afda9857e94",
+      "bytes": 10312
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/copter-probe/proxy.jsonl": {
+      "sha256": "16f411d3a3fc65b355f1b0c19d9bd97391f477463568a2a1f12cc383d8acbb1f",
+      "bytes": 11741986
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/copter-probe/runtime.jsonl": {
+      "sha256": "f2d8219dc10a1aac45df6b1c31a9ca1481e9a772b878ffcd4547e9fb3a9bf6bf",
+      "bytes": 1256185
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/copter-probe/signing-support.json": {
+      "sha256": "c0d25030a0e79f6b4b666cd2b26a9ddbb24a7eb338e38155d220bb35e5ea0cb5",
+      "bytes": 1326
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/copter-probe/sitl.log": {
+      "sha256": "87e970936aa43cbadfb48daf2e4d89e17fd02b868dddb7a40ea98829aec335d7",
+      "bytes": 1900
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/copter-probe/summary.json": {
+      "sha256": "108919d93ed4007c91adb15ded169bf9b758ede09fa4eb453a8833d2ae54d0e1",
+      "bytes": 31089
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/copter-probe/telemetry.jsonl": {
+      "sha256": "8673384e4f4c51e69ca20627eb4eb8689bfee9811c610b6ebaacd45c3dc63a33",
+      "bytes": 13423110
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/copter-probe/world.sdf": {
+      "sha256": "5ce9637a0d1c72de6000fc2b288d0a948cd485efb698a269a0fe1a2e4b1ad56b",
+      "bytes": 3636
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/plane-cancel_window/action-receive-floor": {
+      "sha256": "f0cc53c5d81cefce6fa4b0130c27d56dffd2a7fb2221ebb4f6faf843ebe04425",
+      "bytes": 200
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/plane-cancel_window/application-rx.jsonl": {
+      "sha256": "5037103a39cfde0f320f7053222f602b0ec0b3a30be5447fb927492946fd73ad",
+      "bytes": 2465067
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/plane-cancel_window/gazebo.log": {
+      "sha256": "f6995f8546157ef98d58bb1a522d09582d7a497100b80db771afc3cd0da1e1ac",
+      "bytes": 4562
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/plane-cancel_window/manifest.json": {
+      "sha256": "80adf6af17c268b8ca975a76e3843be30561c3936adc59ce6492575acb21b4c4",
+      "bytes": 5879
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/plane-cancel_window/model.sdf": {
+      "sha256": "ca79bea85e53abedee85bfb10aafc87be462ee2020ba27bae251f4b42a94ba5f",
+      "bytes": 18449
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/plane-cancel_window/proxy.jsonl": {
+      "sha256": "014db05235bf77b77a7768e87b67bfe1aaebb80ad4c9c7203b7a53e875f3ca03",
+      "bytes": 6478188
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/plane-cancel_window/runtime.jsonl": {
+      "sha256": "44209771dfd0a9d00a1bdda5599e354009961577666bd055868a0ce69e178835",
+      "bytes": 569773
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/plane-cancel_window/signing-support.json": {
+      "sha256": "5d1809a37a5839df36cadce374a1255ddfdfa7464bb824370d6819a958f204b1",
+      "bytes": 1328
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/plane-cancel_window/sitl.log": {
+      "sha256": "7e4fba95875036a1d86a6ea5cd5b71791e6bf6271ffe0ec3b766e07e2ab96dde",
+      "bytes": 1442
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/plane-cancel_window/summary.json": {
+      "sha256": "58b4bab852ba5ad1da79a3dc48f79baaedd7cd5347ee76142b788880e876a031",
+      "bytes": 2546
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/plane-cancel_window/trajectory.jsonl": {
+      "sha256": "8014cda36e9d400d7f44c8c18497060cbd4d23de8b8bbb9e7c5febe3d9e1d8ca",
+      "bytes": 1236
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/plane-cancel_window/world.sdf": {
+      "sha256": "125e7353ff7243b092bb7f7b1d425194b921bbaa8803fdeaa5268b30dd6cd6e6",
+      "bytes": 2505
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/plane-control/action-receive-floor": {
+      "sha256": "9d9293fc5f25acd4adbe571dc6f5a039c4f1f01120e2da7131e597c50d0e3df3",
+      "bytes": 200
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/plane-control/gazebo.log": {
+      "sha256": "e6dac9238c39bac206101ca16e88ba83f33481b128e3618f9f22e92a287c7acf",
+      "bytes": 4890
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/plane-control/manifest.json": {
+      "sha256": "28db2abf3231e29bd6f4298e1da8f25363da698b35e2340e412a624835c95897",
+      "bytes": 5857
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/plane-control/model.sdf": {
+      "sha256": "ca79bea85e53abedee85bfb10aafc87be462ee2020ba27bae251f4b42a94ba5f",
+      "bytes": 18449
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/plane-control/proxy.jsonl": {
+      "sha256": "fac8547164a641370fba85bf10a50378c9c1c4e6a986db945a8d897f26618123",
+      "bytes": 37642609
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/plane-control/runtime.jsonl": {
+      "sha256": "501dd81c1043b5be6488753fbd50c8293b37ac97a0086b69a8a696a15fc9b16d",
+      "bytes": 3505502
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/plane-control/signing-support.json": {
+      "sha256": "83217beec8902817e0e97c75f64c11faef8e0bced10aa0f940db393400789dd5",
+      "bytes": 1328
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/plane-control/sitl.log": {
+      "sha256": "d280452b6dd963adcd565cfdaa50240379b0968055ab13cceabbcf85db1e09ba",
+      "bytes": 1607
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/plane-control/summary.json": {
+      "sha256": "56b9765f5951d71d90c999ddff6e3a4b46a7ebc197a82e77b6e49b9715acd290",
+      "bytes": 20886
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/plane-control/trajectory.jsonl": {
+      "sha256": "66bbabc54c28df800d8b7750cc80eec1b39bf654961234a9ab336bf9cfc08118",
+      "bytes": 3203442
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/plane-control/world.sdf": {
+      "sha256": "266566f6611e9c78616535b39a1cdc76d7e03d7278392322b63f18dfc486a0a0",
+      "bytes": 2499
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-faults/action-receive-floor": {
+      "sha256": "9581f86445140d9a95bd1ebf5f543edb8416b47a7b6df2cdc795d10d36c38b1c",
+      "bytes": 200
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-faults/gazebo.log": {
+      "sha256": "fce9437c3dfae6398beb3f1a1a96c2c6630c6ab7f08784bb5789445388131aa6",
+      "bytes": 4101
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-faults/manifest.json": {
+      "sha256": "4e2216958ab81b0fc4bb92c9a7d41f4c71f78bff8d256e0aee00fb1efb866b1b",
+      "bytes": 10064
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-faults/model.sdf": {
+      "sha256": "53c32fdc91ebbceecee1c0a72abfac86fd02e97bc241a4b17a927049ebdb40b6",
+      "bytes": 8025
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-faults/proxy.jsonl": {
+      "sha256": "ea2ff0b5001dc544a1f820b4c18ba4d1e808b99b8fde408244b0f4766580d3c4",
+      "bytes": 16287609
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-faults/runtime-process-motion.json": {
+      "sha256": "b6ae0924434177018b6ea14d01e4208952c9303f0c821ced8b25178eec22f1d2",
+      "bytes": 63692
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-faults/runtime-process-restart.json": {
+      "sha256": "8803a41dce23390542d27e10f7b0e9e12c05b7e4d9c4dff9ea4c807b079b28fc",
+      "bytes": 6473
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-faults/runtime.jsonl": {
+      "sha256": "ade4f507b48e0d962b6362c0342962cbdd2daca5a06ff50c846a9f3743ec1920",
+      "bytes": 1777300
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-faults/runtime_motion.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-faults/runtime_readonly.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-faults/signing-support.json": {
+      "sha256": "377e9506468fb0b2191328754e22c0d21fb835e571029a76ca9f037c143a5080",
+      "bytes": 1330
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-faults/signing-support_restart.json": {
+      "sha256": "e2def90b02b0fc6cfa1e736b3aff2642af2e229a095534a5089a915bde6c5220",
+      "bytes": 1712
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-faults/sitl.log": {
+      "sha256": "6763f73143516920d5dae8ed2d5eba54d3367c548dc047642395ef9112810869",
+      "bytes": 1689
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-faults/sitl_restart.log": {
+      "sha256": "ba56d8345c0b0a5b6af4e5759a1ae3f8bea7e0ee79426d2fe102c467aed418d9",
+      "bytes": 1228
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-faults/summary.json": {
+      "sha256": "7225160ebd0a75246709cc465ad843fdc402227dfc07301c305d1ca729c9bc95",
+      "bytes": 4995
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-faults/trajectory.jsonl": {
+      "sha256": "3127ffdf1ee1216a5bcff87611c4688571ebfb924f8cd9631ced14a8ea23d53b",
+      "bytes": 368345
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-faults/world.sdf": {
+      "sha256": "e44b9cc448a58fb861b19024f04ef259bf79018295f5bcac59d2937a35f06ab0",
+      "bytes": 1619
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-legacy_physical/action-receive-floor": {
+      "sha256": "4e9318890db0362e9f19315c07aaf7b0c399e6c9ff84f7d8d10ff1e65abee371",
+      "bytes": 200
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-legacy_physical/gazebo.log": {
+      "sha256": "55e53c45ae7ea6aec8f1fa3cf97174710b556b2975ada59ac19e604dbd9b3ad2",
+      "bytes": 4025
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-legacy_physical/manifest.json": {
+      "sha256": "6d21e46506ecac17961507370af64daaff94af114adc46bb03bd98afed14cf42",
+      "bytes": 5588
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-legacy_physical/model.sdf": {
+      "sha256": "53c32fdc91ebbceecee1c0a72abfac86fd02e97bc241a4b17a927049ebdb40b6",
+      "bytes": 8025
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-legacy_physical/runtime.jsonl": {
+      "sha256": "7404c2104e7862677a73c93ace3270bee6853cc64d22794324341bbd9e7dc751",
+      "bytes": 1719906
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-legacy_physical/signing-support.json": {
+      "sha256": "b184d25094d907c94782d1997e3b932b8fab19f40752b00ff726b73b4fddcb6f",
+      "bytes": 1330
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-legacy_physical/sitl.log": {
+      "sha256": "e7af9f37029455df812b6b071e7908f373beef88b6af19c44eed2e0280e00770",
+      "bytes": 1278
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-legacy_physical/summary.json": {
+      "sha256": "5b23ef613e79c641214fad1b33218060d9bc95db07fdd16917c84c79adaccc60",
+      "bytes": 8604
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-legacy_physical/trajectory.jsonl": {
+      "sha256": "d556f908d3ad992d179606d7616e461af1f6baaf4416c4052a6102cd2961b163",
+      "bytes": 387919
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-legacy_physical/world.sdf": {
+      "sha256": "9b7854e6547a99b7d64b2f9c075eb0d18d1b3f4f0a0e4e66dd0d18b022cfb8ec",
+      "bytes": 1628
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-physical/action-receive-floor": {
+      "sha256": "6ea5b23cf82153e8449b5611195930ec28504009592a06dea8287c5552290965",
+      "bytes": 200
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-physical/gazebo.log": {
+      "sha256": "21c162b1b3128a73b2543cdb632e6681941c7be600bc3bf1ca6196d9dc8d24d8",
+      "bytes": 4103
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-physical/manifest.json": {
+      "sha256": "002054949f76c4822d50fe4dea667e3f88a475d1a2e4ac4821402bd7420b45c9",
+      "bytes": 6054
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-physical/model.sdf": {
+      "sha256": "53c32fdc91ebbceecee1c0a72abfac86fd02e97bc241a4b17a927049ebdb40b6",
+      "bytes": 8025
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-physical/runtime.jsonl": {
+      "sha256": "21039405127e895c58b429404573927c55de28a5b800e0d8976eb557a73c95bd",
+      "bytes": 1109321
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-physical/signing-support.json": {
+      "sha256": "342bf8dd68a2521c2c4262f16830746906c120d42454808a732fc4e0b5b5f258",
+      "bytes": 1330
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-physical/sitl.log": {
+      "sha256": "fc30c5761d900c5e41e934de151537804fa2bb722b16555e65edc3cd57d3430c",
+      "bytes": 1180
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-physical/summary.json": {
+      "sha256": "a281749dabd05b6be28c099cdb642d728b471dcaef4c3c8e0c0aa80638ae3c7b",
+      "bytes": 11969
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-physical/trajectory.jsonl": {
+      "sha256": "c7fd57cbf92137daaba0ce4481320a0ed5d350fd402dba2b351b0a1c47332629",
+      "bytes": 566562
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-physical/world.sdf": {
+      "sha256": "7286240626401835fb009918850ce8e1813e325e9390cadaaf830b7bbdc4b1af",
+      "bytes": 1621
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-probe/action-receive-floor": {
+      "sha256": "c0eb921be9066ff57f43136464cbaecad925d69f073695a18d462da78aeebc11",
+      "bytes": 200
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-probe/gazebo.log": {
+      "sha256": "5d1f92d8a5f74c291fba7ce7dc747619376a21746717a3dbc39b802ebaf561b5",
+      "bytes": 4015
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-probe/manifest.json": {
+      "sha256": "5c59e27f9ba8122186e19e45e9460787394938b3477eb506307310f67e000ffd",
+      "bytes": 5548
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-probe/model.sdf": {
+      "sha256": "53c32fdc91ebbceecee1c0a72abfac86fd02e97bc241a4b17a927049ebdb40b6",
+      "bytes": 8025
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-probe/proxy.jsonl": {
+      "sha256": "549a22fba06180ba6129f43427812e0e6a4ef6bd0ea7a24588a5e5c1852af271",
+      "bytes": 11411729
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-probe/runtime.jsonl": {
+      "sha256": "1e10e09e5614b467813c7367c6e745dccf5524f2b5750c502cb2d4456724fc05",
+      "bytes": 1250115
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-probe/signing-support.json": {
+      "sha256": "471881734fd793cad835c34fb97abd1589e966c434f2f64b62ef7397181e8778",
+      "bytes": 1330
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-probe/sitl.log": {
+      "sha256": "a200a4d6383386ad9251f43479d9ab828243987740560605314756d50bb716c8",
+      "bytes": 1553
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-probe/summary.json": {
+      "sha256": "05af008c54ecae4d224a38f0ed78b4edaa7e97c5ad1b52d7707c0254ecbb0b09",
+      "bytes": 31131
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-probe/telemetry.jsonl": {
+      "sha256": "a021309d60b093280fb25a2660869efc9606c8db541f8f5f84c6cfb5733a1fdd",
+      "bytes": 13385191
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-1-6e9a1750/rover-probe/world.sdf": {
+      "sha256": "b1e2cb48063a6ccc85a7845398512277fdd1bb853ec8a8ab9e1add10bf29b5eb",
+      "bytes": 1618
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/copter-faults/action-receive-floor": {
+      "sha256": "bcfaf4825a6cc064bed3afc3b3424e7bed812a30c8b69a58698d3df50edabf34",
+      "bytes": 200
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/copter-faults/gazebo.log": {
+      "sha256": "750db3ba3f2466fa8f5d3da38a99ef902d2ec9f365bbc6c916f10dd475298dfc",
+      "bytes": 11462
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/copter-faults/manifest.json": {
+      "sha256": "55573fa1c4961c47ec2090a6d2d0d506cd670c4da0b2f7d0eca2efedd2ceda93",
+      "bytes": 10509
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/copter-faults/model.sdf": {
+      "sha256": "c23f4ddba8da8e6327ffd333718c130060c6e6a9625f420afb211afda9857e94",
+      "bytes": 10312
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/copter-faults/proxy.jsonl": {
+      "sha256": "8d5a5f6f499b5553d706844346fd511280e68926c7b3ac0b4f752168c5ad8e78",
+      "bytes": 18908272
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/copter-faults/runtime-process-motion.json": {
+      "sha256": "7b96462a24aa8d8cd5173bfc5191696f4332ac5b2660b49060285b95162c7033",
+      "bytes": 57552
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/copter-faults/runtime-process-restart.json": {
+      "sha256": "cce1d68a5815fe98a4b6ef7e5bbc9c5ab6230aa84f836edf6ff544f1888ecc4c",
+      "bytes": 6474
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/copter-faults/runtime.jsonl": {
+      "sha256": "c9f5a2998283a0e05cf0856c7890665bb4fe29bab5ff994e9f4a6dfb6f061771",
+      "bytes": 2014494
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/copter-faults/runtime_motion.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/copter-faults/runtime_readonly.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/copter-faults/signing-support.json": {
+      "sha256": "66e3c513e18c310543fc3141300f84bccf67d43877f658c68b98b3042cdc8fda",
+      "bytes": 1326
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/copter-faults/signing-support_restart.json": {
+      "sha256": "ee751cdaaf860e2f01f9d5041942fc9a6fae0c42392f2752d6a8d0fdaaea5b99",
+      "bytes": 1706
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/copter-faults/sitl.log": {
+      "sha256": "1681e3295fc0a06062551df3bc2273ad7d548a3f5bc0302a62e2624abf72bdd7",
+      "bytes": 1986
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/copter-faults/sitl_restart.log": {
+      "sha256": "6c621dbf3b55195aec10f018569877826ff1c7c8b3589cd2b6585c327f46616d",
+      "bytes": 1475
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/copter-faults/summary.json": {
+      "sha256": "442cd1d2cb6ce6a0a617d45a7a2b71f754be5d9567c8645bb06e56b627baa3b2",
+      "bytes": 4989
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/copter-faults/trajectory.jsonl": {
+      "sha256": "08ee217e391bab425f2ac943d7b4d4e52fe1f1b8cdaf60cceaaf17df23ef5089",
+      "bytes": 392559
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/copter-faults/world.sdf": {
+      "sha256": "e0fbf9eafca35b01e583868e7b2316347bceee1bdc4a8d4661c4b01e8c16447f",
+      "bytes": 3637
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/copter-physical/action-receive-floor": {
+      "sha256": "13f1df65ef5f294317f5c1eecd6e16b777a43413c7495776bde99acd6e988ac2",
+      "bytes": 200
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/copter-physical/gazebo.log": {
+      "sha256": "6c0c55697314d68a0b5772d40c6457572ddb27e300d90f60c2b1bcdb6ce814f3",
+      "bytes": 11379
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/copter-physical/manifest.json": {
+      "sha256": "d74559adc2f88d84266104606c00b882a51ef12811c2583991c577adedc509fe",
+      "bytes": 5773
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/copter-physical/model.sdf": {
+      "sha256": "c23f4ddba8da8e6327ffd333718c130060c6e6a9625f420afb211afda9857e94",
+      "bytes": 10312
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/copter-physical/observations.jsonl": {
+      "sha256": "005631cc23c72ca5009f1a08629b673d25e39856199ced32e2a764612593d7c5",
+      "bytes": 274661
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/copter-physical/runtime.jsonl": {
+      "sha256": "eb18f141764bdd6f34bb325064d851d9d174800ed5005f1052869f06d6e5ff7d",
+      "bytes": 1530864
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/copter-physical/signing-support.json": {
+      "sha256": "2b10b3e2c39215504787d680e8509c942158924f664f31bed1dcac0a911d9e1c",
+      "bytes": 1326
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/copter-physical/sitl.log": {
+      "sha256": "8fece53c347789ba8a1fa34ba42842e45ad6193dc846f11a4651ce26c29614d8",
+      "bytes": 1575
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/copter-physical/summary.json": {
+      "sha256": "88d41436897d9f40d3520c75d76953562bc1392826d2592207c402cd7dd3c1df",
+      "bytes": 5132
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/copter-physical/world.sdf": {
+      "sha256": "3c92600fead87f22771afe545259713bc81595ab5a929225e720aee6c8e6af91",
+      "bytes": 3639
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/copter-probe/action-receive-floor": {
+      "sha256": "1cd7994720673c6715dcb40dc263a195278f1d95c64896638c32809461105659",
+      "bytes": 200
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/copter-probe/gazebo.log": {
+      "sha256": "e11b0d38d441137d1426ff540544c44648ae9b824f9bd6e975536bfc2392a5f2",
+      "bytes": 11376
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/copter-probe/manifest.json": {
+      "sha256": "f91092d8458a4b21b437c9ee0ef14ed7b24f05ddd6ba4ae95844d7ad3b88e2a6",
+      "bytes": 5761
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/copter-probe/model.sdf": {
+      "sha256": "c23f4ddba8da8e6327ffd333718c130060c6e6a9625f420afb211afda9857e94",
+      "bytes": 10312
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/copter-probe/proxy.jsonl": {
+      "sha256": "70e2ef190848dd494e71232ddec733820ce59ea13d24118c1bae3d97a5d4ffc4",
+      "bytes": 11715054
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/copter-probe/runtime.jsonl": {
+      "sha256": "42a2879ddd32951076330412cb0664bbd074f9f383d1bb20eebf646e52caf43a",
+      "bytes": 1251849
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/copter-probe/signing-support.json": {
+      "sha256": "b994920003dc3ef2efa329a815600fa31ed39e2e0ba0bd924a85c6a4590dff35",
+      "bytes": 1326
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/copter-probe/sitl.log": {
+      "sha256": "87e970936aa43cbadfb48daf2e4d89e17fd02b868dddb7a40ea98829aec335d7",
+      "bytes": 1900
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/copter-probe/summary.json": {
+      "sha256": "cb1392aa0e16912dd475955e7b72b23f167f3102baf30e4e00be48f1456225b8",
+      "bytes": 31088
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/copter-probe/telemetry.jsonl": {
+      "sha256": "4592113b1ebdcd44b274c4faa85f14e0f68f48e716bb18146bd269c456e04f47",
+      "bytes": 13403916
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/copter-probe/world.sdf": {
+      "sha256": "5f5cce6d2d3a8d850c963c6864eaf30b7767f27cec3229dc228d3d86635a839e",
+      "bytes": 3636
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/plane-cancel_window/action-receive-floor": {
+      "sha256": "40dd49bdf8fdfe8d7ccfb8d5d644831d5ee7e1fb4b18b9707fb8707e773b87e3",
+      "bytes": 200
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/plane-cancel_window/application-rx.jsonl": {
+      "sha256": "a8b419908b2ea01069e9b8b22b21d3ad3ca317decaab7c59e3f92fafab877645",
+      "bytes": 2465038
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/plane-cancel_window/gazebo.log": {
+      "sha256": "01ada1079e41dee6fcb03206d2bb39a60f6cc1a580bfc3f631da69ed8be065b9",
+      "bytes": 4562
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/plane-cancel_window/manifest.json": {
+      "sha256": "d9369dbd227c2b35e1cdf4fd66b725e8976a2097c17308023f30b66e3ab8eb6e",
+      "bytes": 5879
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/plane-cancel_window/model.sdf": {
+      "sha256": "ca79bea85e53abedee85bfb10aafc87be462ee2020ba27bae251f4b42a94ba5f",
+      "bytes": 18449
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/plane-cancel_window/proxy.jsonl": {
+      "sha256": "f3345775d161723d2d7511683152ce3e72ebf725fcac7aa498d6809096d7fa9a",
+      "bytes": 6461278
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/plane-cancel_window/runtime.jsonl": {
+      "sha256": "346530110127bc0bf899c5ca6e548741eccb7fc2af890558272afe3b6b9cd9be",
+      "bytes": 569334
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/plane-cancel_window/signing-support.json": {
+      "sha256": "05e2835a27e8eac0388e738dfc443ac3880b13bb817c0f54cbeaa8af13c44161",
+      "bytes": 1328
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/plane-cancel_window/sitl.log": {
+      "sha256": "7e4fba95875036a1d86a6ea5cd5b71791e6bf6271ffe0ec3b766e07e2ab96dde",
+      "bytes": 1442
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/plane-cancel_window/summary.json": {
+      "sha256": "849b5d366cde743a63466f0385356bf622467178131253138ca6d52065a30957",
+      "bytes": 2546
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/plane-cancel_window/trajectory.jsonl": {
+      "sha256": "1cf60d352b47012f781c78d678d1e62e2fae0c0ba77af958bd662a4b477f6d07",
+      "bytes": 1370
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/plane-cancel_window/world.sdf": {
+      "sha256": "68b63e0cd02e1b719cf899efc34d5587dbca9e4411ee9c11be47f32f371ead3c",
+      "bytes": 2505
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/plane-control/action-receive-floor": {
+      "sha256": "cc955bb97097d24f4bf46615c7215e8f6417e94aad4bbcb3c6c6f5445ec2f3f0",
+      "bytes": 200
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/plane-control/gazebo.log": {
+      "sha256": "0f10caba4daf6b4682b81f92b2f08061be2c4c7d8e764f804c67b238fb4d4895",
+      "bytes": 4890
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/plane-control/manifest.json": {
+      "sha256": "cc77571ffb668eabb211de9b89a45f658c6fe94868f3bfc55c5d14218416bbfc",
+      "bytes": 5857
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/plane-control/model.sdf": {
+      "sha256": "ca79bea85e53abedee85bfb10aafc87be462ee2020ba27bae251f4b42a94ba5f",
+      "bytes": 18449
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/plane-control/proxy.jsonl": {
+      "sha256": "2a71221b643a6326e34fefe80668efd0c78bb6b85caded3742f9c67a8834236c",
+      "bytes": 37797451
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/plane-control/runtime.jsonl": {
+      "sha256": "9209d4bd1a0c66a624c173c61b3e7ec403b12fcbcd263be3d14785f2efb3de6d",
+      "bytes": 3519395
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/plane-control/signing-support.json": {
+      "sha256": "4a24572d86f814348a95734154631a3baf744dad4e68d043834a8a3e2740b7bd",
+      "bytes": 1328
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/plane-control/sitl.log": {
+      "sha256": "d280452b6dd963adcd565cfdaa50240379b0968055ab13cceabbcf85db1e09ba",
+      "bytes": 1607
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/plane-control/summary.json": {
+      "sha256": "b43a1a1a065312b52e1cd0c81b53d838b5a376a42264d23cacca2e2347f7c19e",
+      "bytes": 20886
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/plane-control/trajectory.jsonl": {
+      "sha256": "1049010276850e0ee37d1c3ddd3a9126a1dd90c134e6f1309ed5ad8b675a3f2f",
+      "bytes": 3217559
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/plane-control/world.sdf": {
+      "sha256": "d3b6c93e616b1371f9b8342b44cab83fbe7740be11234ddd2aa6e8925765abc1",
+      "bytes": 2499
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-faults/action-receive-floor": {
+      "sha256": "d3d7568e05fce5e183a0c399897e6cafeb5745206de3813944a7681390945263",
+      "bytes": 200
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-faults/gazebo.log": {
+      "sha256": "5299a3c2f45ae427f38f307203402e3bb8d5d229940eb32b734b10940a03d022",
+      "bytes": 4101
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-faults/manifest.json": {
+      "sha256": "96c1f833595e7de9e50c339b7393e62d26c020ec0d0bb985d584ba573d3e5823",
+      "bytes": 10064
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-faults/model.sdf": {
+      "sha256": "53c32fdc91ebbceecee1c0a72abfac86fd02e97bc241a4b17a927049ebdb40b6",
+      "bytes": 8025
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-faults/proxy.jsonl": {
+      "sha256": "87f7d362884ed4e2923515ae1fef7d6b1aeb0e651f282fba6ff35f80c9232a88",
+      "bytes": 16282211
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-faults/runtime-process-motion.json": {
+      "sha256": "4487d0d29a8ba2f3aeed4d07f481b7b71c117a9524afaaa916435b8cb6a319cf",
+      "bytes": 63692
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-faults/runtime-process-restart.json": {
+      "sha256": "70fc2a911d274f95afe4f5aa24e13ac86a4d7793d82d27bfacec4f3aeafe9e14",
+      "bytes": 6181
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-faults/runtime.jsonl": {
+      "sha256": "d86583c7620aecb937d22607ab45af7305bfab09b25bab16caae524eb98c195e",
+      "bytes": 1779095
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-faults/runtime_motion.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-faults/runtime_readonly.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-faults/signing-support.json": {
+      "sha256": "38974152f920055ca5f2bc02fa137c46eca6ec179bc319c9800e2df0693a4434",
+      "bytes": 1330
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-faults/signing-support_restart.json": {
+      "sha256": "82935ac6df5527738b7463b8d97e7175e11bf94035cd405996e1b380cffb5051",
+      "bytes": 1712
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-faults/sitl.log": {
+      "sha256": "6763f73143516920d5dae8ed2d5eba54d3367c548dc047642395ef9112810869",
+      "bytes": 1689
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-faults/sitl_restart.log": {
+      "sha256": "ba56d8345c0b0a5b6af4e5759a1ae3f8bea7e0ee79426d2fe102c467aed418d9",
+      "bytes": 1228
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-faults/summary.json": {
+      "sha256": "065f15c6da175606e50efe58fbf0179f378119cde581f9e152e3f01962373113",
+      "bytes": 4991
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-faults/trajectory.jsonl": {
+      "sha256": "a414d8e6b550424ff8d061224caa8634655a19608fba9fb59e93cc1b5c118b2a",
+      "bytes": 368764
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-faults/world.sdf": {
+      "sha256": "e9d6cf84e7147dd3967393534be4e87b68fb321289fdd234b213ec8d986c827e",
+      "bytes": 1619
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-legacy_physical/action-receive-floor": {
+      "sha256": "fd45b3e4b65a2413a924c792f6d957c55e88e103cd1d39707bd2723bf355f89a",
+      "bytes": 200
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-legacy_physical/gazebo.log": {
+      "sha256": "41e86d1c68aeca0b84fddbe46c32b2be8256e8536adae1d37c787f4d68cb0d00",
+      "bytes": 4025
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-legacy_physical/manifest.json": {
+      "sha256": "a92d9bf926ba3732dddaa24983f4c56bf386561eeb2585b70a2c57bd899f17f3",
+      "bytes": 5588
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-legacy_physical/model.sdf": {
+      "sha256": "53c32fdc91ebbceecee1c0a72abfac86fd02e97bc241a4b17a927049ebdb40b6",
+      "bytes": 8025
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-legacy_physical/runtime.jsonl": {
+      "sha256": "f03ff586d71a151803c0d7729eb4f298e594ff76a47c5f48dd27d129aa5361d8",
+      "bytes": 1699325
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-legacy_physical/signing-support.json": {
+      "sha256": "441d11c1cf9b90455dafbcc969f2eb07e1c0a89153243150e6b0cc90f722c0e4",
+      "bytes": 1330
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-legacy_physical/sitl.log": {
+      "sha256": "e7af9f37029455df812b6b071e7908f373beef88b6af19c44eed2e0280e00770",
+      "bytes": 1278
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-legacy_physical/summary.json": {
+      "sha256": "f4b11a99393463af8e5ad67e18db19f4f08f593fb7b36a0766653d2b4c8acc24",
+      "bytes": 8548
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-legacy_physical/trajectory.jsonl": {
+      "sha256": "c3f8d669e82edd4b41d76cd7ca0bd6eb3557c924b0f6657afe2c89ebc966da86",
+      "bytes": 381391
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-legacy_physical/world.sdf": {
+      "sha256": "e28270b06520e6bed07b8aa3070001f27418ce1b982e2678f4d464ae68fe8903",
+      "bytes": 1628
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-physical/action-receive-floor": {
+      "sha256": "8bfd13e0d2a0ed31fc94e3095eef470ebc5479990bd9a99b25f6526a8a272df6",
+      "bytes": 200
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-physical/gazebo.log": {
+      "sha256": "f41e44e97a63e0b56e35dc671b374f357a0369692dbc7e9d2d223633fa7f400c",
+      "bytes": 4103
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-physical/manifest.json": {
+      "sha256": "5c7f9fc2d28836aae0403e72ff1489a831e10ef3a96e0a18eb32fdcefb27d6b4",
+      "bytes": 6055
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-physical/model.sdf": {
+      "sha256": "53c32fdc91ebbceecee1c0a72abfac86fd02e97bc241a4b17a927049ebdb40b6",
+      "bytes": 8025
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-physical/runtime.jsonl": {
+      "sha256": "d3da41189532527f0ea8cc7b707ef71e631f2e67a162071c1a58448117ac9329",
+      "bytes": 1172653
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-physical/signing-support.json": {
+      "sha256": "f22a0c120625c5606aa7947d8febc90329f52d060c7bd0de8972f97c0ef2c7ec",
+      "bytes": 1330
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-physical/sitl.log": {
+      "sha256": "fc30c5761d900c5e41e934de151537804fa2bb722b16555e65edc3cd57d3430c",
+      "bytes": 1180
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-physical/summary.json": {
+      "sha256": "82f66c5dd8d89e593e27c8114c36940f8a57fce5bc60ecb67ac26b1d65aedd2b",
+      "bytes": 11856
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-physical/trajectory.jsonl": {
+      "sha256": "0f764757ab9c31688df1b0ca21a824040263e86637a79c131bfdb3398424af0e",
+      "bytes": 587315
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-physical/world.sdf": {
+      "sha256": "da88167d51f58e13c32cac5df672ce1a8d42a8660a4b1e6efc602ca191263a0d",
+      "bytes": 1621
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-probe/action-receive-floor": {
+      "sha256": "6c5b526751fc012282fabbd8e2aaff74d58adf2ed4e77d67a3c24435423055ac",
+      "bytes": 200
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-probe/gazebo.log": {
+      "sha256": "57072fe3d4e0e8c57858a0385dbedb24d7801e0d602d05420f0d7f28420b12d3",
+      "bytes": 4015
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-probe/manifest.json": {
+      "sha256": "d10062fda22b2b89584eaacc57a8edb4c3cb71ca088594e7bb65e17ce7b2218b",
+      "bytes": 5548
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-probe/model.sdf": {
+      "sha256": "53c32fdc91ebbceecee1c0a72abfac86fd02e97bc241a4b17a927049ebdb40b6",
+      "bytes": 8025
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-probe/proxy.jsonl": {
+      "sha256": "9c1e81d32455f15a4fbbafc27e6de39560a467d4dcc0e113d4f605f445767526",
+      "bytes": 11417849
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-probe/runtime.jsonl": {
+      "sha256": "5f104d917639e144b7fce19db1044c21f8ff2cabbe779f4ca816dd000604aa9f",
+      "bytes": 1248869
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-probe/signing-support.json": {
+      "sha256": "d3e4803a4f24e67f5fb9c16948c828d8f55a113803cf821fd8fb1fe1e7ce4f6d",
+      "bytes": 1330
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-probe/sitl.log": {
+      "sha256": "a200a4d6383386ad9251f43479d9ab828243987740560605314756d50bb716c8",
+      "bytes": 1553
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-probe/summary.json": {
+      "sha256": "ddb47607bca272bb1655ae3267f1063f14a5483e6ecffa42558914c789dfbe7d",
+      "bytes": 31131
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-probe/telemetry.jsonl": {
+      "sha256": "d458b4ceaa72a2a19bd0c4696e2a6b247ebca390daff434a7a76a151922edbb0",
+      "bytes": 13387568
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/run-2-1601f6bc/rover-probe/world.sdf": {
+      "sha256": "574d59690b8edeedd5ef658f4c30b2b1bca539a63a147bb26833210a06012eed",
+      "bytes": 1618
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/stages.json": {
+      "sha256": "4527185dd79f9931b019cf0bb505683b290d16f7d7a1a5af2d180ee77b80e2cf",
+      "bytes": 14381
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/summary.json": {
+      "sha256": "2fef27ad3f16e8b19fddae1309b95c4e98d80171e0a5864edebeaab41ccf6f14",
+      "bytes": 10820
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/unit.json": {
+      "sha256": "5585e7f53ac7d7b68d35030ed6d70a240e3a88826463fabe0b0e326340e580f7",
+      "bytes": 84
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/phase2-regression/unit.log": {
+      "sha256": "123fe8283ca0f981357f2399ff6c56a7527ee1cb48816fe81dbfc7751018d24e",
+      "bytes": 590
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/copter-actions/action-owner.lock": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/copter-actions/action-receive-floor": {
+      "sha256": "be09d3ab499a3a04196417cfdcdccbc4b553456edbc85cc1b4074e12cb26a99a",
+      "bytes": 200
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/copter-actions/application-rx.jsonl": {
+      "sha256": "6b9fdc81646dd472bf8f9b65db3961a395508bb9731ee734813666e110f064ce",
+      "bytes": 5935535
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/copter-actions/gazebo.log": {
+      "sha256": "b26c0694bc3b9a15c32914e093baecc43fe89d6dc235a522eede71cfc772e2bd",
+      "bytes": 11447
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/copter-actions/http-audit.jsonl": {
+      "sha256": "7b2f017a49f796343ce8445997ba29efd95212fe1cf87dd3d3acd31a2baed458",
+      "bytes": 3584
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/copter-actions/manifest.json": {
+      "sha256": "349e53c9b0f66f78c635e6efa6830190b701bae54d7075c351048d9d0e218b01",
+      "bytes": 5705
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/copter-actions/model.sdf": {
+      "sha256": "c23f4ddba8da8e6327ffd333718c130060c6e6a9625f420afb211afda9857e94",
+      "bytes": 10312
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/copter-actions/proxy.jsonl": {
+      "sha256": "f43dbc8d148099550c2aa8980051af577a6e50bbe9be09a2c2c05ab855bac365",
+      "bytes": 17899260
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/copter-actions/runtime.jsonl": {
+      "sha256": "15507c966761bd5d96e4a1bd8317adbd8fb9d16bade27efbbdeedc0f3cbfbadc",
+      "bytes": 2291260
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/copter-actions/signing-support.json": {
+      "sha256": "3f5cc36de58d654b1db843f1de87501eea96160125030e244751f371f5372d09",
+      "bytes": 1326
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/copter-actions/sitl.log": {
+      "sha256": "271829946233795ff9eb6e36c1fc9b6dc83e13c8346b044a3582e58aeaf68b60",
+      "bytes": 1625
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/copter-actions/summary.json": {
+      "sha256": "a716617ad1813b44cde326df1bc5c75afb3289d90dcff6a2ccf131c006d91963",
+      "bytes": 385365
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/copter-actions/trajectory.jsonl": {
+      "sha256": "cfea3d004e43187de6567458f5f6b1229296756292a3e9bebfd4d272680d103b",
+      "bytes": 377763
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/copter-actions/world.sdf": {
+      "sha256": "fa9863bb66e36cbabc91c9040cf2525c9ec259f625b51e7b66d4ffd8283b86b6",
+      "bytes": 3622
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/copter-faults/action-owner.lock": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/copter-faults/action-receive-floor": {
+      "sha256": "e2792b68b0a086bc25d6d663b3c7997d75ab7424efe3b1624bcf3900bb1349be",
+      "bytes": 200
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/copter-faults/application-rx.jsonl": {
+      "sha256": "fb95cf703c9ae180318a751c63d636a51a728915be452b50747e825757fa75f3",
+      "bytes": 2493424
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/copter-faults/gazebo.log": {
+      "sha256": "677344a1814b3942a51127e23364d9bfe9320aba8991614fc18e20435b233e79",
+      "bytes": 11361
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/copter-faults/http-audit.jsonl": {
+      "sha256": "07a81d00f0f5f3b491e2e6b89dbef91b6f8f7e62225a643b8ab472f50d093f00",
+      "bytes": 1865
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/copter-faults/manifest.json": {
+      "sha256": "ae203e42a4e766b822cb65a2a5d77d8fc2b3fc36dab329812dfd7e623720f8a6",
+      "bytes": 5701
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/copter-faults/model.sdf": {
+      "sha256": "c23f4ddba8da8e6327ffd333718c130060c6e6a9625f420afb211afda9857e94",
+      "bytes": 10312
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/copter-faults/proxy.jsonl": {
+      "sha256": "760bc18fd84332d2c7267b86bdf38f53d54bc365751bc31032779698d3b81a4e",
+      "bytes": 7611676
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/copter-faults/runtime.jsonl": {
+      "sha256": "da14b3d16eb686f61ec5492d29dfe9e892409b0420ac233f04c343dcbab7faf0",
+      "bytes": 912890
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/copter-faults/signing-support.json": {
+      "sha256": "a772f02466b05bbd79fb0e5f576f72f6d41d569948e41baae9ce2d8e40020bf2",
+      "bytes": 1326
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/copter-faults/sitl.log": {
+      "sha256": "8fece53c347789ba8a1fa34ba42842e45ad6193dc846f11a4651ce26c29614d8",
+      "bytes": 1575
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/copter-faults/summary.json": {
+      "sha256": "81ffcf4230b6e7b417b2643634b3e0a32ed6cbd7f869e1d800eb358d56c1e02f",
+      "bytes": 140364
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/copter-faults/trajectory.jsonl": {
+      "sha256": "1d031d575358d8d080bbd10aa26fcd0bc1bcaaafda42485bcdcb619aa39ed173",
+      "bytes": 182152
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/copter-faults/world.sdf": {
+      "sha256": "2b9f71847edbdf519a0f063e9628e438eafe0574f6d729193f7ba415e2c3f201",
+      "bytes": 3621
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/external/.vaf-resource-6b1a40e1f2a12014bbc50750abffd3adecff5bce1982758884693af57d170119.anchor": {
+      "sha256": "9b5ce6efd06e10c8c028dabc8612c02ac04fcc4587f6d699ff7c402a237d0bcd",
+      "bytes": 338
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/external/resource-state/claims.json": {
+      "sha256": "5fa5eb1186b28a31fa055fa79322521be0096c45c186358e851247d22ec49984",
+      "bytes": 548
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/external/resource-state/owner.lock": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/external/ros-server.log": {
+      "sha256": "52fdd7220653b7659e70662f4a804fc9be33c1cb65035b5b3f59466b4769267f",
+      "bytes": 16
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/external/runtime.jsonl": {
+      "sha256": "f1dd362f57709106bfa5d6bedb37fcd12d06e87e2b19bf804122b53fc5d50a54",
+      "bytes": 9558
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/external/summary.json": {
+      "sha256": "e40b673a67e1af673565aa2a1717c5ee0925544722e34a53354ec8c3e31163ea",
+      "bytes": 35803
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/plane-actions/action-owner.lock": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/plane-actions/action-receive-floor": {
+      "sha256": "333679481859512474481a02a0fa89f4a6c5cf042ad310a3dbe6563eecea8279",
+      "bytes": 200
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/plane-actions/application-rx.jsonl": {
+      "sha256": "ab5030cbdcddc4e07bb48eb129bb229c026fee49d057fec0277112b11065f02e",
+      "bytes": 11489384
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/plane-actions/gazebo.log": {
+      "sha256": "1d75d798b7dd7fa7ac997d71a922646231e3e3f04fe65b7e96d6bfb27477d195",
+      "bytes": 4773
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/plane-actions/http-audit.jsonl": {
+      "sha256": "0c0a39c69e1c7e313de6f1cb1906e34a72029735d31bfaf423b3dd347d4fc9bd",
+      "bytes": 1573
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/plane-actions/manifest.json": {
+      "sha256": "c1670d63d62c3ed94d3c3a9c9368731b9f26b0deb0c7f8ab1a0dfcb7e0c4201e",
+      "bytes": 5792
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/plane-actions/model.sdf": {
+      "sha256": "ca79bea85e53abedee85bfb10aafc87be462ee2020ba27bae251f4b42a94ba5f",
+      "bytes": 18449
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/plane-actions/proxy.jsonl": {
+      "sha256": "eead61f1c519cf26e419babc660f8db7374c084b1e019db5589d30e0358ded3e",
+      "bytes": 34959438
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/plane-actions/runtime.jsonl": {
+      "sha256": "5377813427b94f115b2f49fecba06d8bb24cfb60c9f0b3f1f0ce1d2f66733ced",
+      "bytes": 3414631
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/plane-actions/signing-support.json": {
+      "sha256": "7797fb9dce0d7ab10d66ca615e9dba528155dd41003cced3fc3ca0f8f00e6d6e",
+      "bytes": 1328
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/plane-actions/sitl.log": {
+      "sha256": "d280452b6dd963adcd565cfdaa50240379b0968055ab13cceabbcf85db1e09ba",
+      "bytes": 1607
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/plane-actions/summary.json": {
+      "sha256": "da469848896a065ff36b2215da6058b52eb6bb345cda7cf03d0e54b7d4e149a4",
+      "bytes": 163079
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/plane-actions/trajectory.jsonl": {
+      "sha256": "bdb4e58de678c4470e2ce1f5d7cfa4082b7a63cee7419f85c2a8e3a078ef3131",
+      "bytes": 611972
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/plane-actions/world.sdf": {
+      "sha256": "e1b2385fba52fb3d12e58208145c35de7a8a23b16e8a74f33265fdfa6faeb8ce",
+      "bytes": 2483
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/plane-faults/action-owner.lock": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/plane-faults/action-receive-floor": {
+      "sha256": "3f3acd42807018d427220278791d8c526b265c31dd2b4f9514464b1ad1d02487",
+      "bytes": 200
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/plane-faults/application-rx.jsonl": {
+      "sha256": "767fe27a9fd5384d61afd687dc821ec0722ea7c4f9810dfe1c84346d0f63a445",
+      "bytes": 2172080
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/plane-faults/gazebo.log": {
+      "sha256": "cf6ad3aaece89eb6d1e7a86421054fb671e73d157e7ec762b24a8497c13c3176",
+      "bytes": 4516
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/plane-faults/http-audit.jsonl": {
+      "sha256": "c976949220502cfd1db6bcd3fa6ac6c47f7a31b935fba501d9065996be8d8ace",
+      "bytes": 1147
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/plane-faults/manifest.json": {
+      "sha256": "853533257f871bb3afec69df1c74b075615fbf538801a227b2ec807e14e7a540",
+      "bytes": 5787
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/plane-faults/model.sdf": {
+      "sha256": "ca79bea85e53abedee85bfb10aafc87be462ee2020ba27bae251f4b42a94ba5f",
+      "bytes": 18449
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/plane-faults/proxy.jsonl": {
+      "sha256": "945a5cf6ae8367ce40a360ff64085e637e8a165b494730b8009f23903fea7d5d",
+      "bytes": 6676872
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/plane-faults/runtime.jsonl": {
+      "sha256": "a779d1872ad14e6648fc2acbd8c8ae1000f48ca8cf4a62462d54a057104d8d8b",
+      "bytes": 651740
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/plane-faults/signing-support.json": {
+      "sha256": "d0763e899c97af05b104e9595d19ed83520da5a348c2fbdc5d17d2d912e5b13f",
+      "bytes": 1328
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/plane-faults/sitl.log": {
+      "sha256": "282e98d5220f76d33de7768dcfb26d8eb8344872b65ff3c35bb56cfd3a2c3546",
+      "bytes": 1387
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/plane-faults/summary.json": {
+      "sha256": "a231af66217297b0991daf218e5387317eb10de2166f4efea789a0aca94ea029",
+      "bytes": 89466
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/plane-faults/trajectory.jsonl": {
+      "sha256": "775031e0ec44301bbcc3474ddd7e811158a86b47e458ab3014928ab17d5beadb",
+      "bytes": 128791
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/plane-faults/world.sdf": {
+      "sha256": "673824170b976484378159ad7b618d643b8dbdb71a601aed0f698b792dd01c66",
+      "bytes": 2482
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/rover-actions/action-lab.png": {
+      "sha256": "c30f268105a1da0619cabac230207a879f08bc2243eb7cb9025a2bf947865ba9",
+      "bytes": 205833
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/rover-actions/action-owner.lock": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/rover-actions/action-receive-floor": {
+      "sha256": "cc0e35d343a5d29ffe1b5c472f413a6e73d35dd1728d0248249ec5a7f36f68d2",
+      "bytes": 200
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/rover-actions/application-rx.jsonl": {
+      "sha256": "90e0a1bf2d464a9df38a1f943b3e7162da008e5e8c7d6f04b7e5d36bfa2c27d5",
+      "bytes": 1419688
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/rover-actions/gazebo.log": {
+      "sha256": "e08093f171d7df33c594a538de4d7ce945da15d64b01178ed323b9bb6b93240d",
+      "bytes": 4086
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/rover-actions/http-audit.jsonl": {
+      "sha256": "b6b10141f006b6ab00ace839f1dc9ed8eebc20f078e1b19a91390e3d8df7c85b",
+      "bytes": 3876
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/rover-actions/manifest.json": {
+      "sha256": "3cebb468eb549ecdfeaec01b92edd43c90f0b5b55531ced3e51701330e9a67c5",
+      "bytes": 5986
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/rover-actions/model.sdf": {
+      "sha256": "53c32fdc91ebbceecee1c0a72abfac86fd02e97bc241a4b17a927049ebdb40b6",
+      "bytes": 8025
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/rover-actions/proxy.jsonl": {
+      "sha256": "22ee9857ebeed72af89ac2e61d3b18afe5dc36e5ca3edefada1ab28e3966128b",
+      "bytes": 4460948
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/rover-actions/runtime.jsonl": {
+      "sha256": "cc56f3f234d766e31756639f3b9638cf48bc5da61a0146bc34a4a9232dd76cc2",
+      "bytes": 956810
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/rover-actions/signing-support.json": {
+      "sha256": "54e1d4c01c3c903ea2f266a80bbb48bd604bfa4c75a70f999d12445b879bec74",
+      "bytes": 1330
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/rover-actions/sitl.log": {
+      "sha256": "fc30c5761d900c5e41e934de151537804fa2bb722b16555e65edc3cd57d3430c",
+      "bytes": 1180
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/rover-actions/summary.json": {
+      "sha256": "f6a8b272bbe3e69b3821445bf66a8fba81246088454b843630676086f7432b47",
+      "bytes": 366273
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/rover-actions/trajectory.jsonl": {
+      "sha256": "b4d1c8e5e352d36d002355321f148e0f4f6c543bb074d921ad8bc9989b0a3a50",
+      "bytes": 415710
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/rover-actions/world.sdf": {
+      "sha256": "cdbf96e5b3f02f81b249c8694b62e1353b2db331ac41b5806919f78abb3ec435",
+      "bytes": 1604
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/rover-faults/action-owner.lock": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/rover-faults/action-receive-floor": {
+      "sha256": "a52b988a94c19fb77af452b760f8286358ad29c958119dcc087783c4da55e740",
+      "bytes": 200
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/rover-faults/application-rx.jsonl": {
+      "sha256": "f47e195a4e3a596f30dc19927267b3d21f99bb8b086fd121d332ead51064a919",
+      "bytes": 606158
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/rover-faults/gazebo.log": {
+      "sha256": "9e4ff5e5c961b43ae8cfe1169f8b0308b319f7ec94c39eba36f438ad5df1b972",
+      "bytes": 4000
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/rover-faults/http-audit.jsonl": {
+      "sha256": "83261dabd896158cd0acb81782be9487e45a2c1cc5dc3f193b0aaf2d80b015a1",
+      "bytes": 2008
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/rover-faults/manifest.json": {
+      "sha256": "d44577378663ef5232bbe666121baf132210cac91a6bdb43b4c182a559fe901b",
+      "bytes": 5982
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/rover-faults/model.sdf": {
+      "sha256": "53c32fdc91ebbceecee1c0a72abfac86fd02e97bc241a4b17a927049ebdb40b6",
+      "bytes": 8025
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/rover-faults/proxy.jsonl": {
+      "sha256": "f19a127efd1bfd71af9a958a5cd5cba37b377e94430df4de393c9569fb81e30c",
+      "bytes": 1885970
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/rover-faults/runtime.jsonl": {
+      "sha256": "df1263115537ee2f598c5aa670f3ff790ec096374dc522ff7e5775179422ff15",
+      "bytes": 368859
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/rover-faults/signing-support.json": {
+      "sha256": "71b38edc5e9dc2bef10373ebe93e080d2410dc4d771da849a31f0030e3f81190",
+      "bytes": 1330
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/rover-faults/sitl.log": {
+      "sha256": "fc30c5761d900c5e41e934de151537804fa2bb722b16555e65edc3cd57d3430c",
+      "bytes": 1180
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/rover-faults/summary.json": {
+      "sha256": "0861ab286b976724431f4eb361fbfa6eff3716b3516e8bd3d44baf2e37c0816f",
+      "bytes": 133525
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/rover-faults/trajectory.jsonl": {
+      "sha256": "a9e2ca6d909d7a32f74adcb983bf406b040f11fe59027a95e8067659e9d9746f",
+      "bytes": 178239
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-1-fb4f0163/rover-faults/world.sdf": {
+      "sha256": "df24070ba3eaf7efa3359803a6b70dd50fcc8185ce68e03d16d1039a5bf12bf7",
+      "bytes": 1603
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/copter-actions/action-owner.lock": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/copter-actions/action-receive-floor": {
+      "sha256": "2734c83d0282ca8a064308e6d1eeef7c3d0210a9880e4b279124641ca69330a9",
+      "bytes": 200
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/copter-actions/application-rx.jsonl": {
+      "sha256": "af3c3313f72cfccf429acf1d2698e2747709b29abb02b8e2c22e62bc1768f0b8",
+      "bytes": 5896271
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/copter-actions/gazebo.log": {
+      "sha256": "e5c1365be606a982bade87d45d5fedc190c2f734049a8f4e1beabcfb0002be96",
+      "bytes": 11447
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/copter-actions/http-audit.jsonl": {
+      "sha256": "2ab50173683ca43461328a57b7dae86492da3f060fd1bdcd37c00c216567843b",
+      "bytes": 3584
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/copter-actions/manifest.json": {
+      "sha256": "113b316b8a6b1f37c5ffec9f8c9324af92665ef3257c402b25cd1b05e142a2fc",
+      "bytes": 5705
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/copter-actions/model.sdf": {
+      "sha256": "c23f4ddba8da8e6327ffd333718c130060c6e6a9625f420afb211afda9857e94",
+      "bytes": 10312
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/copter-actions/proxy.jsonl": {
+      "sha256": "9c209fb4e3954b8d7dc0151d317a2a7c980feb1fd416910ce9ec2128688096e4",
+      "bytes": 17784057
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/copter-actions/runtime.jsonl": {
+      "sha256": "332cc746bad7dcdc19ddfb99f89bea6897ddc40504655a0bb6e7f521b254cb4e",
+      "bytes": 2278544
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/copter-actions/signing-support.json": {
+      "sha256": "adda42967f02eb0c4b29e5349c1a6ed272579d7a61d21374bf820cc3de91d3d5",
+      "bytes": 1326
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/copter-actions/sitl.log": {
+      "sha256": "271829946233795ff9eb6e36c1fc9b6dc83e13c8346b044a3582e58aeaf68b60",
+      "bytes": 1625
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/copter-actions/summary.json": {
+      "sha256": "88a93c16d8a21c4f1253ec7dfd001fbb1990fb86c92219bd21c1e35125dd88fe",
+      "bytes": 385997
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/copter-actions/trajectory.jsonl": {
+      "sha256": "00035e73f861e8cd32562015f04a40a52a3e1acf2d57d57234c41412d4931f3b",
+      "bytes": 374977
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/copter-actions/world.sdf": {
+      "sha256": "dfe716d9345370e42d526666611cf0dd4d9b2fba1a6985da7f527f3eedd8f685",
+      "bytes": 3622
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/copter-faults/action-owner.lock": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/copter-faults/action-receive-floor": {
+      "sha256": "afb9ac62e533357f7f9a72f85a8278538f70d79a1bff90b8adae6b4250e15405",
+      "bytes": 200
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/copter-faults/application-rx.jsonl": {
+      "sha256": "3bdb057038bdf7fab3af7ebd971008c908759a05607d75646759e95bac0655d6",
+      "bytes": 2492176
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/copter-faults/gazebo.log": {
+      "sha256": "52a39362c5859ff67db9b695144db1e86c1d2d23c39ff65863764071322cba9a",
+      "bytes": 11361
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/copter-faults/http-audit.jsonl": {
+      "sha256": "9aa06f832e68ce139eb01718f5a0983c9a93c95e2dce63be1e502dca3fe72904",
+      "bytes": 1865
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/copter-faults/manifest.json": {
+      "sha256": "f7006d717c7f872ca6e30b5b94ae7af0b06658f8f528c775031185676f52ca2f",
+      "bytes": 5701
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/copter-faults/model.sdf": {
+      "sha256": "c23f4ddba8da8e6327ffd333718c130060c6e6a9625f420afb211afda9857e94",
+      "bytes": 10312
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/copter-faults/proxy.jsonl": {
+      "sha256": "09f957dc15f122ee1e6793302ad505cb9e7d3c70e6a6e60d9dc32d53a85c12af",
+      "bytes": 7609705
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/copter-faults/runtime.jsonl": {
+      "sha256": "9fd4ffe7918fce562a324985288aec90c551a2ec4b585046c5adf8b6afa554c7",
+      "bytes": 911092
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/copter-faults/signing-support.json": {
+      "sha256": "f7e8a62333bb6fe88f86dff86f13ead1833fb04d25f9335e0f5da4db2ce3279c",
+      "bytes": 1326
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/copter-faults/sitl.log": {
+      "sha256": "8fece53c347789ba8a1fa34ba42842e45ad6193dc846f11a4651ce26c29614d8",
+      "bytes": 1575
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/copter-faults/summary.json": {
+      "sha256": "756df7549268c39f53234ba0d0610be52e4ffd80e5ae1828918ce7894eb911c8",
+      "bytes": 138771
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/copter-faults/trajectory.jsonl": {
+      "sha256": "5a340b57c1ceff807cfa68c4567bd8684c26daab167a7308afca76c3808c9855",
+      "bytes": 181992
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/copter-faults/world.sdf": {
+      "sha256": "54ce57bd2c0a6728c97eb780908c335156f789a68536c798f2a99b438e567ee1",
+      "bytes": 3621
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/external/.vaf-resource-60513a71d6104813d5f32b26caa604ba35355b593ab9e79a279d918339de97ef.anchor": {
+      "sha256": "ba88b66b314dcf5dc810ae9c78b4285fbb64b1b2b7a0f4b9355b8499d9cb008e",
+      "bytes": 338
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/external/resource-state/claims.json": {
+      "sha256": "2bb874d9f717878b801c1fcc095c6011ec4cec355ced17bac76c395984813dba",
+      "bytes": 548
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/external/resource-state/owner.lock": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/external/ros-server.log": {
+      "sha256": "52fdd7220653b7659e70662f4a804fc9be33c1cb65035b5b3f59466b4769267f",
+      "bytes": 16
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/external/runtime.jsonl": {
+      "sha256": "e08811e67d37464bfa1c8d370f45a19ae4988fff8b3d78cda9f1a13bb080167d",
+      "bytes": 9558
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/external/summary.json": {
+      "sha256": "bed421ff569a2d9310e4e311dddab00f808ae493c0d630a32e678d80e51aa155",
+      "bytes": 36618
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/plane-actions/action-owner.lock": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/plane-actions/action-receive-floor": {
+      "sha256": "c6f07381a19757327ad9aa5b593345876293c58e43af54943ace3a0d2072ac5d",
+      "bytes": 200
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/plane-actions/application-rx.jsonl": {
+      "sha256": "5e1ca5223869723ddce50ba6949695b33d29d84f5efd4a57317ffe89c77ff595",
+      "bytes": 11440029
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/plane-actions/gazebo.log": {
+      "sha256": "78167bf85f0f1ed4fa955be4654bfa547ac689b42f75360ca988e488889a7dca",
+      "bytes": 4773
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/plane-actions/http-audit.jsonl": {
+      "sha256": "57bf718b1ac5e98ffdc7677ab85e733ea7091a12a81244b35bab74616a6cbea3",
+      "bytes": 1573
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/plane-actions/manifest.json": {
+      "sha256": "fa1b4679d659d65c9fdc5767c227de2f8e7473749018eb0bd3eb434ba54d9a0b",
+      "bytes": 5792
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/plane-actions/model.sdf": {
+      "sha256": "ca79bea85e53abedee85bfb10aafc87be462ee2020ba27bae251f4b42a94ba5f",
+      "bytes": 18449
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/plane-actions/proxy.jsonl": {
+      "sha256": "da8342fcb046258db62d2b79cc4ec55fcbd969321c7c41e4278250e84f3710e9",
+      "bytes": 34811130
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/plane-actions/runtime.jsonl": {
+      "sha256": "c71d24111a5e4eaf26fa2dfddb02c443b2a0e08611f60a2166c31e8a0a12dbac",
+      "bytes": 3399597
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/plane-actions/signing-support.json": {
+      "sha256": "207f7f57b3f9d187f03864c3c8dcf06ee779d11aef667a82df2fdbcd22531f06",
+      "bytes": 1328
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/plane-actions/sitl.log": {
+      "sha256": "d280452b6dd963adcd565cfdaa50240379b0968055ab13cceabbcf85db1e09ba",
+      "bytes": 1607
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/plane-actions/summary.json": {
+      "sha256": "6ae5bcb468f59372b88eaeb91c55614fa885ed5d7c8d07b32c725553122395fe",
+      "bytes": 163070
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/plane-actions/trajectory.jsonl": {
+      "sha256": "8425920e238bc3f7979608e19cba09574a7632c455ffc7bbf932315cdda9ea68",
+      "bytes": 609621
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/plane-actions/world.sdf": {
+      "sha256": "c0bceecb1822d4f4a08ca9c01fbd1a528d2fa02d6b2e5ea2fd87162f9254b7ca",
+      "bytes": 2483
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/plane-faults/action-owner.lock": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/plane-faults/action-receive-floor": {
+      "sha256": "abcc1a582c923fd7eecc621302b77e923c6206bf75a86f364d782a2a48935e55",
+      "bytes": 200
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/plane-faults/application-rx.jsonl": {
+      "sha256": "114088670054b5da36de5166fdc0374c15fdf03a19354244c1fcc42e497ad62d",
+      "bytes": 2178244
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/plane-faults/gazebo.log": {
+      "sha256": "30897f2ef5825a02822dc522621c74c6507478c242f317d8513a1d39cd9b2d4a",
+      "bytes": 4516
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/plane-faults/http-audit.jsonl": {
+      "sha256": "4579718f8b3eccc3505b0a955bc61a8064e0fffb6167590309775280df885af4",
+      "bytes": 1147
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/plane-faults/manifest.json": {
+      "sha256": "26e34f2879d404341bd8c16ea33d1cee92ed5019d34d96baeebee6c237c7cfaf",
+      "bytes": 5787
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/plane-faults/model.sdf": {
+      "sha256": "ca79bea85e53abedee85bfb10aafc87be462ee2020ba27bae251f4b42a94ba5f",
+      "bytes": 18449
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/plane-faults/proxy.jsonl": {
+      "sha256": "ebf0d0e146bc0e9f580a62b36432e542ffacfd9bcf6d097cdd35f7d708407ec7",
+      "bytes": 6683560
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/plane-faults/runtime.jsonl": {
+      "sha256": "49c7d9461d1bd45506ae606c22423cb642f8e2401b412084add16fecff2b6230",
+      "bytes": 652184
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/plane-faults/signing-support.json": {
+      "sha256": "c82cd05fd4ba2919254b63c28b96f970794f3cbb1af0646e4b65a9119c3183d4",
+      "bytes": 1328
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/plane-faults/sitl.log": {
+      "sha256": "282e98d5220f76d33de7768dcfb26d8eb8344872b65ff3c35bb56cfd3a2c3546",
+      "bytes": 1387
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/plane-faults/summary.json": {
+      "sha256": "9d101f39f812c8ea4cca540b4096c165facc828331fa6f7dbe3377b23cadecae",
+      "bytes": 89864
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/plane-faults/trajectory.jsonl": {
+      "sha256": "5efa583b060677bf7b44efe04159c313df9af411fc428890e035f9a996022ecd",
+      "bytes": 129002
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/plane-faults/world.sdf": {
+      "sha256": "6e3bd6e902c3e27e37d3610b412609adc3db4f7c24fde4c6c7e727e4b931b7d1",
+      "bytes": 2482
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/rover-actions/action-lab.png": {
+      "sha256": "0b46f1d7349fd9cea5f2c3dfdc7415ea996195cc2d88882776bb962dfec7ffc8",
+      "bytes": 204859
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/rover-actions/action-owner.lock": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/rover-actions/action-receive-floor": {
+      "sha256": "8eef07b261e5e19c8ed8be0092392df1c5dde6b03daff8b479f74a860d6f326f",
+      "bytes": 200
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/rover-actions/application-rx.jsonl": {
+      "sha256": "9f0715a699a11666a7503f77cb2f80087e723f6796e60ef36f07c7a4d976ea68",
+      "bytes": 1447444
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/rover-actions/gazebo.log": {
+      "sha256": "2addef9388d540482793c0ce39408e8161147c58fb3ddca7451f5a38aae8d20e",
+      "bytes": 4086
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/rover-actions/http-audit.jsonl": {
+      "sha256": "4b9f849facc9848f51ffb57547474507f38ab3d5a315c9d2dcc086b7804d2a99",
+      "bytes": 3876
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/rover-actions/manifest.json": {
+      "sha256": "23b984f8655a2d994190fde2160aabcb79eecc6f44f2288af2809e1e9f7e3d37",
+      "bytes": 5986
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/rover-actions/model.sdf": {
+      "sha256": "53c32fdc91ebbceecee1c0a72abfac86fd02e97bc241a4b17a927049ebdb40b6",
+      "bytes": 8025
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/rover-actions/proxy.jsonl": {
+      "sha256": "ae7340e04495f375e10a91b724103407b56977efa2d31364b5132caa7a4dc8e0",
+      "bytes": 4548693
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/rover-actions/runtime.jsonl": {
+      "sha256": "a60dc59fc30c7b23c50b8351e9cf10b9fd435ad5c34b4b8bcefe72c1f9b7ee53",
+      "bytes": 975392
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/rover-actions/signing-support.json": {
+      "sha256": "679c9ad2aeb6824c4a445e0b1a6c86c500efb4cfd691d3188d30d17b8161e408",
+      "bytes": 1330
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/rover-actions/sitl.log": {
+      "sha256": "fc30c5761d900c5e41e934de151537804fa2bb722b16555e65edc3cd57d3430c",
+      "bytes": 1180
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/rover-actions/summary.json": {
+      "sha256": "d6064c4d9cbbdfd722116463983652904143e1136bd0dd43a286c03bd01464ac",
+      "bytes": 371857
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/rover-actions/trajectory.jsonl": {
+      "sha256": "56065331360ba5363b21c0d8d7cd4f70d0f0c163df8fdfabf7597fade021e202",
+      "bytes": 421543
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/rover-actions/world.sdf": {
+      "sha256": "4351ce921303cf037aff7e2c1c132a7c88cb07ae2ad7c1da16336f86d5528c6d",
+      "bytes": 1604
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/rover-faults/action-owner.lock": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/rover-faults/action-receive-floor": {
+      "sha256": "b7ac15187b4ab610726bed7b24d0bbfc3c2bf69f88f1e0a9d678c7d9e2a44b35",
+      "bytes": 200
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/rover-faults/application-rx.jsonl": {
+      "sha256": "8ecf96efb93c0b52e94a75d4404916eb4d490d338048abf2095b916f4d3d004f",
+      "bytes": 606171
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/rover-faults/gazebo.log": {
+      "sha256": "3590d8ee4c1bd4b033272161410a71355c465b04e143fd736f2cb7186352ec28",
+      "bytes": 4000
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/rover-faults/http-audit.jsonl": {
+      "sha256": "5bda60253c0ef91bbca77a20c4c91b17a9fe8b6168d96d1ae562e111cc1215bd",
+      "bytes": 2008
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/rover-faults/manifest.json": {
+      "sha256": "4dd69f933a5fd6eddd12c012d2ee457c4709adecd949e9a0ba09789569247657",
+      "bytes": 5982
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/rover-faults/model.sdf": {
+      "sha256": "53c32fdc91ebbceecee1c0a72abfac86fd02e97bc241a4b17a927049ebdb40b6",
+      "bytes": 8025
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/rover-faults/proxy.jsonl": {
+      "sha256": "e3ed87f96baf9640e21d3b4097167c933bbccc140816c18ab73d2b6e235590d5",
+      "bytes": 1885996
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/rover-faults/runtime.jsonl": {
+      "sha256": "22707bb77723474c18cd582ccb9cd8b3ad80d80653c389fcebc6fe675f3fdbac",
+      "bytes": 368863
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/rover-faults/signing-support.json": {
+      "sha256": "59173b8a0565e0f3853071ab9dcadb0d212726f6b2123dc0f13dc5bfefa5b5d2",
+      "bytes": 1330
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/rover-faults/sitl.log": {
+      "sha256": "fc30c5761d900c5e41e934de151537804fa2bb722b16555e65edc3cd57d3430c",
+      "bytes": 1180
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/rover-faults/summary.json": {
+      "sha256": "7d7e63a1bda9c3a0ea5cb846fa21d5b6094aca81e2cbdc69bb1d3dd5a0642c4e",
+      "bytes": 132967
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/rover-faults/trajectory.jsonl": {
+      "sha256": "7efcd505895c5f0422af4fff77cfab843cedd8d5707ad801276bc1fefa36c2bf",
+      "bytes": 178257
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/round-2-2e31f87a/rover-faults/world.sdf": {
+      "sha256": "4adae58dc7ee04046f436f798b32ed3395446c6104273e56845269ec4e8dbaf4",
+      "bytes": 1603
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/stages.json": {
+      "sha256": "6b5c4766a9b8d5d140b46f5bcb0afba99db403d6945fc93236aaf298d87d8e96",
+      "bytes": 12618
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/summary.json": {
+      "sha256": "5195c0caeb11acb7b8ea8d2add375f581413c84f7b4ec97b754c29abc52fe544",
+      "bytes": 15400
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/unit.json": {
+      "sha256": "5585e7f53ac7d7b68d35030ed6d70a240e3a88826463fabe0b0e326340e580f7",
+      "bytes": 84
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1/unit.log": {
+      "sha256": "c5551aca50800d3fbaea10a6966b23c57468970f1a83808c69780457ad56ab0e",
+      "bytes": 590
+    },
+    "artifacts/phase3-remediation/acceptance-readback-1.log": {
+      "sha256": "ad5d30b18f042b873cfdc978faa99b657263a5db056cb80cc979748664ca94df",
+      "bytes": 787
+    },
+    "artifacts/phase3-remediation/action-suite-1.log": {
+      "sha256": "e70fec2825d9bf206d27463a792768195039599cb39bcca66339f47283f84cce",
+      "bytes": 108
+    },
+    "artifacts/phase3-remediation/action-suite-2.log": {
+      "sha256": "680c66e3d96dde3998320cd7546037d004f6ca0a45ba1f5a24412f2b77fe8bbc",
+      "bytes": 11555
+    },
+    "artifacts/phase3-remediation/baseline-unit.log": {
+      "sha256": "5040e4525822a4ab5cb306225d999a63360c3bc34248835b88c4fc902d53a6c3",
+      "bytes": 75688
+    },
+    "artifacts/phase3-remediation/baseline.json": {
+      "sha256": "0b30545d116ebfefe49eb501078c74418c566d1fe60bc35cfa89170102a423c9",
+      "bytes": 114040
+    },
+    "artifacts/phase3-remediation/before-api/restart-after.json": {
+      "sha256": "1498dabb189fa85c5cf400a64f09c02fdb311b1081258245bed70c27b63bcb27",
+      "bytes": 1159
+    },
+    "artifacts/phase3-remediation/before-api/restart-before.json": {
+      "sha256": "6a4e31e9594e4222cbcc84a55e23c26e5013e5ed6162db81305460f24e9e3569",
+      "bytes": 1158
+    },
+    "artifacts/phase3-remediation/before-api/restart_child.py": {
+      "sha256": "16e7c00c888d293ea6617e345846c7e213a5656cd110ab37e3f2be4b7c4cbbf1",
+      "bytes": 906
+    },
+    "artifacts/phase3-remediation/before-api/restart_probe.json": {
+      "sha256": "432305fc1256b219c25dc7ef546efebe9b1c44cccd49cdd4d6501a81f4972670",
+      "bytes": 651
+    },
+    "artifacts/phase3-remediation/before-api/restart_probe.py": {
+      "sha256": "253188f429c8d9d3db0f18f76c1d03b19d706a3bb98c095bd9989f10c527e312",
+      "bytes": 2090
+    },
+    "artifacts/phase3-remediation/before-api.log": {
+      "sha256": "d75482b0582005b2ce4a4034cbfb7c78b43817dfea0fc80b5178e19cd3178114",
+      "bytes": 652
+    },
+    "artifacts/phase3-remediation/before-boundaries.log": {
+      "sha256": "bfeb33381fde6153d749402624cbdd77ea8faee9292233de745afa704495f598",
+      "bytes": 4169
+    },
+    "artifacts/phase3-remediation/before-ros/ros-real-service/fault-done.json": {
+      "sha256": "970e34f32ad669fe3ba4f2ce90c5511d8c999408497ab208da804ac5e4cff506",
+      "bytes": 43
+    },
+    "artifacts/phase3-remediation/before-ros/ros-real-service/fault-started.json": {
+      "sha256": "28eb55a62575934542f10c72d6115b9c254c07f86757f35d02fd44939051cc6d",
+      "bytes": 42
+    },
+    "artifacts/phase3-remediation/before-ros/ros-real-service/normal-done.json": {
+      "sha256": "605439c0d2bbc6a64d52bcd85cd343160570ab698fcda31187b6275ffc0ce4b5",
+      "bytes": 43
+    },
+    "artifacts/phase3-remediation/before-ros/ros-real-service/normal-started.json": {
+      "sha256": "d4fe693eb12e203405ee1076f7e59097fb33cefbe8b3cc8036cbd181c5659002",
+      "bytes": 42
+    },
+    "artifacts/phase3-remediation/before-ros/ros-real-service/ready.json": {
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "bytes": 2
+    },
+    "artifacts/phase3-remediation/before-ros/ros-real-service/server.log": {
+      "sha256": "81a1d001416439626aa43f2af46ce198771a3f14f18e2ef2d2940f1473f291e1",
+      "bytes": 102
+    },
+    "artifacts/phase3-remediation/before-ros/ros_real_probe.json": {
+      "sha256": "b8f6afa52f8c12e796f172f5caca794f2569191aebe82d5e54ba91fbe1aabd4c",
+      "bytes": 3875
+    },
+    "artifacts/phase3-remediation/before-ros/ros_real_probe.py": {
+      "sha256": "5c56a91f94a8d7a43a1716a24ae94bdda3dc6ff6c1f6d8c8432dd71b0fdd90a3",
+      "bytes": 3698
+    },
+    "artifacts/phase3-remediation/before-ros/ros_service_fault_worker.py": {
+      "sha256": "4b21ea16fda03d5eafd96b25e43a1a431452e4872ff52fd8d623d1439bb2511f",
+      "bytes": 589
+    },
+    "artifacts/phase3-remediation/before-ros/ros_service_server.py": {
+      "sha256": "69031c0fa359cfec5a86f30635c3a863d499c305788c2b612688a1bf9ad612c7",
+      "bytes": 1013
+    },
+    "artifacts/phase3-remediation/before-ros.log": {
+      "sha256": "2c79af1a1b2b335c7843bbb85f388f24f2eb14002018300d41d7c9c857364529",
+      "bytes": 253
+    },
+    "artifacts/phase3-remediation/before-watermark/persistence_probe.json": {
+      "sha256": "bc333c5a39f8656710646a9359fc2f1aa48faf3c841bfced11bb7fceecf8d75f",
+      "bytes": 377
+    },
+    "artifacts/phase3-remediation/before-watermark/persistence_probe.py": {
+      "sha256": "88fbc3ab73b7670c6df16df0681d814522e085863594acc24ec66581450a5913",
+      "bytes": 3460
+    },
+    "artifacts/phase3-remediation/before-watermark/watermark-fixture/action-owner.lock": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/before-watermark/watermark-fixture/action-receive-floor": {
+      "sha256": "08490295488a1189099751ebeddb5992313dd2a831e07a92e66d196ddc261777",
+      "bytes": 3
+    },
+    "artifacts/phase3-remediation/before-watermark/watermark-fixture/ardurover": {
+      "sha256": "0664f1fa0f1db6ead3fd54e1ccc7fbf4166a3ba7276075736f49db82a3b1c1a5",
+      "bytes": 49
+    },
+    "artifacts/phase3-remediation/before-watermark/watermark-fixture/manifest.json": {
+      "sha256": "7a5c879752dfa0d5be8f96a7d1b30ad36a09f7152901a57cf53e1e574c8a3eeb",
+      "bytes": 671
+    },
+    "artifacts/phase3-remediation/before-watermark.log": {
+      "sha256": "885cb0b40de2816089c9f611f9acc8148b654c04332f8bbfcdc207e2f8341154",
+      "bytes": 378
+    },
+    "artifacts/phase3-remediation/boundary-unit-3.log": {
+      "sha256": "7432bff6f1fda3e4b32a41b377ec6de0eead74c6ac8d34be06a7300f922f1333",
+      "bytes": 3738
+    },
+    "artifacts/phase3-remediation/boundary-unit-4.log": {
+      "sha256": "51388c41829b8896d303e8058ac33793bb375acc9a9c7fb3a92bd6c3ea6470e5",
+      "bytes": 4405
+    },
+    "artifacts/phase3-remediation/delivery-audit.json": {
+      "sha256": "612903765fe435dd6b78b7352dd957658ba3ca4a5c74601ef1819c21ff023e2c",
+      "bytes": 9140
+    },
+    "artifacts/phase3-remediation/delivery-audit.py": {
+      "sha256": "5842fdd9e0bf05490a916dbdd84821ffa0e0fe1e200558ae5ec98b048a00e0d5",
+      "bytes": 9154
+    },
+    "artifacts/phase3-remediation/delivery-report.py": {
+      "sha256": "4bd9a46ace1d5ab30402efef902e8e571e4a11869ea475a67e613a140fac5e44",
+      "bytes": 10218
+    },
+    "artifacts/phase3-remediation/diagnostic-owned-floor-1/action-owner.lock": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/diagnostic-owned-floor-1/action-receive-floor": {
+      "sha256": "9ad453e2922fded9f0b6b28bebbcfdbdf1f5d9d6708cf07c0b0a51bafb777990",
+      "bytes": 200
+    },
+    "artifacts/phase3-remediation/diagnostic-owned-floor-1/admission-after.json": {
+      "sha256": "a618c8bd50810a199fe21638d325d450431888021665e8f51702417ef593107b",
+      "bytes": 107
+    },
+    "artifacts/phase3-remediation/diagnostic-owned-floor-1/admission-diagnostic.json": {
+      "sha256": "e1c2e989805b19cb89595ac6039957de2e267b505b7aff80b2ee3dc6351c3baf",
+      "bytes": 249
+    },
+    "artifacts/phase3-remediation/diagnostic-owned-floor-1/gazebo.log": {
+      "sha256": "11f036102aec54578575be959c457b366dcb7adbe192b5d407ba2df134cc17be",
+      "bytes": 3973
+    },
+    "artifacts/phase3-remediation/diagnostic-owned-floor-1/manifest.json": {
+      "sha256": "4661de5e03e7593cf739ea12226fcddd923e58128e14262a0c99fcb610e15edc",
+      "bytes": 5453
+    },
+    "artifacts/phase3-remediation/diagnostic-owned-floor-1/model.sdf": {
+      "sha256": "53c32fdc91ebbceecee1c0a72abfac86fd02e97bc241a4b17a927049ebdb40b6",
+      "bytes": 8025
+    },
+    "artifacts/phase3-remediation/diagnostic-owned-floor-1/signing-support.json": {
+      "sha256": "e81092f1c71c333b4faa1214252fe3025d2c6e789d92c3a60caae8166c0bf1b3",
+      "bytes": 1330
+    },
+    "artifacts/phase3-remediation/diagnostic-owned-floor-1/sitl.log": {
+      "sha256": "ef36eca70426377745d5529553c691ba40b18bfbb5b9e177cf91bc5e38a98ca3",
+      "bytes": 1125
+    },
+    "artifacts/phase3-remediation/diagnostic-owned-floor-1/world.sdf": {
+      "sha256": "f4c2e95476edfdb5d1c576296ed1de24a88243ccd9bed2499f31cd955141cfb0",
+      "bytes": 1576
+    },
+    "artifacts/phase3-remediation/diagnostic-owned-floor-1.log": {
+      "sha256": "7a46bd86d83b05f8512361cdd40830d60292fb1dd193da312903e745d6f8d782",
+      "bytes": 868
+    },
+    "artifacts/phase3-remediation/durable-2.log": {
+      "sha256": "8fa5da17eda2c3e9578f72ff8aeccd0918f0b0df67a7473652f66609cc83abb6",
+      "bytes": 2769
+    },
+    "artifacts/phase3-remediation/exit-ros-boundaries-1.log": {
+      "sha256": "a3e6ce5288f26907f0a248736f1c595e68ecfd3cc696bc713da00f9f6ecfbbfb",
+      "bytes": 1067
+    },
+    "artifacts/phase3-remediation/external-boundaries-1.log": {
+      "sha256": "98e8be6d1123c36193cfbdbbbf00fa4a9efb9bfab6870f2d8c04d97e1c192452",
+      "bytes": 77
+    },
+    "artifacts/phase3-remediation/external-boundaries-2.log": {
+      "sha256": "03f21f68a39b5639f89061ef90f78e40d04f23187136fe7c49aa5343dfea602e",
+      "bytes": 32
+    },
+    "artifacts/phase3-remediation/external-boundaries-3.log": {
+      "sha256": "03f21f68a39b5639f89061ef90f78e40d04f23187136fe7c49aa5343dfea602e",
+      "bytes": 32
+    },
+    "artifacts/phase3-remediation/external-boundaries-4.log": {
+      "sha256": "03f21f68a39b5639f89061ef90f78e40d04f23187136fe7c49aa5343dfea602e",
+      "bytes": 32
+    },
+    "artifacts/phase3-remediation/external-boundaries-5/api-before-id/.vaf-resource-1a7f41351c46a97acb6effa40f8473e58f6e8af9813cfd865dd0a597e06d66b3.anchor": {
+      "sha256": "c0f430ff2d52a8f222de59cc24732a5eb8e25a181e0787073d5e24d6f735f6e0",
+      "bytes": 314
+    },
+    "artifacts/phase3-remediation/external-boundaries-5/api-before-id/concurrent.json": {
+      "sha256": "393a4a6764c0fc78799066b58005a4ebe08481638e78689af695a4c50723fe10",
+      "bytes": 1368
+    },
+    "artifacts/phase3-remediation/external-boundaries-5/api-before-id/concurrent.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/external-boundaries-5/api-before-id/first.json": {
+      "sha256": "7b26d1d785c4ee2829197a6454b486728bb009a63bdb6786fee11eaca0637942",
+      "bytes": 1290
+    },
+    "artifacts/phase3-remediation/external-boundaries-5/api-before-id/first.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/external-boundaries-5/api-before-id/positive.json": {
+      "sha256": "55fcf8361a119aae012399666aacb93eb7ed86aeb832bc2df2a1f890fd6e0cf3",
+      "bytes": 1817
+    },
+    "artifacts/phase3-remediation/external-boundaries-5/api-before-id/positive.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/external-boundaries-5/api-before-id/resource-state/claims.json": {
+      "sha256": "edc2583e3234d65294bfc435d880392571a268f1caf7a595f1a83de2e3549e1d",
+      "bytes": 114
+    },
+    "artifacts/phase3-remediation/external-boundaries-5/api-before-id/resource-state/owner.lock": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/external-boundaries-5/api-before-id/restart.json": {
+      "sha256": "b98debb382e06d034ee4b0c1a43cf195e91227f9523054be85db0c9280fcc3a0",
+      "bytes": 1384
+    },
+    "artifacts/phase3-remediation/external-boundaries-5/api-before-id/restart.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/external-boundaries-5/api-known/.vaf-resource-efdce1f2d1b8536f007fef326aba1321f41dfbe0654f310161df62ed0c8b08bb.anchor": {
+      "sha256": "06ebf703431443dffde4f665e40a2b93c7cd7a000fd7dc6ee7331800399ea4ef",
+      "bytes": 310
+    },
+    "artifacts/phase3-remediation/external-boundaries-5/api-known/concurrent.json": {
+      "sha256": "d51de347c3d0590fa37bc0aa594b6f76db95bf085789b3b74cd3051b1299c684",
+      "bytes": 1398
+    },
+    "artifacts/phase3-remediation/external-boundaries-5/api-known/concurrent.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/external-boundaries-5/api-known/first.json": {
+      "sha256": "815660e508411a3e15c9661bec6f6099357738fc9d17b7c21433d29a152886f4",
+      "bytes": 1394
+    },
+    "artifacts/phase3-remediation/external-boundaries-5/api-known/first.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/external-boundaries-5/api-known/positive.json": {
+      "sha256": "2c1a354fe19eb7b0253ec727dc0d0961be2df69f5f726c279dee85caad50d304",
+      "bytes": 1814
+    },
+    "artifacts/phase3-remediation/external-boundaries-5/api-known/positive.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/external-boundaries-5/api-known/resource-state/claims.json": {
+      "sha256": "edc2583e3234d65294bfc435d880392571a268f1caf7a595f1a83de2e3549e1d",
+      "bytes": 114
+    },
+    "artifacts/phase3-remediation/external-boundaries-5/api-known/resource-state/owner.lock": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/external-boundaries-5/api-known/restart.json": {
+      "sha256": "1decea516eb2c99006646b5dfd26f4075775a66b5f42fdce502321fa70d1e1ff",
+      "bytes": 1414
+    },
+    "artifacts/phase3-remediation/external-boundaries-5/api-known/restart.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/external-boundaries-5/ros-service/.vaf-resource-b0279b7d0a618e73e96a1f0ad374d70a2b96f5929a630b8d04d10a0e7eb11502.anchor": {
+      "sha256": "0460a7e44cc098d4b2308464d6417c8dcf54349bcbd503e3ffe814f4b61d58bd",
+      "bytes": 324
+    },
+    "artifacts/phase3-remediation/external-boundaries-5/ros-service/error-done.json": {
+      "sha256": "f799b43ff3b61e97f775a3118a238e0c922e429791a5c4d90a0cddcf90c4aa4c",
+      "bytes": 126
+    },
+    "artifacts/phase3-remediation/external-boundaries-5/ros-service/error-started.json": {
+      "sha256": "bf4595f25fd5b54c80b895bcfd7d75364421e1db8397d76d959655b973197f43",
+      "bytes": 108
+    },
+    "artifacts/phase3-remediation/external-boundaries-5/ros-service/fault-done.json": {
+      "sha256": "9e726dae6fa3c1380729a6034879b46d36e05a75e04d1e68c3e2fae0ed80d4d2",
+      "bytes": 126
+    },
+    "artifacts/phase3-remediation/external-boundaries-5/ros-service/fault-started.json": {
+      "sha256": "df53e492e6e0a124ac70d1a0f5cd9b5abbe5adc495cd1da845f5826d897c5b5e",
+      "bytes": 108
+    },
+    "artifacts/phase3-remediation/external-boundaries-5/ros-service/normal-done.json": {
+      "sha256": "b970806d683095bd81d7b51ed01d5d61f13f7bcb672e9e7ebcee68e2c7761cd7",
+      "bytes": 126
+    },
+    "artifacts/phase3-remediation/external-boundaries-5/ros-service/normal-started.json": {
+      "sha256": "80ffa9b49c6057cb6cb14eb6d49f61f87279bb94b6159ec34c4465f56552516d",
+      "bytes": 108
+    },
+    "artifacts/phase3-remediation/external-boundaries-5/ros-service/ready.json": {
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "bytes": 2
+    },
+    "artifacts/phase3-remediation/external-boundaries-5/ros-service/resource-state/claims.json": {
+      "sha256": "edc2583e3234d65294bfc435d880392571a268f1caf7a595f1a83de2e3549e1d",
+      "bytes": 114
+    },
+    "artifacts/phase3-remediation/external-boundaries-5/ros-service/resource-state/owner.lock": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/external-boundaries-5/ros-service/server.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/external-boundaries-5/summary.json": {
+      "sha256": "352e1b1f67cfc9921baca505d25e918c423a75bdb7d62ab4b8b52d5006fcfdcf",
+      "bytes": 14410
+    },
+    "artifacts/phase3-remediation/external-boundaries-5.log": {
+      "sha256": "03f21f68a39b5639f89061ef90f78e40d04f23187136fe7c49aa5343dfea602e",
+      "bytes": 32
+    },
+    "artifacts/phase3-remediation/full-unit-1.log": {
+      "sha256": "9255136e7d83758f72d1ad53994f0b48713876b11ac784c80f878de74e278c10",
+      "bytes": 79219
+    },
+    "artifacts/phase3-remediation/full-unit-2.log": {
+      "sha256": "90fbbd01ff5b14728fe9de396ba9e0cc3c460c754c2fae7d5bcd06d7eaf9da79",
+      "bytes": 79868
+    },
+    "artifacts/phase3-remediation/full-unit-3.log": {
+      "sha256": "e70bb76053a4353b006a4f79ad24956aad788c8ee288e4b4f4c03c3e1eefe348",
+      "bytes": 80089
+    },
+    "artifacts/phase3-remediation/independent-review/INDEPENDENT_PHASE3_REVIEW.md": {
+      "sha256": "aaf389430fdee3ac7f7f95e71af1a63867ebf9e1cb14438e4b136571b05a4e93",
+      "bytes": 25312
+    },
+    "artifacts/phase3-remediation/independent-review/catalog.json": {
+      "sha256": "60d0c33332b9953df68c3cc6a1c70d8004b0d77665a9062e6982d10141208659",
+      "bytes": 1429
+    },
+    "artifacts/phase3-remediation/independent-review/catalog_audit.py": {
+      "sha256": "083e2a378ce1b5cd068aa9fbd8db2fa7acc6d624e33b901fef3664f58676632f",
+      "bytes": 1581
+    },
+    "artifacts/phase3-remediation/independent-review/coverage.json": {
+      "sha256": "e743c4246a37b05f6c16dbb65ef4e5d13ade4706142dc7bd33865e3bcea9169f",
+      "bytes": 36435
+    },
+    "artifacts/phase3-remediation/independent-review/coverage.py": {
+      "sha256": "8c1ef2eddd3a2beb0e2dbc33d2e0279a0d8af336fe23ee6b2267d9164f5c51fd",
+      "bytes": 2555
+    },
+    "artifacts/phase3-remediation/independent-review/credential-check.json": {
+      "sha256": "e45b8bd26e4a296336c10862f701ea0d591314cb8c940545020a602b99e0acd8",
+      "bytes": 151
+    },
+    "artifacts/phase3-remediation/independent-review/exit_probe.json": {
+      "sha256": "60fae7db7cf6aa6796a2890502c0a0e61678d3dd57c20f11004e3853ae1d271b",
+      "bytes": 2329
+    },
+    "artifacts/phase3-remediation/independent-review/exit_probe.log": {
+      "sha256": "897a06165a828c188a03fe6a4dfc87b1d403b7aaf2e9aacef5bfa35cba61bfa7",
+      "bytes": 2330
+    },
+    "artifacts/phase3-remediation/independent-review/exit_probe.py": {
+      "sha256": "a6109ca043f486e01245973e333533f11e01d9286d4bc6f306521e0639387947",
+      "bytes": 2296
+    },
+    "artifacts/phase3-remediation/independent-review/external-round-2.log": {
+      "sha256": "03f21f68a39b5639f89061ef90f78e40d04f23187136fe7c49aa5343dfea602e",
+      "bytes": 32
+    },
+    "artifacts/phase3-remediation/independent-review/final-snapshot.json": {
+      "sha256": "019c8e304e338be8aa8da91e94f7e8c6bffb8cfc5c50e76558e80559a9b03617",
+      "bytes": 476
+    },
+    "artifacts/phase3-remediation/independent-review/final_snapshot.py": {
+      "sha256": "a94575d2932b98db76df2ab8feaaffa106ae053297fb1ef6c890be73383d4cb9",
+      "bytes": 1870
+    },
+    "artifacts/phase3-remediation/independent-review/findings.json": {
+      "sha256": "e868ea2c6dd3abf2957dfa0178c7a851a8d763f268b46198251819f3664ad4d8",
+      "bytes": 1475
+    },
+    "artifacts/phase3-remediation/independent-review/hung_exit_probe.json": {
+      "sha256": "ac780d137a943e915b5a162ff022630d90b398250cf0eeeca316a7e0aae470c6",
+      "bytes": 4224
+    },
+    "artifacts/phase3-remediation/independent-review/hung_exit_probe.py": {
+      "sha256": "b41f2e07abc71ac67c32f5d01c817278d5c11e6cc3c19b3312369308be0a44ba",
+      "bytes": 2092
+    },
+    "artifacts/phase3-remediation/independent-review/initial.json": {
+      "sha256": "4f5edd2ea37e1bc325f0e5d58aaf58570377eaeed3f0912797a006435bcc154e",
+      "bytes": 231
+    },
+    "artifacts/phase3-remediation/independent-review/integrity.json": {
+      "sha256": "19b14c93d542fec4fd1673d014dc69ec21340a081cd8cdd9e81ef35c565783ae",
+      "bytes": 19376
+    },
+    "artifacts/phase3-remediation/independent-review/integrity.log": {
+      "sha256": "25a82212368c5bc6c066e462bc4273aa9443b9352d9f1bd75edcceb1a232a855",
+      "bytes": 621
+    },
+    "artifacts/phase3-remediation/independent-review/integrity.py": {
+      "sha256": "990a72d4888cae85bbfba02938f9f4b619052ca018cad734c2c507a3d96fb280",
+      "bytes": 2589
+    },
+    "artifacts/phase3-remediation/independent-review/other-physics-phase2-regression.json": {
+      "sha256": "142d2ff4114087a61c64b1991e6037a5dc0a7760d82b02edc9e0eb6a7af61f72",
+      "bytes": 5871
+    },
+    "artifacts/phase3-remediation/independent-review/persistence_probe.json": {
+      "sha256": "bc333c5a39f8656710646a9359fc2f1aa48faf3c841bfced11bb7fceecf8d75f",
+      "bytes": 377
+    },
+    "artifacts/phase3-remediation/independent-review/persistence_probe.py": {
+      "sha256": "e3e66bb2507c714547225fb511bde937bdb2c9ea5193da53a2a31e840f9ad700",
+      "bytes": 3411
+    },
+    "artifacts/phase3-remediation/independent-review/physical.json": {
+      "sha256": "5ab394ce8851666af4fb5f34d1c1c8a76c60347fb6f1f3c8a91d9f02b8de1a09",
+      "bytes": 604178
+    },
+    "artifacts/phase3-remediation/independent-review/physical.py": {
+      "sha256": "1f443412423a9de907daaa64bcf18055d5f2fd83e24a4f198017d6a277ac0d1e",
+      "bytes": 4565
+    },
+    "artifacts/phase3-remediation/independent-review/physics-phase2-regression.json": {
+      "sha256": "c0b8eceb860147bb68ff3285cba7647945df47d1a6d4a8331f9c09b826e731ad",
+      "bytes": 2199
+    },
+    "artifacts/phase3-remediation/independent-review/regression-other-physics.log": {
+      "sha256": "1057fe860de9cf461356570d7d5a1f60205e90d9c4d785396d0e3e442fb4e7c5",
+      "bytes": 5872
+    },
+    "artifacts/phase3-remediation/independent-review/regression-other-physics.py": {
+      "sha256": "3d929b90207ab84950bc7ede90d4a5fb86019274abb749b26a0ba93747071add",
+      "bytes": 2905
+    },
+    "artifacts/phase3-remediation/independent-review/regression-physics.log": {
+      "sha256": "54c44ea6d8cecb3fa48ab5b1755ddbcf6dc3f2b663f374ca2652a0c816794985",
+      "bytes": 2200
+    },
+    "artifacts/phase3-remediation/independent-review/regression-physics.py": {
+      "sha256": "d16e69d3fe6455af8c0ad2484c5633ac89b422a0837b67476cfee1b548d1a589",
+      "bytes": 4231
+    },
+    "artifacts/phase3-remediation/independent-review/resources.json": {
+      "sha256": "6042a26f7ec4df2eaecdd20af186257a9d36e455920a469a3475cec50869a310",
+      "bytes": 12318
+    },
+    "artifacts/phase3-remediation/independent-review/resources.py": {
+      "sha256": "4226b1b323a79766aafdf51d67244bc0cdcaef11066bb165c6057551a668b614",
+      "bytes": 2461
+    },
+    "artifacts/phase3-remediation/independent-review/restart-after.json": {
+      "sha256": "5bfc4d30f33f672add1082431839bfd65253a067a9ccf4699caffafca914757b",
+      "bytes": 1154
+    },
+    "artifacts/phase3-remediation/independent-review/restart-before.json": {
+      "sha256": "7581581f2bc746ed77bf207eb1e9888fcb677fbfd7678ce80f0e6e478ae42d98",
+      "bytes": 1155
+    },
+    "artifacts/phase3-remediation/independent-review/restart_child.py": {
+      "sha256": "16e7c00c888d293ea6617e345846c7e213a5656cd110ab37e3f2be4b7c4cbbf1",
+      "bytes": 906
+    },
+    "artifacts/phase3-remediation/independent-review/restart_probe.json": {
+      "sha256": "c55435f227bb8021a5b7f5991716a16c038d5df0b86b2faaef2f3b0624035b0d",
+      "bytes": 651
+    },
+    "artifacts/phase3-remediation/independent-review/restart_probe.py": {
+      "sha256": "88dd6a3647f331acffc25a7d0458a842375e87ce3a6efae71f93b1642cef7ebf",
+      "bytes": 2047
+    },
+    "artifacts/phase3-remediation/independent-review/review-manifest.json": {
+      "sha256": "fb40d0eb97dd34a0781549f7adbcd6804b7c87e60b2bdfa65d54fca9b4c44da5",
+      "bytes": 613
+    },
+    "artifacts/phase3-remediation/independent-review/reviewer-interruption.json": {
+      "sha256": "ded914f71a801eb6e03dfdfe8124c8c8ba8b2cf321988fb969abe87a290f4b95",
+      "bytes": 411
+    },
+    "artifacts/phase3-remediation/independent-review/ros-real-service/fault-done.json": {
+      "sha256": "f0b1a2e1333fe7fab5a01237584dcc8de0c35a9a672853f2e1885d65cd14dc46",
+      "bytes": 42
+    },
+    "artifacts/phase3-remediation/independent-review/ros-real-service/fault-started.json": {
+      "sha256": "5aa2c29903cd7818f12e1172eb5ea910beb20a395cdcc20d8f05cd278783ced7",
+      "bytes": 41
+    },
+    "artifacts/phase3-remediation/independent-review/ros-real-service/normal-done.json": {
+      "sha256": "8df52cc9610f648c99087885a1745bd35c2ec8d41db2b71c2150f645bdcac45a",
+      "bytes": 42
+    },
+    "artifacts/phase3-remediation/independent-review/ros-real-service/normal-started.json": {
+      "sha256": "e80e299e59c0944bf2a8c4b8adb174be0e82d8a9475338d7aee90dc779903645",
+      "bytes": 41
+    },
+    "artifacts/phase3-remediation/independent-review/ros-real-service/ready.json": {
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "bytes": 2
+    },
+    "artifacts/phase3-remediation/independent-review/ros-real-service/server.log": {
+      "sha256": "81a1d001416439626aa43f2af46ce198771a3f14f18e2ef2d2940f1473f291e1",
+      "bytes": 102
+    },
+    "artifacts/phase3-remediation/independent-review/ros_exception_probe.json": {
+      "sha256": "9de32652bcddfc964dee4dcc9b5c6527c31967d1e04ffdf82a253b5c44b68a7a",
+      "bytes": 1143
+    },
+    "artifacts/phase3-remediation/independent-review/ros_exception_probe.py": {
+      "sha256": "2f477fe20e8f5eebe0241e3297cd2db94d45aab9c57ef575bb913aab114dec1c",
+      "bytes": 3582
+    },
+    "artifacts/phase3-remediation/independent-review/ros_real_probe.json": {
+      "sha256": "50951940f659135ac6589e873d7790de0549d01725a7a7271e95c4ebc4d2cfe2",
+      "bytes": 3863
+    },
+    "artifacts/phase3-remediation/independent-review/ros_real_probe.py": {
+      "sha256": "ef8713f70990a35269540bdf7bce5e6c46d9aafb1d6489896c1361ff3efbcc28",
+      "bytes": 3655
+    },
+    "artifacts/phase3-remediation/independent-review/ros_service_fault_worker.py": {
+      "sha256": "4b21ea16fda03d5eafd96b25e43a1a431452e4872ff52fd8d623d1439bb2511f",
+      "bytes": 589
+    },
+    "artifacts/phase3-remediation/independent-review/ros_service_server.py": {
+      "sha256": "69031c0fa359cfec5a86f30635c3a863d499c305788c2b612688a1bf9ad612c7",
+      "bytes": 1013
+    },
+    "artifacts/phase3-remediation/independent-review/runtime_probe.json": {
+      "sha256": "bfaaa305c6ed8f2ad0f460e61a1855430b793e7464c92951d06614416ef49487",
+      "bytes": 385
+    },
+    "artifacts/phase3-remediation/independent-review/runtime_probe.py": {
+      "sha256": "1ece52157ae6f86aca6db6b3dd436fcde9a4cad8308eebaf85967f0020f08fe3",
+      "bytes": 3346
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/1_copter_actions.log": {
+      "sha256": "03f21f68a39b5639f89061ef90f78e40d04f23187136fe7c49aa5343dfea602e",
+      "bytes": 32
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/1_copter_faults.log": {
+      "sha256": "03f21f68a39b5639f89061ef90f78e40d04f23187136fe7c49aa5343dfea602e",
+      "bytes": 32
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/1_external.log": {
+      "sha256": "03f21f68a39b5639f89061ef90f78e40d04f23187136fe7c49aa5343dfea602e",
+      "bytes": 32
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/1_plane_actions.log": {
+      "sha256": "03f21f68a39b5639f89061ef90f78e40d04f23187136fe7c49aa5343dfea602e",
+      "bytes": 32
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/1_plane_faults.log": {
+      "sha256": "03f21f68a39b5639f89061ef90f78e40d04f23187136fe7c49aa5343dfea602e",
+      "bytes": 32
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/1_rover_actions.log": {
+      "sha256": "03f21f68a39b5639f89061ef90f78e40d04f23187136fe7c49aa5343dfea602e",
+      "bytes": 32
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/1_rover_faults.log": {
+      "sha256": "03f21f68a39b5639f89061ef90f78e40d04f23187136fe7c49aa5343dfea602e",
+      "bytes": 32
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/2_rover_actions.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/copter-actions/application-rx.jsonl": {
+      "sha256": "10eed31e84901983a28abe1261743e8f89f1d8ff0dcdef38561f1598e25d81b1",
+      "bytes": 5890451
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/copter-actions/gazebo.log": {
+      "sha256": "856bd9fcbc9d82955cde76dc9c40350eddf0c0ed1f413c65fb327ca2bdd2e917",
+      "bytes": 11404
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/copter-actions/http-audit.jsonl": {
+      "sha256": "b4bf3b34e00a882418fe6b928f2ef70cb5fa38dfc0cb0f2551c23fee79c73b4c",
+      "bytes": 3584
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/copter-actions/manifest.json": {
+      "sha256": "ff25bce6a322f20ffb40fdba6cac362c15ef2407693479df98b28a785af9c2a4",
+      "bytes": 5534
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/copter-actions/model.sdf": {
+      "sha256": "c23f4ddba8da8e6327ffd333718c130060c6e6a9625f420afb211afda9857e94",
+      "bytes": 10312
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/copter-actions/proxy.jsonl": {
+      "sha256": "4ab498b333caa636c97134622de06606c4635998c3c07af32d9a917cbf7ec7cf",
+      "bytes": 17758907
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/copter-actions/runtime.jsonl": {
+      "sha256": "40c73bf024f7e8786440d3c5e01e2476405e3bfd22ba8c1a76e8af6ce34b47b9",
+      "bytes": 2253089
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/copter-actions/signing-support.json": {
+      "sha256": "ac194985a4476070c4f3b8655b40735ceedb584c4f0db027fa9e645eb1ce049d",
+      "bytes": 1326
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/copter-actions/sitl.log": {
+      "sha256": "271829946233795ff9eb6e36c1fc9b6dc83e13c8346b044a3582e58aeaf68b60",
+      "bytes": 1625
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/copter-actions/summary.json": {
+      "sha256": "5716d41551751565706685eca143e7f91aedaccae51a37f0b4f140fff8d8d72a",
+      "bytes": 380254
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/copter-actions/trajectory.jsonl": {
+      "sha256": "edb3453be6c367ba166caaa18328071863b2d8aed62d8c59c4ba557dd81062a2",
+      "bytes": 374425
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/copter-actions/world.sdf": {
+      "sha256": "95d905e0d8122f37f53b8825869156a97e03d97abe2c04ca3702b84a9f20b16c",
+      "bytes": 3579
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/copter-faults/application-rx.jsonl": {
+      "sha256": "978077397d1f0a50f61f3fad091cbc8b277e48e47ad2d887242a297d88b435c6",
+      "bytes": 2485950
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/copter-faults/gazebo.log": {
+      "sha256": "d776e01de7d343a2b85907babbc6422bd8823869ce17c535389e2da7a846ecf8",
+      "bytes": 11318
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/copter-faults/http-audit.jsonl": {
+      "sha256": "36e0b0179ff9c8020a3cb5a33a05d582e5fdc64b2701c804c8dd48aad27772a4",
+      "bytes": 1865
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/copter-faults/manifest.json": {
+      "sha256": "9cf44ed92e88957ecd47cb3910416c772a3d0b1e32bbdf1555138db300384d96",
+      "bytes": 5530
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/copter-faults/model.sdf": {
+      "sha256": "c23f4ddba8da8e6327ffd333718c130060c6e6a9625f420afb211afda9857e94",
+      "bytes": 10312
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/copter-faults/proxy.jsonl": {
+      "sha256": "bf8ee854dc70ec04e191dcd9cde9c486340f8c7ac5e48ad6df6abde0cbd19813",
+      "bytes": 7598633
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/copter-faults/runtime.jsonl": {
+      "sha256": "e32e6df83b0d537a1f070335884d2f00b49fc2ccd3cf85dd1b6389f3b1862f1b",
+      "bytes": 902470
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/copter-faults/signing-support.json": {
+      "sha256": "cc3675249b2f6c27ed0a9a0435460725c7376be9a066b85c191e5ab80ba298ee",
+      "bytes": 1326
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/copter-faults/sitl.log": {
+      "sha256": "8fece53c347789ba8a1fa34ba42842e45ad6193dc846f11a4651ce26c29614d8",
+      "bytes": 1575
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/copter-faults/summary.json": {
+      "sha256": "853daf56685921a464010509383ae709a9c0f7ce2f23137f5a0c4fea1101307c",
+      "bytes": 140511
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/copter-faults/trajectory.jsonl": {
+      "sha256": "1346577944ff1d5f0568c81d4eb0d1344b26273c6364445df66912124fa85ce2",
+      "bytes": 181400
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/copter-faults/world.sdf": {
+      "sha256": "16304bd30473814759862858776504414102563997a17c2c6bfbd32de1af3ce8",
+      "bytes": 3578
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/external/ros-server.log": {
+      "sha256": "52fdd7220653b7659e70662f4a804fc9be33c1cb65035b5b3f59466b4769267f",
+      "bytes": 16
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/external/runtime.jsonl": {
+      "sha256": "0ad268e47163a198751ba4d843314763b1c8ac02f195494de4222d8eb676a64e",
+      "bytes": 9503
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/external/summary.json": {
+      "sha256": "f7a0bb8953e1ffbda801e8ed6fcd7ea5c7d328195afba2166b87b19d380bd3cb",
+      "bytes": 35939
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/plane-actions/application-rx.jsonl": {
+      "sha256": "1d18af9e1ef8207207bd8e8b4809c66d1b6b0f9b5b047fa5ebea6767c0eb1043",
+      "bytes": 11461039
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/plane-actions/gazebo.log": {
+      "sha256": "6f0ff271b47993cdeb1002d1439e46c5541700fc66bab2a3d999681c5af8dba6",
+      "bytes": 4687
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/plane-actions/http-audit.jsonl": {
+      "sha256": "472c98b132d0720d54e6d89b2e99a47769a4a6d5e537b19219371ec6229563fe",
+      "bytes": 1573
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/plane-actions/manifest.json": {
+      "sha256": "3c78129c6ac0df263bb764f64b655206f7eca3714e808fea50e9996b53cf71b7",
+      "bytes": 5621
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/plane-actions/model.sdf": {
+      "sha256": "ca79bea85e53abedee85bfb10aafc87be462ee2020ba27bae251f4b42a94ba5f",
+      "bytes": 18449
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/plane-actions/proxy.jsonl": {
+      "sha256": "b3b188ed7e40b8342e86e58787b29961542244a74495eeb998485b52c690be86",
+      "bytes": 34904276
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/plane-actions/runtime.jsonl": {
+      "sha256": "00393a436fa0a3e9478305ee00cc6c87e768335e6df4b4efc2287f2c65e220a9",
+      "bytes": 3382810
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/plane-actions/signing-support.json": {
+      "sha256": "80cba0f97e51392d1a786e59409ecb696d11423373a074052358227ccd506cb9",
+      "bytes": 1328
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/plane-actions/sitl.log": {
+      "sha256": "d280452b6dd963adcd565cfdaa50240379b0968055ab13cceabbcf85db1e09ba",
+      "bytes": 1607
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/plane-actions/summary.json": {
+      "sha256": "f4bd068ad167ebfa825664bfa31d8b5e875e1d2d99357dad6bef388a35c10e4b",
+      "bytes": 162818
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/plane-actions/trajectory.jsonl": {
+      "sha256": "84e8a3557500b90ef4cda8d50e8817d4dc7c2d5f202cb0bdc831bb3df6529c26",
+      "bytes": 610089
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/plane-actions/world.sdf": {
+      "sha256": "c2fe6f4b76a6a877ce0de4faf5501cc1e8dd6c2afce087cf99ba09ccd3e91401",
+      "bytes": 2440
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/plane-faults/application-rx.jsonl": {
+      "sha256": "286b3f0db3ee651f01c1156a2a4313a1554eb592f7fe52500ea140d064e9af45",
+      "bytes": 2172300
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/plane-faults/gazebo.log": {
+      "sha256": "4c1994a55ebfe6c05513631bcb87470570d0e8f05716ce58e6665eec2b90f671",
+      "bytes": 4430
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/plane-faults/http-audit.jsonl": {
+      "sha256": "12775d924b9379aa3f0dc5d569b358087ea573807360bcbaeec3ae5c9cdbd90d",
+      "bytes": 1147
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/plane-faults/manifest.json": {
+      "sha256": "0fa53d407bc6a7f50d55d828808048b7f28946340a736859d388d9b699003fd2",
+      "bytes": 5616
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/plane-faults/model.sdf": {
+      "sha256": "ca79bea85e53abedee85bfb10aafc87be462ee2020ba27bae251f4b42a94ba5f",
+      "bytes": 18449
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/plane-faults/proxy.jsonl": {
+      "sha256": "7e44b31b755daf8d195d5a935bc380568b0af45545e9491d5d4dcbeeb0ee6741",
+      "bytes": 6671655
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/plane-faults/runtime.jsonl": {
+      "sha256": "2bdb62c7f6fb2f1002aba364f47d4e6a4c9e021eec5e82d82f4761bb6ebb6af1",
+      "bytes": 645883
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/plane-faults/signing-support.json": {
+      "sha256": "0c670da03042c1c6f12d7de95798a522ba5aa99d17441fea8e8f68b2bb9dee91",
+      "bytes": 1328
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/plane-faults/sitl.log": {
+      "sha256": "282e98d5220f76d33de7768dcfb26d8eb8344872b65ff3c35bb56cfd3a2c3546",
+      "bytes": 1387
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/plane-faults/summary.json": {
+      "sha256": "692b231e9a59e4474e5661c8d1bf0e6cf902c4bc58c064950a99c7704cc23dcd",
+      "bytes": 89980
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/plane-faults/trajectory.jsonl": {
+      "sha256": "00f444fe31893c468f7185ddf35d2e628a83bd1694a81f42d11947b141d73478",
+      "bytes": 129004
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/plane-faults/world.sdf": {
+      "sha256": "8ce8c80d8f26efa1ccb47d61bb5a57f30950904b999a13bede156e4622f28a69",
+      "bytes": 2439
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/rover-actions/action-lab.png": {
+      "sha256": "0b8c7acca5dcda4c1ef9494805404bf245691dfbcc460442c5cc0613dd4f360c",
+      "bytes": 206772
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/rover-actions/application-rx.jsonl": {
+      "sha256": "63c57b4ea7ae5701093e8dab08136ab20045f911bf1d583345a997f6a8baa7bc",
+      "bytes": 1415045
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/rover-actions/gazebo.log": {
+      "sha256": "9ee66ffff979e275e61ee6aa4677c1f0961ff589fad80097880a4f02b6e4a663",
+      "bytes": 4043
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/rover-actions/http-audit.jsonl": {
+      "sha256": "2464331310124e21d1b58253976f732bd149c8db44506444ea6580d38dfa4628",
+      "bytes": 3876
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/rover-actions/manifest.json": {
+      "sha256": "dbd1b2871c0dee40906be35873edef92ded35745d6559166ac5b56d257f5cdf3",
+      "bytes": 5815
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/rover-actions/model.sdf": {
+      "sha256": "53c32fdc91ebbceecee1c0a72abfac86fd02e97bc241a4b17a927049ebdb40b6",
+      "bytes": 8025
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/rover-actions/proxy.jsonl": {
+      "sha256": "a0f195905546860a4e069e6b06f440f07f9e4e44bd972688d60d310cf84c7aed",
+      "bytes": 4451545
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/rover-actions/runtime.jsonl": {
+      "sha256": "ed74072d2f7e69a54cfca1a444e9ebb6587e767f3b8c8ece93040bf4e8b82a0c",
+      "bytes": 951297
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/rover-actions/signing-support.json": {
+      "sha256": "19650f8c1cfc59faa505bbcb8ffe04dc6aa2738aed10fbbed28583e20f8bcc57",
+      "bytes": 1330
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/rover-actions/sitl.log": {
+      "sha256": "fc30c5761d900c5e41e934de151537804fa2bb722b16555e65edc3cd57d3430c",
+      "bytes": 1180
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/rover-actions/summary.json": {
+      "sha256": "cf172dc2054cdb6c1f051f7c0dc39aff9b5ea3070661a9631405d2e8f2a24ebc",
+      "bytes": 366121
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/rover-actions/trajectory.jsonl": {
+      "sha256": "75ed948d7f8d9f2b182c872169644c6b97536d0c57fa4f6b9ae3c18ceab8fbb2",
+      "bytes": 414642
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/rover-actions/world.sdf": {
+      "sha256": "7e6d995aaeb67a1de78c3dad5af25f59c44f92eb3bed02664cd927bbfee367c0",
+      "bytes": 1561
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/rover-faults/application-rx.jsonl": {
+      "sha256": "658375878db7b9a10c01512d1493cf2a51f7c45efcf97b6f83dfcf34b9c29e0e",
+      "bytes": 604579
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/rover-faults/gazebo.log": {
+      "sha256": "a2fb07e2d1923b53eda43fc47220b8f1168ebf173f67cdea04ff8fbbe4a65168",
+      "bytes": 3957
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/rover-faults/http-audit.jsonl": {
+      "sha256": "071f14af5fcd16258a7cdc0a36f76d222c9a5c1f49f29eace1ba4828423cfd60",
+      "bytes": 2008
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/rover-faults/manifest.json": {
+      "sha256": "5ca6027cbe06d29da8f27a0cf7ddbb8a108d2ee3aee1e3932dcf6aa6265cbce7",
+      "bytes": 5811
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/rover-faults/model.sdf": {
+      "sha256": "53c32fdc91ebbceecee1c0a72abfac86fd02e97bc241a4b17a927049ebdb40b6",
+      "bytes": 8025
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/rover-faults/proxy.jsonl": {
+      "sha256": "5bffa16138565c864451f6ff6171f8b8c810cc311c5cba2ae801bd3b2d9ef1f5",
+      "bytes": 1882675
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/rover-faults/runtime.jsonl": {
+      "sha256": "519110d540627df26976da3b98bbf7835cebc0e271f7670772a6815412c31b2e",
+      "bytes": 366091
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/rover-faults/signing-support.json": {
+      "sha256": "e2f403a570864f7549dea6addbcbf49ceaa549a47c88284d8524c3b178edd463",
+      "bytes": 1330
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/rover-faults/sitl.log": {
+      "sha256": "fc30c5761d900c5e41e934de151537804fa2bb722b16555e65edc3cd57d3430c",
+      "bytes": 1180
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/rover-faults/summary.json": {
+      "sha256": "025325221bf186bea44fbe85d775974cde75cf960749031d140d690a19eea2c3",
+      "bytes": 133408
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/rover-faults/trajectory.jsonl": {
+      "sha256": "bec964ac07c4963a196b638b755a4debf67a2407dd2aebc87e7c06d6b20e69c8",
+      "bytes": 177486
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/round-1-9f953caf/rover-faults/world.sdf": {
+      "sha256": "c647cbac11f16e8e759155f5842e74de20c5cf2555c47a4605d823eda6d9adfd",
+      "bytes": 1560
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/stages.json": {
+      "sha256": "acc2768367fb2074d56b856ba7800399f4d66dac3ab36bdc61effbc4d49b68ee",
+      "bytes": 5925
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/summary.json": {
+      "sha256": "1a1eb9d470bc9b04e877860d27f8f6eab8b8766fd391d5e485642c24ff647f67",
+      "bytes": 7386
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/unit.json": {
+      "sha256": "2da37a8e87db667ee70c4a74ae15f01ad80e87b79b72096d87ec1738651513d7",
+      "bytes": 84
+    },
+    "artifacts/phase3-remediation/independent-review/simulation/unit.log": {
+      "sha256": "49512bdaeecd9b628b9070b85db3760f9fab42271f3d06cae6a47772b71148d6",
+      "bytes": 567
+    },
+    "artifacts/phase3-remediation/independent-review/suite.log": {
+      "sha256": "9345ea67d2aa274de61e1dcdbecc485aa41b7b6f6ccf2c6614402984061fa76e",
+      "bytes": 340
+    },
+    "artifacts/phase3-remediation/independent-review/wheel-dependencies.log": {
+      "sha256": "11715791f476c0d6a44aebeac817a451425973ed4f1a8c952903db50abb735b8",
+      "bytes": 1054
+    },
+    "artifacts/phase3-remediation/independent-review/wheel-entrypoint.log": {
+      "sha256": "92da5d51772d26de3226701893d46121938adbc1d78fa9458ede28dcdd3d6f18",
+      "bytes": 647
+    },
+    "artifacts/phase3-remediation/independent-review/wheel-install.log": {
+      "sha256": "f9465215d6b67f87c9d77763879dee423d48d7a7ec02bf68f73278955583d702",
+      "bytes": 186
+    },
+    "artifacts/phase3-remediation/independent-review/wheel.json": {
+      "sha256": "cc599f9dedd0118efddd2d6201ba4c7353ac47b2fb834ca7deae8c68837a228b",
+      "bytes": 487
+    },
+    "artifacts/phase3-remediation/independent-review/wheel_check.py": {
+      "sha256": "d06f24c51763d6a17ec1ea73b8587baca11deef0abccb78cad699b8d397ed9f2",
+      "bytes": 2028
+    },
+    "artifacts/phase3-remediation/independent-review/wire-acceptance-047beba-1.json": {
+      "sha256": "ffa56ad7b31be4fcf5614ea3fcc4a7ff8bfc180216b8ee989c608e6185184fd7",
+      "bytes": 32182
+    },
+    "artifacts/phase3-remediation/independent-review/wire-history.log": {
+      "sha256": "88e4cb8612e898ee13b128b206778596256a87bfaf67e87e7dfc4be1015857aa",
+      "bytes": 149
+    },
+    "artifacts/phase3-remediation/independent-review/wire-new.log": {
+      "sha256": "fc1980490381ce6effb909412ded89cbfdc28661d331f750f8c1ddddeee34319",
+      "bytes": 147
+    },
+    "artifacts/phase3-remediation/independent-review/wire-simulation.json": {
+      "sha256": "4309448a1af42bdc33897effcbae52e6caa9d9917368f4451fb93f6cb0203d7f",
+      "bytes": 7919
+    },
+    "artifacts/phase3-remediation/independent-review/wire.py": {
+      "sha256": "4632851c14b3aa46c8eb3c112247c6821219a78ec5b459b8616e38a87d191059",
+      "bytes": 501
+    },
+    "artifacts/phase3-remediation/independent-review/writer-proxy.json": {
+      "sha256": "e7f0b577c3f3759407fd5dc7285c88403cb8c4ba3e289dd81bbc79704d479482",
+      "bytes": 4890
+    },
+    "artifacts/phase3-remediation/pre-freeze-external/api-before-id/.vaf-resource-bb75a5383bda4cee5519b329d6f705762bc4c06469cd07d058afc0fbeb7c4c9d.anchor": {
+      "sha256": "315aa52b2294d3a17e5ea13d620a3ec692252d553e2ccbc159b3a4fac45d201e",
+      "bytes": 312
+    },
+    "artifacts/phase3-remediation/pre-freeze-external/api-before-id/concurrent.json": {
+      "sha256": "6939283f96296c902afda38ff31aaf6c796a51b42204d0e95f3a3f2b1de70e8d",
+      "bytes": 1368
+    },
+    "artifacts/phase3-remediation/pre-freeze-external/api-before-id/concurrent.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/pre-freeze-external/api-before-id/first.json": {
+      "sha256": "ca6dd02aea067548108246083ea5f1365d8943c3ae288c79c2791cf2296dc80a",
+      "bytes": 1290
+    },
+    "artifacts/phase3-remediation/pre-freeze-external/api-before-id/first.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/pre-freeze-external/api-before-id/positive.json": {
+      "sha256": "0d890e6ccc4178a20b8b06e0cc31cb790daee8bf7f08dda86be2878b03415423",
+      "bytes": 1817
+    },
+    "artifacts/phase3-remediation/pre-freeze-external/api-before-id/positive.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/pre-freeze-external/api-before-id/resource-state/claims.json": {
+      "sha256": "edc2583e3234d65294bfc435d880392571a268f1caf7a595f1a83de2e3549e1d",
+      "bytes": 114
+    },
+    "artifacts/phase3-remediation/pre-freeze-external/api-before-id/resource-state/owner.lock": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/pre-freeze-external/api-before-id/restart.json": {
+      "sha256": "8cf5f1fb491d0393b9fd8bfd86f30a0dee149f2be4460d81ab87ab1927a0328f",
+      "bytes": 1384
+    },
+    "artifacts/phase3-remediation/pre-freeze-external/api-before-id/restart.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/pre-freeze-external/api-known/.vaf-resource-4b07f7acf5af9730d1d2c8d4e7b99455b4ce640ccb4f4ea33da3671c0f7f497d.anchor": {
+      "sha256": "62cfb4de4eaeb2d0949def24ce827f786c024c18c2ac25e9d9b796a60e920e29",
+      "bytes": 308
+    },
+    "artifacts/phase3-remediation/pre-freeze-external/api-known/concurrent.json": {
+      "sha256": "1d9b4f31aff403026caa19fc133dc82f6b81bb59bcfac5f652f5c1b3a29c957e",
+      "bytes": 1398
+    },
+    "artifacts/phase3-remediation/pre-freeze-external/api-known/concurrent.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/pre-freeze-external/api-known/first.json": {
+      "sha256": "4903512b0cc24788fa1e7e0f59b4878bcaffdef4aa3061020d31395fd87191be",
+      "bytes": 1394
+    },
+    "artifacts/phase3-remediation/pre-freeze-external/api-known/first.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/pre-freeze-external/api-known/positive.json": {
+      "sha256": "ee65aeaaae1a8b2a98ad4ebed90a8ab12bfbbe837bb7df87c01687b80ed7ddbd",
+      "bytes": 1814
+    },
+    "artifacts/phase3-remediation/pre-freeze-external/api-known/positive.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/pre-freeze-external/api-known/resource-state/claims.json": {
+      "sha256": "edc2583e3234d65294bfc435d880392571a268f1caf7a595f1a83de2e3549e1d",
+      "bytes": 114
+    },
+    "artifacts/phase3-remediation/pre-freeze-external/api-known/resource-state/owner.lock": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/pre-freeze-external/api-known/restart.json": {
+      "sha256": "a724746bf29026c775c94ffd072f93507a65d27fa19a7f9dd2bf150fcc572ff1",
+      "bytes": 1414
+    },
+    "artifacts/phase3-remediation/pre-freeze-external/api-known/restart.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/pre-freeze-external/ros-service/.vaf-resource-b5114bf01f0b8c9b8c1853c576f2af143ff02ba3c1ca58192bb005bdcb90d8f7.anchor": {
+      "sha256": "4f6b77d96b2d972e0d9c314a954b8a84e23673fe3870c6efd5f1df0493edda40",
+      "bytes": 322
+    },
+    "artifacts/phase3-remediation/pre-freeze-external/ros-service/error-done.json": {
+      "sha256": "ce284444a1e227bb326eac1ea2dc705c9a0f8b36eaf7ddaf8302fe116e204768",
+      "bytes": 126
+    },
+    "artifacts/phase3-remediation/pre-freeze-external/ros-service/error-started.json": {
+      "sha256": "364be82616fa7a51bdfb635206eb8a8ab4e36d7825235d3ad40740da11e92604",
+      "bytes": 108
+    },
+    "artifacts/phase3-remediation/pre-freeze-external/ros-service/fault-done.json": {
+      "sha256": "00aee56dcd75cb173e37cb7de63fc22ae1e2475b33e63d2a697d2c694d80790e",
+      "bytes": 126
+    },
+    "artifacts/phase3-remediation/pre-freeze-external/ros-service/fault-started.json": {
+      "sha256": "81a8934e9a9c5bf8b87c8358e9bde3a92cbea57f09e3fdb129fdd63186e572a7",
+      "bytes": 108
+    },
+    "artifacts/phase3-remediation/pre-freeze-external/ros-service/normal-done.json": {
+      "sha256": "66ce4a364dacf82270cb5b784a48ad708813e52b59c5358c4830f5abe4721475",
+      "bytes": 126
+    },
+    "artifacts/phase3-remediation/pre-freeze-external/ros-service/normal-started.json": {
+      "sha256": "f94ce1716b4fadd10233d49b564b3c6cdb7c1c9245c8cd7722262179b0d1d068",
+      "bytes": 108
+    },
+    "artifacts/phase3-remediation/pre-freeze-external/ros-service/ready.json": {
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "bytes": 2
+    },
+    "artifacts/phase3-remediation/pre-freeze-external/ros-service/resource-state/claims.json": {
+      "sha256": "edc2583e3234d65294bfc435d880392571a268f1caf7a595f1a83de2e3549e1d",
+      "bytes": 114
+    },
+    "artifacts/phase3-remediation/pre-freeze-external/ros-service/resource-state/owner.lock": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/pre-freeze-external/ros-service/server.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/phase3-remediation/pre-freeze-external/summary.json": {
+      "sha256": "f7ac70651ac6d6e415d1a44184df0b7f299222cfbbc2d0f5bf98bea511519ff1",
+      "bytes": 14410
+    },
+    "artifacts/phase3-remediation/pre-freeze-external.log": {
+      "sha256": "03f21f68a39b5639f89061ef90f78e40d04f23187136fe7c49aa5343dfea602e",
+      "bytes": 32
+    },
+    "artifacts/phase3-remediation/pre-freeze-unit.log": {
+      "sha256": "be907f37a0713b5146c54a09c4fce6249b553c8de1cb23f8fdfd69a100851a48",
+      "bytes": 80089
+    },
+    "artifacts/phase3-remediation/readback-fence-unit.log": {
+      "sha256": "c2b24281ad2490e5b46bf505a331596825e571a02c5edc17aecc508150739ba6",
+      "bytes": 80299
+    },
+    "artifacts/phase3-remediation/report-narrative.md": {
+      "sha256": "5271642b87ac9930830a0e9f2ac394c7fa6f34fbf8535c05ae6254a3db76b5de",
+      "bytes": 12351
+    },
+    "artifacts/phase3-remediation/targeted-1.log": {
+      "sha256": "d8e1047e238411d7d1f5096fc18bb2eda74bb084db3863daa57d0fca66469be1",
+      "bytes": 7186
+    },
+    "artifacts/phase3-remediation/targeted-2.log": {
+      "sha256": "6883c0a6b7f085143c4e1bca04ad97fecf6f0102e201a21fde8c3a363e08d737",
+      "bytes": 5971
+    },
+    "artifacts/phase3-remediation/watermark-1.log": {
+      "sha256": "1cc8fba7dac18aec2b2aa97ebd89cf000011b5559d843f0a2cf163ecadfde150",
+      "bytes": 1124
+    },
+    "artifacts/phase3-remediation/wheel-audit.json": {
+      "sha256": "5d1791c8f129751c9fd549aee569e25bb059e7211f2835dd908b0d3b2486e8ee",
+      "bytes": 279
+    },
+    "artifacts/phase3-remediation/wheel-build.log": {
+      "sha256": "3a71a3932f17a1f58d2110f5a9b971180a3d6b48bf208322f078076a6d838862",
+      "bytes": 691
+    },
+    "artifacts/phase3-remediation/wheel-final/vehicle_autonomy-0.1.0-py3-none-any.whl": {
+      "sha256": "929377c7f351d7802e1365a508898ebb131bce320ddefd3d6ded27add856fcd7",
+      "bytes": 411450
+    },
+    "artifacts/phase3-remediation/wheel-final-build.log": {
+      "sha256": "484006fa53d65e824805e2a9f4c4e6e79aa2feb122f47925825548113391a1c1",
+      "bytes": 691
+    },
+    "artifacts/phase3-remediation/wheel-final-check/check.py": {
+      "sha256": "d722696a0b8ce4d5525c8ba79f48ae95ab3c10f93064cb713278211d32f336d8",
+      "bytes": 3864
+    },
+    "artifacts/phase3-remediation/wheel-final-check/installed-check.log": {
+      "sha256": "313bdcc305120830d562c578b2b7730eea00a435a637f7f0f152eeb616bf1574",
+      "bytes": 517
+    },
+    "artifacts/phase3-remediation/wheel-final-check/ros-server.log": {
+      "sha256": "f44e741ebaa61363435fa31a6e6eac4b9608767b4812011774e86789c33f8127",
+      "bytes": 1086
+    },
+    "artifacts/phase3-remediation/wheel-final-check/summary.json": {
+      "sha256": "b18ce84fba5cdd79a4586c604491e2f75aa70290ba44b2ac99bebc3121085187",
+      "bytes": 536
+    },
+    "artifacts/phase3-remediation/wheel-final-install.log": {
+      "sha256": "690e40e8eb286ebf38e5d3847f61266df1dad37a43164d86ea61cc3e2a679b76",
+      "bytes": 1432
+    },
+    "artifacts/phase3-remediation/wheel-install.log": {
+      "sha256": "76c5f95fd0c50a49544a4cd517cb52046cfba92a4094f40026ec82ee329fb286",
+      "bytes": 1426
+    }
+  }
+}
