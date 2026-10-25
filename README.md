@@ -88,8 +88,11 @@ Registry 生成参数表单，可执行、取消和查询实例、反馈、命�
 的同号 Job 终态。本次使用 HTTP v2 请求/响应身份围栏修复，512 项单元、
 11 项新增真实 HTTP 边界、原 A–K、真实 Rover 混合边界及 ROS/API 回归通过。
 外部 HTTP Provider 必须支持新协议；不支持时拒绝启动，不能退回旧状态查询。
-详见 [HTTP 身份修复报告](docs/PHASE3_HTTP_IDENTITY_FIX_REPORT.md)。本次未重跑
-完整两轮长回归，开发侧状态为 **READY FOR RE-AUDIT**，未批准冻结 Phase 3。
+修复记录见 [HTTP 身份修复报告](docs/PHASE3_HTTP_IDENTITY_FIX_REPORT.md)。随后在
+`43d849fef21bc432eff536a00da43fb13a8c0e25` 上重新完成全部正式两轮验收、
+原 Phase 1/2 回归和 wheel 检查，已按用户授权**冻结受信本机仿真范围**。
+冻结标签 `phase3-frozen` 指向该受测实现；最新冻结说明是后续纯文档提交，见
+[冻结记录](docs/PHASE3_FREEZE_RECORD.md)。历史独立 FAIL 保留，不扩大为实机认证。
 使用方式与安全限制见 [Action Lab 使用说明](docs/phase3/USAGE.md)，
 跨重启认证与资源恢复见 [恢复合同](docs/phase3/INDEPENDENT_REMEDIATION_CONTRACTS.md)，
 混合生命周期和本机身份部署见 [第三轮合同](docs/phase3/ROUND3_LIFECYCLE_AND_IDENTITY.md)。
