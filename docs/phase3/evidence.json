@@ -1,0 +1,1959 @@
+{
+  "tested_commit": "047bebafaf7bdb6f1d44407606200810da4d80e0",
+  "source_sha256": "d7c64b1e77e56c631a846556421cc2695f5bf50bdf39282088fcd5382651d000",
+  "status": "READY FOR RE-AUDIT",
+  "formal_root": "artifacts/phase3-actions/acceptance-047beba-1",
+  "historical_protected_files": 739,
+  "historical_unchanged": true,
+  "credential_bytes_included": false,
+  "files": {
+    "artifacts/phase3-actions/acceptance-047beba-1/1_copter_actions.log": {
+      "bytes": 32,
+      "sha256": "03f21f68a39b5639f89061ef90f78e40d04f23187136fe7c49aa5343dfea602e"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/1_copter_faults.log": {
+      "bytes": 32,
+      "sha256": "03f21f68a39b5639f89061ef90f78e40d04f23187136fe7c49aa5343dfea602e"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/1_external.log": {
+      "bytes": 32,
+      "sha256": "03f21f68a39b5639f89061ef90f78e40d04f23187136fe7c49aa5343dfea602e"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/1_plane_actions.log": {
+      "bytes": 32,
+      "sha256": "03f21f68a39b5639f89061ef90f78e40d04f23187136fe7c49aa5343dfea602e"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/1_plane_faults.log": {
+      "bytes": 32,
+      "sha256": "03f21f68a39b5639f89061ef90f78e40d04f23187136fe7c49aa5343dfea602e"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/1_rover_actions.log": {
+      "bytes": 32,
+      "sha256": "03f21f68a39b5639f89061ef90f78e40d04f23187136fe7c49aa5343dfea602e"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/1_rover_faults.log": {
+      "bytes": 32,
+      "sha256": "03f21f68a39b5639f89061ef90f78e40d04f23187136fe7c49aa5343dfea602e"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/2_copter_actions.log": {
+      "bytes": 32,
+      "sha256": "03f21f68a39b5639f89061ef90f78e40d04f23187136fe7c49aa5343dfea602e"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/2_copter_faults.log": {
+      "bytes": 32,
+      "sha256": "03f21f68a39b5639f89061ef90f78e40d04f23187136fe7c49aa5343dfea602e"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/2_external.log": {
+      "bytes": 32,
+      "sha256": "03f21f68a39b5639f89061ef90f78e40d04f23187136fe7c49aa5343dfea602e"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/2_plane_actions.log": {
+      "bytes": 32,
+      "sha256": "03f21f68a39b5639f89061ef90f78e40d04f23187136fe7c49aa5343dfea602e"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/2_plane_faults.log": {
+      "bytes": 32,
+      "sha256": "03f21f68a39b5639f89061ef90f78e40d04f23187136fe7c49aa5343dfea602e"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/2_rover_actions.log": {
+      "bytes": 32,
+      "sha256": "03f21f68a39b5639f89061ef90f78e40d04f23187136fe7c49aa5343dfea602e"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/2_rover_faults.log": {
+      "bytes": 32,
+      "sha256": "03f21f68a39b5639f89061ef90f78e40d04f23187136fe7c49aa5343dfea602e"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase1_phase2_regression.log": {
+      "bytes": 909,
+      "sha256": "4f2d1d34eec483945e523e6f9510af2df3be5f009b06c429f886b2bd1aee3062"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/1_copter_faults.log": {
+      "bytes": 4024,
+      "sha256": "e17959875e87ce5fb9a2f85fc56f0dbfa0e4baa05212a946235834b74cfe4bdf"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/1_copter_physical.log": {
+      "bytes": 4049,
+      "sha256": "7129b7e7811e644c303a57fe6aebce4f915778c67a9fcee02d1a3b22fd2139d7"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/1_copter_probe.log": {
+      "bytes": 21292,
+      "sha256": "ff795112a064b5c0afc3e7441eeb69bb49b5a108a97f1295f21d58301cb191f2"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/1_plane_cancel_window.log": {
+      "bytes": 2130,
+      "sha256": "7ac72cd3c66b34926b8887f6a06921d684a07915c2fa011a5a21af3d77094024"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/1_plane_control.log": {
+      "bytes": 16241,
+      "sha256": "a4a5a9138fa912e3cce3f2abd3c521b685429e41bdc2cfa87755f29c6a412dad"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/1_rover_faults.log": {
+      "bytes": 4033,
+      "sha256": "57fa250c05f72d11401058792c182beb6ec58f81ede0f468f5e607bf39d2c4c5"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/1_rover_legacy_physical.log": {
+      "bytes": 6885,
+      "sha256": "600ef00c18cea9e62afa366840c2930f7a1be16bf34d3776275b90eb7a541d70"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/1_rover_physical.log": {
+      "bytes": 9492,
+      "sha256": "d5da7679d774b7beb063a281f39405be5fbebcac965c309c75f7be833400ea19"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/1_rover_probe.log": {
+      "bytes": 21335,
+      "sha256": "e31ded7118bbda34a91f5d74cb6bf18cb29f8388d681f44b81d40f2c2f56d78a"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/2_copter_faults.log": {
+      "bytes": 4026,
+      "sha256": "4ccb6707b47b500aba2a116041d8e5bf3442f3d5796d0304f5921cd147017820"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/2_copter_physical.log": {
+      "bytes": 4047,
+      "sha256": "79f9a1f8392870f05c686a5fbaa873fcf032d9ff6456447820f900564b1e5ac4"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/2_copter_probe.log": {
+      "bytes": 21292,
+      "sha256": "554e197c575fea24fb68574c760b4cf8e00117bc9f3790c3af2e78c9e264707f"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/2_plane_cancel_window.log": {
+      "bytes": 2130,
+      "sha256": "3e1ff44a9026e1149872728cd3c9e60fd99fd26c9e13ec35a22dc8c99898a831"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/2_plane_control.log": {
+      "bytes": 16240,
+      "sha256": "f5e15cd7156ab2e44d9e11cd102cc579a0229d92b25af8de8c3c890ac8dd6113"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/2_rover_faults.log": {
+      "bytes": 4031,
+      "sha256": "632bff2a040ac1b6f208d64db9afd9f018d74258f7f73974b3a3b9ade5adb980"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/2_rover_legacy_physical.log": {
+      "bytes": 6926,
+      "sha256": "4aaf2ac6f66b256f23ec890640c23d30c014e22062f7d8df89048a450072b729"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/2_rover_physical.log": {
+      "bytes": 9456,
+      "sha256": "16ca8da08b72e7b7a450846ead442fc69fcda8a4106785216f5cdb51ababec9d"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/2_rover_probe.log": {
+      "bytes": 21335,
+      "sha256": "deee744a0824ced8e3d016f3d2b5a8d40907bb98d9dbc0d62b0c796092dd09fa"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/copter-faults/gazebo.log": {
+      "bytes": 11457,
+      "sha256": "eccc4b15165a82f0d44ee64c42d6e979cc31322710cc95f82fb6097be0a039b4"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/copter-faults/manifest.json": {
+      "bytes": 10444,
+      "sha256": "0b3ffd78008896f75dfbfbef61ed1d97f86251b82d30234d32a25215055d2266"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/copter-faults/model.sdf": {
+      "bytes": 10312,
+      "sha256": "c23f4ddba8da8e6327ffd333718c130060c6e6a9625f420afb211afda9857e94"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/copter-faults/proxy.jsonl": {
+      "bytes": 18859801,
+      "sha256": "4050ec05e9a42dcca94c4d168e9eab99f83b3a04a1d3cca63de42a01844a7f6a"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/copter-faults/runtime-process-motion.json": {
+      "bytes": 56826,
+      "sha256": "17b333a172ca0844cb4496677dd310cf4ef26469b15ed8cb1b39028de3d0b50e"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/copter-faults/runtime-process-restart.json": {
+      "bytes": 6424,
+      "sha256": "d4949fee7d243bfe780e3cdd3d76a65314a86fc89d3779f9ab72132d6ac311c7"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/copter-faults/runtime.jsonl": {
+      "bytes": 1993227,
+      "sha256": "4772c1fa0c51b9e1d9d342c53287d292f5c7033a8907b6ed674005ead53e9778"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/copter-faults/runtime_motion.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/copter-faults/runtime_readonly.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/copter-faults/signing-support.json": {
+      "bytes": 1326,
+      "sha256": "ce3bbfd09be6dc5dc3a9b8afd1c5c5aa99d9442e3050b87fd2459887ab9c75ef"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/copter-faults/signing-support_restart.json": {
+      "bytes": 1326,
+      "sha256": "95d8014dbbc4d3ab01442f9534ea0e27393cf44413d1c54cec9a9f5bdc085c78"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/copter-faults/sitl.log": {
+      "bytes": 1986,
+      "sha256": "1681e3295fc0a06062551df3bc2273ad7d548a3f5bc0302a62e2624abf72bdd7"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/copter-faults/sitl_restart.log": {
+      "bytes": 1475,
+      "sha256": "6c621dbf3b55195aec10f018569877826ff1c7c8b3589cd2b6585c327f46616d"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/copter-faults/summary.json": {
+      "bytes": 4977,
+      "sha256": "d9fe060ebbdd98715f128462e8fd6601d38228f725f9dba3613f660a58acfd40"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/copter-faults/trajectory.jsonl": {
+      "bytes": 391879,
+      "sha256": "9a16111ed0cd2ea87c4e61108773f54966dfde3d497f308c836de40fc9a92dd9"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/copter-faults/world.sdf": {
+      "bytes": 3632,
+      "sha256": "90ca9e5d9926a8046486e3a8780dc2c1cd76df1140510373c121e251bab891ec"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/copter-physical/gazebo.log": {
+      "bytes": 11374,
+      "sha256": "3d07fd26f6b517394f72684c6c7292393746606be43d95928973c9e4ae946a1a"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/copter-physical/manifest.json": {
+      "bytes": 5751,
+      "sha256": "2028ffbe03e335c68eda641e2ac8b7e3ad87fda0c8d8ed538b750214940be58e"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/copter-physical/model.sdf": {
+      "bytes": 10312,
+      "sha256": "c23f4ddba8da8e6327ffd333718c130060c6e6a9625f420afb211afda9857e94"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/copter-physical/observations.jsonl": {
+      "bytes": 274855,
+      "sha256": "7b717c5382de4940254e92025ab9dd2b27b5dca601345ca9a8772fd928986b1e"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/copter-physical/runtime.jsonl": {
+      "bytes": 1528751,
+      "sha256": "ee771c4a14cce07ea01f95858f90130d2b6e2c463c352c7eb178d9f7203d8520"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/copter-physical/signing-support.json": {
+      "bytes": 1326,
+      "sha256": "fd3daa560a1a6b5afd0e5ae311c5778c0c4b0848c60acbace78b4eaccda86898"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/copter-physical/sitl.log": {
+      "bytes": 1575,
+      "sha256": "8fece53c347789ba8a1fa34ba42842e45ad6193dc846f11a4651ce26c29614d8"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/copter-physical/summary.json": {
+      "bytes": 5128,
+      "sha256": "4cfa123439db58350f5fe79fb065f53dd9883a4492490fff07edbf652e11f39a"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/copter-physical/world.sdf": {
+      "bytes": 3634,
+      "sha256": "45fa36d43bc41f0c201295357ca2d971fd36c28f2835c239c1739eb9e31325d0"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/copter-probe/gazebo.log": {
+      "bytes": 11371,
+      "sha256": "26b386f28f50b01278c0b6dbd917d88144479ab88db05ee5fc92ac2c1c34e163"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/copter-probe/manifest.json": {
+      "bytes": 5739,
+      "sha256": "a0e720514d237de14a61eb01b02c5afab2f0bd4a0c6c6a479028b374a85b5ce7"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/copter-probe/model.sdf": {
+      "bytes": 10312,
+      "sha256": "c23f4ddba8da8e6327ffd333718c130060c6e6a9625f420afb211afda9857e94"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/copter-probe/proxy.jsonl": {
+      "bytes": 11701114,
+      "sha256": "befef846294e90282f199b31ef9493e60a0d1081b4d7548a056fb35c1d0de682"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/copter-probe/runtime.jsonl": {
+      "bytes": 1235132,
+      "sha256": "216e188f99d84c1ae50fd8e04be87c94824d5ade1239c5b5664c64a06df73ef0"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/copter-probe/signing-support.json": {
+      "bytes": 1326,
+      "sha256": "1f959df50565fb6dd24e556991ed37ca2c229ab898b08384d127793fcb333c54"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/copter-probe/sitl.log": {
+      "bytes": 1900,
+      "sha256": "87e970936aa43cbadfb48daf2e4d89e17fd02b868dddb7a40ea98829aec335d7"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/copter-probe/summary.json": {
+      "bytes": 31029,
+      "sha256": "68af70ae1eb90625ec16aa7f7897d9089f6607455ffec27a9c845c06267bd1cb"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/copter-probe/telemetry.jsonl": {
+      "bytes": 13344371,
+      "sha256": "9d02711736ed2c05e9a6fd4774a29cf5513365b87048dcd82860e9280cf82594"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/copter-probe/world.sdf": {
+      "bytes": 3631,
+      "sha256": "4a4320ed2f960c9169dba051fab43a758458bcaff1551adf6c8d30d3912cd01d"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/plane-cancel_window/application-rx.jsonl": {
+      "bytes": 2459808,
+      "sha256": "e1d0ffbbc6207a616811d6db187feadaa3324bfa2abc87d9580e8c08fa7593cf"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/plane-cancel_window/gazebo.log": {
+      "bytes": 4552,
+      "sha256": "60557a1f8a6a2350e16af4145ef35d2561a7b5d9b0a5e6d4720aaee45847a4dd"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/plane-cancel_window/manifest.json": {
+      "bytes": 5857,
+      "sha256": "9ed8f6aaf8e1be7506de1bfd9f8fd4544184fc01cf207f848a809ff80f9c566b"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/plane-cancel_window/model.sdf": {
+      "bytes": 18449,
+      "sha256": "ca79bea85e53abedee85bfb10aafc87be462ee2020ba27bae251f4b42a94ba5f"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/plane-cancel_window/proxy.jsonl": {
+      "bytes": 6456442,
+      "sha256": "b3685e495d7c4f400f576144c470ad246a49bd22488c303830465ff47d4f48ac"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/plane-cancel_window/runtime.jsonl": {
+      "bytes": 562369,
+      "sha256": "15aff0668db31a74b57243b44f2c5a31e18758c4400c2d9c4f7691e70cf39dba"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/plane-cancel_window/signing-support.json": {
+      "bytes": 1328,
+      "sha256": "02ab5cf1d4c59c26adb3ee995f236de65073c6978091e0cce27935186d196875"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/plane-cancel_window/sitl.log": {
+      "bytes": 1442,
+      "sha256": "7e4fba95875036a1d86a6ea5cd5b71791e6bf6271ffe0ec3b766e07e2ab96dde"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/plane-cancel_window/summary.json": {
+      "bytes": 2543,
+      "sha256": "8f64266e0777daa55abf5c7966e4fd9542f57b86024ae7efb1f9a2363e14f7f7"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/plane-cancel_window/trajectory.jsonl": {
+      "bytes": 1356,
+      "sha256": "cf3072e0e601f8dae84c69847ffed3ec936ce6402e58f6dffe2b1ea276e08119"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/plane-cancel_window/world.sdf": {
+      "bytes": 2500,
+      "sha256": "2dd8d15d56a1358f2fc97133a7abe1fbe4982bad5418cc0d2a23c972b37e8616"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/plane-control/gazebo.log": {
+      "bytes": 4880,
+      "sha256": "897e998cbef78fee09ca0f3fb27fa37d5d83b5f7bf89f4be511840da538246a5"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/plane-control/manifest.json": {
+      "bytes": 5835,
+      "sha256": "990f8c3fb9298d1b8de3835341acef1b486a12b48238a5771d8f1a7e78629f37"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/plane-control/model.sdf": {
+      "bytes": 18449,
+      "sha256": "ca79bea85e53abedee85bfb10aafc87be462ee2020ba27bae251f4b42a94ba5f"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/plane-control/proxy.jsonl": {
+      "bytes": 37864304,
+      "sha256": "ec0c556d26c0585bfda4d31928a4fbc920aef66c34363930d786bb808879efff"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/plane-control/runtime.jsonl": {
+      "bytes": 3499257,
+      "sha256": "d090520d0ebe3e93b6732e0af9a493723a47aac82255e1159979f7412eaa79ab"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/plane-control/signing-support.json": {
+      "bytes": 1328,
+      "sha256": "0233853e9d090cdb114b2b91563ae78657d5571ee86ff8fcdcc35354b1a9242b"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/plane-control/sitl.log": {
+      "bytes": 1607,
+      "sha256": "d280452b6dd963adcd565cfdaa50240379b0968055ab13cceabbcf85db1e09ba"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/plane-control/summary.json": {
+      "bytes": 20866,
+      "sha256": "cce3757cb0ef7ae7df433ae34cf5463421cdde96ad08e5fabd564a3bb36da667"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/plane-control/trajectory.jsonl": {
+      "bytes": 3227901,
+      "sha256": "290811de185912b7859c2178d5827435e98fc93b719bc9136dc70852e3d417c1"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/plane-control/world.sdf": {
+      "bytes": 2494,
+      "sha256": "1d0734ee37cfee498df1b0511604a836c2cc8a5f81c8031efbc6f173269f7e2d"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/rover-faults/gazebo.log": {
+      "bytes": 4096,
+      "sha256": "29f09c87bfa4b5dfa379d5f7c8ee405108f693c7ee5716984e84ece7eb26d1a3"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/rover-faults/manifest.json": {
+      "bytes": 9999,
+      "sha256": "22f70a8da4e9d961cbe43f81d90df2ddfee1418399554a5ad9939b1ebb1631f4"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/rover-faults/model.sdf": {
+      "bytes": 8025,
+      "sha256": "53c32fdc91ebbceecee1c0a72abfac86fd02e97bc241a4b17a927049ebdb40b6"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/rover-faults/proxy.jsonl": {
+      "bytes": 16264055,
+      "sha256": "9aff8b49749d7db0112a0e743830e4f806e99b5f7e4978cd2fdc5c3b3156dd7b"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/rover-faults/runtime-process-motion.json": {
+      "bytes": 63219,
+      "sha256": "81353f6a6d7f1b851170d816c1132ae9d5e9c42313b85fcd7bc140cb03f2a32c"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/rover-faults/runtime-process-restart.json": {
+      "bytes": 6423,
+      "sha256": "63ca214d104b9fad78f42a80db0606cac2505b1eea8cb38b629ed2a111eec98e"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/rover-faults/runtime.jsonl": {
+      "bytes": 1759683,
+      "sha256": "65ab5f801baa19cda4c86041462a22b3e7916e7d8723a14d80b7a4766875c59f"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/rover-faults/runtime_motion.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/rover-faults/runtime_readonly.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/rover-faults/signing-support.json": {
+      "bytes": 1330,
+      "sha256": "17241ccd9970d25242b1148903f5af5a4533422ad23bfde004ed9dc31387c20c"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/rover-faults/signing-support_restart.json": {
+      "bytes": 1712,
+      "sha256": "5d266b38301f701dbdb3c99d16a8b108fd12e66d2cd557241884b75150e9a761"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/rover-faults/sitl.log": {
+      "bytes": 1689,
+      "sha256": "6763f73143516920d5dae8ed2d5eba54d3367c548dc047642395ef9112810869"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/rover-faults/sitl_restart.log": {
+      "bytes": 1228,
+      "sha256": "ba56d8345c0b0a5b6af4e5759a1ae3f8bea7e0ee79426d2fe102c467aed418d9"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/rover-faults/summary.json": {
+      "bytes": 4986,
+      "sha256": "0e8ee4872e579a76b14da392967e4861dcc617ce7a2bcfa47b0eca053cface80"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/rover-faults/trajectory.jsonl": {
+      "bytes": 367375,
+      "sha256": "aafb735921719aae9109c122dd5ed63ac91567c2ff618475aff8910ccf5de4d1"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/rover-faults/world.sdf": {
+      "bytes": 1614,
+      "sha256": "3917e3747d3a6180fc5a4dd4a34a72a995aed68397184497e1b52b54f52eed32"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/rover-legacy_physical/gazebo.log": {
+      "bytes": 4020,
+      "sha256": "ff4b069faf19480885ef2a2ddefbe3f8c9c9d6a5c2e9c4d83f1fa228c4b3a4ae"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/rover-legacy_physical/manifest.json": {
+      "bytes": 5566,
+      "sha256": "00c154b7f677f29fdf48905d4cfd2b57ae09577067644e7173f226c055d8fe83"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/rover-legacy_physical/model.sdf": {
+      "bytes": 8025,
+      "sha256": "53c32fdc91ebbceecee1c0a72abfac86fd02e97bc241a4b17a927049ebdb40b6"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/rover-legacy_physical/runtime.jsonl": {
+      "bytes": 1683021,
+      "sha256": "d4aeaff77483e4aef1b006ac307c4f89dd145966f08e8ec64a90d12bd0115845"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/rover-legacy_physical/signing-support.json": {
+      "bytes": 1330,
+      "sha256": "ae3829196a33785b9f6cf598e9f6ad09a7ae3be36a957881fea4686edd4cbe85"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/rover-legacy_physical/sitl.log": {
+      "bytes": 1278,
+      "sha256": "e7af9f37029455df812b6b071e7908f373beef88b6af19c44eed2e0280e00770"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/rover-legacy_physical/summary.json": {
+      "bytes": 8542,
+      "sha256": "d0f435b3825eb9ee75464934e07575a60a5b15d40528d267a13488f34c4c58c3"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/rover-legacy_physical/trajectory.jsonl": {
+      "bytes": 380503,
+      "sha256": "509955e72c6bc008bfdc3411a41b7d28602e93166762c05f18a4cabc73c7e11f"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/rover-legacy_physical/world.sdf": {
+      "bytes": 1623,
+      "sha256": "244924c4daa4cb7b4fe5b2caaa5fe578aaf2889774f9781082ceb8730fb933a6"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/rover-physical/gazebo.log": {
+      "bytes": 4098,
+      "sha256": "ae6d327f50397920499abd1206d943e336e259d5f825e33f8367a52c2cf2dbb2"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/rover-physical/manifest.json": {
+      "bytes": 6032,
+      "sha256": "79dfa01b247c1b0295759a35f982f25e4b51c059bbc01b28df0376832cb5c605"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/rover-physical/model.sdf": {
+      "bytes": 8025,
+      "sha256": "53c32fdc91ebbceecee1c0a72abfac86fd02e97bc241a4b17a927049ebdb40b6"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/rover-physical/runtime.jsonl": {
+      "bytes": 1100445,
+      "sha256": "7bde02dd8b188851e7cbd9774c77953d444aa7246492b7b3f7cf2d9b3c69b467"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/rover-physical/signing-support.json": {
+      "bytes": 1330,
+      "sha256": "418751165f5c6b4c24d961d5d41b463a43d4152db9ec39368a7b835d1158b69c"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/rover-physical/sitl.log": {
+      "bytes": 1180,
+      "sha256": "fc30c5761d900c5e41e934de151537804fa2bb722b16555e65edc3cd57d3430c"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/rover-physical/summary.json": {
+      "bytes": 11903,
+      "sha256": "3fd2fed1beafeaa1a1dcc67c9cce4baf918b3251046c92abe5435fa806762c5b"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/rover-physical/trajectory.jsonl": {
+      "bytes": 563156,
+      "sha256": "0c1721244b1a663027d66601c8cd66d7d86f5fa4bbb378bfa939d67cf7631430"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/rover-physical/world.sdf": {
+      "bytes": 1616,
+      "sha256": "f54ad098fcba2b768fe0b5cf649396a1985c4ba87c69e1a51e7c42b6908f4377"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/rover-probe/gazebo.log": {
+      "bytes": 4010,
+      "sha256": "54c964eb454bcd40a8c3899e78d425f9ad9b603e9ff95a3886feaf6041058534"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/rover-probe/manifest.json": {
+      "bytes": 5526,
+      "sha256": "7bcfbb72a6dd3f6298b5e2f513fc9146018529bfbddd25e4bee6af792dd5ef93"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/rover-probe/model.sdf": {
+      "bytes": 8025,
+      "sha256": "53c32fdc91ebbceecee1c0a72abfac86fd02e97bc241a4b17a927049ebdb40b6"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/rover-probe/proxy.jsonl": {
+      "bytes": 11392296,
+      "sha256": "b7e878f30338cc85e4942cc8704489b3cbcb59bf9b51ff0f1a228ac89726f7cc"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/rover-probe/runtime.jsonl": {
+      "bytes": 1234279,
+      "sha256": "07de37720450dc7c1b02227768463a3b918bdb6212fbba351ffa39b08eaeb577"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/rover-probe/signing-support.json": {
+      "bytes": 1330,
+      "sha256": "64c6ee7c94264a9e6bc5eb46c39887d21182547beeaceece842bd091371ec038"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/rover-probe/sitl.log": {
+      "bytes": 1553,
+      "sha256": "a200a4d6383386ad9251f43479d9ab828243987740560605314756d50bb716c8"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/rover-probe/summary.json": {
+      "bytes": 31072,
+      "sha256": "1c6460f40d38eaa2f98f51fe256488bc4ee433cfbd53c93120773c07aa111e10"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/rover-probe/telemetry.jsonl": {
+      "bytes": 13357522,
+      "sha256": "03002e26212de1916778316a25c6cbbaad29e6f17f772fd40bca8a907ad3d500"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-1-85769205/rover-probe/world.sdf": {
+      "bytes": 1613,
+      "sha256": "ad5d702cf9447caa1e7acff371c4b9ff4ed2db1d1ca25ac730df2925a6b0131b"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/copter-faults/gazebo.log": {
+      "bytes": 11457,
+      "sha256": "471634bcc32c79469bebdf59743b83c7e8b838914a8cebea9ea2fd1464446a44"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/copter-faults/manifest.json": {
+      "bytes": 10444,
+      "sha256": "0afe22e7e55399d1da8ebaca7c50fcae9f7fbd40ac249fdc3b1d7d8c37ab31fd"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/copter-faults/model.sdf": {
+      "bytes": 10312,
+      "sha256": "c23f4ddba8da8e6327ffd333718c130060c6e6a9625f420afb211afda9857e94"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/copter-faults/proxy.jsonl": {
+      "bytes": 18892690,
+      "sha256": "3d8e9ca94be0e886dd3dcf150a3da3b76ab6b2e32e47b2a12d7085baf44fee7c"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/copter-faults/runtime-process-motion.json": {
+      "bytes": 56826,
+      "sha256": "d1477d78ea8a284419b79229b1f53b01bb37af6e1c38078953bec6365ea49a9d"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/copter-faults/runtime-process-restart.json": {
+      "bytes": 6424,
+      "sha256": "789b68cb81926c03a97c0057688c86e12e592fa00d47904f1446abe10b1a6ba9"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/copter-faults/runtime.jsonl": {
+      "bytes": 1995458,
+      "sha256": "740b32c61a17cd9ae50222b8891b138f7d2a3bf1f7b6fb045a99d372db2d5914"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/copter-faults/runtime_motion.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/copter-faults/runtime_readonly.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/copter-faults/signing-support.json": {
+      "bytes": 1326,
+      "sha256": "2ad4a7a3210615bbd9d8a39c67b11d3aa5c66083e6d99565ea535e2bb93e119b"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/copter-faults/signing-support_restart.json": {
+      "bytes": 1706,
+      "sha256": "ca89ac5780759cfc06dc349af44ccc9395ab1dacd27341069082b5e5b6918db1"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/copter-faults/sitl.log": {
+      "bytes": 1986,
+      "sha256": "1681e3295fc0a06062551df3bc2273ad7d548a3f5bc0302a62e2624abf72bdd7"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/copter-faults/sitl_restart.log": {
+      "bytes": 1475,
+      "sha256": "6c621dbf3b55195aec10f018569877826ff1c7c8b3589cd2b6585c327f46616d"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/copter-faults/summary.json": {
+      "bytes": 4979,
+      "sha256": "dfacce6c14b8c84a46b0a5160130d623f562c0810aab3e51a57e632d9ab5acb4"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/copter-faults/trajectory.jsonl": {
+      "bytes": 390397,
+      "sha256": "9c9c8c6f235f5c5a3b0c30035f8ccf0c95fa876c58795519c169611dad5982fe"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/copter-faults/world.sdf": {
+      "bytes": 3632,
+      "sha256": "6379cb566bc6230159d3cef87b8fb0470ed5ca0cb329f7aa74d8e869e4a07a54"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/copter-physical/gazebo.log": {
+      "bytes": 11374,
+      "sha256": "ee45eb36abeda0212ab1eb44d45ecbee95d4cad6280d8cde2633955b186e4bb1"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/copter-physical/manifest.json": {
+      "bytes": 5751,
+      "sha256": "e046e6e9fcbf3087c761c2d40712086b8720147dbf08bac6f3e8fdd327d671ff"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/copter-physical/model.sdf": {
+      "bytes": 10312,
+      "sha256": "c23f4ddba8da8e6327ffd333718c130060c6e6a9625f420afb211afda9857e94"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/copter-physical/observations.jsonl": {
+      "bytes": 279892,
+      "sha256": "c953b315b81718b32455f578ecf8a72b7108ae6a4ac62e23f857ba1c2194644d"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/copter-physical/runtime.jsonl": {
+      "bytes": 1556210,
+      "sha256": "c07fd8f8b72f9240f572d7efd8b8e5a5075e6ad88b90143cc9eef57e80c26147"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/copter-physical/signing-support.json": {
+      "bytes": 1326,
+      "sha256": "77968fc3c68e25f9b0f96285687f0ea3591f5b0dac5af6e2b9b7e47177c38b1e"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/copter-physical/sitl.log": {
+      "bytes": 1575,
+      "sha256": "8fece53c347789ba8a1fa34ba42842e45ad6193dc846f11a4651ce26c29614d8"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/copter-physical/summary.json": {
+      "bytes": 5126,
+      "sha256": "0cdec31123cce752836f4d871cd31fd5f7c812243b81748e12931337d2aa5f85"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/copter-physical/world.sdf": {
+      "bytes": 3634,
+      "sha256": "8926ce158cafb3439b26d88e823574e65320b7df1b61dc39734504170e02fb84"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/copter-probe/gazebo.log": {
+      "bytes": 11371,
+      "sha256": "cd69cf3e298a1240b583ef2cc762a4c9d593c8b417a4a74fa2c4a52d86e47e55"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/copter-probe/manifest.json": {
+      "bytes": 5739,
+      "sha256": "e9696a250fe64052f29ee761cb65bcac8f4eb4bf139ee4021181c2baac5128c1"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/copter-probe/model.sdf": {
+      "bytes": 10312,
+      "sha256": "c23f4ddba8da8e6327ffd333718c130060c6e6a9625f420afb211afda9857e94"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/copter-probe/proxy.jsonl": {
+      "bytes": 11715495,
+      "sha256": "64e8c3a49c386092d84d793009560c2b4fafa5dbbcbda7c56115bac1cc960c4f"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/copter-probe/runtime.jsonl": {
+      "bytes": 1239799,
+      "sha256": "a0380b7b9a4197625c63e5068dad7a8debe651296c951b383356b15f292c21e9"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/copter-probe/signing-support.json": {
+      "bytes": 1326,
+      "sha256": "77bfa538c7e0307774408b01a8a485818e9ab7286fb3af50f7b9477a89271363"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/copter-probe/sitl.log": {
+      "bytes": 1900,
+      "sha256": "87e970936aa43cbadfb48daf2e4d89e17fd02b868dddb7a40ea98829aec335d7"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/copter-probe/summary.json": {
+      "bytes": 31029,
+      "sha256": "6c376808ee3f92f3ddd3073fbf2ace1650809ec4c647daf7f25e14fb402c567a"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/copter-probe/telemetry.jsonl": {
+      "bytes": 13386996,
+      "sha256": "41a90a31df99c50912d70b41a2b1da196cd4f299807d52c2a8fb7821f0d58451"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/copter-probe/world.sdf": {
+      "bytes": 3631,
+      "sha256": "3dc97219cdb1e4a9b352540422e9df65580094bce264777013385a3755a291b4"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/plane-cancel_window/application-rx.jsonl": {
+      "bytes": 2462678,
+      "sha256": "e0d98cd1b831d2a2230fe427cc285c26a4a8b868bfbea6f40cf25c3e1887e2cc"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/plane-cancel_window/gazebo.log": {
+      "bytes": 4552,
+      "sha256": "c75b4daf0e35e28a2cf2cecb123094a4eab2d7b5ce65524ee948560978f0c39a"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/plane-cancel_window/manifest.json": {
+      "bytes": 5857,
+      "sha256": "f3be276951943884475e9cf54920a76f438a6392e1fc792aa7af51526664bb46"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/plane-cancel_window/model.sdf": {
+      "bytes": 18449,
+      "sha256": "ca79bea85e53abedee85bfb10aafc87be462ee2020ba27bae251f4b42a94ba5f"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/plane-cancel_window/proxy.jsonl": {
+      "bytes": 6456326,
+      "sha256": "ba2fe9f7c9cc6a3b1cf1ff514bd69d5c1a39ca099c1f573534d56c836b836977"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/plane-cancel_window/runtime.jsonl": {
+      "bytes": 561303,
+      "sha256": "b092571b4aeb38227db86e621d1911c8c410095b96ffffa8808793e20bfdd161"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/plane-cancel_window/signing-support.json": {
+      "bytes": 1328,
+      "sha256": "824bd8953dfb10969e9fa863467069df0476f9e6241a4d78c0f7143f55848c33"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/plane-cancel_window/sitl.log": {
+      "bytes": 1442,
+      "sha256": "7e4fba95875036a1d86a6ea5cd5b71791e6bf6271ffe0ec3b766e07e2ab96dde"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/plane-cancel_window/summary.json": {
+      "bytes": 2543,
+      "sha256": "4b5ffe20d8ebc3a34659a533bfcd9d91679d8c50dc825430fd34b980e5a60ae1"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/plane-cancel_window/trajectory.jsonl": {
+      "bytes": 1222,
+      "sha256": "c25cb658dfbd7b043519c61f7453743e28e6c5601dd7dce6a3d1305de65a13c7"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/plane-cancel_window/world.sdf": {
+      "bytes": 2500,
+      "sha256": "6e688db53df33af7e4edda968e9efd9b9a5c85a3d42c89583257df906d02bf9e"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/plane-control/gazebo.log": {
+      "bytes": 4880,
+      "sha256": "8e4c17d238c82f9abd9aa0b61898ece87b779f8c17ebb194b711e437fe71c887"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/plane-control/manifest.json": {
+      "bytes": 5835,
+      "sha256": "19ac6b08da7a862a9752bdb599a0ee7a0da69002e1dfbe33edd7ca3c1556d00a"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/plane-control/model.sdf": {
+      "bytes": 18449,
+      "sha256": "ca79bea85e53abedee85bfb10aafc87be462ee2020ba27bae251f4b42a94ba5f"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/plane-control/proxy.jsonl": {
+      "bytes": 37576922,
+      "sha256": "e6e9d2be1d2078ce512bd4a246091d29b3a754895d95ad924ec4bc2627d9d6f7"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/plane-control/runtime.jsonl": {
+      "bytes": 3470389,
+      "sha256": "480003aceb3fad19638a914ebe2322f77ea7fa03abc21df32e4e8316fa3ca09a"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/plane-control/signing-support.json": {
+      "bytes": 1328,
+      "sha256": "978c5f9f6a9a495163484ecc5dd9105ccfd497075295f7b0147c0447e8956dd4"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/plane-control/sitl.log": {
+      "bytes": 1607,
+      "sha256": "d280452b6dd963adcd565cfdaa50240379b0968055ab13cceabbcf85db1e09ba"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/plane-control/summary.json": {
+      "bytes": 20865,
+      "sha256": "9240d590f274d2283ce53c16c97430ba62c224c24fd34ed6863cea4aead67267"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/plane-control/trajectory.jsonl": {
+      "bytes": 3200230,
+      "sha256": "b17090bc04a91a6a94724cdaeedf6f0e73d17fa57381a3d19f2fdc5db4f3385d"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/plane-control/world.sdf": {
+      "bytes": 2494,
+      "sha256": "ef8dcd14a5cb1e41f13516e06df9bc8e81cf2340f9d16f07b124eef369acf1e0"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/rover-faults/gazebo.log": {
+      "bytes": 4096,
+      "sha256": "eb4a692db9ecc3eef3367b38236bf4bd75f855e8fad6af0dfadd77d34ce05adc"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/rover-faults/manifest.json": {
+      "bytes": 9999,
+      "sha256": "7bfad8527d237b1cde45ba291b9ede58b43ef917b6419e73c60edc2d918ee45a"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/rover-faults/model.sdf": {
+      "bytes": 8025,
+      "sha256": "53c32fdc91ebbceecee1c0a72abfac86fd02e97bc241a4b17a927049ebdb40b6"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/rover-faults/proxy.jsonl": {
+      "bytes": 16267005,
+      "sha256": "59b72cfc348434cfc48fef5b52b3ef7e653917093a2451e2e815ff614dee4747"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/rover-faults/runtime-process-motion.json": {
+      "bytes": 63219,
+      "sha256": "bc84491b09e82e1ee7e25ee5a59577d29682340da4ad28154f299bc28d98e989"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/rover-faults/runtime-process-restart.json": {
+      "bytes": 6134,
+      "sha256": "a02764e43e102b18b233c4937b7c7811ccdf3951edd8b8bdf23d8924a098c5c4"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/rover-faults/runtime.jsonl": {
+      "bytes": 1762373,
+      "sha256": "656030c2009d0c3c424fb173305d59da6062596d62eb0d17d6d7b58582d33c3c"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/rover-faults/runtime_motion.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/rover-faults/runtime_readonly.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/rover-faults/signing-support.json": {
+      "bytes": 1330,
+      "sha256": "58873b1a6ce09444bf0084024a1e5e01ced002f2687d72c4c1ac53094501fe28"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/rover-faults/signing-support_restart.json": {
+      "bytes": 1712,
+      "sha256": "74175b88f6a254c9ab8fd236478ce2f051a618c8083e6a48c81db741fdf3c38b"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/rover-faults/sitl.log": {
+      "bytes": 1689,
+      "sha256": "6763f73143516920d5dae8ed2d5eba54d3367c548dc047642395ef9112810869"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/rover-faults/sitl_restart.log": {
+      "bytes": 1228,
+      "sha256": "ba56d8345c0b0a5b6af4e5759a1ae3f8bea7e0ee79426d2fe102c467aed418d9"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/rover-faults/summary.json": {
+      "bytes": 4984,
+      "sha256": "22a9810b63a41970fa73dae0b8b219aa977bad2cea2327e2d560a38f417e8c62"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/rover-faults/trajectory.jsonl": {
+      "bytes": 367164,
+      "sha256": "b527d66496cceb7e8171b2be64bb91bf69509164c1b8bffb82971c1c1ac2ad00"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/rover-faults/world.sdf": {
+      "bytes": 1614,
+      "sha256": "5fc1a7ccc74cd472bb4dc4e9ad44edccfc205a408da1fe37c4e64481e5ab19c9"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/rover-legacy_physical/gazebo.log": {
+      "bytes": 4020,
+      "sha256": "cc73b37c6617e88aa85fc068462fe4ad8a6772875ebebaf9c56ffa740f3976ba"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/rover-legacy_physical/manifest.json": {
+      "bytes": 5566,
+      "sha256": "daab0c68e0d443d51c64b42653ac9e20cf3cbcdd4d3a7eee4c518000604b7533"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/rover-legacy_physical/model.sdf": {
+      "bytes": 8025,
+      "sha256": "53c32fdc91ebbceecee1c0a72abfac86fd02e97bc241a4b17a927049ebdb40b6"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/rover-legacy_physical/runtime.jsonl": {
+      "bytes": 1704472,
+      "sha256": "ec4c409475c2ad635445d55358b877255f3dc344eac1e9b076dc3492141c5d1d"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/rover-legacy_physical/signing-support.json": {
+      "bytes": 1330,
+      "sha256": "f739131be17d3e3507b333ce20c166dd1ec70c5c74b1ad1e400f48342a5981a2"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/rover-legacy_physical/sitl.log": {
+      "bytes": 1278,
+      "sha256": "e7af9f37029455df812b6b071e7908f373beef88b6af19c44eed2e0280e00770"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/rover-legacy_physical/summary.json": {
+      "bytes": 8587,
+      "sha256": "1485190e8429baaaab1e0f82041fdd0d6da0ba86724a52edc17b552d47de2944"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/rover-legacy_physical/trajectory.jsonl": {
+      "bytes": 386951,
+      "sha256": "618f3167afb8759b5eaf8e677815c2eed9f0253d17ea1f2dc5b6a17af3fc7f1c"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/rover-legacy_physical/world.sdf": {
+      "bytes": 1623,
+      "sha256": "d09ed7bed528c701bf037716e7bab0416a25855736884b6413fc369ccd386bb0"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/rover-physical/gazebo.log": {
+      "bytes": 4098,
+      "sha256": "0445f482445a8e77e3766288cb4d853a547f5ca46d134222e673ec56afd360e7"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/rover-physical/manifest.json": {
+      "bytes": 6033,
+      "sha256": "f90b625e7bcfb89313bb0a6b25ded0468853c3fc1b9a13262f783ad52f93490c"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/rover-physical/model.sdf": {
+      "bytes": 8025,
+      "sha256": "53c32fdc91ebbceecee1c0a72abfac86fd02e97bc241a4b17a927049ebdb40b6"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/rover-physical/runtime.jsonl": {
+      "bytes": 1157661,
+      "sha256": "f82a5ddf92ea054d879cf83b657b5098bba1d3df5dac7829feadbd050cc024da"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/rover-physical/signing-support.json": {
+      "bytes": 1330,
+      "sha256": "5d82d7148fbb668b57d2b35a4e36c04a63641e872e6176cbdf7afb26580eb1fe"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/rover-physical/sitl.log": {
+      "bytes": 1180,
+      "sha256": "fc30c5761d900c5e41e934de151537804fa2bb722b16555e65edc3cd57d3430c"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/rover-physical/summary.json": {
+      "bytes": 11863,
+      "sha256": "9702a644976e87d3c434a026de9dfc68e427397ceffa887c7fc88211e46efbee"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/rover-physical/trajectory.jsonl": {
+      "bytes": 584761,
+      "sha256": "4b15e51d7a8660493c850864d17a1f6512d6b971d844504a6c818fa04dd69df0"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/rover-physical/world.sdf": {
+      "bytes": 1616,
+      "sha256": "b6816e77e22b683cf4f5555b947535e239f4d185950d2dfc8481e2da865d7b77"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/rover-probe/gazebo.log": {
+      "bytes": 4010,
+      "sha256": "cff751f2586a9664b99ede6e1e4fd77370e7f65eb0c938731165053a289a76c5"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/rover-probe/manifest.json": {
+      "bytes": 5526,
+      "sha256": "1883150c929f9c64a0e854b7d5ef4f15345f470a706d152f50e79640f9ab7930"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/rover-probe/model.sdf": {
+      "bytes": 8025,
+      "sha256": "53c32fdc91ebbceecee1c0a72abfac86fd02e97bc241a4b17a927049ebdb40b6"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/rover-probe/proxy.jsonl": {
+      "bytes": 11392243,
+      "sha256": "aafe1b564106aa982e0acdfdd0cf343d287bd64f5f027ebc4c1a6d957ffdd8e4"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/rover-probe/runtime.jsonl": {
+      "bytes": 1234085,
+      "sha256": "4356b18e6366ef19d5c116d7a25573fb94d401e54fce9179ac1d3f37eafe0084"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/rover-probe/signing-support.json": {
+      "bytes": 1330,
+      "sha256": "6315f6d28ffae8f6fa9c35e747cb3ef507f8e0e4002825203e9b25544d486efb"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/rover-probe/sitl.log": {
+      "bytes": 1553,
+      "sha256": "a200a4d6383386ad9251f43479d9ab828243987740560605314756d50bb716c8"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/rover-probe/summary.json": {
+      "bytes": 31072,
+      "sha256": "1bd4dd2084204102e564005b45988b7d3dabc751094fe8579d14167c4dad5f11"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/rover-probe/telemetry.jsonl": {
+      "bytes": 13336409,
+      "sha256": "67d16285f5face262a9355d3ae8d493a53f885ed1ace269dd9765480e988c1f2"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/run-2-58b22294/rover-probe/world.sdf": {
+      "bytes": 1613,
+      "sha256": "a468fa67c6e803307a525be30f17da653cf7e80096a6c9a66cd1e95d715475e6"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/stages.json": {
+      "bytes": 14191,
+      "sha256": "175d90acbf03611b59af2ef7117c5a3653c5bde3d19bb7e5c0d41d60332ace95"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/summary.json": {
+      "bytes": 10640,
+      "sha256": "808ac123c7118373a3e2ba0597c4830333f714c5efeaa4396219ab687ff10c11"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/unit.json": {
+      "bytes": 84,
+      "sha256": "2da37a8e87db667ee70c4a74ae15f01ad80e87b79b72096d87ec1738651513d7"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/phase2-regression/unit.log": {
+      "bytes": 567,
+      "sha256": "596a89c1106f95302f4a052e79a44826b5e3275bcbfe2845e4f304e190c01c75"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/copter-actions/action-owner.lock": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/copter-actions/action-receive-floor": {
+      "bytes": 14,
+      "sha256": "d352055e9a396a4eda5e602c8b011c98b9fe0b75f1225e7b92edb58c63a72431"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/copter-actions/application-rx.jsonl": {
+      "bytes": 5845646,
+      "sha256": "c2c7d703f2cebf2093e10016127fdafe87e612723bcc4497f4023afe8b283777"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/copter-actions/gazebo.log": {
+      "bytes": 11442,
+      "sha256": "64a22be12eefc0eb59e4c72a61f40d96d3968e07f3df23e46cebc700a43bf035"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/copter-actions/http-audit.jsonl": {
+      "bytes": 3584,
+      "sha256": "a754ae3201b04d70d6cc921ae3d049334223c0efb14922ea8e06c9aa346a29b2"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/copter-actions/manifest.json": {
+      "bytes": 5683,
+      "sha256": "f2bd35bebc21667fae3707d7bdcfe3e76cf16f74dfc957702edd8280941dbab2"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/copter-actions/model.sdf": {
+      "bytes": 10312,
+      "sha256": "c23f4ddba8da8e6327ffd333718c130060c6e6a9625f420afb211afda9857e94"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/copter-actions/proxy.jsonl": {
+      "bytes": 17640643,
+      "sha256": "ee58db86673e6793211ae81c2c10f6dc1fabb8252f3eb6d2510489a3df92e07a"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/copter-actions/runtime.jsonl": {
+      "bytes": 2240823,
+      "sha256": "82c98e22da46953eee4367fd49fe95aa64e5c7267d4c792ececb64e715a43627"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/copter-actions/signing-support.json": {
+      "bytes": 1326,
+      "sha256": "e005a71abf21028003e5893630b3309414ebab2cbcba575d28a2b04a96ca2e4f"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/copter-actions/sitl.log": {
+      "bytes": 1625,
+      "sha256": "271829946233795ff9eb6e36c1fc9b6dc83e13c8346b044a3582e58aeaf68b60"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/copter-actions/summary.json": {
+      "bytes": 383548,
+      "sha256": "c907d3661a046cd58758a2544a14cff69d2f09af0272be9fc3ef0f20a790a3a4"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/copter-actions/trajectory.jsonl": {
+      "bytes": 371467,
+      "sha256": "2e62a649b6d3b9cd035b0673cc314d813efee7d8b8ca2f9fadf3116a04a9a3e3"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/copter-actions/world.sdf": {
+      "bytes": 3617,
+      "sha256": "05ed14d30dcf6d5243a1ab414cac4c1fb89a0b2f242eef0f060de20346a26d70"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/copter-faults/action-owner.lock": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/copter-faults/action-receive-floor": {
+      "bytes": 14,
+      "sha256": "5275426937068c54a0e78bdac12912b2cb05e0bcfbbc470e2b30dcc601fcd3af"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/copter-faults/application-rx.jsonl": {
+      "bytes": 2487309,
+      "sha256": "25581c9eca558d59c6dce091bfa348ee2e0d0e086f2703ca06c0e9cbe04dcdac"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/copter-faults/gazebo.log": {
+      "bytes": 11356,
+      "sha256": "0aa774e0bccc752294d2f76dbe478d919e7d4836e1c4be60c434e10048a28373"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/copter-faults/http-audit.jsonl": {
+      "bytes": 1865,
+      "sha256": "d6d3cc43709db0488e19bc29f2889eeabfbef9bf5e7fa0e23c26d642d33032a8"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/copter-faults/manifest.json": {
+      "bytes": 5679,
+      "sha256": "2cd1082f7e336582969bb43e8bc29c8c32fda2c639868cdd048bf2790a3f0fa0"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/copter-faults/model.sdf": {
+      "bytes": 10312,
+      "sha256": "c23f4ddba8da8e6327ffd333718c130060c6e6a9625f420afb211afda9857e94"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/copter-faults/proxy.jsonl": {
+      "bytes": 7597930,
+      "sha256": "aa08716886faa7edef8b266578c32280ba5d95f49ef17868df9d7584f581712d"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/copter-faults/runtime.jsonl": {
+      "bytes": 903454,
+      "sha256": "a5fc371eb305634ee7e8579028e5a881534fa41ca8f20ac06752230a238e3de4"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/copter-faults/signing-support.json": {
+      "bytes": 1326,
+      "sha256": "462300b333da02b3ac975d54c1be69026b45926b7ee0cf52105663735bf36388"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/copter-faults/sitl.log": {
+      "bytes": 1575,
+      "sha256": "8fece53c347789ba8a1fa34ba42842e45ad6193dc846f11a4651ce26c29614d8"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/copter-faults/summary.json": {
+      "bytes": 139462,
+      "sha256": "fd58da545b1bae587e9740683cc628e90cf39cd48d59d57f91c4f108b57f012e"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/copter-faults/trajectory.jsonl": {
+      "bytes": 181179,
+      "sha256": "1820cf98f9d157ece963085511d15bdf71e761cf0000527473d155d0b364fd0e"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/copter-faults/world.sdf": {
+      "bytes": 3616,
+      "sha256": "cb7bbb24d7ec2f0149c42ca8e43175f08c0d40f26f79a43af3559a153d587c1a"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/external/ros-server.log": {
+      "bytes": 16,
+      "sha256": "52fdd7220653b7659e70662f4a804fc9be33c1cb65035b5b3f59466b4769267f"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/external/runtime.jsonl": {
+      "bytes": 9503,
+      "sha256": "d686f1f08259c988f3d4570854c1a3f1a22ae0ec8246d0c701aa3c6db85573ee"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/external/summary.json": {
+      "bytes": 36448,
+      "sha256": "691d20e15c4e71db1dd165cc4695cef3d6e0acc501f7a74e55d1852e3db646bd"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/plane-actions/action-owner.lock": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/plane-actions/action-receive-floor": {
+      "bytes": 14,
+      "sha256": "59b5811e7889668c4414ab3316d757d967b05a9c478ffa322cff62754b50e8cc"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/plane-actions/application-rx.jsonl": {
+      "bytes": 11459001,
+      "sha256": "97d17489b0b40f8b1d3e67ed796648b9eec29e6f35507d80977965c3c9df84af"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/plane-actions/gazebo.log": {
+      "bytes": 4763,
+      "sha256": "37ed6a42ae603eda73b0a3145b67d6dd72120263f4d84647628fe2b261253542"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/plane-actions/http-audit.jsonl": {
+      "bytes": 1573,
+      "sha256": "5f7f45029e1f5fcea7d7863af9cbda3cfc2c947c2b2449b7cad2938744567791"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/plane-actions/manifest.json": {
+      "bytes": 5770,
+      "sha256": "9559f1d7a2a443adbcf56210a5333251f424fd4a5045cbc6fbee1fcb60a0a81d"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/plane-actions/model.sdf": {
+      "bytes": 18449,
+      "sha256": "ca79bea85e53abedee85bfb10aafc87be462ee2020ba27bae251f4b42a94ba5f"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/plane-actions/proxy.jsonl": {
+      "bytes": 34887730,
+      "sha256": "4a5c802a9bc605c6606e788468806e73a493a411ed69471a7c5e17434293930b"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/plane-actions/runtime.jsonl": {
+      "bytes": 3382077,
+      "sha256": "fde6672dd7bec295847ebaf315fb25b90d56942f6c438104f44a1ef3be881bae"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/plane-actions/signing-support.json": {
+      "bytes": 1328,
+      "sha256": "4c64273677fa1be5d7d8333b9f736c69c5b9ea410d6815fc6f1639dff386248b"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/plane-actions/sitl.log": {
+      "bytes": 1607,
+      "sha256": "d280452b6dd963adcd565cfdaa50240379b0968055ab13cceabbcf85db1e09ba"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/plane-actions/summary.json": {
+      "bytes": 162810,
+      "sha256": "e341e227488d0db4129c43be3c16d6c153e0d6b954719c368229432cff0776c7"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/plane-actions/trajectory.jsonl": {
+      "bytes": 610212,
+      "sha256": "892383f9db9166284cb8289e8717ae3ddc0c12c3f8806db8361cfaa669f0b488"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/plane-actions/world.sdf": {
+      "bytes": 2478,
+      "sha256": "ac8b08a700f4196e290f16eed4fc057941a93cb6533ad70f1800a5f66412c256"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/plane-faults/action-owner.lock": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/plane-faults/action-receive-floor": {
+      "bytes": 14,
+      "sha256": "e55e170ea582383ffa47c88888b84afcfcba022f16e1a34ca5d5b753974a733e"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/plane-faults/application-rx.jsonl": {
+      "bytes": 2172269,
+      "sha256": "f47b5c7bf86f3fb244bdcad714a15dfe63853df4cec88baff5157f66214f85a1"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/plane-faults/gazebo.log": {
+      "bytes": 4506,
+      "sha256": "5573e12d9b48c1d2da38cf066c64219097e50184e1fb1d0479fe1ef5fded04f6"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/plane-faults/http-audit.jsonl": {
+      "bytes": 1147,
+      "sha256": "0e3ff19656fda51c1f92146391c02773b937cc97565c9e66f6a4b48d8ec62534"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/plane-faults/manifest.json": {
+      "bytes": 5765,
+      "sha256": "4090bf82af74361a3333f85c38627f8c9a981942467b6fd92d49a27ff7d8efee"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/plane-faults/model.sdf": {
+      "bytes": 18449,
+      "sha256": "ca79bea85e53abedee85bfb10aafc87be462ee2020ba27bae251f4b42a94ba5f"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/plane-faults/proxy.jsonl": {
+      "bytes": 6671571,
+      "sha256": "adb1e1e5c9148bc186ea4f42eb86b37741e9bd11b72e30d9e99895b8cc73849c"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/plane-faults/runtime.jsonl": {
+      "bytes": 645498,
+      "sha256": "ac9946e68ce98a891e932f79251299e311df3bcda5ea77939e23b90d54e79ddb"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/plane-faults/signing-support.json": {
+      "bytes": 1328,
+      "sha256": "d470da729fd6c575621cbec4353c5d84a4e9874856a230eaaa055c2c4e19fd86"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/plane-faults/sitl.log": {
+      "bytes": 1387,
+      "sha256": "282e98d5220f76d33de7768dcfb26d8eb8344872b65ff3c35bb56cfd3a2c3546"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/plane-faults/summary.json": {
+      "bytes": 89687,
+      "sha256": "6bf08359e675dd7a550384b21f4eaefb49c3e1c555b75ab36bf1e54fa2bb8bd4"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/plane-faults/trajectory.jsonl": {
+      "bytes": 128521,
+      "sha256": "3ad41308007e6609421264a107030c988849cb8f4f3ae0064c6f03c9a74c0b07"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/plane-faults/world.sdf": {
+      "bytes": 2477,
+      "sha256": "ce0998246655648d0adacf8a412c8f572a6bbe93c859e3a9ed7e440b63df144e"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/rover-actions/action-lab.png": {
+      "bytes": 206074,
+      "sha256": "ed35ff81714149a249d7b54a7501a6919d0b63edfd8400b55e8981ef4f769923"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/rover-actions/action-owner.lock": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/rover-actions/action-receive-floor": {
+      "bytes": 14,
+      "sha256": "92c6ca7bf8faa297626e4b72becc0f1953f5a0dcdd9f6c9a792b6fd79f1f10e7"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/rover-actions/application-rx.jsonl": {
+      "bytes": 1425137,
+      "sha256": "2bab69f4f61a607e74e000f02e38b9e77e557c16a0a00cd5bb6d8dc4230445b3"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/rover-actions/gazebo.log": {
+      "bytes": 4081,
+      "sha256": "c78d1169d8edd20a8ca1cd94184223e69eb9e277a787cd022137e2de14fb160e"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/rover-actions/http-audit.jsonl": {
+      "bytes": 3876,
+      "sha256": "7b12448efd40d33f0d1ad7d8c081f6374790169845013a67e10348b3488251fc"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/rover-actions/manifest.json": {
+      "bytes": 5964,
+      "sha256": "e5331982fece0bd92d0e3fa95422791cc9b85425f84e8525d85b0684639d85ee"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/rover-actions/model.sdf": {
+      "bytes": 8025,
+      "sha256": "53c32fdc91ebbceecee1c0a72abfac86fd02e97bc241a4b17a927049ebdb40b6"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/rover-actions/proxy.jsonl": {
+      "bytes": 4482301,
+      "sha256": "a8bc37e91dadda3b345f4132133e9b732e8f25ff88401ebd95ddd0564bab7139"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/rover-actions/runtime.jsonl": {
+      "bytes": 956143,
+      "sha256": "342005cb89da0eb8abfb5503c805872dc8e1266639238fb3257701c98de8a3c9"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/rover-actions/signing-support.json": {
+      "bytes": 1330,
+      "sha256": "eb0c2d03de1ccc1954cc86062076d3e43236444311e7d3a1c8272385cd8e222e"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/rover-actions/sitl.log": {
+      "bytes": 1180,
+      "sha256": "fc30c5761d900c5e41e934de151537804fa2bb722b16555e65edc3cd57d3430c"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/rover-actions/summary.json": {
+      "bytes": 366116,
+      "sha256": "37337c5aad76907cff799831f25caa422000df55d2e5963521b08135b598f8e7"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/rover-actions/trajectory.jsonl": {
+      "bytes": 418541,
+      "sha256": "54251aee23534e560210d5b7c01cfc2da19c439967984c662f8a1294f2910460"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/rover-actions/world.sdf": {
+      "bytes": 1599,
+      "sha256": "78507d8950490843c3d84bc90a4ba80c87fa8b3bad1f636d178d0d7678dcdb81"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/rover-faults/action-owner.lock": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/rover-faults/action-receive-floor": {
+      "bytes": 14,
+      "sha256": "627273df5680d9f52027a508add834bfa73f3e7f1bea178d3ebdad0ce3462b44"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/rover-faults/application-rx.jsonl": {
+      "bytes": 604594,
+      "sha256": "ef7f638e7b9ff136797a59dcd99ee535b719a42f8e057edef83c3c1d9bebc021"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/rover-faults/gazebo.log": {
+      "bytes": 3995,
+      "sha256": "61bc0d3d09119e1513ec7ae401f44b16333a4f7bfd34cdb8991929e072ffade7"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/rover-faults/http-audit.jsonl": {
+      "bytes": 2008,
+      "sha256": "f6b3b3486136cc835d4974a16950b65231cedabbcbf2032d8b85de334ba0ba5d"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/rover-faults/manifest.json": {
+      "bytes": 5960,
+      "sha256": "a19b4213f27f2ed8f8a25a59516f6ea6c605c4b27a26901d488ad7243d502abb"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/rover-faults/model.sdf": {
+      "bytes": 8025,
+      "sha256": "53c32fdc91ebbceecee1c0a72abfac86fd02e97bc241a4b17a927049ebdb40b6"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/rover-faults/proxy.jsonl": {
+      "bytes": 1882711,
+      "sha256": "047ab7ff2ae8d47faf46afc77b2953c392eba033a8361a5f201debea59e6f0c4"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/rover-faults/runtime.jsonl": {
+      "bytes": 366089,
+      "sha256": "7087aec7f9710c577003ba31c9e797561d62754ed66ecba29cf021b30b0e0ecc"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/rover-faults/signing-support.json": {
+      "bytes": 1330,
+      "sha256": "e63bd96e53d9474db2ebbc6b246eb2fb509a80ab123c04a5afebc049a044a2b3"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/rover-faults/sitl.log": {
+      "bytes": 1180,
+      "sha256": "fc30c5761d900c5e41e934de151537804fa2bb722b16555e65edc3cd57d3430c"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/rover-faults/summary.json": {
+      "bytes": 133118,
+      "sha256": "562de2e4157127f7f9cb46697a5f372d15e21f5ed159d0ddf1f1371f50158dc3"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/rover-faults/trajectory.jsonl": {
+      "bytes": 177487,
+      "sha256": "acd8e7321b29b6332c16d330802ebf6d80b5f3f6316ac34c21fde530a0b4edf5"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-1-1212aa7f/rover-faults/world.sdf": {
+      "bytes": 1598,
+      "sha256": "475dc8f949c96a6599e168c0417a822f0b61066228efaa9767f52fbc85282dcc"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/copter-actions/action-owner.lock": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/copter-actions/action-receive-floor": {
+      "bytes": 14,
+      "sha256": "638945da1fd52b4a239bf7dd59748da22d71237d48e68bf7f01b832453a5ece5"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/copter-actions/application-rx.jsonl": {
+      "bytes": 5921180,
+      "sha256": "e7b2a4c205830262c1a4a240950ed1ce4540e8046a89b24190725aa9f77d74fb"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/copter-actions/gazebo.log": {
+      "bytes": 11442,
+      "sha256": "51d54559a73dc46b5217e7c52541fd296df676876e076ed8c19be23e319eab5c"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/copter-actions/http-audit.jsonl": {
+      "bytes": 3584,
+      "sha256": "10a6dcf59bfffc4761fa76d0c56839e7420928be2e0a4643e1f6042c0b05781a"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/copter-actions/manifest.json": {
+      "bytes": 5683,
+      "sha256": "5b3acb9b0fd91a34543b3751230c6924aaf33d79174204f15ef3e931a77620f2"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/copter-actions/model.sdf": {
+      "bytes": 10312,
+      "sha256": "c23f4ddba8da8e6327ffd333718c130060c6e6a9625f420afb211afda9857e94"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/copter-actions/proxy.jsonl": {
+      "bytes": 17867035,
+      "sha256": "21583d22df4abea3e7b371698583d6737d56ea8989f12e10b23afef8e58d8e57"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/copter-actions/runtime.jsonl": {
+      "bytes": 2268953,
+      "sha256": "a1f789901c853272189329ad72b7f21dc00ade3fde0fdee61619f8940bdc75f2"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/copter-actions/signing-support.json": {
+      "bytes": 1326,
+      "sha256": "53cc23ec7528d8601ba6e4fd205caa69f175f59c8ca56d111631c8724ccfe4a4"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/copter-actions/sitl.log": {
+      "bytes": 1625,
+      "sha256": "271829946233795ff9eb6e36c1fc9b6dc83e13c8346b044a3582e58aeaf68b60"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/copter-actions/summary.json": {
+      "bytes": 382611,
+      "sha256": "aa1c8e08c00eccd5aa98668277ecdbb67328293d13712aa0c72d0a4dcca0f174"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/copter-actions/trajectory.jsonl": {
+      "bytes": 376283,
+      "sha256": "a85e9b50b41ce459de86345d08a441cfac045c9a7726063767b5d6075c69e6bc"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/copter-actions/world.sdf": {
+      "bytes": 3617,
+      "sha256": "4ec8bc431440b944466af9db0e047dde9561a33cfbebd93e4cb3f1c2425c703a"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/copter-faults/action-owner.lock": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/copter-faults/action-receive-floor": {
+      "bytes": 14,
+      "sha256": "4499b120450ccb19ec37293b3801f70f8c0db7da566b837092b9b2b9a1f4216e"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/copter-faults/application-rx.jsonl": {
+      "bytes": 2485937,
+      "sha256": "205dbdb3d6d45766350deebfd3ff286af87e4ff277ca20d7c267a4963c41127e"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/copter-faults/gazebo.log": {
+      "bytes": 11356,
+      "sha256": "5af4d4fbf80dd52da4391673dc849bbee44efd4001d1c06a237675ee0d9fe9d6"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/copter-faults/http-audit.jsonl": {
+      "bytes": 1865,
+      "sha256": "e4174a3acdc6a421e4bd44d075d344e5e84d5d2725cf42409e98c4b3582ca3b3"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/copter-faults/manifest.json": {
+      "bytes": 5679,
+      "sha256": "ed872222080126a67c4121cb2ca8320c7db5dae3e2b199105e12efa918b20b10"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/copter-faults/model.sdf": {
+      "bytes": 10312,
+      "sha256": "c23f4ddba8da8e6327ffd333718c130060c6e6a9625f420afb211afda9857e94"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/copter-faults/proxy.jsonl": {
+      "bytes": 7597060,
+      "sha256": "bf99eeac5ef584ab596a47bf74f1c6c0f26201081050ab54e71b72aced1fdf31"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/copter-faults/runtime.jsonl": {
+      "bytes": 902156,
+      "sha256": "34d830d8e022588bebe909fc1af1b2910bbbfba5037553f1607cd38bb2e1b878"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/copter-faults/signing-support.json": {
+      "bytes": 1326,
+      "sha256": "7d21f0d816508c5d60ac56660e8bcbe543d7e6c90e7179f86304fb06144f66e6"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/copter-faults/sitl.log": {
+      "bytes": 1575,
+      "sha256": "8fece53c347789ba8a1fa34ba42842e45ad6193dc846f11a4651ce26c29614d8"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/copter-faults/summary.json": {
+      "bytes": 140300,
+      "sha256": "1f251d789d65f145a0371ee38389a27433b87fac286a2a76957a99261404e2c5"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/copter-faults/trajectory.jsonl": {
+      "bytes": 181329,
+      "sha256": "6b22ae5908b1bb86abc97fdb3944b66cd8cb173a22d89a82efa266854258f1af"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/copter-faults/world.sdf": {
+      "bytes": 3616,
+      "sha256": "ab4fe417cf3f729897733ecf7db31a4d97c5986990c704377105c0098d421d54"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/external/ros-server.log": {
+      "bytes": 16,
+      "sha256": "52fdd7220653b7659e70662f4a804fc9be33c1cb65035b5b3f59466b4769267f"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/external/runtime.jsonl": {
+      "bytes": 9503,
+      "sha256": "61add7b345c78924e62e833998e9f2e09c92d7f71fe6d7a2cfe9ddbdf6c15241"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/external/summary.json": {
+      "bytes": 35947,
+      "sha256": "1db433a38875af8790c0deef75801f9ec7eac42e8a92ae18e2b7b5cda577f49c"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/plane-actions/action-owner.lock": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/plane-actions/action-receive-floor": {
+      "bytes": 14,
+      "sha256": "8d45235f92bdc1e9953b33606ffd74da082d964b4bebd05b6070a737e492bc7d"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/plane-actions/application-rx.jsonl": {
+      "bytes": 11418063,
+      "sha256": "3ac2d58331da50383d0b80900ccfc7c8034a80221fe2c2f85a8b33463cb0a37e"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/plane-actions/gazebo.log": {
+      "bytes": 4763,
+      "sha256": "75dfb524e62437f0233971346e464ebbe60d4815f129144d154e4c07f48db579"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/plane-actions/http-audit.jsonl": {
+      "bytes": 1573,
+      "sha256": "e917c91c80c4e2bb20d31daf8f1d534e0bbb1fc251499610ae09777137e81244"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/plane-actions/manifest.json": {
+      "bytes": 5770,
+      "sha256": "e77d2d0832f9b54571463e706a8c95270ffe1066754dee6ad6b4d4eb307cf8a4"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/plane-actions/model.sdf": {
+      "bytes": 18449,
+      "sha256": "ca79bea85e53abedee85bfb10aafc87be462ee2020ba27bae251f4b42a94ba5f"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/plane-actions/proxy.jsonl": {
+      "bytes": 34757532,
+      "sha256": "da821b263397430bc0f9f7eae8dacb6d36f1309d3f3750c4a8c258d01c14f95d"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/plane-actions/runtime.jsonl": {
+      "bytes": 3368895,
+      "sha256": "a9b70cd858b6bf8a6e92a7fcb518443d58d3bfb8b2f34e08d5028f751ba1c285"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/plane-actions/signing-support.json": {
+      "bytes": 1328,
+      "sha256": "349b43a40234c98200921970f662d6a4566e1924920f96a58f3d13eabe4f3e45"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/plane-actions/sitl.log": {
+      "bytes": 1607,
+      "sha256": "d280452b6dd963adcd565cfdaa50240379b0968055ab13cceabbcf85db1e09ba"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/plane-actions/summary.json": {
+      "bytes": 162794,
+      "sha256": "d8169905fd4affdde39bef3d683f1b9054874a570f7548b82f29622d16f2ae87"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/plane-actions/trajectory.jsonl": {
+      "bytes": 607435,
+      "sha256": "23b704ff35d89422ff888ecef7e7a9040efaf426fc5605ecdc6ea0c7d2ff93eb"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/plane-actions/world.sdf": {
+      "bytes": 2478,
+      "sha256": "7092ce83f85d7de64e60ea341192c9b834a3c1575acc0459e8b0d607ec1c049a"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/plane-faults/action-owner.lock": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/plane-faults/action-receive-floor": {
+      "bytes": 14,
+      "sha256": "65cd69eaf5a550e7170aee1314ac3a3eda96d81e5c31e3a90e1262b375c3eb28"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/plane-faults/application-rx.jsonl": {
+      "bytes": 2172257,
+      "sha256": "8946ce608e57829a87e5c845d84d18e4c342f198e052e65e5c6b67898fd09815"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/plane-faults/gazebo.log": {
+      "bytes": 4506,
+      "sha256": "cadca1d2b9372acaecf565a7af752b0ef691d73b576babeb70deb42f973fe093"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/plane-faults/http-audit.jsonl": {
+      "bytes": 1147,
+      "sha256": "36fadd821dc5fda726099fcf828f25a262aa64b392eb96e786b5208f54877ade"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/plane-faults/manifest.json": {
+      "bytes": 5765,
+      "sha256": "ce6e13e5f3e57e6c44126b30098dcd647281483a7c4a81b34cfed9837b6ff57a"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/plane-faults/model.sdf": {
+      "bytes": 18449,
+      "sha256": "ca79bea85e53abedee85bfb10aafc87be462ee2020ba27bae251f4b42a94ba5f"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/plane-faults/proxy.jsonl": {
+      "bytes": 6671545,
+      "sha256": "0017d5c5d0d67bad720e9a0d9c26ea2153b6a342716f391b8b707dac314eaa2e"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/plane-faults/runtime.jsonl": {
+      "bytes": 645498,
+      "sha256": "8f234327abcf67d6a45690b384af9a851cd7ce1a8ca3198bce19a47df96d3906"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/plane-faults/signing-support.json": {
+      "bytes": 1328,
+      "sha256": "e1b6c6acf09bffcf3b28e13ff63ccd4a654e3976bbeb7a4b0d29cbed3429be4b"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/plane-faults/sitl.log": {
+      "bytes": 1387,
+      "sha256": "282e98d5220f76d33de7768dcfb26d8eb8344872b65ff3c35bb56cfd3a2c3546"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/plane-faults/summary.json": {
+      "bytes": 89687,
+      "sha256": "e905aab57861f3cc70b67440eb607718df633f3ef00a76d2aa034154fb4f7e01"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/plane-faults/trajectory.jsonl": {
+      "bytes": 128531,
+      "sha256": "de9c39561305712fa18b69b4a6012d340d8bd0383d46624baaff2611c6b1abbb"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/plane-faults/world.sdf": {
+      "bytes": 2477,
+      "sha256": "b9d799e5a184d5df7925f15e53f3ed2214bdd1e40de6107d2f7fc483d9cf561f"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/rover-actions/action-lab.png": {
+      "bytes": 203918,
+      "sha256": "26a23286201a4fbb46dbeedc96c3f905f861bf420ba879bb0573d3591260e38a"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/rover-actions/action-owner.lock": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/rover-actions/action-receive-floor": {
+      "bytes": 14,
+      "sha256": "7f9847f5ddee9440435a53b9c75326a15d518079e502edf15f2126d9887ec0cf"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/rover-actions/application-rx.jsonl": {
+      "bytes": 1444295,
+      "sha256": "0bbc9b4699c66b09a39156dfeab3d5d50c5a2fc88094a1c9722858234cb65e8d"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/rover-actions/gazebo.log": {
+      "bytes": 4081,
+      "sha256": "66e2d5c97de5437b82f658a3a805ead80c1e4361278d746486b3e57437292a9f"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/rover-actions/http-audit.jsonl": {
+      "bytes": 3876,
+      "sha256": "e27a66026e072cf7cd582fff5a7003efbcb45bd30575a13b6f92dd31295c1e7e"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/rover-actions/manifest.json": {
+      "bytes": 5964,
+      "sha256": "e298e830a87d2d3b1aecc8325f82406b64d181d807a0b1e0b858b7f649915b03"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/rover-actions/model.sdf": {
+      "bytes": 8025,
+      "sha256": "53c32fdc91ebbceecee1c0a72abfac86fd02e97bc241a4b17a927049ebdb40b6"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/rover-actions/proxy.jsonl": {
+      "bytes": 4540796,
+      "sha256": "0c4761d93c346e40df79b7f40b6a15e16323eb3b94ea5e2671911a39e9f596c6"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/rover-actions/runtime.jsonl": {
+      "bytes": 968209,
+      "sha256": "3b610f2bf9d0c190b519392dde26012d392f29627f0ccbdd5c92e4d055e12a44"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/rover-actions/signing-support.json": {
+      "bytes": 1330,
+      "sha256": "7a4cd5d819eea6d8ed38677c01e0d6b18ebc1f6803555c5369114d800d4a60cc"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/rover-actions/sitl.log": {
+      "bytes": 1180,
+      "sha256": "fc30c5761d900c5e41e934de151537804fa2bb722b16555e65edc3cd57d3430c"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/rover-actions/summary.json": {
+      "bytes": 368548,
+      "sha256": "9470eb3c1fd13969d4ad0d5093436afa1befe723aa179221bb83c2cd656700a4"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/rover-actions/trajectory.jsonl": {
+      "bytes": 419638,
+      "sha256": "1b585764b347310b91983e4846e35a0b7a3a4d4d9def34178711e8d9d5283272"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/rover-actions/world.sdf": {
+      "bytes": 1599,
+      "sha256": "be84536260d2ad2ffe9104bb1f9a34a40d36945c1c724eef3d48ccc6482f7946"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/rover-faults/action-owner.lock": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/rover-faults/action-receive-floor": {
+      "bytes": 14,
+      "sha256": "aba439c6611317a9b989a2b6380d80dfaac61e63665d9140eb22716e10a457c6"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/rover-faults/application-rx.jsonl": {
+      "bytes": 613840,
+      "sha256": "204a5477e3a8a17227bb62f7bbdaeb14bd3c9d78df56563054742094428352a6"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/rover-faults/gazebo.log": {
+      "bytes": 3995,
+      "sha256": "974c4e345e7229ba90de7d9622bc05d3dd877940f8b41abb1693868c36a9c57b"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/rover-faults/http-audit.jsonl": {
+      "bytes": 2008,
+      "sha256": "9d5655c305a9eece969efeaf46f245f62e9ca4c74cef2e266d55099c44c2c3db"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/rover-faults/manifest.json": {
+      "bytes": 5960,
+      "sha256": "60c2b14a00d056d861d232a1b63f5bce76f845c431d719b510574b2c591dcf11"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/rover-faults/model.sdf": {
+      "bytes": 8025,
+      "sha256": "53c32fdc91ebbceecee1c0a72abfac86fd02e97bc241a4b17a927049ebdb40b6"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/rover-faults/proxy.jsonl": {
+      "bytes": 1909016,
+      "sha256": "a3ef2a3ec7daa98c265678bc3e4fcf2a543ed359d849d698f4072126135428b5"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/rover-faults/runtime.jsonl": {
+      "bytes": 371423,
+      "sha256": "b3c5fd1289ff2dcd107f7092bd0486ca980fb018e4521655f2df59b7e6707e6c"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/rover-faults/signing-support.json": {
+      "bytes": 1330,
+      "sha256": "ac9cbe1a9e8f27bb43e5c73bc44d40ad313d5ae7666ad014fd7f599d37f63ab8"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/rover-faults/sitl.log": {
+      "bytes": 1180,
+      "sha256": "fc30c5761d900c5e41e934de151537804fa2bb722b16555e65edc3cd57d3430c"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/rover-faults/summary.json": {
+      "bytes": 133588,
+      "sha256": "cef57601c22559abbf148ae098840a3e3d4edeea133359e051f35176f7d3b2a2"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/rover-faults/trajectory.jsonl": {
+      "bytes": 179495,
+      "sha256": "217fc04b26de6dd8dd029167b0dbf1c45d542564d6b5cda7f309d03003aa8432"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/round-2-4b74e39e/rover-faults/world.sdf": {
+      "bytes": 1598,
+      "sha256": "ed7fa5ec17947200531c02bd5621b21fc1e41838513b6eafba595bef24eeb3bb"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/stages.json": {
+      "bytes": 11737,
+      "sha256": "7dd985662db70a55d899a83b5c42aeff01fe1c9ea5a32c151f071f3b5ab85923"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/summary.json": {
+      "bytes": 15094,
+      "sha256": "ef92a7d27db5fc5b908fb6ee467fef1f92f9709e7be9fc747ac4142778a07f0e"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/unit.json": {
+      "bytes": 84,
+      "sha256": "2da37a8e87db667ee70c4a74ae15f01ad80e87b79b72096d87ec1738651513d7"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1/unit.log": {
+      "bytes": 567,
+      "sha256": "d3393e13bb2f43c86525173a3da18bf78695e6f3887c20478c32fcd1de4f5e4f"
+    },
+    "artifacts/phase3-actions/acceptance-047beba-1.log": {
+      "bytes": 703,
+      "sha256": "5b941d643e786d23f5e5315095ce338fcfe5ca556b703f8eed2f503a35dbf3bf"
+    },
+    "artifacts/phase3-actions/acceptance-2faceb3-1/round-1-bffd907d/rover-actions/summary.json": {
+      "bytes": 102152,
+      "sha256": "deea97ba753f3fbecaa648218bfdd3d5566b8b1bcfa3a16ea0616d04f4d2fa20"
+    },
+    "artifacts/phase3-actions/acceptance-2faceb3-1/summary.json": {
+      "bytes": 475,
+      "sha256": "18d0d6e370ca49958fddf3f5aab631faec22a34c3922f28f023ab795b2e67ea8"
+    },
+    "artifacts/phase3-actions/acceptance-2faceb3-1.log": {
+      "bytes": 30,
+      "sha256": "69ec9f31bb861c9fb835a4450c5a4f3c5ea5b9b51b4f0fdb9b1b204edaea9817"
+    },
+    "artifacts/phase3-actions/acceptance-coherent-1/phase2-regression/run-1-289c165b/copter-faults/summary.json": {
+      "bytes": 4978,
+      "sha256": "016f1f8d706a14375e0d71ee0f612797579aff98dffa19db745f17bfd503fe26"
+    },
+    "artifacts/phase3-actions/acceptance-coherent-1/phase2-regression/run-1-289c165b/copter-physical/summary.json": {
+      "bytes": 5123,
+      "sha256": "b4f490943f465c61f90a0ce2c67867709438b285e883c12c98d3e11f6e904cc8"
+    },
+    "artifacts/phase3-actions/acceptance-coherent-1/phase2-regression/run-1-289c165b/copter-probe/summary.json": {
+      "bytes": 31030,
+      "sha256": "f63af7a35fc10a9899d18f3fccae03ad35e8d9699d67116598a7295f13e822d6"
+    },
+    "artifacts/phase3-actions/acceptance-coherent-1/phase2-regression/run-1-289c165b/plane-cancel_window/summary.json": {
+      "bytes": 2543,
+      "sha256": "57635ae9e5d8bf037b17d5bac2d3260b10da01029da9fe5830a11de7532a68af"
+    },
+    "artifacts/phase3-actions/acceptance-coherent-1/phase2-regression/run-1-289c165b/plane-control/summary.json": {
+      "bytes": 20864,
+      "sha256": "592233587b0bbda85098eb27640f3dbee153c84ed7b81fc5d441d60943b59c95"
+    },
+    "artifacts/phase3-actions/acceptance-coherent-1/phase2-regression/run-1-289c165b/rover-faults/summary.json": {
+      "bytes": 4986,
+      "sha256": "89b13de51bf0ce4f97e44676b3aaa6cdd5a72fb81b129ebdc9a3aea0d09f4b55"
+    },
+    "artifacts/phase3-actions/acceptance-coherent-1/phase2-regression/run-1-289c165b/rover-legacy_physical/summary.json": {
+      "bytes": 8586,
+      "sha256": "1f95ca4b8a2d426f4af260ec125b3eb9511ab0c82b377e968b676c87eb7e32ea"
+    },
+    "artifacts/phase3-actions/acceptance-coherent-1/phase2-regression/run-1-289c165b/rover-physical/summary.json": {
+      "bytes": 11857,
+      "sha256": "376854af73811ee291e67e05db6e53c887ef1cf7cb7749f8acc3848de3713f5f"
+    },
+    "artifacts/phase3-actions/acceptance-coherent-1/phase2-regression/run-1-289c165b/rover-probe/summary.json": {
+      "bytes": 31073,
+      "sha256": "69511d03ba1d64ae9f4c4b05f28f96447d1dec8f5233eff98bac58c04df1762b"
+    },
+    "artifacts/phase3-actions/acceptance-coherent-1/phase2-regression/run-2-5f9f4041/copter-faults/summary.json": {
+      "bytes": 4977,
+      "sha256": "822c87c687b8f5482dadbf99356292b6b86b48e7f023a4df6b6a16ae9d940980"
+    },
+    "artifacts/phase3-actions/acceptance-coherent-1/phase2-regression/run-2-5f9f4041/copter-physical/summary.json": {
+      "bytes": 5131,
+      "sha256": "c67aa1c95536fc236030af198c9770a80908f7b105acc073173dddd1c6a25914"
+    },
+    "artifacts/phase3-actions/acceptance-coherent-1/phase2-regression/run-2-5f9f4041/copter-probe/summary.json": {
+      "bytes": 31031,
+      "sha256": "0f09e3c8e0da314f6132f59997ceb6a7008442e52bd8b0cf5937aee85c95aedf"
+    },
+    "artifacts/phase3-actions/acceptance-coherent-1/phase2-regression/run-2-5f9f4041/plane-cancel_window/summary.json": {
+      "bytes": 2543,
+      "sha256": "b83dcd4a8add0c0c35fca6ccfcb84f79f45fcd7aa6d151b0f3900908719cc78d"
+    },
+    "artifacts/phase3-actions/acceptance-coherent-1/phase2-regression/run-2-5f9f4041/plane-control/gazebo.log": {
+      "bytes": 4542,
+      "sha256": "57d837d4e174dbb25c99ece74dbd79ab57fc9e6b69922bb269e28c7a01b94259"
+    },
+    "artifacts/phase3-actions/acceptance-coherent-1/phase2-regression/run-2-5f9f4041/plane-control/manifest.json": {
+      "bytes": 5837,
+      "sha256": "0570fd06ce6d6f177aa28bf3ec1a0d20d3e1366ee6ba00e672d16e67c29c3455"
+    },
+    "artifacts/phase3-actions/acceptance-coherent-1/phase2-regression/run-2-5f9f4041/plane-control/model.sdf": {
+      "bytes": 18449,
+      "sha256": "ca79bea85e53abedee85bfb10aafc87be462ee2020ba27bae251f4b42a94ba5f"
+    },
+    "artifacts/phase3-actions/acceptance-coherent-1/phase2-regression/run-2-5f9f4041/plane-control/proxy.jsonl": {
+      "bytes": 7153459,
+      "sha256": "219b42d1f03cdbdf70ccfc16e1ef5c8ef42800539846193b8097c7179e6ec610"
+    },
+    "artifacts/phase3-actions/acceptance-coherent-1/phase2-regression/run-2-5f9f4041/plane-control/runtime.jsonl": {
+      "bytes": 647897,
+      "sha256": "af7dc5c7a3de571b14cd671f02cadeeb9d34226fa664dca3a46570802c7b4039"
+    },
+    "artifacts/phase3-actions/acceptance-coherent-1/phase2-regression/run-2-5f9f4041/plane-control/signing-support.json": {
+      "bytes": 1328,
+      "sha256": "b2137e2a4d4998f58fd0ea8ad18cf78b985ee21dc467234eb392fff813d7a6dc"
+    },
+    "artifacts/phase3-actions/acceptance-coherent-1/phase2-regression/run-2-5f9f4041/plane-control/sitl.log": {
+      "bytes": 1387,
+      "sha256": "282e98d5220f76d33de7768dcfb26d8eb8344872b65ff3c35bb56cfd3a2c3546"
+    },
+    "artifacts/phase3-actions/acceptance-coherent-1/phase2-regression/run-2-5f9f4041/plane-control/summary.json": {
+      "bytes": 3468,
+      "sha256": "597f3bcab21404e73a49b7b7a2843fb01ae8ef4c3712f90234c9c5aa4a01f1b0"
+    },
+    "artifacts/phase3-actions/acceptance-coherent-1/phase2-regression/run-2-5f9f4041/plane-control/trajectory.jsonl": {
+      "bytes": 540924,
+      "sha256": "e768f577c20bb0651c123a7b25db00a508ec78676982ec3b36e5c15deb28fdb1"
+    },
+    "artifacts/phase3-actions/acceptance-coherent-1/phase2-regression/run-2-5f9f4041/plane-control/world.sdf": {
+      "bytes": 2495,
+      "sha256": "55cf9889924c91c8af0e0bb480a077de70c24941235a6151d35db19375c03448"
+    },
+    "artifacts/phase3-actions/acceptance-coherent-1/phase2-regression/run-2-5f9f4041/rover-faults/summary.json": {
+      "bytes": 4981,
+      "sha256": "55f585194ee723cbd5e4d102743dc4ee7e118701b2a4b13a234fd239581cf528"
+    },
+    "artifacts/phase3-actions/acceptance-coherent-1/phase2-regression/run-2-5f9f4041/rover-legacy_physical/summary.json": {
+      "bytes": 8535,
+      "sha256": "683f3e8b6afb7de7dcb8abc4489ae1e1e2e38bafe192d52a73cb0f03e9c53915"
+    },
+    "artifacts/phase3-actions/acceptance-coherent-1/phase2-regression/run-2-5f9f4041/rover-physical/summary.json": {
+      "bytes": 11844,
+      "sha256": "d84cc3cdc0120b097cfac971fbd2eaae3efd80ee522e793299c978786e4371a8"
+    },
+    "artifacts/phase3-actions/acceptance-coherent-1/phase2-regression/run-2-5f9f4041/rover-probe/summary.json": {
+      "bytes": 31073,
+      "sha256": "2c930c70595340fcccb65477a00dc707470482e7708ce26815527ec64aaa8dce"
+    },
+    "artifacts/phase3-actions/acceptance-coherent-1/phase2-regression/summary.json": {
+      "bytes": 10660,
+      "sha256": "2ee9002aea2d306bbdfbd4507696c8ced692b7ca785eb19cb6c874bc8791acc4"
+    },
+    "artifacts/phase3-actions/acceptance-coherent-1/round-1-a346ce22/copter-actions/summary.json": {
+      "bytes": 388202,
+      "sha256": "cac5c2813eb218ff1a4d2afcfc37093e51208d3a5efaf1ebf349e353832deb91"
+    },
+    "artifacts/phase3-actions/acceptance-coherent-1/round-1-a346ce22/copter-faults/summary.json": {
+      "bytes": 135826,
+      "sha256": "5abd2015be74cfdca4bfea5cf95089e7655b4ad97ed5f649c38b40ecb00aca5a"
+    },
+    "artifacts/phase3-actions/acceptance-coherent-1/round-1-a346ce22/external/summary.json": {
+      "bytes": 36088,
+      "sha256": "bc9e1565aa7634f092a8f35391d4c12d868ca142468b991c7088f0116518cbdc"
+    },
+    "artifacts/phase3-actions/acceptance-coherent-1/round-1-a346ce22/plane-actions/summary.json": {
+      "bytes": 163122,
+      "sha256": "58ab2d1aecf872da3c80345cf3f1b770f486b81bfff221b7aebfcbb314251271"
+    },
+    "artifacts/phase3-actions/acceptance-coherent-1/round-1-a346ce22/plane-faults/summary.json": {
+      "bytes": 89688,
+      "sha256": "c4684e6c8bff73df7c071da2e072364be207f3ee8a6b3a73f0c16b2cc4661e13"
+    },
+    "artifacts/phase3-actions/acceptance-coherent-1/round-1-a346ce22/rover-actions/summary.json": {
+      "bytes": 364380,
+      "sha256": "7cd1c23d125a8d5b548774850c57653a56cac00fe3a2b3aee19455003a0ba57f"
+    },
+    "artifacts/phase3-actions/acceptance-coherent-1/round-1-a346ce22/rover-faults/summary.json": {
+      "bytes": 131983,
+      "sha256": "727454eb00f1d83e371c2eadfce69038cef6482a83f6be3bb115a125e3ce8404"
+    },
+    "artifacts/phase3-actions/acceptance-coherent-1/round-2-c1a0d8a8/copter-actions/summary.json": {
+      "bytes": 384786,
+      "sha256": "35d18e6826283e62200bed8800d33f8618198e7ce5f6afb64379d6bd9ad92042"
+    },
+    "artifacts/phase3-actions/acceptance-coherent-1/round-2-c1a0d8a8/copter-faults/summary.json": {
+      "bytes": 139876,
+      "sha256": "4c1369c3c774723bd3edf06ca9bc92f5bb94c306fcd17b8a615fc1ed21fbbf02"
+    },
+    "artifacts/phase3-actions/acceptance-coherent-1/round-2-c1a0d8a8/external/summary.json": {
+      "bytes": 36076,
+      "sha256": "4266f888b3fdde22b209611d10d146ad6c08781b1792fd733e97b68b0aa74218"
+    },
+    "artifacts/phase3-actions/acceptance-coherent-1/round-2-c1a0d8a8/plane-actions/summary.json": {
+      "bytes": 162991,
+      "sha256": "59f1a76c83af41a38d7684a839468e50a975188df46b15320c809bc4354fae59"
+    },
+    "artifacts/phase3-actions/acceptance-coherent-1/round-2-c1a0d8a8/plane-faults/summary.json": {
+      "bytes": 89995,
+      "sha256": "81a0b7ba28911edf19a65f3beaac1e477999db7ebf8bb062d77dbcd0172d3e33"
+    },
+    "artifacts/phase3-actions/acceptance-coherent-1/round-2-c1a0d8a8/rover-actions/summary.json": {
+      "bytes": 365202,
+      "sha256": "384cf79f38d46813089f7b1f90d23bb3ced6afde33d652fda32a63717de3347a"
+    },
+    "artifacts/phase3-actions/acceptance-coherent-1/round-2-c1a0d8a8/rover-faults/summary.json": {
+      "bytes": 134987,
+      "sha256": "23492262e591894360228d5b8dad57b974e75bb06d5791e215338833edbb3407"
+    },
+    "artifacts/phase3-actions/acceptance-coherent-1/summary.json": {
+      "bytes": 14968,
+      "sha256": "61047c391ed4a8c9f1cf484fe005be0bdfade81a8ad8884cab007b308fff7713"
+    },
+    "artifacts/phase3-actions/acceptance-coherent-1.log": {
+      "bytes": 689,
+      "sha256": "de76ef862d943b954f67e4da2d65996f446670af00509a8beb2587e40d47d4fa"
+    },
+    "artifacts/phase3-actions/acceptance-complete-1/round-1-b9d27563/rover-actions/summary.json": {
+      "bytes": 135744,
+      "sha256": "6ddf80900541139462ea27a38d5b460799e1b3337c733cc46d058e13fec40b08"
+    },
+    "artifacts/phase3-actions/acceptance-complete-1/summary.json": {
+      "bytes": 732,
+      "sha256": "b363a7886dbf0a7939c71df6cd285a3193857a884c8b74809c0ea64daa56327a"
+    },
+    "artifacts/phase3-actions/acceptance-complete-1.log": {
+      "bytes": 51,
+      "sha256": "df63f1d6b931118c53031b6ed8c941828adedbbd9a5eb2f50db60cf0b76f7df0"
+    },
+    "artifacts/phase3-actions/acceptance-final-1/round-1-db8568d1/copter-actions/summary.json": {
+      "bytes": 306245,
+      "sha256": "20c69bbc365ed0c1b337538d7007b2d6d29c5f8ec75df3f78436ed38211c48de"
+    },
+    "artifacts/phase3-actions/acceptance-final-1/round-1-db8568d1/copter-faults/summary.json": {
+      "bytes": 181,
+      "sha256": "e6a263bd1a377dd38b5b6b54906ce277a9265cdb2a555c74eb2fe806057ac3ff"
+    },
+    "artifacts/phase3-actions/acceptance-final-1/round-1-db8568d1/rover-actions/summary.json": {
+      "bytes": 364265,
+      "sha256": "fd88a26afe95df16b9845583f64fb21b8e86d8026c2ffae2b16cc36cc7d6a159"
+    },
+    "artifacts/phase3-actions/acceptance-final-1/round-1-db8568d1/rover-faults/summary.json": {
+      "bytes": 129470,
+      "sha256": "0395b1e912074dbf4e35d00843256ce42a0a6d1b4f39bc8dadaee766d8e22f0f"
+    },
+    "artifacts/phase3-actions/acceptance-final-1/summary.json": {
+      "bytes": 3329,
+      "sha256": "6e79a5a30bff4d5d782da602a7932745c202a56fd092559e9f233656761c629d"
+    },
+    "artifacts/phase3-actions/acceptance-final-1.log": {
+      "bytes": 168,
+      "sha256": "5fa492813a4206a5afefb01370759917d57149bdc332c56c608f643293b52cbe"
+    },
+    "artifacts/phase3-actions/baseline-unit.log": {
+      "bytes": 67681,
+      "sha256": "c5e1dfe9467705be354e5a5151c80193a5d462aec9e9a9a9f5d22112741a8644"
+    },
+    "artifacts/phase3-actions/baseline.json": {
+      "bytes": 237835,
+      "sha256": "92e86ca6605545bb73913b99dde7b90a09bba4ab1c3f5dc4370be77c70e953e7"
+    },
+    "artifacts/phase3-actions/delivery-audit.json": {
+      "bytes": 9518,
+      "sha256": "b5c01a04da25ee4d69ec51922f80cc5499574968a26e2037133918da88c976a2"
+    },
+    "artifacts/phase3-actions/delivery-audit.py": {
+      "bytes": 6384,
+      "sha256": "2885ef18f988c65493e888ca04af2b1555a9b5bebee5531e3e3040684deeff75"
+    },
+    "artifacts/phase3-actions/delivery-environment-audit.json": {
+      "bytes": 538,
+      "sha256": "d1fc618c1149ac0a1017534d6c3a51643c7461c86af063ba033c19fef5f955d4"
+    },
+    "artifacts/phase3-actions/delivery-plot.py": {
+      "bytes": 1769,
+      "sha256": "4af64fefd575a25004e35426db73ce9e9e8c85a2c257d62daa3ee1e6644aa825"
+    },
+    "artifacts/phase3-actions/delivery-report.py": {
+      "bytes": 10040,
+      "sha256": "e3725681bbfa07029062df93a46a6cbdfd38808f7f2eb29a39865425df6f41fe"
+    },
+    "artifacts/phase3-actions/replay-scheduling-unit.log": {
+      "bytes": 75688,
+      "sha256": "dd51800a27442d14c1ad27f2d057a417087641653e15b5eee5427531a8971244"
+    },
+    "artifacts/phase3-actions/wheel-5651edf/vehicle_autonomy-0.1.0-py3-none-any.whl": {
+      "bytes": 403284,
+      "sha256": "ce6c601480fdc2262e7a1a52f0a47da8d98ee7cd0f466edeb8156c9b09bffaf3"
+    },
+    "artifacts/phase3-actions/wheel-audit.json": {
+      "bytes": 887,
+      "sha256": "508822d550521360888c9f3d0ad1b4f8d7f509bd3ea0cf7beaadabbb2a42b518"
+    },
+    "artifacts/phase3-actions/wheel-frozen-check/summary.json": {
+      "bytes": 530,
+      "sha256": "070f0b9c74ff24ad9711ca668a8b4a2f6e6efd51ca2ded11980d2d2bdfd49be9"
+    },
+    "artifacts/phase3-actions/wheel-frozen-check/tested-check.log": {
+      "bytes": 511,
+      "sha256": "82b21fdb3cab0e441dbee9d5ad2aa22a2fc89e89b443d50e88a811919840c160"
+    },
+    "docs/phase3/trajectories.png": {
+      "bytes": 424360,
+      "sha256": "2ee29b076e4d10df97be521d3b27edecf6867592571d3b6c1c24aee27f8668bc"
+    }
+  }
+}

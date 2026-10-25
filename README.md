@@ -72,8 +72,32 @@ Action 交接和只读重连边界。原候选独立 FAIL 已保留，三项缺�
 ```
 
 该入口必须显式提供自有三车型 SITL 二进制；依赖与隔离构建见
-[基线记录](docs/phase2/BASELINE.md)。Plane 是专用 SimulationRuntime/仿真验收接口，
-尚未开放到 Web/业务任务目录；不包含实机或下一阶段感知/智能开发。
+[基线记录](docs/phase2/BASELINE.md)。Phase 2 的 Plane 入口是专用
+SimulationRuntime/仿真验收接口；独立 Action/Web 接口见下文 Phase 3。
+
+## Phase 3 标准 Action 与 Web Action Lab
+
+统一 Registry/Runtime 提供 OneShot、Goal、Continuous、Query 四种语义，
+18 个标准 Action 名称覆盖三车型的 31 个绑定。独立 Web Action Lab 由同一
+Registry 生成参数表单，可执行、取消和查询实例、反馈、命令及资源。
+车辆写入继续经过原 Execution、Authority、Safety 和唯一 MAVLink Writer；
+只接受明确自有的仿真 fixture，默认双 SEND 关闭。
+
+开发侧 466 项单元测试、两轮真实三车型 Action/API/Chrome/SITL/Gazebo A–G、
+两轮原 Phase 1/2 完整回归均通过；两轮真实 ROS 2 外部接口各通过 11 个场景。
+当前状态为 **READY FOR RE-AUDIT**，等待独立审查，未宣布最终阶段通过。
+使用方式与安全限制见 [Action Lab 使用说明](docs/phase3/USAGE.md)，
+逐项结果、原始失败记录、准确受测提交和证据索引见
+[Phase 3 报告](docs/PHASE3_ACTION_SYSTEM_REPORT.md)。
+
+```bash
+./scripts/test_phase3_actions.sh --allow-send \
+  --sitl-bin-dir artifacts/phase2-control/ardupilot-source/build/sitl/bin \
+  --run-dir artifacts/phase3-actions/acceptance-UNIQUE
+```
+
+没有实机、Mission Graph、AI 决策或新增感知/导航算法；Plane 取消仍保留
+UNKNOWN/UNCONFIRMED 和飞行资源约束。完成本阶段后停止，等待独立审查。
 
 ## 当前实现
 
