@@ -69,6 +69,24 @@ class StreamState:
             self._latest[key]=observation;self._sequences[key]=h.sequence;self.accepted+=1
             return True
 
+    def ingest_many(self,observations):
+        if not isinstance(observations,tuple) or len(observations)>self.capacity:raise ValueError('bounded immutable stream batch required')
+        with self._lock:
+            latest=dict(self._latest);sequences=dict(self._sequences);accepted=self.accepted
+            try:
+                keys=[self.key(s.header.source_id,s.header.sensor_id,s.header.kind) for s in observations]
+                if len(set(keys))!=len(keys):raise ValueError('one observation per stream in an atomic cut')
+                for sample in observations:self.ingest(sample)
+            except Exception:
+                self._latest=latest;self._sequences=sequences;self.accepted=accepted
+                raise
+
+    def withdraw(self,source_id):
+        """A lost worker invalidates references without resetting replay fences."""
+        with self._lock:
+            for key in tuple(self._latest):
+                if key[0]==source_id:self._latest.pop(key)
+
     def snapshot(self,now,*,navigation=False):
         if not isinstance(now,TimePoint):raise TypeError('typed current time required')
         with self._lock:

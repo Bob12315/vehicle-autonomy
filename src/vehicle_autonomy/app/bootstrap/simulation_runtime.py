@@ -127,6 +127,10 @@ class SimulationRuntime:
     def world_epoch(self):
         return self._world.generation_id
 
+    def stream_ingress(self):
+        """Only immutable sensor references; no control or localization promotion."""
+        return self._world.stream_ingress()
+
     def ingest_observation(self, observation):
         self._world.ingest_observation(observation)
 

@@ -13,6 +13,7 @@ from vehicle_autonomy.contracts.core.quality import ComponentFreshness
 from vehicle_autonomy.contracts.core.time import TimePoint
 from vehicle_autonomy.contracts.localization.models import LocalizationEstimate
 from vehicle_autonomy.contracts.vehicle.models import VehicleStateSnapshot
+from vehicle_autonomy.contracts.streams import StreamObservation
 
 ObjectT = TypeVar("ObjectT")
 
@@ -56,6 +57,7 @@ class WorldSnapshot(Generic[ObjectT]):
     environment: ResourceReference | None = None
     freshness: tuple[ComponentFreshness, ...] = ()
     dependencies: tuple[ResourceDependency, ...] = ()
+    streams: tuple[StreamObservation, ...] = ()
 
     def __post_init__(self) -> None:
         if not isinstance(self.schema_version, SchemaVersion) or not isinstance(self.version, ResourceVersion):
@@ -72,9 +74,11 @@ class WorldSnapshot(Generic[ObjectT]):
             value = getattr(self, name)
             if value is not None and not isinstance(value, ResourceReference):
                 raise TypeError(f"{name} must be ResourceReference")
-        for name in ("objects", "freshness", "dependencies"):
+        for name in ("objects", "freshness", "dependencies", "streams"):
             if not isinstance(getattr(self, name), tuple):
                 raise TypeError(f"{name} must be a tuple")
+        if not all(isinstance(value,StreamObservation) for value in self.streams):
+            raise TypeError("stream entries must be typed observations")
         if not all(is_dataclass(value) and is_deeply_immutable(value) for value in self.objects):
             raise TypeError("world objects must be deeply immutable typed values")
         if not all(isinstance(item, ComponentFreshness) for item in self.freshness):

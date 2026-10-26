@@ -55,6 +55,15 @@ class ServiceTests(unittest.TestCase):
             with urlopen(self.base+path) as r:self.assertEqual(r.status,200)
         self.assertEqual(self.api('/api/studio/state')[1]['result']['vehicles'][0]['target'],'v')
         self.assertEqual(self.api('/api/actions')[0],200)
+    def test_readonly_vehicle_stream_endpoint_preserves_auth_and_no_effects(self):
+        code,data=self.api('/api/world/vehicle?target=v')
+        self.assertEqual(code,200);self.assertEqual(data['result']['target'],'v')
+        self.assertIn('world',data['result']);self.assertFalse(data['result']['system_send'])
+        self.assertEqual(self.api('/api/world/vehicle?target=v',auth=False)[0],401)
+        self.assertEqual(self.api('/api/world/vehicle')[0],400)
+        self.assertEqual(self.api('/api/world/vehicle?target=v&extra=1')[0],400)
+        self.assertEqual(self.driver.writes,[]);self.assertEqual(self.lab.runtime.views(),[])
+
     def test_save_validate_start_do_not_collide_on_shared_request_id(self):
         payload={'spec':graph(leaf())};request_id=uuid4().hex
         self.assertEqual(self.api('/api/missions/validate',payload,request_id)[0],200)

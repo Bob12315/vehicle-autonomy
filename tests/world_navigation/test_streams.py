@@ -58,6 +58,15 @@ class StreamsTests(unittest.TestCase):
         for i in range(1,10001):self.state.ingest(self.sample(sequence=i,source_ns=i,received_at=stamp(i+1),captured_at=stamp(i)))
         self.assertEqual(len(self.state._latest),1);self.assertEqual(len(self.state._sequences),1)
         self.assertEqual(self.state.snapshot(stamp(10002))[0]['sample'].header.sequence,10000)
+    def test_atomic_cut_rejects_all_samples_and_preserves_watermarks(self):
+        original=self.sample();self.state.ingest(original)
+        newer=self.sample(sequence=2,source_ns=11,received_at=stamp(21),captured_at=stamp(11))
+        bad=self.sample(sequence=3,source_ns=12,generation='untrusted')
+        with self.assertRaises(ValueError):self.state.ingest_many((newer,bad))
+        self.assertEqual(self.state.snapshot(stamp(30))[0]['sample'],original)
+        self.state.ingest_many((newer,))
+        self.assertEqual(self.state.snapshot(stamp(30))[0]['sample'],newer)
+
     def test_reference_and_units_contract(self):
         with self.assertRaises(ValueError):DataReference('image','bad',1,'image/jpeg')
         with self.assertRaises(ValueError):DataReference('image','a'*64,65*1024*1024,'image/jpeg')

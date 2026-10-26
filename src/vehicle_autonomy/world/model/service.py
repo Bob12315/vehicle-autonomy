@@ -14,6 +14,8 @@ from vehicle_autonomy.contracts.sensor import DetectedObject, Observation
 from vehicle_autonomy.contracts.vehicle.models import VehicleStateSnapshot
 from vehicle_autonomy.contracts.world.models import ResourceDependency, ResourceReference, WorldSnapshot
 from vehicle_autonomy.world.model.models import WorldObject
+from vehicle_autonomy.world.model.streams import StreamState,StreamProfile
+from vehicle_autonomy.contracts.streams import StreamObservation
 
 
 @dataclass(frozen=True, slots=True)
@@ -42,6 +44,19 @@ class WorldReader:
         return self._model.snapshot()
 
 
+class WorldStreamIngress:
+    """Trusted composition port; no vehicle state, localization or authority setters."""
+    __slots__=('_model',)
+    def __init__(self,model):self._model=model
+    @property
+    def generation_id(self):return self._model.generation_id
+    def register_stream(self,profile):return self._model.register_stream(profile)
+    def ingest_stream(self,observation):return self._model.ingest_stream(observation)
+    def ingest_streams(self,observations):return self._model.ingest_streams(observations)
+    def withdraw_streams(self,source_id):return self._model.withdraw_streams(source_id)
+    def require(self,now,requirements):return self._model.stream_state.require(now,requirements)
+
+
 class WorldModel:
     def __init__(self, generation_id: str, limits: FreshnessLimits) -> None:
         if not isinstance(limits, FreshnessLimits):
@@ -60,6 +75,21 @@ class WorldModel:
         self._environment = None
         self._map = None
         self._map_captured_at = None
+        self.stream_state = StreamState()
+        self.max_observations = 1024
+        self.max_producers = 64
+
+    def stream_ingress(self):return WorldStreamIngress(self)
+
+    def withdraw_streams(self,source_id):self.stream_state.withdraw(source_id)
+
+    def register_stream(self,profile:StreamProfile):
+        self.stream_state.register(profile)
+
+    def ingest_streams(self,observations):return self.stream_state.ingest_many(observations)
+
+    def ingest_stream(self,observation:StreamObservation):
+        return self.stream_state.ingest(observation)
 
     @property
     def generation_id(self):
@@ -150,6 +180,11 @@ class WorldModel:
             raise ValueError("received_at cannot precede captured_at")
         producer = str(observation.producer_id)
         with self._lock:
+            if producer not in self._producer_sequences and len(self._producer_sequences)>=self.max_producers:
+                raise ValueError('World observation producer capacity exhausted')
+            key=(producer,str(observation.data.object_id))
+            if key not in self._observations and len(self._observations)>=self.max_observations:
+                raise ValueError('World object capacity exhausted; publish to prune expired objects')
             previous = self._producer_sequences.get(producer, -1)
             if observation.sequence < previous:
                 raise ValueError("observation sequence regressed")
@@ -241,6 +276,9 @@ class WorldModel:
                     component_id, published_at, self._limits.objects_ns,
                     observation.captured_at, observation.received_at,
                 )
+                if item_freshness.state is not FreshnessState.FRESH:
+                    # Keep bounded per-producer replay watermarks after eviction.
+                    self._observations.pop((producer,object_id),None)
                 object_freshness.append(item_freshness)
                 dependencies.append(ResourceDependency(
                     "Observation", observation.observation_id,
@@ -275,12 +313,19 @@ class WorldModel:
             adopted_map = self._map if map_freshness.state is FreshnessState.FRESH else None
             if self._map is not None:
                 dependencies.append(ResourceDependency("Map", self._map.resource_id, self._map.version))
+            stream_rows=self.stream_state.snapshot(published_at)
+            stream_observations=tuple(r['sample'] for r in stream_rows if r['usable'])
+            for row in stream_rows:
+                profile=row['profile']
+                freshness.append(ComponentFreshness('stream:'+profile.source_id+':'+profile.sensor_id+':'+profile.kind.value,
+                    FreshnessState.FRESH if row['usable'] else FreshnessState.STALE if row['reason']=='expired' else FreshnessState.UNKNOWN,
+                    row['age_ns'],row['reason']))
             revision = self._revision + 1
             result = WorldSnapshot(
                 SchemaVersion(1, 0), f"{self._generation}:{revision}",
                 ResourceVersion(self._generation, revision), published_at,
                 selected_vehicle, selected_localization, tuple(objects),
-                map=adopted_map, environment=self._environment, freshness=tuple(freshness), dependencies=tuple(dependencies),
+                map=adopted_map, environment=self._environment, freshness=tuple(freshness), dependencies=tuple(dependencies),streams=stream_observations,
             )
             self._revision = revision
             self._latest = result

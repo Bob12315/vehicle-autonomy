@@ -109,6 +109,9 @@ class VehicleActionDriver:
         return ActionContext(self.target,self.profile.kind,frozenset(caps),True,
             getattr(self,'_home',None),{'mode_ids':self.profile.mode_ids,
                 'home_source':'signed local position at completed Arm; owned flat-world AP unlocked-home convention'})
+    def stream_ingress(self):
+        return self._runtime.stream_ingress()
+
     def snapshot(self):
         with self._lock:return self._world
     def info(self):

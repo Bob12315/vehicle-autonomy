@@ -181,6 +181,12 @@ class MissionControl(ActionLab):
 
     def handle(self, operation, payload):
         with self._control_lock:
+            if operation == 'world.vehicle':
+                if set(payload) != {'target'}: raise ValueError('one explicit target required')
+                driver=self.drivers[payload['target']]
+                verifier=getattr(getattr(driver,'ownership',None),'receive_signing',None)
+                return dict(**driver.info(),world=to_json_value(driver.snapshot()),
+                    signing_configured=verifier is not None,verified_frames=0 if verifier is None else verifier.accepted)
             if operation == 'studio.state': return self._snapshot()
             if operation == 'mission.library': return list(self.journal.data['versions'].values())
             if operation == 'mission.types': return list(NODE_TYPES)
@@ -295,6 +301,13 @@ class MissionControlHandler(ActionLabHandler):
         if self.path in static:
             name, kind = static[self.path]
             self.reply(200, (Path(__file__).parent/'static'/name).read_bytes(), kind);return
+        if urlsplit(self.path).path == '/api/world/vehicle':
+            if not self.authorized():return
+            try:
+                query=parse_qs(urlsplit(self.path).query,strict_parsing=True)
+                if set(query)!={'target'} or len(query['target'])!=1:raise ValueError('one explicit target required')
+            except ValueError as exc:self.reply(400,dict(ok=False,error=str(exc)));return
+            self.invoke('world.vehicle',dict(target=query['target'][0]));return
         if urlsplit(self.path).path == '/api/manual/state':
             if not self.authorized():return
             try:
