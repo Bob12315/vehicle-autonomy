@@ -56,7 +56,7 @@ def create_mission(page,f,result):
             page.locator(f'[data-node-id="{ids[child]}"]').click()
     page.locator('#layout').click();page.locator('#undo').click();page.locator('#redo').click();page.locator('#fit').click()
     page.locator('#validate').click();page.locator('#validation').filter(has_text='schema_version').wait_for(timeout=5000)
-    page.locator('#save').click();page.locator('#validation').filter(has_text='Version saved').wait_for()
+    page.locator('#save').click();page.locator('#validation').filter(has_text='版本已保存').wait_for()
     with page.expect_download() as download:page.locator('#export').click()
     download.value.save_as(str(f.path/'browser-mission-export.json'))
     page.locator('#import').set_input_files(str(f.path/'browser-mission-export.json'))
@@ -77,6 +77,7 @@ def create_mission(page,f,result):
     mission=wait(page,f,completed,960 if f.kind=='plane' else 210)
     if not mission['release_safe'] or mission['continuation_allowed']:raise AssertionError('Mission did not safely release')
     result['mission']=mission
+    page.locator('#run-detail').locator('..').locator('summary').click()
     page.locator('#run-detail').filter(has_text='SUCCEEDED').wait_for()
     page.screenshot(path=str(f.path/'mission-studio.png'),full_page=True,mask=[page.locator('#token')])
     return mission
@@ -174,6 +175,7 @@ def manual(page,f,result):
     result['manual_final_truth']=dict(position=[t.x_m,t.y_m,t.z_m],speed_mps=f.oracle.recent_speed_mps())
     # The displayed result must follow the server, not remain the submit-time
     # VALIDATING response after the actual operation has already completed.
+    page.locator('#log').locator('..').locator('summary').click()
     wait(page,f,lambda:json.loads(page.locator('#log').inner_text()).get('state')=='SUCCEEDED',3)
     page.screenshot(path=str(f.path/'manual-control.png'),full_page=True,mask=[page.locator('#token')])
     return result

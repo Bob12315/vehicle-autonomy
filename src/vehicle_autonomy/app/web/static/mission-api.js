@@ -1,8 +1,27 @@
 'use strict';
 window.VAF = {
   catalog: [], target: '',
+  nodeTypes: {
+    Action:['动作执行','执','调用车辆或外部动作'], Sequence:['顺序执行','序','依次执行所有子节点'],
+    Parallel:['并行执行','并','按策略协调多个分支'], Condition:['条件判断','判','真 / 假 / 未知三值判断'],
+    Fallback:['失败备选','备','安全失败后尝试备选'], Recovery:['故障恢复','复','可信退出后执行恢复'],
+    Event:['事件触发','事','等待新的有效事件'], Reactive:['事件响应','应','事件到达后切换分支'],
+    Wait:['等待','等','等待指定时长'], Timeout:['超时限制','限','限制子节点执行时长'], Repeat:['有限重复','循','按次数重复子节点']
+  },
+  actionNames:{GetVehicleState:'读取车辆状态',SetMode:'切换模式',Arm:'解锁',Disarm:'上锁',Takeoff:'起飞',Drive:'直线行驶',Turn:'转向',Goto:'前往目标',Stop:'停止运动',SetVelocity:'设置速度',SetYaw:'设置航向',Hold:'保持位置',ReturnHome:'返回起点',Land:'降落',SetGuidedTarget:'设置固定翼目标',Loiter:'盘旋等待',RTL:'原生返航',AutoLand:'自动着陆'},
+  stateNames:{IDLE:'待执行',VALIDATING:'校验中',WAITING:'等待中',READY:'就绪',STARTING:'启动中',RUNNING:'运行中',CANCELLING:'正在请求退出',SUCCEEDED:'已成功',COMPLETED:'已完成',FAILED:'失败',REJECTED:'已拒绝',CANCELLED:'已取消',TIMED_OUT:'已超时',UNKNOWN:'未知',UNCONFIRMED:'未确认'},
+  fieldNames:{mode:'飞行 / 驾驶模式',height_m:'起飞高度（米）',x_m:'东向位置 E（米）',y_m:'北向位置 N（米）',z_m:'向上高度 U（米）',speed_mps:'行驶速度（米/秒）',yaw_rate_rad_s:'转向角速度（弧度/秒）',vx_mps:'X 方向速度（米/秒）',vy_mps:'Y 方向速度（米/秒）',vz_mps:'Z 方向速度（米/秒）',yaw_rad:'航向角（弧度）',frame:'坐标系',latitude_deg:'纬度（度）',longitude_deg:'经度（度）',altitude_amsl_m:'海拔高度 AMSL（米）',timeout_s:'超时（秒）',duration_s:'等待时长（秒）',count:'重复次数',output:'输出 Blackboard 键',event:'事件名称',op:'比较运算',source:'数据来源',path:'数据字段路径','value (JSON scalar)':'比较值（JSON 标量）',completion:'并行完成策略',failure:'并行失败策略'},
+  typeLabel(type) { return this.nodeTypes[type]?.[0] || type; },
+  actionLabel(name) { return this.actionNames[name] || name; },
+  stateLabel(state) { return this.stateNames[state] || state; },
+  kindLabel(kind) { return ({rover:'地面车',copter:'多旋翼',plane:'固定翼',OneShot:'单次动作',Goal:'目标动作',Continuous:'持续动作',Query:'只读查询'})[kind] || kind; },
+  fieldLabel(name) { return this.fieldNames[name] || name; },
+  connection(label, state) {
+    const el=document.querySelector('#connection-state');if(el){el.textContent=label;el.dataset.state=state;}
+  },
   async call(path, payload) {
     const token = document.querySelector('#token').value.trim();
+    if(!token)throw Error('请先输入本地访问令牌。');
     const headers = {'Authorization': 'Bearer ' + token};
     const options = {headers};
     if (payload !== undefined) {
@@ -11,6 +30,7 @@ window.VAF = {
     }
     const response = await fetch(path, options);
     const data = await response.json();
+    if(response.status===401)this.connection('认证失败，请检查令牌','error');
     if (!response.ok || !data.ok) throw Error(data.error || 'Request failed');
     return data.result;
   },
@@ -22,19 +42,19 @@ window.VAF = {
   async connect() {
     const vehicles = await this.call('/api/vehicles');
     const select = document.querySelector('#target'); select.replaceChildren();
-    for (const v of vehicles) select.append(this.node('option', `${v.target} · ${v.kind}`, {value:v.target}));
-    if (!vehicles.length) throw Error('No owned simulation vehicles. Start with explicit --simulation manifests.');
+    for (const v of vehicles) select.append(this.node('option', `${this.kindLabel(v.kind)} · ${v.target}`, {value:v.target}));
+    if (!vehicles.length) throw Error('没有可用的自有仿真车辆，请先使用明确的仿真清单启动服务。');
     this.target = select.value;
-    await this.loadCatalog(); return vehicles;
+    await this.loadCatalog(); this.connection('已连接 · '+vehicles.length+' 辆仿真车辆','connected');return vehicles;
   },
   async loadCatalog() { this.target=document.querySelector('#target').value; this.catalog=await this.call('/api/actions?target='+encodeURIComponent(this.target)); },
   parameters(container, schema, values, onChange) {
     container.replaceChildren();
     for (const [name, property] of Object.entries(schema.properties || {})) {
-      const label=this.node('label', name); let input;
+      const label=this.node('label', this.fieldLabel(name)); let input;
       if (values[name] && typeof values[name]==='object' && values[name].$query) {
         input=this.node('input');input.value=JSON.stringify(values[name]);input.readOnly=true;
-        input.title='Typed observation binding; edit in Mission JSON';label.append(input);container.append(label);continue;
+        input.title='类型化观测参数绑定，可在任务 JSON 中编辑';label.append(input);container.append(label);continue;
       }
       if (property.enum) {
         input=this.node('select'); for (const v of property.enum) input.append(this.node('option',String(v),{value:JSON.stringify(v)}));

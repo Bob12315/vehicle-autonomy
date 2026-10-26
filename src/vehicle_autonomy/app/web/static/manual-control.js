@@ -5,7 +5,10 @@ const terminal=new Set(['SUCCEEDED','FAILED','REJECTED','CANCELLED','TIMED_OUT',
 function selected(){return state?.vehicles.find(v=>v.target===api.target);}
 function chosen(){return api.catalog.find(s=>s.name+'@'+s.version===$('#action').value);}
 function form(){const s=chosen();parameters={};if(s)api.parameters($('#parameters'),s.parameters,parameters);}
-async function catalog(){await api.loadCatalog();$('#action').replaceChildren();for(const s of api.catalog)$('#action').append(api.node('option',s.name,{value:s.name+'@'+s.version}));form();}
+const fmt=value=>typeof value==='number'&&Number.isFinite(value)?value.toFixed(2):'未知';
+const vector=value=>value?`X ${fmt(value.x)} · Y ${fmt(value.y)} · Z ${fmt(value.z)}`:'未知';
+$('#speed').addEventListener('input',()=>{$('#speed-value').textContent=Number($('#speed').value).toFixed(2)+' m/s';});
+async function catalog(){await api.loadCatalog();$('#action').replaceChildren();for(const s of api.catalog)$('#action').append(api.node('option',api.actionLabel(s.name)+' · '+api.kindLabel(s.kind),{value:s.name+'@'+s.version}));form();}
 $('#connect').onclick=api.guard(async()=>{await api.connect();await catalog();await poll();});
 $('#target').onchange=api.guard(async()=>{await stop();await catalog();await poll();});$('#action').onchange=form;
 $('#execute').onclick=api.guard(async()=>{
@@ -33,7 +36,7 @@ async function begin(){
  }finally{pending=false;}
 }
 async function stop(){
- keys.clear();const s=session;session=null;input=null;
+ keys.clear();document.querySelectorAll('[data-key]').forEach(b=>b.classList.remove('pressed'));const s=session;session=null;input=null;
  if(s)try{await api.call('/api/manual/stop',{session_id:s.id});}catch(e){api.report('停止请求未确认；服务器 deadman 仍独立生效。'+e.message);}
 }
 async function update(){
@@ -48,8 +51,8 @@ async function update(){
   input=await api.call('/api/manual/update',{session_id:session.id,sequence:input.input_sequence+1,deadline_ns:input.input_ticket,parameters:values()});
  }catch(e){await stop();api.report(e);}finally{updating=false;}
 }
-function down(key){if(!'wasdqerf'.includes(key)||selected()?.kind==='plane')return;keys.add(key);begin().catch(api.report);}
-function up(key){keys.delete(key);if(!keys.size)stop().catch(api.report);}
+function down(key){if(!'wasdqerf'.includes(key)||selected()?.kind==='plane')return;keys.add(key);document.querySelector(`[data-key="${key}"]`)?.classList.add('pressed');begin().catch(api.report);}
+function up(key){keys.delete(key);if('wasdqerf'.includes(key)&&key.length===1)document.querySelector(`[data-key="${key}"]`)?.classList.remove('pressed');if(!keys.size)stop().catch(api.report);}
 for(const b of document.querySelectorAll('[data-key]')){
  b.onpointerdown=e=>{e.preventDefault();b.setPointerCapture(e.pointerId);down(b.dataset.key);};
  b.onpointerup=()=>up(b.dataset.key);b.onpointercancel=()=>stop();
@@ -59,25 +62,48 @@ window.addEventListener('keyup',e=>up(e.key.toLowerCase()));window.addEventListe
 document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();});window.addEventListener('pagehide',()=>stop());$('#manual-stop').onclick=()=>stop();
 setInterval(()=>update(),100);
 function render(){
+ document.querySelectorAll('[data-key]').forEach(b=>b.classList.toggle('pressed',keys.has(b.dataset.key)));
  const v=selected();if(!v)return;
  const w=v.world,vehicle=w?.vehicle,pose=vehicle?.reported_pose,twist=vehicle?.reported_twist;
- $('#stream-controls').hidden=v.kind==='plane';
+ $('#stream-controls').hidden=v.kind==='plane';$('#plane-manual-help').hidden=v.kind!=='plane';
+ api.connection(v.connected?'车辆已连接 · '+api.kindLabel(v.kind):'车辆连接已中断',v.connected?'connected':'error');
  const grid=$('#status');grid.replaceChildren();
- const metrics={Connection:v.connected?'CONNECTED':'DISCONNECTED',Signing:v.signing_configured?`verified frames ${v.verified_frames}`:'UNCONFIGURED',
-  'Fresh state':v.fresh_vehicle_state?'VALID':'UNKNOWN',Armed:vehicle?.operation?.armed??'UNKNOWN',Mode:vehicle?.operation?.native_mode??'UNKNOWN',
-  SEND:`system=${v.system_send} action=${v.action_send}`,Authority:v.scope||'none',Position:pose?JSON.stringify(pose.value.position):'UNKNOWN',
-  'Yaw ENU deg':pose?(Math.atan2(2*(pose.value.orientation.w*pose.value.orientation.z+pose.value.orientation.x*pose.value.orientation.y),1-2*(pose.value.orientation.y**2+pose.value.orientation.z**2))*180/Math.PI).toFixed(1):'UNKNOWN',
-  'Height odom U m':pose?pose.value.position.z:'UNKNOWN',Velocity:twist?JSON.stringify(twist.value.linear):'UNKNOWN',Attitude:pose?JSON.stringify(pose.value.orientation):'UNKNOWN'};
- for(const[k,value]of Object.entries(metrics)){const cell=api.node('div');cell.append(api.node('strong',k),api.node('span',String(value)));grid.append(cell);}
+ const metrics={
+  '连接状态':v.connected?'已连接':'已断开',
+  '签名验证':v.signing_configured?`已验证 ${v.verified_frames} 帧`:'未配置',
+  '状态新鲜度':v.fresh_vehicle_state?'有效':'未知',
+  '解锁状态':vehicle?.operation?.armed===true?'已解锁':vehicle?.operation?.armed===false?'未解锁':'未知',
+  '当前模式':vehicle?.operation?.native_mode??'未知',
+  '发送授权':`系统 ${v.system_send?'开':'关'} · 动作 ${v.action_send?'开':'关'}`,
+  '车辆执行域':v.scope?'已占用 · 见控制权详情':'无活跃执行域',
+  '位置（米）':vector(pose?.value.position),
+  'ENU 航向（度）':pose?(Math.atan2(2*(pose.value.orientation.w*pose.value.orientation.z+pose.value.orientation.x*pose.value.orientation.y),1-2*(pose.value.orientation.y**2+pose.value.orientation.z**2))*180/Math.PI).toFixed(1):'未知',
+  'odom 向上高度（米）':fmt(pose?.value.position.z),
+  '速度（米/秒）':vector(twist?.value.linear),
+  '姿态四元数':pose?`W ${fmt(pose.value.orientation.w)} · X ${fmt(pose.value.orientation.x)} · Y ${fmt(pose.value.orientation.y)} · Z ${fmt(pose.value.orientation.z)}`:'未知'};
+ for(const[k,value]of Object.entries(metrics)){
+  const cell=api.node('div');cell.append(api.node('strong',k),api.node('span',String(value)));
+  if(k==='连接状态')cell.dataset.tone=v.connected?'good':'warning';
+  if(k==='状态新鲜度')cell.dataset.tone=v.fresh_vehicle_state?'good':'warning';
+  grid.append(cell);
+ }
  const actions=state.actions.filter(a=>a.target===api.target),missions=state.missions.filter(m=>m.target===api.target);
  if(actions.length)$('#log').textContent=JSON.stringify(actions.at(-1),null,2);
  $('#activity').textContent=JSON.stringify({missions:missions.map(m=>({id:m.id,state:m.state,release_safe:m.release_safe,continuation_of:m.continuation_of})),
   restarted:state.recovered_actions.filter(a=>a.target===api.target),actions:actions.slice(-5).map(a=>({id:a.id,name:a.name,state:a.state,safety:a.safety})),resources:state.resources},null,2);
+ const summary=$('#activity-summary');summary.replaceChildren();
+ const row=(label,value,warning=false)=>{const el=api.node('div',undefined,{class:'activity-row'}),badge=api.node('span',value);if(warning)badge.dataset.tone='warning';el.append(api.node('strong',label),badge);summary.append(el);};
+ row('任务',missions.length?api.stateLabel(missions.at(-1).state):'暂无任务',missions.at(-1)?.state==='UNKNOWN');
+ for(const a of actions.slice(-3))row(api.actionLabel(a.name),api.stateLabel(a.state),['UNKNOWN','UNCONFIRMED','FAILED'].includes(a.state));
+ row('资源记录',String(state.resources.length)+' 项 · 详见原始记录');
+ const uncertain=missions.some(m=>m.state==='UNKNOWN'||!m.release_safe)||actions.some(a=>['UNKNOWN','UNCONFIRMED'].includes(a.state));
+ if(uncertain)row('安全退出','含未确认记录，请核查资源',true);
+ $('#manual-summary').textContent=session?'输入会话 · '+api.stateLabel(input?.state||'STARTING'):'当前无持续输入会话';
  if(session){const a=actions.find(a=>a.id===session.action_id);if(a&&(!input||a.input_sequence>input.input_sequence||a.input_sequence===input.input_sequence&&(['CANCELLING',...terminal].includes(a.state)||input.state!=='RUNNING')))input=a;
   $('#session').textContent=JSON.stringify({session_id:session.id,action:input?.id,state:input?.state,input_sequence:input?.input_sequence,input_deadline_ns:input?.input_deadline_ns},null,2);
   if(input&&terminal.has(input.state)){session=null;input=null;keys.clear();}}
  const retained=actions.filter(a=>a.state==='SUCCEEDED'&&a.safety?.continuation_allowed).at(-1);
- $('#continuation').placeholder=retained?'续接：'+retained.id:'Plane continuation Action ID';
+ $('#continuation').placeholder=retained?'续接：'+retained.id:'固定翼续接动作 ID（可选）';
  draw(v);
 }
 function draw(v){
@@ -88,7 +114,7 @@ function draw(v){
  if(v.kind==='plane'){
   if(!global){$('#map-frame').textContent='WGS84 位置未知：不能创建地图目标';return;}
   const g=global.value;mapTransform={kind:'plane',x:g.longitude_deg,y:g.latitude_deg,sx:W/.008,sy:H/.004};
-  $('#map-frame').textContent=`WGS84 · lon ${g.longitude_deg.toFixed(6)}° · lat ${g.latitude_deg.toFixed(6)}° · altitude ${g.altitude_m.toFixed(2)}m AMSL · frame ${global.frame_id}`;
+  $('#map-frame').textContent=`WGS84 · 经度 ${g.longitude_deg.toFixed(6)}° · 纬度 ${g.latitude_deg.toFixed(6)}° · 海拔 ${g.altitude_m.toFixed(2)}m AMSL · 坐标系 ${global.frame_id}`;
   ctx.strokeStyle='#6fcbc0';ctx.beginPath();let first=true;
   for(const sample of v.track||[]){const g=sample.global_position?.value;if(!g)continue;
    const x=W/2+(g.longitude_deg-mapTransform.x)*mapTransform.sx,y=H/2-(g.latitude_deg-mapTransform.y)*mapTransform.sy;
