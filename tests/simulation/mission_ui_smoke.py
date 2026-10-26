@@ -19,6 +19,54 @@ from vehicle_autonomy.app.web.mission_control import MissionControl, MissionCont
 from vehicle_autonomy.contracts.action import ActionContext
 
 
+
+def edge_checks(page,lab):
+    """Invalid editing/import cannot submit a Mission or silently drop edges."""
+    from playwright.sync_api import expect
+    original=page.locator('#json').input_value()
+    page.locator('#json').locator('..').locator('summary').click()
+    mutations=[]
+    page.on('request',lambda r:mutations.append(r.url) if r.method=='POST' and '/api/missions/' in r.url else None)
+    def draft(nodes):
+        return dict(schema_version=1,id='edge-regression',name='连线回归',version='1.0.0',target='v',root='n1',
+            nodes=[dict(n,position={'x':30+210*i,'y':30}) for i,n in enumerate(nodes)])
+    def apply(spec):
+        page.locator('#json').fill(json.dumps(spec));page.locator('#apply-json').click()
+    for kind in ('Action','Wait'):
+        parent=dict(id='n1',type=kind,children=['n2'])
+        if kind=='Action':parent.update(action='GetVehicleState',parameters={})
+        else:parent['duration_s']=.1
+        apply(draft([parent,dict(id='n2',type='Wait',duration_s=.1,children=[])]))
+        page.locator('[data-node-id="n1"]').click()
+        expect(page.locator('#connect-nodes')).to_be_disabled()
+        expect(page.locator('#child-rule')).to_contain_text('叶子节点')
+        assert json.loads(page.locator('#json').input_value())['nodes'][0]['children']==['n2']
+        for button in ('validate','save','start'):
+            page.locator('#'+button).click()
+            expect(page.locator('#notice')).to_contain_text('n1')
+            expect(page.locator('#notice')).to_contain_text('不能连接子节点')
+            expect(page.locator('#notice')).to_contain_text('顺序执行')
+        page.locator('#properties button').filter(has_text='断开').click()
+        assert json.loads(page.locator('#json').input_value())['nodes'][0]['children']==[]
+    apply(draft([dict(id='n1',type='Sequence',children=['n2']),dict(id='n2',type='Sequence',children=[])]))
+    page.locator('[data-node-id="n2"]').click();page.locator('#connect-nodes').click();page.locator('[data-node-id="n1"]').click()
+    expect(page.locator('#notice')).to_contain_text('循环')
+    assert json.loads(page.locator('#json').input_value())['nodes'][1]['children']==[]
+    apply(draft([dict(id='n1',type='Sequence',children=['n2','n3']),dict(id='n2',type='Sequence',children=['n4']),
+        dict(id='n3',type='Sequence',children=[]),dict(id='n4',type='Wait',duration_s=.1,children=[])]))
+    page.locator('[data-node-id="n3"]').click();page.locator('#connect-nodes').click();page.locator('[data-node-id="n4"]').click()
+    expect(page.locator('#notice')).to_contain_text('已有父节点')
+    assert json.loads(page.locator('#json').input_value())['nodes'][2]['children']==[]
+    apply(draft([dict(id='n1',type='Timeout',timeout_s=1,children=['n2']),dict(id='n2',type='Wait',duration_s=.1,children=[])]))
+    page.locator('[data-node-id="n1"]').click();page.locator('#connect-nodes').click()
+    expect(page.locator('#notice')).to_contain_text('上限')
+    assert not mutations and not lab.missions.views() and not lab.runtime.views()
+    page.locator('#json').fill(original);page.locator('#apply-json').click()
+    page.locator('#json').locator('..').locator('summary').click()
+    return ['Action/Wait outgoing disabled','imported leaf children retained and blocked before validate/save/start',
+        'explicit disconnect repairs edge','cycle rejected','shared child rejected','child capacity enforced']
+
+
 def run(directory):
     from playwright.sync_api import sync_playwright, expect
     directory.mkdir(parents=True, exist_ok=False)
@@ -50,6 +98,7 @@ def run(directory):
             expect(page.locator('#action-library option').first).to_be_attached()
             expect(page.locator('#send')).not_to_be_checked()
             expect(page.locator('#action-library option[value="Arm@1.0.0"]')).to_contain_text('解锁')
+            result['edge_guards']=edge_checks(page,lab)
             page.locator('#add-sequence').click()
             page.locator('#palette [data-type="Wait"]').click()
             page.locator('[data-node-id="n1"]').click();page.locator('#connect-nodes').click();page.locator('[data-node-id="n2"]').click()

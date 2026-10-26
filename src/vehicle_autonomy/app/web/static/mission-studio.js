@@ -3,9 +3,44 @@ const api=window.VAF, $=s=>document.querySelector(s);
 let draft={schema_version:1,id:'mission',name:'新建任务',version:'1.0.0',target:'',root:'',nodes:[],blackboard:{},timeout_s:600};
 let selected=null,connecting=null,zoom=1,undo=[],redo=[],state=null,runId=null,replaying=false;
 const text=()=>JSON.stringify(draft);
+const childLimits={Action:0,Wait:0,Sequence:32,Parallel:32,Fallback:32,Recovery:32,Timeout:1,Repeat:1,Event:1,Reactive:2,Condition:3};
+const nodeName=n=>(n.type==='Action'?api.actionLabel(n.action):api.typeLabel(n.type))+'（'+n.id+'）';
+function childHint(n){
+ const max=childLimits[n.type];
+ if(max===0)return nodeName(n)+'是叶子节点，不能连接子节点。要依次执行多个步骤，请添加“顺序执行”并将各步骤按顺序连接为它的子节点。';
+ if(n.type==='Condition')return '条件判断可以不接分支，或按“真 / 假 / 未知”连接 2 或 3 个分支。';
+ if(n.type==='Reactive')return '按顺序连接 2 个子节点：主任务、事件响应。';
+ return max===1?'连接 1 个子节点，由该节点控制它的执行。':'按执行或分支顺序连接 1–32 个子节点。';
+}
+function clearConnection(){connecting=null;$('#connect-nodes').textContent='连接节点';}
+function checkDraftChildren(){
+ // Early editor feedback only; the server still validates the complete graph.
+ for(const n of draft.nodes){
+  if((n.children||[]).length>childLimits[n.type]){
+   const message=childLimits[n.type]===0?childHint(n):nodeName(n)+'最多允许 '+childLimits[n.type]+' 个子节点，请在属性中断开多余连线。';
+   $('#validation').textContent=message;throw Error(message);
+  }
+ }
+}
+function connectChild(parent,child){
+ if(!parent)throw Error('父节点已不存在，请重新选择。');
+ const children=parent.children||[];
+ if(childLimits[parent.type]===0)throw Error(childHint(parent));
+ if(parent.id===child.id)throw Error('不能把节点连接到自身。');
+ if(children.includes(child.id))throw Error('这条连线已存在。');
+ if(children.length>=childLimits[parent.type])throw Error(nodeName(parent)+'最多允许 '+childLimits[parent.type]+' 个子节点。');
+ if(draft.nodes.some(n=>(n.children||[]).includes(child.id)))throw Error(nodeName(child)+'已有父节点，请先在原父节点属性中断开连线。');
+ const visited=new Set(),pending=[child.id];
+ while(pending.length){
+  const id=pending.pop();if(id===parent.id)throw Error('该连线会形成循环，请使用“有限重复”节点表达重复执行。');
+  if(visited.has(id))continue;visited.add(id);pending.push(...(draft.nodes.find(n=>n.id===id)?.children||[]));
+ }
+ change(()=>{parent.children=[...children,child.id];});
+ $('#notice').textContent='已连接：'+nodeName(parent)+' → '+nodeName(child)+'。';
+}
 function remember(old){if(old!==text()){undo.push(old);if(undo.length>100)undo.shift();redo=[];$('#undo').disabled=!undo.length;$('#redo').disabled=!redo.length;}}
 function change(fn){const old=text();fn();remember(old);render();}
-function restore(raw){draft=JSON.parse(raw);$('#mission-id').value=draft.id;$('#mission-name').value=draft.name;$('#mission-version').value=draft.version;$('#mission-timeout').value=draft.timeout_s;render();}
+function restore(raw){clearConnection();draft=JSON.parse(raw);$('#mission-id').value=draft.id;$('#mission-name').value=draft.name;$('#mission-version').value=draft.version;$('#mission-timeout').value=draft.timeout_s;render();}
 function renderEdges(){
  const svg=$('#edges');svg.replaceChildren();
  for(const p of draft.nodes)for(const child of p.children||[]){
@@ -33,9 +68,8 @@ function render(){
   el.addEventListener('pointerdown',e=>{
    if(e.button!==0)return;
    if(connecting!==null){
-    const parent=draft.nodes.find(v=>v.id===connecting);
-    if(parent&&parent.id!==n.id&&!parent.children.includes(n.id))change(()=>parent.children.push(n.id));
-    connecting=null;$('#connect-nodes').textContent='连接节点';return;
+    const parent=draft.nodes.find(v=>v.id===connecting);clearConnection();
+    try{connectChild(parent,n);}catch(error){api.report(error);}return;
    }
    selected=n.id;document.querySelectorAll('.graph-node').forEach(v=>v.classList.toggle('selected',v===el));properties();
    const old=text(),sx=e.clientX,sy=e.clientY,x=pos.x,y=pos.y;el.setPointerCapture(e.pointerId);
@@ -50,7 +84,10 @@ function render(){
 function properties(){
  const panel=$('#properties');panel.replaceChildren();const n=draft.nodes.find(n=>n.id===selected);
  $('#selected-node').textContent=n?n.id:'未选择';
+ const connect=$('#connect-nodes');connect.disabled=!n||childLimits[n.type]===0;
+ connect.title=n?childHint(n):'请先选择父节点';
  if(!n){panel.textContent='点击画布中的节点，查看参数和连接。';return;}
+ panel.append(api.node('p',childHint(n),{class:'muted',id:'child-rule'}));
  const title=api.node('div',undefined,{class:'property-title'});title.append(api.node('strong',n.type==='Action'?api.actionLabel(n.action):api.typeLabel(n.type)),api.node('small',n.id+' · '+n.type));panel.append(title);
  function field(name,value,set,type='text'){
   const label=api.node('label',api.fieldLabel(name)),input=api.node('input');input.type=type;input.value=value??'';input.name=name;
@@ -123,18 +160,25 @@ $('#add-action').onclick=()=>{const s=api.catalog.find(v=>v.name+'@'+v.version==
 for(const [selector,key]of [['#mission-id','id'],['#mission-name','name'],['#mission-version','version']])$(selector).onchange=()=>change(()=>draft[key]=$(selector).value);
 $('#mission-timeout').onchange=()=>change(()=>draft.timeout_s=Number($('#mission-timeout').value));
 $('#undo').onclick=()=>{if(undo.length){redo.push(text());restore(undo.pop());}};$('#redo').onclick=()=>{if(redo.length){undo.push(text());restore(redo.pop());}};
-$('#connect-nodes').onclick=()=>{if(selected){connecting=selected;$('#connect-nodes').textContent='选择子节点（父：'+selected+'）';}else api.report('请先选择父节点');};
+$('#connect-nodes').onclick=()=>{
+ if(connecting!==null){clearConnection();return;}
+ const parent=draft.nodes.find(n=>n.id===selected);
+ if(!parent){api.report('请先选择父节点');return;}
+ if(childLimits[parent.type]===0){api.report(childHint(parent));return;}
+ if((parent.children||[]).length>=childLimits[parent.type]){api.report(nodeName(parent)+'的子节点数量已达上限，请先断开多余连线。');return;}
+ connecting=parent.id;$('#connect-nodes').textContent='选择子节点 / 再点取消';$('#notice').textContent='父节点：'+nodeName(parent)+'。'+childHint(parent);
+};
 $('#root').onclick=()=>change(()=>{if(selected)draft.root=selected;});
-$('#delete').onclick=()=>change(()=>{draft.nodes=draft.nodes.filter(n=>n.id!==selected);for(const n of draft.nodes)n.children=n.children.filter(c=>c!==selected);if(draft.root===selected)draft.root=draft.nodes[0]?.id||'';selected=null;});
+$('#delete').onclick=()=>{clearConnection();change(()=>{draft.nodes=draft.nodes.filter(n=>n.id!==selected);for(const n of draft.nodes)n.children=n.children.filter(c=>c!==selected);if(draft.root===selected)draft.root=draft.nodes[0]?.id||'';selected=null;});};
 $('#layout').onclick=()=>change(()=>{let row=0;const seen=new Set();function walk(id,depth){if(seen.has(id))return;seen.add(id);const n=draft.nodes.find(n=>n.id===id);if(!n)return;n.position={x:30+depth*210,y:30+row++*100};for(const c of n.children)walk(c,depth+1);}walk(draft.root,0);for(const n of draft.nodes)if(!seen.has(n.id))walk(n.id,0);});
 function scale(){ $('#graph').style.transform=`scale(${zoom})`;$('#zoom-level').textContent=Math.round(zoom*100)+'%'; }$('#zoom-in').onclick=()=>{zoom=Math.min(2,zoom+.1);scale();};$('#zoom-out').onclick=()=>{zoom=Math.max(.3,zoom-.1);scale();};$('#fit').onclick=()=>{zoom=.8;scale();$('#graph-view').scrollTo(0,0);};
-$('#validate').onclick=api.guard(async()=>{$('#validation').textContent='校验通过\n'+JSON.stringify(await api.call('/api/missions/validate',{spec:draft}),null,2);});
-$('#save').onclick=api.guard(async()=>{draft=await api.call('/api/missions/save',{spec:draft});$('#validation').textContent='版本已保存';await library();render();});
+$('#validate').onclick=api.guard(async()=>{checkDraftChildren();$('#validation').textContent='校验通过\n'+JSON.stringify(await api.call('/api/missions/validate',{spec:draft}),null,2);});
+$('#save').onclick=api.guard(async()=>{checkDraftChildren();draft=await api.call('/api/missions/save',{spec:draft});$('#validation').textContent='版本已保存';await library();render();});
 $('#load').onclick=api.guard(async()=>{const key=$('#library').value;const d=(await library()).find(d=>d.id+'@'+d.version===key);if(d)change(()=>restore(JSON.stringify(d)));});
 $('#export').onclick=()=>{const url=URL.createObjectURL(new Blob([JSON.stringify(draft,null,2)],{type:'application/json'}));const a=api.node('a','',{href:url,download:draft.id+'.json'});a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
 $('#import').onchange=api.guard(async()=>{const f=$('#import').files[0];if(!f||f.size>131072)throw Error('任务 JSON 不能超过 128 KiB');const raw=await f.text();change(()=>restore(raw));});
 $('#apply-json').onclick=api.guard(()=>change(()=>restore($('#json').value)));
-$('#start').onclick=api.guard(async()=>{const p={spec:draft,allow_send:$('#send').checked};const c=$('#continuation').value.trim();if(c)p.continuation_of=c;$('#send').checked=false;const r=await api.call('/api/missions/start',p);runId=r.id;replaying=false;await poll();});
+$('#start').onclick=api.guard(async()=>{checkDraftChildren();const p={spec:draft,allow_send:$('#send').checked};const c=$('#continuation').value.trim();if(c)p.continuation_of=c;$('#send').checked=false;const r=await api.call('/api/missions/start',p);runId=r.id;replaying=false;await poll();});
 $('#cancel').onclick=api.guard(async()=>{if(runId)await api.call('/api/missions/cancel',{id:runId});await poll();});
 $('#runs').onchange=()=>{runId=$('#runs').value;replaying=false;highlight();};$('#history-position').oninput=()=>{replaying=true;highlight();};
 function highlight(){

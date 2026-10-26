@@ -59,7 +59,9 @@ class GraphTests(unittest.TestCase):
         cases=[]
         for k,v in [('schema_version',2),('schema_version',True),('version','1'),('target','absent'),('unknown',1)]:
             d=graph(leaf());d[k]=v;cases.append(d)
-        cases += [graph(dict(id='a',type='Sequence',children=['a'])),graph(leaf(),leaf('orphan')),
+        cases += [graph(leaf(children=['b']),leaf('b')),
+                  graph(dict(id='a',type='Wait',duration_s=1,children=['b']),leaf('b')),
+                  graph(dict(id='a',type='Sequence',children=['a'])),graph(leaf(),leaf('orphan')),
                   graph(dict(id='a',type='Sequence',children=['no'])),graph(dict(id='a',type='Repeat',count=100,children=['b']),leaf('b')),
                   graph(dict(id='a',type='Action',action='missing')),graph(dict(id='a',type='Wait',duration_s=float('nan')))]
         for d in cases:
