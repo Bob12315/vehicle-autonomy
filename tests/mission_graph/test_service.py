@@ -64,6 +64,17 @@ class ServiceTests(unittest.TestCase):
         self.assertEqual(self.api('/api/world/vehicle?target=v&extra=1')[0],400)
         self.assertEqual(self.driver.writes,[]);self.assertEqual(self.lab.runtime.views(),[])
 
+    def test_readonly_vehicle_cut_is_not_blocked_by_mission_journal_lock(self):
+        from threading import Event,Thread
+        done=Event();received=[]
+        def read():
+            received.append(self.api('/api/world/vehicle?target=v'));done.set()
+        with self.lab._control_lock:
+            thread=Thread(target=read);thread.start()
+            self.assertTrue(done.wait(1),'read-only AP feed waited on Mission arbitration/journal')
+        thread.join(2);self.assertFalse(thread.is_alive());self.assertEqual(received[0][0],200)
+        self.assertEqual(self.driver.writes,[])
+
     def test_save_validate_start_do_not_collide_on_shared_request_id(self):
         payload={'spec':graph(leaf())};request_id=uuid4().hex
         self.assertEqual(self.api('/api/missions/validate',payload,request_id)[0],200)

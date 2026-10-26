@@ -180,13 +180,15 @@ class MissionControl(ActionLab):
             recovered_actions=list(self.recovered_manual.values()), fault=self.control_fault)
 
     def handle(self, operation, payload):
+        if operation == 'world.vehicle':
+            if set(payload) != {'target'}: raise ValueError('one explicit target required')
+            driver=self.drivers[payload['target']]
+            view=getattr(driver,'read_view',None)
+            info,world=view() if callable(view) else (driver.info(),driver.snapshot())
+            verifier=getattr(getattr(driver,'ownership',None),'receive_signing',None)
+            return dict(**info,world=to_json_value(world),
+                signing_configured=verifier is not None,verified_frames=0 if verifier is None else verifier.accepted)
         with self._control_lock:
-            if operation == 'world.vehicle':
-                if set(payload) != {'target'}: raise ValueError('one explicit target required')
-                driver=self.drivers[payload['target']]
-                verifier=getattr(getattr(driver,'ownership',None),'receive_signing',None)
-                return dict(**driver.info(),world=to_json_value(driver.snapshot()),
-                    signing_configured=verifier is not None,verified_frames=0 if verifier is None else verifier.accepted)
             if operation == 'studio.state': return self._snapshot()
             if operation == 'mission.library': return list(self.journal.data['versions'].values())
             if operation == 'mission.types': return list(NODE_TYPES)

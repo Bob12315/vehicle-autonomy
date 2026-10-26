@@ -114,6 +114,9 @@ class VehicleActionDriver:
 
     def snapshot(self):
         with self._lock:return self._world
+    def read_view(self):
+        # One immutable published cut; no Mission/journal lock or vehicle I/O.
+        with self._lock:return dict(self._info),self._world
     def info(self):
         with self._lock:return dict(self._info)
     def effect_results(self,identifier):

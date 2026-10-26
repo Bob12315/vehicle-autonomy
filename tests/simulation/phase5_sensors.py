@@ -39,8 +39,8 @@ def bridge_config(path,world):
 
 
 class SensorFixture(MissionFixture):
-    def __init__(self,path):
-        super().__init__(path,'rover');self.collector=None
+    def __init__(self,path,**kwargs):
+        super().__init__(path,'rover',**kwargs);self.collector=None
         sensors(self.owned)
         from tests.simulation.phase5_setup import telemetry_rates
         original_start=self.owned.start

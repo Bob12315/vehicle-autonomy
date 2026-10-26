@@ -16,7 +16,7 @@
 - `contracts/algorithms.py` 和 `engine/providers/catalog.py`：算法能力元数据和选择；与 Phase 3 安全 ProviderRegistry 分开命名。选择不授予 SEND/Lease，不替代 Action 资源；需要运动桥的 Provider 还须匹配原固定根安全 Ledger、资源定义和无未解决作业。
 - `scripts/setup_ros2_local.py --full-navigation --directory NEW_DIRECTORY`：保留原选项，新增完整依赖的隔离提取；拒绝覆盖已有前缀，不运行系统安装或 maintainer scripts。
 
-在线 WorldSnapshot 及只读 ROS 传感器侧车已在第二个增量接通，详见 `WORLD_DATA_CONTRACT.md`。实际 Rover 场景验证四类传感器引用和 CameraInfo、AP 10 Hz 位姿、原时间 TF；传感器阶段 Writer 为 0。原生 SLAM 的建图/保存/加载定位数据资格验证已接通（见 `SLAM_INTEGRATION.md`），DDS 原生权限正反对照见 `ROS_SECURITY_BOUNDARY.md`。Nav2 控制和完整 Provider/Web/YOLO 及托管生命周期仍未完成，不能据基础合同宣称已实现。
+在线 WorldSnapshot 及只读 ROS 传感器侧车已在第二个增量接通，详见 `WORLD_DATA_CONTRACT.md`。实际 Rover 场景验证四类传感器引用和 CameraInfo、AP 10 Hz 位姿、原时间 TF；传感器阶段 Writer 为 0。原生 SLAM 的建图/保存/加载定位数据资格验证已接通（见 `SLAM_INTEGRATION.md`），DDS 原生权限正反对照见 `ROS_SECURITY_BOUNDARY.md`。真实 YOLO → World → Mission Event 的数据闭环已运行（见 `YOLO_INTEGRATION.md`）。Nav2 控制、完整 Provider/Web 和托管生命周期仍未完成，不能据基础合同宣称已实现。
 
 ## 后续实现约束
 
