@@ -46,3 +46,6 @@ artifacts/phase3-round3/
 
 # Phase 4 isolated evidence and runtime state
 /artifacts/phase4-mission/
+
+# Phase 5 isolated algorithm dependencies, private runtime and raw evidence.
+/artifacts/phase5-world-navigation/

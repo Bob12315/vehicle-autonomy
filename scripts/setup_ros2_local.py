@@ -24,11 +24,14 @@ def main():
     parser.add_argument("--directory", type=Path, default=Path.home()/".local/share/vehicle-autonomy/ros2-jazzy")
     parser.add_argument("--navigation", action="store_true", help="also extract the read-only Nav2 planner dependencies")
     parser.add_argument("--visualization", action="store_true", help="also extract RViz2 and ROS topic tools")
+    parser.add_argument("--full-navigation", action="store_true", help="isolated full Nav2, sensor and rosbag2 integration dependencies; use a NEW directory")
     args = parser.parse_args()
+    if args.full_navigation and (args.directory.resolve()/"root").exists():
+        parser.error("full navigation requires a fresh directory; never upgrade an existing ROS environment")
     if subprocess.check_output(["dpkg", "--print-architecture"], text=True).strip() != "amd64" or 'VERSION_ID="24.04"' not in Path("/etc/os-release").read_text():
         parser.error("the audited local extraction requires Ubuntu 24.04 amd64")
     directory = args.directory.resolve()
-    if (directory / "root/opt/ros/jazzy/local_setup.bash").exists() and not args.navigation and not args.visualization:
+    if (directory / "root/opt/ros/jazzy/local_setup.bash").exists() and not args.navigation and not args.visualization and not args.full_navigation:
         print(f"Existing local Jazzy tree retained: {directory}/root")
         return 0
     apt = directory / "apt"
@@ -62,6 +65,11 @@ Acquire::Languages "none";
 ''')
     subprocess.run(["apt-get", "-c", str(config), "update"], check=True)
     requested = PACKAGES + (["ros-jazzy-nav2-planner", "ros-jazzy-nav2-smac-planner", "ros-jazzy-nav2-msgs"] if args.navigation else [])
+    if args.full_navigation:
+        requested += ["ros-jazzy-navigation2", "ros-jazzy-nav2-bringup", "ros-jazzy-rviz2",
+                      "ros-jazzy-ros2topic", "ros-jazzy-rosbag2", "ros-jazzy-rosbag2-storage-mcap",
+                      "ros-jazzy-cv-bridge", "ros-jazzy-image-transport", "ros-jazzy-vision-msgs",
+                      "ros-jazzy-pointcloud-to-laserscan", "ros-jazzy-tf2-tools"]
     if args.visualization:
         requested += ["ros-jazzy-rviz2", "ros-jazzy-ros2topic"]
     subprocess.run(["apt-get", "-c", str(config), "--download-only", "--assume-yes",
