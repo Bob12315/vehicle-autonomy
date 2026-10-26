@@ -9,10 +9,11 @@ import socket
 import time
 
 
-def telemetry_rates(owned):
+def telemetry_rates(owned,*,hz=10):
     from pymavlink.dialects.v20 import ardupilotmega as mav
     if owned.kind!='rover' or (owned.run_dir/'action-owner.lock').exists():raise ValueError('fresh unowned Rover simulation provisioning only')
-    rates={'MAV1_POSITION':10.,'MAV1_EXTRA1':10.,'MAV1_EXT_STAT':5.}
+    if hz not in (10,20):raise ValueError('explicit qualified telemetry rate required')
+    rates={'MAV1_POSITION':float(hz),'MAV1_EXTRA1':float(hz),'MAV1_EXT_STAT':5.}
     parser=mav.MAVLink(None);parser.robust_parsing=True;peer=mav.MAVLink(None,srcSystem=250,srcComponent=191)
     sent=False;observed={name:[] for name in ("ATTITUDE","LOCAL_POSITION_NED","GLOBAL_POSITION_INT")};ready=False
     with socket.create_connection(('127.0.0.1',owned.port),timeout=1) as connection:
@@ -30,7 +31,7 @@ def telemetry_rates(owned):
                     # AP initializes message scheduling before dynamic stream
                     # defaults load; PARAM_VALUE alone does not prove frequency.
                     for msgid in (30,32,33):
-                        connection.sendall(peer.command_long_encode(1,1,mav.MAV_CMD_SET_MESSAGE_INTERVAL,0,msgid,100000,0,0,0,0,0).pack(peer));peer.seq=(peer.seq+1)&255
+                        connection.sendall(peer.command_long_encode(1,1,mav.MAV_CMD_SET_MESSAGE_INTERVAL,0,msgid,1_000_000//hz,0,0,0,0,0).pack(peer));peer.seq=(peer.seq+1)&255
                     sent=True
                 name=message.get_type()
                 if sent and name in observed:

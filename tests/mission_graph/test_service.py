@@ -62,6 +62,9 @@ class ServiceTests(unittest.TestCase):
         self.assertEqual(self.api('/api/world/vehicle?target=v',auth=False)[0],401)
         self.assertEqual(self.api('/api/world/vehicle')[0],400)
         self.assertEqual(self.api('/api/world/vehicle?target=v&extra=1')[0],400)
+        code,projected=self.api('/api/world/vehicle?target=v&projection=ap')
+        self.assertEqual(code,200)
+        self.assertEqual(self.api('/api/world/vehicle?target=v&projection=unknown')[0],400)
         self.assertEqual(self.driver.writes,[]);self.assertEqual(self.lab.runtime.views(),[])
 
     def test_readonly_vehicle_cut_is_not_blocked_by_mission_journal_lock(self):

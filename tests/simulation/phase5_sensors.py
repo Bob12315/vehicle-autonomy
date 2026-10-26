@@ -39,27 +39,46 @@ def bridge_config(path,world):
 
 
 class SensorFixture(MissionFixture):
-    def __init__(self,path,**kwargs):
-        super().__init__(path,'rover',**kwargs);self.collector=None
+    def __init__(self,path,source_time_sync=False,secure=False,**kwargs):
+        super().__init__(path,'rover',driver_options={'source_time_sync':source_time_sync,'cycle_period_ns':20_000_000 if source_time_sync else None},**kwargs);self.collector=None;self.source_time_sync=source_time_sync;self.secure=secure;self.security_environment={}
         sensors(self.owned)
         from tests.simulation.phase5_setup import telemetry_rates
         original_start=self.owned.start
-        def start_owned():original_start();telemetry_rates(self.owned)
+        def start_owned():
+            original_start();telemetry_rates(self.owned,hz=20 if source_time_sync else 10)
+            if source_time_sync:self.owned.verify_parameters({'SERIAL0_BAUD':115.},'phase5_clock_uart_baud')
         self.owned.start=start_owned
+    def ros_start(self,name,command,role,**kwargs):
+        if self.secure:
+            command=list(command)
+            if '--ros-args' in command:
+                i=command.index('--ros-args');command[i+1:i+1]=['--enclave','/vaf/'+role]
+            else:command+=['--ros-args','--enclave','/vaf/'+role]
+        return self.owned.start_process(name,command,environment=self.security_environment,**kwargs)
     def start(self):
         os.environ['PYTHONPATH']=str(ROOT/'src')+os.pathsep+os.environ.get('PYTHONPATH','')
         os.environ['ROS_DOMAIN_ID']=str(120+os.getpid()%80)
         super().start();f=self;path=self.path
+        if self.secure:
+            from vehicle_autonomy.app.bootstrap.navigation_security import profiles
+            auth=f.owned.credentials.create_state('_phase5_dds');f.owned._save()
+            (path/'dds-profiles.json').write_text(json.dumps(profiles('/nav2_wire'),indent=2))
+            helper=f.owned.start_process('dds-provision',[str(ROOT/'scripts/with_ros2.sh'),'/usr/bin/python3','-m','vehicle_autonomy.app.bootstrap.ros2_security','--root',str(auth/'keystore'),'--profiles',str(path/'dds-profiles.json'),'--result',str(path/'dds-provision.json')],transient=True)
+            try:code=helper.wait(timeout=45)
+            finally:f.owned.stop_process(helper)
+            if code:raise RuntimeError('native DDS credential provisioning failed')
+            self.security_environment=dict(ROS_SECURITY_ENABLE='true',ROS_SECURITY_STRATEGY='Enforce',ROS_SECURITY_KEYSTORE=str(auth/'keystore'),RMW_IMPLEMENTATION='rmw_fastrtps_cpp')
         fd=os.open(path/'stream-api.private',os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600)
         try:
             os.write(fd,f.token.encode());f.owned.credentials.register_private('stream-api.private',fd)
         finally:os.close(fd)
         f.owned._save()
         bridge_config(path/'sensor-bridge.yaml',f.owned.world)
-        f.owned.start_process('ros-sensor-bridge',[str(ROOT/'scripts/with_ros2.sh'),'/usr/bin/python3','-m','vehicle_autonomy.app.bootstrap.ros2_run','ros_gz_bridge','parameter_bridge','--ros-args','-p','config_file:='+str(path/'sensor-bridge.yaml')])
+        f.ros_start('ros-sensor-bridge',[str(ROOT/'scripts/with_ros2.sh'),'/usr/bin/python3','-m','vehicle_autonomy.app.bootstrap.ros2_run','ros_gz_bridge','parameter_bridge','--ros-args','-p','config_file:='+str(path/'sensor-bridge.yaml')],role='bridge')
         raw={'camera':[f.owned.model+'/base_link/rgb_camera'],'scan':[f.owned.model+'/base_link/mapping_lidar'],
              'cloud':[f.owned.model+'/base_link/lidar3d'],'imu':[f.owned.model+'/base_link/imu_sensor']}
         config=dict(schema=1,base_url=f.base,target='rover',token_file=str(path/'stream-api.private'),directory=str(path/'streams'),source_id='gazebo:'+f.owned.world,frame_epoch=f.driver.snapshot().version.generation_id,calibration_version='owned-rover-sensors-v1',raw_frames=raw)
+        if self.source_time_sync:config['generation_clock_world']=f.owned.world
         (path/'stream-profile.json').write_text(json.dumps(config,indent=2)+'\n')
         from vehicle_autonomy.app.bootstrap.stream_collector import StreamCollector
         from vehicle_autonomy.contracts.streams import FrameDescriptor
@@ -67,7 +86,7 @@ class SensorFixture(MissionFixture):
         frames={name:FrameDescriptor(frame,convention,config['frame_epoch']) for name,frame,convention in
             [('camera','camera_optical','camera_optical'),('scan','laser','FLU'),('cloud','lidar3d','FLU'),('imu','imu_frd','FRD')]}
         self.collector=StreamCollector(f.driver,path/'streams',source_id=config['source_id'],origin_id=config['frame_epoch'],calibration_version=config['calibration_version'],frames=frames)
-        f.owned.start_process('world-streams',[str(ROOT/'scripts/with_ros2.sh'),'/usr/bin/python3','-m','vehicle_autonomy.world.sensors.ros2_streams','--config',str(path/'stream-profile.json')])
+        f.ros_start('world-streams',[str(ROOT/'scripts/with_ros2.sh'),'/usr/bin/python3','-m','vehicle_autonomy.world.sensors.ros2_streams','--config',str(path/'stream-profile.json')],role='sensors')
         self.sensor_config=config
         return self
     def close(self):

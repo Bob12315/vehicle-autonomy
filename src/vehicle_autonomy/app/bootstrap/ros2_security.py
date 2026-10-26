@@ -26,6 +26,7 @@ def policy(profiles):
             for direction in directions:
                 values=list(permissions.get(tag,{}).get(direction,()))
                 if tag=='topics' and direction=='publish':values+=['/rosout','/parameter_events']
+                if tag=='topics' and direction=='subscribe':values+=['/parameter_events']
                 if tag=='services' and direction=='reply':values+=['/*/get_type_description']
                 if not values:continue
                 element=ET.SubElement(profile,tag,**{direction:'ALLOW'})

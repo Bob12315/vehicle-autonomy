@@ -72,6 +72,8 @@ class SimulationRuntime:
                  event_sink: Callable[[dict], None] | None = None,
                  motion_guard: Callable[..., str | None] | None = None,
                  receive_signing: ReceiveSigning | None = None,
+                 source_time_sync: bool = False,
+                 time_sync_uart_baud: int | None = None,
                  sleep: Callable[[float], None] = time.sleep) -> None:
         if not isinstance(profile, SimulationProfile):
             raise TypeError("validated SimulationProfile required")
@@ -83,6 +85,9 @@ class SimulationRuntime:
         self.clock = clock or (lambda: TimePoint(time.monotonic_ns(), datetime.now(timezone.utc),
                                                  profile.clock_domain_id))
         self._transport_factory = transport_factory or TcpByteTransport.connect
+        if type(source_time_sync) is not bool or source_time_sync and receive_signing is None:raise ValueError("explicit authenticated simulation clock sync required")
+        if source_time_sync and (type(time_sync_uart_baud) is not int or time_sync_uart_baud<57600):raise ValueError("verified simulation UART baud lower bound required")
+        self._source_time_sync=source_time_sync
         self._receive_signing = receive_signing  # retain replay floor across reconnect
         self._event_sink = event_sink
         self.motion_guard = motion_guard
@@ -178,7 +183,8 @@ class SimulationRuntime:
                                     translator=self._translator, now=self.clock,
                                     stop_speed_tolerance=0.1 if self.profile.kind == "rover" else 0.05,
                                     write_guard=self._write_guard)
-        capture_clock = SimulationSourceClock()
+        from vehicle_autonomy.vehicles.ardupilot.timesync_clock import TimesyncSourceClock
+        capture_clock = TimesyncSourceClock() if self._source_time_sync else SimulationSourceClock()
         session = ArduPilotSession(
             transport=transport, codec=codec, authority=self.authority,
             commands=port, link_timeout_ns=self.profile.link_timeout_ns,
@@ -191,6 +197,7 @@ class SimulationRuntime:
                 link_timeout_ns=self.profile.link_timeout_ns),
             captured_at=lambda message, received: self._capture(capture_clock, message, received),
             confirmation_time_qualified=True,
+            time_sync=capture_clock if self._source_time_sync else None,clock=self.clock if self._source_time_sync else None,
         )
         self._transport, self._port, self._session = transport, port, session
         safety_class = RoverSimulationSafetyPolicy if self.profile.kind == "rover" else SimulationSafetyPolicy

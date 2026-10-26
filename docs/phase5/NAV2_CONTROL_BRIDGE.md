@@ -19,3 +19,34 @@ ActionDecision.valid_until 只会缩短既有 TTL/deadline，不会授予或延�
 `bridge-contract-tests.log`：6 项确定性正反对照通过，包括正常爬升/制动、重复接收 999 次、
 旧身份、错误时域、关闭后输出，以及回调耗时后实际 Driver dispatch 为 0。
 `bridge-unit-590.log`：590 项完整单元通过。真实 Writer 与三车型物理回归仍须正式执行。
+
+## 原生链路开发验证（未完成车辆桥）
+
+`phase5_nav2_chain` 实际启动 native Planner、DWB Controller、Velocity Smoother、
+Collision Monitor、Behavior Server 和 BT Navigator。`dev-nav2-chain-5/6` 在
+Gazebo + signed SITL 下生成真实路径并观察连续最终速度、原生 Goal 取消；
+没有装配车辆运动桥，车辆保持静止。只读 TIMESYNC 与车辆控制 Writer 必须
+分开计数。上述开发记录不能替代正式导航或两轮 A–I。
+
+Native Wait 的正常完成不发送零速；取消长 Wait 才会发送真实零速，可用于
+受控 macro 的 PREPARING 阶段。Smoother 即使关闭普通重打时间戳，输入超时
+减速仍会生成新 stamp。最终帧必须另有原始控制器 stamp/产生时间证据；
+不匹配的帧拒绝，不能据最终接收时刻续期。ControllerEvidence 和
+NavigationMailbox 均有固定容量和 200 ms 原始源年龄上限。
+
+新配置保持 scan source_timeout=0.3、TF tolerance=0.2，禁用 native 需要
+当前时刻外推 TF 的 base_shift_correction，采用保守扩大 footprint/stop
+polygon。实际车辆桥启用前必须验证签名观测速度 <=0.4 m/s、偏航率
+<=0.45 rad/s；300 ms 内的平移及车体旋转不确定性 <0.25 m 额外包络。
+目前尚无实际运动桥，不能把该配置声称为已通过物理导航验收。
+
+真实全图 SROS2 Enforce 权限正在验证。固定角色分别约束 raw/smoothed/final
+发布、管理 Goal 和只读 viewer；命名空间本身不构成认证。早期全图启动失败
+独立保留在 dev-nav2-secure-*，尚不能宣称最终导航安全装配已完成。
+
+开发检查点：618 个单元测试通过；dev-nav2-secure-17/18 真实加密图通过。
+加强原始零速新鲜度断言后 dev-nav2-secure-19 也通过；没有延长零速时间戳，
+而是在真实 Wait 子目标运行期间等待通道建立后再正常取消以取得新零速。
+只读 viewer 的最终发布/Goal 客户端均由实际 middleware 拒绝，
+管理客户端仅一个 Navigate Goal，原始 producer 时间限定的最终控制持续有效。
+所有运行清理凭据、进程组和端口。仍未装配实际车辆桥，不能声明 Phase 5 完成。

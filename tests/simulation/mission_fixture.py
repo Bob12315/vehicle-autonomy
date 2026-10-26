@@ -25,13 +25,13 @@ from tests.simulation.faults import TcpFaultProxy
 
 
 class MissionFixture:
-    def __init__(self,path,kind,*,registry=None,events=None,application_dir=None,provider_registry_root=None):
+    def __init__(self,path,kind,*,registry=None,events=None,application_dir=None,provider_registry_root=None,driver_options=None):
         self.path=Path(path);self.path.mkdir(parents=True,exist_ok=False);self.kind=kind
         self.owned=OwnedSimulation(self.path,kind,confirmation_signing=True,rover_native_rtl=kind=='rover')
         self.application_dir=Path(application_dir) if application_dir else self.path/'application'
         self.provider_registry_root=Path(provider_registry_root) if provider_registry_root else self.path/'provider-registry'
         self._initialize_registry=provider_registry_root is None
-        self.registry=registry;self.events=events;self._registry_context=None;self._profile_context=ExitStack();self.timings={};self.slow_calls=[];self.gc_pauses=deque(maxlen=4096);self._gc_started={};self.writer=[];self.received=deque(maxlen=4096);self.trajectory=deque(maxlen=48000)
+        self.driver_options=dict(driver_options or {});self.registry=registry;self.events=events;self._registry_context=None;self._profile_context=ExitStack();self.timings={};self.slow_calls=[];self.gc_pauses=deque(maxlen=4096);self._gc_started={};self.writer=[];self.received=deque(maxlen=4096);self.trajectory=deque(maxlen=48000)
         self.lab=self.server=self.proxy=self.driver=None;self._stop=Event();self._thread=None;self.sampling_error=None
         self.logs={name:(self.path/name).open('w') for name in ('runtime.jsonl','trajectory.jsonl','application-rx.jsonl')}
     def start(self):
@@ -71,7 +71,7 @@ class MissionFixture:
             return Observed(TcpByteTransport.connect('127.0.0.1',self.proxy.port,**kw))
         translator={'rover':ArduRoverCommandTranslator,'copter':ArduPilotCommandTranslator,'plane':ArduPlaneCommandTranslator}[self.kind](mode_ids=self.owned.profile.mode_ids)
         self.driver=VehicleActionDriver(self.kind,self.owned.profile,translator,proof,allow_send=True,
-            event_sink=lambda e:self.write('runtime.jsonl',e),transport_factory=connect)
+            event_sink=lambda e:self.write('runtime.jsonl',e),transport_factory=connect,**self.driver_options)
         self.observe_driver_timing()
         from vehicle_autonomy.engine.action.provider_identity import ProviderRegistry
         self._registry_context=ExitStack()
@@ -126,7 +126,7 @@ class MissionFixture:
         proof=OwnedActionSimulation(self.path/'manifest.json')
         translator={'rover':ArduRoverCommandTranslator,'copter':ArduPilotCommandTranslator,'plane':ArduPlaneCommandTranslator}[self.kind](mode_ids=self.owned.profile.mode_ids)
         self.driver=VehicleActionDriver(self.kind,self.owned.profile,translator,proof,allow_send=True,
-            event_sink=lambda e:self.write('runtime.jsonl',e),transport_factory=self._connect)
+            event_sink=lambda e:self.write('runtime.jsonl',e),transport_factory=self._connect,**self.driver_options)
         self.observe_driver_timing()
         self.lab=MissionControl({self.kind:self.driver},self.application_dir,registry=self.registry,
             events=self.events,event_sink=lambda e:self.write('runtime.jsonl',e))

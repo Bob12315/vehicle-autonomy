@@ -33,7 +33,8 @@ class ArduPilotSession:
                  link_timeout_ns: int,
                  expected_vehicle_type: int,
                  captured_at: Callable[[object, TimePoint], TimePoint | None] | None = None,
-                 confirmation_time_qualified: bool = False) -> None:
+                 confirmation_time_qualified: bool = False,
+                 time_sync=None, clock=None) -> None:
         if isinstance(link_timeout_ns, bool) or not isinstance(link_timeout_ns, int) or link_timeout_ns <= 0:
             raise ValueError("link timeout must be positive nanoseconds")
         if not commands.uses(authority=authority, transport=transport, codec=codec):
@@ -49,6 +50,8 @@ class ArduPilotSession:
         self._expected_vehicle_type = expected_vehicle_type
         if not isinstance(confirmation_time_qualified, bool):
             raise TypeError("source-time qualification must be explicit bool")
+        if time_sync is not None and (codec.receive_signing is None or not callable(clock)):raise ValueError("clock sync requires authenticated simulation timing")
+        self._time_sync=time_sync;self._clock=clock;self._last_write_was_query=False
         self._captured_at = captured_at
         self._confirmation_time_qualified = confirmation_time_qualified
         self._session_id: LinkSessionId | None = None
@@ -171,6 +174,8 @@ class ArduPilotSession:
                 # rejected payloads remain in the caller's receive log; they
                 # must not overwrite WorldSnapshot's newer heartbeat field.
                 continue
+            if kind=='TIMESYNC' and self._time_sync is not None:
+                self._time_sync.observe(message,self._clock(),self._commands.wire_attempted_bytes);continue
             if kind in ('HEARTBEAT', 'COMMAND_ACK'):
                 if signature is None:
                     # Unauthenticated headers and other messages' timestamps
@@ -254,6 +259,19 @@ class ArduPilotSession:
 
     def write_next(self, now: TimePoint) -> CommandStatus | None:
         self.tick(now)
+        if self._time_sync is not None and self._session_id is not None:
+            nonce=self._time_sync.request_due(self._clock())
+            if nonce is not None:
+                # A caller with a slow cadence must still make control progress.
+                # One query cannot take two consecutive available control slots.
+                if self._last_write_was_query:
+                    written=self._commands.write_next(now)
+                    if written is not None:
+                        self._last_write_was_query=False;return written
+                try:self._time_sync.sent(nonce,*self._commands.write_timesync(nonce))
+                except (OSError,ConnectionError):self._disconnect(self._clock());raise
+                self._last_write_was_query=True;return None
+        self._last_write_was_query=False
         return self._commands.write_next(now)
 
     def snapshot(self) -> VehicleStateSnapshot | None:

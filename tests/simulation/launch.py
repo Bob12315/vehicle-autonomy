@@ -127,11 +127,14 @@ class OwnedSimulation:
     def _save(self):
         (self.run_dir / "manifest.json").write_text(json.dumps(self.manifest, indent=2))
 
-    def start_process(self, name, command, *, cwd=None, transient=False):
+    def start_process(self, name, command, *, cwd=None, transient=False, environment=None):
         if type(transient) is not bool:raise TypeError("explicit process lifetime required")
         logfile = self.run_dir / f"{name}.log"
         handle = logfile.open("w")
         env = dict(os.environ)
+        if environment is not None:
+            if type(environment) is not dict or any(not isinstance(k,str) or not isinstance(v,str) for k,v in environment.items()):raise TypeError("explicit string environment overlay required")
+            env.update(environment)
         env["GZ_SIM_RESOURCE_PATH"] = ":".join([str(ROOT / "simulation/models"),
             str(PLUGIN / "models"), str(PLUGIN / "worlds"), env.get("GZ_SIM_RESOURCE_PATH", "")])
         env["GZ_SIM_SYSTEM_PLUGIN_PATH"] = env.get("VAF_SIMULATION_PLUGIN_DIR", str(PLUGIN / "build")) + ":" + env.get("GZ_SIM_SYSTEM_PLUGIN_PATH", "")

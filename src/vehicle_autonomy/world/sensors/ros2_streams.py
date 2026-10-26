@@ -35,7 +35,7 @@ class VehicleProbe:
             raise ValueError('explicit loopback simulation API required')
         path=Path(token_file);info=path.lstat()
         if not stat.S_ISREG(info.st_mode) or info.st_uid!=os.getuid() or stat.S_IMODE(info.st_mode)&0o077:raise ValueError('private owned token file required')
-        self._token=path.read_text().strip();self.url=base+'/api/world/vehicle?target='+quote(target,safe='')
+        self._token=path.read_text().strip();self.url=base+'/api/world/vehicle?target='+quote(target,safe='')+'&projection=ap'
         self.latest=None;self.error=None;self.stop=Event();self.thread=Thread(target=self._run,daemon=True);self.thread.start()
     def _run(self):
         while not self.stop.is_set():
@@ -46,7 +46,7 @@ class VehicleProbe:
                 if not data.get('ok'):raise ValueError('telemetry rejected')
                 self.latest=(time.monotonic_ns(),data['result']);self.error=None
             except Exception as e:self.error=type(e).__name__
-            self.stop.wait(.08)
+            self.stop.wait(.02)
     def close(self):
         self.stop.set();self.thread.join(1)
         if self.thread.is_alive():raise RuntimeError('read-only telemetry probe did not exit')
@@ -55,10 +55,12 @@ class VehicleProbe:
 def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--config',type=Path,required=True);args,ros_args=p.parse_known_args()
     c=json.loads(args.config.read_text())
-    if set(c)!={'schema','base_url','target','token_file','directory','source_id','frame_epoch','calibration_version','raw_frames'} or c['schema']!=1:
+    if set(c)-{'generation_clock_world'}!={'schema','base_url','target','token_file','directory','source_id','frame_epoch','calibration_version','raw_frames'} or c['schema']!=1:
         raise ValueError('strict owned simulation stream profile required')
     directory=Path(c['directory']);directory.mkdir(mode=0o700,parents=True,exist_ok=True)
     store=StreamStore(directory/'payloads');clock=RosClockBridge();epoch=uuid4().hex
+    from vehicle_autonomy.world.sensors.simulation_time import SimulationGenerationClock
+    generation=SimulationGenerationClock(c['generation_clock_world']) if 'generation_clock_world' in c else None
     probe=VehicleProbe(c['base_url'],c['target'],c['token_file'])
     # Optional native imports remain confined to this explicitly launched worker.
     import rclpy
@@ -94,15 +96,21 @@ def main():
                 self.create_subscription(cls,topic,lambda m,k=key:self.enqueue(k,m),qos)
             self.create_subscription(CameraInfo,'/phase5/camera/info',self.on_info,qos)
             self.publish_static()
-            self.create_timer(.04,self.tick,clock=Clock(clock_type=ClockType.STEADY_TIME))
+            self.create_timer(.01,self.tick,clock=Clock(clock_type=ClockType.STEADY_TIME))
+            self.create_timer(1.,self.publish_static,clock=Clock(clock_type=ClockType.STEADY_TIME))
         def publish_static(self):
             frames=[('laser',(0.,0.,.2),(0.,0.,0.,1.)),('lidar3d',(0.,0.,.25),(0.,0.,0.,1.)),('imu_frd',(0.,0.,0.),(1.,0.,0.,0.)),
                     ('camera_link',(.15,0.,.25),(0.,0.,0.,1.)),('camera_optical',(0.,0.,0.),(-.5,.5,-.5,.5))]
+            transforms=[]
             for name,xyz,xyzw in frames:
                 t=TransformStamped();t.header.frame_id='camera_link' if name=='camera_optical' else 'base_link';t.child_frame_id=name
                 t.transform.translation.x,t.transform.translation.y,t.transform.translation.z=xyz
                 t.transform.rotation.x,t.transform.rotation.y,t.transform.rotation.z,t.transform.rotation.w=xyzw
-                self.static.sendTransform(t)
+                transforms.append(t)
+                self.buffer.set_transform_static(t,'owned-calibration')
+            # TRANSIENT_LOCAL retains the complete calibrated tree in one sample.
+            # DDS authentication may finish after the first publications.
+            self.static.sendTransform(transforms)
         def on_clock(self,message):
             if clock.observe(ns(message.clock),time.monotonic_ns()):self.fault='simulation clock epoch changed; restart and readmit streams'
             self.last_clock=clock.pairs[-1][1] if clock.pairs else None
@@ -138,7 +146,7 @@ def main():
             yaw=math.atan2(2*(qq['w']*qq['z']+qq['x']*qq['y']),1-2*(qq['y']**2+qq['z']**2))
             msg.twist.twist.linear.x=math.cos(yaw)*linear['x']+math.sin(yaw)*linear['y'];msg.twist.twist.linear.y=-math.sin(yaw)*linear['x']+math.cos(yaw)*linear['y'];msg.twist.twist.linear.z=linear['z'];msg.twist.twist.angular.z=angular['z']
             t=TransformStamped();t.header=msg.header;t.child_frame_id='base_link';t.transform.translation.x,t.transform.translation.y,t.transform.translation.z=msg.pose.pose.position.x,msg.pose.pose.position.y,msg.pose.pose.position.z;t.transform.rotation=msg.pose.pose.orientation
-            self.odom.publish(msg);self.tf.sendTransform(t);self.last_tf_ros=ros;self.last_pose=capture['monotonic_ns'];self.counts['odom']=self.counts.get('odom',0)+1
+            self.odom.publish(msg);self.tf.sendTransform(t);self.buffer.set_transform(t,'authenticated-ap-source');self.last_tf_ros=ros;self.last_pose=capture['monotonic_ns'];self.counts['odom']=self.counts.get('odom',0)+1
         def consume(self,key,m,received,capture):
             frame={'camera':('camera_optical','camera_optical'),'scan':('laser','FLU'),'cloud':('lidar3d','FLU'),'imu':('imu_frd','FRD')}[key]
             kind={'camera':DataKind.IMAGE,'scan':DataKind.SCAN,'cloud':DataKind.CLOUD,'imu':DataKind.IMU}[key]
@@ -180,7 +188,7 @@ def main():
                         source=ns(m.header.stamp)
                         if source<=self.last_source.get(key,-1):q.popleft();self.drops[key]=self.drops.get(key,0)+1;continue
                         try:
-                            capture=clock.to_host(source)
+                            capture=generation.lower_bound(source,at(now),strict_previous=True).monotonic_ns if generation else clock.to_host(source)
                             if capture>received:
                                 if capture-received>20_000_000:raise ValueError('capture follows receipt')
                                 capture=received # Conservative older capture for delivery-order ambiguity.
@@ -190,12 +198,14 @@ def main():
                         except ValueError:q.popleft();self.drops[key]=self.drops.get(key,0)+1;continue
                         q.popleft();self.last_source[key]=source
             except (ValueError,LookupError) as exc:error=str(exc)
-            atomic_json(directory/'state.json',dict(schema=1,generation=epoch,source_kind='simulation',source_id=c['source_id'],origin_id=c['frame_epoch'],ap_world_epoch=self.frame_epoch,published_ns=time.monotonic_ns(),error=error,streams=self.latest,intrinsics=self.intrinsics,counts=self.counts,dropped=self.drops,queue_depths={k:len(v) for k,v in self.pending.items()},dropped_scope='worker reference processing only; raw ROS topics unmodified',scan_wait=self.scan_wait,last_tf_ros=self.last_tf_ros))
+            atomic_json(directory/'state.json',dict(schema=1,generation=epoch,source_kind='simulation',source_id=c['source_id'],origin_id=c['frame_epoch'],ap_world_epoch=self.frame_epoch,published_ns=time.monotonic_ns(),error=error,streams=self.latest,intrinsics=self.intrinsics,counts=self.counts,dropped=self.drops,queue_depths={k:len(v) for k,v in self.pending.items()},dropped_scope='worker reference processing only; raw ROS topics unmodified',scan_wait=self.scan_wait,last_tf_ros=self.last_tf_ros,generation_clock=None if generation is None else dict(fault=generation.fault,samples=len(generation.samples))))
     node=Streams()
     try:
         while rclpy.ok() and not stop:rclpy.spin_once(node,timeout_sec=.05)
     finally:
-        probe.close();node.destroy_node()
+        probe.close()
+        if generation:generation.close()
+        node.destroy_node()
         if rclpy.ok():rclpy.shutdown()
         atomic_json(directory/'stopped.json',dict(stopped=True,generation=epoch,at_ns=time.monotonic_ns()))
 

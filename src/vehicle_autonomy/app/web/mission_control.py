@@ -181,12 +181,13 @@ class MissionControl(ActionLab):
 
     def handle(self, operation, payload):
         if operation == 'world.vehicle':
-            if set(payload) != {'target'}: raise ValueError('one explicit target required')
+            if set(payload) not in ({'target'},{'target','projection'}) or payload.get('projection','full') not in ('full','ap'): raise ValueError('explicit target/projection required')
             driver=self.drivers[payload['target']]
             view=getattr(driver,'read_view',None)
             info,world=view() if callable(view) else (driver.info(),driver.snapshot())
             verifier=getattr(getattr(driver,'ownership',None),'receive_signing',None)
-            return dict(**info,world=to_json_value(world),
+            projected=(None if world is None else dict(version=to_json_value(world.version),published_at=to_json_value(world.published_at),vehicle=to_json_value(world.vehicle))) if payload.get('projection')=='ap' else to_json_value(world)
+            return dict(**info,world=projected,
                 signing_configured=verifier is not None,verified_frames=0 if verifier is None else verifier.accepted)
         with self._control_lock:
             if operation == 'studio.state': return self._snapshot()
@@ -307,9 +308,9 @@ class MissionControlHandler(ActionLabHandler):
             if not self.authorized():return
             try:
                 query=parse_qs(urlsplit(self.path).query,strict_parsing=True)
-                if set(query)!={'target'} or len(query['target'])!=1:raise ValueError('one explicit target required')
+                if set(query) not in ({'target'},{'target','projection'}) or len(query['target'])!=1 or 'projection' in query and query['projection']!=['ap']:raise ValueError('explicit target/projection required')
             except ValueError as exc:self.reply(400,dict(ok=False,error=str(exc)));return
-            self.invoke('world.vehicle',dict(target=query['target'][0]));return
+            self.invoke('world.vehicle',dict(target=query['target'][0],**({'projection':'ap'} if 'projection' in query else {})));return
         if urlsplit(self.path).path == '/api/manual/state':
             if not self.authorized():return
             try:

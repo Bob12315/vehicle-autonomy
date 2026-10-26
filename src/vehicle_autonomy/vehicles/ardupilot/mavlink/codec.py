@@ -40,7 +40,14 @@ class LocalSetpoint:
     yaw_rate: float = 0.0
 
 
-Instruction: TypeAlias = CommandLong | CommandInt | LocalSetpoint
+@dataclass(frozen=True,slots=True)
+class TimesyncQuery:
+    nonce: int
+    def __post_init__(self):
+        if type(self.nonce) is not int or not 0<self.nonce<2**63:raise ValueError('bounded clock query correlation required')
+
+
+Instruction: TypeAlias = CommandLong | CommandInt | LocalSetpoint | TimesyncQuery
 
 
 class MavlinkCodec:
@@ -63,7 +70,9 @@ class MavlinkCodec:
         self.receive_signing = receive_signing
 
     def encode(self, instruction: Instruction, *, advance_sequence: bool = True) -> bytes:
-        if isinstance(instruction, CommandLong):
+        if isinstance(instruction, TimesyncQuery):
+            message = self._sender.timesync_encode(0,instruction.nonce)
+        elif isinstance(instruction, CommandLong):
             message = self._sender.command_long_encode(
                 self.target_system, self.target_component, instruction.command, 0,
                 *instruction.params,

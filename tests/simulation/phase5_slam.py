@@ -30,10 +30,10 @@ def ros(f,label,*args):
 
 
 def start_slam(f,label,profile):
-    process=f.owned.start_process(label,[str(ROOT/'scripts/with_ros2.sh'),'/usr/bin/python3','-m','vehicle_autonomy.app.bootstrap.ros2_run','slam_toolbox',
-        'localization_slam_toolbox_node' if 'localization' in profile.name else 'async_slam_toolbox_node','--ros-args','--params-file',str(profile)])
+    process=f.ros_start(label,[str(ROOT/'scripts/with_ros2.sh'),'/usr/bin/python3','-m','vehicle_autonomy.app.bootstrap.ros2_run','slam_toolbox',
+        'localization_slam_toolbox_node' if 'localization' in profile.name else 'async_slam_toolbox_node','--ros-args','--params-file',str(profile)],role='slam')
     for transition in ('configure','activate'):
-        worker=f.owned.start_process(label+'-'+transition,[str(ROOT/'scripts/with_ros2.sh'),'/usr/bin/python3','-m','vehicle_autonomy.app.bootstrap.ros2_lifecycle','--node','/slam_toolbox','--transition',transition,'--result',str(f.path/(label+'-'+transition+'.json'))],transient=True)
+        worker=f.ros_start(label+'-'+transition,[str(ROOT/'scripts/with_ros2.sh'),'/usr/bin/python3','-m','vehicle_autonomy.app.bootstrap.ros2_lifecycle','--node','/slam_toolbox','--transition',transition,'--result',str(f.path/(label+'-'+transition+'.json'))],role='manager',transient=True)
         try:code=worker.wait(timeout=25)
         finally:f.owned.stop_process(worker)
         if code:raise RuntimeError('native '+label+' '+transition+' result unconfirmed')

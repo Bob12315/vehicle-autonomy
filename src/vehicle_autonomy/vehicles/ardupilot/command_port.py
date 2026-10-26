@@ -18,7 +18,7 @@ from vehicle_autonomy.contracts.vehicle.command import (
 from vehicle_autonomy.contracts.vehicle.models import VehicleStateSnapshot
 from vehicle_autonomy.engine.control.control_authority import ControlAuthority
 from vehicle_autonomy.vehicles.ardupilot.transports.bytes import ByteTransport
-from vehicle_autonomy.vehicles.ardupilot.mavlink.codec import CommandLong, CommandInt, Instruction, LocalSetpoint, MavlinkCodec
+from vehicle_autonomy.vehicles.ardupilot.mavlink.codec import CommandLong, CommandInt, Instruction, LocalSetpoint, MavlinkCodec, TimesyncQuery
 from vehicle_autonomy.vehicles.ardupilot.mavlink import constants as mavlink
 
 from vehicle_autonomy.vehicles.ardupilot.commands import ArduPilotCommandTranslator
@@ -68,6 +68,7 @@ class ArduPilotCommandPort:
         self._streams: dict[str, tuple[int, LinkSessionId, str]] = {}
         self.reasons: dict[CommandId, str] = {}
         self._write_uncertain = False
+        self._wire_attempted_bytes=0
         self._receive_ticket = -1
         self._sent_ticket: dict[CommandId, int] = {}
         self._sent_signature: dict[CommandId, int] = {}
@@ -136,6 +137,28 @@ class ArduPilotCommandPort:
     def status(self, command_id: CommandId) -> CommandStatus | None:
         with self._authority.lock:
             return self._statuses.get(command_id)
+
+    def write_timesync(self,nonce):
+        """Whitelisted read-only protocol query through this SAME sole writer.
+
+        Only the optional authenticated simulation Session uses this method.
+        It cannot encode an actuator, mode, parameter or arbitrary raw frame.
+        """
+        with self._authority.lock:
+            if self._write_uncertain:raise ConnectionError('writer transport outcome uncertain')
+            if self._authority.link_session_id is None or self._codec.receive_signing is None:raise ConnectionError('authenticated protocol session required')
+            started=self._now();data=self._codec.encode(TimesyncQuery(nonce),advance_sequence=False)
+            at=self._now()
+            if not 0<=at.elapsed_ns_since(started)<=self._max_guard_duration_ns:raise TimeoutError('clock query preparation exceeded writer budget')
+            self._codec.commit_sequence()
+            self._wire_attempted_bytes+=len(data)
+            try:self._transport.write(data)
+            except (OSError,ConnectionError):self._write_uncertain=True;raise
+            return at,self._wire_attempted_bytes
+
+    @property
+    def wire_attempted_bytes(self):
+        with self._authority.lock:return self._wire_attempted_bytes
 
     def write_next(self, now: TimePoint | None = None) -> CommandStatus | None:
         """The caller's time is a scheduling hint, never the write fence.
@@ -209,6 +232,7 @@ class ArduPilotCommandPort:
                         self._codec.commit_sequence()
                         if self._codec.receive_signing is not None:
                             self._sent_signature[command_id] = self._codec.receive_signing.watermark
+                        self._wire_attempted_bytes+=len(data)
                         self._transport.write(data)
                     except (OSError, ConnectionError) as exc:
                         self._write_uncertain = True
