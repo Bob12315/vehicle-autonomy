@@ -240,17 +240,20 @@ class ActionRuntime:
             return
         self._state(r,ActionState.CANCELLING)
 
-    def _emit(self,r,effects,now,*,cleanup):
+    def _emit(self,r,effects,now,*,cleanup,source_deadline=None):
         if not isinstance(effects,tuple) or any(type(e) not in r.registration.spec.effect_types for e in effects):
             raise TypeError('Action emitted undeclared effects')
         if r.registration.spec.kind is ActionKind.QUERY and effects:raise TypeError('Query cannot emit effects')
         if len(r.effects)+len(effects)>self.max_effects:raise ValueError('Action effect budget exhausted')
+        if source_deadline is not None and (not isinstance(source_deadline,TimePoint) or source_deadline.clock_domain_id!=now.clock_domain_id):
+            raise ValueError('effect source deadline clock mismatch')
         driver=self.drivers[r.target]
         for effect in effects:
             # Cleanup has its own bounded window. The final writer still enforces
             # every Lease/TTL/session/generation condition using its own clock.
             limit=(r.exit_started_ns+r.registration.spec.exit_timeout_ns) if cleanup else r.deadline_ns
             if not cleanup and r.input_deadline_ns is not None:limit=min(limit,r.input_deadline_ns)
+            if not cleanup and source_deadline is not None:limit=min(limit,source_deadline.monotonic_ns)
             ttl=(to_json_value(r.registration.spec.effect_ttl_overrides) or {}).get(type(effect).__name__,r.registration.spec.effect_ttl_ns)
             deadline=min(now.monotonic_ns+ttl,limit)
             if deadline<=now.monotonic_ns:raise ValueError('Action effect deadline expired')
@@ -383,7 +386,9 @@ class ActionRuntime:
             self.resources.started(r.id);r.provider_started=True
             try:
                 with r.external.callback():
-                    r.instance=(factory.start_with_context(r.parameters,world,replace(driver.context(),external_jobs=r.external))
+                    r.instance=(factory.start_with_context(r.parameters,world,replace(driver.context(),external_jobs=r.external,action_id=r.id,
+                                    vehicle_session=(driver.info() if callable(getattr(driver,'info',None)) else {}).get('session_id'),
+                                    world_generation=getattr(getattr(world,'version',None),'generation_id',None)))
                                 if hasattr(factory,'start_with_context') else factory.start(r.parameters,world))
             except Exception as exc:
                 if not isinstance(exc,ActionAdmissionRejected) and s.kind is not ActionKind.QUERY and s.external_lifecycle!='typed_only':
@@ -406,7 +411,7 @@ class ActionRuntime:
             now=self.clock()
             if now.monotonic_ns>=r.deadline_ns:
                 self._begin_exit(r,ActionState.TIMED_OUT,'Action deadline exceeded during callback');return
-            self._emit(r,decision.effects,now,cleanup=False)
+            self._emit(r,decision.effects,now,cleanup=False,source_deadline=decision.valid_until)
             if decision.outcome is not ActionOutcome.RUNNING:
                 if decision.outcome is ActionOutcome.SUCCEEDED:
                     if s.kind is ActionKind.CONTINUOUS:

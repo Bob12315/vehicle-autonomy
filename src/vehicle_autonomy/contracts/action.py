@@ -66,12 +66,17 @@ class ActionContext:
     home: Pose3 | None = None
     metadata: FrozenJson = None
     external_jobs: ExternalJobPort | None = None
+    action_id: str | None = None
+    vehicle_session: str | None = None
+    world_generation: str | None = None
 
     def __post_init__(self):
         if not self.target_id or not self.target_kind or not isinstance(self.capabilities, frozenset):
             raise ValueError('immutable Action target context required')
         if type(self.owned_simulation) is not bool:
             raise TypeError('ownership must be an explicit bool')
+        for value in (self.action_id,self.vehicle_session,self.world_generation):
+            if value is not None and (not isinstance(value,str) or not 1<=len(value)<=256):raise ValueError('bounded Action binding required')
         object.__setattr__(self, 'metadata', freeze_json(self.metadata))
 
 

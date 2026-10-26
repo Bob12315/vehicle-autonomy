@@ -8,6 +8,7 @@ import re
 from types import UnionType
 from typing import Any, Literal, Protocol, Union, get_args, get_origin, get_type_hints
 
+from vehicle_autonomy.contracts.core.time import TimePoint
 from vehicle_autonomy.contracts.core.primitives import FrozenJson, freeze_json, thaw_json, is_deeply_immutable
 from vehicle_autonomy.contracts.action import ActionKind, ActionResource, ActionSafety
 from vehicle_autonomy.contracts.effects.vehicle import (
@@ -184,8 +185,10 @@ class ActionDecision:
     result: FrozenJson = None
     error: str | None = None
     feedback: FrozenJson = None
+    valid_until: TimePoint | None = None
 
     def __post_init__(self) -> None:
+        if self.valid_until is not None and not isinstance(self.valid_until,TimePoint):raise TypeError('typed source validity deadline required')
         if not isinstance(self.outcome, ActionOutcome):
             raise TypeError("outcome must be ActionOutcome")
         if not isinstance(self.effects, tuple) or any(not isinstance(effect, DECISION_EFFECT_TYPES) for effect in self.effects):
