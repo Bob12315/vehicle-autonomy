@@ -26,6 +26,7 @@ class DataKind(str, Enum):
     DETECTIONS='image_detections'
     MAP='occupancy_grid'
     PATH='navigation_path'
+    TRANSFORM='transform'
 
 
 def identity(value, name):

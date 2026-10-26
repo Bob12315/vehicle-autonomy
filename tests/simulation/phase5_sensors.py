@@ -38,18 +38,18 @@ def bridge_config(path,world):
     path.write_text(json.dumps([dict(ros_topic_name=r,gz_topic_name=g,ros_type_name=rt,gz_type_name=gt,direction='GZ_TO_ROS',qos_profile='SENSOR_DATA') for r,g,rt,gt in topics],indent=2))
 
 
-def run(path):
-    f=MissionFixture(path,'rover');result={'passed':False,'motion_requested':False,'source':'real Gazebo RGB/2D+3D LiDAR/IMU and authenticated AP EKF; no truth localization'}
-    os.environ['PYTHONPATH']=str(ROOT/'src')+os.pathsep+os.environ.get('PYTHONPATH','')
-    os.environ['ROS_DOMAIN_ID']=str(120+os.getpid()%80)
-    collector=None
-    sensors(f.owned)
-    from tests.simulation.phase5_setup import telemetry_rates
-    original_start=f.owned.start
-    def start():original_start();telemetry_rates(f.owned)
-    f.owned.start=start
-    try:
-        f.start()
+class SensorFixture(MissionFixture):
+    def __init__(self,path):
+        super().__init__(path,'rover');self.collector=None
+        sensors(self.owned)
+        from tests.simulation.phase5_setup import telemetry_rates
+        original_start=self.owned.start
+        def start_owned():original_start();telemetry_rates(self.owned)
+        self.owned.start=start_owned
+    def start(self):
+        os.environ['PYTHONPATH']=str(ROOT/'src')+os.pathsep+os.environ.get('PYTHONPATH','')
+        os.environ['ROS_DOMAIN_ID']=str(120+os.getpid()%80)
+        super().start();f=self;path=self.path
         fd=os.open(path/'stream-api.private',os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600)
         try:
             os.write(fd,f.token.encode());f.owned.credentials.register_private('stream-api.private',fd)
@@ -66,8 +66,20 @@ def run(path):
         (path/'streams').mkdir(mode=0o700)
         frames={name:FrameDescriptor(frame,convention,config['frame_epoch']) for name,frame,convention in
             [('camera','camera_optical','camera_optical'),('scan','laser','FLU'),('cloud','lidar3d','FLU'),('imu','imu_frd','FRD')]}
-        collector=StreamCollector(f.driver,path/'streams',source_id=config['source_id'],origin_id=config['frame_epoch'],calibration_version=config['calibration_version'],frames=frames)
+        self.collector=StreamCollector(f.driver,path/'streams',source_id=config['source_id'],origin_id=config['frame_epoch'],calibration_version=config['calibration_version'],frames=frames)
         f.owned.start_process('world-streams',[str(ROOT/'scripts/with_ros2.sh'),'/usr/bin/python3','-m','vehicle_autonomy.world.sensors.ros2_streams','--config',str(path/'stream-profile.json')])
+        self.sensor_config=config
+        return self
+    def close(self):
+        try:
+            if self.collector:self.collector.close()
+        finally:super().close()
+
+
+def run(path):
+    f=SensorFixture(path);result={'passed':False,'motion_requested':False,'source':'real Gazebo RGB/2D+3D LiDAR/IMU and authenticated AP EKF; no truth localization'}
+    try:
+        f.start()
         deadline=time.monotonic()+35;latest=None
         while time.monotonic()<deadline:
             f.truth();file=path/'streams/state.json'
@@ -78,7 +90,7 @@ def run(path):
         else:raise AssertionError('real sensor streams incomplete: '+str(latest))
         result['streams']=latest
         result['world_streams']=f.api('/api/world/vehicle?target=rover')['world']['streams']
-        result['collector']=dict(cycles=collector.cycles,max_poll_ns=collector.max_poll_ns,error=collector.input.error)
+        result['collector']=dict(cycles=f.collector.cycles,max_poll_ns=f.collector.max_poll_ns,error=f.collector.input.error)
         assert not f.writer and not f.lab.runtime.views(),'data sidecar wrote vehicle commands'
         result.update(passed=True,writer_calls=0,domain=int(os.environ['ROS_DOMAIN_ID']))
         (path/'observed-streams.json').write_text(json.dumps(latest,indent=2)+'\n')
@@ -86,7 +98,6 @@ def run(path):
         result['error']=type(exc).__name__+': '+str(exc);raise
     finally:
         try:
-            if collector:collector.close()
             f.close()
         finally:(path/'summary.json').write_text(json.dumps(result,indent=2)+'\n')
     return result

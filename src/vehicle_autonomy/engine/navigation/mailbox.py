@@ -27,7 +27,7 @@ class NavigationBinding:
     def __post_init__(self):
         for name in self.__dataclass_fields__:identity(getattr(self,name),name)
         if self.frame_id!='base_link':raise ValueError('Rover bridge requires base_link FLU')
-        if len(self.producer_gid)!=48 or any(v not in '0123456789abcdef' for v in self.producer_gid) or set(self.producer_gid)=={'0'}:
+        if len(self.producer_gid) not in (32,48) or any(v not in '0123456789abcdef' for v in self.producer_gid) or set(self.producer_gid)=={'0'}:
             raise ValueError('actual pinned final publisher GID required')
 
 

@@ -23,6 +23,8 @@ class WorldStreamTests(unittest.TestCase):
         sample=case.sample();model.ingest_stream(sample);model.stream_state.withdraw('gazebo')
         self.assertFalse(model.publish(stamp(30)).streams)
         with self.assertRaises(ValueError):model.ingest_stream(sample)
+        with self.assertRaises(ValueError):model.ingest_stream(case.sample(sequence=2,source_ns=9,received_at=stamp(21),captured_at=stamp(11)))
+        with self.assertRaises(ValueError):model.ingest_stream(case.sample(sequence=2,source_ns=11,received_at=stamp(21),captured_at=stamp(9)))
         model.ingest_stream(case.sample(sequence=2,source_ns=11,received_at=stamp(21),captured_at=stamp(11)))
         self.assertTrue(model.publish(stamp(31)).streams)
     def test_old_object_payloads_are_pruned_without_losing_producer_watermark(self):
@@ -34,3 +36,17 @@ class WorldStreamTests(unittest.TestCase):
         self.assertFalse(model.publish(stamp(200)).objects);self.assertFalse(model._observations)
         with self.assertRaises(ValueError):model.ingest_observation(values[0])
         self.assertLessEqual(len(model._producer_sequences),model.max_producers)
+
+    def test_worker_liveness_is_not_extended_by_static_map_lifetime(self):
+        import tempfile
+        from pathlib import Path
+        import json
+        from vehicle_autonomy.world.model.stream_input import WorkerStreamInput
+        case=stream_fixtures.StreamsTests();case.setUp();sample=case.sample();model=WorldModel('world',FreshnessLimits(100,100,100))
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);root.chmod(0o700)
+            state=dict(schema=1,source_id='gazebo',source_kind='simulation',origin_id=case.frame.origin_id,ap_world_epoch=case.frame.origin_id,published_ns=100,error=None,generation=sample.header.generation,streams={'lidar':to_json_value(sample)})
+            (root/'state.json').write_text(json.dumps(state))
+            receiver=WorkerStreamInput(model,root,source_id='gazebo',origin_id=case.frame.origin_id,calibration_version=case.profile.calibration_version,frames={'lidar':case.frame},max_age_ns={'lidar':10_000_000_000})
+            self.assertTrue(receiver.poll(stamp(100)));self.assertTrue(model.publish(stamp(100)).streams)
+            self.assertFalse(receiver.poll(stamp(500_000_101)));self.assertFalse(model.publish(stamp(500_000_101)).streams)

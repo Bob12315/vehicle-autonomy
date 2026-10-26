@@ -40,11 +40,13 @@ class WorkerStreamInput:
             try:
                 info=os.fstat(fd)
                 if not stat.S_ISREG(info.st_mode) or info.st_uid!=os.getuid() or info.st_size>262144:raise ValueError('worker metadata budget/ownership')
-                with os.fdopen(fd,'rb',closefd=False) as f:data=json.load(f)
+                with os.fdopen(fd,'rb',closefd=False) as f:raw=f.read(262145)
+                if len(raw)>262144:raise ValueError('worker metadata budget')
+                data=json.loads(raw)
             finally:os.close(fd)
             if data['schema']!=1 or data['source_id']!=self.source_id or data['source_kind']!='simulation' or data['origin_id']!=self.origin_id or data['ap_world_epoch']!=self.origin_id:
                 raise ValueError('worker source or AP frame epoch mismatch')
-            if data['error'] is not None or not 0<=now.monotonic_ns-data['published_ns']<=self.max_age:raise ValueError('worker unavailable or stale')
+            if data['error'] is not None or not 0<=now.monotonic_ns-data['published_ns']<=500_000_000:raise ValueError('worker unavailable or stale')
             if self.generation is not None and data['generation']!=self.generation:raise ValueError('worker restarted; source readmission required')
             if set(data['streams'])-self.frames.keys():raise ValueError('unknown worker streams')
             candidates=[]
@@ -61,7 +63,7 @@ class WorkerStreamInput:
             for item in candidates:
                 h=item.header
                 if h.sensor_id not in self.registered:
-                    self.model.register_stream(StreamProfile(h.source_id,h.sensor_id,h.kind,h.generation,h.frame,h.calibration_version,h.source_kind,self.max_age))
+                    self.model.register_stream(StreamProfile(h.source_id,h.sensor_id,h.kind,h.generation,h.frame,h.calibration_version,h.source_kind,self.max_age[h.sensor_id] if isinstance(self.max_age,dict) else self.max_age))
                     self.registered.add(h.sensor_id)
             self.model.ingest_streams(tuple(candidates))
             for item in candidates:self.last_seen[item.header.sensor_id]=item

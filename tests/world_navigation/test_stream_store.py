@@ -34,3 +34,12 @@ class StoreTests(unittest.TestCase):
         import os
         os.mkfifo(p)
         with self.assertRaises(ValueError):self.store.load(ref)
+
+class ReaderTests(unittest.TestCase):
+    def test_read_only_existing_store_and_replaced_root(self):
+        from vehicle_autonomy.world.sensors.stream_store import StreamReader
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)/'stream';store=StreamStore(root);ref=store.put(b'real','application/test')
+            reader=StreamReader(root);self.assertFalse(hasattr(reader,'put'));self.assertEqual(reader.load(ref),b'real')
+            root.rename(Path(tmp)/'old');replacement=StreamStore(root);replacement.put(b'real','application/test')
+            with self.assertRaises(ValueError):reader.load(ref)

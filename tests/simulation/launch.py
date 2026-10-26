@@ -127,7 +127,8 @@ class OwnedSimulation:
     def _save(self):
         (self.run_dir / "manifest.json").write_text(json.dumps(self.manifest, indent=2))
 
-    def start_process(self, name, command, *, cwd=None):
+    def start_process(self, name, command, *, cwd=None, transient=False):
+        if type(transient) is not bool:raise TypeError("explicit process lifetime required")
         logfile = self.run_dir / f"{name}.log"
         handle = logfile.open("w")
         env = dict(os.environ)
@@ -137,7 +138,7 @@ class OwnedSimulation:
         process = subprocess.Popen(command, cwd=cwd or ROOT, env=env, stdout=handle,
                                    stderr=subprocess.STDOUT, start_new_session=True)
         record = {"name": name, "command": command, "pid": process.pid, "pgid": process.pid,
-                  "log": str(logfile), "cwd": str(Path(cwd or ROOT).absolute()), "exit_code": None}
+                  "log": str(logfile), "cwd": str(Path(cwd or ROOT).absolute()), "exit_code": None, "transient": transient}
         record["start_ticks"] = Path(f"/proc/{process.pid}/stat").read_text().rsplit(")", 1)[1].split()[19]
         self.processes.append((process, handle, record))
         self.manifest["processes"].append(record)
@@ -293,15 +294,16 @@ class OwnedSimulation:
 
     def assert_alive(self):
         for process, _, record in self.processes:
-            if record.get("stopped"):
+            if record.get("stopped") or record.get("stopping"):
                 continue
-            if process.poll() is not None:
+            if process.poll() is not None and not (record.get("transient") and process.returncode==0):
                 raise RuntimeError(f"owned {record['name']} exited {process.returncode}")
             if Path(record["log"]).stat().st_size > 25 * 1024 * 1024:
                 raise RuntimeError(f"owned {record['name']} log exceeds 25 MiB")
 
     def stop_process(self, process):
         entry = next(entry for entry in self.processes if entry[0] is process)
+        entry[2]["stopping"] = True
         if process.poll() is None:
             try:
                 os.killpg(process.pid, signal.SIGTERM)

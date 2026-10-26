@@ -75,3 +75,14 @@ class StreamsTests(unittest.TestCase):
         with self.assertRaises(ValueError):self.sample(confidence=float('nan'))
         with self.assertRaises(ValueError):self.sample(covariance=(-1.,)*9)
         with self.assertRaises(ValueError):self.sample(captured_at=stamp(21))
+
+    def test_partial_batch_rollback_restores_original_header_time_watermark(self):
+        state=StreamState();state.register(self.profile)
+        other=replace(self.profile,sensor_id='other');state.register(other)
+        original=self.sample();state.ingest(original)
+        first=self.sample(sequence=2,source_ns=11,received_at=stamp(22),captured_at=stamp(11))
+        bad=replace(first,header=replace(first.header,sensor_id='other',generation='wrong'))
+        with self.assertRaises(ValueError):state.ingest_many((first,bad))
+        self.assertEqual(state.accepted,1)
+        self.assertTrue(state.ingest(first))
+        self.assertEqual(state.accepted,2)

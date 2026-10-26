@@ -69,7 +69,7 @@ Acquire::Languages "none";
         requested += ["ros-jazzy-navigation2", "ros-jazzy-nav2-bringup", "ros-jazzy-rviz2",
                       "ros-jazzy-ros2topic", "ros-jazzy-rosbag2", "ros-jazzy-rosbag2-storage-mcap",
                       "ros-jazzy-cv-bridge", "ros-jazzy-image-transport", "ros-jazzy-vision-msgs",
-                      "ros-jazzy-pointcloud-to-laserscan", "ros-jazzy-tf2-tools"]
+                      "ros-jazzy-pointcloud-to-laserscan", "ros-jazzy-tf2-tools", "ros-jazzy-sros2"]
     if args.visualization:
         requested += ["ros-jazzy-rviz2", "ros-jazzy-ros2topic"]
     subprocess.run(["apt-get", "-c", str(config), "--download-only", "--assume-yes",

@@ -5,9 +5,9 @@ from vehicle_autonomy.world.model.stream_input import WorkerStreamInput
 
 
 class StreamCollector:
-    def __init__(self,driver,directory,*,source_id,origin_id,calibration_version,frames):
+    def __init__(self,driver,directory,*,source_id,origin_id,calibration_version,frames,max_age_ns=500_000_000):
         self.driver=driver;self.port=driver.stream_ingress();self.input=WorkerStreamInput(self.port,directory,
-            source_id=source_id,origin_id=origin_id,calibration_version=calibration_version,frames=frames)
+            source_id=source_id,origin_id=origin_id,calibration_version=calibration_version,frames=frames,max_age_ns=max_age_ns)
         self.stop=Event();self.cycles=0;self.max_poll_ns=0
         self.thread=Thread(target=self._run,name='world-stream-collector',daemon=True);self.thread.start()
     def _run(self):

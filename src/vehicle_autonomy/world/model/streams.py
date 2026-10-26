@@ -33,7 +33,7 @@ class StreamProfile:
 class StreamState:
     def __init__(self,*,capacity=64):
         if type(capacity) is not int or not 1<=capacity<=256:raise ValueError('bounded stream capacity required')
-        self.capacity=capacity;self._lock=RLock();self._profiles={};self._latest={};self._sequences={}
+        self.capacity=capacity;self._lock=RLock();self._profiles={};self._latest={};self._sequences={};self._headers={}
         self.accepted=0;self.dropped=0
 
     @staticmethod
@@ -60,25 +60,27 @@ class StreamState:
                 self.dropped+=1
                 if previous==observation:return False
                 raise ValueError('duplicate or regressed source sequence')
-            if previous:
-                old=previous.header
+            if key in self._headers:
+                old=self._headers[key]
                 if h.source_clock_domain!=old.source_clock_domain or h.source_timestamp_ns<=old.source_timestamp_ns:
                     self.dropped+=1;raise ValueError('source time did not advance; explicit fresh epoch required')
                 if h.received_at.clock_domain_id!=old.received_at.clock_domain_id or h.received_at<old.received_at:
                     self.dropped+=1;raise ValueError('receipt clock changed or regressed')
-            self._latest[key]=observation;self._sequences[key]=h.sequence;self.accepted+=1
+                if old.captured_at is not None and h.captured_at is not None and (old.captured_at.clock_domain_id!=h.captured_at.clock_domain_id or h.captured_at<old.captured_at):
+                    self.dropped+=1;raise ValueError('mapped capture clock changed or regressed')
+            self._latest[key]=observation;self._sequences[key]=h.sequence;self._headers[key]=h;self.accepted+=1
             return True
 
     def ingest_many(self,observations):
         if not isinstance(observations,tuple) or len(observations)>self.capacity:raise ValueError('bounded immutable stream batch required')
         with self._lock:
-            latest=dict(self._latest);sequences=dict(self._sequences);accepted=self.accepted
+            latest=dict(self._latest);sequences=dict(self._sequences);headers=dict(self._headers);accepted=self.accepted
             try:
                 keys=[self.key(s.header.source_id,s.header.sensor_id,s.header.kind) for s in observations]
                 if len(set(keys))!=len(keys):raise ValueError('one observation per stream in an atomic cut')
                 for sample in observations:self.ingest(sample)
             except Exception:
-                self._latest=latest;self._sequences=sequences;self.accepted=accepted
+                self._latest=latest;self._sequences=sequences;self._headers=headers;self.accepted=accepted
                 raise
 
     def withdraw(self,source_id):
