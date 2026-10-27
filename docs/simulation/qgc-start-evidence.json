@@ -1,0 +1,150 @@
+{
+  "scope": "owned simulation startup/GUI-process/MAVLink telemetry and parameter read only; no arming or flight acceptance",
+  "runs": {
+    "rover": {
+      "result": "artifacts/simulation/qgc-launch-final/rover-result.json",
+      "session": "artifacts/simulation/qgc-launch-final/rover/session.json",
+      "checks": {
+        "kind": "rover",
+        "gui": true,
+        "passed": true,
+        "requested_parameters": {
+          "MAV_SYSID": 1.0
+        },
+        "armed": false,
+        "duplicate_rejected_without_stopping_owner": true,
+        "message_types": [
+          "AHRS",
+          "AHRS2",
+          "ATTITUDE",
+          "GLOBAL_POSITION_INT",
+          "GPS_GLOBAL_ORIGIN",
+          "HEARTBEAT",
+          "HOME_POSITION",
+          "PARAM_VALUE",
+          "STATUSTEXT"
+        ],
+        "heartbeat_type": 10,
+        "model": "target_rover",
+        "source_model": "/home/level6/vehicle-autonomy-framework/simulation/models/target_rover/model.sdf",
+        "original_inputs_unchanged": true,
+        "gazebo_resource_errors": false,
+        "remaining_process_groups": [],
+        "cleanup_errors": [],
+        "launcher_exit": 0
+      }
+    },
+    "copter": {
+      "result": "artifacts/simulation/qgc-launch-final/copter-result.json",
+      "session": "artifacts/simulation/qgc-launch-final/copter/session.json",
+      "checks": {
+        "kind": "copter",
+        "gui": true,
+        "passed": true,
+        "requested_parameters": {
+          "MAV_SYSID": 2.0
+        },
+        "armed": false,
+        "duplicate_rejected_without_stopping_owner": true,
+        "message_types": [
+          "AHRS2",
+          "ATTITUDE",
+          "GLOBAL_POSITION_INT",
+          "GPS_GLOBAL_ORIGIN",
+          "HEARTBEAT",
+          "HOME_POSITION",
+          "PARAM_VALUE",
+          "STATUSTEXT"
+        ],
+        "heartbeat_type": 2,
+        "model": "iris_with_gimbal",
+        "source_model": "/home/level6/gz_ws/src/ardupilot_gazebo/models/iris_with_gimbal/model.sdf",
+        "original_inputs_unchanged": true,
+        "gazebo_resource_errors": false,
+        "remaining_process_groups": [],
+        "cleanup_errors": [],
+        "launcher_exit": 0
+      }
+    },
+    "plane": {
+      "result": "artifacts/simulation/qgc-launch-final/plane-result.json",
+      "session": "artifacts/simulation/qgc-launch-final/plane/session.json",
+      "checks": {
+        "kind": "plane",
+        "gui": true,
+        "passed": true,
+        "requested_parameters": {
+          "MAV_SYSID": 3.0,
+          "SERVO3_FUNCTION": 73.0,
+          "SERVO6_FUNCTION": 74.0
+        },
+        "armed": false,
+        "duplicate_rejected_without_stopping_owner": true,
+        "message_types": [
+          "AHRS",
+          "AHRS2",
+          "AOA_SSA",
+          "ATTITUDE",
+          "BATTERY_STATUS",
+          "EKF_STATUS_REPORT",
+          "GLOBAL_POSITION_INT",
+          "GPS_GLOBAL_ORIGIN",
+          "GPS_RAW_INT",
+          "HEARTBEAT",
+          "LOCAL_POSITION_NED",
+          "MEMINFO",
+          "MISSION_CURRENT",
+          "PARAM_VALUE",
+          "POWER_STATUS",
+          "RAW_IMU",
+          "RC_CHANNELS",
+          "SCALED_IMU2",
+          "SCALED_IMU3",
+          "SCALED_PRESSURE",
+          "SCALED_PRESSURE2",
+          "SERVO_OUTPUT_RAW",
+          "SIMSTATE",
+          "STATUSTEXT",
+          "SYSTEM_TIME",
+          "SYS_STATUS",
+          "TERRAIN_REPORT",
+          "TERRAIN_REQUEST",
+          "VFR_HUD",
+          "VIBRATION",
+          "WIND"
+        ],
+        "heartbeat_type": 1,
+        "model": "twin_cessna",
+        "source_model": "/home/level6/twin-fixedwing/models/twin_cessna/model.sdf",
+        "original_inputs_unchanged": true,
+        "gazebo_resource_errors": false,
+        "remaining_process_groups": [],
+        "cleanup_errors": [],
+        "launcher_exit": 0
+      }
+    }
+  },
+  "tested_inputs_sha256": {
+    "src/vehicle_autonomy/app/bootstrap/qgc_simulation.py": "5393358192d592384c227fa22d3cefa43007d0fc205a135c86082b74fe7d4989",
+    "scripts/start_rover_sim.sh": "f89468f01246c34465a7a84a81b30b13da36d38109c63cabc7bb3502ea45a17c",
+    "scripts/start_copter_sim.sh": "65a2adb6ae487cfcb3f17daa9068a2e249a6a256db4e7d865a0a40e22798c77a",
+    "scripts/start_plane_sim.sh": "04531dcc83a831be7eedf25f72ea666b39856fe0f2c3a70df2818591a856a303",
+    "tests/simulation/qgc_launch.py": "6cad030f083902896eb820a94f06b2a861a202d513c5927f6b88b8eb44f25590"
+  },
+  "external_twin_originals_unchanged": {
+    "/home/level6/twin-fixedwing/models/twin_cessna/model.sdf": true,
+    "/home/level6/twin-fixedwing/worlds/twin_runway.sdf": true,
+    "/home/level6/twin-fixedwing/config/twin.parm": true,
+    "/home/level6/twin-fixedwing/plugins/build/libTwinPayload.so": true
+  },
+  "earlier_plane_run_not_qualified": "qgc-launch-validation-1/plane had bidirectional telemetry but failed to load the prebuilt TwinPayload ABI (libprotobuf.so.23 absent). Original logs/results retained. Current launcher builds TwinPayload in its owned run; final plane passed explicit plugin/resource error checks.",
+  "phase5_started": false,
+  "unit_regression": {
+    "command": "python -m unittest discover -s tests -v",
+    "passed": 665,
+    "failed": 0,
+    "duration_s": 75.202,
+    "log": "artifacts/simulation/qgc-launch-final/unit.log",
+    "log_sha256": "d4385396044573c53d571a9dfb0a598daa26736002405eee2b3764974b5a4c17"
+  }
+}

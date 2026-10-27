@@ -129,6 +129,20 @@ UNKNOWN/UNCONFIRMED 和飞行资源约束。完成本阶段后停止，等待独
   --run-dir artifacts/phase4-mission/acceptance-UNIQUE
 ```
 
+## 人工 QGC 仿真环境
+
+三个独立启动入口，默认打开 Gazebo；在本机 QGC 使用 UDP 14550：
+
+```bash
+./scripts/start_rover_sim.sh   # 汽车
+./scripts/start_copter_sim.sh  # 多旋翼
+./scripts/start_plane_sim.sh   # ~/twin-fixedwing 双发固定翼
+```
+
+这是独立的人工地面站测试环境，不启动框架任务或 Phase 5，不自动解锁/运动。
+每次使用新状态，Ctrl+C 仅关闭本次自有进程。环境、QGC 配置及模型来源见
+[三车型启动说明](docs/simulation/qgc-start.md)。
+
 ## Phase 5 开发状态
 
 通用 World/Sensor、真实 SLAM/YOLO 和原生 Nav2 受控 Rover 桥正在开发。
