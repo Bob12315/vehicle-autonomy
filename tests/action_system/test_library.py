@@ -5,6 +5,7 @@ import unittest
 from vehicle_autonomy.actions.catalog import register_standard,capabilities
 from vehicle_autonomy.actions.common.standard import NativeGoal
 from vehicle_autonomy.contracts.action import ActionContext,ActionKind
+from vehicle_autonomy.contracts.core.serialization import to_json_value
 from vehicle_autonomy.contracts.core.geometry import Pose3,Quaternion,Vector3
 from vehicle_autonomy.contracts.decision import ActionOutcome,EffectPhase,EffectResult,ExitReason
 from vehicle_autonomy.contracts.effects.vehicle import ModeEffect,TwistTargetEffect
@@ -73,6 +74,34 @@ class LibraryTests(unittest.TestCase):
         for seconds in (1,3):self.assertEqual(instance.tick_with_results(self.fixture.sample(seconds,Vector3(0,0,1.5)),ack).outcome,ActionOutcome.RUNNING)
         instance.tick_with_results(self.fixture.sample(5,Vector3(0,0,.1),armed=False),ack)
         self.assertEqual(instance.tick_with_results(self.fixture.sample(7.1,Vector3(0,0,.1),armed=False),ack).outcome,ActionOutcome.SUCCEEDED)
+
+    def test_rover_return_home_leaves_room_for_post_goal_hold_stop(self):
+        instance=self.instance('ReturnHome','rover');instance.tick(self.world)
+        completed=(EffectResult('rtl','a',EffectPhase.COMPLETED),)
+        for second in (1,4):
+            self.assertEqual(instance.tick_with_results(self.fixture.sample(second,Vector3(.7,0,0)),completed).outcome,ActionOutcome.RUNNING)
+        braking=instance.tick_with_results(self.fixture.sample(5,Vector3(.4,0,0)),completed)
+        self.assertEqual(braking.effects,(ModeEffect('HOLD'),))
+        held=completed+(EffectResult('hold','a',EffectPhase.COMPLETED),)
+        instance.tick_with_results(self.fixture.sample(6,Vector3(.8,0,0)),held)
+        self.assertEqual(instance.tick_with_results(self.fixture.sample(9,Vector3(.8,0,0)),held).outcome,ActionOutcome.RUNNING)
+        instance.tick_with_results(self.fixture.sample(10,Vector3(.4,0,0)),held)
+        self.assertEqual(instance.tick_with_results(self.fixture.sample(12.1,Vector3(.4,0,0)),held).outcome,ActionOutcome.SUCCEEDED)
+
+    def test_plane_ground_navigation_rejected_before_effect_creation(self):
+        for mode in ('GUIDED','LOITER','RTL'):
+            with self.assertRaisesRegex(ValueError,'地面'):
+                self.instance('SetMode','plane',dict(mode=mode))
+
+    def test_stop_in_hold_requests_braking_without_guided_and_waits_for_fresh_stop(self):
+        instance=self.instance('Stop','rover')
+        self.assertEqual(instance.tick(self.world).effects,(ModeEffect('HOLD'),))
+        completed=(EffectResult('hold','a',EffectPhase.COMPLETED),)
+        self.assertEqual(instance.tick_with_results(self.world,completed).outcome,ActionOutcome.RUNNING)
+        instance.tick_with_results(self.fixture.sample(1),completed)
+        decision=instance.tick_with_results(self.fixture.sample(3.1),completed)
+        self.assertEqual(decision.outcome,ActionOutcome.SUCCEEDED)
+        self.assertEqual(to_json_value(decision.result),{'physical_goal_observed':True})
 
 
 if __name__=='__main__':unittest.main()

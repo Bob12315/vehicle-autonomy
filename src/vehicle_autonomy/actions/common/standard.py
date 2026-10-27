@@ -50,6 +50,12 @@ class CommonFactory(ContextFactory):
                 raise ValueError('use the native Goal Action; configuration alone cannot release its motion claim')
             if ctx.target_kind=='plane' and p.mode=='TAKEOFF':raise ValueError('use Takeoff Goal to observe physical climb')
             if ctx.target_kind=='plane' and p.mode=='AUTOLAND':raise ValueError('use AutoLand Goal to observe touchdown')
+            if ctx.target_kind=='plane' and p.mode in ('GUIDED','LOITER','RTL') and (
+                    not state.operation.armed or state.reported_pose.value.position.z<10):
+                raise ValueError('固定翼地面请使用 MANUAL，解锁后执行起飞；GUIDED/LOITER/RTL 仅供空中使用')
+            if ctx.target_kind=='plane' and p.mode=='MANUAL' and (
+                    state.operation.armed or abs(state.reported_pose.value.position.z)>1.5 or speed(world)>1):
+                raise ValueError('固定翼 MANUAL 模式仅允许未解锁、静止的地面状态')
         elif self.name in ('Arm','Disarm'):
             target=self.name=='Arm'
             if state.operation.armed==target:raise ValueError('unexpected initial arm state; no implicit success')

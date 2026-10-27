@@ -1,0 +1,779 @@
+{
+  "scope": "Three actual launcher models controlled exclusively via Control Center HTTP requests; independent Gazebo truth. Local simulation only, Phase 5 disabled.",
+  "baseline_commit": "5666765",
+  "runs": {
+    "rover": {
+      "passed": true,
+      "result": "artifacts/simulation/web-controls-verified/rover/web-control-result.json",
+      "http_requests": "artifacts/simulation/web-controls-verified/rover/web-control-requests.jsonl",
+      "truth": "artifacts/simulation/web-controls-verified/rover/web-control-truth.jsonl",
+      "session": "artifacts/simulation/web-controls-verified/rover/session.json",
+      "actions": [
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED",
+          "parameters": {
+            "mode": "GUIDED"
+          },
+          "safety": {
+            "release_safe": true,
+            "continuation_allowed": false,
+            "reason": "execution exit confirmed",
+            "evidence": {
+              "stops": {}
+            }
+          }
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED",
+          "parameters": {
+            "mode": "HOLD"
+          },
+          "safety": {
+            "release_safe": true,
+            "continuation_allowed": false,
+            "reason": "execution exit confirmed",
+            "evidence": {
+              "stops": {}
+            }
+          }
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED",
+          "parameters": {
+            "mode": "GUIDED"
+          },
+          "safety": {
+            "release_safe": true,
+            "continuation_allowed": false,
+            "reason": "execution exit confirmed",
+            "evidence": {
+              "stops": {}
+            }
+          }
+        },
+        {
+          "name": "Arm",
+          "state": "SUCCEEDED",
+          "parameters": {},
+          "safety": {
+            "release_safe": true,
+            "continuation_allowed": false,
+            "reason": "execution exit confirmed",
+            "evidence": {
+              "stops": {}
+            }
+          }
+        },
+        {
+          "name": "Disarm",
+          "state": "SUCCEEDED",
+          "parameters": {},
+          "safety": {
+            "release_safe": true,
+            "continuation_allowed": false,
+            "reason": "execution exit confirmed",
+            "evidence": {
+              "stops": {}
+            }
+          }
+        },
+        {
+          "name": "Arm",
+          "state": "SUCCEEDED",
+          "parameters": {},
+          "safety": {
+            "release_safe": true,
+            "continuation_allowed": false,
+            "reason": "execution exit confirmed",
+            "evidence": {
+              "stops": {}
+            }
+          }
+        },
+        {
+          "name": "Stop",
+          "state": "SUCCEEDED",
+          "parameters": {},
+          "safety": {
+            "release_safe": true,
+            "continuation_allowed": false,
+            "reason": "execution exit confirmed",
+            "evidence": {
+              "stops": {}
+            }
+          }
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED",
+          "parameters": {
+            "mode": "GUIDED"
+          },
+          "safety": {
+            "release_safe": true,
+            "continuation_allowed": false,
+            "reason": "execution exit confirmed",
+            "evidence": {
+              "stops": {}
+            }
+          }
+        },
+        {
+          "name": "Drive",
+          "state": "CANCELLED",
+          "parameters": {
+            "speed_mps": 0.3,
+            "yaw_rate_rad_s": 0.0
+          },
+          "safety": {
+            "release_safe": true,
+            "continuation_allowed": false,
+            "reason": "execution exit confirmed",
+            "evidence": {
+              "stops": {}
+            }
+          }
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED",
+          "parameters": {
+            "mode": "GUIDED"
+          },
+          "safety": {
+            "release_safe": true,
+            "continuation_allowed": false,
+            "reason": "execution exit confirmed",
+            "evidence": {
+              "stops": {}
+            }
+          }
+        },
+        {
+          "name": "Drive",
+          "state": "CANCELLED",
+          "parameters": {
+            "speed_mps": 0.0,
+            "yaw_rate_rad_s": 0.25
+          },
+          "safety": {
+            "release_safe": true,
+            "continuation_allowed": false,
+            "reason": "execution exit confirmed",
+            "evidence": {
+              "stops": {}
+            }
+          }
+        },
+        {
+          "name": "Stop",
+          "state": "SUCCEEDED",
+          "parameters": {},
+          "safety": {
+            "release_safe": true,
+            "continuation_allowed": false,
+            "reason": "execution exit confirmed",
+            "evidence": {
+              "stops": {}
+            }
+          }
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED",
+          "parameters": {
+            "mode": "GUIDED"
+          },
+          "safety": {
+            "release_safe": true,
+            "continuation_allowed": false,
+            "reason": "execution exit confirmed",
+            "evidence": {
+              "stops": {}
+            }
+          }
+        },
+        {
+          "name": "Goto",
+          "state": "SUCCEEDED",
+          "parameters": {
+            "x_m": 2.0,
+            "y_m": 0.0,
+            "z_m": 0.0
+          },
+          "safety": {
+            "release_safe": true,
+            "continuation_allowed": false,
+            "reason": "execution exit confirmed",
+            "evidence": {
+              "stops": {}
+            }
+          }
+        },
+        {
+          "name": "ReturnHome",
+          "state": "SUCCEEDED",
+          "parameters": {},
+          "safety": {
+            "release_safe": true,
+            "continuation_allowed": false,
+            "reason": "execution exit confirmed",
+            "evidence": {
+              "stops": {
+                "native-rover-rtl": "CONFIRMED"
+              }
+            }
+          }
+        },
+        {
+          "name": "Disarm",
+          "state": "SUCCEEDED",
+          "parameters": {},
+          "safety": {
+            "release_safe": true,
+            "continuation_allowed": false,
+            "reason": "execution exit confirmed",
+            "evidence": {
+              "stops": {}
+            }
+          }
+        }
+      ],
+      "managed_motion": [
+        {
+          "parameters": {
+            "speed_mps": 0.3,
+            "yaw_rate_rad_s": 0
+          },
+          "measured": 0.5036332015330949,
+          "stop_speed_mps": 0.0023021211403688683,
+          "stop_yaw_rate_rad_s": 5.252674926216483e-09,
+          "state": "CANCELLED"
+        },
+        {
+          "parameters": {
+            "speed_mps": 0,
+            "yaw_rate_rad_s": 0.25
+          },
+          "measured": 0.4187486321577406,
+          "stop_speed_mps": 3.089500925042142e-06,
+          "stop_yaw_rate_rad_s": 1.2294203681892542e-05,
+          "state": "CANCELLED"
+        }
+      ],
+      "information_snapshots": 13,
+      "display_projection_snapshots": 13,
+      "observed_modes": [
+        "ARDUPILOT_CUSTOM_0",
+        "ARDUPILOT_CUSTOM_15",
+        "ARDUPILOT_CUSTOM_4"
+      ],
+      "home_error_m": 0.2990820446871995,
+      "stop_modes_tested": [
+        "GUIDED",
+        "HOLD"
+      ],
+      "original_inputs_unchanged": true,
+      "process_groups_remaining": [],
+      "credentials_removed": true
+    },
+    "copter": {
+      "passed": true,
+      "result": "artifacts/simulation/web-controls-final/copter/web-control-result.json",
+      "http_requests": "artifacts/simulation/web-controls-final/copter/web-control-requests.jsonl",
+      "truth": "artifacts/simulation/web-controls-final/copter/web-control-truth.jsonl",
+      "session": "artifacts/simulation/web-controls-final/copter/session.json",
+      "actions": [
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED",
+          "parameters": {
+            "mode": "GUIDED"
+          },
+          "safety": {
+            "release_safe": true,
+            "continuation_allowed": false,
+            "reason": "execution exit confirmed",
+            "evidence": {
+              "stops": {}
+            }
+          }
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED",
+          "parameters": {
+            "mode": "LOITER"
+          },
+          "safety": {
+            "release_safe": true,
+            "continuation_allowed": false,
+            "reason": "execution exit confirmed",
+            "evidence": {
+              "stops": {}
+            }
+          }
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED",
+          "parameters": {
+            "mode": "GUIDED"
+          },
+          "safety": {
+            "release_safe": true,
+            "continuation_allowed": false,
+            "reason": "execution exit confirmed",
+            "evidence": {
+              "stops": {}
+            }
+          }
+        },
+        {
+          "name": "Arm",
+          "state": "SUCCEEDED",
+          "parameters": {},
+          "safety": {
+            "release_safe": true,
+            "continuation_allowed": false,
+            "reason": "execution exit confirmed",
+            "evidence": {
+              "stops": {}
+            }
+          }
+        },
+        {
+          "name": "Disarm",
+          "state": "SUCCEEDED",
+          "parameters": {},
+          "safety": {
+            "release_safe": true,
+            "continuation_allowed": false,
+            "reason": "execution exit confirmed",
+            "evidence": {
+              "stops": {}
+            }
+          }
+        },
+        {
+          "name": "Arm",
+          "state": "SUCCEEDED",
+          "parameters": {},
+          "safety": {
+            "release_safe": true,
+            "continuation_allowed": false,
+            "reason": "execution exit confirmed",
+            "evidence": {
+              "stops": {}
+            }
+          }
+        },
+        {
+          "name": "Takeoff",
+          "state": "SUCCEEDED",
+          "parameters": {
+            "height_m": 1.5
+          },
+          "safety": {
+            "release_safe": true,
+            "continuation_allowed": false,
+            "reason": "execution exit confirmed",
+            "evidence": {
+              "stops": {}
+            }
+          }
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED",
+          "parameters": {
+            "mode": "GUIDED"
+          },
+          "safety": {
+            "release_safe": true,
+            "continuation_allowed": false,
+            "reason": "execution exit confirmed",
+            "evidence": {
+              "stops": {}
+            }
+          }
+        },
+        {
+          "name": "SetVelocity",
+          "state": "CANCELLED",
+          "parameters": {
+            "vx_mps": 0.3,
+            "vy_mps": 0.0,
+            "vz_mps": 0.0,
+            "yaw_rate_rad_s": 0.0,
+            "frame": "base_link"
+          },
+          "safety": {
+            "release_safe": true,
+            "continuation_allowed": false,
+            "reason": "execution exit confirmed",
+            "evidence": {
+              "stops": {}
+            }
+          }
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED",
+          "parameters": {
+            "mode": "GUIDED"
+          },
+          "safety": {
+            "release_safe": true,
+            "continuation_allowed": false,
+            "reason": "execution exit confirmed",
+            "evidence": {
+              "stops": {}
+            }
+          }
+        },
+        {
+          "name": "SetVelocity",
+          "state": "CANCELLED",
+          "parameters": {
+            "vx_mps": 0.0,
+            "vy_mps": 0.0,
+            "vz_mps": 0.0,
+            "yaw_rate_rad_s": 0.25,
+            "frame": "base_link"
+          },
+          "safety": {
+            "release_safe": true,
+            "continuation_allowed": false,
+            "reason": "execution exit confirmed",
+            "evidence": {
+              "stops": {}
+            }
+          }
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED",
+          "parameters": {
+            "mode": "GUIDED"
+          },
+          "safety": {
+            "release_safe": true,
+            "continuation_allowed": false,
+            "reason": "execution exit confirmed",
+            "evidence": {
+              "stops": {}
+            }
+          }
+        },
+        {
+          "name": "Goto",
+          "state": "SUCCEEDED",
+          "parameters": {
+            "x_m": 2.0,
+            "y_m": 0.0,
+            "z_m": 1.5
+          },
+          "safety": {
+            "release_safe": true,
+            "continuation_allowed": false,
+            "reason": "execution exit confirmed",
+            "evidence": {
+              "stops": {}
+            }
+          }
+        },
+        {
+          "name": "ReturnHome",
+          "state": "SUCCEEDED",
+          "parameters": {},
+          "safety": {
+            "release_safe": true,
+            "continuation_allowed": false,
+            "reason": "execution exit confirmed",
+            "evidence": {
+              "stops": {}
+            }
+          }
+        }
+      ],
+      "managed_motion": [
+        {
+          "parameters": {
+            "vx_mps": 0.3,
+            "vy_mps": 0,
+            "vz_mps": 0,
+            "yaw_rate_rad_s": 0,
+            "frame": "base_link"
+          },
+          "measured": 0.5005626319165528,
+          "stop_speed_mps": 0.026063224924164227,
+          "stop_yaw_rate_rad_s": 5.641007495756323e-05,
+          "state": "CANCELLED"
+        },
+        {
+          "parameters": {
+            "vx_mps": 0,
+            "vy_mps": 0,
+            "vz_mps": 0,
+            "yaw_rate_rad_s": 0.25,
+            "frame": "base_link"
+          },
+          "measured": 0.4173707767038377,
+          "stop_speed_mps": 0.0035960542948678697,
+          "stop_yaw_rate_rad_s": -0.000824716430448658,
+          "state": "CANCELLED"
+        }
+      ],
+      "information_snapshots": 12,
+      "display_projection_snapshots": 12,
+      "observed_modes": [
+        "ARDUPILOT_CUSTOM_0",
+        "ARDUPILOT_CUSTOM_4",
+        "ARDUPILOT_CUSTOM_5",
+        "ARDUPILOT_CUSTOM_6"
+      ],
+      "original_inputs_unchanged": true,
+      "process_groups_remaining": [],
+      "credentials_removed": true,
+      "home_error_m": 0.003560271100499321
+    },
+    "plane": {
+      "passed": true,
+      "result": "artifacts/simulation/web-controls-final/plane/web-control-result.json",
+      "http_requests": "artifacts/simulation/web-controls-final/plane/web-control-requests.jsonl",
+      "truth": "artifacts/simulation/web-controls-final/plane/web-control-truth.jsonl",
+      "session": "artifacts/simulation/web-controls-final/plane/session.json",
+      "actions": [
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED",
+          "parameters": {
+            "mode": "MANUAL"
+          },
+          "safety": {
+            "release_safe": true,
+            "continuation_allowed": false,
+            "reason": "execution exit confirmed",
+            "evidence": {
+              "stops": {}
+            }
+          }
+        },
+        {
+          "name": "Arm",
+          "state": "SUCCEEDED",
+          "parameters": {},
+          "safety": {
+            "release_safe": true,
+            "continuation_allowed": false,
+            "reason": "execution exit confirmed",
+            "evidence": {
+              "stops": {}
+            }
+          }
+        },
+        {
+          "name": "Disarm",
+          "state": "SUCCEEDED",
+          "parameters": {},
+          "safety": {
+            "release_safe": true,
+            "continuation_allowed": false,
+            "reason": "execution exit confirmed",
+            "evidence": {
+              "stops": {}
+            }
+          }
+        },
+        {
+          "name": "Arm",
+          "state": "SUCCEEDED",
+          "parameters": {},
+          "safety": {
+            "release_safe": true,
+            "continuation_allowed": false,
+            "reason": "execution exit confirmed",
+            "evidence": {
+              "stops": {}
+            }
+          }
+        },
+        {
+          "name": "Takeoff",
+          "state": "SUCCEEDED",
+          "parameters": {
+            "height_m": 50.0
+          },
+          "safety": {
+            "release_safe": false,
+            "continuation_allowed": true,
+            "reason": "confirmed native configuration; fixed-wing flight remains active",
+            "evidence": {
+              "physical_stop": "UNCONFIRMED",
+              "session_id": "19ed636c4ebf490d874aad9919a5a20b"
+            }
+          }
+        },
+        {
+          "name": "SetGuidedTarget",
+          "state": "SUCCEEDED",
+          "parameters": {
+            "latitude_deg": -35.36191452707382,
+            "longitude_deg": 149.16854165843026,
+            "altitude_amsl_m": 634.14
+          },
+          "safety": {
+            "release_safe": false,
+            "continuation_allowed": true,
+            "reason": "confirmed native configuration; fixed-wing flight remains active",
+            "evidence": {
+              "physical_stop": "UNCONFIRMED",
+              "session_id": "c795ba7f4bd54df69ae506bd47f5f4fa"
+            }
+          }
+        },
+        {
+          "name": "Loiter",
+          "state": "SUCCEEDED",
+          "parameters": {},
+          "safety": {
+            "release_safe": false,
+            "continuation_allowed": true,
+            "reason": "confirmed native configuration; fixed-wing flight remains active",
+            "evidence": {
+              "physical_stop": "UNCONFIRMED",
+              "session_id": "ba0bcfa92a634e1782ea90a94315f3b2"
+            }
+          }
+        },
+        {
+          "name": "RTL",
+          "state": "SUCCEEDED",
+          "parameters": {},
+          "safety": {
+            "release_safe": false,
+            "continuation_allowed": true,
+            "reason": "confirmed native configuration; fixed-wing flight remains active",
+            "evidence": {
+              "physical_stop": "UNCONFIRMED",
+              "session_id": "1a9e730335174f3bbed2880b48558a31"
+            }
+          }
+        },
+        {
+          "name": "AutoLand",
+          "state": "SUCCEEDED",
+          "parameters": {},
+          "safety": {
+            "release_safe": true,
+            "continuation_allowed": false,
+            "reason": "execution exit confirmed",
+            "evidence": {
+              "stops": {}
+            }
+          }
+        }
+      ],
+      "managed_motion": [],
+      "information_snapshots": 10,
+      "display_projection_snapshots": 10,
+      "observed_modes": [
+        "ARDUPILOT_CUSTOM_0",
+        "ARDUPILOT_CUSTOM_13",
+        "ARDUPILOT_CUSTOM_15",
+        "ARDUPILOT_CUSTOM_12",
+        "ARDUPILOT_CUSTOM_11",
+        "ARDUPILOT_CUSTOM_26"
+      ],
+      "original_inputs_unchanged": true,
+      "process_groups_remaining": [],
+      "credentials_removed": true,
+      "landing": {
+        "runway_distance_m": 72.43297954473208,
+        "cross_track_m": 0.06379253650964818,
+        "height_above_initial_m": 6.52591109762124e-08,
+        "speed_mps": 0.0,
+        "disarmed": true
+      },
+      "rtl_limit": "Mode/configuration confirmation is not arrival; independent truth additionally approached within 120 m of HOME. AutoLand separately verified ground/stop/disarm."
+    }
+  },
+  "fixes": [
+    "keyboard ignored with authorization checkbox focused",
+    "Rover arrival must survive explicit native HOLD braking",
+    "Plane ground mode admission and explicit continuation request",
+    "vehicle-specific mode labels and diagnostic display",
+    "Stop uses native HOLD; already-HOLD vehicles do not need to enter GUIDED before braking"
+  ],
+  "chrome_keyboard_and_pointer": {
+    "result": "artifacts/simulation/web-controls-keyboard/rover-result.json",
+    "passed": true,
+    "physical": {
+      "managed_inputs": [
+        {
+          "name": "forward",
+          "measured": 0.35733310550026803,
+          "state": "CANCELLED",
+          "stop_speed_mps": 0.0017873768999873815,
+          "stop_yaw_rate_rad_s": 3.1292011853513265e-09
+        },
+        {
+          "name": "turn",
+          "measured": 0.31511205818357957,
+          "state": "CANCELLED",
+          "stop_speed_mps": 3.066977645387526e-06,
+          "stop_yaw_rate_rad_s": 1.2117649789907009e-05
+        }
+      ],
+      "goto_error_m": 0.29398376141318555,
+      "home_error_m": 0.356192322399905,
+      "home_speed_mps": 1.2178954003699685e-05,
+      "javascript_errors": []
+    },
+    "description": "Actual W key with authorization checkbox focused, pointer turn, and full Rover control sequence."
+  },
+  "chrome_ui_regression": {
+    "result": "artifacts/simulation/web-controls-ui-verified/summary.json",
+    "passed": true,
+    "source": "real Chrome / isolated HTTP / no vehicle transport",
+    "edge_guards": [
+      "Action/Wait outgoing disabled",
+      "imported leaf children retained and blocked before validate/save/start",
+      "explicit disconnect repairs edge",
+      "cycle rejected",
+      "shared child rejected",
+      "child capacity enforced",
+      "blank required coordinates blocked before Mission submission"
+    ],
+    "javascript_errors": [],
+    "writer_calls": 0,
+    "localized_node_types": 10,
+    "responsive_widths": [
+      1680,
+      1280,
+      1024,
+      390
+    ],
+    "machine_identifiers_preserved": true,
+    "send_defaults_false": true,
+    "plane_continuation_serialization": true,
+    "blank_coordinates_blocked_before_submission": true,
+    "wait_mission": "SUCCEEDED"
+  },
+  "unit": {
+    "command": ".venv-migration/bin/python -m unittest discover -s tests -v",
+    "passed": true,
+    "tests": 675,
+    "seconds": 75.872,
+    "log": "artifacts/simulation/web-controls-unit-verified.log"
+  },
+  "failed_originals": [
+    "artifacts/simulation/web-controls-baseline/rover/web-control-result.json",
+    "artifacts/simulation/web-controls-baseline/plane/web-control-result.json",
+    "artifacts/simulation/web-controls-retest/rover/web-control-result.json"
+  ]
+}

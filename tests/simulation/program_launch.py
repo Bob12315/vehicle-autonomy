@@ -22,7 +22,7 @@ ROOT = Path(__file__).resolve().parents[2]
 TERMINAL = {'SUCCEEDED','FAILED','REJECTED','CANCELLED','TIMED_OUT','UNKNOWN'}
 
 
-def run(kind, directory, *, motion=False, gui=False, read_only=False):
+def run(kind, directory, *, motion=False, gui=False, read_only=False, http_controls=False):
     if motion and kind != 'rover':raise ValueError('motion acceptance is currently Rover only')
     directory = directory.resolve();directory.parent.mkdir(parents=True,exist_ok=True)
     port = {'rover':18880,'copter':18881,'plane':18882}[kind]
@@ -118,14 +118,17 @@ def run(kind, directory, *, motion=False, gui=False, read_only=False):
                         if message.get_type()=='PARAM_VALUE' and message.param_id=='ARMING_CHECK':leaked=True
                 assert not leaked
                 result['qgc_monitor']=dict(system_id=manifest['system_id'],signed_types=sorted(seen),request_forwarded=False)
-                if motion:
+                if motion or http_controls:
                     os.environ.update(GZ_IP='127.0.0.1',GZ_PARTITION=manifest['partition'])
                     from tests.simulation.oracle import GazeboTruthOracle
                     oracle=GazeboTruthOracle(manifest['world'],manifest['model'])
                     # Preserve the established 45-second native initialization.
                     ready=time.monotonic()+45
                     while time.monotonic()<ready:time.sleep(.1)
-                    result['physical']=rover_browser(base,token,api,oracle,directory)
+                    if http_controls:
+                        from tests.simulation.web_controls import exercise
+                        result['physical']=exercise(kind,api,oracle,directory)
+                    else:result['physical']=rover_browser(base,token,api,oracle,directory)
                 for name in ['gazebo']+(['gui'] if gui else []):
                     content=(directory/(name+'.log')).read_text(errors='replace').lower()
                     for error in ('failed to load system plugin','error while loading the library','unable to find uri','unable to find file'):
@@ -192,14 +195,19 @@ def rover_browser(base,token,api,oracle,directory):
             for key,name,threshold in [('w','forward',.35),('a','turn',.3)]:
                 perform('SetMode',{'mode':'GUIDED'})
                 start=truth();before={a['id'] for a in instances()}
-                page.locator('#manual-send').check();page.locator(f'[data-key="{key}"]').hover();page.mouse.down()
+                page.locator('#manual-send').check()
+                if key=='w':
+                    page.locator('#manual-send').focus();page.keyboard.down(key)
+                else:page.locator(f'[data-key="{key}"]').hover();page.mouse.down()
                 action=wait(lambda:next((a for a in instances() if a['id'] not in before),None),5)
                 def measured():
                     current=truth()
                     return (math.hypot(current.x_m-start.x_m,current.y_m-start.y_m) if key=='w' else
                         abs(math.atan2(math.sin(current.yaw_rad-start.yaw_rad),math.cos(current.yaw_rad-start.yaw_rad))))
                 try:wait(lambda:measured()>=threshold,12);motion=measured()
-                finally:page.mouse.up()
+                finally:
+                    if key=='w':page.keyboard.up(key)
+                    else:page.mouse.up()
                 final=finish(action,'CANCELLED',20)
                 speed=oracle.recent_speed_mps();yaw_rate=oracle.recent_yaw_rate_rad_s()
                 assert speed is not None and speed<=.1
@@ -225,4 +233,9 @@ if __name__=='__main__':
     parser.add_argument('--run-dir',type=Path,required=True)
     parser.add_argument('--motion',action='store_true');parser.add_argument('--gui',action='store_true')
     parser.add_argument('--read-only',action='store_true')
-    args=parser.parse_args();print(json.dumps(run(args.kind,args.run_dir,motion=args.motion,gui=args.gui,read_only=args.read_only),ensure_ascii=False))
+    parser.add_argument('--http-controls',action='store_true')
+    args=parser.parse_args();result=run(args.kind,args.run_dir,motion=args.motion,gui=args.gui,read_only=args.read_only,http_controls=args.http_controls)
+    if args.http_controls:
+        result={k:result[k] for k in ('kind','passed','cleanup')}
+        result['evidence']=str(args.run_dir/'web-control-result.json')
+    print(json.dumps(result,ensure_ascii=False))

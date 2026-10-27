@@ -147,9 +147,10 @@ class MissionControl(ActionLab):
     def _snapshot(self):
         vehicles = []
         for target, d in self.drivers.items():
-            world = d.snapshot()
+            read=getattr(d,'read_view',None)
+            info,world=read() if callable(read) else (d.info(),d.snapshot())
             track = self._tracks.setdefault(target, deque(maxlen=240))
-            epoch = None if world is None else str(d.info().get('session_id'))
+            epoch = None if world is None else str(info.get('session_id'))
             state = None if world is None else world.vehicle
             if state and state.reported_pose:
                 sample = dict(epoch=epoch, at_ns=state.reported_pose.captured_at.monotonic_ns,
@@ -157,7 +158,6 @@ class MissionControl(ActionLab):
                     global_position=None if state.global_position is None else to_json_value(state.global_position))
                 if track and track[-1]['epoch'] != epoch: track.clear()
                 if not track or track[-1]['at_ns'] != sample['at_ns']: track.append(sample)
-            info = d.info()
             profile = getattr(d,'profile',None)
             if profile is not None:
                 bounds=profile.safety
@@ -168,12 +168,14 @@ class MissionControl(ActionLab):
             configured = getattr(getattr(d, 'ownership', None), 'receive_signing', None) is not None
             verifier = getattr(getattr(d, 'ownership', None), 'receive_signing', None)
             try:
-                fresh = bool(state and state.health.quality.value == 'VALID' and
+                fresh = bool(info.get('connected') and state and state.health.quality.value == 'VALID' and
                     0 <= self.clock().elapsed_ns_since(state.published_at) <= 3_000_000_000)
             except ValueError: fresh = False
             info.update(world=to_json_value(world), track=list(track), signing_configured=configured,
                 verified_frames=0 if verifier is None else verifier.accepted,
                 rejected_frames={} if verifier is None else dict(verifier.rejected), fresh_vehicle_state=fresh)
+            from vehicle_autonomy.app.web.vehicle_display import vehicle_display
+            info['display']=vehicle_display(info,world,profile,self.clock())
             vehicles.append(info)
         return dict(vehicles=vehicles, actions=self.runtime.views(), missions=self.missions.views(),
             resources=self.runtime.resource_view(), manual_sessions=list(self.manual.values()),

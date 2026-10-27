@@ -4,7 +4,12 @@ let state=null,parameters={},session=null,input=null,keys=new Set(),pending=fals
 const terminal=new Set(['SUCCEEDED','FAILED','REJECTED','CANCELLED','TIMED_OUT','UNKNOWN']);
 function selected(){return state?.vehicles.find(v=>v.target===api.target);}
 function chosen(){return api.catalog.find(s=>s.name+'@'+s.version===$('#action').value);}
-function form(){const s=chosen();parameters={};if(s)api.parameters($('#parameters'),s.parameters,parameters);}
+function form(){const s=chosen();parameters={};if(s)api.parameters($('#parameters'),s.parameters,parameters);modeChoices();}
+function modeChoices(){
+ const v=selected(),field=$('#parameters [name="mode"]');if(!field||!v?.display)return;
+ for(const option of field.options)option.disabled=!v.display.mode_choices.includes(JSON.parse(option.value));
+ if(field.selectedOptions[0]?.disabled){const first=[...field.options].find(o=>!o.disabled);if(first){field.value=first.value;parameters.mode=JSON.parse(first.value);}}
+}
 const fmt=value=>typeof value==='number'&&Number.isFinite(value)?value.toFixed(2):'未知';
 const vector=value=>value?`X ${fmt(value.x)} · Y ${fmt(value.y)} · Z ${fmt(value.z)}`:'未知';
 $('#speed').addEventListener('input',()=>{$('#speed-value').textContent=Number($('#speed').value).toFixed(2)+' m/s';});
@@ -15,8 +20,10 @@ $('#execute').onclick=api.guard(async()=>{
  const s=chosen();if(!s)return;
  if(s.kind==='Continuous'&&s.name!=='Hold')throw Error('持续输入请使用右侧按住操控；Hold 可通过 Action Lab 有界执行。');
  api.validateParameters(s.parameters,parameters);
+ if(s.name==='SetMode'&&selected()?.display&&!selected().display.mode_choices.includes(parameters.mode))throw Error(selected().display.control_hint);
  const p={name:s.name,version:s.version,target:api.target,parameters,allow_send:$('#send').checked};
- const continuation=$('#continuation').value.trim();if(continuation)p.continuation_of=continuation;
+ const retained=state?.actions.filter(a=>a.target===api.target&&a.state==='SUCCEEDED'&&a.safety?.continuation_allowed).at(-1);
+ const continuation=$('#continuation').value.trim()||(selected()?.kind==='plane'?retained?.id:'');if(continuation)p.continuation_of=continuation;
  $('#send').checked=false;const a=await api.call('/api/manual/action',p);$('#log').textContent=JSON.stringify(a,null,2);await poll();
 });
 $('#reestablish').onclick=api.guard(async()=>{$('#log').textContent=JSON.stringify(await api.call('/api/control/reestablish',{target:api.target}),null,2);await poll();});
@@ -30,6 +37,9 @@ async function begin(){
  if(pending||session||!keys.size)return;
  const v=selected();if(!v||v.kind==='plane')return;
  if(!$('#manual-send').checked){keys.clear();throw Error('请重新授权下一次按住操控');}
+ if(v.world?.vehicle?.operation?.armed!==true||v.world?.vehicle?.operation?.native_mode!=='ARDUPILOT_CUSTOM_'+(v.kind==='rover'?15:4)){
+  keys.clear();$('#manual-send').checked=false;throw Error('请先切换 GUIDED 并解锁；多旋翼还需先起飞。');
+ }
  $('#manual-send').checked=false;pending=true;
  try{
   const r=await api.call('/api/manual/start',{name:v.kind==='rover'?'Drive':'SetVelocity',target:api.target,parameters:values(),allow_send:true});
@@ -58,7 +68,7 @@ for(const b of document.querySelectorAll('[data-key]')){
  b.onpointerdown=e=>{e.preventDefault();b.setPointerCapture(e.pointerId);down(b.dataset.key);};
  b.onpointerup=()=>up(b.dataset.key);b.onpointercancel=()=>stop();
 }
-window.addEventListener('keydown',e=>{if(['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)||e.repeat)return;if('wasdqerf'.includes(e.key.toLowerCase())){e.preventDefault();down(e.key.toLowerCase());}});
+window.addEventListener('keydown',e=>{const editing=e.target.matches('textarea,select,input:not([type="checkbox"]):not([type="range"])')||e.target.isContentEditable;if(editing||e.repeat)return;if('wasdqerf'.includes(e.key.toLowerCase())){e.preventDefault();down(e.key.toLowerCase());}});
 window.addEventListener('keyup',e=>up(e.key.toLowerCase()));window.addEventListener('blur',()=>stop());
 document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();});window.addEventListener('pagehide',()=>stop());$('#manual-stop').onclick=()=>stop();
 setInterval(()=>update(),100);
@@ -66,6 +76,9 @@ function render(){
  document.querySelectorAll('[data-key]').forEach(b=>b.classList.toggle('pressed',keys.has(b.dataset.key)));
  const v=selected();if(!v)return;
  const w=v.world,vehicle=w?.vehicle,pose=vehicle?.reported_pose,twist=vehicle?.reported_twist;
+ const display=v.display||{};
+ $('#control-hint').textContent=display.control_hint||'连接成功不代表可以解锁，请核查状态。';modeChoices();
+ for(const key of ['q','e'])document.querySelector(`[data-key="${key}"]`).hidden=v.kind==='rover';
  $('#stream-controls').hidden=v.kind==='plane';$('#plane-manual-help').hidden=v.kind!=='plane';
  api.connection(v.connected?'车辆已连接 · '+api.kindLabel(v.kind):'车辆连接已中断',v.connected?'connected':'error');
  const grid=$('#status');grid.replaceChildren();
@@ -74,13 +87,23 @@ function render(){
   '签名验证':v.signing_configured?`已验证 ${v.verified_frames} 帧`:'未配置',
   '状态新鲜度':v.fresh_vehicle_state?'有效':'未知',
   '解锁状态':vehicle?.operation?.armed===true?'已解锁':vehicle?.operation?.armed===false?'未解锁':'未知',
-  '当前模式':vehicle?.operation?.native_mode??'未知',
+  '当前模式':display.mode_name||vehicle?.operation?.native_mode||'未知',
+  '飞控系统 ID':display.source_system??'未知',
+  '定位样本延迟（秒）':fmt(display.pose_age_s),
   '发送授权':`系统 ${v.system_send?'开':'关'} · 动作 ${v.action_send?'开':'关'}`,
   '车辆执行域':v.scope?'已占用 · 见控制权详情':'无活跃执行域',
   '位置（米）':vector(pose?.value.position),
   'ENU 航向（度）':pose?(Math.atan2(2*(pose.value.orientation.w*pose.value.orientation.z+pose.value.orientation.x*pose.value.orientation.y),1-2*(pose.value.orientation.y**2+pose.value.orientation.z**2))*180/Math.PI).toFixed(1):'未知',
   'odom 向上高度（米）':fmt(pose?.value.position.z),
   '速度（米/秒）':vector(twist?.value.linear),
+  '地速（米/秒）':fmt(display.horizontal_speed_mps),
+  '升降速度（米/秒）':fmt(display.vertical_speed_mps),
+  '空速（米/秒）':fmt(display.airspeed_mps),
+  '电池电压（V）':fmt(display.battery?.voltage_v),
+  '电池电量（%）':fmt(display.battery?.remaining_percent),
+  'GPS':diagnostic(display,'GPS_RAW_INT',v=>`定位 ${v.fix_type} · 卫星 ${v.satellites??'未知'} · HDOP ${fmt(v.hdop)}`),
+  'EKF':diagnostic(display,'EKF_STATUS_REPORT',v=>`标志 ${v.flags}`),
+  '飞控状态消息':diagnostic(display,'STATUSTEXT',v=>v.text),
   '姿态四元数':pose?`W ${fmt(pose.value.orientation.w)} · X ${fmt(pose.value.orientation.x)} · Y ${fmt(pose.value.orientation.y)} · Z ${fmt(pose.value.orientation.z)}`:'未知'};
  for(const[k,value]of Object.entries(metrics)){
   const cell=api.node('div');cell.append(api.node('strong',k),api.node('span',String(value)));
@@ -107,6 +130,7 @@ function render(){
  $('#continuation').placeholder=retained?'续接：'+retained.id:'固定翼续接动作 ID（可选）';
  draw(v);
 }
+function diagnostic(display,name,format){const field=display.diagnostics?.[name];if(!field?.value)return'未知';const value=format(field.value);return field.receive_fresh&&field.availability!=='STALE'?value+(field.availability==='UNKNOWN_CAPTURE_TIME'?'（采样时间未知）':''):value+'（已过期）';}
 function draw(v){
  const canvas=$('#field'),ctx=canvas.getContext('2d'),W=canvas.width,H=canvas.height;ctx.clearRect(0,0,W,H);ctx.strokeStyle='#244556';
  for(let x=0;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}for(let y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}

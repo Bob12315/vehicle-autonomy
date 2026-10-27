@@ -172,10 +172,40 @@ def run(directory):
                 assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'),f'Control overflow at {width}'
                 if width==390:page.screenshot(path=str(directory/'control-mobile.png'),full_page=True,mask=[page.locator('#token')])
             assert not driver.writes and not lab.runtime.views()
+            # A browser serialization regression only: mock the displayed
+            # retained Plane owner, capture actual UI HTTP request bodies.
+            # Physical Plane acceptance is run separately through real HTTP.
+            plane_catalog=lab.registry.catalog(vehicle_kind='plane',capabilities=capabilities('plane'))
+            retained='action:11111111111111111111111111111111'
+            plane=dict(target='v',kind='plane',connected=True,world=None,track=[],fresh_vehicle_state=False,
+                display=dict(mode_name='LOITER',mode_choices=[],control_hint='固定翼空中续接'),signing_configured=True,verified_frames=10)
+            state=dict(vehicles=[plane],actions=[dict(id=retained,target='v',name='Takeoff',state='SUCCEEDED',safety=dict(continuation_allowed=True))],
+                missions=[],resources=[],recovered_actions=[])
+            def reply(route,result):route.fulfill(json=dict(ok=True,result=result))
+            page.route('**/api/vehicles',lambda route:reply(route,[plane]))
+            page.route('**/api/actions?target=v',lambda route:reply(route,plane_catalog))
+            page.route('**/api/studio/state',lambda route:reply(route,state))
+            serialized=[]
+            def action_request(route):
+                serialized.append(route.request.post_data_json)
+                reply(route,dict(id='action:22222222222222222222222222222222',state='REJECTED'))
+            page.route('**/api/manual/action',action_request)
+            page.goto(base+'/control');page.locator('#token').fill(token);page.locator('#connect').click()
+            page.locator('#action option[value="Loiter@1.0.0"]').wait_for(state='attached')
+            expect(page.locator('#control-hint')).to_contain_text('固定翼空中续接')
+            page.locator('#action').select_option('Loiter@1.0.0')
+            assert page.locator('#continuation').input_value()==''
+            page.locator('#execute').click()
+            page.wait_for_timeout(150)
+            assert len(serialized)==1 and serialized[0]['continuation_of']==retained and serialized[0]['allow_send'] is False
+            page.locator('#send').check();page.locator('#execute').click();page.wait_for_timeout(150)
+            assert len(serialized)==2 and serialized[1]['continuation_of']==retained and serialized[1]['allow_send'] is True
+            expect(page.locator('#send')).not_to_be_checked()
+            assert not driver.writes and not lab.runtime.views()
             assert not errors,errors
             result.update(passed=True,javascript_errors=errors,writer_calls=len(driver.writes),
                 localized_node_types=10,responsive_widths=[1680,1280,1024,390],
-                machine_identifiers_preserved=True,send_defaults_false=True,blank_coordinates_blocked_before_submission=True,wait_mission='SUCCEEDED')
+                machine_identifiers_preserved=True,send_defaults_false=True,plane_continuation_serialization=True,blank_coordinates_blocked_before_submission=True,wait_mission='SUCCEEDED')
         except Exception as exc:
             result['error']=type(exc).__name__+': '+str(exc)
             page.screenshot(path=str(directory/'failure.png'),full_page=True,mask=[page.locator('#token')])
