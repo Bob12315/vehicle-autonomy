@@ -18,7 +18,7 @@ from vehicle_autonomy.app.web.action_lab import ActionLab, ActionLabHandler, Act
 
 
 class MissionControl(ActionLab):
-    def __init__(self, drivers, data_dir, *, registry=None, event_sink=None, events=None):
+    def __init__(self, drivers, data_dir, *, registry=None, event_sink=None, events=None, scheduler_period_s=.05):
         self._control_lock = RLock()
         self.missions = None
         self.manual = {}
@@ -29,7 +29,7 @@ class MissionControl(ActionLab):
         self._tracks = {}
         self.control_fault = None
         self.journal = None
-        super().__init__(drivers, registry=registry, event_sink=event_sink)
+        super().__init__(drivers, registry=registry, event_sink=event_sink,scheduler_period_s=scheduler_period_s)
         try:
             self.journal = MissionJournal(Path(data_dir) / 'missions')
             self.recovered_manual = deepcopy(self.journal.data['manual'])
@@ -54,7 +54,7 @@ class MissionControl(ActionLab):
                 self.runtime.cancel(a['id'])
 
     def _run(self):
-        while not self._stop.wait(.05):
+        while not self._stop.wait(self.scheduler_period_s):
             with self._control_lock:
                 if self.missions is None: continue
                 try:

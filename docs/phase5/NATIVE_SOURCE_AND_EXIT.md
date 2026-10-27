@@ -49,3 +49,22 @@ A–I。当前桥关闭与既有 Authority 锁统一；实际 Writer 拒绝测�
 Typed Effect 的运动资源使用与既有 Rover Drive 相同的 vehicle.control 冲突组，
 ModeEffect 也沿用其已验收的确认配置，不能用新 Action 默认值缩短确认链。
 源时间、取消/外部责任和未解决事项见主报告。
+
+
+后续无路径场景暴露重复静止零速准备的接口限制：Nav2 1.3.13 Collision
+Monitor 的 publishVelocity 在 stop_pub_timeout 后抑制重复零速，即使输入
+原生时间戳推进也如此，见 [官方实现](https://raw.githubusercontent.com/ros-navigation/navigation2/1.3.13/nav2_collision_monitor/src/collision_monitor_node.cpp)。
+因此明确区分非授权的通路资格与可执行命令：真实 Wait 零速的 raw/final
+必须由两个固定 GID、同一原始 stamp、完整六轴零速共同证明实际经过链路。
+冷启动迟到的零速只可作为 `control_eligible=false` 的通路记录，不进入
+ControllerEvidence、NavigationCommand 或车辆状态，不更新任何新鲜度。
+随后取得当前控制器真实、新鲜的原始零速/GID，不要求静止后的第二个最终零速。
+
+真正 Navigate 请求发送前重建 ControllerEvidence，清空预备 command 与序号；
+ACTIVE 的实际运动必须由该新窗口后的当前控制器原始证据、实际 Collision
+Monitor 最终来源及独立输入检查共同授权，200 ms 期限不变。真实测试还检查
+整个预备窗口实际车辆控制 Writer 次数为零。没有延长 stop_pub_timeout。
+旧零速不能因角色转换重新获得当前命令资格。
+
+当前静态绕障仍因 AP 证据偶发超过原有 200 ms 等边界而失败；主报告保留全部
+开发失败。周期前 GC 维护及更快数据/调度节奏都不提供硬实时保证，未完成正式验收。

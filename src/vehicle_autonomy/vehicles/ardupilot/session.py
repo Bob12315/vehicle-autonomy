@@ -271,8 +271,11 @@ class ArduPilotSession:
                 try:self._time_sync.sent(nonce,*self._commands.write_timesync(nonce))
                 except (OSError,ConnectionError):self._disconnect(self._clock());raise
                 self._last_write_was_query=True;return None
-        self._last_write_was_query=False
-        return self._commands.write_next(now)
+        written=self._commands.write_next(now)
+        # An idle owner cycle is not a control write. Preserve priority earned
+        # after an actual query until a queued control attempt consumes it.
+        if written is not None:self._last_write_was_query=False
+        return written
 
     def snapshot(self) -> VehicleStateSnapshot | None:
         return None if self._state is None else self._state.snapshot()

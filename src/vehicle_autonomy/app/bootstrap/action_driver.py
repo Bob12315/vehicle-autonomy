@@ -33,6 +33,8 @@ class VehicleActionDriver:
         if native_input_fence is not None:
             from vehicle_autonomy.engine.navigation.write_fence import NativeNavigationWriteFence
             if not isinstance(native_input_fence,NativeNavigationWriteFence):raise TypeError('typed native navigation data fence required')
+        from vehicle_autonomy.app.bootstrap.cycle_maintenance import CycleMaintenance
+        self._cycle_maintenance=CycleMaintenance() if source_time_sync else None
         self._native_input_fence=native_input_fence
         self.events=event_sink or (lambda e:None)
         if source_time_sync and ownership.manifest.get('phase5_clock_uart_baud')!={'SERIAL0_BAUD':115.}:raise ValueError('clock sync requires public owned SERIAL0 baud proof')
@@ -62,6 +64,7 @@ class VehicleActionDriver:
             self._info=dict(target=self.target,kind=self.profile.kind,connected=self._runtime.connected,
                 session_id=self._runtime.session_id,owned_simulation=self._ownership_reason() is None,
                 system_send=self._runtime.authority.system_send,action_send=self._runtime.authority.action_send,
+                cycle_maintenance=None if getattr(self,'_cycle_maintenance',None) is None else self._cycle_maintenance.diagnostics(),
                 deployment_send=self.allow_send,lease_active=bool(self._runtime.authority.lease is not None
                     and self._runtime.authority.lease.expires_at.elapsed_ns_since(self.clock())>0),
                 scope=self._scope,fault=self._fault,capabilities=sorted(self.context().capabilities))
@@ -82,6 +85,7 @@ class VehicleActionDriver:
             while not self._stop.is_set():
                 started=time.monotonic()
                 self.ownership.assert_alive()
+                if self._cycle_maintenance is not None:self._cycle_maintenance.run()
                 # One bounded task, then a mandatory safety/telemetry cycle.
                 try:future,function=self._queue.get_nowait()
                 except Empty:pass

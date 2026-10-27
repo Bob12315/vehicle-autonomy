@@ -27,20 +27,24 @@ def sensors(owned):
     tree.write(owned.model_path)
 
 
-def bridge_config(path,world):
+def bridge_config(path,world,*,scan_only=False,without_scan=False):
     topics=[('/clock',f'/world/{world}/clock','rosgraph_msgs/msg/Clock','gz.msgs.Clock'),
         ('/phase5/camera/image_raw','/phase5/gz/camera','sensor_msgs/msg/Image','gz.msgs.Image'),
         ('/phase5/camera/info','/phase5/gz/camera_info','sensor_msgs/msg/CameraInfo','gz.msgs.CameraInfo'),
         ('/phase5/scan_raw','/vaf/lidar','sensor_msgs/msg/LaserScan','gz.msgs.LaserScan'),
         ('/phase5/points','/phase5/gz/lidar3d/points','sensor_msgs/msg/PointCloud2','gz.msgs.PointCloudPacked'),
         ('/phase5/imu',f'/world/{world}/model/target_rover/link/base_link/sensor/imu_sensor/imu','sensor_msgs/msg/Imu','gz.msgs.IMU')]
+    if scan_only and without_scan:raise ValueError('incompatible bridge inputs')
+    if scan_only:topics=[t for t in topics if t[0]=='/phase5/scan_raw']
+    if without_scan:topics=[t for t in topics if t[0]!='/phase5/scan_raw']
     # JSON is a valid YAML document and keeps topic types exact and reviewable.
     path.write_text(json.dumps([dict(ros_topic_name=r,gz_topic_name=g,ros_type_name=rt,gz_type_name=gt,direction='GZ_TO_ROS',qos_profile='SENSOR_DATA') for r,g,rt,gt in topics],indent=2))
 
 
 class SensorFixture(MissionFixture):
-    def __init__(self,path,source_time_sync=False,secure=False,native_input_fence=None,contact_evidence=False,**kwargs):
-        super().__init__(path,'rover',driver_options={'source_time_sync':source_time_sync,'cycle_period_ns':20_000_000 if source_time_sync else None,'native_input_fence':native_input_fence},**kwargs);self.collector=None;self.source_time_sync=source_time_sync;self.secure=secure;self.security_environment={}
+    def __init__(self,path,source_time_sync=False,secure=False,native_input_fence=None,contact_evidence=False,split_lidar_bridge=False,**kwargs):
+        super().__init__(path,'rover',driver_options={'source_time_sync':source_time_sync,'cycle_period_ns':20_000_000 if source_time_sync else None,'native_input_fence':native_input_fence},lab_options={'scheduler_period_s':.02} if source_time_sync else None,**kwargs);self.collector=None;self.source_time_sync=source_time_sync;self.secure=secure;self.security_environment={}
+        self.split_lidar_bridge=split_lidar_bridge;self.lidar_bridge=None
         sensors(self.owned)
         self.contacts=None;self.contact_topics=()
         if contact_evidence:
@@ -80,8 +84,11 @@ class SensorFixture(MissionFixture):
             os.write(fd,f.token.encode());f.owned.credentials.register_private('stream-api.private',fd)
         finally:os.close(fd)
         f.owned._save()
-        bridge_config(path/'sensor-bridge.yaml',f.owned.world)
+        bridge_config(path/'sensor-bridge.yaml',f.owned.world,without_scan=self.split_lidar_bridge)
         f.ros_start('ros-sensor-bridge',[str(ROOT/'scripts/with_ros2.sh'),'/usr/bin/python3','-m','vehicle_autonomy.app.bootstrap.ros2_run','ros_gz_bridge','parameter_bridge','--ros-args','-p','config_file:='+str(path/'sensor-bridge.yaml')],role='bridge')
+        if self.split_lidar_bridge:
+            bridge_config(path/'lidar-bridge.yaml',f.owned.world,scan_only=True)
+            self.lidar_bridge=f.ros_start('ros-lidar-bridge',[str(ROOT/'scripts/with_ros2.sh'),'/usr/bin/python3','-m','vehicle_autonomy.app.bootstrap.ros2_run','ros_gz_bridge','parameter_bridge','--ros-args','-p','config_file:='+str(path/'lidar-bridge.yaml')],role='bridge')
         raw={'camera':[f.owned.model+'/base_link/rgb_camera'],'scan':[f.owned.model+'/base_link/mapping_lidar'],
              'cloud':[f.owned.model+'/base_link/lidar3d'],'imu':[f.owned.model+'/base_link/imu_sensor']}
         config=dict(schema=1,base_url=f.base,target='rover',token_file=str(path/'stream-api.private'),directory=str(path/'streams'),source_id='gazebo:'+f.owned.world,frame_epoch=f.driver.snapshot().version.generation_id,calibration_version='owned-rover-sensors-v1',raw_frames=raw)

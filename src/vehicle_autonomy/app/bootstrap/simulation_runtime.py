@@ -189,7 +189,7 @@ class SimulationRuntime:
                                     stop_speed_tolerance=0.1 if self.profile.kind == "rover" else 0.05,
                                     write_guard=self._write_guard)
         from vehicle_autonomy.vehicles.ardupilot.timesync_clock import TimesyncSourceClock
-        capture_clock = TimesyncSourceClock() if self._source_time_sync else SimulationSourceClock()
+        capture_clock = TimesyncSourceClock(period_ns=20_000_000) if self._source_time_sync else SimulationSourceClock()
         session = ArduPilotSession(
             transport=transport, codec=codec, authority=self.authority,
             commands=port, link_timeout_ns=self.profile.link_timeout_ns,

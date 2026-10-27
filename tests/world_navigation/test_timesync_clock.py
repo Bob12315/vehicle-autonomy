@@ -40,3 +40,16 @@ class TimesyncClockTests(unittest.TestCase):
         clock=TimesyncSourceClock();self.assertTrue(self.sync(clock,1_000_000_000,1_000_000_000,after_bytes=200))
         self.assertIsNone(clock.capture(message('ATTITUDE',time_boot_ms=1020),stamp(1_100_000_000)))
         point=clock.capture(message('ATTITUDE',time_boot_ms=1050),stamp(1_100_000_000));self.assertEqual(point.monotonic_ns,1_000_000_000)
+
+    def test_optional_fast_cadence_never_bypasses_pending_nonce_or_source_proof(self):
+        for value in (True,0,19_999_999,50_000_001):
+            with self.assertRaises(ValueError):TimesyncSourceClock(period_ns=value)
+        for period in (20_000_000,50_000_000):
+            clock=TimesyncSourceClock(period_ns=period);self.assertTrue(self.sync(clock,1_000_000_000,1_000_000_000))
+            self.assertIsNone(clock.request_due(stamp(1_000_000_000+period-1)))
+            nonce=clock.request_due(stamp(1_000_000_000+period));self.assertIsNotNone(nonce)
+            clock.sent(nonce,stamp(1_000_000_000+period),100)
+            self.assertIsNone(clock.request_due(stamp(1_100_000_000)))
+            self.assertFalse(clock.observe(message('TIMESYNC',tc1=1_100_000_000,ts1=nonce+1,_vaf_signature_timestamp=1),stamp(1_100_000_000),100))
+            self.assertIsNone(clock.capture(message('HEARTBEAT'),stamp(1_100_000_000)))
+            self.assertIsNone(clock.capture(message('COMMAND_ACK'),stamp(1_100_000_000)))

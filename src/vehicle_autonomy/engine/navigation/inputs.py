@@ -54,7 +54,7 @@ class RoverNavigationInputs:
             if field is None:raise ValueError('signed AP pose/twist unavailable')
             deadlines.append(self._expiry(field.captured_at,now,200_000_000))
         twist=v.reported_twist.value
-        if hypot(twist.linear.x,twist.linear.y)>.4 or abs(twist.angular.z)>.45:raise ValueError('observed Rover motion exceeds conservative scan halo qualification')
+        if hypot(twist.linear.x,twist.linear.y)>.4 or abs(twist.angular.z)>.45:raise ValueError('observed Rover motion exceeds conservative scan halo qualification: linear_mps='+str(hypot(twist.linear.x,twist.linear.y))+' yaw_radps='+str(twist.angular.z))
         for requirement in self.requirements:
             matches=[s for s in world.streams if requirement.identity(s.header)]
             if len(matches)!=1:raise NavigationEvidenceUnavailable('pinned native navigation stream missing/ambiguous: '+requirement.header.kind.value)

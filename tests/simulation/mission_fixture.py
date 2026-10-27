@@ -25,13 +25,13 @@ from tests.simulation.faults import TcpFaultProxy
 
 
 class MissionFixture:
-    def __init__(self,path,kind,*,registry=None,events=None,application_dir=None,provider_registry_root=None,driver_options=None):
+    def __init__(self,path,kind,*,registry=None,events=None,application_dir=None,provider_registry_root=None,driver_options=None,lab_options=None):
         self.path=Path(path);self.path.mkdir(parents=True,exist_ok=False);self.kind=kind
         self.owned=OwnedSimulation(self.path,kind,confirmation_signing=True,rover_native_rtl=kind=='rover')
         self.application_dir=Path(application_dir) if application_dir else self.path/'application'
         self.provider_registry_root=Path(provider_registry_root) if provider_registry_root else self.path/'provider-registry'
         self._initialize_registry=provider_registry_root is None
-        self.driver_options=dict(driver_options or {});self.registry=registry;self.events=events;self._registry_context=None;self._profile_context=ExitStack();self.timings={};self.slow_calls=[];self.gc_pauses=deque(maxlen=4096);self._gc_started={};self.writer=[];self.received=deque(maxlen=4096);self.trajectory=deque(maxlen=48000)
+        self.lab_options=dict(lab_options or {});self.driver_options=dict(driver_options or {});self.registry=registry;self.events=events;self._registry_context=None;self._profile_context=ExitStack();self.timings={};self.slow_calls=[];self.gc_pauses=deque(maxlen=4096);self._gc_started={};self.writer=[];self.received=deque(maxlen=4096);self.trajectory=deque(maxlen=48000)
         self.lab=self.server=self.proxy=self.driver=None;self._stop=Event();self._thread=None;self.sampling_error=None
         self.logs={name:(self.path/name).open('w') for name in ('runtime.jsonl','trajectory.jsonl','application-rx.jsonl')}
     def start(self):
@@ -80,7 +80,7 @@ class MissionFixture:
         if self._initialize_registry:ProviderRegistry.initialize()
         self._connect=connect
         self.lab=MissionControl({self.kind:self.driver},self.application_dir,registry=self.registry,
-            events=self.events,event_sink=lambda e:self.write('runtime.jsonl',e))
+            events=self.events,event_sink=lambda e:self.write('runtime.jsonl',e),**self.lab_options)
         self._start_server()
         def sample_loop():
             while not self._stop.wait(.05):
@@ -129,7 +129,7 @@ class MissionFixture:
             event_sink=lambda e:self.write('runtime.jsonl',e),transport_factory=self._connect,**self.driver_options)
         self.observe_driver_timing()
         self.lab=MissionControl({self.kind:self.driver},self.application_dir,registry=self.registry,
-            events=self.events,event_sink=lambda e:self.write('runtime.jsonl',e))
+            events=self.events,event_sink=lambda e:self.write('runtime.jsonl',e),**self.lab_options)
         self._start_server()
         until=time.monotonic()+6
         while time.monotonic()<until:

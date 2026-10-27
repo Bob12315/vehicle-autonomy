@@ -169,3 +169,12 @@ class NativeNavigationActionTests(unittest.TestCase):
         resources.release('native',no_effects=True)
         self.assertTrue(resources.acquire('manual','rover',drive.resources))
         self.assertFalse(resources.acquire('new-native','rover',native.resources))
+
+    def test_an_initial_zero_does_not_waive_the_first_physical_motion_ramp(self):
+        w=self.sample(40_000_000);self.command(1,30_000_000,0.)
+        self.assertEqual(len(self.instance.tick(w).effects),1)
+        self.assertFalse(self.instance.moving)
+        w=self.sample(400_000_000);self.command(2,390_000_000,.09)
+        decision=self.instance.tick(w)
+        self.assertEqual(decision.outcome,ActionOutcome.FAILED)
+        self.assertEqual(decision.effects,())

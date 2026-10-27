@@ -15,14 +15,16 @@ from vehicle_autonomy.app.web.server import ConsoleServer,Handler
 
 
 class ActionLab:
-    def __init__(self,drivers,*,registry=None,event_sink=None):
+    def __init__(self,drivers,*,registry=None,event_sink=None,scheduler_period_s=.05):
+        if type(scheduler_period_s) not in (int,float) or not .02<=scheduler_period_s<=.05:raise ValueError('bounded scheduler cadence required')
+        self.scheduler_period_s=scheduler_period_s
         self.drivers=dict(drivers);self.registry=registry or ActionRegistry()
         if registry is None:register_standard(self.registry)
         self.clock=lambda:TimePoint(time.monotonic_ns(),datetime.now(timezone.utc),'host-monotonic-simulation')
         self.runtime=ActionRuntime(self.registry,self.drivers,clock=self.clock,event_sink=event_sink,max_instances=512)
         self._stop=Event();self._thread=Thread(target=self._run,name='action-lab-scheduler',daemon=True);self._thread.start()
     def _run(self):
-        while not self._stop.wait(.05):self.runtime.tick()
+        while not self._stop.wait(self.scheduler_period_s):self.runtime.tick()
     def handle(self,operation,payload):
         if operation=='vehicles':return [d.info() for d in self.drivers.values()]
         if operation=='catalog':

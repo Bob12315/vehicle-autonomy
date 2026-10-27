@@ -14,7 +14,9 @@ import secrets
 class TimesyncSourceClock:
     PERIOD_NS=50_000_000
     MAX_RTT_NS=200_000_000
-    def __init__(self):
+    def __init__(self,*,period_ns=PERIOD_NS):
+        if type(period_ns) is not int or not 20_000_000<=period_ns<=self.PERIOD_NS:raise ValueError('bounded protocol query cadence required')
+        self.period_ns=period_ns
         self._anchors=deque(maxlen=64);self._pending=None;self._last_request=None;self._nonce=secrets.randbits(61)+1;self.last_boot={}
         self.accepted=0;self.rejected=0;self.last_rtt_ns=None
     def request_due(self,now):
@@ -22,7 +24,7 @@ class TimesyncSourceClock:
             nonce,sent,marker=self._pending
             if now.elapsed_ns_since(sent)<self.MAX_RTT_NS:return None
             self._pending=None;self.rejected+=1
-        if self._last_request is not None and now.elapsed_ns_since(self._last_request)<self.PERIOD_NS:return None
+        if self._last_request is not None and now.elapsed_ns_since(self._last_request)<self.period_ns:return None
         self._nonce+=1
         if self._nonce>=2**63:raise ValueError('clock correlation epoch exhausted')
         return self._nonce

@@ -142,7 +142,7 @@ class NativeRoverNavigation:
                 if self.stream.touched:raise ValueError('native macro left ACTIVE after vehicle dispatch')
                 if feedback.get('phase') not in ('PREPARING','PREPARE_CANCEL','CONTROLLER_PREPARE'):raise ValueError('unrecognized native macro phase')
                 return ActionDecision(ActionOutcome.RUNNING,feedback={'phase':'PREPARING_NATIVE_SOURCE'})
-            if not self.stream.touched and (abs(command.speed_mps)>.06 or abs(command.yaw_rate_rad_s)>.1):raise ValueError('first actual vehicle input must ramp from stationary state')
+            if not self.moving and (abs(command.speed_mps)>.06 or abs(command.yaw_rate_rad_s)>.1):raise ValueError('first actual vehicle input must ramp from stationary state')
             deadline=min(expiry,command.captured_at.monotonic_ns+200_000_000)
             # A known nearly-expired cut cannot survive the queued owner cycle.
             # Do not emit/renew it; a later independently fresh cut may proceed.

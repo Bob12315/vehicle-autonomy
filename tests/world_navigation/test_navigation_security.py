@@ -8,6 +8,8 @@ class NavigationPermissionsTests(unittest.TestCase):
         self.assertEqual([r for r,v in p.items() if '/nav2_test/cmd_vel_final' in v['topics']['publish']],['collision'])
         self.assertEqual(p['viewer']['topics']['publish'],[]);self.assertEqual(p['viewer']['actions']['call'],[])
         self.assertEqual(p['manager']['topics']['publish'],[])
+        self.assertIn('/initialpose',p['slam']['topics']['subscribe'])
+        self.assertFalse(any('/initialpose' in role['topics']['publish'] for role in p.values()))
         self.assertEqual(p['collision']['actions']['call'],[])
         self.assertIn(b'/parameter_events',policy(p))
     def test_reserved_or_ambiguous_namespace_cannot_expand_source_role_into_control_domain(self):

@@ -94,3 +94,24 @@ class TimesyncWriterTests(unittest.TestCase):
                 self.assertFalse(hasattr(transport,'submit'))
             finally:transport.close();peer.close()
         finally:listener.close()
+
+    def test_idle_cycle_cannot_consume_control_priority_after_actual_query(self):
+        from types import SimpleNamespace
+        from vehicle_autonomy.contracts.effects.vehicle import TwistTargetEffect
+        from vehicle_autonomy.contracts.core.geometry import Twist3,Vector3
+        f=self.f;nonce=iter((1,None,2,3))
+        f.session._time_sync=SimpleNamespace(request_due=lambda _:next(nonce),sent=lambda *args:None)
+        f.session._clock=lambda:fixtures.at(f.now_ns)
+        f.now_ns=101;f.session.write_next(fixtures.at(101))
+        f.now_ns=102;self.assertIsNone(f.session.write_next(fixtures.at(102)))
+        self.assertEqual(len(f.transport.attempts),1)
+        target=TwistTargetEffect('base_link',Twist3(Vector3(.01,0,0),Vector3(0,0,0)),'native-stream')
+        f.now_ns=103;f.execution.dispatch(fixtures.effect(1,target),fixtures.world(),fixtures.at(103))
+        f.session.write_next(fixtures.at(103))
+        frames=[m for data in f.transport.writes for m in mav.MAVLink(None).parse_buffer(data) or []]
+        self.assertEqual([m.get_type() for m in frames],['TIMESYNC','SET_POSITION_TARGET_LOCAL_NED'])
+        f.now_ns=104;f.session.write_next(fixtures.at(104))
+        frames=[m for data in f.transport.writes for m in mav.MAVLink(None).parse_buffer(data) or []]
+        self.assertEqual([m.get_type() for m in frames],['TIMESYNC','SET_POSITION_TARGET_LOCAL_NED','TIMESYNC'])
+        self.assertEqual([m.get_seq() for m in frames],[0,1,2])
+        self.assertEqual(len(f.transport.attempts),3)

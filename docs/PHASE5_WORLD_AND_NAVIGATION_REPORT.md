@@ -97,6 +97,16 @@ NativeNavigationJob 在任何原生进程/Goal 前完成 P3 登记。原生逻�
 | dev-native-motion-22 | AP 证据超过 200 ms，停止并明确 FAILED |
 | dev-native-motion-23 | 空旷目标开发场景通过；物理误差约 0.240 m，停车约 0.0044 m/s |
 | dev-native-motion-24 | 认证 Web API 启动导航通过；手动控制 HTTP 409、Runtime 资源拒绝、并行 Query 成功、释放后正常模式控制成功 |
+| dev-native-cancel-1 | 实际运动中 Web 取消，CANCELLED、安全释放、停车约 0.0006 m/s；确认关闭后无非零运动帧 |
+| dev-native-bridge-loss-1 | 真实接收进程 SIGSTOP；源超时后 FAILED、零速写入及停车；冻结输入未变 |
+| dev-native-controller-crash-1 | 真实控制器 SIGKILL；FAILED、停车、生产者组消失、安全释放；冻结输入未变 |
+| dev-native-localization-loss-1 | 停止真实 SLAM 定位源；FAILED、零速写入及停车；冻结输入未变 |
+| dev-native-no-path-1 | 原生控制器零速预备条件配置错误，明确失败；没有冒充无路测试成功 |
+| dev-native-no-path-2 | 原生 Nav2 ABORT(6)，实际 Writer 无非零运动帧、物理位移不超过 0.05 m，安全退出 |
+| dev-native-static-1/2 | 原生地图未覆盖目标；随后巡测原生 Goto 在墙边转向发生接触，分别保留失败 |
+| dev-native-static-3 | 三个巡测点完成、原生图保存成功；定位激活因缺少订阅权限失败 |
+| dev-native-static-4 | 保存和原生定位加载成功；Nav2 无可行路径，未发导航 Effect，绕障验收失败 |
+| dev-native-lidar-loss-1 | 单独停止真实 LaserScan 桥，保留其他桥；FAILED、零速写入及停车；冻结输入未变 |
 
 23 的独立 World 目标误差约 0.192 m。实际 Writer 共 1,793 次：1,587 次只读
 TIMESYNC、3 次 COMMAND_LONG、203 次局部 setpoint/stop。接触探针实际收到
@@ -109,10 +119,15 @@ TIMESYNC、3 次 COMMAND_LONG、203 次局部 setpoint/stop。接触探针实际
 注入参数控制。23 的 AP 位姿保守采样年龄（接收时的上界）P95 约 77 ms，
 20 约 114 ms；这不是准确物理采样时间或硬件性能保证。
 
+真实外部回归 `real-external-regression-1` 通过：HTTP Job 重启（已知 ID 及
+尚未收到 ID）、真实 ROS 2 Service 执行后丢失结果的 UNKNOWN/占用边界。
+它不能替代剩余的全部外部、浏览器和车辆回归。
+
 ## 单元、安装和剩余验收
 
-已完成的最新完整单元结果为 648 项通过；后续新增 Writer、原有资源冲突、
-清理配置与 TCP 检查的定向测试通过；native-navigation-full-regression-6.log 为最新全量记录。原 P1 Writer 期限、
+已完成的最新完整单元结果为 665 项通过（74.394 秒），记录为
+`native-navigation-full-regression-9.log`。第 8 份全量失败日志独立保留。
+新增地图文件、非授权通路、查询调度和周期维护边界测试均纳入全量。原 P1 Writer 期限、
 签名水位与回绕重放、ROS Service 不确定性、混合副作用及持久资源测试保留。
 独立 wheel 开发检查 `dev-native-wheel-1` 通过，包含安装目录验证、默认无车辆、
 未导入可选 ROS、安装 C++ 源码真实编译；最新冻结提交仍须重建。
@@ -123,7 +138,7 @@ TIMESYNC、3 次 COMMAND_LONG、203 次局部 setpoint/stop。接触探针实际
 | B World/Sensor | 真实输入有开发证据；最终组合两轮未完成 |
 | C SLAM | 真实建图/保存/加载定位有证据；最终生命周期/长期预算未完成 |
 | D YOLO | 真实 World/Mission 事件有证据；最终组合复跑未完成 |
-| E Nav2 | 单个空旷目标已通过；静态/动态障碍、无路、故障、取消等完整矩阵未完成 |
+| E Nav2 | 旧开发空旷目标、无路、取消和多种断流已有证据；当前静态绕障仍失败，正式完整矩阵未完成 |
 | F AP Native | 原能力保留；两轮三车型真实回归未完成 |
 | G RViz/Web | DDS 只读权限正反对照已有；实际 RViz、浏览器闭环、新页面未完成 |
 | H 性能/故障 | 有界流与源/写入边界已有；录制回放、统一诊断及长期全系统预算未完成 |
@@ -136,10 +151,82 @@ Copter/Plane 仍用既有 AP 原生控制；不宣称具有 Nav2 飞行或硬件
 ## Git、输入与清理
 
 既有阶段提交：c03b2c1、e658abd、4856ca1、8558bb9、9b6e03c、f1c054e。
-本增量正式提交 SHA 与受测冻结输入将在提交后登记；不能以父提交代替新代码。
+控制桥实现提交：`cd1774ef6bbd2e4c5d4027bb6c87a2adddb3b242`。
+后续故障场景测试仍在开发，不能以该提交代表尚未完成的全阶段交付。
 各运行 manifest 记录当时工作区是否有修改、源码摘要、SITL/插件/场景版本与
 清理状态；旧失败没有覆盖。开发输入补充快照与正式运行前冻结应明确区分。
 
-尚未完成全历史凭据/证据摘要复核。结束交付之前必须检查全部自有测试资源，
+历史凭据审计发现旧 `operator-rover-20261026T095303Z` 遗留状态。已确认登记
+进程组不存在、无其他活进程引用并取得 owner 锁，按原 device/inode 仅销毁
+两项登记凭据资源中的四个文件。原 manifest 字节和审查/日志保持，新的
+`historical-credential-cleanup/operator-rover-20261026T095303Z.json` 记录原 manifest
+摘要、销毁前二进制摘要及 destroyed_unavailable；旧 EEPROM 不再可复核。
+不宣称 SSD/COW/外部备份物理擦除。435 份更早的 EEPROM 没有签名验收元数据，
+另有未登记旧状态，未解析密钥、未擅自收编或删除，审计结果单独保存。
+
+全历史证据摘要复核仍待完成。结束交付之前必须检查全部自有测试资源，
 不触碰独立旧项目和用户文件，不输出认证密钥，不伪造已销毁二进制证据哈希。
 最终只有全部强制项完成后才可改为 READY FOR RE-AUDIT，并等待独立审查。
+
+### 当前保存/加载定位的定向验证
+
+原生定位激活需要 `/initialpose` 订阅，已在 SLAM 专用 Enforce 角色中补齐；所有角色仍没有该 Topic 的发布权，viewer/manager 也没有新增发布权。对应权限回归已通过。依据为 [SLAM Toolbox 2.8.5 原生定位生命周期](https://github.com/SteveMacenski/slam_toolbox/blob/2.8.5/src/slam_toolbox_localization.cpp)。
+
+`dev-native-static-5` 曾验证独立保存/加载与绕障，但最终失败。巡测路径避开此前原生 Goto 的贴墙掉头；原生 Goto 不提供避障。仅本场景的建图处理间隔设为 0.4 秒，减少静止期间冗余图节点；加载后定位恢复原来的 0.1 秒处理间隔。World 新鲜度、足迹、Writer、停车、物理误差及运动安全阈值均未放宽。另用独立物理真值断言起点到目标的直线确实被保守车体边界阻挡，防止没有真实绕障需求的场景被误计成功。
+
+`dev-native-static-5` 仍失败：原生全局规划有路径，但独立 CollisionMonitor 的 StopPolygon 在靠墙起点触发停止，控制器最终因无进展 ABORT；应用没有发导航运动帧。本轮地图文件约 16.3 MB，比上一轮约 55.2 MB 小。后续仅调整巡测结束位置，使初始车体转向空间离墙更远；不缩小 StopPolygon，不放宽控制器无进展时限。
+
+`dev-native-static-6` 导航实际移动约 1.64 m、障碍接触为零，但实测车体运动超出保守扫描补偿上限，停车并 FAILED。后续仅收紧原生请求角速度/加速度至 0.2；实测 0.4 m/s、0.45 rad/s 保护上限不变。原生进展检查改用已安装的 PoseProgressChecker，以原生默认 0.5 rad 认可原地转向进展，原有平移半径 0.08 m、无进展 10 秒、总 Goal 期限、到达误差及停车判定不变。该语义变化明确记录，不能描述为所有算法参数完全未变。依据：[Nav2 1.3.13 PoseProgressChecker](https://github.com/ros-navigation/navigation2/blob/1.3.13/nav2_controller/plugins/pose_progress_checker.cpp)。
+
+`dev-native-static-7` 实际移动约 2.18 m、无障碍接触；实测角速度 -0.45514 rad/s 超过原有 0.45 上限，系统停车并 FAILED。后续保留 0.2 请求转速上限，仅进一步收紧原生请求角加速度至 0.05 rad/s²，避免快速转速变化引起飞控跟踪超调。目标朝向、到达条件和原有期限未变。
+
+`dev-native-static-8` 未通过：控制器预备前的原生 Pose 超过 500 ms，尚未发送 FollowPath；该旧数据没有被刷新使用。修正为在原有 5 秒预备预算内等待真正新鲜的 Pose，而不是只等列表非空；仍不发送任何过期目标。保存图的定位配置关闭原生 loop closing，使用原生 localization 的匹配与有界定位缓冲；不改 SLAM 算法实现，不借 AP/Gazebo 真值伪造定位。
+
+### 查询调度与 Guard 停顿的独立证据
+
+`dev-native-static-9` 实际移动约 1.85 m 后命令到期，Writer 拒绝并停车。确定性复现 `native-query-priority-before.log` 证明：真实查询后经过一次空闲 owner 周期，新控制到来时被额外 TIMESYNC 抢先。修正只在发生实际控制尝试后清除查询优先标记，空闲不消耗；`native-query-priority-after.log` 的 15 项测试通过，核验真实帧类型、顺序、序号及 Writer 次数。未增加 TTL。
+
+`dev-native-static-10` 实际移动约 1.53 m 后 Guard 超时并停车。`timing.json` 记录 53.95 ms 的 generation-2 GC 与该写前窗口重叠。新增可观测的周期前维护仅在可选 source-time-sync 快速装配运行，提前做即将到期的 full GC；不关闭自动 GC、不改变 GC 阈值、不修改 50 ms Guard 或任何有效期限。它是尽力的停顿管理，不是 Python 硬实时保证。维护耗时和次数随 driver info 输出。`native-maintenance-boundaries.log` 10 项通过，含维护跨过期限后 Writer 实际调用 0 次，以及随后有效命令正常发送。真实回归正在继续；没有把维护本身当成通过证据。
+
+原生地图文件验证另覆盖路径越界、私有目录、所有者、软硬链接、空/缺失/超限文件、检查时截断；使用有界分块哈希，不把文件内容一次读入内存。`native-map-file-boundaries.log` 10 项相关测试通过。文件摘要不等于地图定位兼容性保证。
+
+### 本轮当前结论：FAIL
+
+`dev-native-static-11` 在约 2.00 m 实际运动后，AP 证据年龄约 217 ms 被拒；
+`12` 冷启动最终零速通路未及时取得新鲜证据，未进入车辆运动；`13` 约 1.59 m
+后 GC 停顿跨过源期限，Execution 返回 invalid_effect_time；`14` 采用更快调度后
+仍在约 1.77 m 时出现 AP 证据年龄 206.93 ms，超过原有 200 ms，停车并 FAILED。
+这些运行均保留原输入快照，未在运行中修改代码，14 障碍接触为零、车辆安全退出。
+源期限、Writer Guard、停车及到达断言未放宽；没有将这些失败算作绕障通过。
+
+独立只读 RViz 启动探针 `dev-rviz-readonly-1` 因缺少其私有 reset_time 服务权限
+失败；补充仅该服务 reply 和点云订阅后，`dev-rviz-readonly-2` 在 Enforce 下实际
+运行 10 秒并退出、销毁本探针登记凭据。该探针是无车辆的构造验证，不代表已
+读取真实 SLAM/点云，也不是完整 G 组。没有新增 viewer Goal/运动发布权限。
+
+全量回归第 8 份日志记录 665 项中的 7 个错误：旧测试直接构造 Driver 的内存
+装配没有可选维护属性，新的诊断读取抛异常。已将可选诊断读取修为缺失时 None，
+保留原测试与断言；后续全量结果单独记录，不覆盖该失败日志。
+
+当前仍有关键 E 组失败，完整 A–I 两轮与全部真实旧阶段回归尚未完成，因此不能
+给出 READY FOR RE-AUDIT。详见 `static-development-audit.json` 与各独立 run 目录。
+
+## 用户暂停时的 Git 检查点（2026-10-27）
+
+用户要求先暂停，再提交当前成果。本轮作为未完成 Phase 5 的开发检查点提交，
+不代表全阶段完成或 READY FOR RE-AUDIT。当前结论仍为 **FAIL**：静态绕障存在
+原有 200 ms AP 证据期限触发的失败，动态障碍、统一生产装配、Web/RViz 完整集成、
+记录回放和两轮完整 A–I/旧阶段真实回归尚未完成。
+
+最近全量单元为 `native-navigation-full-regression-9.log`：665 项、74.394 秒、OK。
+最新代码真实空旷目标正向对照 `dev-native-reach-current-1` 通过：目标 (1.5, 0) m，
+实际 (1.79198, -0.000094) m，距离误差约 0.292 m，停车约 0.00388 m/s；预备阶段
+实际车辆控制 Writer 为 0 次。全程 2,794 次实际 Writer 中，2,541 次只读 TIMESYNC、
+4 次 COMMAND_LONG、249 次 setpoint/stop；不能把查询统计成车辆控制。
+运行输入冻结未变，车辆控制仍由既有安全链执行。
+
+暂停后的只读清理检查覆盖本轮 14 个静态场景、2 个独立 RViz 启动探针和上述
+空旷正向对照，共 17 个目录：登记临时凭据无残留；仿真剩余进程组为空、端口
+释放已确认。历史证据未覆盖。当前代码与最新空旷运行的源码/测试/配置输入
+快照一致；文档更新不属于执行输入。原始运行记录的 HEAD/dirty 状态保持原样，
+不追改为提交后的状态。检查点提交可由本节所在 Git 提交准确定位。
