@@ -60,11 +60,17 @@ def edge_checks(page,lab):
     apply(draft([dict(id='n1',type='Timeout',timeout_s=1,children=['n2']),dict(id='n2',type='Wait',duration_s=.1,children=[])]))
     page.locator('[data-node-id="n1"]').click();page.locator('#connect-nodes').click()
     expect(page.locator('#notice')).to_contain_text('上限')
+    apply(draft([dict(id='n1',type='Action',action='Goto',action_version='1.0.0',parameters={},children=[])]))
+    page.locator('[data-node-id="n1"]').click()
+    for button in ('validate','save','start'):
+        page.locator('#'+button).click()
+        expect(page.locator('#notice')).to_contain_text('请填写东向位置')
+    assert 'x_m' not in json.loads(page.locator('#json').input_value())['nodes'][0]['parameters']
     assert not mutations and not lab.missions.views() and not lab.runtime.views()
     page.locator('#json').fill(original);page.locator('#apply-json').click()
     page.locator('#json').locator('..').locator('summary').click()
     return ['Action/Wait outgoing disabled','imported leaf children retained and blocked before validate/save/start',
-        'explicit disconnect repairs edge','cycle rejected','shared child rejected','child capacity enforced']
+        'explicit disconnect repairs edge','cycle rejected','shared child rejected','child capacity enforced','blank required coordinates blocked before Mission submission']
 
 
 def run(directory):
@@ -138,6 +144,23 @@ def run(directory):
             page.locator('#action').select_option('Goto@1.0.0')
             expect(page.locator('#parameters label').first).to_contain_text('东向位置')
             assert page.locator('#parameters [name="x_m"]').count()==1
+            # Blank required coordinates must never become an implicit (0,0)
+            # motion submission, even with the per-Action SEND box checked.
+            submissions=[]
+            page.on('request',lambda r:submissions.append(r.url) if r.method=='POST' and '/api/manual/action' in r.url else None)
+            assert page.locator('#parameters [name="x_m"]').input_value()==''
+            assert page.locator('#parameters [name="x_m"]').evaluate('(e)=>e.required')
+            page.locator('#send').check();page.locator('#execute').click()
+            expect(page.locator('#notice')).to_contain_text('请填写东向位置')
+            page.locator('#parameters [name="x_m"]').fill('0');page.locator('#execute').click()
+            expect(page.locator('#notice')).to_contain_text('请填写北向位置')
+            page.locator('#parameters [name="y_m"]').fill('0')
+            page.locator('#parameters [name="x_m"]').fill('')
+            page.locator('#parameters [name="x_m"]').press('e')
+            page.locator('#execute').click()
+            expect(page.locator('#notice')).to_contain_text('需要有效数字')
+            assert not submissions and not lab.runtime.views() and not driver.writes
+            page.locator('#send').uncheck()
             expect(page.locator('#send')).not_to_be_checked();expect(page.locator('#manual-send')).not_to_be_checked()
             expect(page.locator('#status')).to_contain_text('状态新鲜度')
             expect(page.locator('#status')).to_contain_text('未知')
@@ -152,7 +175,7 @@ def run(directory):
             assert not errors,errors
             result.update(passed=True,javascript_errors=errors,writer_calls=len(driver.writes),
                 localized_node_types=10,responsive_widths=[1680,1280,1024,390],
-                machine_identifiers_preserved=True,send_defaults_false=True,wait_mission='SUCCEEDED')
+                machine_identifiers_preserved=True,send_defaults_false=True,blank_coordinates_blocked_before_submission=True,wait_mission='SUCCEEDED')
         except Exception as exc:
             result['error']=type(exc).__name__+': '+str(exc)
             page.screenshot(path=str(directory/'failure.png'),full_page=True,mask=[page.locator('#token')])

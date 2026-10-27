@@ -17,8 +17,11 @@ def main(*,studio=False):
     parser.add_argument('--allow-send',action='store_true',help='deployment SEND only; every writing Action additionally needs allow_send=true')
     parser.add_argument('--port',type=int,default=8780 if studio else 8770);parser.add_argument('--data-dir',type=Path,default=Path('runtime/mission-control' if studio else 'runtime/action-lab'))
     parser.add_argument('--token-file',type=Path,required=True)
+    parser.add_argument('--qgc-monitor-port',type=int,help='receive-only loopback UDP telemetry mirror; QGC commands are not forwarded')
     parser.add_argument('--initialize-provider-registry',action='store_true',help='explicit one-time trusted Mission deployment bootstrap; never recovery')
     args=parser.parse_args();drivers={};lab=server=None
+    if args.qgc_monitor_port is not None and not 1024<=args.qgc_monitor_port<=65535:
+        parser.error('QGC monitor port must be within 1024..65535')
     if args.initialize_provider_registry:
         if not studio:parser.error('provider bootstrap only belongs to the Mission deployment entry')
         from vehicle_autonomy.engine.action.provider_identity import ProviderRegistry
@@ -36,7 +39,14 @@ def main(*,studio=False):
             from vehicle_autonomy.vehicles.rover.ardupilot_commands import ArduRoverCommandTranslator
             from vehicle_autonomy.vehicles.plane.ardupilot_commands import ArduPlaneCommandTranslator
             translator={'rover':ArduRoverCommandTranslator,'copter':ArduPilotCommandTranslator,'plane':ArduPlaneCommandTranslator}[kind](mode_ids=profile.mode_ids)
-            drivers[target]=VehicleActionDriver(target,profile,translator,proof,allow_send=args.allow_send)
+            factory=None
+            if args.qgc_monitor_port is not None:
+                from vehicle_autonomy.vehicles.ardupilot.transports.bytes import TcpByteTransport
+                from vehicle_autonomy.vehicles.ardupilot.transports.monitor import TelemetryMirror
+                from vehicle_autonomy.vehicles.ardupilot.mavlink.monitor import MonitorFramer
+                def factory(host,port,*,timeout_s):
+                    return TelemetryMirror(TcpByteTransport.connect(host,port,timeout_s=timeout_s),args.qgc_monitor_port,frames=MonitorFramer().feed)
+            drivers[target]=VehicleActionDriver(target,profile,translator,proof,allow_send=args.allow_send,transport_factory=factory)
         if studio:
             from vehicle_autonomy.app.web.mission_control import MissionControl,MissionControlServer
             lab=MissionControl(drivers,args.data_dir)

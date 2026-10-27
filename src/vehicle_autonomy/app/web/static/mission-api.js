@@ -67,11 +67,22 @@ window.VAF = {
         if(property.maximum!==undefined) input.max=property.maximum;
         if(input.type==='number') input.step=property.type==='integer'?'1':'any';
       }
-      input.name=name; input.title=property.description || '';
+      input.name=name; input.title=property.description || '';input.required=(schema.required||[]).includes(name);
       if(property.const!==undefined) input.disabled=true;
-      const read=()=>property.enum?JSON.parse(input.value):input.type==='checkbox'?input.checked:input.type==='number'?Number(input.value):input.value;
+      const read=()=>property.enum?JSON.parse(input.value):input.type==='checkbox'?input.checked:input.type==='number'?(input.validity?.badInput?NaN:input.value.trim()===''?undefined:Number(input.value)):input.value;
       values[name]=read(); input.addEventListener('change',()=>{ values[name]=read(); if(onChange)onChange(); });
       label.append(input); container.append(label);
+    }
+  },
+  validateParameters(schema,values,allowQueries=false) {
+    for(const [name,p] of Object.entries(schema.properties||{})){
+      const value=values[name],missing=value===undefined||value===null||value==='';
+      if(missing){if((schema.required||[]).includes(name))throw Error('请填写'+this.fieldLabel(name)+'。');continue;}
+      if(allowQueries&&typeof value==='object'&&value.$query)continue;
+      if(p.type==='number'||p.type==='integer'){
+        if(typeof value!=='number'||!Number.isFinite(value)||(p.type==='integer'&&!Number.isInteger(value)))throw Error(this.fieldLabel(name)+'需要有效数字。');
+        if((p.minimum!==undefined&&value<p.minimum)||(p.maximum!==undefined&&value>p.maximum))throw Error(this.fieldLabel(name)+'超出允许范围。');
+      }
     }
   },
   guard(fn) { return async (...args)=>{try {document.querySelector('#notice').textContent=''; return await fn(...args);}catch(e){this.report(e);}}; }

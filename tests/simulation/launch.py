@@ -4,14 +4,11 @@ from __future__ import annotations
 
 from dataclasses import replace
 import hashlib
-import math
 from datetime import datetime, timezone
 import json
 import os
 from pathlib import Path
 import signal
-import secrets
-from vehicle_autonomy.vehicles.ardupilot.mavlink.signing import ReceiveSigning
 import socket
 import subprocess
 import time
@@ -54,7 +51,10 @@ def output(command: list[str], cwd: Path = ROOT) -> str:
     return result.stdout.strip()
 
 
-class OwnedSimulation:
+from vehicle_autonomy.app.bootstrap.simulation_provisioning import SimulationProvisioning
+
+
+class OwnedSimulation(SimulationProvisioning):
     def __init__(self, run_dir: Path, kind: str, *, rover_model='target_rover', rover_actuation='baseline', confirmation_signing=False, rover_native_rtl=False):
         if rover_model not in ('target_rover','compact_rover'):raise ValueError('unregistered owned Rover fixture')
         if rover_actuation not in ('baseline','low_rate'):raise ValueError('unregistered actuation fixture')
@@ -179,83 +179,6 @@ class OwnedSimulation:
             time.sleep(.1)
         raise TimeoutError("owned SITL TCP listener unavailable")
 
-    def provision_receive_signing(self, suffix):
-        """Public non-actuator protocol setup, ONLY our fresh loopback SITL.
-
-        No EEPROM inspection or control commands. Never record SETUP_SIGNING
-        frames, keys, or its parsed secret_key payload in logs/manifests.
-        """
-        from pymavlink.dialects.v20 import ardupilotmega as mav
-        self.signing_key = secrets.token_bytes(32)
-        seed = int((time.time() - 1420070400) * 100000)
-        self.receive_signing = ReceiveSigning(self.signing_key, initial_timestamp=seed)
-        peer = mav.MAVLink(None, srcSystem=250, srcComponent=191)
-        parser = mav.MAVLink(None)
-        parser.robust_parsing = True  # channel 0 may contain startup console text
-        seen = []; setup = requested = False
-        with socket.create_connection(('127.0.0.1', self.port), timeout=1) as connection:
-            end = time.monotonic() + 25
-            while time.monotonic() < end:
-                self.assert_alive()
-                try:
-                    data = connection.recv(4096)
-                except socket.timeout:
-                    continue
-                if not data:
-                    raise ConnectionError('owned signing setup connection closed')
-                for message in parser.parse_buffer(data) or []:
-                    if message.get_type() == 'BAD_DATA':
-                        continue
-                    if (message.get_srcSystem(),message.get_srcComponent()) != (1,1):
-                        continue
-                    if not setup:
-                        if message.get_type() != 'HEARTBEAT':
-                            continue
-                        if message.base_mode & 128:
-                            raise RuntimeError('signing provisioning requires unarmed owned SITL')
-                        connection.sendall(peer.setup_signing_encode(1,1,self.signing_key,seed).pack(peer))
-                        peer.seq = (peer.seq+1)&255
-                        setup = True
-                        continue
-                    stamp = self.receive_signing.verify(message,system=1,component=1)
-                    if stamp is None:
-                        continue
-                    if message.get_type() in ('HEARTBEAT','COMMAND_ACK'):
-                        seen.append(dict(type=message.get_type(), timestamp=stamp,
-                            raw_hex=bytes(message.get_msgbuf()).hex(), payload=message.to_dict()))
-                    if message.get_type() == 'HEARTBEAT' and not requested:
-                        # Request HEARTBEAT, a read-only protocol query, to
-                        # verify downlink ACK signing without a vehicle effect.
-                        connection.sendall(peer.command_long_encode(1,1,512,0,0,0,0,0,0,0,0).pack(peer))
-                        requested = True
-                if any(x['type']=='HEARTBEAT' for x in seen) and any(x['type']=='COMMAND_ACK' and x['payload']['command']==512 for x in seen):
-                    break
-            else:
-                raise TimeoutError('BLOCKED: actual signed HEARTBEAT and read-only ACK missing')
-        # Separate, standard pymavlink verifier cross-check of actual wire bytes.
-        independent = mav.MAVLink(None)
-        independent.signing.secret_key = self.signing_key
-        independent.signing.timestamp = seed
-        for item in seen:
-            decoded = independent.parse_buffer(bytes.fromhex(item['raw_hex']))
-            if not decoded or not decoded[0].get_signed():
-                raise AssertionError('independent pymavlink signature verification failed')
-        self.signing_config_path = self.run_dir / ('receive-signing'+suffix+'.private')
-        with os.fdopen(os.open(self.signing_config_path,os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600),'w') as private:
-            self.credentials.register_private(self.signing_config_path.name, private.fileno())
-            self._save()  # persist ownership BEFORE writing any credential
-            json.dump(dict(key=self.signing_key.hex(),floor=self.receive_signing.watermark),private)
-        proof = dict(method='public SETUP_SIGNING + read-only MAV_CMD_REQUEST_MESSAGE',
-                     independent_pymavlink_verified=True, initial_timestamp=seed, frames=seen)
-        (self.run_dir / ('signing-support'+suffix+'.json')).write_text(json.dumps(proof,indent=2))
-        self.manifest.setdefault('signing_epochs',[]).append(dict(initial_timestamp=seed,
-            key_sha256=hashlib.sha256(self.signing_key).hexdigest(),proof='signing-support'+suffix+'.json',
-            receiver='MAC first, pinned (1,1,0), retained 48-bit watermark'))
-        if not suffix:
-            from vehicle_autonomy.app.bootstrap.action_ownership import initialize_receive_floor
-            initialize_receive_floor(self.run_dir,self.signing_key,self.receive_signing.watermark)
-        self._save()
-
     def verify_plane_parameters(self):
         """Read-only public parameter echo; no EEPROM or key inspection."""
         expected = {"RTL_ALTITUDE": 50., "TKOFF_ALT": 50., "AUTOLAND_WP_ALT": 40.,
@@ -263,37 +186,6 @@ class OwnedSimulation:
                     "FENCE_ENABLE": 1., "FENCE_TYPE": 3., "FENCE_ACTION": 1.,
                     "FENCE_RADIUS": 2000., "FENCE_ALT_MAX": 150., "FENCE_ALT_MAX_TP": 1.}
         self.verify_parameters(expected, 'plane_parameter_readback')
-
-    def verify_parameters(self, expected, label):
-        from pymavlink.dialects.v20 import ardupilotmega as mav
-        peer = mav.MAVLink(None, srcSystem=250, srcComponent=191)
-        parser = mav.MAVLink(None); parser.robust_parsing = True
-        observed = {}
-        with socket.create_connection(('127.0.0.1',self.port),timeout=1) as connection:
-            for name in expected:
-                connection.sendall(peer.param_request_read_encode(1,1,name.encode(),-1).pack(peer))
-                peer.seq=(peer.seq+1)&255
-            end=time.monotonic()+15
-            while time.monotonic()<end and observed.keys()!=expected.keys():
-                self.assert_alive()
-                try: data=connection.recv(8192)
-                except socket.timeout: continue
-                if not data: raise ConnectionError('parameter readback connection closed')
-                for message in parser.parse_buffer(data) or []:
-                    if message.get_type()=='BAD_DATA': continue
-                    if self.receive_signing.verify(message,system=1,component=1) is None: continue
-                    if message.get_type()!='PARAM_VALUE': continue
-                    name=str(message.param_id).rstrip('\0')
-                    if name in expected:
-                        value=float(message.param_value)
-                        if not math.isfinite(value) or abs(value-expected[name])>1e-6:
-                            raise RuntimeError('owned simulation parameter readback mismatch: '+name)
-                        observed[name]=value
-        if observed.keys()!=expected.keys(): raise TimeoutError('owned simulation parameter readback incomplete')
-        self.manifest[label] = observed
-        # Provisioning floor must include all verified traffic, including reads.
-        self.signing_config_path.write_text(json.dumps(dict(key=self.signing_key.hex(),floor=self.receive_signing.watermark)))
-        self._save()
 
     def assert_alive(self):
         for process, _, record in self.processes:
@@ -346,7 +238,7 @@ class OwnedSimulation:
             self.manifest['ephemeral_signing_config_removed'] = True
         finally:
             # Drop parent references; Python bytes cannot promise RAM zeroization.
-            self.signing_key = self.receive_signing = None
+            self.signing_key = self.receive_signing = self._setup_protocol = None
             self.manifest["ended_at"] = datetime.now(timezone.utc).isoformat()
             self._save()
         if not self.manifest["ports_released"] or remaining or errors:

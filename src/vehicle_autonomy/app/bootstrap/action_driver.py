@@ -39,6 +39,7 @@ class VehicleActionDriver:
         self.events=event_sink or (lambda e:None)
         if source_time_sync and ownership.manifest.get('phase5_clock_uart_baud')!={'SERIAL0_BAUD':115.}:raise ValueError('clock sync requires public owned SERIAL0 baud proof')
         self._runtime=SimulationRuntime(profile,translator=translator,receive_signing=ownership.receive_signing,source_time_sync=source_time_sync,time_sync_uart_baud=115200 if source_time_sync else None,
+            target_system=getattr(ownership,'manifest',{}).get('system_id',1),
             event_sink=self._event,transport_factory=transport_factory,motion_guard=lambda command,state,now:self._ownership_reason() or (None if self._native_input_fence is None else self._native_input_fence.validate(command,state,now,self._runtime.world_snapshot())))
         if self._native_input_fence is not None:self._native_input_fence.bind_authority(self._runtime.authority)
         self.clock=self._runtime.clock

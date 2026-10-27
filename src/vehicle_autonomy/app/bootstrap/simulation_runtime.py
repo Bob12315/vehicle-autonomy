@@ -74,6 +74,7 @@ class SimulationRuntime:
                  receive_signing: ReceiveSigning | None = None,
                  source_time_sync: bool = False,
                  time_sync_uart_baud: int | None = None,
+                 target_system: int = 1,
                  sleep: Callable[[float], None] = time.sleep) -> None:
         if not isinstance(profile, SimulationProfile):
             raise TypeError("validated SimulationProfile required")
@@ -82,6 +83,9 @@ class SimulationRuntime:
         if translator.vehicle_kind != profile.kind:
             raise ValueError("translator and vehicle profile must match")
         self.profile = profile
+        if type(target_system) is not int or not 1 <= target_system <= 255:
+            raise ValueError('explicit MAVLink target system within 1..255 required')
+        self._target_system = target_system
         self.clock = clock or (lambda: TimePoint(time.monotonic_ns(), datetime.now(timezone.utc),
                                                  profile.clock_domain_id))
         self._transport_factory = transport_factory or TcpByteTransport.connect
@@ -183,7 +187,7 @@ class SimulationRuntime:
         transport = self._transport_factory(self.profile.host, self.profile.port,
                                             timeout_s=io_timeout_s)
         codec = MavlinkCodec(source_system=250, source_component=191,
-                             target_system=1, target_component=1, receive_signing=self._receive_signing)
+                             target_system=self._target_system, target_component=1, receive_signing=self._receive_signing)
         port = ArduPilotCommandPort(authority=self.authority, transport=transport, codec=codec,
                                     translator=self._translator, now=self.clock,
                                     stop_speed_tolerance=0.1 if self.profile.kind == "rover" else 0.05,
@@ -196,7 +200,7 @@ class SimulationRuntime:
             expected_vehicle_type=self.profile.mav_type,
             state_factory=lambda session_id: ({"rover": RoverTelemetryState, "plane": PlaneTelemetryState}.get(self.profile.kind, ArduPilotTelemetryState))(
                 vehicle_id=self.profile.vehicle_id, generation_id=str(session_id),
-                link_session_id=session_id, source_system=1, source_component=1,
+                link_session_id=session_id, source_system=self._target_system, source_component=1,
                 max_sample_skew_ns=500_000_000,
                 max_field_age_ns=self.profile.safety.max_snapshot_age_ns,
                 link_timeout_ns=self.profile.link_timeout_ns),

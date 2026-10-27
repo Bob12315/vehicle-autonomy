@@ -129,9 +129,9 @@ UNKNOWN/UNCONFIRMED 和飞行资源约束。完成本阶段后停止，等待独
   --run-dir artifacts/phase4-mission/acceptance-UNIQUE
 ```
 
-## 人工 QGC 仿真环境
+## 仿真与 Web 基础控制
 
-三个独立启动入口，默认打开 Gazebo；在本机 QGC 使用 UDP 14550：
+三个独立启动入口，默认同时启动 Gazebo、SITL 和当前 Phase 4 Web 程序：
 
 ```bash
 ./scripts/start_rover_sim.sh   # 汽车
@@ -139,9 +139,13 @@ UNKNOWN/UNCONFIRMED 和飞行资源约束。完成本阶段后停止，等待独
 ./scripts/start_plane_sim.sh   # ~/twin-fixedwing 双发固定翼
 ```
 
-这是独立的人工地面站测试环境，不启动框架任务或 Phase 5，不自动解锁/运动。
-每次使用新状态，Ctrl+C 仅关闭本次自有进程。环境、QGC 配置及模型来源见
-[三车型启动说明](docs/simulation/qgc-start.md)。
+Web 控制页依次为 `http://127.0.0.1:8780/control`、`:8781/control`、`:8782/control`。
+终端打印访问令牌文件路径；粘贴令牌后连接，等待定位有效，再逐次授权操作。
+汽车支持按住前进/转向、松开停止及返航测试。QGC 在 UDP 14550 接收遥测，
+默认不转发 QGC 指令；如需原先的独立 QGC 控制，给脚本加 `--qgc-only`。
+不接入 Phase 5，不自动解锁/运动。Ctrl+C 关闭本次自有程序和仿真，清理临时凭据。
+操作步骤与机型语义见 [Web 基础控制说明](docs/simulation/program-start.md)；
+独立 QGC 模式及模型来源见 [QGC 启动说明](docs/simulation/qgc-start.md)。
 
 ## Phase 5 开发状态
 

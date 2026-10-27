@@ -14,6 +14,7 @@ $('#target').onchange=api.guard(async()=>{await stop();await catalog();await pol
 $('#execute').onclick=api.guard(async()=>{
  const s=chosen();if(!s)return;
  if(s.kind==='Continuous'&&s.name!=='Hold')throw Error('持续输入请使用右侧按住操控；Hold 可通过 Action Lab 有界执行。');
+ api.validateParameters(s.parameters,parameters);
  const p={name:s.name,version:s.version,target:api.target,parameters,allow_send:$('#send').checked};
  const continuation=$('#continuation').value.trim();if(continuation)p.continuation_of=continuation;
  $('#send').checked=false;const a=await api.call('/api/manual/action',p);$('#log').textContent=JSON.stringify(a,null,2);await poll();

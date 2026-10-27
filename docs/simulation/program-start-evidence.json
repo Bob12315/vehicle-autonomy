@@ -1,0 +1,268 @@
+{
+  "scope": "Current Phase 4 Web plus owned Gazebo/SITL startup; Rover real Chrome and independent Gazebo basic-control acceptance. No Phase 5 integration or Copter/Plane flight acceptance.",
+  "phase5": false,
+  "runs": {
+    "rover": {
+      "result": "artifacts/simulation/web-launch-acceptance/rover-result.json",
+      "session": "artifacts/simulation/web-launch-acceptance/rover/session.json",
+      "checks": {
+        "kind": "rover",
+        "motion": true,
+        "gui": true,
+        "read_only": false,
+        "passed": true,
+        "initial_state": {
+          "kind": "rover",
+          "session_id": "e366d447e179440499ee1fef7c71f644",
+          "verified_frames": 24,
+          "fresh_vehicle_state": true,
+          "system_send": false,
+          "action_send": false,
+          "deployment_send": true
+        },
+        "default_action_send": "REJECTED",
+        "qgc_monitor": {
+          "system_id": 1,
+          "signed_types": [
+            "AHRS",
+            "AHRS2",
+            "ATTITUDE",
+            "GLOBAL_POSITION_INT",
+            "GPS_GLOBAL_ORIGIN",
+            "HEARTBEAT",
+            "HOME_POSITION",
+            "PARAM_VALUE",
+            "STATUSTEXT"
+          ],
+          "request_forwarded": false
+        },
+        "physical": {
+          "managed_inputs": [
+            {
+              "name": "forward",
+              "measured": 0.35888019084999473,
+              "state": "CANCELLED",
+              "stop_speed_mps": 0.0016192212168643976,
+              "stop_yaw_rate_rad_s": 3.0558550243036044e-09
+            },
+            {
+              "name": "turn",
+              "measured": 0.30798255739223773,
+              "state": "CANCELLED",
+              "stop_speed_mps": 4.089465158476151e-06,
+              "stop_yaw_rate_rad_s": 1.622086467618067e-05
+            }
+          ],
+          "goto_error_m": 0.2772921712216071,
+          "home_error_m": 0.7047929840656758,
+          "home_speed_mps": 0.0057423507503922815,
+          "javascript_errors": []
+        },
+        "cleanup": {
+          "remaining_process_groups": [],
+          "cleanup_errors": [],
+          "credentials_removed": true
+        }
+      },
+      "gazebo_resource_errors": false,
+      "original_inputs_unchanged": true
+    },
+    "copter": {
+      "result": "artifacts/simulation/web-launch-acceptance/copter-result.json",
+      "session": "artifacts/simulation/web-launch-acceptance/copter/session.json",
+      "checks": {
+        "kind": "copter",
+        "motion": false,
+        "gui": true,
+        "read_only": false,
+        "passed": true,
+        "initial_state": {
+          "kind": "copter",
+          "session_id": "2cf7c357d5ca46658fcedd94612c6826",
+          "verified_frames": 33,
+          "fresh_vehicle_state": true,
+          "system_send": false,
+          "action_send": false,
+          "deployment_send": true
+        },
+        "default_action_send": "REJECTED",
+        "qgc_monitor": {
+          "system_id": 2,
+          "signed_types": [
+            "AHRS2",
+            "ATTITUDE",
+            "GLOBAL_POSITION_INT",
+            "GPS_GLOBAL_ORIGIN",
+            "HEARTBEAT",
+            "HOME_POSITION",
+            "LOCAL_POSITION_NED",
+            "PARAM_VALUE",
+            "SIMSTATE",
+            "STATUSTEXT"
+          ],
+          "request_forwarded": false
+        },
+        "cleanup": {
+          "remaining_process_groups": [],
+          "cleanup_errors": [],
+          "credentials_removed": true
+        }
+      },
+      "gazebo_resource_errors": false,
+      "original_inputs_unchanged": true
+    },
+    "plane": {
+      "result": "artifacts/simulation/web-launch-acceptance/plane-result.json",
+      "session": "artifacts/simulation/web-launch-acceptance/plane/session.json",
+      "checks": {
+        "kind": "plane",
+        "motion": false,
+        "gui": true,
+        "read_only": false,
+        "passed": true,
+        "initial_state": {
+          "kind": "plane",
+          "session_id": "239ae0cd375942458c1c6c9a18479d9a",
+          "verified_frames": 28,
+          "fresh_vehicle_state": true,
+          "system_send": false,
+          "action_send": false,
+          "deployment_send": true
+        },
+        "default_action_send": "REJECTED",
+        "qgc_monitor": {
+          "system_id": 3,
+          "signed_types": [
+            "AHRS2",
+            "ATTITUDE",
+            "GLOBAL_POSITION_INT",
+            "GPS_GLOBAL_ORIGIN",
+            "HEARTBEAT",
+            "PARAM_VALUE",
+            "SERVO_OUTPUT_RAW",
+            "STATUSTEXT"
+          ],
+          "request_forwarded": false
+        },
+        "cleanup": {
+          "remaining_process_groups": [],
+          "cleanup_errors": [],
+          "credentials_removed": true
+        }
+      },
+      "gazebo_resource_errors": false,
+      "original_inputs_unchanged": true
+    },
+    "rover-read-only": {
+      "result": "artifacts/simulation/web-launch-acceptance/rover-read-only-result.json",
+      "session": "artifacts/simulation/web-launch-acceptance/rover-read-only/session.json",
+      "checks": {
+        "kind": "rover",
+        "motion": false,
+        "gui": false,
+        "read_only": true,
+        "passed": true,
+        "initial_state": {
+          "kind": "rover",
+          "session_id": "ccac550d03b346e79491868b327b01e2",
+          "verified_frames": 24,
+          "fresh_vehicle_state": true,
+          "system_send": false,
+          "action_send": false,
+          "deployment_send": false
+        },
+        "default_action_send": "REJECTED",
+        "read_only_action_send": "REJECTED",
+        "qgc_monitor": {
+          "system_id": 1,
+          "signed_types": [
+            "AHRS",
+            "AHRS2",
+            "ATTITUDE",
+            "GLOBAL_POSITION_INT",
+            "GPS_GLOBAL_ORIGIN",
+            "HEARTBEAT",
+            "HOME_POSITION",
+            "PARAM_VALUE",
+            "STATUSTEXT"
+          ],
+          "request_forwarded": false
+        },
+        "cleanup": {
+          "remaining_process_groups": [],
+          "cleanup_errors": [],
+          "credentials_removed": true
+        }
+      },
+      "gazebo_resource_errors": false,
+      "original_inputs_unchanged": true
+    }
+  },
+  "qgc_compatibility": {
+    "kind": "rover",
+    "gui": false,
+    "passed": true,
+    "requested_parameters": {
+      "MAV_SYSID": 1.0
+    },
+    "armed": false,
+    "duplicate_rejected_without_stopping_owner": true,
+    "message_types": [
+      "AHRS",
+      "AHRS2",
+      "ATTITUDE",
+      "GLOBAL_POSITION_INT",
+      "GPS_GLOBAL_ORIGIN",
+      "HEARTBEAT",
+      "HOME_POSITION",
+      "PARAM_VALUE",
+      "STATUSTEXT"
+    ],
+    "heartbeat_type": 10,
+    "model": "target_rover",
+    "source_model": "/home/level6/vehicle-autonomy-framework/simulation/models/target_rover/model.sdf",
+    "original_inputs_unchanged": true,
+    "gazebo_resource_errors": false,
+    "remaining_process_groups": [],
+    "cleanup_errors": [],
+    "launcher_exit": 0
+  },
+  "browser_regression": {
+    "passed": true,
+    "source": "real Chrome / isolated HTTP / no vehicle transport",
+    "edge_guards": [
+      "Action/Wait outgoing disabled",
+      "imported leaf children retained and blocked before validate/save/start",
+      "explicit disconnect repairs edge",
+      "cycle rejected",
+      "shared child rejected",
+      "child capacity enforced",
+      "blank required coordinates blocked before Mission submission"
+    ],
+    "javascript_errors": [],
+    "writer_calls": 0,
+    "localized_node_types": 10,
+    "responsive_widths": [
+      1680,
+      1280,
+      1024,
+      390
+    ],
+    "machine_identifiers_preserved": true,
+    "send_defaults_false": true,
+    "blank_coordinates_blocked_before_submission": true,
+    "wait_mission": "SUCCEEDED"
+  },
+  "unit": {
+    "command": ".venv-migration/bin/python -m unittest discover -s tests -v",
+    "passed": true,
+    "tests": 669,
+    "seconds": 74.628,
+    "log": "artifacts/simulation/web-launch-unit-verified.log"
+  },
+  "limits": [
+    "QGC mirror display parser checks framing/CRC and signature flag; only the Web runtime verifies MAC and persists receive floors.",
+    "Only Rover movement was exercised. Copter and twin Plane startup/authenticated state were checked; their flight behavior is not accepted by these checks.",
+    "Native Plane RTL confirmation does not claim physical arrival/landing; existing UNCONFIRMED semantics remain."
+  ]
+}

@@ -16,6 +16,10 @@ function clearConnection(){connecting=null;$('#connect-nodes').textContent='连�
 function checkDraftChildren(){
  // Early editor feedback only; the server still validates the complete graph.
  for(const n of draft.nodes){
+  if(n.type==='Action'){
+   const spec=api.catalog.find(s=>s.name===n.action&&s.version===n.action_version);
+   if(spec)api.validateParameters(spec.parameters,n.parameters||{},true);
+  }
   if((n.children||[]).length>childLimits[n.type]){
    const message=childLimits[n.type]===0?childHint(n):nodeName(n)+'最多允许 '+childLimits[n.type]+' 个子节点，请在属性中断开多余连线。';
    $('#validation').textContent=message;throw Error(message);

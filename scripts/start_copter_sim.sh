@@ -5,4 +5,4 @@ vaf_python="${VAF_PYTHON:-$vaf_root/.venv/bin/python}"
 if [[ ! -x "$vaf_python" && -z "${VAF_PYTHON:-}" ]]; then
   vaf_python="$vaf_root/.venv-migration/bin/python"
 fi
-exec "$vaf_python" -m vehicle_autonomy.app.bootstrap.qgc_simulation "$@" --kind copter
+exec "$vaf_python" -m vehicle_autonomy.app.bootstrap.qgc_simulation --allow-send "$@" --kind copter

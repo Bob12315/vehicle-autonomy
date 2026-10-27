@@ -1,8 +1,8 @@
-"""Explicit local Gazebo/SITL sessions controlled by the operator's QGC.
+"""One owned local Gazebo/SITL and the current Phase 4 Web application.
 
-This launcher creates no framework Runtime, Action, authority or command port.
-SITL's native UDP serial endpoint is the only ground-station connection. It
-never arms, starts a mission, writes parameters over MAVLink or opens hardware.
+Web Actions retain the sole vehicle writer; QGC receives telemetry only.
+--qgc-only explicitly selects the former standalone ground-station mode.
+Startup never arms, starts a mission, sends motion or opens hardware.
 External model/ArduPilot/plugin trees are read-only inputs; all generated
 models, parameters, EEPROM, logs and process records belong to a fresh run.
 """
@@ -20,11 +20,14 @@ import shutil
 import signal
 import socket
 import subprocess
+import sys
 import time
 from uuid import uuid4
 import xml.etree.ElementTree as ET
 
 from vehicle_autonomy._resources import resource_root
+from vehicle_autonomy.app.bootstrap.simulation_credentials import OwnedCredentials
+from vehicle_autonomy.app.bootstrap.simulation_provisioning import SimulationProvisioning
 
 
 @dataclass(frozen=True)
@@ -148,14 +151,32 @@ def environment(root, model, partition):
     return env
 
 
-class Session:
+class Session(SimulationProvisioning):
     def __init__(self, directory, env, manifest):
         self.directory, self.env, self.manifest = directory, env, manifest
+        self.run_dir = directory
+        self.system_id = manifest['system_id']
+        self.port = 5760 + 10 * manifest['instance']
+        self.credentials = OwnedCredentials(directory, manifest) if manifest['framework_runtime'] else None
         self.processes = []
         self.save()
 
     def save(self):
         (self.directory / 'session.json').write_text(json.dumps(self.manifest, indent=2) + '\n')
+        if self.manifest['framework_runtime']:
+            owned = dict(self.manifest, processes=[p for p in self.manifest['processes']
+                                                   if p['name'] in ('sitl', 'gazebo')])
+            (self.directory / 'manifest.json').write_text(json.dumps(owned, indent=2) + '\n')
+
+    _save = save
+
+    def assert_alive(self):
+        owned = [(p, r) for p, _, r in self.processes if r['name'] in ('sitl', 'gazebo')]
+        if {r['name'] for _, r in owned} != {'sitl', 'gazebo'}:
+            raise RuntimeError('one live owned simulation required')
+        for process, record in owned:
+            if process.poll() is not None or os.getpgid(process.pid) != record['pgid']:
+                raise RuntimeError('owned simulation ended')
 
     def start(self, name, command, cwd=None, *, transient=False):
         log = (self.directory / (name + '.log')).open('w')
@@ -167,6 +188,7 @@ class Session:
             log.close()
             raise
         record = dict(name=name, pid=process.pid, pgid=process.pid, command=command, transient=transient,
+                      cwd=str(cwd or self.directory), exit_code=None,
                       start_ticks=Path(f'/proc/{process.pid}/stat').read_text().rsplit(')', 1)[1].split()[19])
         self.processes.append((process, log, record))
         self.manifest['processes'].append(record)
@@ -204,7 +226,7 @@ class Session:
                 except ProcessLookupError:
                     pass
                 try:
-                    process.wait(timeout=8)
+                    process.wait(timeout=40 if record['name'] == 'application' else 8)
                 except subprocess.TimeoutExpired:
                     os.killpg(process.pid, signal.SIGKILL)
                     process.wait(timeout=5)
@@ -233,6 +255,12 @@ class Session:
             remaining.append(process.pid)
         if remaining:
             errors.append('remaining_process_groups')
+        if self.credentials is not None and not errors:
+            try:
+                self.credentials.destroy()
+                self.signing_key = self.receive_signing = self._setup_protocol = None
+            except Exception as exc:
+                errors.append('credential_cleanup:' + type(exc).__name__)
         self.manifest.update(ready=False, ended_at=datetime.now(timezone.utc).isoformat(),
                              remaining_process_groups=remaining, cleanup_errors=errors)
         self.save()
@@ -246,14 +274,23 @@ def main():
     parser.add_argument('--headless', action='store_true', help='Do not open the Gazebo GUI')
     parser.add_argument('--check', action='store_true', help='Validate local inputs without starting anything')
     parser.add_argument('--qgc-port', type=int, default=14550, help='QGC UDP listener on 127.0.0.1')
+    parser.add_argument('--qgc-only', action='store_true', help='standalone QGC control, without the Web application')
+    parser.add_argument('--read-only', action='store_true', help='start Web with deployment SEND disabled')
+    parser.add_argument('--allow-send', action='store_true', help='authorize this local simulation deployment; each Action still needs its own SEND')
+    parser.add_argument('--web-port', type=int, help='loopback Web port; defaults: Rover 8780, Copter 8781, Plane 8782')
     parser.add_argument('--duration', type=float, help='Optional finite smoke-test duration in seconds')
     parser.add_argument('--run-dir', type=Path, help='Fresh output directory; never reuse EEPROM/state')
     parser.add_argument('--ardupilot-root', type=Path)
     parser.add_argument('--plugin-root', type=Path, default=Path.home() / 'gz_ws/src/ardupilot_gazebo')
     parser.add_argument('--twin-root', type=Path, default=Path.home() / 'twin-fixedwing')
     args = parser.parse_args()
+    if args.qgc_only and args.read_only:
+        parser.error('--read-only belongs to Web mode; --qgc-only explicitly enables independent QGC control')
     if not 1024 <= args.qgc_port <= 65535:
         parser.error('--qgc-port must be within 1024..65535')
+    web_port = args.web_port if args.web_port is not None else {'rover': 8780, 'copter': 8781, 'plane': 8782}[args.kind]
+    if not 1024 <= web_port <= 65535:
+        parser.error('--web-port must be within 1024..65535')
     if args.duration is not None and not 1 <= args.duration <= 86400:
         parser.error('--duration must be within 1..86400 seconds')
     root = resource_root()
@@ -262,13 +299,23 @@ def main():
         ardupilot = Path.home() / 'ardupilot'
     model = resolve_model(root, args.kind, ardupilot.expanduser().resolve(),
                           args.plugin_root.expanduser().resolve(), args.twin_root.expanduser().resolve())
+    if not args.qgc_only and model.kind == 'plane':
+        from dataclasses import replace
+        model = replace(model, parameters=(*model.parameters, root / 'simulation/params/twin_plane_control.parm'))
     session = None
     lock = None
     try:
         inputs = preflight(model, args.headless or args.check)
+        if not args.qgc_only:
+            for port in (web_port, 5760 + 10 * model.instance):
+                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as probe:
+                    probe.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                    probe.bind(('127.0.0.1', port))
         if args.check:
             print(json.dumps(dict(kind=model.kind, model=model.name, valid=True,
-                                  source_model=str(model.model), qgc=f'127.0.0.1:{args.qgc_port}')))
+                                  source_model=str(model.model), qgc=f'127.0.0.1:{args.qgc_port}',
+                                  framework_runtime=not args.qgc_only, phase5=False,
+                                  web=None if args.qgc_only else f'http://127.0.0.1:{web_port}/control')))
             return 0
         lock_root = root / 'runtime/qgc-simulation'
         lock_root.mkdir(parents=True, exist_ok=True, mode=0o700)
@@ -288,8 +335,12 @@ def main():
                         source_world=str(model.world), inputs_sha256=inputs,
                         world=world_name, partition=partition, fdm_port=model.fdm_port,
                         instance=model.instance, system_id=model.system_id,
-                        qgc_host='127.0.0.1', qgc_port=args.qgc_port, framework_runtime=False,
-                        phase5=False, automatic_commands=False, ready=False, processes=[],
+                        qgc_host='127.0.0.1', qgc_port=args.qgc_port, framework_runtime=not args.qgc_only,
+                        qgc_role='control' if args.qgc_only else 'telemetry_only',
+                        ports={'tcp': 5760 + 10 * model.instance},
+                        binary_path=str(model.binary), binary_sha256=inputs[str(model.binary)],
+                        phase5=False, automatic_motion=False, ready=False, processes=[],
+                        setup_protocol='none' if args.qgc_only else 'fresh signing and read-only protocol queries',
                         started_at=datetime.now(timezone.utc).isoformat())
         session = Session(directory, env, manifest)
 
@@ -305,22 +356,87 @@ def main():
             if model.twin_root:
                 server.append('--headless-rendering')
             session.start('gazebo', server + [str(world_path)])
-            aircraft = directory / 'aircraft'
-            aircraft.mkdir(mode=0o700)
+            if session.credentials is not None:
+                aircraft = session.credentials.create_state('')
+                session.save()
+            else:
+                aircraft = directory / 'aircraft'
+                aircraft.mkdir(mode=0o700)
             session.start('sitl', [str(model.binary), '--model', 'JSON', '--speedup', '1',
                                   '--home=-35.363262,149.165237,584,90',
                                   '--defaults', ','.join(map(str, params)),
                                   '--sim-address=127.0.0.1', f'-I{model.instance}',
                                   '--sysid', str(model.system_id),
-                                  '--serial0', f'udpclient:127.0.0.1:{args.qgc_port}',
+                                  '--serial0', f'udpclient:127.0.0.1:{args.qgc_port}' if args.qgc_only else 'tcp:0',
                                   '--serial1', 'none', '--serial2', 'none'], cwd=aircraft)
             if not args.headless:
                 session.start('gui', ['gz', 'sim', '-g', '-v3'])
+            if not args.qgc_only:
+                print('Preparing authenticated telemetry for the Web application...', flush=True)
+                deadline = time.monotonic() + 25
+                while True:
+                    session.assert_alive()
+                    try:
+                        with socket.create_connection(('127.0.0.1', session.port), timeout=.2):
+                            break
+                    except OSError:
+                        if time.monotonic() > deadline:
+                            raise RuntimeError('SITL TCP endpoint did not start')
+                        time.sleep(.2)
+                session.provision_receive_signing('')
+                if model.kind == 'rover':
+                    session.verify_parameters(dict(RTL_SPEED=.5, WP_SPEED=.5, WP_RADIUS=.2,
+                                                   WP_PIVOT_ANGLE=45, WP_PIVOT_RATE=30), 'rover_parameter_readback')
+                elif model.kind == 'plane':
+                    session.verify_parameters(dict(SERVO3_FUNCTION=73, SERVO6_FUNCTION=74,
+                        SERVO3_MIN=1000, SERVO3_MAX=2000, SERVO3_TRIM=1000,
+                        SERVO6_MIN=1000, SERVO6_MAX=2000, SERVO6_TRIM=1000,
+                        AIRSPEED_CRUISE=12, AIRSPEED_MIN=7, AIRSPEED_MAX=20,
+                        FENCE_ENABLE=1, FENCE_RADIUS=2000, FENCE_ALT_MAX=150, RTL_ALTITUDE=50), 'plane_parameter_readback')
+                command = [sys.executable, '-m', 'vehicle_autonomy.app.web.mission_cli',
+                    '--simulation', f'{model.kind}={directory / "manifest.json"}',
+                    '--port', str(web_port), '--data-dir', str(directory / 'application'),
+                    '--token-file', str(directory / 'web-token.private'),
+                    '--qgc-monitor-port', str(args.qgc_port)]
+                import secrets
+                token_path = directory / 'web-token.private'
+                with os.fdopen(os.open(token_path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600), 'w') as token:
+                    session.credentials.register_private(token_path.name, token.fileno())
+                    session.save()
+                    token.write(secrets.token_urlsafe(32) + '\n')
+                if args.allow_send and not args.read_only:
+                    command.append('--allow-send')
+                from vehicle_autonomy.engine.action.provider_identity import ProviderRegistry
+                registry = ProviderRegistry()
+                if not registry.root.exists() and not registry.anchor().path.exists():
+                    command.append('--initialize-provider-registry')
+                application = session.start('application', command)
+                import urllib.request
+                deadline = time.monotonic() + 30
+                while True:
+                    session.assert_alive()
+                    if application.poll() is not None:
+                        raise RuntimeError('Web application exited; see application.log')
+                    try:
+                        with urllib.request.urlopen(f'http://127.0.0.1:{web_port}/control', timeout=.5) as response:
+                            if response.status == 200:
+                                break
+                    except OSError:
+                        if time.monotonic() > deadline:
+                            raise RuntimeError('Web application did not become available; see application.log')
+                        time.sleep(.2)
+                session.manifest.update(web_url=f'http://127.0.0.1:{web_port}/control',
+                    token_file=str(directory / 'web-token.private'), deployment_send=args.allow_send and not args.read_only)
             session.manifest['ready'] = True
             session.save()
             print(f'{model.kind}: {model.name}; QGC UDP 127.0.0.1:{args.qgc_port}; system ID {model.system_id}', flush=True)
             print(f'Logs/state: {directory}', flush=True)
-            print('Waiting for QGC. Allow sensor/EKF initialization; use QGC to operate. Ctrl+C stops this session.', flush=True)
+            if args.qgc_only:
+                print('Waiting for QGC. Allow sensor/EKF initialization; use QGC to operate. Ctrl+C stops this session.', flush=True)
+            else:
+                print(f'Web: {session.manifest["web_url"]}', flush=True)
+                print(f'Access token file: {directory / "web-token.private"} (paste into Web; never published)', flush=True)
+                print('Wait for fresh EKF/state, then authorize each Web Action. QGC is telemetry-only. Ctrl+C closes this session.', flush=True)
             started = time.monotonic()
             while args.duration is None or time.monotonic() - started < args.duration:
                 for process, _, record in session.processes:

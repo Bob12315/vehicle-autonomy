@@ -29,7 +29,7 @@ def run(kind, directory, *, gui=False):
     result = dict(kind=kind, gui=gui, passed=False, requested_parameters={}, armed=False)
     log_path = directory.parent / (directory.name + '-launcher.log')
     log_path.parent.mkdir(parents=True, exist_ok=True)
-    command = [str(ROOT / f'scripts/start_{kind}_sim.sh'), '--qgc-port', str(port),
+    command = [str(ROOT / f'scripts/start_{kind}_sim.sh'), '--qgc-only', '--qgc-port', str(port),
                '--run-dir', str(directory)]
     if not gui:
         command.append('--headless')

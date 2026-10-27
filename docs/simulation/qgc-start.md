@@ -1,4 +1,7 @@
-# 三车型 QGC 仿真启动
+# 三车型独立 QGC 仿真启动（`--qgc-only`）
+
+启动脚本现在默认还启动 Web；本页描述显式 `--qgc-only` 的原有独立模式。
+Web 操作见 [当前程序基础控制](program-start.md)。
 
 用于人工检查 Gazebo + ArduPilot SITL 环境。三个启动文件互相独立，默认打开
 Gazebo 画面。车辆操作由用户在 QGroundControl 中执行，不启动框架 Web、Mission、
@@ -7,9 +10,9 @@ Action 或 Phase 5，不连接实车，不自动解锁、起飞或运行任务�
 在仓库根目录运行任意一个：
 
 ```bash
-./scripts/start_rover_sim.sh
-./scripts/start_copter_sim.sh
-./scripts/start_plane_sim.sh
+./scripts/start_rover_sim.sh --qgc-only
+./scripts/start_copter_sim.sh --qgc-only
+./scripts/start_plane_sim.sh --qgc-only
 ```
 
 | 启动文件 | 模型 | QGC 系统 ID | SITL instance / JSON UDP |
@@ -52,16 +55,16 @@ Action 或 Phase 5，不连接实车，不自动解锁、起飞或运行任务�
 
 ```bash
 # 只检查文件、二进制和端口，不启动仿真
-./scripts/start_plane_sim.sh --check
+./scripts/start_plane_sim.sh --qgc-only --check
 
 # 后台计算环境，不打开 Gazebo 窗口；仍在本终端运行，Ctrl+C 停止
-./scripts/start_copter_sim.sh --headless
+./scripts/start_copter_sim.sh --qgc-only --headless
 
 # QGC 自定义监听端口时同步指定
-./scripts/start_rover_sim.sh --qgc-port 14560
+./scripts/start_rover_sim.sh --qgc-only --qgc-port 14560
 
 # 覆盖只读输入位置
-./scripts/start_plane_sim.sh --twin-root /path/to/twin-fixedwing \
+./scripts/start_plane_sim.sh --qgc-only --twin-root /path/to/twin-fixedwing \
   --ardupilot-root /path/to/ardupilot --plugin-root /path/to/ardupilot_gazebo
 ```
 
@@ -84,10 +87,10 @@ Action 或 Phase 5，不连接实车，不自动解锁、起飞或运行任务�
 `SERVO6_FUNCTION=74`。这些检查不操作解锁、模式、起飞、运动或参数写入，
 也不冒充用户后续的 QGC 人工运行/飞行验收。
 
-本次三个默认 GUI 启动分支均完成真实遥测/参数读取、资源加载错误检查、重复启动
+首次实现（提交 `41af096`）的三个 GUI 启动分支均完成真实遥测/参数读取、资源加载错误检查、重复启动
 拒绝和 SIGTERM 清理。原始运行位于 `artifacts/simulation/qgc-launch-final/`，
 源码摘要和结果索引见 [验证记录](qgc-start-evidence.json)。本次没有在 QGC 界面解锁或飞行。
-完成该实现后的全量单元回归为 665 项通过，75.202 秒；日志保存在该证据根的 `unit.log`。
+当时完成该实现后的全量单元回归为 665 项通过，75.202 秒；日志保存在该证据根的 `unit.log`。
 
 早期固定翼运行仅通过链路检查，随后日志复核发现外部旧载荷插件依赖缺失的
 `libprotobuf.so.23`，因此不作为完整启动通过证据。旧原件保留；改为本次运行目录
