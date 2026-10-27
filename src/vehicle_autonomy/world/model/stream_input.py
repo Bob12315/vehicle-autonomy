@@ -32,7 +32,7 @@ class WorkerStreamInput:
         info=self.root.stat()
         if not stat.S_ISDIR(info.st_mode) or info.st_uid!=os.getuid() or stat.S_IMODE(info.st_mode)&0o077:raise ValueError('private owned worker root required')
         self.identity=(info.st_dev,info.st_ino);self.frames=dict(frames);self.max_age=max_age_ns;self.generation=None;self.registered=set();self.last_seen={};self.error=None
-    def poll(self,now):
+    def poll(self,now,*,clock=None):
         try:
             info=self.root.stat()
             if self.root.resolve()!=self.root or (info.st_dev,info.st_ino)!=self.identity:raise ValueError('worker directory identity changed')
@@ -44,9 +44,17 @@ class WorkerStreamInput:
                 if len(raw)>262144:raise ValueError('worker metadata budget')
                 data=json.loads(raw)
             finally:os.close(fd)
+            # Metadata can be atomically published AFTER the poll began.
+            # Check freshness against a post-read time; never rewrite sample
+            # capture/receipt facts or tolerate a genuinely future producer.
+            if clock is not None:
+                checked=clock()
+                if not isinstance(checked,TimePoint) or checked.elapsed_ns_since(now)<0:raise ValueError('reader clock regressed')
+                now=checked
             if data['schema']!=1 or data['source_id']!=self.source_id or data['source_kind']!='simulation' or data['origin_id']!=self.origin_id or data['ap_world_epoch']!=self.origin_id:
                 raise ValueError('worker source or AP frame epoch mismatch')
-            if data['error'] is not None or not 0<=now.monotonic_ns-data['published_ns']<=500_000_000:raise ValueError('worker unavailable or stale')
+            if data['error'] is not None:raise ValueError('worker unavailable: '+str(data['error'])[:256])
+            if not 0<=now.monotonic_ns-data['published_ns']<=500_000_000:raise ValueError('worker heartbeat stale/future: age_ns='+str(now.monotonic_ns-data['published_ns']))
             if self.generation is not None and data['generation']!=self.generation:raise ValueError('worker restarted; source readmission required')
             if set(data['streams'])-self.frames.keys():raise ValueError('unknown worker streams')
             candidates=[]

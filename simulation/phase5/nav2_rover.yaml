@@ -22,7 +22,7 @@ controller_server:
       yaw_goal_tolerance: 0.15
       trans_stopped_velocity: 0.05
       rot_stopped_velocity: 0.05
-      stateful: true
+      stateful: false
     FollowPath:
       plugin: dwb_core::DWBLocalPlanner
       debug_trajectory_details: false

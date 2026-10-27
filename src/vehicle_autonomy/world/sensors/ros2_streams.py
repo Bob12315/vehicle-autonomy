@@ -73,7 +73,7 @@ def main():
     from rosgraph_msgs.msg import Clock as RosClock
     from nav_msgs.msg import Odometry
     from geometry_msgs.msg import TransformStamped
-    from tf2_ros import Buffer,TransformListener,TransformBroadcaster,StaticTransformBroadcaster
+    from tf2_ros import TransformBroadcaster,StaticTransformBroadcaster
     stop=False
     def finish(*_):
         nonlocal stop
@@ -87,7 +87,6 @@ def main():
         def __init__(self):
             super().__init__('vaf_world_streams',parameter_overrides=[Parameter('use_sim_time',value=True)])
             self.pending={key:deque(maxlen=8 if key=='scan' else 2) for key in ('camera','scan','cloud','imu')};self.latest={};self.counts={};self.drops={};self.last_source={};self.enqueued_stamp={};self.last_pose=None;self.fault=None;self.frame_epoch=None;self.last_clock=None;self.intrinsics=None;self.scan_wait=None;self.last_tf_ros=None
-            self.buffer=Buffer(node=self);self.listener=TransformListener(self.buffer,self)
             self.tf=TransformBroadcaster(self);self.static=StaticTransformBroadcaster(self)
             self.odom=self.create_publisher(Odometry,'/odom',qos)
             self.scan=self.create_publisher(LaserScan,'/scan',qos)
@@ -107,7 +106,6 @@ def main():
                 t.transform.translation.x,t.transform.translation.y,t.transform.translation.z=xyz
                 t.transform.rotation.x,t.transform.rotation.y,t.transform.rotation.z,t.transform.rotation.w=xyzw
                 transforms.append(t)
-                self.buffer.set_transform_static(t,'owned-calibration')
             # TRANSIENT_LOCAL retains the complete calibrated tree in one sample.
             # DDS authentication may finish after the first publications.
             self.static.sendTransform(transforms)
@@ -146,7 +144,7 @@ def main():
             yaw=math.atan2(2*(qq['w']*qq['z']+qq['x']*qq['y']),1-2*(qq['y']**2+qq['z']**2))
             msg.twist.twist.linear.x=math.cos(yaw)*linear['x']+math.sin(yaw)*linear['y'];msg.twist.twist.linear.y=-math.sin(yaw)*linear['x']+math.cos(yaw)*linear['y'];msg.twist.twist.linear.z=linear['z'];msg.twist.twist.angular.z=angular['z']
             t=TransformStamped();t.header=msg.header;t.child_frame_id='base_link';t.transform.translation.x,t.transform.translation.y,t.transform.translation.z=msg.pose.pose.position.x,msg.pose.pose.position.y,msg.pose.pose.position.z;t.transform.rotation=msg.pose.pose.orientation
-            self.odom.publish(msg);self.tf.sendTransform(t);self.buffer.set_transform(t,'authenticated-ap-source');self.last_tf_ros=ros;self.last_pose=capture['monotonic_ns'];self.counts['odom']=self.counts.get('odom',0)+1
+            self.odom.publish(msg);self.tf.sendTransform(t);self.last_tf_ros=ros;self.last_pose=capture['monotonic_ns'];self.counts['odom']=self.counts.get('odom',0)+1
         def consume(self,key,m,received,capture):
             frame={'camera':('camera_optical','camera_optical'),'scan':('laser','FLU'),'cloud':('lidar3d','FLU'),'imu':('imu_frd','FRD')}[key]
             kind={'camera':DataKind.IMAGE,'scan':DataKind.SCAN,'cloud':DataKind.CLOUD,'imu':DataKind.IMU}[key]
@@ -162,11 +160,10 @@ def main():
             elif key=='scan':
                 if not 1<=len(m.ranges)<=4096:raise ValueError('scan budget')
                 payload=json.dumps(dict(angle_min=float(m.angle_min),angle_increment=float(m.angle_increment),range_min=float(m.range_min),range_max=float(m.range_max),ranges=[float(v) if math.isfinite(v) else None for v in m.ranges]),allow_nan=False).encode();media='application/vnd.ros.laserscan'
-                if self.buffer.can_transform('odom','laser',rclpy.time.Time.from_msg(m.header.stamp)):
-                    relay=copy.deepcopy(m);relay.header.frame_id='laser';self.scan.publish(relay);self.scan_wait=None
-                else:
-                    self.scan_wait=dict(source_stamp=ns(m.header.stamp),tf_stamp=self.last_tf_ros)
-                    raise LookupError('time-matched scan TF unavailable')
+                # Raw calibrated scan is independent of AP odometry arrival.
+                # Keep the original sample stamp. Native TF/message filters and
+                # the separate navigation pose/transform guards do the matching.
+                relay=copy.deepcopy(m);relay.header.frame_id='laser';self.scan.publish(relay);self.scan_wait=None
             else:
                 payload=json.dumps(dict(orientation=[m.orientation.x,m.orientation.y,m.orientation.z,m.orientation.w],angular_velocity=[m.angular_velocity.x,m.angular_velocity.y,m.angular_velocity.z],linear_acceleration=[m.linear_acceleration.x,m.linear_acceleration.y,m.linear_acceleration.z]),allow_nan=False).encode();media='application/vnd.ros.imu'
             ref=store.put(payload,media,dimensions,channel=key)
@@ -174,13 +171,15 @@ def main():
             self.latest[key]=to_json_value(StreamObservation(header,ref));self.counts[key]=seq
             if key=='cloud':self.latest[key]['layout']=dict(fields=[dict(name=f.name,offset=f.offset,datatype=f.datatype,count=f.count) for f in m.fields],point_step=m.point_step,row_step=m.row_step,is_bigendian=m.is_bigendian)
         def tick(self):
-            error=self.fault
+            error=self.fault;odom_error=None
             try:
                 if error:raise ValueError(error)
                 now=time.monotonic_ns()
                 if self.last_clock is None or now-self.last_clock>500_000_000:raise ValueError('clock unavailable/paused')
-                if probe.latest is None or now-probe.latest[0]>500_000_000:raise ValueError('AP probe stale')
-                self.publish_odom(probe.latest[1])
+                try:
+                    if probe.latest is None or now-probe.latest[0]>500_000_000:raise ValueError('AP probe stale')
+                    self.publish_odom(probe.latest[1])
+                except (ValueError,LookupError) as exc:odom_error=str(exc)
                 for key,q in self.pending.items():
                     while q:
                         m,received=q[0]
@@ -198,7 +197,7 @@ def main():
                         except ValueError:q.popleft();self.drops[key]=self.drops.get(key,0)+1;continue
                         q.popleft();self.last_source[key]=source
             except (ValueError,LookupError) as exc:error=str(exc)
-            atomic_json(directory/'state.json',dict(schema=1,generation=epoch,source_kind='simulation',source_id=c['source_id'],origin_id=c['frame_epoch'],ap_world_epoch=self.frame_epoch,published_ns=time.monotonic_ns(),error=error,streams=self.latest,intrinsics=self.intrinsics,counts=self.counts,dropped=self.drops,queue_depths={k:len(v) for k,v in self.pending.items()},dropped_scope='worker reference processing only; raw ROS topics unmodified',scan_wait=self.scan_wait,last_tf_ros=self.last_tf_ros,generation_clock=None if generation is None else dict(fault=generation.fault,samples=len(generation.samples))))
+            atomic_json(directory/'state.json',dict(schema=1,generation=epoch,source_kind='simulation',source_id=c['source_id'],origin_id=c['frame_epoch'],ap_world_epoch=self.frame_epoch,published_ns=time.monotonic_ns(),error=error,odom_error=odom_error,streams=self.latest,intrinsics=self.intrinsics,counts=self.counts,dropped=self.drops,queue_depths={k:len(v) for k,v in self.pending.items()},dropped_scope='worker reference processing only; raw ROS topics unmodified',scan_wait=self.scan_wait,last_tf_ros=self.last_tf_ros,generation_clock=None if generation is None else dict(fault=generation.fault,samples=len(generation.samples))))
     node=Streams()
     try:
         while rclpy.ok() and not stop:rclpy.spin_once(node,timeout_sec=.05)

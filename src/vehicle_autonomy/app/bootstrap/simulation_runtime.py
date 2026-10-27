@@ -175,8 +175,13 @@ class SimulationRuntime:
         self.authority.set_action_send(False)
         self.authority.revoke()
         self.authority.set_link_session(None)
+        # The opt-in native-data cohort schedules at 20 ms; a 50 ms idle
+        # recv would consume its original source TTL before the queue writes.
+        # Tighten I/O blocking only for authenticated TIMESYNC composition;
+        # keep the existing profile/watchdog and default control path intact.
+        io_timeout_s=min(self.profile.period_ns / 2e9,.01) if self._source_time_sync else self.profile.period_ns / 2e9
         transport = self._transport_factory(self.profile.host, self.profile.port,
-                                            timeout_s=self.profile.period_ns / 2e9)
+                                            timeout_s=io_timeout_s)
         codec = MavlinkCodec(source_system=250, source_component=191,
                              target_system=1, target_component=1, receive_signing=self._receive_signing)
         port = ArduPilotCommandPort(authority=self.authority, transport=transport, codec=codec,

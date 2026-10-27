@@ -37,8 +37,14 @@ class TcpByteTransport:
         if isinstance(timeout_s, bool) or not isinstance(timeout_s, (int, float)) or timeout_s <= 0:
             raise ValueError("timeout must be positive")
         connection = socket.create_connection((host, port), timeout=timeout_s)
-        connection.settimeout(timeout_s)
-        return cls(connection)
+        try:
+            # Match ArduPilot's TCP UART: short control/query frames must not
+            # wait for Nagle/delayed-ACK batching. Framing/order stay unchanged.
+            connection.setsockopt(socket.IPPROTO_TCP,socket.TCP_NODELAY,1)
+            connection.settimeout(timeout_s)
+            return cls(connection)
+        except BaseException:
+            connection.close();raise
 
     def write(self, data: bytes) -> None:
         if self._closed:

@@ -108,6 +108,11 @@ class TcpFaultProxy:
             pending = []
             try:
                 upstream = socket.create_connection(("127.0.0.1", self.upstream_port), timeout=2)
+                # Transparent low-latency byte relay, matching the SITL UART.
+                # Fault delays remain explicit in the existing injection code.
+                client.setsockopt(socket.IPPROTO_TCP,socket.TCP_NODELAY,1)
+                upstream.setsockopt(socket.IPPROTO_TCP,socket.TCP_NODELAY,1)
+                self.record({'direction':'transport','tcp_nodelay_client':client.getsockopt(socket.IPPROTO_TCP,socket.TCP_NODELAY),'tcp_nodelay_upstream':upstream.getsockopt(socket.IPPROTO_TCP,socket.TCP_NODELAY)})
                 client.settimeout(.2)
                 upstream.settimeout(.2)
                 with self._lock:

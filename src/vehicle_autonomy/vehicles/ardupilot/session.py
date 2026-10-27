@@ -259,7 +259,7 @@ class ArduPilotSession:
 
     def write_next(self, now: TimePoint) -> CommandStatus | None:
         self.tick(now)
-        if self._time_sync is not None and self._session_id is not None:
+        if self._time_sync is not None and self._session_id is not None and self._commands.protocol_query_slot_available:
             nonce=self._time_sync.request_due(self._clock())
             if nonce is not None:
                 # A caller with a slow cadence must still make control progress.

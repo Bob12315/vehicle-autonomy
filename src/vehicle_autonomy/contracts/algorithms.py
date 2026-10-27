@@ -1,6 +1,6 @@
 """Algorithm capability metadata, distinct from the security ProviderRegistry."""
 from dataclasses import dataclass
-from vehicle_autonomy.contracts.action import ActionResource
+from vehicle_autonomy.contracts.action import ActionResource,ResourceMode
 from vehicle_autonomy.contracts.streams import identity
 
 
@@ -30,3 +30,7 @@ class AlgorithmProvider:
             for v in values:identity(v,name)
         if not isinstance(self.resources,tuple) or not all(isinstance(r,ActionResource) for r in self.resources):raise TypeError('typed resources required')
         if type(self.requires_motion_bridge) is not bool:raise TypeError('explicit bridge requirement required')
+
+
+# Shared conflict domain for a native navigation macro; not vehicle authority.
+NATIVE_NAVIGATION_RESOURCES=(ActionResource('vehicle.motion',ResourceMode.EXCLUSIVE,'vehicle.control'),ActionResource('navigation.native'))

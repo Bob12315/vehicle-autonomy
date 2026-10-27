@@ -22,7 +22,7 @@ from vehicle_autonomy.world.environment.resources import Environment
 
 
 class VehicleActionDriver:
-    def __init__(self,target,profile,translator,ownership,*,allow_send=False,event_sink=None,transport_factory=None,source_time_sync=False,cycle_period_ns=None):
+    def __init__(self,target,profile,translator,ownership,*,allow_send=False,event_sink=None,transport_factory=None,source_time_sync=False,cycle_period_ns=None,native_input_fence=None):
         if type(allow_send) is not bool:raise TypeError('deployment SEND must be an explicit bool')
         if profile.kind!=ownership.kind or profile.port!=ownership.port or profile.host!='127.0.0.1':
             raise ValueError('profile must exactly match the explicit owned SITL endpoint')
@@ -30,10 +30,15 @@ class VehicleActionDriver:
         self._cycle_period_ns=profile.period_ns if cycle_period_ns is None else cycle_period_ns
         if type(self._cycle_period_ns) is not int or not 0<self._cycle_period_ns<=profile.period_ns:raise ValueError('owner cadence may only be faster than the validated profile')
         if source_time_sync and self._cycle_period_ns>20_000_000:raise ValueError('clock queries need an explicit fast owner cadence')
+        if native_input_fence is not None:
+            from vehicle_autonomy.engine.navigation.write_fence import NativeNavigationWriteFence
+            if not isinstance(native_input_fence,NativeNavigationWriteFence):raise TypeError('typed native navigation data fence required')
+        self._native_input_fence=native_input_fence
         self.events=event_sink or (lambda e:None)
         if source_time_sync and ownership.manifest.get('phase5_clock_uart_baud')!={'SERIAL0_BAUD':115.}:raise ValueError('clock sync requires public owned SERIAL0 baud proof')
         self._runtime=SimulationRuntime(profile,translator=translator,receive_signing=ownership.receive_signing,source_time_sync=source_time_sync,time_sync_uart_baud=115200 if source_time_sync else None,
-            event_sink=self._event,transport_factory=transport_factory,motion_guard=lambda *_:self._ownership_reason())
+            event_sink=self._event,transport_factory=transport_factory,motion_guard=lambda command,state,now:self._ownership_reason() or (None if self._native_input_fence is None else self._native_input_fence.validate(command,state,now,self._runtime.world_snapshot())))
+        if self._native_input_fence is not None:self._native_input_fence.bind_authority(self._runtime.authority)
         self.clock=self._runtime.clock
         self._queue=Queue(maxsize=128);self._lock=RLock();self._stop=Event();self._ready=Event()
         self._world=None;self._scope=None;self._effects={};self._results={};self._effect_sessions={};self._requested_scopes=set();self._cancelled=set();self._guards={};self._home=None
@@ -112,7 +117,8 @@ class VehicleActionDriver:
         if 'RTL' not in self.profile.mode_ids:caps=caps-{'return_home','rtl'}
         return ActionContext(self.target,self.profile.kind,frozenset(caps),True,
             getattr(self,'_home',None),{'mode_ids':self.profile.mode_ids,
-                'home_source':'signed local position at completed Arm; owned flat-world AP unlocked-home convention'})
+                'home_source':'signed local position at completed Arm; owned flat-world AP unlocked-home convention',
+                'native_input_fence':None if getattr(self,'_native_input_fence',None) is None else self._native_input_fence.identity})
     def stream_ingress(self):
         return self._runtime.stream_ingress()
 

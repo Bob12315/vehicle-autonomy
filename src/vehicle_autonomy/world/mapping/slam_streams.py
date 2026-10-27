@@ -22,9 +22,11 @@ from vehicle_autonomy.world.sensors.stream_store import StreamStore
 def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--config',type=Path,required=True);a,ros_args=p.parse_known_args()
     c=json.loads(a.config.read_text())
-    if set(c)!={'schema','directory','source_id','frame_epoch','map_epoch','calibration_version'} or c['schema']!=1:raise ValueError('explicit SLAM stream profile required')
+    if set(c)-{'generation_clock_world'}!={'schema','directory','source_id','frame_epoch','map_epoch','calibration_version'} or c['schema']!=1:raise ValueError('explicit SLAM stream profile required')
     root=Path(c['directory']);root.mkdir(mode=0o700,parents=True,exist_ok=True)
     store=StreamStore(root/'payloads',slots=6,max_bytes=2_000_000);epoch=uuid4().hex;clock=RosClockBridge()
+    from vehicle_autonomy.world.sensors.simulation_time import SimulationGenerationClock
+    generation=SimulationGenerationClock(c['generation_clock_world']) if 'generation_clock_world' in c else None
     import rclpy
     from rclpy.node import Node
     from rclpy.parameter import Parameter
@@ -54,7 +56,7 @@ def main():
             self.create_subscription(RosClock,'/clock',self.on_clock,qos)
             self.create_subscription(RosGrid,'/map',lambda m:self.enqueue('map',m),maps)
             self.create_subscription(PoseWithCovarianceStamped,'/pose',lambda m:self.enqueue('slam_pose',m),10)
-            self.create_timer(.04,self.tick,clock=Clock(clock_type=ClockType.STEADY_TIME))
+            self.create_timer(.01 if generation else .04,self.tick,clock=Clock(clock_type=ClockType.STEADY_TIME))
         def on_clock(self,m):
             if clock.observe(ns(m.clock),time.monotonic_ns()):self.fault='clock epoch changed; explicit readmission required'
             self.clock_host=clock.pairs[-1][1] if clock.pairs else None
@@ -126,7 +128,7 @@ def main():
                         m,received=q[0];source=ns(m.header.stamp)
                         if source<=self.last_source.get(key,-1) or now-received>500_000_000:q.popleft();self.dropped[key]=self.dropped.get(key,0)+1;continue
                         try:
-                            capture=clock.to_host(source)
+                            capture=generation.lower_bound(source,at(now),strict_previous=True).monotonic_ns if generation else clock.to_host(source)
                             if capture>received:
                                 if capture-received>20_000_000:raise ValueError('clock/source chronology')
                                 capture=received
@@ -140,6 +142,7 @@ def main():
     try:
         while rclpy.ok() and not stopped:rclpy.spin_once(node,timeout_sec=.05)
     finally:
+        if generation:generation.close()
         node.destroy_node()
         if rclpy.ok():rclpy.shutdown()
         atomic_json(root/'stopped.json',dict(stopped=True,generation=epoch,at_ns=time.monotonic_ns()))

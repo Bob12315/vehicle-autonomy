@@ -129,6 +129,13 @@ UNKNOWN/UNCONFIRMED 和飞行资源约束。完成本阶段后停止，等待独
   --run-dir artifacts/phase4-mission/acceptance-UNIQUE
 ```
 
+## Phase 5 开发状态
+
+通用 World/Sensor、真实 SLAM/YOLO 和原生 Nav2 受控 Rover 桥正在开发。
+空旷目标已有真实开发验证，**完整 Phase 5 尚未完成**；默认入口没有开放
+未经验收的实机运动。进度、失败原件和剩余强制验收见
+[Phase 5 报告](docs/PHASE5_WORLD_AND_NAVIGATION_REPORT.md)。
+
 ## 当前实现
 
 根目录目前提供 P1 基础合同、P2 离线 World Model 状态链、P3 Typed Action/Mission 决策链、P4 控制边界、P5 ArduCopter/MAVLink/TCP 插件，以及 P6 本机 SITL 单进程模式任务运行组合。通用 TransformTree 求解静态/动态 Frame 关系。P5 已在内存传输、本机 Copter SITL 和已连接 Copter 飞控的受限 USB 模式诊断中验证；此前还完成 Rover 飞控的受限 USB HOLD 诊断。P6 将 Effect 经双 SEND、Lease、Safety 和唯一 writer 分派，并等待 ACK 与后续模式状态。新增显式机载只读部署、认证 Web 控制台和 LLM 提案适配；**尚无经过整车安全验收的生产运动连接**。

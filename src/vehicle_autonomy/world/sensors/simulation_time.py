@@ -20,9 +20,9 @@ class SimulationGenerationClock:
         self.topic='/world/'+world+'/clock'
         if subscribe:
             from gz.msgs10.clock_pb2 import Clock
-            from gz.transport13 import Node
-            self.node=Node()
-            if not self.node.subscribe(Clock,self.topic,self._receive):raise RuntimeError('owned public Gazebo clock unavailable')
+            from gz.transport13 import Node,SubscribeOptions
+            self.node=Node();options=SubscribeOptions();options.msgs_per_sec=100
+            if not self.node.subscribe(Clock,self.topic,self._receive,options):raise RuntimeError('owned public Gazebo clock unavailable')
     def _receive(self,m):
         before=time.monotonic_ns();utc=time.time_ns();after=time.monotonic_ns()
         self.observe(m.sim.sec*1_000_000_000+m.sim.nsec,m.system.sec*1_000_000_000+m.system.nsec,after,utc,offset_interval=(before-utc,after-utc))

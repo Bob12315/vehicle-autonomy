@@ -27,6 +27,7 @@ def profiles(namespace):
     base('smoother','velocity_smoother',pub=[ns+'/cmd_vel_smoothed'],sub=[ns+'/cmd_vel_nav'])
     base('collision','collision_monitor',pub=[ns+'/cmd_vel_final',ns+'/collision_state',ns+'/collision_polygon',ns+'/collision_monitor/collision_points_marker'],sub=[ns+'/cmd_vel_smoothed'])
     base('navigator','bt_navigator',pub=[ns+'/behavior_tree_log'],sub=[ns+'/goal_pose',ns+'/controller_selector',ns+'/planner_selector'],execute=['navigate_to_pose'],call=['navigate_to_pose','compute_path_to_pose','compute_path_through_poses','follow_path','spin','backup','wait'],reply=[ns+'/bt_navigator_navigate_to_pose_rclcpp_node/*'],request=[ns+'/is_path_valid',ns+'/local_costmap/clear_entirely_local_costmap',ns+'/global_costmap/clear_entirely_global_costmap'])
-    add('manager','/vaf_native_manager',sub=common+scan+['/pose',ns+'/cmd_vel_nav',ns+'/cmd_vel_smoothed',ns+'/cmd_vel_final',ns+'/plan'],call=[ns+'/'+x for x in ('navigate_to_pose','wait','compute_path_to_pose')],request=lifecycle)
+    add('manager','/vaf_native_manager',sub=common+scan+['/pose',ns+'/cmd_vel_nav',ns+'/cmd_vel_smoothed',ns+'/cmd_vel_final',ns+'/plan'],call=[ns+'/'+x for x in ('navigate_to_pose','wait','compute_path_to_pose','follow_path')],request=lifecycle)
+    add('world_reader','/vaf_slam_streams',sub=common+['/map','/pose'],reply=['/tf2_frames'])
     add('viewer','/vaf_readonly_viewer',sub=common+scan+['/pose','/phase5/camera/image_raw',ns+'/plan',ns+'/local_plan'])
     return result

@@ -138,6 +138,15 @@ class ArduPilotCommandPort:
         with self._authority.lock:
             return self._statuses.get(command_id)
 
+    @property
+    def protocol_query_slot_available(self):
+        # Optional read-only queries must not compete with queued control or
+        # its ACK. After ACK they resume: fresh source bounds are still
+        # needed while waiting for independently authenticated vehicle state.
+        with self._authority.lock:
+            pending=set(self._inflight.values())|set(self._state_pending.values())|{i for i in self._queue if self._ack_id.get(i) is not None}
+            return not any(self._statuses[i].phase in (CommandPhase.ACCEPTED,CommandPhase.TRANSMITTED) for i in pending)
+
     def write_timesync(self,nonce):
         """Whitelisted read-only protocol query through this SAME sole writer.
 

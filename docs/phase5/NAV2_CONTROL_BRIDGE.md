@@ -20,7 +20,7 @@ ActionDecision.valid_until 只会缩短既有 TTL/deadline，不会授予或延�
 旧身份、错误时域、关闭后输出，以及回调耗时后实际 Driver dispatch 为 0。
 `bridge-unit-590.log`：590 项完整单元通过。真实 Writer 与三车型物理回归仍须正式执行。
 
-## 原生链路开发验证（未完成车辆桥）
+## 原生链路早期开发验证
 
 `phase5_nav2_chain` 实际启动 native Planner、DWB Controller、Velocity Smoother、
 Collision Monitor、Behavior Server 和 BT Navigator。`dev-nav2-chain-5/6` 在
@@ -38,7 +38,7 @@ NavigationMailbox 均有固定容量和 200 ms 原始源年龄上限。
 当前时刻外推 TF 的 base_shift_correction，采用保守扩大 footprint/stop
 polygon。实际车辆桥启用前必须验证签名观测速度 <=0.4 m/s、偏航率
 <=0.45 rad/s；300 ms 内的平移及车体旋转不确定性 <0.25 m 额外包络。
-目前尚无实际运动桥，不能把该配置声称为已通过物理导航验收。
+早期记录未包含运动桥。后续开发桥已实际接入，但尚不能把该配置声称为已通过完整物理导航验收。
 
 真实全图 SROS2 Enforce 权限正在验证。固定角色分别约束 raw/smoothed/final
 发布、管理 Goal 和只读 viewer；命名空间本身不构成认证。早期全图启动失败
@@ -49,4 +49,40 @@ polygon。实际车辆桥启用前必须验证签名观测速度 <=0.4 m/s、偏
 而是在真实 Wait 子目标运行期间等待通道建立后再正常取消以取得新零速。
 只读 viewer 的最终发布/Goal 客户端均由实际 middleware 拒绝，
 管理客户端仅一个 Navigate Goal，原始 producer 时间限定的最终控制持续有效。
-所有运行清理凭据、进程组和端口。仍未装配实际车辆桥，不能声明 Phase 5 完成。
+所有运行清理凭据、进程组和端口。该检查点没有装配实际车辆桥，不能声明 Phase 5 完成。
+
+
+## 受控运动桥开发增量
+
+当前新增 Rover 专用 NativeRoverNavigation，沿用同一个 ActionRuntime、
+RoverStream、Execution、Authority 与 Writer。NativeNavigationJob 在现有
+P3 外部生命周期登记后才启动原生 cohort；与车辆 Typed Effect 分别证明退出。
+实际写入时还重新验证固定的扫描、原生位姿/变换/地图、AP Session 和运动界限。
+所有源期限仍为原值；等待、重读元数据、准备 Goal 和重新接收均不能续期。
+详细来源与退出合同见 [NATIVE_SOURCE_AND_EXIT.md](NATIVE_SOURCE_AND_EXIT.md)。
+
+本轮开发中发现并修正元数据读取起点与并发发布的竞态、可选认证时钟路径
+50 ms 空闲读取阻塞、初始加密通道建立时的旧零速，以及逻辑结果早于 DDS
+进程退出的问题。逻辑结果可触发车辆停车，但整个 cohort 未安全结束时，
+外部资源仍被占用。控制器的准备阶段只接受真实零速且禁止任何车辆 Effect；
+新的当前位姿 FollowPath 准备只在前一个原生结果确定成功后才能再次提交。
+正式 Navigate Goal 仍只有一个，不重试 UNKNOWN。
+
+原生 StoppedGoalChecker 的 stateful=false，位置 0.25 m、角度 0.15 rad、
+停止速度 0.05 的参数保持不变；持续检查 XY，以避免首次进入范围后漂出仍
+被原生检查器接受。依据为 [Nav2 1.3.13 SimpleGoalChecker 官方源码](https://raw.githubusercontent.com/ros-navigation/navigation2/1.3.13/nav2_controller/plugins/simple_goal_checker.cpp)。
+应用另以独立新鲜 World 位姿核查目标，原生 SUCCEEDED 不足以宣告成功。
+
+开发失败原件保留：dev-native-motion-9/10 的数据失效、11 的过期写入拒绝、
+12 的未生效接触 Topic、13 的时钟查询暂停范围错误、14 的位姿过期、
+15 的独立目标证据不足、16 的首个运动爬升拒绝、17 的结果传播延迟。
+所有实际无效指令继续被拒绝；失败没有改成 PASS。
+真实 Gazebo Contact 插件的 Topic 在 contact/topic，不能以配置存在代替
+实际接触数据。原生接口依据为 [Gazebo Contact 实现](https://raw.githubusercontent.com/gazebosim/gz-sim/gz-sim8/src/systems/contact/Contact.cc)。
+接触计数包含全部实际报文；地面日志有 50 Hz 抽样及 32 MiB 上限，原始
+计数、被抽样数量和未知实体都另记，任何探针错误使验收失败。
+
+独立 wheel 开发检查 dev-native-wheel-1 已验证安装目录、既有 Web 默认无
+车辆入口和实际安装的 C++ 源码编译；后续正式受测提交还须重建验证。
+上述均为开发证据，完整 A–I、两轮正式仿真、Mission/Web/Provider 装配及
+旧阶段完整回归尚未完成。

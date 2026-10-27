@@ -39,9 +39,13 @@ def bridge_config(path,world):
 
 
 class SensorFixture(MissionFixture):
-    def __init__(self,path,source_time_sync=False,secure=False,**kwargs):
-        super().__init__(path,'rover',driver_options={'source_time_sync':source_time_sync,'cycle_period_ns':20_000_000 if source_time_sync else None},**kwargs);self.collector=None;self.source_time_sync=source_time_sync;self.secure=secure;self.security_environment={}
+    def __init__(self,path,source_time_sync=False,secure=False,native_input_fence=None,contact_evidence=False,**kwargs):
+        super().__init__(path,'rover',driver_options={'source_time_sync':source_time_sync,'cycle_period_ns':20_000_000 if source_time_sync else None,'native_input_fence':native_input_fence},**kwargs);self.collector=None;self.source_time_sync=source_time_sync;self.secure=secure;self.security_environment={}
         sensors(self.owned)
+        self.contacts=None;self.contact_topics=()
+        if contact_evidence:
+            from tests.simulation.phase5_contacts import attach_contacts
+            self.contact_topics=attach_contacts(self.owned)
         from tests.simulation.phase5_setup import telemetry_rates
         original_start=self.owned.start
         def start_owned():
@@ -59,6 +63,9 @@ class SensorFixture(MissionFixture):
         os.environ['PYTHONPATH']=str(ROOT/'src')+os.pathsep+os.environ.get('PYTHONPATH','')
         os.environ['ROS_DOMAIN_ID']=str(120+os.getpid()%80)
         super().start();f=self;path=self.path
+        if self.contact_topics:
+            from tests.simulation.phase5_contacts import ContactOracle
+            self.contacts=ContactOracle(self.contact_topics,path)
         if self.secure:
             from vehicle_autonomy.app.bootstrap.navigation_security import profiles
             auth=f.owned.credentials.create_state('_phase5_dds');f.owned._save()
@@ -85,13 +92,14 @@ class SensorFixture(MissionFixture):
         (path/'streams').mkdir(mode=0o700)
         frames={name:FrameDescriptor(frame,convention,config['frame_epoch']) for name,frame,convention in
             [('camera','camera_optical','camera_optical'),('scan','laser','FLU'),('cloud','lidar3d','FLU'),('imu','imu_frd','FRD')]}
-        self.collector=StreamCollector(f.driver,path/'streams',source_id=config['source_id'],origin_id=config['frame_epoch'],calibration_version=config['calibration_version'],frames=frames)
+        self.collector=StreamCollector(f.driver,path/'streams',source_id=config['source_id'],origin_id=config['frame_epoch'],calibration_version=config['calibration_version'],frames=frames,poll_period_s=.01 if self.source_time_sync else .05)
         f.ros_start('world-streams',[str(ROOT/'scripts/with_ros2.sh'),'/usr/bin/python3','-m','vehicle_autonomy.world.sensors.ros2_streams','--config',str(path/'stream-profile.json')],role='sensors')
         self.sensor_config=config
         return self
     def close(self):
         try:
             if self.collector:self.collector.close()
+            if self.contacts:self.contacts.close()
         finally:super().close()
 
 

@@ -4,7 +4,7 @@ from vehicle_autonomy.app.bootstrap.ros2_security import policy
 
 class NavigationPermissionsTests(unittest.TestCase):
     def test_final_velocity_is_exclusive_and_viewer_has_no_goal_or_motion_right(self):
-        p=profiles('/nav2_test');self.assertEqual(len(p),11)
+        p=profiles('/nav2_test');self.assertEqual(len(p),12)
         self.assertEqual([r for r,v in p.items() if '/nav2_test/cmd_vel_final' in v['topics']['publish']],['collision'])
         self.assertEqual(p['viewer']['topics']['publish'],[]);self.assertEqual(p['viewer']['actions']['call'],[])
         self.assertEqual(p['manager']['topics']['publish'],[])
