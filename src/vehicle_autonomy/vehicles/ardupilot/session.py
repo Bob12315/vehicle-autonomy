@@ -287,6 +287,9 @@ class ArduPilotSession:
     def link_snapshot(self, at_time: TimePoint):
         return None if self._state is None else self._state.link_snapshot(at_time)
 
+    def local_reference(self):
+        return None if self._state is None else self._state.local_reference()
+
     def _disconnect(self, now: TimePoint) -> None:
         # Link loss invalidates a run's authority, not just its command queue.
         # A later heartbeat may establish a new session, but cannot revive the

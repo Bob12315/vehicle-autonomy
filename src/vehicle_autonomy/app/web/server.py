@@ -46,6 +46,7 @@ class ConsoleServer(ThreadingHTTPServer):
             raise ValueError('console must bind loopback; use an authenticated SSH tunnel')
         self.service, self.token = service, token
         self.secure_cookies=False;self.browser_origin=None
+        self.visualization_token=None
         self.sessions=BrowserSessions()
         self.websocket_slots=threading.BoundedSemaphore(4)
         self.closing=threading.Event()

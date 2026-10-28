@@ -153,6 +153,10 @@ class ArduPilotTelemetryState:
         with self._lock:
             return self._monitor.publish(at_time)
 
+    def local_reference(self):
+        """No geodetic origin is retained by the generic LOCAL_POSITION_NED adapter."""
+        return None
+
     def publish(self, published_at: TimePoint) -> VehicleStateSnapshot:
         if not isinstance(published_at, TimePoint):
             raise TypeError("published_at must be TimePoint")

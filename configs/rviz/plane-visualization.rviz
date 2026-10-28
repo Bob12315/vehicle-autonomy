@@ -1,0 +1,142 @@
+Panels:
+  - Class: rviz_common/Displays
+    Name: Displays
+  - Class: rviz_common/Views
+    Name: Views
+Visualization Manager:
+  Class: ""
+  Global Options:
+    Background Color: 18; 25; 35
+    Fixed Frame: __FIXED__
+    Frame Rate: 20
+  Displays:
+    - Class: rviz_default_plugins/Grid
+      Name: Local ENU grid (not a SLAM map)
+      Enabled: true
+      Cell Size: 10
+      Plane Cell Count: 100
+      Color: 70; 85; 95
+      Alpha: 0.5
+    - Class: rviz_default_plugins/TF
+      Name: Explicit frame authority
+      Enabled: true
+      Frame Timeout: 3.0
+      Show Axes: true
+      Show Names: true
+      Show Arrows: true
+    - Class: rviz_default_plugins/MarkerArray
+      Name: Live Plane pose and velocity (expires when stale)
+      Enabled: true
+      Topic:
+        Value: __TOPIC__/markers
+        Reliability Policy: Best Effort
+        Durability Policy: Volatile
+        Depth: 5
+    - Class: rviz_default_plugins/Odometry
+      Name: Historical odometry samples (not live status)
+      Enabled: false
+      Topic:
+        Value: __TOPIC__/odometry
+        Reliability Policy: Best Effort
+        Durability Policy: Volatile
+        Depth: 5
+      Keep: 1
+      Shape: Arrow
+    - Class: rviz_default_plugins/Path
+      Name: Actual bounded Plane trajectory
+      Enabled: true
+      Topic:
+        Value: __TOPIC__/trajectory
+        Reliability Policy: Best Effort
+        Durability Policy: Volatile
+        Depth: 5
+      Buffer Length: 1
+      Color: 60; 220; 190
+      Line Style: Lines
+      Line Width: 0.05
+    - Class: rviz_default_plugins/LaserScan
+      Name: External calibrated scan
+      Enabled: __SCAN_ENABLED__
+      Topic:
+        Value: __SCAN__
+        Reliability Policy: Best Effort
+        Durability Policy: Volatile
+        Depth: 5
+      Decay Time: 0.5
+      Size (m): 0.04
+    - Class: rviz_default_plugins/PointCloud2
+      Name: External RS16 / standard point cloud
+      Enabled: __POINTS_ENABLED__
+      Topic:
+        Value: __POINTS__
+        Reliability Policy: Best Effort
+        Durability Policy: Volatile
+        Depth: 5
+      Decay Time: 0.5
+      Size (m): 0.04
+    - Class: rviz_default_plugins/Map
+      Name: External SLAM map
+      Enabled: __MAP_ENABLED__
+      Topic:
+        Value: __MAP__
+        Reliability Policy: Best Effort
+        Durability Policy: Transient Local
+        Depth: 5
+    - Class: rviz_default_plugins/Path
+      Name: External Nav2 global path
+      Enabled: __GLOBAL_PATH_ENABLED__
+      Topic:
+        Value: __GLOBAL_PATH__
+        Reliability Policy: Best Effort
+        Durability Policy: Volatile
+        Depth: 5
+      Buffer Length: 1
+      Line Width: 0.04
+    - Class: rviz_default_plugins/Path
+      Name: External local path
+      Enabled: __LOCAL_PATH_ENABLED__
+      Topic:
+        Value: __LOCAL_PATH__
+        Reliability Policy: Best Effort
+        Durability Policy: Volatile
+        Depth: 5
+      Buffer Length: 1
+      Line Width: 0.04
+    - Class: rviz_default_plugins/Map
+      Name: External global costmap
+      Enabled: __GLOBAL_COSTMAP_ENABLED__
+      Topic:
+        Value: __GLOBAL_COSTMAP__
+        Reliability Policy: Best Effort
+        Durability Policy: Transient Local
+        Depth: 5
+    - Class: rviz_default_plugins/Map
+      Name: External local costmap
+      Enabled: __LOCAL_COSTMAP_ENABLED__
+      Topic:
+        Value: __LOCAL_COSTMAP__
+        Reliability Policy: Best Effort
+        Durability Policy: Transient Local
+        Depth: 5
+    - Class: rviz_default_plugins/MarkerArray
+      Name: External perception markers
+      Enabled: __PERCEPTION_ENABLED__
+      Topic:
+        Value: __PERCEPTION__
+        Reliability Policy: Best Effort
+        Durability Policy: Volatile
+        Depth: 5
+  Tools:
+    - Class: rviz_default_plugins/MoveCamera
+    - Class: rviz_default_plugins/Select
+    - Class: rviz_default_plugins/FocusCamera
+  Views:
+    Current:
+      Class: rviz_default_plugins/Orbit
+      Distance: 60
+      Pitch: 0.65
+      Yaw: 0.8
+      Target Frame: __BASE__
+Window Geometry:
+  Width: 1280
+  Height: 820

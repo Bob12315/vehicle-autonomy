@@ -58,3 +58,7 @@ class PlaneTelemetryState(ArduPilotTelemetryState):
                                   Vector3(int(message.vy) / 100, int(message.vx) / 100,
                                           -int(message.vz) / 100), captured_at)
         return accepted
+
+    def local_reference(self):
+        """Existing signed FC origin, read-only; not a new map transform."""
+        with self._lock:return self._origin

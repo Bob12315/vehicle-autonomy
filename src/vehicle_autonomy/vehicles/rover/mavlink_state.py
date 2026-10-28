@@ -56,3 +56,7 @@ class RoverTelemetryState(ArduPilotTelemetryState):
                                   Vector3(int(message.vy) / 100, int(message.vx) / 100,
                                           -int(message.vz) / 100), captured_at)
         return accepted
+
+    def local_reference(self):
+        """Existing FC origin, read-only; never infer/reinitialize from a position."""
+        with self._lock:return self._origin

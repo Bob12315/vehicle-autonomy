@@ -1,0 +1,819 @@
+{
+  "schema": 1,
+  "date": "2026-10-28",
+  "audit_commit": "3fc0540",
+  "unit": {
+    "command": ".venv/bin/python -m unittest discover -s tests -v",
+    "passed": 773,
+    "failed": 0,
+    "elapsed_s": 113.57,
+    "log_sha256": "ad722ae618bd5ad9bd1bba247f269a7dd2e1ef2174277b703f40e643af4355d8"
+  },
+  "ui_fixture": {
+    "passed": true,
+    "source": "Actual Chromium/HTTP UI with explicit fixture telemetry; not SITL evidence.",
+    "javascript_errors": [],
+    "three_types": true,
+    "observer_manual": true,
+    "confirmation_required": true,
+    "one_login_across_pages": true,
+    "refresh_restores_session": true,
+    "reconnect_stays_observer": true,
+    "logout": true,
+    "expiry": true,
+    "widths": [
+      1680,
+      1280,
+      1024,
+      768,
+      390
+    ],
+    "vehicle_writes": 0,
+    "tool_shortcut_actual_process": true
+  },
+  "ros_contract_fixture": {
+    "passed": true,
+    "source": "Real ROS/DDS worker contracts with EXPLICIT synthetic VehicleState fixtures.\n\nNot an RViz GUI, real sensor or SITL acceptance. No vehicle writer is present.\n",
+    "real_standard_odometry_and_namespaces": true,
+    "stale_pose_not_republished": true,
+    "tf_conflict_fails_closed_and_recovers": true,
+    "clock_pause_clears_live_data": true,
+    "clock_rewind_readmitted_without_old_path": true,
+    "feed_auth_revocation_and_recovery": true,
+    "counts": {
+      "rover": 28,
+      "copter": 34
+    },
+    "zero_vehicle_writes": true,
+    "final_status": {
+      "rover": {
+        "schema": 1,
+        "vehicle_id": "rover",
+        "vehicle_type": "rover",
+        "valid": true,
+        "reason": null,
+        "sequence": 28,
+        "epoch": "world:fixture-session",
+        "stamp_ns": "14389682285",
+        "sample_age_s": 0.058088557,
+        "max_age_s": 3.0,
+        "use_sim_time": true,
+        "frames": {
+          "namespace": "/contract_rover",
+          "topic": "/contract_rover/viz",
+          "odom": "contract_rover/viz/odom",
+          "base": "contract_rover/viz/base_link",
+          "fixed": "contract_rover/viz/odom",
+          "tf": "/contract_rover/viz/tf",
+          "tf_static": "/contract_rover/viz/tf_static"
+        },
+        "path_samples": 1,
+        "proposal": null,
+        "source": "existing Framework VehicleState; visualization only",
+        "tf_owner": "isolated bridge",
+        "covariance": "unknown; conservative large odometry covariance"
+      },
+      "copter": {
+        "schema": 1,
+        "vehicle_id": "copter",
+        "vehicle_type": "copter",
+        "valid": true,
+        "reason": null,
+        "sequence": 34,
+        "epoch": "world:fixture-session",
+        "stamp_ns": "14300050072",
+        "sample_age_s": 0.05949138,
+        "max_age_s": 3.0,
+        "use_sim_time": true,
+        "frames": {
+          "namespace": "/contract_copter",
+          "topic": "/contract_copter/viz",
+          "odom": "contract_copter/viz/odom",
+          "base": "contract_copter/viz/base_link",
+          "fixed": "contract_copter/viz/odom",
+          "tf": "/contract_copter/viz/tf",
+          "tf_static": "/contract_copter/viz/tf_static"
+        },
+        "path_samples": 1,
+        "proposal": null,
+        "source": "existing Framework VehicleState; visualization only",
+        "tf_owner": "isolated bridge",
+        "covariance": "unknown; conservative large odometry covariance"
+      }
+    }
+  },
+  "native": {
+    "rover": {
+      "case": "rover-sync-20261028",
+      "case_passed": true,
+      "actual_native_rviz": true,
+      "source": "native RViz2 desktop + live signed SITL data; no fake vehicle data",
+      "context": {
+        "vehicle_id": "rover",
+        "vehicle_type": "rover",
+        "environment": "simulation",
+        "ros_namespace": "/visual_rover",
+        "ros_domain_id": 171,
+        "mavlink_profile": "monitor"
+      },
+      "displacement_m": 2.606290586269928,
+      "max_actual_path": 110,
+      "counts": {
+        "status": 466,
+        "odom": 101,
+        "path": 130,
+        "tf": 101,
+        "gps": 130,
+        "markers": 130
+      },
+      "one_tf_authority": true,
+      "monotonic_stamps": true,
+      "first_odom": {
+        "host_ns": 156925799132205,
+        "stamp_ns": 1793193828092644800,
+        "frame": "visual_rover/viz/odom",
+        "child": "visual_rover/viz/base_link",
+        "position": [
+          0.0,
+          0.0,
+          0.18000000715255737
+        ],
+        "orientation": [
+          -4.588929341170788e-13,
+          -1.0752006941009342e-11,
+          -3.774894979935439e-08,
+          -0.9999999999999993
+        ],
+        "body_velocity": [
+          4.4078409147997953e-10,
+          -1.7435962952580133e-10,
+          -4.568611799981172e-08
+        ]
+      },
+      "last_odom": {
+        "host_ns": 157030998779663,
+        "stamp_ns": 1793193933251415959,
+        "frame": "visual_rover/viz/odom",
+        "child": "visual_rover/viz/base_link",
+        "position": [
+          0.1361706256866455,
+          0.21150580048561096,
+          0.18000000715255737
+        ],
+        "orientation": [
+          -9.119363728374487e-10,
+          -5.605409916899365e-10,
+          0.5945382783438735,
+          -0.8040673078691254
+        ],
+        "body_velocity": [
+          0.0002662218965452929,
+          -0.00013465162603288163,
+          8.09782534301694e-13
+        ]
+      },
+      "gps": {
+        "fix": 0,
+        "altitude": null,
+        "covariance_type": 0
+      },
+      "trace_sha256": "a3ae8d839c005152a518d1ed90bf283dac8f35feb4bb497c8ead9e329eab4f7e",
+      "actions": [
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Arm",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Disarm",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Arm",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Stop",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Drive",
+          "state": "CANCELLED"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Drive",
+          "state": "CANCELLED"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Drive",
+          "state": "CANCELLED"
+        },
+        {
+          "name": "Stop",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Goto",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "ReturnHome",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Disarm",
+          "state": "SUCCEEDED"
+        }
+      ],
+      "observed_height_range_m": [
+        0.18000000715255737,
+        0.18000000715255737
+      ],
+      "observed_rpy_range_rad": [
+        [
+          -1.1856012838151742e-09,
+          1.3251469921371499e-09
+        ],
+        [
+          2.150401384737322e-11,
+          2.5181097207394036e-09
+        ],
+        [
+          -2.9916224360426487,
+          3.1401361982014517
+        ]
+      ]
+    },
+    "copter": {
+      "case": "copter-v2-20261028",
+      "case_passed": true,
+      "actual_native_rviz": true,
+      "source": "native RViz2 desktop + live signed SITL data; no fake vehicle data",
+      "context": {
+        "vehicle_id": "copter",
+        "vehicle_type": "copter",
+        "environment": "simulation",
+        "ros_namespace": "/visual_copter",
+        "ros_domain_id": 172,
+        "mavlink_profile": "monitor"
+      },
+      "displacement_m": 2.749525021417875,
+      "max_actual_path": 600,
+      "counts": {
+        "odom": 1250,
+        "tf": 1250,
+        "path": 1250,
+        "status": 582,
+        "gps": 646,
+        "markers": 1250
+      },
+      "one_tf_authority": true,
+      "monotonic_stamps": true,
+      "first_odom": {
+        "host_ns": 157617955615753,
+        "stamp_ns": 1793195404816985380,
+        "frame": "visual_copter/viz/odom",
+        "child": "visual_copter/viz/base_link",
+        "position": [
+          0.0,
+          0.0,
+          0.1899999976158142
+        ],
+        "orientation": [
+          4.737184473704767e-10,
+          -4.5943703724236235e-10,
+          -0.7071067811865468,
+          -0.7071067811865483
+        ],
+        "body_velocity": [
+          1.5902226061422927e-10,
+          2.4316171323099506e-12,
+          5.757536200690293e-06
+        ]
+      },
+      "last_odom": {
+        "host_ns": 157750905641718,
+        "stamp_ns": 1793195537732334351,
+        "frame": "visual_copter/viz/odom",
+        "child": "visual_copter/viz/base_link",
+        "position": [
+          -0.018156083300709724,
+          0.06679131090641022,
+          0.1899999976158142
+        ],
+        "orientation": [
+          6.049231030413677e-10,
+          -3.2852640536875413e-10,
+          -0.8466926219855264,
+          -0.5320823280990215
+        ],
+        "body_velocity": [
+          -4.841454420266817e-11,
+          -1.3531699973186434e-10,
+          1.3325653073151734e-10
+        ]
+      },
+      "gps": {
+        "fix": 0,
+        "altitude": null,
+        "covariance_type": 0
+      },
+      "trace_sha256": "49d6199c6d957c728a38453788216810270e193981334de47f2f547a0a5b2e3a",
+      "actions": [
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Arm",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Disarm",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Arm",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Takeoff",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "SetVelocity",
+          "state": "CANCELLED"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "SetVelocity",
+          "state": "CANCELLED"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "SetVelocity",
+          "state": "TIMED_OUT"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "SetVelocity",
+          "state": "CANCELLED"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "SetVelocity",
+          "state": "TIMED_OUT"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Goto",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Land",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Arm",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Takeoff",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Goto",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "ReturnHome",
+          "state": "SUCCEEDED"
+        }
+      ],
+      "observed_height_range_m": [
+        0.1899999976158142,
+        2.2200000286102295
+      ],
+      "observed_rpy_range_rad": [
+        [
+          -0.306962877511978,
+          0.2799386680126189
+        ],
+        [
+          -0.32522153854370117,
+          0.3537318110466004
+        ],
+        [
+          1.5707963267948946,
+          2.027508125701223
+        ]
+      ]
+    },
+    "plane": {
+      "case": "plane-first-20261028",
+      "case_passed": true,
+      "actual_native_rviz": true,
+      "source": "native RViz2 desktop + live signed SITL data; no fake vehicle data",
+      "context": {
+        "vehicle_id": "plane",
+        "vehicle_type": "plane",
+        "environment": "simulation",
+        "ros_namespace": "/visual_plane",
+        "ros_domain_id": 173,
+        "mavlink_profile": "monitor"
+      },
+      "displacement_m": 495.5023619733132,
+      "max_actual_path": 600,
+      "counts": {
+        "odom": 1496,
+        "tf": 1496,
+        "path": 1500,
+        "gps": 763,
+        "markers": 1500,
+        "status": 710
+      },
+      "one_tf_authority": true,
+      "monotonic_stamps": true,
+      "first_odom": {
+        "host_ns": 157826220737032,
+        "stamp_ns": 1793195613055059419,
+        "frame": "visual_plane/viz/odom",
+        "child": "visual_plane/viz/base_link",
+        "position": [
+          0.0,
+          0.0,
+          0.14000000059604645
+        ],
+        "orientation": [
+          -3.214415504604329e-10,
+          -0.014707450399980589,
+          2.1853331200194503e-08,
+          -0.99989183960203
+        ],
+        "body_velocity": [
+          4.002243077262278e-08,
+          2.5887979929431183e-15,
+          6.599776813531927e-07
+        ]
+      },
+      "last_odom": {
+        "host_ns": 157988270913897,
+        "stamp_ns": 1793195775207157517,
+        "frame": "visual_plane/viz/odom",
+        "child": "visual_plane/viz/base_link",
+        "position": [
+          74.094970703125,
+          -0.022263769060373306,
+          0.14000000059604645
+        ],
+        "orientation": [
+          -1.4584262513720608e-07,
+          -0.014707471817359857,
+          9.915154181361352e-06,
+          -0.9998918392378298
+        ],
+        "body_velocity": [
+          0.001147744587860366,
+          -2.947387994495364e-11,
+          3.377180366832051e-05
+        ]
+      },
+      "gps": {
+        "fix": 0,
+        "altitude": null,
+        "covariance_type": 0
+      },
+      "trace_sha256": "d5d0beea4bfaccda1f8a724605d8ed502f6d1750268cd593f4dbe0adda643da6",
+      "actions": [
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Arm",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Disarm",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Arm",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Takeoff",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "SetGuidedTarget",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Loiter",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "RTL",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "AutoLand",
+          "state": "SUCCEEDED"
+        }
+      ],
+      "observed_height_range_m": [
+        0.14000000059604645,
+        50.189998626708984
+      ],
+      "observed_rpy_range_rad": [
+        [
+          -0.6619932651519777,
+          0.7034868001937866
+        ],
+        [
+          -0.21412503719329842,
+          0.13909259438514712
+        ],
+        [
+          -3.136249291892869,
+          3.1407484571125845
+        ]
+      ]
+    }
+  },
+  "native_pending_goal_subcase": {
+    "source": "actual owned native RViz SetGoal mouse drag, then Web confirmation",
+    "mouse": {
+      "actual_native_mouse": true,
+      "owned_rviz_pid": 709832,
+      "window": 136315142,
+      "client_size": [
+        1280,
+        820
+      ]
+    },
+    "candidate": {
+      "id": "f8135f4ac84343548f97ecc4e7b62385",
+      "target": "rover",
+      "epoch": "12bbb26b6c6e4ef5b07d963cbd58ce8f:2da6adb8fa2c46e2a3c742adf8d11d56",
+      "frame": "odom",
+      "ros_frame": "visual_rover/viz/odom",
+      "position": [
+        1.6062501668930054,
+        0.012499939650297165,
+        0.0
+      ],
+      "orientation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "remaining_s": 29.875900034996448,
+      "action_id": null,
+      "executable": true,
+      "reason": null,
+      "execution_semantics": "Existing Goto executes position only; selected orientation is preview-only"
+    },
+    "no_action_before_confirmation": true,
+    "action": {
+      "id": "action:c47ddd8cd5d943a39f36624cf95ba05f",
+      "name": "Goto",
+      "state": "SUCCEEDED"
+    },
+    "truth": [
+      1.2666657127817584,
+      -8.165057100785438e-08,
+      -4.5590906883052895e-09
+    ],
+    "overall_case_passed": false,
+    "overall_failure": "subsequent ReturnHome TIMED_OUT; not a whole-case pass"
+  },
+  "retained_vehicle_control_failures": [
+    {
+      "case": "rover-v3-20261028",
+      "failure": "Goto physical target observed but Action exit stopping unconfirmed, before explicit source clock synchronization"
+    },
+    {
+      "case": "rover-goal-lifecycle-20261028",
+      "failure": "Goto physical target observed but stop_exit_deadline_unconfirmed despite explicit existing source clock sync"
+    },
+    {
+      "case": "rover-goal-v5-20261028",
+      "failure": "confirmed native pending Goto SUCCEEDED; subsequent ReturnHome TIMED_OUT"
+    }
+  ],
+  "not_validated": [
+    "real hardware movement",
+    "qualified URDF",
+    "real RS16/other LiDAR source and extrinsic calibration",
+    "online qualified SLAM/Nav2 navigation execution",
+    "remote multi-host production clocks/GUI/network"
+  ],
+  "native_lifecycle": {
+    "case": "rover-lifecycle-v4-20261028",
+    "passed": true,
+    "actual_native_rviz_restart": true,
+    "logs": true,
+    "old_pid": 737719,
+    "new_pid": 738454,
+    "bridge_pid_unchanged": 737523,
+    "actual_agent_heartbeat_loss": true,
+    "explicit_reconciliation": true,
+    "no_second_login": true,
+    "simulation_workspace_ready": true,
+    "shared_manual_bridge_survived_workspace_stop": true,
+    "wait_mission_succeeded": true,
+    "no_vehicle_actions_from_lifecycle": true,
+    "actual_owned_sitl_blackout": true,
+    "stale_pose_not_republished": true,
+    "live_markers_deleted": true,
+    "path_cleared": true,
+    "cleanup": {
+      "remaining_process_groups": [],
+      "cleanup_errors": [],
+      "credentials_removed": true
+    }
+  },
+  "owned_window_capture_sha256": "57e42e5926edd12aad91293b0c6f9b7a812cbc4bc46c555b9ef28cd736413f2c",
+  "native_readonly_launcher": {
+    "passed": true,
+    "source": "Real default-readonly launcher, auto Agent, shared login and native RViz.\n\nRequires the existing native ROS/Gazebo/SITL environment. No Arm or movement.\n",
+    "auto_agent": true,
+    "no_automatic_tool_launch": true,
+    "no_vehicle_actions": true,
+    "send_gates": {
+      "deployment_send": false,
+      "system_send": false,
+      "action_send": false
+    },
+    "origin": {
+      "id": "f2899c6671af4b459734f51342914b17:5c3dd271580d4a93885c0b774bd92d44",
+      "frame": "odom",
+      "axes": "ENU",
+      "body": "FLU",
+      "basis": "AP GPS_GLOBAL_ORIGIN projection",
+      "altitude_reference": "native local-origin relative; global GPS altitude is AMSL",
+      "geodetic_origin": {
+        "latitude_deg": -35.363262,
+        "longitude_deg": 149.165237,
+        "altitude_amsl_m": 584.0
+      }
+    },
+    "namespace": "/launcher_rover",
+    "domain": 184,
+    "native_window": {
+      "owned_rviz_pid": 741550,
+      "window": 136315142,
+      "client_size": [
+        1280,
+        820
+      ],
+      "focus_verified": true,
+      "window_only_capture": true
+    },
+    "one_login_across_pages": true,
+    "javascript_errors": [],
+    "temporary_credentials_removed": true,
+    "owned_deployment_closed": true
+  },
+  "packaging": {
+    "wheel_built": true,
+    "profiles": 3,
+    "worker_and_launcher_entries_included": true,
+    "pip_check": "no broken requirements; pre-existing system pybind11 metadata warning"
+  },
+  "native_pending_goal_final": {
+    "case": "rover-goal-final-20261028",
+    "passed": true,
+    "scenario": "straight native pending goal + Web consent + existing Goto + Disarm + tool lifecycle; not the separate complex ReturnHome sequence",
+    "goal": {
+      "source": "actual owned native RViz SetGoal mouse drag, then Web confirmation",
+      "mouse": {
+        "actual_native_mouse": true,
+        "owned_rviz_pid": 742625,
+        "window": 136315142,
+        "client_size": [
+          1280,
+          820
+        ]
+      },
+      "candidate": {
+        "id": "1ce13b2aca1546d589b036d117f4350d",
+        "target": "rover",
+        "epoch": "aad8a7166a004c11aa9c48af7e728e17:eefc390bf0ac494d8e9e8987bab432ca",
+        "frame": "odom",
+        "ros_frame": "visual_rover/viz/odom",
+        "position": [
+          1.6062501668930054,
+          0.012499939650297165,
+          0.0
+        ],
+        "orientation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "remaining_s": 29.910949742014054,
+        "action_id": null,
+        "executable": true,
+        "reason": null,
+        "execution_semantics": "Existing Goto executes position only; selected orientation is preview-only"
+      },
+      "no_action_before_confirmation": true,
+      "action": {
+        "id": "action:b0fae085519d4b818b1fc579fbcab41f",
+        "name": "Goto",
+        "state": "SUCCEEDED"
+      },
+      "truth": [
+        1.261676502164809,
+        -4.815336697290838e-08,
+        -4.559084831878835e-09
+      ]
+    },
+    "lifecycle": {
+      "actual_native_rviz_restart": true,
+      "logs": true,
+      "old_pid": 746561,
+      "new_pid": 747053,
+      "bridge_pid_unchanged": 746360,
+      "actual_agent_heartbeat_loss": true,
+      "explicit_reconciliation": true,
+      "no_second_login": true,
+      "simulation_workspace_ready": true,
+      "shared_manual_bridge_survived_workspace_stop": true,
+      "wait_mission_succeeded": true,
+      "no_vehicle_actions_from_lifecycle": true,
+      "actual_owned_sitl_blackout": true,
+      "stale_pose_not_republished": true,
+      "live_markers_deleted": true,
+      "path_cleared": true
+    },
+    "cleanup": {
+      "remaining_process_groups": [],
+      "cleanup_errors": [],
+      "credentials_removed": true
+    }
+  }
+}

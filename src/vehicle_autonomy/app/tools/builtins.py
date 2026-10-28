@@ -135,6 +135,8 @@ def main():
     p.add_argument('--output',required=True,type=Path);p.add_argument('--ros-wrapper',type=Path)
     p.add_argument('--qgc',type=Path);p.add_argument('--qgc-relay',type=Path);p.add_argument('--sitl-dir',type=Path);p.add_argument('--ardupilot-plugin',type=Path)
     p.add_argument('--coupled-rover',action='store_true',help='generate matching isolated Rover Gazebo/JSON SITL deployment profiles')
+    p.add_argument('--visualization-config',type=Path,help='trusted narrow Framework feed config; adds matching bridge and three RViz profiles')
+    p.add_argument('--owned-simulation',type=Path,help='with visualization-config: public current Framework simulation manifest for non-owning Workspace dependencies')
     a=p.parse_args();env=None
     if a.ros_wrapper:
         # Explicit local operator-selected environment; fixed argv, no shell
@@ -144,6 +146,10 @@ def main():
         full=dict(part.decode().split('=',1) for part in result.stdout.split(b'\0') if b'=' in part)
         env={k:full[k] for k in ROS_KEYS if k in full}
     value=registry(ros_env=env,qgc=a.qgc,qgc_relay=a.qgc_relay,sitl_dir=a.sitl_dir,plugin=a.ardupilot_plugin)
+    if a.visualization_config:
+        from vehicle_autonomy.app.visualization.registry import configure
+        value=configure(value,a.visualization_config,env or {k:os.environ[k] for k in ROS_KEYS if k in os.environ},owned_simulation=a.owned_simulation)
+    elif a.owned_simulation:p.error('--owned-simulation requires --visualization-config')
     # Never overwrite existing operator configuration.
     a.output.parent.mkdir(parents=True,exist_ok=True,mode=0o700)
     if a.output.exists():raise ValueError('registry exists; select a new output, existing configuration is never overwritten')

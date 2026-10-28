@@ -205,7 +205,21 @@ function render(){
  $('#safety-badge').textContent=fresh?'以动作准入检查为准':'BLOCKED';$('#safety-badge').dataset.tone=fresh?'':'warning';
  if(session){const a=state.actions.find(a=>a.id===session.action_id);if(a&&terminal.has(a.state)){session=null;input=null;keys.clear();}}
  const goal=state.actions.filter(a=>a.target===api.target&&a.name==='SetGuidedTarget').at(-1);if(goal)$('#navigation-target').textContent=`请求目标：${goal.parameters.latitude_deg}°, ${goal.parameters.longitude_deg}° / ${goal.parameters.altitude_amsl_m} m AMSL · ${actionStatus(goal)}`;
- renderFeedback();renderTools();$('#diagnostics').textContent=JSON.stringify({vehicle:v,control:ctrl,last_action:state.actions.find(a=>a.id===lastAction),resources:state.resources},null,2);
+ renderFeedback();renderTools();renderGoals();window.VAFVisualization.render($('#visualization-entry'),state,api.target);$('#diagnostics').textContent=JSON.stringify({vehicle:v,control:ctrl,last_action:state.actions.find(a=>a.id===lastAction),resources:state.resources},null,2);
+}
+function renderGoals(){
+ const root=$('#pending-goals'),goals=state.visualization_goals?.[api.target]||[];root.replaceChildren();
+ if(!goals.length){root.append(node('p','RViz 点选只创建候选；不会直接发送 Nav2 或车辆命令。',{class:'muted small-note'}));return;}
+ for(const goal of goals.slice(-3).reverse()){
+  const row=node('div',undefined,{class:'tool-shortcut','data-goal':goal.id}),text=node('div');
+  text.append(node('strong',goal.position.map(v=>fmt(v)).join(' / ')+' m · '+goal.frame),node('small',goal.action_id?'已提交 '+goal.action_id:goal.reason||'剩余 '+Math.floor(goal.remaining_s)+' s · 尚未执行'),node('small','现有 Goto 只执行 odom ENU 位置；选定朝向仅预览。'));row.append(text);
+  const button=node('button','核对并提交');button.disabled=!goal.executable||!!goal.action_id||!canCommand();
+  button.onclick=guard(()=>confirmOperation('确认 RViz 候选目标',`${api.target}\nodom ENU：${goal.position.join(', ')} m\n这将请求现有 Goto Action；当前控制权、定位、安全围栏与逐条 SEND 仍由后端检查。`,async()=>{
+   if(!canCommand())throw Error('控制状态已变化');commandPending=true;$('#send').checked=false;render();
+   try{const a=await api.call('/api/visualization/confirm',{id:goal.id,target:api.target,allow_send:true});lastAction=a.id;notice('候选目标已提交现有 Action；等待实际确认。');await refresh();}
+   finally{commandPending=false;render();}
+  }));row.append(button);root.append(row);
+ }
 }
 function renderTools(){
  const panel=$('#tool-shortcuts');panel.replaceChildren();
@@ -216,8 +230,11 @@ function renderTools(){
   const row=node('div',undefined,{class:'tool-shortcut'}),text=node('div');text.append(node('strong',t.name),node('small',!a.connected?'Agent 离线':running?(i.ready?'Ready':'运行中 · 数据就绪待确认'):check?.launchable?'可启动':'依赖 / 桌面不可用'));row.append(text);
   const button=node('button',running?'已运行':t.type==='gui'?'打开窗口':'启动后台');button.disabled=running||!a.connected||!check?.launchable||t.external_pids.length>0;button.title=running?'请在 Agent 桌面查看窗口；Tool Manager 可停止或重启。':t.external_pids.length?'已有外部进程，仅可观察。':'';
   button.onclick=guard(async()=>{
-   const saved=state.tools.settings?.context;const workspace=state.tools.workspaces?.runs?.find(r=>r.context?.vehicle_id===api.target&&r.state!=='STOPPED');
-   const ctx=workspace?.context||{vehicle_id:api.target,vehicle_type:selected().kind,environment:selected().owned_simulation?'simulation':'hardware_readonly',ros_namespace:saved?.vehicle_id===api.target?saved.ros_namespace:'/'+api.target.replace(/[^A-Za-z0-9_]/g,'_'),ros_domain_id:saved?.ros_domain_id??91,mavlink_profile:saved?.mavlink_profile||'monitor'};
+   if(id==='rviz2'&&t.profiles.includes(selected().kind)){
+    const result=await api.call('/api/visualization/open',{target:api.target});notice('RViz2 Workspace · '+result.state+' · '+(result.error||result.agent_id));await refresh();return;
+   }
+   const saved=state.tools.settings?.context;const workspace=state.tools.workspaces?.runs?.find(r=>(r.spec?.context||r.context)?.vehicle_id===api.target&&r.state!=='STOPPED');
+   const ctx=workspace?.spec?.context||workspace?.context||{vehicle_id:api.target,vehicle_type:selected().kind,environment:selected().owned_simulation?'simulation':'hardware_readonly',ros_namespace:saved?.vehicle_id===api.target?saved.ros_namespace:'/'+api.target.replace(/[^A-Za-z0-9_]/g,'_'),ros_domain_id:saved?.ros_domain_id??91,mavlink_profile:saved?.mavlink_profile||'monitor'};
    await api.call('/api/tools/operation',{agent_id:a.id,tool_id:id,profile_id:profile,operation:t.type==='gui'?'open':'launch',context:ctx});notice('工具请求已排队；实际运行与就绪状态由 Agent 确认。');await refresh();
   });row.append(button);panel.append(row);
  }

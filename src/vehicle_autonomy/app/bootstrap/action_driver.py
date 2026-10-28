@@ -65,6 +65,7 @@ class VehicleActionDriver:
             self._world=world
             self._info=dict(target=self.target,kind=self.profile.kind,connected=self._runtime.connected,
                 session_id=self._runtime.session_id,owned_simulation=self._ownership_reason() is None,
+                local_reference=self._runtime.local_reference(),
                 system_send=self._runtime.authority.system_send,action_send=self._runtime.authority.action_send,
                 cycle_maintenance=None if getattr(self,'_cycle_maintenance',None) is None else self._cycle_maintenance.diagnostics(),
                 deployment_send=self.allow_send,lease_active=bool(self._runtime.authority.lease is not None

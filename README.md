@@ -131,6 +131,12 @@ UNKNOWN/UNCONFIRMED 和飞行资源约束。完成本阶段后停止，等待独
 
 ## Web 控制中心与 Tool Agent V1
 
+RViz2 三车型可视化已接入 Vehicle Control / Dashboard 的 **Open RViz2**。
+本机已有依赖时，`./scripts/start_visualization_sim.sh --kind rover`（或 `copter`、`plane`）
+启动默认只读的独占仿真、Web 和自动连接的 Desktop Agent；随后由操作员打开原生
+RViz。实际 ROS/GUI/SITL 证据、话题配置、控制边界及未关闭的 Rover 控制确认风险见
+[RViz2 集成报告](docs/RVIZ2_VISUALIZATION_REPORT.md)。
+
 `/console` 提供三车型 Dashboard、Tool Manager、Workspaces、Logs 和 Settings，
 Vehicle Control 复用 `/control` 原有 Action/Authority/Safety/Execution 链。
 过期或断开的遥测显示未知；不新增 Mission Studio 或专业地图/点云查看器。

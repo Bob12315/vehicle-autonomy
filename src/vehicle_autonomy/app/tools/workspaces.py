@@ -38,6 +38,8 @@ def validate(value):
 
 TEMPLATES=(dict(id='rover-navigation',name='Rover Navigation',description='ROS 2 → Nav2 + RViz2; requires configured map/TF/sensor inputs'),
     dict(id='uav-ground-station',name='UAV Ground Station',description='Copter/Plane context + existing telemetry-only MAVLink relay + QGC'),
+    dict(id='uav-visualization',name='UAV Visualization',description='Existing Copter/Plane → Visualization Bridge → desktop RViz2; optional telemetry-only QGC'),
+    dict(id='simulation-visualization',name='Simulation Visualization',description='Observe existing matching Framework-owned Gazebo/SITL → Bridge → RViz2; vehicle lifecycle remains with trusted launcher'),
     dict(id='simulation-lab',name='Simulation Lab',description='Gazebo + native SITL + QGC, optional RViz2; select matching coupled profiles for vehicle physics'))
 
 
@@ -48,9 +50,27 @@ def template(template_id, ctx, agents):
         return next((a['id'] for a in candidates if a['role']=='desktop' and tool in ('rviz2','qgroundcontrol')),candidates[0]['id'] if candidates else 'select-agent')
     def component(tool,depends=(),optional=False,wait_for='ready',profile='default'):
         return dict(id=tool,agent_id=host(tool),tool_id=tool,profile_id=profile,depends_on=list(depends),optional=optional,wait_for=wait_for,timeout_s=120)
+    paired=sorted([a for a in agents if all(any(t['manifest']['id']==tool and ctx['vehicle_type'] in t['manifest']['profiles'] for t in a['tools']) for tool in ('visualization-bridge','rviz2'))],key=lambda a:(a['role']!='desktop',a['id']))
+    def visual(depends=()):
+        result=[component('visualization-bridge',depends,profile=ctx['vehicle_type']),component('rviz2',['visualization-bridge'],profile=ctx['vehicle_type'])]
+        if paired:
+            for c in result:c['agent_id']=paired[0]['id']
+        return result
     if template_id=='rover-navigation':
         if ctx['vehicle_type']!='rover':raise ValueError('Rover Navigation requires Rover context')
-        components=[component('ros2'),component('nav2',['ros2']),component('rviz2',['ros2'],True)]
+        if paired:
+            components=[component('ros2'),*visual(['ros2']),component('nav2',['ros2'],True),component('slam',['ros2'],True)]
+            components[0]['agent_id']=paired[0]['id']
+        else:components=[component('ros2'),component('nav2',['ros2']),component('rviz2',['ros2'],True)]
+    elif template_id=='uav-visualization':
+        if ctx['vehicle_type'] not in ('copter','plane'):raise ValueError('UAV Visualization requires Copter/Plane context')
+        components=[*visual(),component('qgroundcontrol',optional=True,wait_for='running',profile='monitor')]
+    elif template_id=='simulation-visualization':
+        if ctx['environment']!='simulation':raise ValueError('Simulation Visualization requires simulation context')
+        components=[component('gazebo',profile='framework-owned'),component('sitl',['gazebo'],profile='framework-owned'),*visual(['sitl'])]
+        for c in components[:2]:
+            qualified=next((a for a in agents if any(t['manifest']['id']==c['tool_id'] and 'framework-owned' in t['manifest']['profiles'] for t in a['tools'])),None)
+            if qualified:c['agent_id']=qualified['id']
     elif template_id=='uav-ground-station':
         if ctx['vehicle_type'] not in ('copter','plane'):raise ValueError('UAV Ground Station requires Copter/Plane context')
         components=[component('qgroundcontrol',wait_for='running',profile='monitor')]
@@ -195,6 +215,7 @@ class Workspaces:
 
     def _start(self,run,c):
         a,t=self._preflight(c,run['spec']['context']);key=self.key(c);lease=self.data['leases'].get(key);i=t['instance']
+        c['visualization']='ros2.visualization' in t['manifest']['integrations']
         live=i and (i['process_running'] or i['state']=='STARTING')
         if lease is None or not lease['owners'] and (lease['boot_id']!=a['boot_id'] or lease['context']!=compatibility(run['spec']['context']) or lease['profile_id']!=c['profile_id']):
             lease=dict(profile_id=c['profile_id'],context=compatibility(run['spec']['context']),boot_id=a['boot_id'],
@@ -226,8 +247,9 @@ class Workspaces:
             if lease['instance_id'] is not None and lease['instance_id']!=i['instance_id']:raise ValueError('pinned service instance changed')
             c['instance_id']=i['instance_id'];lease['instance_id']=i['instance_id'];c['observed_ready']=i['ready']
             if i['state'] in ('FAILED','UNKNOWN') or i['process_running'] is False and i['state']!='STARTING':raise ValueError(i['error'] or 'service exited')
-            if i['ready']:c['state']='READY'
+            if i['ready']:c['state']='READY';c['qualified_once']=True
             elif i['process_running'] and c['wait_for']=='running':c['state']='RUNNING'
+            elif i['process_running'] and c.get('qualified_once') and 'ros2.visualization' in t['manifest']['integrations']:c['state']='DEGRADED'
             else:c['state']='WAITING'
         if c['state']=='WAITING' and time.monotonic()>c['deadline']:raise TimeoutError('Workspace component readiness timeout')
 
@@ -277,13 +299,18 @@ class Workspaces:
                     if any(d['state'] in ('FAILED','SKIPPED','BLOCKED','UNKNOWN') for d in deps):c.update(state='SKIPPED' if c['optional'] else 'BLOCKED',error='dependency failed');continue
                     if any(d['state'] not in ('READY','RUNNING') for d in deps):continue
                     self._start(run,c)
-                if c['state'] in ('WAITING','RUNNING','READY'):self._observe(run,c)
+                if c['state'] in ('WAITING','RUNNING','READY','DEGRADED'):self._observe(run,c)
             except Exception as exc:
+                agent=self.registry.agents.get(c['agent_id']);lease=self.data['leases'].get(self.key(c))
+                if c.get('visualization') and (not agent or not self.registry.online(agent) or lease and agent['boot_id']!=lease['boot_id']):
+                    c.update(state='UNKNOWN',observed_ready=False,error='visualization Agent disconnected or changed boot')
+                    run.update(state='UNKNOWN',recovering=True,error='visualization ownership unknown; explicitly reconcile current instances after Agent recovery')
+                    return
                 c.update(state='SKIPPED' if c['optional'] else 'FAILED',observed_ready=False,error=type(exc).__name__+': '+str(exc)[:500])
         required=[c for c in run['components'] if not c['optional']]
         if any(c['state'] in ('FAILED','BLOCKED') for c in required):run.update(state='FAILED',error='required component failed; stop explicitly to release owned services')
-        elif all(c['state'] in ('READY','RUNNING','SKIPPED') for c in run['components']):
-            run['state']='DEGRADED' if any(c['state']=='SKIPPED' for c in run['components']) else 'READY' if all(c['observed_ready'] for c in run['components']) else 'PREPARED'
+        elif all(c['state'] in ('READY','RUNNING','SKIPPED','DEGRADED') for c in run['components']):
+            run['state']='DEGRADED' if any(c['state'] in ('SKIPPED','DEGRADED') for c in run['components']) else 'READY' if all(c['observed_ready'] for c in run['components']) else 'PREPARED'
         else:run['state']='PREPARING'
 
     def _monitor(self):
@@ -308,7 +335,9 @@ class Workspaces:
                     c['observed_ready']=bool(not ended and a and a['online'] and i and i['instance_id']==c['instance_id'] and i['ready'])
                     if not ended and (not a or not a['online']) and c['instance_id']:
                         c['state']='DISCONNECTED'
-                        if run['state'] in ('READY','PREPARED','DEGRADED'):run['state']='UNKNOWN'
+                        if run['state'] in ('READY','PREPARED','DEGRADED'):
+                            run['state']='UNKNOWN'
+                            if c.get('visualization'):run.update(recovering=True,error='visualization Agent offline; explicitly reconcile current instances after recovery')
         return dict(definitions=deepcopy(list(self.data['definitions'].values())),runs=runs,
             leases=deepcopy(self.data['leases']),templates=deepcopy(TEMPLATES),fault=self.fault)
 

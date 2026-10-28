@@ -1,5 +1,13 @@
 # Web console & Tool Agent deployment
 
+For optional current-vehicle RViz, see the
+[integration deployment and acceptance report](RVIZ2_VISUALIZATION_REPORT.md).
+`vehicle-autonomy-tool-registry --ros-wrapper /trusted/with_ros2.sh --visualization-config /private/source.json --output /private/registry.json`
+adds matched profiles using a visualization-only credential. Web management and
+Agent credentials remain separate. `scripts/start_visualization_sim.sh` composes
+an owned simulation, Web and auto-connecting Desktop Agent; it is read-only by
+default and never automatically opens a tool or starts a mission.
+
 Targets Ubuntu 22.04/24.04, user-level Python >=3.10; this run was actually
 validated on Ubuntu 24.04.1 / Python 3.12.3. Native GUI/ROS dependencies must
 match the host distribution/architecture. No sudo, package installation, hardware

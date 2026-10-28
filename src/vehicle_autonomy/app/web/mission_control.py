@@ -31,6 +31,8 @@ class MissionControl(ActionLab):
         self.journal = None
         from .operator_control import OperatorControls
         self.operator_controls=OperatorControls(self)
+        from vehicle_autonomy.app.visualization.goals import PendingGoals
+        self.visualization_goals=PendingGoals(self)
         super().__init__(drivers, registry=registry, event_sink=event_sink,scheduler_period_s=scheduler_period_s)
         try:
             self.journal = MissionJournal(Path(data_dir) / 'missions')
@@ -298,6 +300,14 @@ class MissionControl(ActionLab):
 
     def handle_authenticated(self, operation, payload, *, principal, control_token, sessions):
         if principal!='api' and not sessions.alive(principal):raise ValueError('browser session expired before operation')
+        if operation=='visualization.open':
+            if set(payload)!={'target'}:raise ValueError('one vehicle target required')
+            from vehicle_autonomy.app.visualization.integration import open_rviz
+            return open_rviz(self,payload['target'])
+        if operation=='visualization.propose':return self.visualization_goals.submit(payload)
+        if operation=='visualization.confirm':
+            with self._control_lock:
+                return self.visualization_goals.execute(payload,lambda p:self.handle_authenticated('manual.action',p,principal=principal,control_token=control_token,sessions=sessions))
         if operation not in ('control.snapshot','control.takeover','manual.action','manual.start','manual.update','manual.stop','run') and not operation.startswith('operator.'):
             return self.handle(operation,payload)
         with self._control_lock:
@@ -322,7 +332,8 @@ class MissionControl(ActionLab):
                         tool_view['agents'].append(dict(id=a['id'],connected=a['connected'],tools=[dict(
                             id=t['manifest']['id'],name=t['manifest']['name'],type=t['manifest']['type'],
                             profiles=list(t['manifest']['profiles']),checks=t['checks'],instance=t['instance'],external_pids=t['external_pids']) for t in a['tools']]))
-                return dict(**view,operator_control=controls.snapshot(principal,control_token),tools=tool_view,observed_at_ns=str(self.clock().monotonic_ns))
+                return dict(**view,operator_control=controls.snapshot(principal,control_token),tools=tool_view,
+                    visualization_goals={target:self.visualization_goals.view(target) for target in self.drivers},observed_at_ns=str(self.clock().monotonic_ns))
             if principal!='api' and operation=='control.takeover':raise ValueError('explicit confirmed takeover flow required')
             if operation.startswith('operator.'):
                 if principal=='api' or not sessions.alive(principal):raise ValueError('browser session required')
@@ -370,8 +381,15 @@ class MissionControlServer(ActionLabServer):
 
 
 class MissionControlHandler(ActionLabHandler):
+    def do_POST(self):
+        from vehicle_autonomy.app.visualization.http import post
+        if post(self):return
+        super().do_POST()
+
     def do_GET(self):
         if self.auth_get():return
+        from vehicle_autonomy.app.visualization.http import get
+        if get(self):return
         if urlsplit(self.path).path=='/ws/telemetry':
             if self.path!='/ws/telemetry':self.reply(400,dict(ok=False,error='WebSocket URL takes no credentials or query'));return
             from .live import stream
@@ -385,6 +403,7 @@ class MissionControlHandler(ActionLabHandler):
             '/mission-studio.js':('mission-studio.js','application/javascript'),
             '/manual-control.js':('manual-control.js','application/javascript'),
             '/vehicle-control.css':('vehicle-control.css','text/css'),
+            '/visualization-ui.js':('visualization-ui.js','application/javascript'),
             '/mission-api.js':('mission-api.js','application/javascript')}
         if self.path in static:
             name, kind = static[self.path]
@@ -428,3 +447,5 @@ class MissionControlHandler(ActionLabHandler):
         '/api/control/takeover':'control.takeover','/api/control/reestablish':'control.reestablish'})
     post_routes.update({'/api/control/acquire':'operator.acquire','/api/control/renew':'operator.renew',
         '/api/control/release':'operator.release','/api/control/request-takeover':'operator.takeover'})
+    post_routes.update({'/api/visualization/open':'visualization.open','/api/visualization/candidates':'visualization.propose',
+        '/api/visualization/confirm':'visualization.confirm'})

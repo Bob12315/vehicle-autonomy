@@ -49,3 +49,6 @@ artifacts/phase3-round3/
 
 # Phase 5 isolated algorithm dependencies, private runtime and raw evidence.
 /artifacts/phase5-world-navigation/
+
+# Native RViz/ROS/SITL evidence and ephemeral private deployment files.
+/artifacts/rviz-v1/

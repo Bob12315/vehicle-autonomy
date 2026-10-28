@@ -160,6 +160,10 @@ class SimulationRuntime:
     def link_snapshot(self):
         return None if self._session is None else self._session.link_snapshot(self.clock())
 
+    def local_reference(self):
+        """Read the already-owned telemetry adapter; no transport operation."""
+        return None if self._session is None else self._session.local_reference()
+
     def world_reader(self):
         return RuntimeWorldReader(self.world_snapshot)
 

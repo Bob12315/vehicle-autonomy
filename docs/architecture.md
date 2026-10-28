@@ -1,5 +1,24 @@
 # V1 framework boundary
 
+## Optional RViz2 visualization integration (2026-10-28)
+
+`app/visualization` reads the existing immutable Driver/VehicleState cut through
+a separate narrow HTTP capability, then publishes standard ROS data from an
+explicitly launched optional worker. It owns neither a vehicle session nor a
+command port. Existing ENU/FLU normalization is reused, source capture times are
+preserved conservatively, unknown GPS ellipsoid altitude/covariance stay unknown,
+and stale live markers/path are cleared. Default TF islands are per namespace;
+an explicitly attested external TF binding disables bridge TF publication.
+
+Tool Agent profiles compose bridge + native RViz using existing supervision and
+Workspace sharing. Browser sessions remain common. RViz goals are inert, bounded
+proposals; only manually confirmed Rover odom ground positions may enter the
+existing Goto Action. Map and aircraft proposals remain previews. No new Nav2
+action or vehicle writer is added. Simulation Workspace observers validate the
+same already owned simulator rather than launching a second vehicle chain.
+Actual native evidence and retained Rover control failures are documented in
+[the integration report](RVIZ2_VISUALIZATION_REPORT.md).
+
 ## Shared browser sessions and Vehicle Control (2026-10-28)
 
 `app/web/auth.py` owns bounded opaque browser sessions, separate from Agent

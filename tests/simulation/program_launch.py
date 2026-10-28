@@ -22,7 +22,7 @@ ROOT = Path(__file__).resolve().parents[2]
 TERMINAL = {'SUCCEEDED','FAILED','REJECTED','CANCELLED','TIMED_OUT','UNKNOWN'}
 
 
-def run(kind, directory, *, motion=False, gui=False, read_only=False, http_controls=False, tool_registry=None):
+def run(kind, directory, *, motion=False, gui=False, read_only=False, http_controls=False, tool_registry=None,visualization=False,visualization_extended=False,visualization_lifecycle_only=False):
     if motion and kind != 'rover':raise ValueError('motion acceptance is currently Rover only')
     directory = directory.resolve();directory.parent.mkdir(parents=True,exist_ok=True)
     port = {'rover':18880,'copter':18881,'plane':18882}[kind]
@@ -31,7 +31,10 @@ def run(kind, directory, *, motion=False, gui=False, read_only=False, http_contr
     launcher = None;tools = None
     if tool_registry:
         from tests.simulation.web_ui_controls import ToolAcceptance
-        tools = ToolAcceptance(directory.parent/(directory.name+'-tools'),tool_registry)
+        if visualization:
+            from tests.simulation.visualization import VisualizationAcceptance
+            tools=VisualizationAcceptance(directory.parent/(directory.name+'-tools'),tool_registry,kind,extended=visualization_extended,lifecycle_only=visualization_lifecycle_only)
+        else:tools = ToolAcceptance(directory.parent/(directory.name+'-tools'),tool_registry)
     with socket.socket(socket.AF_INET,socket.SOCK_DGRAM) as monitor:
         monitor.bind(('127.0.0.1',0));monitor.settimeout(.05)
         qgc_port = monitor.getsockname()[1]
@@ -191,7 +194,13 @@ if __name__=='__main__':
     parser.add_argument('--read-only',action='store_true')
     parser.add_argument('--http-controls',action='store_true')
     parser.add_argument('--tool-registry',type=Path,help='Run real browser controls and native ROS2 tool UI using this trusted registry')
-    args=parser.parse_args();result=run(args.kind,args.run_dir,motion=args.motion,gui=args.gui,read_only=args.read_only,http_controls=args.http_controls,tool_registry=args.tool_registry)
+    parser.add_argument('--visualization',action='store_true',help='With --tool-registry: real desktop RViz, vehicle bridge and native ROS observations')
+    parser.add_argument('--visualization-extended',action='store_true',help='Rover motion + actual RViz goal selection and tool/Workspace lifecycle; full controls are a separate run')
+    parser.add_argument('--visualization-lifecycle-only',action='store_true',help='Rover native tools, Wait Mission and owned SITL blackout; no vehicle Actions')
+    args=parser.parse_args()
+    if args.visualization and not args.tool_registry:parser.error('--visualization requires an explicit trusted native --tool-registry')
+    if args.visualization_extended and (not args.visualization or args.kind!='rover'):parser.error('--visualization-extended requires --visualization --kind rover')
+    result=run(args.kind,args.run_dir,motion=args.motion,gui=args.gui,read_only=args.read_only,http_controls=args.http_controls,tool_registry=args.tool_registry,visualization=args.visualization,visualization_extended=args.visualization_extended,visualization_lifecycle_only=args.visualization_lifecycle_only)
     if args.http_controls or args.tool_registry:
         result={k:result[k] for k in ('kind','passed','cleanup')}
         result['evidence']=str(args.run_dir/'web-control-result.json')

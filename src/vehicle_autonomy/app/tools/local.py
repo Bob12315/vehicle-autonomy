@@ -36,6 +36,7 @@ class LocalTools:
     def _environment(self, profile, ctx):
         env = dict(self.env); env.update(profile['env'])
         env.update(ROS_NAMESPACE=ctx['ros_namespace'], ROS_DOMAIN_ID=str(ctx['ros_domain_id']))
+        env.update(VAF_VEHICLE_ID=ctx['vehicle_id'],VAF_VEHICLE_TYPE=ctx['vehicle_type'],VAF_ENVIRONMENT=ctx['environment'])
         return env
 
     @staticmethod
