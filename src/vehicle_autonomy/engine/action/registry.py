@@ -77,7 +77,8 @@ class ActionRegistry:
             max_snapshot_age_s=s.max_snapshot_age_ns/1e9,exit_timeout_s=s.exit_timeout_ns/1e9,
             effect_ttl_s=s.effect_ttl_ns/1e9,effect_ttl_overrides_s={k:v/1e9 for k,v in (to_json_value(s.effect_ttl_overrides) or {}).items()},
             implementation=s.implementation_ref or type(entry.factory).__module__+'.'+type(entry.factory).__qualname__,
-            success_semantics=s.success_semantics,cancel_semantics=s.cancel_semantics,external_lifecycle=s.external_lifecycle)
+            success_semantics=s.success_semantics,cancel_semantics=s.cancel_semantics,external_lifecycle=s.external_lifecycle,
+            retryable=s.retryable,skippable=s.skippable,runtime_mutable_parameters=list(s.runtime_mutable_parameters))
 
     def catalog(self,*,vehicle_kind=None,capabilities=None):
         result=[]

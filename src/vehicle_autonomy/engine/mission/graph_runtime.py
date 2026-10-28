@@ -30,6 +30,9 @@ class NodeRun:
     truth: str | None = None
     pending_end: str | None = None
     event_id: str | None = None
+    inputs: dict = field(default_factory=dict)
+    outputs: dict = field(default_factory=dict)
+    details: dict = field(default_factory=dict)
 
 
 class GraphRun:
@@ -93,8 +96,9 @@ class MissionGraphRuntime:
     def validate(self, document):
         return validate(document, self.actions.registry, self.actions.drivers)
 
-    def start(self, document, *, allow_send=False, continuation_of=None):
+    def start(self, document, *, allow_send=False, continuation_of=None, debug=False):
         if type(allow_send) is not bool: raise ValueError('explicit Mission SEND bool required')
+        if type(debug) is not bool:raise ValueError('explicit debug bool required')
         spec = self.validate(document)
         d = spec.to_dict()
         for old in self.views():
@@ -104,6 +108,10 @@ class MissionGraphRuntime:
         if len(self.journal.data['runs']) >= 64: raise ValueError('Mission history budget exhausted')
         self.journal.save_version(spec)
         r = GraphRun(spec, self.clock(), self.events.cursor, allow_send, continuation_of)
+        r.studio=None
+        if 'studio' in r.spec:
+            from .studio_state import StudioState
+            r.history=deque(maxlen=4096);r.studio=StudioState(self,r,self.clock());r.debug=debug
         r.provider_bindings = {}
         for n in d['nodes']:
             if n['type'] != 'Action':continue
@@ -124,6 +132,10 @@ class MissionGraphRuntime:
                    for v in self.views())
 
     def _event(self, r, event, **values):
+        if 'studio' in r.spec:
+            if len(r.history)>=r.history.maxlen:raise ValueError('Mission event history budget exhausted')
+            r.event_counter=getattr(r,'event_counter',0)+1
+            values=dict(id=r.id+':event:'+str(r.event_counter),sequence=r.event_counter,**values)
         r.history.append(dict(event=event, at_ns=self.clock().monotonic_ns, **values))
 
     def _set(self, r, n, state):
@@ -167,12 +179,16 @@ class MissionGraphRuntime:
 
     def _reset(self, r, key):
         for n in tuple(self._children(r, key)):
+            if r.studio:r.studio.archive(n)
             r.runs[n.id] = NodeRun(n.id)
 
     def _tick_node(self, r, key, now):
         n, spec = r.runs[key], r.nodes[key]
+        if n.state=='SKIPPED':return 'SUCCEEDED'
+        if n.details.get('debug_failed'):return 'RUNNING'
         if n.state in TERMINAL: return n.state
         if n.state == 'IDLE':
+            if r.studio and r.studio.gate(key):return 'RUNNING'
             n.started_ns = now.monotonic_ns
             self._set(r, n, 'RUNNING')
         timeout = spec.get('timeout_s')
@@ -184,7 +200,8 @@ class MissionGraphRuntime:
             return state
         t, children = spec['type'], spec['children']
         result = 'RUNNING'
-        if t == 'Action':
+        if t=='Result':result=spec['outcome']
+        elif t == 'Action':
             if n.action_id is None:
                 if len(r.actions) >= 256: raise ValueError('Mission Action budget exceeded')
                 self._event(r, 'action_intent', node_id=key)
@@ -193,7 +210,9 @@ class MissionGraphRuntime:
                 transfer = r.continuation if registration.spec.effect_types else None
                 world = self.actions.drivers[r.spec['target']].snapshot()
                 now = self.clock()
-                try: parameters = resolve_parameters(spec['parameters'], world, r.blackboard, now)
+                try:
+                    parameters=(r.studio.resolve(spec['parameters'],key,world,now) if r.studio else resolve_parameters(spec['parameters'], world, r.blackboard, now))
+                    if r.studio:parameters.update(r.studio.overrides.get(key,{}))
                 except ValueError:
                     n.truth = 'UNKNOWN'
                     if now.monotonic_ns - n.started_ns < 3_000_000_000: return 'RUNNING'
@@ -214,6 +233,7 @@ class MissionGraphRuntime:
                 if a['safety'] and a['safety']['continuation_allowed']:
                     r.continuation = a['id']
                 elif not self._action_safe(a): result = 'UNKNOWN'
+                if r.studio and result=='SUCCEEDED':r.studio.action_result(key,self.actions.assess(n.action_id,include_result=True),now)
                 if 'output' in spec:
                     a=self.actions.assess(n.action_id,include_result=True)
                     stamp = a['result_at']
@@ -221,12 +241,16 @@ class MissionGraphRuntime:
                     observed = TimePoint(stamp['monotonic_ns'],datetime.fromisoformat(stamp['utc']),stamp['clock_domain_id'])
                     r.blackboard[spec['output']] = BlackboardValue(a['result'], observed, 3_000_000_000, source=a['id'])
             elif result in TERMINAL and not self._action_safe(a): result = 'UNKNOWN'
+            if r.studio and r.debug and result in ('FAILED','TIMED_OUT') and self._action_safe(a):
+                self._set(r,n,result);n.details['debug_failed']=True;r.studio.pause_requested=True
+                self._event(r,'debug_failure',node_id=spec['source_node_id'],execution_id=n.execution_id,state=result)
+                return 'RUNNING'
         elif t == 'Wait':
             if now.monotonic_ns - n.started_ns >= int(spec['duration_s'] * 1e9): result = 'SUCCEEDED'
         elif t == 'Condition':
             if n.truth is None:
                 world = self.actions.drivers[r.spec['target']].snapshot()
-                n.truth = evaluate(spec['expression'], world, r.blackboard, self.clock()).value
+                n.truth = self._evaluate(r,key,spec['expression'],world,self.clock()).value
             if not children: result = {'TRUE': 'SUCCEEDED', 'FALSE': 'FAILED', 'UNKNOWN': 'UNKNOWN'}[n.truth]
             elif n.truth == 'UNKNOWN' and len(children) != 3: result = 'UNKNOWN'
             else: result = self._tick_node(r, children[{'TRUE': 0, 'FALSE': 1, 'UNKNOWN': 2}[n.truth]], now)
@@ -240,7 +264,14 @@ class MissionGraphRuntime:
             elif result in TERMINAL and result != 'SUCCEEDED':
                 if n.index < len(children) - 1: n.index += 1; result = 'RUNNING'
         elif t == 'Parallel':
-            values = [self._tick_node(r, c, now) for c in children]
+            if r.studio and 'branches' not in n.details:
+                n.details['branches']=[r.studio.board.create('parallel',r.studio.context(key),{},now) for c in children]
+                for c,scope in zip(children,n.details['branches']):r.studio.assign(c,scope)
+            capacity=spec.get('max_concurrency',len(children));active=sum(r.runs[c].state not in TERMINAL|{'IDLE','SKIPPED'} for c in children);values=[]
+            for c in children:
+                if r.runs[c].state=='IDLE' and active>=capacity:values.append('RUNNING');continue
+                initial=r.runs[c].state=='IDLE';value=self._tick_node(r,c,now);values.append(value)
+                if initial and value not in TERMINAL:active+=1
             if 'UNKNOWN' in values: chosen = 'UNKNOWN'
             elif spec['failure'] == 'fail_fast' and any(v in TERMINAL - {'SUCCEEDED'} for v in values): chosen = 'FAILED'
             elif spec['completion'] == 'any' and 'SUCCEEDED' in values: chosen = 'SUCCEEDED'
@@ -253,6 +284,39 @@ class MissionGraphRuntime:
                 n.pending_end = chosen
                 state = self._cancel_tree(r, key, chosen)
                 result = chosen if state == chosen else state
+                if r.studio and result=='SUCCEEDED' and not n.details.get('committed'):
+                    selected=[scope for scope,value in zip(n.details['branches'],values) if value=='SUCCEEDED']
+                    r.studio.board.commit(selected)
+                    for scope in n.details['branches']:r.studio.board.scopes[scope]['closed']=True
+                    n.details['committed']=True
+        elif t=='ForEach':
+            if not r.studio.foreach_scope(key,now):result='SUCCEEDED'
+            else:
+                child=children[0];value=self._tick_node(r,child,now)
+                if value in TERMINAL:
+                    scope=n.details['iteration_scopes'][n.index]
+                    r.studio.board.scopes[scope]['closed']=True
+                    self._event(r,'iteration_completed',node_id=spec['source_node_id'],execution_id=n.execution_id,index=n.index,scope_id=scope,state=value)
+                    if value=='UNKNOWN' or value!='SUCCEEDED' and spec['on_item_failure']=='abort':result=value
+                    else:
+                        n.index+=1
+                        if n.index<len(n.details['items']):self._reset(r,child)
+                        else:result='SUCCEEDED'
+        elif t=='SubMission':
+            r.studio.submission_enter(key,now);result=self._tick_node(r,children[0],now)
+            if result=='SUCCEEDED':r.studio.submission_exit(key,now)
+        elif t=='Retry':
+            result=self._tick_node(r,children[0],now)
+            if result in ('FAILED','TIMED_OUT') and n.index+1<spec['count']:
+                if any(child.action_id and not self._action_safe(self.actions.assess(child.action_id)) for child in self._children(r,children[0])):result='UNKNOWN'
+                else:n.index+=1;self._reset(r,children[0]);result='RUNNING'
+        elif t=='Await':
+            if 'expression' in spec:
+                world=self.actions.drivers[r.spec['target']].snapshot();n.truth=self._evaluate(r,key,spec['expression'],world,now).value
+                if n.truth=='TRUE':result='SUCCEEDED'
+            else:
+                events=self.events.read(r.event_cursors[key],spec['event'],now)
+                if events:n.event_id=events[0].id;r.event_cursors[key]=events[0].sequence;result='SUCCEEDED'
         elif t == 'Repeat':
             result = self._tick_node(r, children[0], now)
             if result == 'SUCCEEDED' and n.index + 1 < spec['count']:
@@ -289,6 +353,9 @@ class MissionGraphRuntime:
                 if r.cancel_to:
                     state = self._cancel_tree(r, r.spec['root'], r.cancel_to)
                     r.state = state
+                elif r.state=='PAUSED':
+                    self._persist(r);continue
+                elif r.studio and r.studio.pause_requested and r.studio.safe_boundary():r.state='PAUSED'
                 else:
                     state = self._tick_node(r, r.spec['root'], now)
                     if state in TERMINAL:
@@ -298,6 +365,7 @@ class MissionGraphRuntime:
                             r.cancel_to = state
                             r.state = self._cancel_tree(r, r.spec['root'], state)
                         else: r.state = state
+                    elif r.studio and r.studio.pause_requested and r.studio.safe_boundary():r.state='PAUSED'
                 if r.state in TERMINAL:
                     self.actions.mission_groups.finish(r.permit,continuation=self.view(r.id)['continuation_allowed'])
                 self._persist(r)
@@ -316,7 +384,7 @@ class MissionGraphRuntime:
         latest = None if r.continuation is None else self.actions.assess(r.continuation)
         continuation = r.state == 'SUCCEEDED' and not safe and latest is not None and latest['safety'] and latest['safety']['continuation_allowed'] and all(
             self._action_safe(a) or a['state'] == 'SUCCEEDED' and a['safety'] and a['safety']['continuation_allowed'] for a in views)
-        return dict(id=r.id, mission_id=r.spec['id'], version=r.spec['version'], target=r.spec['target'],
+        result=dict(id=r.id, mission_id=r.spec['id'], version=r.spec['version'], target=r.spec['target'],
             provider_bindings=deepcopy(r.provider_bindings),resource_claims=to_json_value(r.permit.resources),resource_group_id=r.permit.id,
             deployment_identity=deepcopy(r.deployment_identity), state=r.state, release_safe=safe, continuation_allowed=bool(continuation), continuation_of=r.continuation,
             error=r.error, deadline_ns=r.deadline_ns, spec=deepcopy(r.spec),
@@ -324,9 +392,66 @@ class MissionGraphRuntime:
             nodes=[dict(id=n.id, execution_id=n.execution_id, state=n.state, action_id=n.action_id, truth=n.truth,
                         iteration=n.index, event_id=n.event_id) for n in r.runs.values()],
             action_ids=list(r.actions), action_bindings=deepcopy(r.action_bindings), history=list(r.history))
+        if r.studio:result['studio']=r.studio.snapshot(self.clock())
+        return result
+
+    def _evaluate(self,r,key,expression,world,now):
+        resolver=None
+        if r.studio:
+            def resolver(e):
+                try:return r.studio.board.read(r.studio.context(key),dict(source='world',path=e['path']) if e['source']=='world' else dict(ref=e['path']),now,world)[1]
+                except ValueError:return None
+        return evaluate(expression,world,r.blackboard,now,resolver=resolver)
 
     def views(self):
         return [self.view(k) for k in self.recovered] + [self.view(k) for k in self.runs]
+
+    def debug(self,identifier,operation,*,node_id=None,parameters=None):
+        if identifier not in self.runs:raise ValueError('recovered runs are observational; new validation/authorization required')
+        r=self.runs[identifier];s=r.studio
+        if s is None:raise ValueError('Studio debug requires a schema-2 publication')
+        if r.state in TERMINAL:raise ValueError('terminal/uncertain run cannot be resumed by debug')
+        if operation=='pause':
+            s.pause_requested=True;r.state='PAUSE_REQUESTED';self._event(r,'pause_requested')
+        elif operation=='breakpoints':
+            values=parameters
+            ids={n.get('source_node_id') for n in r.nodes.values()}
+            if type(values) is not list or len(values)>128 or any(type(v) is not str or v not in ids for v in values):raise ValueError('bounded existing breakpoint nodes required')
+            s.breakpoints=set(values);self._event(r,'breakpoints_changed',nodes=values)
+        else:
+            if r.state!='PAUSED' or not s.safe_boundary():raise ValueError('confirmed safe paused boundary required')
+            if operation in ('resume','step'):
+                if any(n.details.get('debug_failed') for n in r.runs.values()):raise ValueError('resolve failed node with permitted retry/skip before resume')
+                driver=self.actions.drivers[r.spec['target']];world=driver.snapshot();now=self.clock()
+                if world is None or not 0<=now.elapsed_ns_since(world.published_at)<3_000_000_000:raise ValueError('fresh state required before resume')
+                info=driver.info() if callable(getattr(driver,'info',None)) else {}
+                epoch=(info.get('session_id'),str(getattr(getattr(world,'version',None),'generation_id',None)))
+                if epoch!=s.vehicle_epoch:raise ValueError('vehicle session/origin changed; create a newly validated run')
+                if getattr(world,'vehicle',None) is not None and world.vehicle.health.quality.value!='VALID':raise ValueError('valid vehicle state required')
+                s.pause_requested=False;s.step_remaining=None if operation=='resume' else (0 if any(n.state=='RUNNING' and r.nodes[n.id]['type'] in ('Wait','Await') for n in r.runs.values()) else 1)
+                r.state='RUNNING';self._event(r,'mission_'+operation)
+            elif operation in ('retry','skip','override'):
+                choices=[n for n in r.runs.values() if n.id==node_id or r.nodes[n.id].get('source_node_id')==node_id and r.nodes[n.id]['type'] in ('Action','Wait','Await')]
+                if len(choices)!=1:raise ValueError('one unambiguous runtime node required')
+                n=choices[0];spec=r.nodes[n.id]
+                if operation=='retry':
+                    if not n.details.get('debug_failed') or spec['type']!='Action' or not self.actions.registry.resolve_typed(spec['action'],spec['action_version']).spec.retryable:raise ValueError('node/Action contract does not permit retry')
+                    attempts=n.details.get('debug_retries',0)
+                    if attempts>=2 or n.action_id and not self._action_safe(self.actions.assess(n.action_id)):raise ValueError('retry budget or physical exit barrier')
+                    self._reset(r,n.id);r.runs[n.id].details['debug_retries']=attempts+1
+                elif operation=='skip':
+                    if n.state!='IDLE' and not n.details.get('debug_failed'):raise ValueError('only pending or safely failed nodes may be skipped')
+                    if spec['type'] not in ('Wait','Await') and not spec.get('skippable'):raise ValueError('published node/Action contract forbids skip')
+                    n.details.pop('debug_failed',None);self._set(r,n,'SKIPPED')
+                else:
+                    if n.state!='IDLE' or spec['type']!='Action' or type(parameters) is not dict or not parameters or parameters.keys()-set(spec.get('runtime_overrides',[])):raise ValueError('only declared pending parameters may be overridden')
+                    from vehicle_autonomy.engine.action.schema import validate_json
+                    schema=self.actions.registry.metadata(spec['action'],spec['action_version'],vehicle_kind=self.actions.drivers[r.spec['target']].context().target_kind)['parameters']
+                    for name,value in parameters.items():validate_json(value,schema['properties'][name],name)
+                    s.overrides[n.id]=dict(s.overrides.get(n.id,{}),**deepcopy(parameters))
+                self._event(r,'debug_'+operation,node_id=spec.get('source_node_id'),execution_id=n.execution_id,parameters=deepcopy(parameters))
+            else:raise ValueError('unsupported debug operation')
+        self._persist(r);return self.view(identifier)
 
     def _persist(self, r):
         view = self.view(r.id)

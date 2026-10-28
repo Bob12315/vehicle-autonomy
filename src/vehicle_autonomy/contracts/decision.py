@@ -82,12 +82,18 @@ class ActionSpec:
     success_semantics: str = ''
     cancel_semantics: str = 'Exit barrier; uncertain physical effects retain resources.'
     external_lifecycle: str = 'opaque'
+    retryable: bool = False
+    skippable: bool = False
+    runtime_mutable_parameters: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
+        if type(self.retryable) is not bool or type(self.skippable) is not bool:raise TypeError('explicit retry/skip contracts required')
+        if type(self.runtime_mutable_parameters) is not tuple or any(type(v) is not str for v in self.runtime_mutable_parameters):raise TypeError('immutable declared runtime parameters required')
         if not isinstance(self.name, str) or not self.name.strip():
             raise ValueError("Action name must be non-empty")
         if not isinstance(self.parameters_type, type) or not is_dataclass(self.parameters_type):
             raise TypeError("parameters_type must be a dataclass type")
+        if set(self.runtime_mutable_parameters)-{f.name for f in fields(self.parameters_type)}:raise ValueError('unknown mutable Action parameter')
         if not self.parameters_type.__dataclass_params__.frozen:
             raise TypeError("Action parameters must use a frozen dataclass")
         if not isinstance(self.required_capabilities, frozenset) or any(

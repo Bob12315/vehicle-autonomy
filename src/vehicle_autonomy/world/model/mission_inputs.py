@@ -79,17 +79,17 @@ def query(world, path):
     return BlackboardValue(value, stamp, 3_000_000_000, quality, frame, 'world:' + path)
 
 
-def evaluate(expression, world, blackboard, now):
+def evaluate(expression, world, blackboard, now, *, resolver=None):
     op = expression['op']
     if op in ('all', 'any'):
-        values = [evaluate(e, world, blackboard, now) for e in expression['args']]
+        values = [evaluate(e, world, blackboard, now,resolver=resolver) for e in expression['args']]
         if op == 'all':
             return Truth.FALSE if Truth.FALSE in values else Truth.UNKNOWN if Truth.UNKNOWN in values else Truth.TRUE
         return Truth.TRUE if Truth.TRUE in values else Truth.UNKNOWN if Truth.UNKNOWN in values else Truth.FALSE
     if op == 'not':
-        value = evaluate(expression['arg'], world, blackboard, now)
+        value = evaluate(expression['arg'], world, blackboard, now,resolver=resolver)
         return {Truth.TRUE: Truth.FALSE, Truth.FALSE: Truth.TRUE, Truth.UNKNOWN: Truth.UNKNOWN}[value]
-    value = (query(world, expression['path']) if expression['source'] == 'world' else blackboard_query(blackboard, expression['path']))
+    value = resolver(expression) if resolver else (query(world, expression['path']) if expression['source'] == 'world' else blackboard_query(blackboard, expression['path']))
     if not usable(value, now, frame=expression.get('frame'), max_age_s=expression.get('max_age_s', 3)):
         return Truth.UNKNOWN
     actual, expected = thaw_json(value.value), expression['value']
@@ -125,8 +125,9 @@ def blackboard_query(blackboard, path):
         if q is not None and q != 'VALID': quality = 'UNKNOWN'
     provenance(value)
     for part in parts:
-        if type(value) is not dict or part not in value: return None
-        value = value[part]
+        if type(value) is list and part.isdecimal() and int(part)<len(value):value=value[int(part)]
+        elif type(value) is dict and part in value:value=value[part]
+        else:return None
         provenance(value)
     return BlackboardValue(value, stamp, item.valid_for_ns, quality, frame, item.source)
 
