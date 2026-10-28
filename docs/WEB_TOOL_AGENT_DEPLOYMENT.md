@@ -24,11 +24,45 @@ parent directories as 0700. Keep browser and Agent tokens different. Transfer
 only that Agent's token to its host using an authenticated secure channel; never
 put token contents in command arguments, committed files or URLs.
 
+For a concrete checkout-local setup (run once; existing configuration is not
+overwritten):
+
+```bash
+.venv/bin/python - <<'PY'
+import json
+from pathlib import Path
+from vehicle_autonomy.app.web.server import load_token
+root = Path('runtime/web-tools').resolve()
+root.mkdir(parents=True, mode=0o700, exist_ok=True)
+load_token(root / 'web.private')
+load_token(root / 'desktop.private')
+with (root / 'agents.json').open('x') as stream:
+    json.dump({'schema': 1, 'agents': {'desktop': {
+        'token_file': str(root / 'desktop.private')}}}, stream, indent=2)
+print('Private configuration directory:', root)
+PY
+.venv/bin/vehicle-autonomy-tool-registry --output runtime/web-tools/tools.json \
+  --ros-wrapper scripts/with_ros2.sh \
+  --sitl-dir artifacts/phase2-control/ardupilot-source/build/sitl/bin \
+  --ardupilot-plugin /home/level6/gz_ws/src/ardupilot_gazebo/build/libArduPilotPlugin.so \
+  --coupled-rover
+```
+
+The dependency paths above are this developer host's existing installations;
+replace/omit unavailable options on another host. For its complete Nav2 prefix,
+set `VAF_ROS2_ROOT=$PWD/artifacts/phase5-world-navigation/ros2-jazzy/root` for the
+registry-generation command. The ordinary local ROS prefix contains only a
+subset of Nav2. Software/profiles with missing dependencies stay unavailable.
+QGC needs the additional actual relay/profile setup described below.
+
 ```bash
 .venv/bin/vehicle-autonomy-console --port 8780 \
   --token-file runtime/operator/web.private --data-dir runtime/operator/state \
   --tool-agents runtime/operator/agents.json --tool-port 8791
 ```
+
+For the concrete configuration above, use `--token-file runtime/web-tools/web.private`,
+`--data-dir runtime/web-tools/operator`, `--tool-agents runtime/web-tools/agents.json`.
 
 Open `http://127.0.0.1:8780/console`; paste the browser token. With no simulation
 arguments the Dashboard accurately has no vehicle and SEND stays off. Original
@@ -40,6 +74,23 @@ assembly and its signing/provider registry prerequisites. Add `--allow-send` onl
 when intentionally authorizing that owned simulation deployment; each control
 still requires separate Action SEND. Do not attempt to use a Tool-launched native
 SITL as a trusted Framework vehicle without the original ownership/signing setup.
+
+To use the **same center with an actual owned vehicle** through an existing
+launcher (Rover shown; Copter/Plane accept the same optional arguments):
+
+```bash
+./scripts/start_rover_sim.sh --headless --read-only \
+  --tool-agents runtime/web-tools/agents.json --tool-port 8791 \
+  --tool-data-dir runtime/web-tools/persistent-tools
+```
+
+Open `http://127.0.0.1:8780/console`, using the **simulation launcher's printed
+token-file path**; it provisions its own private Web token. Start the Agent in a
+second terminal with `--id desktop --token-file runtime/web-tools/desktop.private
+--registry runtime/web-tools/tools.json --data-dir runtime/web-tools/agent-state
+--backend http://127.0.0.1:8791`. Do not run another backend on those same ports.
+The explicit `--tool-data-dir` persists Workspaces across fresh simulation Mission
+journals without weakening their vehicle-identity fences. No arm/motion is sent.
 
 ## Configure a host and run its Agent
 

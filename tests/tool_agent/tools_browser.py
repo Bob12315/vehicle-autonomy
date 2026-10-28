@@ -20,6 +20,7 @@ def run(directory):
                 row=page.locator('[data-tool="desktop:fixture"]');expect(row).to_be_visible()
                 row.get_by_role('button',name='Launch',exact=True).click()
                 expect(row.locator('td:nth-child(4) .badge')).to_have_text('Ready',timeout=10000)
+                row.get_by_role('button',name='Connection',exact=True).click();expect(page.locator('#tool-detail pre')).to_contain_text('vaf.tools.integration/1')
                 row.get_by_role('button',name='Logs',exact=True).click();expect(page.locator('#tool-detail pre')).to_contain_text('started')
                 row.get_by_role('button',name='Configure',exact=True).click();page.get_by_role('button',name='保存选择',exact=True).click()
                 row.get_by_role('button',name='Stop',exact=True).click();expect(row.locator('td:nth-child(3) small').first).to_have_text('STOPPED',timeout=10000)

@@ -7,27 +7,32 @@ import signal
 from threading import Event, RLock, Thread
 import time
 from urllib.parse import urlsplit
-from urllib.request import Request, build_opener, ProxyHandler
+from urllib.error import HTTPError
+from urllib.request import Request, build_opener, ProxyHandler, HTTPRedirectHandler
 from uuid import uuid4
 
 from vehicle_autonomy.app.web.server import load_token
 from .local import LocalTools
-from .schema import identifier, object_fields
+from .schema import identifier, object_fields, context, number
 from .storage import Store
+
+
+class NoRedirect(HTTPRedirectHandler):
+    def redirect_request(self,*args,**kwargs):return None
 
 
 class Agent:
     def __init__(self, agent_id, name, role, endpoint, token, tools, *, interval_s=.5):
         identifier(agent_id)
         parts = urlsplit(endpoint)
-        if parts.scheme != 'http' or parts.hostname not in ('127.0.0.1', 'localhost') or not parts.port or parts.path not in ('', '/') or parts.query or parts.fragment or parts.username:
+        if parts.scheme != 'http' or parts.hostname not in ('127.0.0.1', 'localhost') or not parts.port or parts.path not in ('', '/') or parts.query or parts.fragment or parts.username is not None or parts.password is not None:
             raise ValueError('loopback HTTP endpoint required; use authenticated SSH forwarding')
         self.id = agent_id; self.name = name; self.role = role; self.endpoint = endpoint.rstrip('/')
         self.token = token; self.tools = tools; self.interval = interval_s
         self.boot = uuid4().hex; self.sequence = 0; self.stop_event = Event()
         self.pending = {}; self.completed = {}; self.inflight = set(); self.queue = deque(); self.lock = RLock()
         self.connected = False; self.error = None
-        self.opener = build_opener(ProxyHandler({}))
+        self.opener = build_opener(ProxyHandler({}),NoRedirect())
         self.thread = Thread(target=self._run, name='tool-agent-link', daemon=True)
         self.worker = Thread(target=self._commands, name='tool-agent-commands', daemon=True)
 
@@ -36,10 +41,16 @@ class Agent:
     def exchange(self):
         with self.lock:
             payload = dict(boot_id=self.boot, sequence=self.sequence, name=self.name, role=self.role,
-                           tools=self.tools.snapshot(), results=list(self.pending.values())[:128])
+                           tools=self.tools.snapshot(), results=list(self.pending.values())[:16])
             self.sequence += 1
+        raw=json.dumps(payload,allow_nan=False).encode()
+        if len(raw)>1_400_000:
+            for report in payload['tools']:
+                if report['instance']:report['instance']['logs']=report['instance']['logs'][-4:]
+            raw=json.dumps(payload,allow_nan=False).encode()
+        if len(raw)>1_400_000:raise ValueError('Agent metadata exceeds channel budget; split the trusted registry')
         before = time.monotonic()
-        request = Request(self.endpoint + '/v1/exchange', data=json.dumps(payload, allow_nan=False).encode(),
+        request = Request(self.endpoint + '/v1/exchange', data=raw,
             headers={'Content-Type':'application/json', 'Authorization':'Bearer ' + self.token, 'X-VAF-Agent':self.id})
         with self.opener.open(request, timeout=2) as response:
             body = response.read(262145)
@@ -50,6 +61,9 @@ class Agent:
         with self.lock:
             for key in result['acknowledged']: self.pending.pop(key, None)
             for command in result['commands']:
+                object_fields(command,('id','boot_id','operation','tool_id','profile_id','context','expires_in_s'))
+                identifier(command['tool_id']);identifier(command['profile_id']);context(command['context']);number(command['expires_in_s'],0,10)
+                if command['operation'] not in ('launch','stop','restart','check','connect','open'):raise ValueError('unsupported Agent command')
                 if command['boot_id'] != self.boot: raise ValueError('stale command boot')
                 key = command['id']; identifier(key)
                 if key in self.inflight: continue
@@ -67,7 +81,12 @@ class Agent:
         while not self.stop_event.is_set():
             try: self.exchange()
             except Exception as exc:
-                self.connected = False; self.error = type(exc).__name__
+                error=type(exc).__name__+(f' HTTP {exc.code}' if isinstance(exc,HTTPError) else '')
+                if error!=self.error:
+                    try:self.tools.store.audit('agent.link_failed',error=error)
+                    except OSError:pass
+                    print('Tool Agent link failed: '+error+'; retrying',flush=True)
+                self.connected = False; self.error = error
             self.stop_event.wait(self.interval)
 
     def _commands(self):
@@ -97,7 +116,12 @@ def main():
     p.add_argument('--token-file', required=True, type=Path)
     p.add_argument('--registry', required=True, type=Path, help='trusted local Manifest JSON; never browser supplied')
     p.add_argument('--data-dir', required=True, type=Path)
-    a = p.parse_args(); store = Store(a.data_dir); local = agent = None
+    a = p.parse_args()
+    # Dedicated Agent process only: adopt/reap descendants if a private
+    # supervisor is killed. This is never set in the Mission/backend process.
+    import ctypes
+    ctypes.CDLL(None,use_errno=True).prctl(36,1,0,0,0)
+    store = Store(a.data_dir); local = agent = None
     try:
         if a.registry.stat().st_size > 1_000_000: raise ValueError('registry too large')
         config = json.loads(a.registry.read_text()); object_fields(config, ('schema', 'tools'))

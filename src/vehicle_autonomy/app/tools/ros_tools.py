@@ -22,6 +22,15 @@ def namespace():
     return os.environ.get('ROS_NAMESPACE', '/').rstrip('/') or ''
 
 
+def nav2_parameters(source,ns):
+    """Bind data inputs to the selected vehicle as well as service endpoints."""
+    source=source.replace('use_sim_time: true','use_sim_time: false').replace('behavior_plugins: [spin, backup, wait]','behavior_plugins: [wait]')
+    for field,topic in (('odom_topic','odom'),('topic','scan'),('map_topic','map')):
+        source=source.replace(field+': /'+topic,field+': '+ns+'/'+topic)
+    native_ns=ns+'/vaf_tools'
+    return native_ns.lstrip('/')+':\n'+''.join('  '+line if line.strip() else line for line in source.splitlines(keepends=True))
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('operation', choices=('observe', 'graph', 'rviz', 'rviz-node', 'nav2', 'nav2-nodes', 'start-nav2'))
@@ -55,11 +64,11 @@ def main():
             native_ns = ns + '/vaf_tools'
             with tempfile.TemporaryDirectory(prefix='nav2-', dir=Path.cwd()) as temporary:
                 config = Path(temporary) / 'nav2.yaml'
-                content = a.params.read_text().replace('use_sim_time: true', 'use_sim_time: false').replace('behavior_plugins: [spin, backup, wait]', 'behavior_plugins: [wait]')
-                config.write_text(native_ns.lstrip('/') + ':\n' + ''.join('  ' + line if line.strip() else line for line in content.splitlines(keepends=True)))
+                config.write_text(nav2_parameters(a.params.read_text(),ns))
                 for package, executable in NODES:
                     binary = Path(get_package_prefix(package))/'lib'/package/executable
-                    command = [str(binary), '--ros-args', '--params-file', str(config), '-r', '__ns:=' + native_ns]
+                    command = [str(binary), '--ros-args', '--params-file', str(config), '-r', '__ns:=' + native_ns,
+                        '-r','/tf:='+ns+'/tf','-r','/tf_static:='+ns+'/tf_static']
                     if executable == 'bt_navigator': command += ['-p', 'default_nav_to_pose_bt_xml:=' + str(a.behavior_tree)]
                     if executable in ('controller_server', 'behavior_server'): command += ['-r', 'cmd_vel:=cmd_vel_tool_candidate']
                     if executable == 'velocity_smoother': command += ['-r', 'cmd_vel:=cmd_vel_tool_candidate', '-r', 'cmd_vel_smoothed:=cmd_vel_tool_smoothed']

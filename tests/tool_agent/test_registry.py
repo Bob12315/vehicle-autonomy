@@ -13,6 +13,13 @@ from .helpers import tool, CTX
 
 
 class RegistryTests(unittest.TestCase):
+    def test_nav2_inputs_are_bound_to_vehicle_namespace_not_another_global_robot(self):
+        from vehicle_autonomy.app.tools.ros_tools import nav2_parameters
+        text=nav2_parameters('odom_topic: /odom\ntopic: /scan\nmap_topic: /map\nuse_sim_time: true\n','/second_vehicle')
+        self.assertIn('odom_topic: /second_vehicle/odom',text);self.assertIn('topic: /second_vehicle/scan',text);self.assertIn('map_topic: /second_vehicle/map',text)
+        self.assertNotIn(': /odom',text);self.assertNotIn(': /scan',text);self.assertNotIn(': /map',text)
+    def test_root_ros_namespace_expands_without_double_slashes(self):
+        self.assertEqual(LocalTools._expand(['{namespace}/tf','__ns:={namespace}'],CTX|{'ros_namespace':'/'}),['/tf','__ns:=/'])
     def test_all_standard_manifests_validate_without_optional_imports(self):
         value=registry()
         self.assertEqual({m['id'] for m in value['tools']},{'rviz2','qgroundcontrol','gazebo','nav2','ros2','sitl'})

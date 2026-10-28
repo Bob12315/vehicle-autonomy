@@ -20,7 +20,7 @@ async function api(path,payload){
 function route(){view=location.hash.slice(1)||'dashboard';if(!titles[view])view='dashboard';for(const e of document.querySelectorAll('[data-panel]'))e.hidden=e.dataset.panel!==view;for(const e of document.querySelectorAll('[data-view]')){if(e.dataset.view===view)e.setAttribute('aria-current','page');else e.removeAttribute('aria-current');}$('#page-title').textContent=titles[view][0];$('#page-subtitle').textContent=titles[view][1];if(snapshot)render();}
 window.addEventListener('hashchange',route);route();
 function linkState(ok){$('#link-state').textContent=ok?'控制中心已连接':'控制中心已断开 · 状态未知';$('#link-dot').style.background=ok?'#087e79':'#ad3c32';}
-function invalidate(){if(!snapshot)return;snapshot.vehicles=[];if(snapshot.tools)for(const a of snapshot.tools.agents){a.connected=false;for(const t of a.tools)if(t.instance)Object.assign(t.instance,{state:'DISCONNECTED',ready:false,process_running:null,service_health:'UNKNOWN',connection:'DISCONNECTED'});}renderTools();$('#dashboard-data').hidden=true;$('#vehicle-empty').hidden=false;$('#vehicle-empty').replaceChildren(node('strong','连接中断，当前状态未知'),node('p','连接恢复后同步完整状态。已显示的旧遥测不能用于操作。'));linkState(false);}
+function invalidate(){if(!snapshot)return;snapshot.vehicles=[];if(snapshot.tools){for(const a of snapshot.tools.agents){a.connected=false;for(const t of a.tools)if(t.instance)Object.assign(t.instance,{state:'DISCONNECTED',ready:false,process_running:null,service_health:'UNKNOWN',connection:'DISCONNECTED'});}for(const r of snapshot.tools.workspaces?.runs||[])if(!['STOPPED','ABANDONED'].includes(r.state)){r.state='UNKNOWN';r.error='Web 连接中断，远端状态未知';for(const c of r.components)c.observed_ready=false;}}$('#tool-detail').hidden=true;renderTools();renderWorkspaces();$('#dashboard-data').hidden=true;$('#vehicle-empty').hidden=false;$('#vehicle-empty').replaceChildren(node('strong','连接中断，当前状态未知'),node('p','连接恢复后同步完整状态。已显示的旧遥测不能用于操作。'));linkState(false);}
 async function poll(){if(busy||!connected)return;busy=true;try{snapshot=await api('/api/console/state');if(!settingsLoaded&&snapshot.tools?.settings){toolContext=snapshot.tools.settings.context;fillContext();settingsLoaded=true;}lastReceived=performance.now();linkState(true);$('#updated').textContent='已同步 '+new Date().toLocaleTimeString();render();}catch(e){invalidate();notice(e);}finally{busy=false;}}
 $('#connection').onsubmit=guard(async e=>{e.preventDefault();connected=true;notice('');await poll();});
 $('#disconnect').onclick=()=>{connected=false;invalidate();$('#token').value='';};
@@ -60,7 +60,7 @@ function renderTools(){
  for(const a of snapshot.tools.agents){const row=node('div');row.append(badge(a.connected?'Online':'Disconnected',a.connected?'good':'error'),node('strong',' '+a.name),node('small',`${a.id} · ${a.role} · 心跳 ${num(a.heartbeat_age_s,1)} s`));host.append(row);}
  if(!snapshot.tools.agents.length){$('#tools-content').className='panel empty';$('#tools-content').replaceChildren(node('strong','等待 Agent 注册'),node('p','启动已授权的 Desktop、Server 或 Onboard Agent；无需固定 Agent IP。'));return;}
  if(view!=='tools')return;
- if($('#tools-content').contains(document.activeElement)&&document.activeElement.tagName==='SELECT')return;
+ if(snapshot.tools.agents.every(a=>a.connected)&&$('#tools-content').contains(document.activeElement)&&document.activeElement.tagName==='SELECT')return;
  const table=node('table',undefined,{class:'tools-table'}),thead=node('thead'),tr=node('tr');for(const name of ['TOOL / VERSION','HOST / PROFILE','INSTALL / PROCESS','HEALTH / READY','CONNECTION / ERROR','OPERATIONS'])tr.append(node('th',name));thead.append(tr);table.append(thead);const body=node('tbody');table.append(body);
  for(const a of snapshot.tools.agents)for(const t of a.tools){
   const m=t.manifest,p=profileFor(a,t),check=t.checks[p]||{},i=t.instance,key=a.id+':'+m.id;
@@ -72,17 +72,17 @@ function renderTools(){
   const actions=node('td'),buttons=node('div',undefined,{class:'actions'}),active=i?.process_running===true;
   buttons.append(button('Launch',()=>operate(a.id,m.id,'launch'),!a.connected||!check.launchable||active||t.external_pids.length>0,error||'启动选定 Profile'),button('Stop',()=>operate(a.id,m.id,'stop'),!a.connected||!active||!i?.owned,'只停止本 Agent 拥有的进程'),button('Restart',()=>operate(a.id,m.id,'restart'),!a.connected||!i?.owned||!check.launchable),button('Logs',()=>showTool(a.id,m.id,'logs')),button('Configure',()=>showTool(a.id,m.id,'configure')),button('Dependencies',()=>operate(a.id,m.id,'check'),!a.connected),button('Connection',()=>showTool(a.id,m.id,'connection')));
   if(m.type==='gui')buttons.append(button('Open Window',()=>operate(a.id,m.id,'open'),!a.connected||active||!check.launchable,'在目标 Agent 桌面启动；不提供已有远端窗口置前'));
-  if(t.external_pids.length)buttons.append(button('Observe / Connect',()=>operate(a.id,m.id,'connect'),!a.connected));actions.append(buttons);row.append(actions);body.append(row);
+  if(t.external_pids.length)buttons.append(button('Observe / Connection Info',()=>operate(a.id,m.id,'connect'),!a.connected));actions.append(buttons);row.append(actions);body.append(row);
  }
  const container=$('#tools-content');container.className='panel table-wrap';container.replaceChildren(node('p',`启动上下文：${toolContext.vehicle_id} / ${toolContext.vehicle_type} · ${toolContext.environment} · ROS ${toolContext.ros_domain_id} ${toolContext.ros_namespace}`,{class:'muted'}),table);
  if(detailSelection?.mode==='logs'){const[a,t]=findTool(detailSelection.agent,detailSelection.tool);if(t)$('#tool-detail pre').textContent=t.instance?.logs?.join('')||'当前没有由 Agent 收集的进程输出。';}
 }
-function showTool(agentId,toolId,mode){
- const[a,t]=findTool(agentId,toolId),p=profileFor(a,t),detail=$('#tool-detail');detailSelection={agent:agentId,tool:toolId,mode};detail.hidden=false;detail.replaceChildren(node('h2',`${t.manifest.name} / ${a.id}`));
+async function showTool(agentId,toolId,mode){
+ const[a,t]=findTool(agentId,toolId),p=profileFor(a,t),detail=$('#tool-detail'),selection={agent:agentId,tool:toolId,mode};detailSelection=selection;detail.hidden=false;detail.replaceChildren(node('h2',`${t.manifest.name} / ${a.id}`));
  if(mode==='configure'){
   detail.append(node('p','选择主机预先授权的 Profile。保存选择不会修改正在运行的实例。',{class:'muted'}));const select=node('select',undefined,{'aria-label':'配置 Profile'});for(const name of Object.keys(t.manifest.profiles))select.append(node('option',name,{value:name}));select.value=p;detail.append(select,node('pre',JSON.stringify(toolContext,null,2)),button('保存选择',async()=>{await api('/api/tools/configure',{agent_id:agentId,tool_id:toolId,profile_id:select.value,context:toolContext});profileSelections.set(agentId+':'+toolId,select.value);notice('Profile 选择已保存；运行实例没有被重配。');await poll();}));
  }else if(mode==='logs')detail.append(node('pre',t.instance?.logs?.join('')||'当前没有由 Agent 收集的进程输出。'));
- else detail.append(node('pre',JSON.stringify({profile:p,connection:t.manifest.profiles[p].connection,context:t.instance?.context||toolContext,external_pids:t.external_pids,integrations:t.manifest.integrations,last_operation:snapshot.tools.jobs.filter(j=>j.agent_id===agentId&&j.tool_id===toolId).at(-1)},null,2)));
+ else {const integration=await api('/api/tools/integration',{agent_id:agentId,tool_id:toolId,profile_id:p});if(detailSelection!==selection)return;detail.append(node('pre',JSON.stringify({integration,external_pids:t.external_pids,integrations:t.manifest.integrations,last_operation:snapshot.tools.jobs.filter(j=>j.agent_id===agentId&&j.tool_id===toolId).at(-1)},null,2)));}
  detail.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 function workspaceCall(name,payload){return api('/api/workspaces/'+name,payload).then(async value=>{notice('Workspace '+name+' 请求已记录；准备状态以组件检测结果为准。');await poll();return value;});}

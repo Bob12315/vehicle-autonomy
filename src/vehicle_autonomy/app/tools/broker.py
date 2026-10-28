@@ -7,7 +7,7 @@ import time
 from uuid import uuid4
 
 from vehicle_autonomy.app.web.server import ConsoleServer, Handler
-from .schema import context, identifier, number, object_fields, string
+from .schema import context, identifier, number, object_fields, string, tool_report
 
 
 class AgentRegistry:
@@ -27,10 +27,14 @@ class AgentRegistry:
         if type(payload['tools']) is not list or len(payload['tools']) > 48: raise ValueError('bounded Tool snapshot required')
         ids = set()
         for tool in payload['tools']:
-            identifier(tool['manifest']['id'])
+            tool_report(tool)
             if tool['manifest']['id'] in ids: raise ValueError('duplicate Tool report')
             ids.add(tool['manifest']['id'])
         if type(payload['results']) is not list or len(payload['results']) > 128: raise ValueError('bounded command results required')
+        for result in payload['results']:
+            object_fields(result,('id','ok','result','error'));identifier(result['id'])
+            if type(result['ok']) is not bool or result['result'] is not None and type(result['result']) is not dict:raise ValueError('invalid Tool result')
+            if result['error'] is not None and (type(result['error']) is not str or len(result['error'])>1024):raise ValueError('bounded result error required')
         with self.lock:
             old = self.agents.get(agent_id)
             if old:
@@ -49,10 +53,12 @@ class AgentRegistry:
             self.agents[agent_id] = value
             acknowledged = []
             for result in payload['results']:
-                object_fields(result, ('id', 'ok', 'result', 'error'))
-                identifier(result['id'])
-                if type(result['ok']) is not bool: raise ValueError('result status required')
                 job = self.jobs.get(result['id'])
+                if job is None:
+                    # Backend restart does not replay old jobs. Acknowledge the
+                    # transport record so old unrecognized results cannot fill
+                    # the Agent outbox and starve fresh command results.
+                    acknowledged.append(result['id']);continue
                 if job and job['agent_id'] == agent_id and job['boot_id'] == payload['boot_id']:
                     if job['state'] in ('DELIVERED', 'UNKNOWN'):
                         job.update(state='SUCCEEDED' if result['ok'] else 'FAILED', result=deepcopy(result['result']), error=result['error'])
@@ -109,6 +115,7 @@ class AgentServer(ConsoleServer):
         for key, token in credentials.items():
             identifier(key)
             if type(token) is not str or not 32 <= len(token) <= 256: raise ValueError('strong Agent token required')
+        if len(set(credentials.values()))!=len(credentials):raise ValueError('each Agent requires a distinct credential')
         self.credentials = dict(credentials)
         super().__init__(address, registry, '', audit_path)
         self.RequestHandlerClass = AgentHandler

@@ -113,8 +113,9 @@ def manifest(value):
             if re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]{0,127}', k) is None: raise ValueError('invalid environment name')
             string(v, 8192)
         probe(p['health']); probe(p['ready'])
-        object_fields(p['connection'], ('kind', 'description'), ('telemetry_only',))
+        object_fields(p['connection'], ('kind', 'description'), ('telemetry_only','endpoint'))
         string(p['connection']['kind'], 64); string(p['connection']['description'])
+        if 'endpoint' in p['connection']:string(p['connection']['endpoint'])
         if 'telemetry_only' in p['connection'] and type(p['connection']['telemetry_only']) is not bool: raise ValueError('boolean connection policy required')
         number(p.get('startup_timeout_s', 20), .2, 180); number(p.get('stop_timeout_s', 3), .1, 10)
         if type(p.get('exclusive_ports',[])) is not list or len(p.get('exclusive_ports',[]))>8:raise ValueError('bounded exclusive simulation ports required')
@@ -128,3 +129,49 @@ def manifest(value):
             string(dep['value'], 4096)
             if dep['kind'] in ('file','directory') and not dep['value'].startswith('/'):raise ValueError('absolute trusted dependency path required')
     return deepcopy(value)
+
+
+def tool_report(value):
+    """Validate the public, redacted Agent wire contract before state mutation."""
+    object_fields(value,('manifest','checks','external_pids','instance'))
+    m=value['manifest']
+    object_fields(m,('schema','id','name','type','version','supported_os','integrations','agent_requirements','permissions','stop_strategy','profiles'))
+    if m['schema']!=1 or m['type'] not in ('gui','service','simulation') or m['stop_strategy']!='owned_process_group':raise ValueError('invalid Tool report metadata')
+    identifier(m['id']);string(m['name'],128);string(m['version'],128)
+    for key in ('supported_os','integrations','agent_requirements','permissions'):
+        if type(m[key]) is not list or len(m[key])>32:raise ValueError('bounded Tool metadata required')
+        for text in m[key]:string(text,128)
+    if set(m['permissions'])-{'desktop','ros_read','ros_service','simulation','telemetry_only'}:raise ValueError('unsupported Tool permissions')
+    if type(m['profiles']) is not dict or not 1<=len(m['profiles'])<=16 or type(value['checks']) is not dict or set(value['checks'])!=set(m['profiles']):raise ValueError('complete bounded Profile checks required')
+    for name,p in m['profiles'].items():
+        identifier(name);object_fields(p,('connection','readiness_probe','observe_only'))
+        if type(p['readiness_probe']) is not bool or type(p['observe_only']) is not bool:raise ValueError('boolean Profile policy required')
+        object_fields(p['connection'],('kind','description'),('telemetry_only','endpoint'))
+        string(p['connection']['kind'],64);string(p['connection']['description'])
+        if 'endpoint' in p['connection']:string(p['connection']['endpoint'])
+        if 'telemetry_only' in p['connection'] and type(p['connection']['telemetry_only']) is not bool:raise ValueError('boolean relay policy required')
+        check=value['checks'][name];object_fields(check,('installed','launchable','missing','desktop'))
+        if any(type(check[k]) is not bool for k in ('installed','launchable','desktop')):raise ValueError('boolean dependency status required')
+        if type(check['missing']) is not list or len(check['missing'])>128:raise ValueError('bounded dependency report required')
+        for missing in check['missing']:string(missing,8192)
+    if type(value['external_pids']) is not list or len(value['external_pids'])>16 or any(type(pid) is not int or pid<=0 for pid in value['external_pids']):raise ValueError('bounded external process observations required')
+    i=value['instance']
+    if i is None:return
+    object_fields(i,('tool_id','profile_id','context','instance_id','state','owned','process_running','service_health','ready','connection','error','pid','returncode','cleanup_confirmed','started_at','stopping','logs','resource'))
+    if i['tool_id']!=m['id'] or i['profile_id'] not in m['profiles']:raise ValueError('Tool instance identity mismatch')
+    identifier(i['instance_id']);context(i['context'])
+    if i['state'] not in ('STARTING','RUNNING','READY','STOPPING','STOPPED','FAILED','UNKNOWN'):raise ValueError('invalid Tool process state')
+    if any(type(i[k]) is not bool for k in ('owned','ready','cleanup_confirmed','stopping')):raise ValueError('boolean process state required')
+    if type(i['process_running']) is not bool and not (i['state']=='UNKNOWN' and i['process_running'] is None):raise ValueError('process running must be boolean or explicitly unknown')
+    if i['service_health'] not in ('UNKNOWN','HEALTHY','UNHEALTHY') or i['connection'] not in ('UNKNOWN','CONNECTED','DISCONNECTED'):raise ValueError('invalid health/connection state')
+    if i['ready'] and (not i['process_running'] or i['state']!='READY' or i['service_health']=='UNHEALTHY' or i['connection']!='CONNECTED'):raise ValueError('readiness requires a live healthy/unknown service with qualified connection')
+    if i['state']=='READY' and not i['ready']:raise ValueError('READY process needs readiness evidence')
+    if i['pid'] is not None and (type(i['pid']) is not int or i['pid']<=0):raise ValueError('invalid owned pid')
+    if i['returncode'] is not None and type(i['returncode']) is not int:raise ValueError('invalid process result')
+    if i['error'] is not None and (type(i['error']) is not str or len(i['error'])>1024):raise ValueError('bounded process error required')
+    number(i['started_at'],0,1e12)
+    if type(i['logs']) is not list or len(i['logs'])>24 or any(type(line) is not str or len(line)>2048 for line in i['logs']):raise ValueError('bounded process logs required')
+    object_fields(i['resource'],('rss_bytes','cpu_time_s','scope'))
+    for k in ('rss_bytes','cpu_time_s'):
+        if i['resource'][k] is not None:number(i['resource'][k],0,1e18)
+    string(i['resource']['scope'],128)

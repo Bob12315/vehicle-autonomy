@@ -57,7 +57,7 @@ def registry(*, ros_env=None, qgc=None, qgc_relay=None, sitl_dir=None, plugin=No
     nav2 = make('nav2','Nav2 isolated services','service',{'default':profile(
         [python,'-u','-m','vehicle_autonomy.app.tools.ros_tools','start-nav2','--params',str(nav2_params),'--behavior-tree',str(bt)], env=ros_env,
         health=ros('nav2-nodes'), ready=ros('nav2'),
-        connection=dict(kind='ros2.action.NavigateToPose', description='Endpoint {namespace}/vaf_tools/navigate_to_pose; isolated cmd_vel, no vehicle authority'),
+        connection=dict(kind='ros2.action.NavigateToPose',endpoint='{namespace}/vaf_tools/navigate_to_pose', description='Endpoint {namespace}/vaf_tools/navigate_to_pose; isolated cmd_vel, no vehicle authority'),
         requires=[dep('file',nav2_params),dep('file',bt)], timeout=120)}, permissions=['ros_read','ros_service'], dependencies=nav2_deps,
         integrations=['ros2.action.NavigateToPose', 'ros2.lifecycle.GetState'])
     relay = Path(qgc_relay).resolve() if qgc_relay else Path('/NOT_CONFIGURED/telemetry-only-relay.json')

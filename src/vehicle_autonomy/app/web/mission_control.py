@@ -348,6 +348,7 @@ class MissionControlHandler(ActionLabHandler):
         '/api/manual/action':'manual.action','/api/manual/start':'manual.start',
         '/api/manual/update':'manual.update','/api/manual/stop':'manual.stop',
         '/api/tools/operation':'tools.operation','/api/tools/configure':'tools.configure',
+        '/api/tools/integration':'tools.integration',
         '/api/settings/context':'settings.context',
         '/api/workspaces/template':'workspace.template','/api/workspaces/save':'workspace.save',
         '/api/workspaces/launch':'workspace.launch','/api/workspaces/stop':'workspace.stop',

@@ -14,10 +14,12 @@ DEFAULT_CONTEXT = dict(vehicle_id='rover', vehicle_type='rover', environment='si
 class ToolService:
     def __init__(self, directory):
         self.store=Store(directory);self.lock=RLock();self.registry=AgentRegistry(self.store)
-        self.settings=self.store.load('settings.json',dict(context=DEFAULT_CONTEXT,profiles={}))
-        context(self.settings['context'])
-        from .workspaces import Workspaces
-        self.workspaces=Workspaces(self)
+        try:
+            self.settings=self.store.load('settings.json',dict(context=DEFAULT_CONTEXT,profiles={}))
+            context(self.settings['context'])
+            from .workspaces import Workspaces
+            self.workspaces=Workspaces(self)
+        except BaseException:self.store.close();raise
 
     def selected(self, agent_id, tool_id, profile_id):
         identifier(agent_id);identifier(tool_id);identifier(profile_id)
@@ -29,6 +31,19 @@ class ToolService:
 
     def handle(self, operation, payload):
         with self.lock:
+            if operation=='tools.integration':
+                object_fields(payload,('agent_id','tool_id','profile_id'))
+                a,t=self.selected(payload['agent_id'],payload['tool_id'],payload['profile_id']);i=t['instance']
+                matched=bool(i and i['profile_id']==payload['profile_id'])
+                connection=deepcopy(t['manifest']['profiles'][payload['profile_id']]['connection'])
+                if matched:
+                    from .local import LocalTools
+                    for key,value in connection.items():
+                        if type(value) is str:connection[key]=LocalTools._expand([value],i['context'])[0]
+                return dict(protocol='vaf.tools.integration/1',agent_id=a['id'],boot_id=a['boot_id'],
+                    tool_id=payload['tool_id'],profile_id=payload['profile_id'],instance_id=i['instance_id'] if matched else None,
+                    context=deepcopy(i['context']) if matched else None,ready=bool(matched and self.registry.online(a) and i['ready']),
+                    connection=connection,vehicle_authority=False)
             if operation=='settings.context':
                 ctx=context(payload);value=deepcopy(self.settings);value['context']=ctx
                 self.store.audit('settings.context',context=ctx);self.store.save('settings.json',value);self.settings=value

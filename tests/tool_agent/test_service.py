@@ -20,7 +20,7 @@ from .helpers import CTX,tool,wait
 
 
 class Harness:
-    def __init__(self,directory,items=None):
+    def __init__(self,directory,items=None,drivers=None):
         self.stack=ExitStack();self.directory=Path(directory)
         try:
             self.stack.enter_context(patch('vehicle_autonomy.app.web.mission_control.bind_simulations',return_value={}))
@@ -29,7 +29,7 @@ class Harness:
             channel=AgentServer(('127.0.0.1',0),self.service.registry,{'desktop':self.agent_token,'server':secrets.token_urlsafe(32)},self.directory/'agent-http.jsonl')
             self.channel=channel
             self.start_server(channel)
-            self.lab=MissionControl({},self.directory/'mission');self.lab.tool_service=self.service;self.stack.callback(self.lab.close)
+            self.lab=MissionControl(drivers or {},self.directory/'mission');self.lab.tool_service=self.service;self.stack.callback(self.lab.close)
             self.web=MissionControlServer(('127.0.0.1',0),self.lab,self.web_token,self.directory/'web-http.jsonl');self.start_server(self.web)
             store=Store(self.directory/'agent');self.stack.callback(store.close)
             self.local=LocalTools(items or [tool()],store)
@@ -106,6 +106,27 @@ class ServiceTests(unittest.TestCase):
         job=self.h.service.registry.submit('server','launch','second-tool','default',CTX)
         wait(lambda:self.h.service.registry.jobs[job['id']]['state']=='SUCCEEDED')
         self.assertIn('second-tool',local.instances);self.assertFalse(self.h.local.instances)
+
+    def test_active_mission_survives_agent_disconnect_and_web_cannot_take_authority(self):
+        from tests.mission_graph.test_service import WebDriver
+        from tests.mission_graph.test_graph import graph
+        driver=WebDriver();h=Harness(self.h.directory/'mission-isolation',drivers={'v':driver});self.addCleanup(h.close)
+        code,body=h.api('/api/missions/start',dict(spec=graph(dict(id='wait',type='Wait',duration_s=.8))))
+        self.assertEqual(code,200,body);run_id=body['result']['id']
+        wait(lambda:h.lab.missions.view(run_id)['state']=='RUNNING')
+        code,body=h.api('/api/manual/action',dict(name='Arm',target='v',parameters={},allow_send=True))
+        self.assertEqual(code,409);self.assertIn('Mission owns',body['error'])
+        h.agent.stop_event.set();h.agent.thread.join(3)
+        with h.service.registry.lock:h.service.registry.agents['desktop']['seen']-=10
+        self.assertFalse(h.service.snapshot()['agents'][0]['connected'])
+        wait(lambda:h.lab.missions.view(run_id)['state']=='SUCCEEDED')
+        self.assertEqual(driver.writes,[]);self.assertEqual(h.lab.runtime.views(),[])
+
+    def test_integration_descriptor_has_instance_identity_and_no_vehicle_authority(self):
+        self.h.operation('launch');wait(lambda:(lambda i:i and i['ready'])(self.h.service.snapshot()['agents'][0]['tools'][0]['instance']))
+        code,body=self.h.api('/api/tools/integration',dict(agent_id='desktop',tool_id='fixture',profile_id='default'))
+        self.assertEqual(code,200,body);self.assertTrue(body['result']['ready']);self.assertFalse(body['result']['vehicle_authority'])
+        self.assertEqual(body['result']['instance_id'],self.h.local.instances['fixture']['instance_id'])
 
 
 if __name__=='__main__':unittest.main()

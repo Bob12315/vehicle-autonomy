@@ -278,6 +278,9 @@ def main():
     parser.add_argument('--read-only', action='store_true', help='start Web with deployment SEND disabled')
     parser.add_argument('--allow-send', action='store_true', help='authorize this local simulation deployment; each Action still needs its own SEND')
     parser.add_argument('--web-port', type=int, help='loopback Web port; defaults: Rover 8780, Copter 8781, Plane 8782')
+    parser.add_argument('--tool-agents',type=Path,help='optional trusted Agent allowlist for the same Web control center')
+    parser.add_argument('--tool-port',type=int,default=8791,help='optional loopback Agent listener port')
+    parser.add_argument('--tool-data-dir',type=Path,help='optional persistent Tool/Workspace state separate from this fresh simulation journal')
     parser.add_argument('--duration', type=float, help='Optional finite smoke-test duration in seconds')
     parser.add_argument('--run-dir', type=Path, help='Fresh output directory; never reuse EEPROM/state')
     parser.add_argument('--ardupilot-root', type=Path)
@@ -286,11 +289,14 @@ def main():
     args = parser.parse_args()
     if args.qgc_only and args.read_only:
         parser.error('--read-only belongs to Web mode; --qgc-only explicitly enables independent QGC control')
+    if args.qgc_only and (args.tool_agents or args.tool_data_dir):parser.error('Tool service belongs to the Web control center')
+    if not 1024<=args.tool_port<=65535:parser.error('Tool port must be within 1024..65535')
     if not 1024 <= args.qgc_port <= 65535:
         parser.error('--qgc-port must be within 1024..65535')
     web_port = args.web_port if args.web_port is not None else {'rover': 8780, 'copter': 8781, 'plane': 8782}[args.kind]
     if not 1024 <= web_port <= 65535:
         parser.error('--web-port must be within 1024..65535')
+    if args.tool_agents and args.tool_port==web_port:parser.error('Web and Agent listeners require distinct ports')
     if args.duration is not None and not 1 <= args.duration <= 86400:
         parser.error('--duration must be within 1..86400 seconds')
     root = resource_root()
@@ -398,6 +404,8 @@ def main():
                     '--port', str(web_port), '--data-dir', str(directory / 'application'),
                     '--token-file', str(directory / 'web-token.private'),
                     '--qgc-monitor-port', str(args.qgc_port)]
+                if args.tool_agents:command+=['--tool-agents',str(args.tool_agents.expanduser().resolve()),'--tool-port',str(args.tool_port)]
+                if args.tool_data_dir:command+=['--tool-data-dir',str(args.tool_data_dir.expanduser().resolve())]
                 import secrets
                 token_path = directory / 'web-token.private'
                 with os.fdopen(os.open(token_path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600), 'w') as token:

@@ -10,6 +10,7 @@ import tempfile
 from threading import Thread
 import time
 import unittest
+from unittest.mock import patch
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
@@ -114,6 +115,25 @@ time.sleep(120)
             wait(lambda:not Path(f'/proc/{pid}').exists())
         finally:
             if parent.poll() is None:parent.kill();parent.wait()
+
+    def test_audit_failure_prevents_launch_and_cleanup_does_not_wait_on_audit(self):
+        local=self.local()
+        with patch.object(self.store,'audit',side_effect=OSError('disk failure')):
+            with self.assertRaises(OSError):local.execute('launch','fixture','default',CTX)
+        self.assertFalse(local.instances)
+        original=self.store.audit
+        def broken(operation,**kw):
+            if operation!='tool.intent':raise OSError('disk failure')
+            return original(operation,**kw)
+        with patch.object(self.store,'audit',side_effect=broken):
+            local.execute('launch','fixture','default',CTX)
+            wait(lambda:local.instances['fixture']['cleanup_confirmed'])
+            self.assertEqual(local.instances['fixture']['state'],'FAILED')
+
+    def test_rotated_audit_files_remain_private(self):
+        self.store.handler.maxBytes=200
+        for _ in range(10):self.store.audit('test.rotation',value='x'*50)
+        for path in self.store.root.glob('audit.jsonl*'):self.assertEqual(path.stat().st_mode&0o777,0o600)
 
 
 class LinkTests(unittest.TestCase):

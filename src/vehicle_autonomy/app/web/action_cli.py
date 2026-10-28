@@ -22,9 +22,10 @@ def main(*,studio=False):
     parser.add_argument('--qgc-monitor-port',type=int,help='receive-only loopback UDP telemetry mirror; QGC commands are not forwarded')
     parser.add_argument('--tool-agents',type=Path,help='trusted JSON Agent ID -> private token file allowlist; enables outbound Agent channel')
     parser.add_argument('--tool-port',type=int,default=8791,help='loopback Agent channel, forward via SSH for remote hosts')
+    parser.add_argument('--tool-data-dir',type=Path,help='optional private persistent Tool/Workspace state, independent of the vehicle Mission journal')
     parser.add_argument('--initialize-provider-registry',action='store_true',help='explicit one-time trusted Mission deployment bootstrap; never recovery')
     args=parser.parse_args();drivers={};lab=server=tool_service=agent_server=agent_thread=None
-    if args.tool_agents and not studio:parser.error('Tool service requires the Mission/console entry')
+    if (args.tool_agents or args.tool_data_dir) and not studio:parser.error('Tool service requires the Mission/console entry')
     if args.qgc_monitor_port is not None and not 1024<=args.qgc_monitor_port<=65535:
         parser.error('QGC monitor port must be within 1024..65535')
     if args.initialize_provider_registry:
@@ -56,7 +57,7 @@ def main(*,studio=False):
             from vehicle_autonomy.app.web.mission_control import MissionControl,MissionControlServer
             lab=MissionControl(drivers,args.data_dir)
             from vehicle_autonomy.app.tools.service import ToolService
-            tool_service=ToolService(args.data_dir/'tools');lab.tool_service=tool_service
+            tool_service=ToolService(args.tool_data_dir or args.data_dir/'tools');lab.tool_service=tool_service
             if args.tool_agents:
                 from vehicle_autonomy.app.tools.broker import AgentServer
                 from vehicle_autonomy.app.tools.schema import object_fields,identifier
@@ -68,6 +69,7 @@ def main(*,studio=False):
                     path=Path(item['token_file'])
                     if not path.is_absolute():raise ValueError('absolute Agent token-file path required')
                     credentials[agent_id]=load_token(path)
+                if load_token(args.token_file) in credentials.values():raise ValueError('Agent credentials must differ from the browser token')
                 agent_server=AgentServer(('127.0.0.1',args.tool_port),tool_service.registry,credentials,tool_service.store.root/'agent-http.jsonl')
                 agent_thread=Thread(target=agent_server.serve_forever,kwargs={'poll_interval':.2},daemon=True);agent_thread.start()
             server_class=MissionControlServer

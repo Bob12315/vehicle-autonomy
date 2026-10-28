@@ -192,7 +192,11 @@ def run(directory):
             page.route('**/api/manual/action',action_request)
             page.goto(base+'/control');page.locator('#token').fill(token);page.locator('#connect').click()
             page.locator('#action option[value="Loiter@1.0.0"]').wait_for(state='attached')
-            expect(page.locator('#control-hint')).to_contain_text('固定翼空中续接')
+            # A retained Action is not fresh telemetry. The stale fixture must
+            # not keep a normal LOITER display/hint while serialization remains
+            # compatible with the existing explicit continuation contract.
+            expect(page.locator('#control-hint')).to_contain_text('遥测已过期或断开')
+            expect(page.locator('#status')).not_to_contain_text('LOITER')
             page.locator('#action').select_option('Loiter@1.0.0')
             assert page.locator('#continuation').input_value()==''
             page.locator('#execute').click()

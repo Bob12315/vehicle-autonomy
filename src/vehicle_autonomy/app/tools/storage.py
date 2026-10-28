@@ -12,6 +12,17 @@ from threading import RLock
 from uuid import uuid4
 
 
+class AuditHandler(RotatingFileHandler):
+    def _open(self):
+        descriptor=os.open(self.baseFilename,os.O_APPEND|os.O_CREAT|os.O_WRONLY|os.O_NOFOLLOW,0o600)
+        return os.fdopen(descriptor,'a',encoding='utf-8')
+
+    def handleError(self,record):
+        # Python logging otherwise swallows disk/rotation errors, which would
+        # permit an unaudited new process launch. Admission must fail closed.
+        raise OSError('tool audit write failed') from None
+
+
 class Store:
     def __init__(self, directory):
         self.root = Path(directory)
@@ -28,8 +39,10 @@ class Store:
         self.logger.setLevel(logging.INFO); self.logger.propagate = False
         path = self.root / 'audit.jsonl'
         if path.is_symlink(): self.close(); raise ValueError('audit symlink rejected')
-        self.handler = RotatingFileHandler(path, maxBytes=1_000_000, backupCount=3)
-        os.chmod(path, 0o600); self.logger.addHandler(self.handler)
+        try:
+            self.handler = AuditHandler(path, maxBytes=1_000_000, backupCount=3)
+            os.chmod(path, 0o600); self.logger.addHandler(self.handler)
+        except BaseException:self.close();raise
 
     def load(self, name, default):
         with self.lock:
