@@ -13,6 +13,43 @@ vehicle types, fixes initial/switching Tool Context selection, and records a
 fresh 724-test regression. Its separate evidence index identifies the updated
 production tree; the phased evidence below remains the initial acceptance.
 
+## Desktop startup/readiness follow-up — 2026-10-28
+
+An operator using the plain Copter launcher reached an empty Tool Manager:
+the optional Agent listener and Desktop Agent had not been started. Local
+operator configuration now starts both with separate credentials, detected
+software paths and the actual desktop session. RViz2 and QGC were launched
+through the Web UI and their native, mapped main windows were verified.
+RViz's operator-specific `viewer-only` profile checks its ROS node/window
+availability; its description explicitly says Copter map/TF data is absent.
+The standard data-qualified profile still requires live TF. QGC remains a
+telemetry-only window with internal readiness unqualified.
+
+This exposed a process-management defect: after a tool had already become
+Ready, a later failed probe still applied the original startup deadline and
+closed the running application. Startup completion is now latched privately
+per instance. Subsequent readiness loss reports RUNNING/not-ready (or unhealthy
+on probe errors), retains the owned process, and can recover. Tools that never
+become ready still time out and clean their descendants; explicit Stop and
+ownership rules remain unchanged. Probe exceptions cannot overwrite a concurrent
+stop, and a recovered healthy/ready probe clears its previous probe error.
+
+Validation: **725 unit tests PASS**, zero skips, 99.359 seconds
+(`/tmp/vaf-desktop-full.log`), including actual process readiness loss,
+probe exception, recovery and explicit shutdown. Native RViz2 and QGC main
+windows remained mapped for more than 70 seconds, including readiness loss;
+no vehicle actions or SEND changes occurred. Local operator evidence is in
+`runtime/copter-desktop/runtime-check.json` and `tools-ready.png` (private local
+runtime, not packaged source). The fixed speed-one simulation clock correctly
+rejected stale state when GUI loading delayed simulation time; this change does
+not relax vehicle freshness, authorization, leases or UNCONFIRMED semantics.
+The simultaneous desktop-window session still observed stale Copter telemetry
+after startup, including a warmed/headless retry. Desktop window lifecycle is
+verified; continued vehicle-control readiness in that particular desktop
+session is not accepted. Movement must remain blocked until fresh vehicle
+evidence is restored. Earlier three-vehicle isolated simulation acceptance
+does not qualify this concurrent desktop workload.
+
 ## Baseline / Phase 0
 
 * Isolated installation: `python3 -m venv --system-site-packages .venv` then

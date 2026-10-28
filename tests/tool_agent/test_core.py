@@ -93,6 +93,27 @@ class CoreTests(unittest.TestCase):
         item=tool();item['profiles']['default']['env']['SECRET']='not-public'
         local=self.local(item);self.assertNotIn('not-public',json.dumps(local.snapshot()))
 
+    def test_readiness_loss_after_startup_does_not_close_running_tool(self):
+        ready_file=Path(self.tmp.name)/'ready';ready_file.touch()
+        item=tool();profile=item['profiles']['default'];profile['startup_timeout_s']=.3
+        profile['ready']['argv']=[sys.executable,'-c',
+            'from pathlib import Path; import sys; print("ready" if Path(sys.argv[1]).exists() else "waiting")',str(ready_file)]
+        local=self.local(item);local.execute('launch','fixture','default',CTX)
+        wait(lambda:local.snapshot()[0]['instance']['ready'])
+        ready_file.unlink()
+        view=wait(lambda:(lambda v:v if not v['ready'] and v['service_health']=='HEALTHY' else None)(local.snapshot()[0]['instance']))
+        self.assertTrue(view['process_running']);self.assertEqual(view['state'],'RUNNING')
+        self.assertEqual(view['connection'],'UNKNOWN');self.assertIsNone(view['error'])
+        self.assertNotIn('startup_complete',view)
+        with patch.object(local,'_probe',side_effect=OSError('probe unavailable')):
+            view=wait(lambda:(lambda v:v if v['error'] else None)(local.snapshot()[0]['instance']))
+            self.assertTrue(view['process_running']);self.assertFalse(view['ready'])
+            self.assertEqual(view['state'],'RUNNING');self.assertEqual(view['connection'],'UNKNOWN')
+        ready_file.touch();wait(lambda:local.snapshot()[0]['instance']['ready'])
+        self.assertIsNone(local.snapshot()[0]['instance']['error'])
+        local.execute('stop','fixture','default',CTX)
+        wait(lambda:local.snapshot()[0]['instance']['cleanup_confirmed'])
+
     def test_agent_sigkill_closes_supervisor_pipe_and_cleans_tool(self):
         destination=Path(self.tmp.name)/'pid.json'
         script='''

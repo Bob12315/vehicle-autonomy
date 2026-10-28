@@ -114,7 +114,7 @@ class LocalTools:
                     process_running=False, service_health='UNKNOWN', ready=False,
                     connection='UNKNOWN', error=None, pid=None, returncode=None,
                     cleanup_confirmed=True, started_at=time.time(), started_mono=time.monotonic(), logs=deque(maxlen=24),
-                    process=None, last_probe=0., stopping=False,ownership_marker=uuid4().hex)
+                    process=None, last_probe=0., stopping=False,startup_complete=False,ownership_marker=uuid4().hex)
 
     def execute(self, operation, tool_id, profile_id, ctx):
         ctx = context(ctx)
@@ -304,12 +304,16 @@ class LocalTools:
                                       ready=ready is True and health is not False,
                                       connection='CONNECTED' if ready is True and health is not False else 'UNKNOWN',
                                       state='READY' if ready is True and health is not False else 'RUNNING')
-                        if p['ready'] and not record['ready'] and time.monotonic() - record['started_mono'] > p.get('startup_timeout_s', 20):
+                        if record['ready']:
+                            record['startup_complete'] = True
+                            if str(record['error'] or '').startswith('health probe:'): record['error'] = None
+                        if p['ready'] and not record['startup_complete'] and time.monotonic() - record['started_mono'] > p.get('startup_timeout_s', 20):
                             record['error'] = 'startup/readiness timeout'; self._stop(record)
                 except Exception as exc:
                     with self.lock:
-                        record.update(service_health='UNHEALTHY', ready=False, error='health probe: ' + type(exc).__name__)
-                        if p['ready'] and time.monotonic()-record['started_mono']>p.get('startup_timeout_s',20):
+                        if record['stopping'] or not record['process_running']: continue
+                        record.update(service_health='UNHEALTHY', ready=False, connection='UNKNOWN',state='RUNNING',error='health probe: ' + type(exc).__name__)
+                        if p['ready'] and not record['startup_complete'] and time.monotonic()-record['started_mono']>p.get('startup_timeout_s',20):
                             record['error']='startup/readiness timeout after probe failure';self._stop(record)
 
     @staticmethod
@@ -322,7 +326,7 @@ class LocalTools:
                 fields=Path(f"/proc/{record['pid']}/stat").read_text().rsplit(')',1)[1].split()
                 resource.update(rss_bytes=int(rss)*1024,cpu_time_s=(int(fields[11])+int(fields[12]))/os.sysconf('SC_CLK_TCK'))
             except (OSError,StopIteration,ValueError):pass
-        return {k: deepcopy(v) for k, v in record.items() if k not in ('process', 'logs', 'last_probe', 'restart', 'started_mono','ownership_marker')} | dict(logs=list(record['logs']),resource=resource)
+        return {k: deepcopy(v) for k, v in record.items() if k not in ('process', 'logs', 'last_probe', 'restart', 'started_mono','startup_complete','ownership_marker')} | dict(logs=list(record['logs']),resource=resource)
 
     def snapshot(self):
         with self.lock:
