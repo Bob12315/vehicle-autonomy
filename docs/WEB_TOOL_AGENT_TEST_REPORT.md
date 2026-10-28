@@ -28,5 +28,25 @@ Date: 2026-10-28. Initial HEAD: `a49b8b9`. No real hardware is opened or command
   errors, widths 1680/1280/1024/390, original Wait Mission succeeds, zero writer
   calls and both SEND defaults false. This is browser integration, not flight.
 
-Final phase results, native software evidence, regression commands, deployment
-verification and outstanding limitations will be added after implementation.
+## Phase 2
+
+* All six standard manifests validate; custom registration requires no UI code.
+  Focused core/registry: **12 PASS**, 2.383 s. Full regression: **687 PASS**,
+  76.948 s, no skips (`/tmp/vaf-agent-phase2-full.log`).
+* Registry generated with the real local Jazzy wrapper, Gazebo plugin and
+  repository-owned SITL binaries. `python -m tests.tool_agent.native_smoke
+  --registry runtime/tool-agent-dev/registry.json --run-dir
+  artifacts/phase4-mission/tool-agent-native-phase2` actually launches tools.
+  Gazebo stats, ROS 2 graph observer and Rover SITL TCP listener: READY and
+  clean owned shutdown. SITL listener readiness is not vehicle telemetry or flight.
+* RViz2: GUI process actually RUNNING; **not READY** without live namespace TF.
+  QGC: correctly blocked, missing trusted telemetry-only relay declaration.
+* Complete native Nav2 binaries found in the isolated Phase 5 dependency tree.
+  Repeated generator with `VAF_ROS2_ROOT=$PWD/artifacts/phase5-world-navigation/ros2-jazzy/root`
+  and ran native smoke (`tool-agent-native-nav2`, `--tool nav2 --observe-s 15`).
+  Nodes actually RUNNING; costmap reports missing `map`/`base_link` transform.
+  **Nav2 READY not passed**; clean group shutdown observed. No navigation goal
+  or vehicle command is sent by these checks.
+
+Later phase results, final native evidence, deployment verification and remaining
+limitations are recorded below as work completes.

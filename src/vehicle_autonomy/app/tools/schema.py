@@ -80,9 +80,11 @@ def manifest(value):
     required = ('schema', 'id', 'name', 'type', 'version', 'supported_os', 'dependencies',
                 'install_detection', 'profiles', 'stop_strategy', 'integrations',
                 'agent_requirements', 'permissions')
-    object_fields(value, required)
+    object_fields(value, required, ('process_names',))
     if value['schema'] != 1: raise ValueError('Tool schema 1 required')
     identifier(value['id']); string(value['name'], 128); string(value['version'], 128)
+    if type(value.get('process_names', [])) is not list or len(value.get('process_names', [])) > 16: raise ValueError('bounded process names required')
+    for name in value.get('process_names', []): identifier(name)
     if value['type'] not in ('gui', 'service', 'simulation'): raise ValueError('unsupported tool type')
     for key in ('supported_os', 'integrations', 'agent_requirements'):
         if type(value[key]) is not list or len(value[key]) > 32: raise ValueError('bounded metadata lists required')

@@ -21,6 +21,7 @@ vehicle-autonomy-web = "vehicle_autonomy.app.web.cli:main"
 vehicle-autonomy-actions = "vehicle_autonomy.app.web.action_cli:main"
 vehicle-autonomy-missions = "vehicle_autonomy.app.web.mission_cli:main"
 vehicle-autonomy-tool-agent = "vehicle_autonomy.app.tools.agent:main"
+vehicle-autonomy-tool-registry = "vehicle_autonomy.app.tools.builtins:main"
 vehicle-autonomy-plan = "vehicle_autonomy.app.planning:main"
 vehicle-autonomy-anchor = "vehicle_autonomy.app.anchor:main"
 vehicle-autonomy-onboard = "vehicle_autonomy.app.bootstrap.onboard:main"
@@ -36,6 +37,7 @@ where = ["src"]
 "vehicle_autonomy.world.sensors.lidar" = ["robosense/*.cpp"]
 
 [tool.setuptools.data-files]
+"share/vehicle-autonomy/configs/tools" = ["configs/tools/lab.sdf"]
 "share/vehicle-autonomy/simulation/phase5" = ["simulation/phase5/slam_mapping.yaml", "simulation/phase5/nav2_rover.yaml", "simulation/phase5/navigate_rover.xml"]
 "share/vehicle-autonomy/configs" = ["configs/llm.server-tunnel.json", "configs/rs16-scan.json", "configs/sitl.toml", "configs/sitl_arm.toml"]
 "share/vehicle-autonomy/configs/deployment" = ["configs/deployment/hardware-controlled.json", "configs/deployment/hardware-readonly.json", "configs/deployment/simulation.json"]

@@ -35,6 +35,19 @@ in argv, errors or process stdout. Environment values and launch argv are not
 published to the browser. Logs are bounded but are visible to authenticated
 operators; use token files instead of printing credentials.
 
+Optional Tool `process_names` lists exact executable basenames for applications
+such as AppImage that re-exec with a different name. Otherwise discovery matches
+trusted argv prefixes, not every process sharing an interpreter. Owned process
+groups are excluded. Unknown external profile/context is never assumed compatible.
+
+`vehicle-autonomy-tool-registry` generates six standard entries. ROS environment
+capture is explicit via `--ros-wrapper`; the Core process never sources ROS.
+The default Gazebo profile is an isolated empty lab; native SITL profiles are
+separate simulators, **not a coupled vehicle physics environment**. For coupled
+ArduPilot/Gazebo control use the existing validated simulation launchers, or
+operator-provisioned matching world/FDM/port profiles. The manifest does not
+promise automatic third-party UI configuration.
+
 Only `{namespace}` and `{domain_id}` in argv are expanded from validated context.
 `ROS_NAMESPACE` and `ROS_DOMAIN_ID` are injected as typed context; there is no
 shell, arbitrary expression, browser path, or browser environment expansion.

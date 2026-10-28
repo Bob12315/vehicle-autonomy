@@ -71,7 +71,8 @@ class LocalTools:
 
     def discover(self, tool_id):
         tool = self.registry[tool_id]
-        names = {Path(p['argv'][0]).name for p in tool['profiles'].values() if p['argv']}
+        names = set(tool.get('process_names', []))
+        commands = [p['argv'] for p in tool['profiles'].values() if p['argv']]
         # Executable identities only; never inspect arbitrary files or signal a
         # discovered PID. Exclude this Agent's supervisor-owned tools.
         owned = {v.get('pid') for v in self.instances.values()}
@@ -79,9 +80,20 @@ class LocalTools:
         for entry in Path('/proc').iterdir():
             if not entry.name.isdigit() or int(entry.name) in owned: continue
             try:
-                if entry.stat().st_uid != os.getuid(): continue
+                if entry.stat().st_uid != os.getuid() or os.getpgid(int(entry.name)) in owned: continue
                 executable = (entry / 'exe').readlink().name
-                if executable in names: found.append(int(entry.name))
+                raw=(entry/'cmdline').read_bytes()[:16384].split(b'\0')
+                args=[v.decode(errors='replace') for v in raw if v]
+                matched=executable in names
+                for command in commands:
+                    # Match trusted argv prefixes, including script interpreters.
+                    # A Python/ROS process sharing only an interpreter is not
+                    # automatically the same registered tool.
+                    for offset in (0,1):
+                        if len(args)<len(command)+offset:continue
+                        if Path(args[offset]).name!=Path(command[0]).name:continue
+                        if all(a==b for a,b in zip(args[offset+1:offset+len(command)],command[1:]) if '{namespace}' not in b and '{domain_id}' not in b):matched=True
+                if matched: found.append(int(entry.name))
             except (OSError, ValueError): pass
             if len(found) >= 16: break
         return found
@@ -92,7 +104,7 @@ class LocalTools:
                     instance_id=f'{os.getpid()}-{self.counter}', state=state, owned=True,
                     process_running=False, service_health='UNKNOWN', ready=False,
                     connection='UNKNOWN', error=None, pid=None, returncode=None,
-                    cleanup_confirmed=True, started_at=time.time(), logs=deque(maxlen=120),
+                    cleanup_confirmed=True, started_at=time.time(), started_mono=time.monotonic(), logs=deque(maxlen=24),
                     process=None, last_probe=0., stopping=False)
 
     def execute(self, operation, tool_id, profile_id, ctx):
@@ -160,7 +172,7 @@ class LocalTools:
                 event = json.loads(line)
                 with self.lock:
                     if event['event'] == 'spawned':
-                        record.update(pid=event['pid'], process_running=True, state='RUNNING')
+                        record.update(pid=event['pid'], process_running=True, state='STOPPING' if record['stopping'] else 'RUNNING')
                         self.store.audit('tool.running', tool=record['tool_id'], instance_id=record['instance_id'], pid=event['pid'])
                     elif event['event'] == 'log': record['logs'].append(event['text'][:2048])
                     elif event['event'] == 'error': record['error'] = event['error']
@@ -226,15 +238,17 @@ class LocalTools:
                                       ready=ready is True and health is not False,
                                       connection='CONNECTED' if ready is True and health is not False else 'UNKNOWN',
                                       state='READY' if ready is True and health is not False else 'RUNNING')
-                        if p['ready'] and not record['ready'] and time.time() - record['started_at'] > p.get('startup_timeout_s', 20):
+                        if p['ready'] and not record['ready'] and time.monotonic() - record['started_mono'] > p.get('startup_timeout_s', 20):
                             record['error'] = 'startup/readiness timeout'; self._stop(record)
                 except Exception as exc:
                     with self.lock:
                         record.update(service_health='UNHEALTHY', ready=False, error='health probe: ' + type(exc).__name__)
+                        if p['ready'] and time.monotonic()-record['started_mono']>p.get('startup_timeout_s',20):
+                            record['error']='startup/readiness timeout after probe failure';self._stop(record)
 
     @staticmethod
     def _view(record):
-        return {k: deepcopy(v) for k, v in record.items() if k not in ('process', 'logs', 'last_probe', 'restart')} | dict(logs=list(record['logs']))
+        return {k: deepcopy(v) for k, v in record.items() if k not in ('process', 'logs', 'last_probe', 'restart', 'started_mono')} | dict(logs=list(record['logs']))
 
     def snapshot(self):
         with self.lock:
