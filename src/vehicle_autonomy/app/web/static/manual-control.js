@@ -3,6 +3,8 @@ const api=window.VAF,auth=window.VAFAuth,$=s=>document.querySelector(s);
 const terminal=new Set(['SUCCEEDED','FAILED','REJECTED','CANCELLED','TIMED_OUT','UNKNOWN']);
 let state=null,current=null,controller=null,session=null,input=null,keys=new Set(),pending=false,updating=false,polling=false,renewing=false,commandPending=false,confirmation=null,socket=null,retry=0,closing=false,lastAction=null,targetHeight=null,lastReceived=0;
 let sendChanging=false;
+let velocityEnabled=false,velocityUntil=0,motionGeneration=0;
+let lastInputReplyAt=0;
 const node=api.node.bind(api),fmt=(v,n=2)=>typeof v==='number'&&Number.isFinite(v)?v.toFixed(n):'未知';
 function notice(error){$('#notice').textContent=String(error?.message||error||'');$('#notice').dataset.tone=error?.message?'error':'info';}
 function guard(fn){return async(...args)=>{try{await fn(...args);}catch(e){notice(e);}};}
@@ -92,7 +94,7 @@ $('#takeoff').onclick=guard(()=>{const height=Number($('#takeoff-height').value)
 $('#plane-takeoff').onclick=guard(()=>request('Takeoff',{height_m:Number($('#plane-height').value)}));
 $('#return-control').onclick=guard(()=>request(selected()?.kind==='plane'?'RTL':'ReturnHome'));
 $('#hold-control').onclick=guard(async()=>{
- if(session){await stop();return;}
+ if(session){if(velocityEnabled){neutral();return;}await stop();return;}
  if(!canCommand())throw Error('请先开启 SEND ON 并等待有效遥测');
  if(selected().kind==='rover')return request('Stop');
  if(selected().kind==='copter')return request('SetMode',{mode:'LOITER'});
@@ -110,6 +112,15 @@ $('#goto').onclick=guard(()=>{
 });
 // Copter's existing velocity interface is deliberately behind the advanced panel.
 const stream=$('#copter-stream');
+const motionSwitch=node('button','GUIDED 速度控制 OFF · 开启',{id:'copter-motion-toggle',class:'primary','aria-pressed':'false'});
+const motionStatus=node('p','开启后按住运动，松开或 HOLD 归零保持；关闭才退出。单次上限 60 秒。',{id:'copter-motion-state',class:'muted small-note',role:'status'});
+stream.append(motionSwitch,motionStatus);
+motionSwitch.onclick=guard(async()=>{
+ if(velocityEnabled){await stop();notice('已关闭 GUIDED 速度控制，等待实际安全退出。');return;}
+ if(!canCommand()||selected()?.kind!=='copter')throw Error('请在多旋翼页面开启 SEND ON 并等待当前动作退出');
+ velocityEnabled=true;velocityUntil=performance.now()+60000;
+ try{await begin();}catch(e){velocityEnabled=false;throw e;}finally{render();}
+});
 stream.append(node('div',undefined,{class:'speed-row'}));stream.lastChild.append(node('label','速度限制',{for:'copter-speed'}),node('input',undefined,{id:'copter-speed',type:'range',min:'.1',max:'.5',step:'.05',value:'.3'}),node('output','0.30 m/s',{id:'copter-speed-value'}));
 const pad=node('div',undefined,{class:'direction-pad'});
 for(const[key,label,position]of [['w','↑ 前进','forward'],['a','← 左移','left'],['d','→ 右移','right'],['s','↓ 后退','back']]){const b=node('button',label,{'data-key':key,'data-needs-control':'',class:'key-'+position});pad.append(b);}
@@ -123,34 +134,56 @@ function values(){
  return{vx_mps:speed*axis('w','s'),vy_mps:speed*axis('a','d'),vz_mps:.2*axis('q','e'),yaw_rate_rad_s:.25*axis('r','f'),frame:'base_link'};
 }
 async function begin(){
- if(pending||session||!keys.size)return;
+ if(pending||session||(!keys.size&&!velocityEnabled))return;
  if(!canCommand()||selected().kind==='plane'){keys.clear();throw Error('持续控制不可用');}
  const v=selected(),op=v.world?.vehicle?.operation,height=v.world?.vehicle?.reported_pose?.value.position.z;
  if(op?.armed!==true||op.native_mode!=='ARDUPILOT_CUSTOM_'+(v.kind==='rover'?15:4)||v.kind==='copter'&&!(height>.3)){keys.clear();throw Error('请先切换 GUIDED、解锁；多旋翼必须先起飞。');}
  pending=true;
- try{const r=await api.call('/api/manual/start',{name:v.kind==='rover'?'Drive':'SetVelocity',target:api.target,parameters:values(),allow_send:true});session=r.session;input=r.action;lastAction=input.id;if(!keys.size)await stop();}
- finally{pending=false;}
+ const generation=motionGeneration,target=api.target;
+ try{
+  const payload={name:v.kind==='rover'?'Drive':'SetVelocity',target,parameters:values(),allow_send:true};
+  if(velocityEnabled)payload.timeout_s=60;
+  const r=await api.call('/api/manual/start',payload);
+  if(generation!==motionGeneration||target!==api.target||!manual()){
+   try{await api.call('/api/manual/stop',{session_id:r.session.id});}catch(_){}
+   return;
+  }
+  session=r.session;input=r.action;lastAction=input.id;lastInputReplyAt=0;
+  if(!keys.size&&!velocityEnabled)await stop();
+ }finally{pending=false;render();}
 }
-async function stop(){keys.clear();for(const b of document.querySelectorAll('[data-key]'))b.classList.remove('pressed');const s=session;session=null;input=null;if(s)try{await api.call('/api/manual/stop',{session_id:s.id});}catch(e){notice('停止请求未确认；独立 watchdog 仍生效。'+e.message);}}
+function clearKeys(){keys.clear();for(const b of document.querySelectorAll('[data-key]'))b.classList.remove('pressed');}
+function neutral(){clearKeys();if(velocityEnabled&&session)update();render();}
+async function stop(){motionGeneration++;velocityEnabled=false;velocityUntil=0;clearKeys();const s=session;session=null;input=null;render();if(s)try{await api.call('/api/manual/stop',{session_id:s.id});}catch(e){notice('停止请求未确认；独立 watchdog 仍生效。'+e.message);}}
 async function update(){
- if(!session||!input||updating||!keys.size)return;
+ if(!session||!input||updating||(!keys.size&&!velocityEnabled))return;
+ // Key changes may arrive just after a heartbeat. Preserve the server's
+ // 20 Hz input limit instead of turning a rapid release into an exit error.
+ if(performance.now()-lastInputReplyAt<60)return;
  if(!manual()||!selected()?.fresh_vehicle_state){await stop();return;}
  updating=true;
+ const currentSession=session;
  try{
-  if(terminal.has(input.state)){session=null;input=null;keys.clear();return;}
-  if(input.state!=='RUNNING')input=await api.call('/api/manual/state?session_id='+encodeURIComponent(session.id));
-  if(input.state==='RUNNING')input=await api.call('/api/manual/update',{session_id:session.id,sequence:input.input_sequence+1,deadline_ns:input.input_ticket,parameters:values()});
- }catch(e){await stop();notice(e);}finally{updating=false;}
+  if(terminal.has(input.state)){velocityEnabled=false;session=null;input=null;clearKeys();render();return;}
+  let next=input;
+  if(next.state!=='RUNNING')next=await api.call('/api/manual/state?session_id='+encodeURIComponent(currentSession.id));
+  if(session?.id!==currentSession.id)return;
+  if(next.state==='RUNNING'){
+   next=await api.call('/api/manual/update',{session_id:currentSession.id,sequence:next.input_sequence+1,deadline_ns:next.input_ticket,parameters:values()});
+   if(session?.id===currentSession.id)lastInputReplyAt=performance.now();
+  }
+  if(session?.id===currentSession.id)input=next;
+ }catch(e){if(session?.id===currentSession.id){await stop();notice(e);}}finally{updating=false;}
 }
-function down(key){if(!'wasdqerf'.includes(key)||!manual()||selected()?.kind==='plane')return;keys.add(key);for(const b of document.querySelectorAll('[data-key]'))b.classList.toggle('pressed',keys.has(b.dataset.key));begin().catch(notice);}
-function up(key){keys.delete(key);for(const b of document.querySelectorAll('[data-key]'))b.classList.toggle('pressed',keys.has(b.dataset.key));if(!keys.size)stop();}
-for(const b of document.querySelectorAll('[data-key]')){b.onpointerdown=e=>{e.preventDefault();b.setPointerCapture(e.pointerId);down(b.dataset.key);};b.onpointerup=()=>up(b.dataset.key);b.onpointercancel=()=>stop();}
+function down(key){if(!'wasdqerf'.includes(key)||!manual()||selected()?.kind==='plane'||selected()?.kind==='copter'&&!velocityEnabled)return;keys.add(key);for(const b of document.querySelectorAll('[data-key]'))b.classList.toggle('pressed',keys.has(b.dataset.key));if(session)update();else begin().catch(notice);}
+function up(key){keys.delete(key);for(const b of document.querySelectorAll('[data-key]'))b.classList.toggle('pressed',keys.has(b.dataset.key));if(!keys.size){if(velocityEnabled)neutral();else stop();}else if(session)update();}
+for(const b of document.querySelectorAll('[data-key]')){b.onpointerdown=e=>{e.preventDefault();b.setPointerCapture(e.pointerId);down(b.dataset.key);};b.onpointerup=()=>up(b.dataset.key);b.onpointercancel=()=>{if(velocityEnabled)neutral();else stop();};}
 window.addEventListener('keydown',e=>{if(e.repeat||e.target.matches('textarea,select,input:not([type="checkbox"]):not([type="range"])')||e.target.isContentEditable||$('#command-confirm').open)return;if('wasdqerf'.includes(e.key.toLowerCase())){e.preventDefault();down(e.key.toLowerCase());}});
 window.addEventListener('keyup',e=>up(e.key.toLowerCase()));window.addEventListener('blur',()=>stop());
 document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();});
 window.addEventListener('pagehide',()=>{closing=true;stop();if(auth.control)loseControl();if(socket)socket.close();});
 window.addEventListener('vaf:auth-lost',()=>{closing=true;stop();auth.control='';if(socket)socket.close();});
-$('#manual-stop').onclick=()=>stop();$('#copter-manual-stop').onclick=()=>stop();
+$('#manual-stop').onclick=()=>stop();$('#copter-manual-stop').onclick=()=>{if(velocityEnabled)neutral();else stop();};
 function renderFeedback(){
  const actions=state.actions.filter(a=>a.target===api.target),a=actions.find(a=>a.id===lastAction)||actions.at(-1);
  $('#recent-commands').replaceChildren();for(const old of actions.slice(-5).reverse()){const row=node('div');row.append(node('span',api.actionLabel(old.name)),node('span',actionStatus(old),{class:'badge','data-tone':old.state==='SUCCEEDED'||old.safety?.release_safe?'good':'warning'}));$('#recent-commands').append(row);}
@@ -167,6 +200,7 @@ function renderFeedback(){
 }
 function render(){
  const v=selected();if(!v)return;
+ if(session){const a=state.actions.find(a=>a.id===session.action_id);if(a&&terminal.has(a.state)){velocityEnabled=false;session=null;input=null;clearKeys();}}
  const fresh=v.fresh_vehicle_state,veh=fresh?v.world?.vehicle:null,display=fresh?v.display||{}:{},pose=veh?.reported_pose?.value,op=veh?.operation,ctrl=control(),mine=manual();
  $('#vehicle-name').textContent=v.target+' / '+({rover:'Rover',copter:'Copter',plane:'Plane'}[v.kind]||v.kind);$('#kind-label').textContent=api.kindLabel(v.kind);
  $('#environment').textContent=v.owned_simulation?'SITL · 自有仿真':'Real Hardware / 未准入 · 只读';$('#connection-state').textContent=v.connected?'MAVLink · Connected':'MAVLink · Disconnected';$('#link-dot').style.background=fresh?'#087e79':'#9a661b';
@@ -195,13 +229,16 @@ function render(){
  $('#return-control').disabled=!enabled||!spec(v.kind==='plane'?'RTL':'ReturnHome')||!op?.armed;$('#hold-control').disabled=!mine||!fresh||(!session&&!enabled)||!op?.armed;
  $('#hold-control').querySelector('strong').textContent=({rover:'停车 / HOLD',copter:'Hold / LOITER',plane:'LOITER · 盘旋'})[v.kind];$('#return-control').querySelector('small').textContent=v.kind==='plane'?'原生 RTL · 非着陆':'RETURN HOME';
  $('#guided-target').disabled=!enabled||!spec('SetGuidedTarget')||!op?.armed||!(pose?.position.z>=10);$('#goto').disabled=!enabled||!spec('Goto')||!op?.armed;
- for(const b of document.querySelectorAll('[data-key]')){const movingAllowed=mine&&fresh&&op?.armed===true&&op.native_mode==='ARDUPILOT_CUSTOM_'+(v.kind==='rover'?15:4)&&(v.kind==='rover'||pose?.position.z>.3)&&(!activeAction()||!!session);b.disabled=!movingAllowed;b.classList.toggle('pressed',keys.has(b.dataset.key));}
+ for(const b of document.querySelectorAll('[data-key]')){const movingAllowed=mine&&fresh&&op?.armed===true&&op.native_mode==='ARDUPILOT_CUSTOM_'+(v.kind==='rover'?15:4)&&(v.kind==='rover'||velocityEnabled&&pose?.position.z>.3)&&(!activeAction()||!!session);b.disabled=!movingAllowed;b.classList.toggle('pressed',keys.has(b.dataset.key));}
  $('#manual-stop').disabled=!mine;$('#copter-manual-stop').disabled=!mine;
+ motionSwitch.textContent=velocityEnabled?'GUIDED 速度控制 ON · 点击关闭':'GUIDED 速度控制 OFF · 点击开启';motionSwitch.setAttribute('aria-pressed',String(velocityEnabled));
+ motionSwitch.disabled=pending||!mine||!fresh||(!velocityEnabled&&(!enabled||v.kind!=='copter'||op?.armed!==true||op.native_mode!=='ARDUPILOT_CUSTOM_4'||!(pose?.position.z>.3)));
+ motionStatus.textContent=velocityEnabled?(pending?'正在建立零速度控制会话…':(keys.size?'目标速度输入中':'零速度保持 · 会话继续')+' · 剩余约 '+Math.max(0,Math.ceil((velocityUntil-performance.now())/1000))+' 秒。松开/HOLD 不退出；关闭后可切模式或降落。'):'开启后按住运动，松开或 HOLD 归零保持；关闭才退出。单次上限 60 秒，失焦/断线仍安全退出。';
+ if(velocityEnabled){$('#hold-control').querySelector('strong').textContent='HOLD · 归零保持';$('#control-hint').textContent='GUIDED 速度控制已开启；松开归零，关闭开关并确认退出后可切模式/降落。';}
  list($('#authority-info'),[['控制者',ctrl?.holder||'无'],['本页 SEND',mine?'ON':'OFF'],['当前指令系统 SEND',v.system_send?'ON':'OFF'],['当前 Action SEND',v.action_send?'ON':'OFF'],['Execution Lease',v.lease_active?'ACTIVE':'无'],['Scope',v.scope||'无']]);
  $('#preflight').replaceChildren();const labels={telemetry_valid:'有效遥测',owned_simulation:'明确自有仿真',deployment_send:'部署发送授权',runtime_healthy:'Runtime 无故障',physical_scope_free:'执行域可用'};
  for(const[k,label]of Object.entries(labels)){const row=node('div'),ok=ctrl?.preflight?.[k]===true;row.append(node('span',label),node('span',ok?'已满足':'未满足 / 未知',{class:'check-state','data-ok':String(ok)}));$('#preflight').append(row);}
  $('#safety-badge').textContent=fresh?'以动作准入检查为准':'BLOCKED';$('#safety-badge').dataset.tone=fresh?'':'warning';
- if(session){const a=state.actions.find(a=>a.id===session.action_id);if(a&&terminal.has(a.state)){session=null;input=null;keys.clear();}}
  const goal=state.actions.filter(a=>a.target===api.target&&a.name==='SetGuidedTarget').at(-1);if(goal)$('#navigation-target').textContent=`请求目标：${goal.parameters.latitude_deg}°, ${goal.parameters.longitude_deg}° / ${goal.parameters.altitude_amsl_m} m AMSL · ${actionStatus(goal)}`;
  renderFeedback();renderTools();renderGoals();window.VAFVisualization.render($('#visualization-entry'),state,api.target);$('#diagnostics').textContent=JSON.stringify({vehicle:v,control:ctrl,last_action:state.actions.find(a=>a.id===lastAction),resources:state.resources},null,2);
 }

@@ -38,3 +38,29 @@ fixture，不将其宣称为本轮真实飞行验证。既有控制算法、ACK/
 
 当前运行的 Copter/Gazebo/SITL/Agent/RViz 无需重启。刷新 `/control` 获取新界面，点击
 SEND ON，然后操作模式、Arm、Takeoff、Land。未自动替操作员开启 SEND 或飞行。
+
+## GUIDED 速度控制开关（2026-10-29）
+
+多旋翼高级面板增加 **GUIDED 速度控制 ON/OFF**。它是运动模式开关，不是另一道 SEND
+授权。SEND ON、已解锁、实际 GUIDED 且已经起飞时可开启；开启先创建一条零速度
+SetVelocity Action，按键在同一条会话内更新目标速度。
+
+- 按住方向键发送速度；松开或点击 HOLD 归零，持续发送零速度心跳，保持原 Action。
+- 再次按下继续更新同一 Action，不重复创建/退出，不反复请求物理停止屏障。
+- 关闭速度控制开关才取消 Action；确认实际安全退出后，可切模式、Land 或 RTL。
+- 失焦、隐藏页面、断线、SEND OFF、车辆/认证失效仍退出；后端 0.4 秒 deadman 保留。
+- 遵守现有 Action 上限，单次最多 60 秒并显示约剩余时间；到期退出，不延长后端 TTL，
+  不自动重新开启。Rover 原有松开停车/HOLD 行为保持不变。
+
+按键即时变更与周期心跳共用序列和一次性 deadline ticket，且在前次更新回复后至少间隔
+60ms，避免快速按下/松开触发后端 20Hz 频率限制而意外退出。异步回复绑定原 session，
+关闭或换车后旧回复不会重新激活输入。
+
+全量测试 773 passed / 106.539s。真实 Chromium/HTTP fixture 测试证明零速度心跳跨越
+deadman 时间仍维持同一 Action、松开/HOLD 后可再运动、快速切换不退出、显式 OFF
+取消、更新和 stop 同时断路时后端独立超时、真实浏览器标签失焦退出且不自动重开。
+布局、三车型和共享登录另行通过。证据在 `artifacts/rviz-v1/guided-toggle-v4-20261029/`
+和 `guided-toggle-layout-20261029/`（最终速度专项另在 `guided-toggle-final-20261029/`）；
+这里不是新的物理飞行验收。既有控制链路未改，未对操作员的飞行发送测试指令。
+收尾发现原 Gazebo 自行异常退出（-4），因此保留日志并另启完整 Copter 环境；这不是
+以重启替代停止确认，也没有自动 Arm/起飞。原生 Gazebo 崩溃原因尚未定位。

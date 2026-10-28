@@ -186,6 +186,7 @@ class BrowserControlCheck(ControlCheck):
         if self.kind=='copter':
             section=page.locator('#copter-advanced')
             if section.get_attribute('open') is None:section.locator('summary').click()
+            page.locator('#copter-motion-toggle').click()
         expect(page.locator('[data-key="'+key+'"]').last if self.kind=='copter' else page.locator('[data-key="'+key+'"]').first).to_be_enabled(timeout=15000)
         page.locator('#control-level').click();page.keyboard.down(key)
         try:
@@ -197,6 +198,14 @@ class BrowserControlCheck(ControlCheck):
             t, measured = self.wait(moved, 15)
         finally:
             page.keyboard.up(key)
+        if self.kind=='copter':
+            def held_neutral():
+                self.truth();current=self.state(a['id']);speed=self.oracle.recent_speed_mps();rate=self.oracle.recent_yaw_rate_rad_s()
+                assert current['state']=='RUNNING',current
+                return speed is not None and speed<=.15 and rate is not None and abs(rate)<=.15
+            self.wait(held_neutral,15)
+            assert {r['id'] for r in self.call('/api/instances') if r['id'] not in before}=={a['id']}
+            page.locator('#copter-motion-toggle').click()
         final = self.finish(a, 25, expected='CANCELLED')
         speed = self.oracle.recent_speed_mps(); yaw_rate = self.oracle.recent_yaw_rate_rad_s()
         bound = .1 if self.kind == 'rover' else .15
@@ -213,8 +222,9 @@ class BrowserControlCheck(ControlCheck):
         page=self.page;self.perform('SetMode',{'mode':'GUIDED'})
         panel=page.locator('#copter-advanced')
         if panel.get_attribute('open') is None:panel.locator('summary').click()
-        expect(page.locator('#copter-stream [data-key="w"]')).to_be_enabled()
         before={a['id'] for a in self.call('/api/instances')};start=self.truth()
+        page.locator('#copter-motion-toggle').click()
+        expect(page.locator('#copter-stream [data-key="w"]')).to_be_enabled()
         page.locator('#control-level').click();page.keyboard.down('w')
         a=self.wait(lambda:next((a for a in self.call('/api/instances') if a['id'] not in before),None),8)
         self.wait(lambda:math.hypot(self.truth().x_m-start.x_m,self.truth().y_m-start.y_m)>=.25,12)
