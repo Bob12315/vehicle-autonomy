@@ -59,9 +59,10 @@ class Cell:
 
 
 class Blackboard:
-    def __init__(self,definitions,now,*,emit=None):
+    def __init__(self,definitions,now,*,emit=None,external=None):
         if type(definitions) is not dict or len(definitions)>64 or any(not NAME.fullmatch(k) for k in definitions):raise ValueError('bounded declared Blackboard required')
         self.scopes={};self.cells={};self.outputs={};self.history=[];self.emit=emit or (lambda *_a,**_k:None)
+        self.external=external
         self.create('mission',None,definitions,now,identifier='mission')
 
     def create(self,kind,parent,definitions,now,*,identifier=None):
@@ -117,7 +118,12 @@ class Blackboard:
             if staged:prior=self._staged_data(staged)
             if prior is None or type(thaw_json(prior.value)) is not list:raise ValueError('append requires an initialized typed list')
             value=thaw_json(prior.value)+[value]
-            if original is None or original.observed_at.elapsed_ns_since(prior.observed_at)>=0:original=prior
+            if original is None:original=prior
+            else:
+                oldest=prior if original.observed_at.elapsed_ns_since(prior.observed_at)>=0 else original
+                original=BlackboardValue(value,oldest.observed_at,min(prior.valid_for_ns,original.valid_for_ns),
+                    quality='INVALID' if 'INVALID' in (prior.quality,original.quality) else 'UNKNOWN' if 'UNKNOWN' in (prior.quality,original.quality) else 'VALID',
+                    frame=prior.frame if prior.frame==original.frame else None,source=producer)
         elif mode!='set':raise ValueError('unknown output binding mode')
         if branch and target!=branch:
             s=self.scopes[branch];d=self.scopes[target]['declarations'][name];validate_json(value,d['schema'],name)
@@ -148,14 +154,20 @@ class Blackboard:
             None if data is None else data.frame,staged['producer'] if data is None else data.source)
 
     def read(self,sid,binding,now,world=None):
-        if type(binding) is not dict or binding.keys()-{'ref','source','path','frame','max_age_s','offset'}:raise ValueError('strict typed binding required')
-        if binding.get('source')=='world':data=query(world,binding['path'])
+        if type(binding) is not dict or binding.keys()-{'ref','source','path','frame','max_age_s','offset','provider','id'}:raise ValueError('strict typed binding required')
+        if binding.get('source')=='external':
+            if self.external is None:raise ValueError('external input provider unavailable')
+            data=self.external(binding,now)
+        elif binding.get('source')=='world':data=query(world,binding['path'])
         else:
             parts=binding['ref'].split('.');head=parts.pop(0)
             if head=='node':
                 node=parts.pop(0)
                 if parts and parts[0]=='output':parts.pop(0)
-                data=next((self.outputs[s,node] for s in self.ancestors(sid) if (s,node) in self.outputs),None)
+                data=None
+                for ancestor in self.ancestors(sid):
+                    if (ancestor,node) in self.outputs:data=self.outputs[ancestor,node];break
+                    if self.scopes[ancestor]['kind']=='submission':break
             else:
                 target=(self.scope(sid,'submission') or 'mission') if head=='mission' else sid if head=='local' else self.scope(sid,head)
                 if target is None:raise ValueError('reference scope unavailable')

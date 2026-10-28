@@ -16,7 +16,7 @@ from vehicle_autonomy.contracts.core.serialization import to_json_value
 from vehicle_autonomy.engine.mission.graph import validate
 from vehicle_autonomy.world.model.mission_inputs import evaluate, resolve_parameters
 
-TERMINAL = {'SUCCEEDED', 'FAILED', 'REJECTED', 'CANCELLED', 'TIMED_OUT', 'UNKNOWN'}
+TERMINAL = {'SUCCEEDED', 'FAILED', 'REJECTED', 'CANCELLED', 'TIMED_OUT', 'UNKNOWN','SUSPENDED'}
 
 
 @dataclass
@@ -56,8 +56,9 @@ class GraphRun:
 
 
 class MissionGraphRuntime:
-    def __init__(self, actions, journal, events, *, clock, deployment_identities=None, recovered_manual=None):
+    def __init__(self, actions, journal, events, *, clock, deployment_identities=None, recovered_manual=None,external_inputs=None):
         self.actions, self.journal, self.events, self.clock = actions, journal, events, clock
+        self.external_inputs=external_inputs
         self.identities = deepcopy(deployment_identities or {})
         self.runs = {}
         self.recovered = deepcopy(journal.data['runs'])
@@ -171,6 +172,9 @@ class MissionGraphRuntime:
     def cancel(self, identifier, *, outcome='CANCELLED'):
         if identifier in self.recovered: return self.view(identifier)
         r = self.runs[identifier]
+        if r.state=='SUSPENDED':
+            r.state=self._cancel_tree(r,r.spec['root'],outcome);r.cancel_to=outcome
+            self._event(r,'suspended_mission_cancelled');self._persist(r);return self.view(identifier)
         if r.state in TERMINAL and self.view(identifier)['release_safe']: return self.view(identifier)
         r.cancel_to = outcome
         r.state = 'CANCELLING'
@@ -211,8 +215,7 @@ class MissionGraphRuntime:
                 world = self.actions.drivers[r.spec['target']].snapshot()
                 now = self.clock()
                 try:
-                    parameters=(r.studio.resolve(spec['parameters'],key,world,now) if r.studio else resolve_parameters(spec['parameters'], world, r.blackboard, now))
-                    if r.studio:parameters.update(r.studio.overrides.get(key,{}))
+                    parameters=(r.studio.resolve(dict(spec['parameters'],**r.studio.overrides.get(key,{})),key,world,now) if r.studio else resolve_parameters(spec['parameters'], world, r.blackboard, now))
                 except ValueError:
                     n.truth = 'UNKNOWN'
                     if now.monotonic_ns - n.started_ns < 3_000_000_000: return 'RUNNING'
@@ -241,11 +244,16 @@ class MissionGraphRuntime:
                     observed = TimePoint(stamp['monotonic_ns'],datetime.fromisoformat(stamp['utc']),stamp['clock_domain_id'])
                     r.blackboard[spec['output']] = BlackboardValue(a['result'], observed, 3_000_000_000, source=a['id'])
             elif result in TERMINAL and not self._action_safe(a): result = 'UNKNOWN'
+            if r.studio and result in TERMINAL and result!='SUCCEEDED':
+                n.details['action_error']=a['error']
+                scope=n.details.get('execution_scope')
+                if scope and self._action_safe(a):r.studio.board.scopes[scope]['closed']=True
             if r.studio and r.debug and result in ('FAILED','TIMED_OUT') and self._action_safe(a):
                 self._set(r,n,result);n.details['debug_failed']=True;r.studio.pause_requested=True
                 self._event(r,'debug_failure',node_id=spec['source_node_id'],execution_id=n.execution_id,state=result)
                 return 'RUNNING'
         elif t == 'Wait':
+            if r.studio:n.inputs=dict(duration_s=spec['duration_s'],source='fixed',time_basis='mission monotonic clock')
             if now.monotonic_ns - n.started_ns >= int(spec['duration_s'] * 1e9): result = 'SUCCEEDED'
         elif t == 'Condition':
             if n.truth is None:
@@ -353,6 +361,13 @@ class MissionGraphRuntime:
                 if r.cancel_to:
                     state = self._cancel_tree(r, r.spec['root'], r.cancel_to)
                     r.state = state
+                elif r.state=='TAKEOVER_REQUESTED':
+                    if r.studio.safe_boundary():
+                        for n in r.runs.values():
+                            if n.action_id in r.studio.takeover['interrupted_actions']:self._set(r,n,'CANCELLED')
+                        r.state='SUSPENDED';self._event(r,'mission_suspended',resumable=r.studio.takeover['resumable'])
+                    elif any(self.actions.assess(i)['state']=='UNKNOWN' for i in r.studio.takeover['interrupted_actions']):
+                        r.state='UNKNOWN';r.error='takeover blocked by unconfirmed Action exit';self._event(r,'takeover_blocked')
                 elif r.state=='PAUSED':
                     self._persist(r);continue
                 elif r.studio and r.studio.pause_requested and r.studio.safe_boundary():r.state='PAUSED'
@@ -399,8 +414,11 @@ class MissionGraphRuntime:
         resolver=None
         if r.studio:
             def resolver(e):
-                try:return r.studio.board.read(r.studio.context(key),dict(source='world',path=e['path']) if e['source']=='world' else dict(ref=e['path']),now,world)[1]
-                except ValueError:return None
+                try:
+                    data=r.studio.board.read(r.studio.context(key),dict(source='world',path=e['path']) if e['source']=='world' else dict(ref=e['path']),now,world)[1]
+                    r.runs[key].inputs[e['path']]=to_json_value(data);return data
+                except ValueError as exc:
+                    r.runs[key].inputs[e['path']]=dict(status='UNKNOWN',reason=str(exc));return None
         return evaluate(expression,world,r.blackboard,now,resolver=resolver)
 
     def views(self):
@@ -410,8 +428,15 @@ class MissionGraphRuntime:
         if identifier not in self.runs:raise ValueError('recovered runs are observational; new validation/authorization required')
         r=self.runs[identifier];s=r.studio
         if s is None:raise ValueError('Studio debug requires a schema-2 publication')
-        if r.state in TERMINAL:raise ValueError('terminal/uncertain run cannot be resumed by debug')
-        if operation=='pause':
+        if r.state in TERMINAL and not (r.state=='SUSPENDED' and operation=='resume'):raise ValueError('terminal/uncertain run cannot be resumed by debug')
+        if operation=='takeover':
+            if s.takeover is not None:raise ValueError('takeover already requested')
+            interrupted=[i for i in r.actions if not self._action_safe(self.actions.assess(i))]
+            s.takeover=dict(resumable=not interrupted,interrupted_actions=interrupted,requested_at=to_json_value(self.clock()))
+            s.pause_requested=True;r.state='TAKEOVER_REQUESTED'
+            for i in interrupted:self.actions.cancel(i)
+            self._event(r,'takeover_requested',interrupted_actions=interrupted)
+        elif operation=='pause':
             s.pause_requested=True;r.state='PAUSE_REQUESTED';self._event(r,'pause_requested')
         elif operation=='breakpoints':
             values=parameters
@@ -419,8 +444,13 @@ class MissionGraphRuntime:
             if type(values) is not list or len(values)>128 or any(type(v) is not str or v not in ids for v in values):raise ValueError('bounded existing breakpoint nodes required')
             s.breakpoints=set(values);self._event(r,'breakpoints_changed',nodes=values)
         else:
-            if r.state!='PAUSED' or not s.safe_boundary():raise ValueError('confirmed safe paused boundary required')
+            suspended=r.state=='SUSPENDED'
+            if r.state not in ('PAUSED','SUSPENDED') or not s.safe_boundary():raise ValueError('confirmed safe paused boundary required')
+            if suspended and (operation!='resume' or not s.takeover or not s.takeover['resumable']):raise ValueError('interrupted Action is retained in history; checkpoint resume unavailable, explicitly create a new validated run')
             if operation in ('resume','step'):
+                if operation=='step' and self.actions.drivers[r.spec['target']].context().target_kind=='plane' and any(
+                    n['type']=='Action' and self.actions.registry.resolve_typed(n['action'],n['action_version']).spec.effect_types
+                    for n in r.nodes.values()):raise ValueError('Plane flight may retain native authority; single-step is limited to read-only graphs, use normal Run and explicit safe exit')
                 if any(n.details.get('debug_failed') for n in r.runs.values()):raise ValueError('resolve failed node with permitted retry/skip before resume')
                 driver=self.actions.drivers[r.spec['target']];world=driver.snapshot();now=self.clock()
                 if world is None or not 0<=now.elapsed_ns_since(world.published_at)<3_000_000_000:raise ValueError('fresh state required before resume')
@@ -428,6 +458,15 @@ class MissionGraphRuntime:
                 epoch=(info.get('session_id'),str(getattr(getattr(world,'version',None),'generation_id',None)))
                 if epoch!=s.vehicle_epoch:raise ValueError('vehicle session/origin changed; create a newly validated run')
                 if getattr(world,'vehicle',None) is not None and world.vehicle.health.quality.value!='VALID':raise ValueError('valid vehicle state required')
+                if suspended:
+                    if now.monotonic_ns>=r.deadline_ns:raise ValueError('original Mission deadline expired')
+                    self.validate(r.spec)
+                    for other in self.views():
+                        if other['id']!=r.id and other['target']==r.spec['target'] and (other['state'] not in TERMINAL or not other['release_safe']):raise ValueError('another Mission owns target')
+                    for a in self.actions.views():
+                        if a['target']==r.spec['target'] and not self._action_safe(a):raise ValueError('manual/other Action must safely release before resume')
+                    r.permit=self.actions.mission_groups.reserve(r.id+':resume:'+uuid4().hex,r.spec['target'],self.declarations(r.spec),allow_send=r.allow_send)
+                    s.takeover=None
                 s.pause_requested=False;s.step_remaining=None if operation=='resume' else (0 if any(n.state=='RUNNING' and r.nodes[n.id]['type'] in ('Wait','Await') for n in r.runs.values()) else 1)
                 r.state='RUNNING';self._event(r,'mission_'+operation)
             elif operation in ('retry','skip','override'):

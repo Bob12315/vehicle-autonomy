@@ -64,4 +64,11 @@ class CompilerTests(unittest.TestCase):
     def test_legacy_linear_migration_is_explicit_copy(self):
         old=dict(schema_version=1,id='old',name='Old',version='1.0.0',target='v',root='root',nodes=[dict(id='root',type='Sequence',children=['a','b']),dict(id='a',type='Action',action='ok',parameters={}),dict(id='b',type='Wait',duration_s=.1)])
         before=deepcopy(old);self.compile(migrate(old));self.assertEqual(old,before)
+    def test_migration_keeps_observation_bindings_and_scopes_guard(self):
+        old=dict(schema_version=1,id='old',name='Old',version='1.0.0',target='v',root='root',blackboard={'value':3},nodes=[
+            dict(id='root',type='Sequence',children=['work','guard']),dict(id='work',type='Action',action='ok',parameters={'count':{'$query':dict(source='blackboard',path='value')}}),
+            dict(id='guard',type='Condition',expression=dict(op='eq',source='blackboard',path='value',value=3))])
+        migrated=migrate(old,registry=self.registry,drivers=self.drivers);compiled=self.compile(migrated)
+        self.assertTrue(any(n['type']=='Condition' for n in compiled['nodes']))
+        self.assertEqual(next(n for n in migrated['nodes'] if n['type']=='Action')['input_bindings']['count']['ref'],'mission.value')
 

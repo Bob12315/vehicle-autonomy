@@ -33,6 +33,7 @@ class PendingGoals:
             if recent:raise ValueError('goal proposal rate exceeds 5 Hz')
             executable=payload['frame']=='odom' and source['kind']=='rover' and abs(p[2])<.01
             record=dict(request=deepcopy(payload),created=now,expires=now+30,action_id=None,
+                observed_at=self.service.clock(),
                 executable=executable,reason=None if executable else 'Preview only: no qualified map transform/Nav2 execution or aircraft goal interface; Rover execution requires odom ground coordinates')
             self.records[key]=record;return self._view(record)
 
@@ -40,6 +41,18 @@ class PendingGoals:
 
     def view(self,target):
         with self.lock:return [self._view(v) for v in self.records.values() if v['request']['target']==target and v['expires']>self.clock()][-10:]
+
+    def read_input(self,target,binding,now):
+        """Read a proposal as data; this method cannot create an Action."""
+        from vehicle_autonomy.contracts.mission import BlackboardValue
+        with self.lock:
+            record=self.records.get(binding['id'])
+            if record is None or record['request']['target']!=target or record['expires']<=self.clock():raise ValueError('navigation input missing, expired or wrong vehicle')
+            source=snapshot(self.service,target)
+            if not source['valid'] or source['epoch']!=record['request']['epoch'] or record['request']['frame']!='odom':raise ValueError('navigation input epoch/frame unavailable; map transform is not qualified')
+            index={'position.x':0,'position.y':1,'position.z':2}.get(binding['path'])
+            if index is None:raise ValueError('only position data import is supported; orientation is not executed')
+            return BlackboardValue(record['request']['position'][index],record['observed_at'],30_000_000_000,frame='odom',source='navigation_goal:'+binding['id'])
 
     def execute(self,payload,submit):
         object_fields(payload,('id','target','allow_send'))

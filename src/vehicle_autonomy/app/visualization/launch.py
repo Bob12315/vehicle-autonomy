@@ -22,6 +22,7 @@ def main():
     p.add_argument('--domain-id',type=int,default=91);p.add_argument('--namespace');p.add_argument('--ros-wrapper',type=Path)
     p.add_argument('--duration',type=float,help='optional finite diagnostic run, measured after backend startup')
     p.add_argument('--gazebo-gui',action='store_true',help='also open the owned Gazebo desktop client; default keeps simulation headless')
+    p.add_argument('--studio-demo',action='store_true',help='offer software-only Mission Studio example Actions and templates')
     a=p.parse_args();root=resource_root();port=a.web_port or {'rover':8780,'copter':8781,'plane':8782}[a.kind]
     if not 1024<=port<=65535 or a.duration is not None and a.duration<=0:p.error('bounded port and positive duration required')
     ctx=context(dict(vehicle_id=a.kind,vehicle_type=a.kind,environment='simulation',ros_namespace=a.namespace or '/'+a.kind,
@@ -59,6 +60,7 @@ def main():
             '--web-port',str(port),'--tool-agents',str(allow),'--tool-port',str(agent_port),'--visualization-token-file',str(feed),'--run-dir',str(simulation),
             '--allow-send' if a.allow_send else '--read-only']
         if not a.gazebo_gui:command.append('--headless')
+        if a.studio_demo:command.append('--studio-demo')
         log=(directory/'simulation.log').open('w');logs.append(log);launcher=subprocess.Popen(command,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
         deadline=time.monotonic()+100
         while not closed:

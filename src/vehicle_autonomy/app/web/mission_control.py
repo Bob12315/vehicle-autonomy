@@ -18,7 +18,9 @@ from vehicle_autonomy.app.web.action_lab import ActionLab, ActionLabHandler, Act
 
 
 class MissionControl(ActionLab):
-    def __init__(self, drivers, data_dir, *, registry=None, event_sink=None, events=None, scheduler_period_s=.05):
+    def __init__(self, drivers, data_dir, *, registry=None, event_sink=None, events=None, scheduler_period_s=.05,studio_demo=False):
+        if type(studio_demo) is not bool:raise ValueError('explicit software demo bool required')
+        self.studio_demo=studio_demo
         self._control_lock = RLock()
         self.missions = None
         self.manual = {}
@@ -36,6 +38,9 @@ class MissionControl(ActionLab):
         self.visualization_goals=PendingGoals(self)
         super().__init__(drivers, registry=registry, event_sink=event_sink,scheduler_period_s=scheduler_period_s)
         try:
+            if studio_demo:
+                from vehicle_autonomy.actions.simulation.studio_demo import register_demo
+                register_demo(self.registry)
             self.journal = MissionJournal(Path(data_dir) / 'missions')
             self.recovered_manual = deepcopy(self.journal.data['manual'])
             for identifier, record in self.recovered_manual.items():
@@ -46,7 +51,7 @@ class MissionControl(ActionLab):
             self.deployment_identities = bind_simulations(self.drivers,self.journal)
             self.events = events or LocalEvents()
             self.missions = MissionGraphRuntime(self.runtime, self.journal, self.events, clock=self.clock,
-                deployment_identities=self.deployment_identities,recovered_manual=self.recovered_manual)
+                deployment_identities=self.deployment_identities,recovered_manual=self.recovered_manual,external_inputs=self.visualization_goals.read_input)
             from vehicle_autonomy.app.mission_designer.studio_service import StudioService
             self.studio=StudioService(self,Path(data_dir)/'studio')
         except BaseException:
@@ -461,5 +466,5 @@ class MissionControlHandler(ActionLabHandler):
     post_routes.update({'/api/visualization/open':'visualization.open','/api/visualization/candidates':'visualization.propose',
         '/api/visualization/confirm':'visualization.confirm'})
     post_routes.update({'/api/studio-b/'+op.replace('.','/'): 'studio-b.'+op for op in (
-        'draft.save','draft.validate','draft.publish','draft.clone','draft.restore','draft.import','template.apply','template.save',
-        'diff','run.start','run.get','run.cancel','run.debug')})
+        'draft.save','draft.validate','draft.publish','draft.clone','draft.restore','draft.import','draft.extract','draft.new_version','template.apply','template.save',
+        'diff','run.start','run.get','run.cancel','run.debug','run.takeover','inputs.goals')})

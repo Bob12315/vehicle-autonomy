@@ -17,9 +17,11 @@ def timestamp(value):return TimePoint(value['monotonic_ns'],datetime.fromisoform
 class StudioState:
     def __init__(self,engine,run,now):
         self.engine=engine;self.run=run;self.definition=run.spec['studio']['definition']
-        self.board=Blackboard(self.definition['blackboard'],now,emit=lambda event,**kw:engine._event(run,event,**kw))
+        self.board=Blackboard(self.definition['blackboard'],now,emit=lambda event,**kw:engine._event(run,event,**kw),
+            external=None if engine.external_inputs is None else lambda binding,stamp:engine.external_inputs(run.spec['target'],binding,stamp))
         self.scopes={k:'mission' for k in run.nodes};self.archived=[]
         self.pause_requested=False;self.breakpoints=set(self.definition['execution_policy'].get('breakpoints',[]));self.bypass=set();self.step_remaining=None;self.overrides={}
+        self.takeover=None
         driver=engine.actions.drivers[run.spec['target']];world=driver.snapshot();info=driver.info() if callable(getattr(driver,'info',None)) else {}
         self.vehicle_epoch=(info.get('session_id'),str(getattr(getattr(world,'version',None),'generation_id',None)))
 
@@ -31,8 +33,10 @@ class StudioState:
 
     def record(self,n):
         spec=self.run.nodes[n.id]
+        sub=self.board.scope(self.context(n.id),'submission');origin=self.definition if sub is None else self.board.scopes[sub]
         return dict(node_id=spec.get('source_node_id'),runtime_node_id=n.id,execution_id=n.execution_id,state=n.state,
-            scope_id=self.context(n.id),action_id=n.action_id,started_ns=n.started_ns,iteration=n.index,truth=n.truth,
+            source_mission_id=origin.get('mission_id'),source_mission_version=origin.get('version'),
+            scope_id=n.details.get('execution_scope',self.context(n.id)),context_scope_id=self.context(n.id),action_id=n.action_id,started_ns=n.started_ns,iteration=n.index,truth=n.truth,
             inputs=deepcopy(n.inputs),outputs=deepcopy(n.outputs),details=deepcopy(n.details))
 
     def archive(self,n):
@@ -41,15 +45,33 @@ class StudioState:
         self.archived.append(self.record(n))
 
     def resolve(self,parameters,key,world,now):
-        result={};snapshots={}
+        result={};snapshots={};samples=[]
         for name,value in parameters.items():
             if type(value) is dict and set(value)=={'$binding'}:
                 value,data=self.board.read(self.context(key),value['$binding'],now,world)
                 snapshots[name]=to_json_value(data)
-            else:snapshots[name]=dict(value=deepcopy(value),source='fixed')
+                samples.append(data)
+            else:snapshots[name]=dict(value=deepcopy(value),source='runtime_override' if name in self.overrides.get(key,{}) else 'fixed')
             result[name]=value
+        spec=self.run.nodes[key]
+        result=to_json_value(self.engine.actions.registry.parameters(spec['action'],result,spec['action_version'],
+            vehicle_kind=self.engine.actions.drivers[self.run.spec['target']].context().target_kind))
+        for name,value in result.items():
+            if name not in snapshots:snapshots[name]=dict(value=deepcopy(value),source='contract_default')
         self.run.runs[key].inputs=snapshots
         self.run.runs[key].details['resolved_parameters']=deepcopy(result)
+        spec=self.run.nodes[key];n=self.run.runs[key]
+        if 'execution_scope' not in n.details:
+            meta=self.engine.actions.registry.metadata(spec['action'],spec['action_version'],vehicle_kind=self.engine.actions.drivers[self.run.spec['target']].context().target_kind)
+            definitions=dict(inputs=dict(schema=meta['parameters'],readonly=True,max_age_s=self.run.spec['timeout_s']))
+            if meta['output'] is not None:definitions['output']=dict(schema=meta['output'],readonly=True,max_age_s=3)
+            scope=self.board.create('node',self.context(key),definitions,now);n.details['execution_scope']=scope
+            original=None
+            if samples:
+                oldest=min(samples,key=lambda d:d.observed_at.monotonic_ns)
+                for sample in samples:sample.observed_at.elapsed_ns_since(oldest.observed_at)
+                original=BlackboardValue(result,oldest.observed_at,min(d.valid_for_ns for d in samples),source=n.execution_id)
+            self.board._set(scope,'inputs',result,now,n.execution_id,original=original,internal=True)
         return result
 
     def action_result(self,key,a,now):
@@ -59,6 +81,10 @@ class StudioState:
         data=BlackboardValue(value,observed,3_000_000_000,source=a['id'])
         logical=spec['source_node_id'];scope=self.context(key)
         self.board.output(scope,logical,value,now,a['id'],original=data)
+        node_scope=n.details.get('execution_scope')
+        if node_scope:
+            if 'output' in self.board.scopes[node_scope]['declarations']:self.board._set(node_scope,'output',value,now,a['id'],original=data,internal=True)
+            self.board.scopes[node_scope]['closed']=True
         n.outputs=dict(result=deepcopy(value),source=a['id'],observed_at=to_json_value(observed))
         for field,binding in spec.get('output_bindings',{}).items():
             ref='node.'+logical+'.output'+('' if field=='result' else '.'+field)
@@ -91,7 +117,11 @@ class StudioState:
         definitions={**deepcopy(spec['local_definitions']),**deepcopy(spec['interface']['inputs']),**deepcopy(spec['interface']['outputs'])}
         if len(definitions)!=len(spec['local_definitions'])+len(spec['interface']['inputs'])+len(spec['interface']['outputs']):raise ValueError('SubMission variable/port name collision')
         parent=self.context(key);scope=self.board.create('submission',parent,definitions,now)
-        for name,value in spec['parameters'].items():self.board._set(scope,name,value,now,'submission:fixed',internal=True)
+        self.board.scopes[scope].update(mission_id=spec['sub_mission']['mission_id'],version=spec['sub_mission']['version'])
+        for name,decl in spec['interface']['inputs'].items():
+            if 'default' in decl:n.inputs[name]=dict(value=deepcopy(decl['default']),source='interface_default')
+        for name,value in spec['parameters'].items():
+            self.board._set(scope,name,value,now,'submission:fixed',internal=True);n.inputs[name]=dict(value=deepcopy(value),source='fixed')
         world=self.engine.actions.drivers[self.run.spec['target']].snapshot()
         for name,binding in spec['input_bindings'].items():
             value,data=self.board.read(parent,binding,now,world)
@@ -144,4 +174,4 @@ class StudioState:
         # shared serializer; no original time/quality is replaced with now.
         return to_json_value(dict(definition=self.definition,definition_hash=self.run.spec['studio']['definition_hash'],
             executions=records,blackboard=self.board.snapshot(now),pause_requested=self.pause_requested,
-            breakpoints=sorted(self.breakpoints),overrides=self.overrides))
+            breakpoints=sorted(self.breakpoints),overrides=self.overrides,takeover=self.takeover))

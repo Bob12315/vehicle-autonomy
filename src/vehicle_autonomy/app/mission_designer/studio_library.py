@@ -61,6 +61,19 @@ class StudioLibrary:
             item.update(state='Validated',validation=deepcopy(report));return item
         return self.transaction(change)
 
+    def extract(self,parent,revision,child):
+        a=normalize(parent);b=normalize(child)
+        def change(data):
+            current=data['drafts'][a['mission_id']]
+            if current['definition']['revision']!=revision:raise RevisionConflict(revision,current)
+            if b['mission_id'] in data['drafts'] or len(data['drafts'])>=256:raise ValueError('fresh SubMission ID and draft capacity required')
+            result=[]
+            for definition,rev in ((a,revision+1),(b,1)):
+                definition['revision']=rev;item=dict(definition=definition,state='Draft',definition_hash=digest(definition),updated_at=datetime.now(timezone.utc).isoformat())
+                data['drafts'][definition['mission_id']]=item;result.append(item)
+            return dict(parent=result[0],child=result[1])
+        return self.transaction(change)
+
     def publish(self,identifier,revision,compiled):
         def change(data):
             item=data['drafts'][identifier]

@@ -10,17 +10,67 @@ from .studio_library import StudioLibrary,graph_diff
 class StudioService:
     def __init__(self,service,path):
         self.service=service;self.library=StudioLibrary(path)
+        try:self.install_examples()
+        except BaseException:self.library.close();raise
+
+    def install_examples(self):
+        from .studio_examples import cuadc,rover_inspection,copter_inspection,plane_inspection
+        data=self.library.snapshot()
+        for target,driver in self.service.drivers.items():
+            data=self.library.snapshot()
+            context=driver.context()
+            if not context.owned_simulation:continue
+            if context.target_kind=='rover' and 'Rover_Inspection' not in data['templates']:
+                try:self.service.registry.resolve_typed('Goto');self.service.registry.resolve_typed('Stop')
+                except ValueError:continue
+                self.library.template('Rover_Inspection',rover_inspection(target))
+            if context.target_kind=='copter' and self.service.studio_demo:
+                child,parent=cuadc(target)
+                if 'HandleTarget@1.0.0' not in data['publications']:
+                    if 'HandleTarget' in data['drafts']:raise ValueError('demo child ID occupied; existing user draft was preserved')
+                    item=self.library.save(child,0);compiled=self.compile(item['definition']);self.library.publish('HandleTarget',1,compiled)
+                if 'CUADC_MultiTarget_Simulation' not in data['templates']:self.library.template('CUADC_MultiTarget_Simulation',parent)
+            if context.target_kind in ('copter','plane'):
+                identifier=context.target_kind.title()+'_Inspection'
+                if identifier not in data['templates']:
+                    try:self.service.registry.resolve_typed('Takeoff');self.service.registry.resolve_typed('ReturnHome' if context.target_kind=='copter' else 'AutoLand')
+                    except ValueError:continue
+                    self.library.template(identifier,(copter_inspection if context.target_kind=='copter' else plane_inspection)(target))
 
     def compile(self,definition):
-        return validate(definition,self.service.registry,self.service.drivers,resolve=self.library.publication)
+        for path in definition.get('metadata',{}).get('unresolved_tool_inputs',[]):
+            identifier,field=path.split('.',1);node=next((n for n in definition['nodes'] if n['node_id']==identifier),{})
+            if field not in node.get('parameters',{}) and field not in node.get('input_bindings',{}):raise ValueError('template Tool input needs explicit replacement: '+path)
+        compiled=validate(definition,self.service.registry,self.service.drivers,resolve=self.library.publication)
+        for n in compiled.to_dict()['nodes']:
+            if n['type']=='Action' and not self.provider(n['action'],n['action_version'],definition['target'])['configured']:raise ValueError('Action Provider not bound: '+n['action'])
+        return compiled
+
+    def provider(self,name,version,target=None):
+        entry=self.service.registry.resolve_typed(name,version)
+        if entry.spec.external_lifecycle=='typed_only':return dict(configured=True,state='REGISTERED_IN_PROCESS',readiness='checked at Action admission')
+        store=getattr(entry.factory,'resource_store',None) or getattr(self.service.drivers.get(target),'resource_store',None)
+        try:bound=store is not None and store.binding() is not None
+        except Exception:bound=False
+        return dict(configured=bound,state='BOUND_EXTERNAL' if bound else 'UNAVAILABLE',readiness='checked at Action admission' if bound else 'no verified external Provider binding')
 
     def catalog(self):
-        return dict(node_types=deepcopy(TYPES),actions=self.service.registry.catalog(),vehicles=[dict(target=k,kind=d.context().target_kind,
+        from vehicle_autonomy.engine.mission.studio_graph import WORLD_TYPES
+        profiles={}
+        for target,driver in self.service.drivers.items():
+            context=driver.context();items=self.service.registry.catalog(vehicle_kind=context.target_kind,capabilities=context.capabilities)
+            for item in items:item['provider']=self.provider(item['name'],item['version'],target)
+            profiles[target]=items
+        return dict(node_types=deepcopy(TYPES),actions=self.service.registry.catalog(),action_sets=profiles,world_bindings=deepcopy(WORLD_TYPES),vehicles=[dict(target=k,kind=d.context().target_kind,
             capabilities=sorted(d.context().capabilities),connected=d.info().get('connected',False)) for k,d in self.service.drivers.items()])
 
     def handle(self,operation,p):
         op=operation.removeprefix('studio-b.')
         if op=='catalog':return self.catalog()
+        if op=='inputs.goals':
+            if set(p)!={'target'} or p['target'] not in self.service.drivers:raise ValueError('one registered input target required')
+            return dict(provider='navigation_goal',goals=self.service.visualization_goals.view(p['target']),
+                limitations='Only current odom position proposals. Orientation and unqualified map transforms are not imported. QGC import is not installed.')
         if op=='library':
             data=self.library.snapshot()
             runs=[{k:v.get(k) for k in ('id','target','state','release_safe','error','started_at')} for v in self.service.missions.views()]
@@ -28,6 +78,24 @@ class StudioService:
         if op=='draft.save':
             if set(p)!={'definition','expected_revision'}:raise ValueError('strict draft save request required')
             return self.library.save(p['definition'],p['expected_revision'])
+        if op=='draft.extract':
+            if set(p)!={'mission_id','revision','node_ids','sub_mission_id','name'}:raise ValueError('explicit extraction selection and revision required')
+            item=self.library.snapshot()['drafts'][p['mission_id']]
+            if item['definition']['revision']!=p['revision']:
+                from .studio_library import RevisionConflict
+                raise RevisionConflict(p['revision'],item)
+            from .studio_extract import extract
+            source=self.compile(item['definition']).to_dict()['studio']['definition']
+            child,parent=extract(source,p['node_ids'],p['sub_mission_id'],p['name'],self.service.registry)
+            self.compile(child)
+            validate(parent,self.service.registry,self.service.drivers,resolve=lambda i,v:child if (i,v)==(child['mission_id'],child['version']) else self.library.publication(i,v))
+            return self.library.extract(parent,p['revision'],child)
+        if op=='draft.new_version':
+            if set(p)!={'source','new_version','expected_revision'}:raise ValueError('explicit publication, version and current draft revision required')
+            data=self.library.snapshot();d=deepcopy(data['publications'][p['source']]['definition']);current=data['drafts'].get(d['mission_id'])
+            if current is not None and current['state']!='Published':raise ValueError('an editable draft already exists; finish or export it before restoring another version')
+            if d['mission_id']+'@'+p['new_version'] in data['publications']:raise ValueError('select an unpublished semantic version')
+            d['version']=p['new_version'];return self.library.save(d,p['expected_revision'])
         if op=='draft.validate':
             if set(p)!={'mission_id','revision'}:raise ValueError('explicit stored draft revision required')
             item=self.library.snapshot()['drafts'][p['mission_id']]
@@ -52,13 +120,17 @@ class StudioService:
         if op=='draft.import':
             if set(p)!={'definition','new_mission_id'}:raise ValueError('explicit import source and fresh Mission ID required')
             d=deepcopy(p['definition'])
-            if d.get('schema_version')==1:d=migrate(d)
+            if d.get('schema_version')==1:d=migrate(d,registry=self.service.registry,drivers=self.service.drivers)
             d.update(mission_id=p['new_mission_id'],revision=0)
             if p['new_mission_id'] in self.library.snapshot()['drafts']:raise ValueError('import requires a new Mission ID')
             return self.library.save(d,0)
         if op=='template.save':
             if set(p)-{'mission_id','template_id','expected_hash'}:raise ValueError('strict template request required')
-            d=self.library.snapshot()['drafts'][p['mission_id']]['definition']
+            d=self.library.snapshot()['drafts'][p['mission_id']]['definition'];unresolved=[]
+            for n in d['nodes']:
+                for name,b in list(n.get('input_bindings',{}).items()):
+                    if b.get('source')=='external':del n['input_bindings'][name];unresolved.append(n['node_id']+'.'+name)
+            if unresolved:d['metadata']['unresolved_tool_inputs']=unresolved
             return self.library.template(p['template_id'],d,expected_hash=p.get('expected_hash'))
         if op=='diff':
             if set(p)!={'left','right'}:raise ValueError('two stored definition references required')
@@ -71,6 +143,14 @@ class StudioService:
         if op=='run.start':
             if set(p)-{'publication','allow_send','debug'}:raise ValueError('strict publication run request required')
             self.service._require_operational();item=self.library.snapshot()['publications'][p['publication']]
+            from vehicle_autonomy.world.model.mission_inputs import usable
+            now=self.service.clock()
+            for n in item['compiled']['nodes']:
+                values=list(n.get('input_bindings',{}).values())+[v['$binding'] for v in n.get('parameters',{}).values() if type(v) is dict and set(v)=={'$binding'}]
+                for binding in values:
+                    if binding.get('source')=='external':
+                        data=self.service.visualization_goals.read_input(item['compiled']['target'],binding,now)
+                        if not usable(data,now,frame=binding.get('frame'),max_age_s=binding.get('max_age_s')):raise ValueError('external input stale or invalid before Run')
             # Revalidate the stored compiled snapshot, including its pinned dependencies.
             return self.service.handle('mission.start',dict(spec=item['compiled'],allow_send=p.get('allow_send',False),debug=p.get('debug',False)))
         if op=='run.get':
@@ -89,7 +169,16 @@ class StudioService:
         if op=='run.debug':
             if set(p)-{'id','operation','node_id','parameters'}:raise ValueError('strict debug request required')
             self.service._require_operational()
+            if p['operation']=='takeover':raise ValueError('explicit confirmed takeover endpoint required')
+            if p['operation']=='resume':
+                run=self.service.missions.view(p['id'])
+                if run['state']=='SUSPENDED':
+                    if run['target'] in self.service.operator_controls.records:raise ValueError('Vehicle Control must release its reservation before Mission resume')
+                    self.service._idle(run['target'])
             return self.service.missions.debug(p['id'],p['operation'],node_id=p.get('node_id'),parameters=p.get('parameters'))
+        if op=='run.takeover':
+            if set(p)!={'id','confirmed'} or p['confirmed'] is not True:raise ValueError('explicit takeover confirmation required')
+            self.service._require_operational();return self.service.missions.debug(p['id'],'takeover')
         raise ValueError('unknown Mission Studio operation')
 
     def close(self):self.library.close()

@@ -47,6 +47,9 @@ class StudioRuntimeTests(unittest.TestCase):
         self.h.engine.debug(i,'override',node_id='work',parameters={'count':4});self.h.engine.debug(i,'step');self.h.ticks(20)
         v=self.h.engine.view(i);self.assertEqual(v['state'],'PAUSED');self.assertEqual(len(v['action_ids']),1)
         self.assertEqual(self.h.actions.view(v['action_ids'][0])['parameters']['count'],4)
+        execution=next(e for e in v['studio']['executions'] if e['node_id']=='work' and e['action_id'])
+        self.assertEqual(execution['inputs']['count']['value'],4);self.assertEqual(execution['inputs']['count']['source'],'runtime_override')
+        self.assertTrue(execution['scope_id'].startswith('node:'))
         self.assertNotIn('count',v['studio']['definition']['nodes'][1]['parameters'])
         self.h.engine.debug(i,'resume');self.h.ticks(5);self.assertEqual(self.h.engine.view(i)['state'],'SUCCEEDED')
     def test_pause_does_not_freeze_running_action_and_cancel_keeps_exit_barrier(self):
@@ -59,4 +62,18 @@ class StudioRuntimeTests(unittest.TestCase):
         with self.assertRaises(ValueError):self.h.engine.debug(i,'skip',node_id='work')
         with self.assertRaises(ValueError):self.h.engine.debug(i,'override',node_id='work',parameters={'count':3})
         self.assertFalse(self.h.engine.view(i)['action_ids'])
+    def test_takeover_at_safe_boundary_releases_then_requires_explicit_validated_resume(self):
+        d=definition(execution_policy=dict(timeout_s=30,breakpoints=['work']));i=self.start(d);self.h.ticks(3)
+        self.h.engine.debug(i,'takeover');self.h.ticks(3);v=self.h.engine.view(i)
+        self.assertEqual(v['state'],'SUSPENDED');self.assertTrue(v['release_safe']);self.assertTrue(v['studio']['takeover']['resumable'])
+        old_group=v['resource_group_id'];self.h.ticks(5);self.assertFalse(self.h.engine.view(i)['action_ids'])
+        self.h.engine.debug(i,'resume');self.h.ticks(15);v=self.h.engine.view(i)
+        self.assertEqual(v['state'],'SUCCEEDED');self.assertNotEqual(v['resource_group_id'],old_group)
+    def test_interrupted_active_action_does_not_silently_restart_after_takeover(self):
+        d=definition();d['nodes'][1]['action_type']='stream';i=self.start(d);self.h.ticks(4)
+        self.h.engine.debug(i,'takeover');self.h.ticks(10);v=self.h.engine.view(i)
+        self.assertEqual(v['state'],'SUSPENDED');self.assertTrue(v['release_safe']);self.assertFalse(v['studio']['takeover']['resumable'])
+        self.assertEqual(len(v['action_ids']),1)
+        with self.assertRaises(ValueError):self.h.engine.debug(i,'resume')
+        self.h.ticks(5);self.assertEqual(len(self.h.engine.view(i)['action_ids']),1)
 

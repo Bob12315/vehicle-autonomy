@@ -46,12 +46,19 @@ WORLD_TYPES={
  'vehicle.vehicle_id':{'type':'string'},'vehicle.health.quality':{'type':'string'}}
 for field in ('x','y','z'):WORLD_TYPES['vehicle.reported_pose.value.position.'+field]={'type':'number'}
 for field in ('x','y','z'):WORLD_TYPES['vehicle.reported_twist.value.linear.'+field]={'type':'number'}
+for field in ('latitude_deg','longitude_deg','altitude_amsl_m'):WORLD_TYPES['vehicle.global_position.value.'+field]={'type':'number'}
 
 
 def binding_schema(binding,variables,outputs):
-    if type(binding) is not dict or binding.keys()-{'ref','source','path','max_age_s','frame','offset'}:raise ValueError('strict data binding required')
+    if type(binding) is not dict or binding.keys()-{'ref','source','path','max_age_s','frame','offset','provider','id'}:raise ValueError('strict data binding required')
     bounded_number(binding.get('max_age_s',3),.01,3600,'binding freshness')
-    if binding.get('source')=='world':
+    if binding.get('source') not in (None,'blackboard','world','external'):raise ValueError('unknown data binding source')
+    if binding.get('source')!='external' and ('provider' in binding or 'id' in binding):raise ValueError('external identity only belongs to external input bindings')
+    if binding.get('source')=='external':
+        if binding.get('provider')!='navigation_goal' or type(binding.get('id')) is not str or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}',binding['id']) or binding.get('path') not in ('position.x','position.y','position.z') or binding.get('frame')!='odom':raise ValueError('qualified navigation input reference required')
+        if binding.get('max_age_s',30)>30:raise ValueError('navigation proposal validity cannot be extended')
+        result={'type':'number'}
+    elif binding.get('source')=='world':
         if binding.get('path') not in WORLD_TYPES:raise ValueError('world binding path has no declared scalar contract')
         result=WORLD_TYPES[binding['path']]
     else:
@@ -60,6 +67,7 @@ def binding_schema(binding,variables,outputs):
         parts=ref.split('.')
         if parts[0]=='node':
             if len(parts)<3 or parts[2]!='output' or parts[1] not in outputs:raise ValueError('declared upstream node output required')
+            if outputs[parts[1]] is None:raise ValueError('upstream Action has no declared output schema; diagnostic data cannot be bound')
             result=subschema(outputs[parts[1]],parts[3:])
         else:
             root='.'.join(parts[:2])
@@ -70,6 +78,7 @@ def binding_schema(binding,variables,outputs):
     if 'offset' in binding:
         bounded_number(binding['offset'],-1e6,1e6,'binding offset')
         if result.get('type') not in ('integer','number'):raise ValueError('numeric binding offset required')
+        if result.get('type')=='integer' and type(binding['offset']) is float:result={'type':'number'}
     return result
 
 
@@ -119,11 +128,12 @@ def compile_graph(document,registry,drivers,*,resolve=None,stack=(),pins=None):
             if set(n['position'])!={'x','y'}:raise ValueError('node position x/y required')
             for value in n['position'].values():bounded_number(value,-100000,100000,'layout')
         nodes[n['node_id']]=n;out[n['node_id']]={}
+        if type(n.get('metadata',{})) is not dict:raise ValueError('node metadata must be an object')
         if n['type']=='Action':
             entry=registry.resolve_typed(n.get('action_type'),n.get('action_contract_version'));n['action_contract_version']=entry.spec.version
             if entry.spec.vehicle_types and kind not in entry.spec.vehicle_types or not entry.spec.required_capabilities<=drivers[target].context().capabilities:raise ValueError('Action vehicle/capability unavailable')
             if entry.spec.vehicle_types and set(d['supported_vehicles'])-entry.spec.vehicle_types:raise ValueError('Action is incompatible with declared supported vehicles')
-            outputs[n['node_id']]=to_json_value(entry.spec.output_schema) or {'type':'null'}
+            outputs[n['node_id']]=to_json_value(entry.spec.output_schema)
             resources.extend(to_json_value(entry.spec.resources))
     for e in d['edges']:
         if type(e) is not dict or set(e)!={'edge_id','source','target','port'} or not NODE_ID.fullmatch(e['edge_id']) or e['edge_id'] in edge_ids:raise ValueError('unique edge identity required')
@@ -148,6 +158,10 @@ def compile_graph(document,registry,drivers,*,resolve=None,stack=(),pins=None):
             producer=ref.split('.')[1]
             if producer==key or producer not in dominators[key]:raise ValueError('binding must reference a dominating upstream execution')
         return binding_schema(binding,env,outputs)
+    def destination(binding,env):
+        ref=binding['ref']
+        if ref in env and env[ref].get('readonly'):raise ValueError('output binding cannot write read-only external state')
+        return binding_schema({'ref':ref},env,outputs)
     def check_expression(key,e,env):
         expression_check(e)
         if e['op'] in ('all','any'):
@@ -198,9 +212,10 @@ def compile_graph(document,registry,drivers,*,resolve=None,stack=(),pins=None):
             for field,binding in n['output_bindings'].items():
                 if type(binding) is not dict or binding.keys()-{'ref','mode'}:raise ValueError('strict output binding required')
                 if len(binding.get('ref','').split('.'))!=2 or binding['ref'].split('.')[0] not in ('mission','submission','local'):raise ValueError('output must target one declared scope variable')
-                dest=binding_schema({'ref':binding['ref']},env,outputs)
+                dest=destination(binding,env)
                 if binding.get('mode','set')=='append':dest=dest.get('items',{})
                 elif binding.get('mode','set')!='set':raise ValueError('unknown output binding mode')
+                if outputs[key] is None:raise ValueError('output bindings require a declared Action output schema')
                 source=outputs[key] if field=='result' else subschema(outputs[key],field.split('.'))
                 if not compatible(source,dest):raise ValueError('output binding type mismatch')
         elif t=='Wait':
@@ -251,7 +266,7 @@ def compile_graph(document,registry,drivers,*,resolve=None,stack=(),pins=None):
             node['timeout_s']=min(policy.get('timeout_s',d['execution_policy']['timeout_s']),child['execution_policy']['timeout_s'])
             for field,binding in n['output_bindings'].items():
                 if field not in child['interface']['outputs'] or type(binding) is not dict or binding.keys()-{'ref','mode'} or len(binding.get('ref','').split('.'))!=2:raise ValueError('declared SubMission output mapping required')
-                dest=binding_schema({'ref':binding['ref']},env,outputs)
+                dest=destination(binding,env)
                 if binding.get('mode','set')=='append':dest=dest.get('items',{})
                 elif binding.get('mode','set')!='set':raise ValueError('unknown output binding mode')
                 if not compatible(child['interface']['outputs'][field]['schema'],dest):raise ValueError('SubMission output type mismatch')
@@ -279,21 +294,43 @@ def compile_graph(document,registry,drivers,*,resolve=None,stack=(),pins=None):
         blackboard={},timeout_s=d['execution_policy']['timeout_s'],studio=dict(definition=d,definition_hash=digest(d),dependencies=deepcopy(pins)))
 
 
-def migrate(document):
+def migrate(document,*,registry=None,drivers=None):
     """Explicit copy to schema 2; never edit a historical schema-1 version."""
     d=deepcopy(document)
     if d.get('schema_version')==2:return normalize(d)
     if d.get('schema_version')!=1:raise ValueError('unsupported migration source schema')
-    ids={n['id']:'n'+hashlib.sha256(n['id'].encode()).hexdigest()[:12] for n in d['nodes']};nodes=[];edges=[]
+    ids={n['id']:'n'+hashlib.sha256(n['id'].encode()).hexdigest()[:12] for n in d['nodes']};nodes=[];edges=[];extra_definitions={}
     def edge(a,b,p):edges.append(dict(edge_id='e'+str(len(edges)),source=a,target=b,port=p))
     for old in d['nodes']:
         n=dict(node_id=ids[old['id']],type=old['type'],parameters=deepcopy(old.get('parameters',{})),execution_policy={})
         if 'position' in old:n['position']=old['position']
         for key in ('timeout_s','expression','completion','failure','event'): 
             if key in old:n['execution_policy'][key]=old[key]
-        if old['type']=='Action':n.update(action_type=old['action'],action_contract_version=old.get('action_version','1.0.0'))
+        if old['type']=='Action':
+            n.update(action_type=old['action'],action_contract_version=old.get('action_version','1.0.0'));n['input_bindings']={}
+            for name,value in list(n['parameters'].items()):
+                if type(value) is dict and set(value)=={'$query'}:
+                    query=deepcopy(value['$query']);source=query.pop('source');path=query.pop('path')
+                    if source not in ('world','blackboard'):raise ValueError('unsupported historical binding source')
+                    n['input_bindings'][name]=dict(query,**(dict(source='world',path=path) if source=='world' else dict(ref='mission.'+path)))
+                    del n['parameters'][name]
+            if 'output' in old:
+                if registry is None:raise ValueError('Action output migration needs the registered output schema; historical source remains unchanged')
+                schema=to_json_value(registry.resolve_typed(n['action_type'],n['action_contract_version']).spec.output_schema)
+                if schema is None:raise ValueError('historical output has no declared schema; explicitly remodel its consumer')
+                extra_definitions[old['output']]=dict(schema=schema);n['output_bindings']={'result':dict(ref='mission.'+old['output'])}
         if old['type']=='Wait':n['parameters']['duration_s']=old['duration_s']
         if old['type'] not in TYPES:raise ValueError('legacy '+old['type']+' must remain schema 1 until explicitly remodelled')
+        if old['type']=='Condition':
+            def scoped(expression):
+                if expression.get('op') in ('all','any'):
+                    for child in expression['args']:scoped(child)
+                elif expression.get('op')=='not':scoped(expression['arg'])
+                elif expression.get('source')=='blackboard':expression['path']='mission.'+expression['path']
+            scoped(n['execution_policy']['expression'])
+            if not old.get('children'):
+                for port,outcome in [('true','SUCCEEDED'),('false','FAILED'),('unknown','UNKNOWN')]:
+                    child=n['node_id']+'_'+port;nodes.append(dict(node_id=child,type='End',execution_policy={'outcome':outcome}));edge(n['node_id'],child,port)
         for i,c in enumerate(old.get('children',[])):
             port=('true','false','unknown')[i] if old['type']=='Condition' else ('try','recover')[i] if old['type']=='Recovery' else ('branch:' if old['type']=='Parallel' else 'child:')+str(i)
             edge(n['node_id'],ids[c],port)
@@ -303,5 +340,10 @@ def migrate(document):
         if type(v) is list:return dict(type='array',items=infer(v[0]) if v else {'type':'string'})
         if type(v) is dict:return dict(type='object',properties={k:infer(x) for k,x in v.items()},required=list(v),additionalProperties=False)
         return dict(type={bool:'boolean',int:'integer',float:'number',str:'string',type(None):'null'}[type(v)])
-    return normalize(dict(schema_version=2,mission_id=d['id'],revision=0,version=d['version'],name=d['name'],target=d['target'],supported_vehicles=['rover','copter','plane'],nodes=nodes,edges=edges,
-        execution_policy=dict(timeout_s=d.get('timeout_s',600)),blackboard={k:dict(schema=infer(v),default=v) for k,v in d.get('blackboard',{}).items()},metadata={'migrated_from':1}))
+    board={k:dict(schema=infer(v),default=v) for k,v in d.get('blackboard',{}).items()}
+    for name,decl in extra_definitions.items():
+        if name in board:decl['default']=board[name]['default']
+        board[name]=decl
+    kinds=[drivers[d['target']].context().target_kind] if drivers is not None and d['target'] in drivers else ['rover','copter','plane']
+    return normalize(dict(schema_version=2,mission_id=d['id'],revision=0,version=d['version'],name=d['name'],target=d['target'],supported_vehicles=kinds,nodes=nodes,edges=edges,
+        execution_policy=dict(timeout_s=d.get('timeout_s',600)),blackboard=board,metadata={'migrated_from':1}))

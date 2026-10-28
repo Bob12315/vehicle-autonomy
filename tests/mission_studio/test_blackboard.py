@@ -25,6 +25,9 @@ class BlackboardTests(unittest.TestCase):
         self.assertEqual(self.b.read(a,dict(ref='node.detect.output.value'),self.clock())[0],1)
         self.assertEqual(self.b.read(b,dict(ref='node.detect.output.value'),self.clock())[0],2)
         with self.assertRaises(ValueError):self.b.read('mission',dict(ref='node.detect.output.value'),self.clock())
+        self.b.output('mission','detect',dict(value=99),self.clock(),'outer')
+        child=self.b.create('submission','mission',{},self.clock())
+        with self.assertRaises(ValueError):self.b.read(child,dict(ref='node.detect.output.value'),self.clock())
     def test_stale_future_domain_quality_and_frame_are_not_promoted(self):
         now=self.clock()
         for original in (BlackboardValue(2,now,10),BlackboardValue(2,replace(now,monotonic_ns=now.monotonic_ns+1),100),

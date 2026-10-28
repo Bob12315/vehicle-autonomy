@@ -27,6 +27,7 @@ def main(*,studio=False):
     parser.add_argument('--tool-port',type=int,default=8791,help='loopback Agent channel, forward via SSH for remote hosts')
     parser.add_argument('--tool-data-dir',type=Path,help='optional private persistent Tool/Workspace state, independent of the vehicle Mission journal')
     parser.add_argument('--initialize-provider-registry',action='store_true',help='explicit one-time trusted Mission deployment bootstrap; never recovery')
+    parser.add_argument('--studio-demo',action='store_true',help='register software-only Copter Mission Studio scene Actions and templates; never executes them')
     args=parser.parse_args();drivers={};lab=server=tool_service=agent_server=agent_thread=None;agent_credentials=[]
     if args.https_origin:
         from urllib.parse import urlsplit
@@ -34,6 +35,7 @@ def main(*,studio=False):
         if origin.scheme!='https' or not origin.hostname or origin.username or origin.password or origin.path or origin.query or origin.fragment:
             parser.error('https-origin must be an HTTPS origin without credentials/path/query')
     if (args.tool_agents or args.tool_data_dir) and not studio:parser.error('Tool service requires the Mission/console entry')
+    if args.studio_demo and not studio:parser.error('software Mission scenarios require the Studio entry')
     if args.visualization_token_file and not studio:parser.error('Visualization feed requires Mission/console composition')
     if args.qgc_monitor_port is not None and not 1024<=args.qgc_monitor_port<=65535:
         parser.error('QGC monitor port must be within 1024..65535')
@@ -65,7 +67,7 @@ def main(*,studio=False):
                 source_time_sync=args.source_time_sync,cycle_period_ns=20_000_000 if args.source_time_sync else None)
         if studio:
             from vehicle_autonomy.app.web.mission_control import MissionControl,MissionControlServer
-            lab=MissionControl(drivers,args.data_dir)
+            lab=MissionControl(drivers,args.data_dir,studio_demo=args.studio_demo)
             from vehicle_autonomy.app.tools.service import ToolService
             tool_service=ToolService(args.tool_data_dir or args.data_dir/'tools');lab.tool_service=tool_service
             if args.tool_agents:

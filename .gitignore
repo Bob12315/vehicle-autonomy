@@ -52,3 +52,4 @@ artifacts/phase3-round3/
 
 # Native RViz/ROS/SITL evidence and ephemeral private deployment files.
 /artifacts/rviz-v1/
+/artifacts/mission-studio-b/

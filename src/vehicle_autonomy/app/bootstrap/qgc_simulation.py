@@ -281,6 +281,7 @@ def main():
     parser.add_argument('--tool-agents',type=Path,help='optional trusted Agent allowlist for the same Web control center')
     parser.add_argument('--visualization-token-file',type=Path,help='optional independent narrow visualization feed credential')
     parser.add_argument('--source-time-sync',action='store_true',help='enable existing signed read-only source clock synchronization for concurrent desktop visualization')
+    parser.add_argument('--studio-demo',action='store_true',help='offer the software-only Mission Studio scenario; no automatic mission execution')
     parser.add_argument('--tool-port',type=int,default=8791,help='optional loopback Agent listener port')
     parser.add_argument('--tool-data-dir',type=Path,help='optional persistent Tool/Workspace state separate from this fresh simulation journal')
     parser.add_argument('--duration', type=float, help='Optional finite smoke-test duration in seconds')
@@ -291,6 +292,7 @@ def main():
     args = parser.parse_args()
     if args.qgc_only and args.read_only:
         parser.error('--read-only belongs to Web mode; --qgc-only explicitly enables independent QGC control')
+    if args.qgc_only and args.studio_demo:parser.error('Mission Studio scenarios require the Framework Web runtime')
     if args.qgc_only and (args.source_time_sync or args.visualization_token_file):parser.error('Framework source clock/visualization options do not apply to independent QGC mode')
     if args.qgc_only and (args.tool_agents or args.tool_data_dir):parser.error('Tool service belongs to the Web control center')
     if not 1024<=args.tool_port<=65535:parser.error('Tool port must be within 1024..65535')
@@ -411,6 +413,7 @@ def main():
                 if args.tool_agents:command+=['--tool-agents',str(args.tool_agents.expanduser().resolve()),'--tool-port',str(args.tool_port)]
                 if args.visualization_token_file:command+=['--visualization-token-file',str(args.visualization_token_file.expanduser().resolve())]
                 if args.source_time_sync:command+=['--source-time-sync']
+                if args.studio_demo:command+=['--studio-demo']
                 if args.tool_data_dir:command+=['--tool-data-dir',str(args.tool_data_dir.expanduser().resolve())]
                 import secrets
                 token_path = directory / 'web-token.private'
