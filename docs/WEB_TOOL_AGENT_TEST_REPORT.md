@@ -92,3 +92,30 @@ limitations are recorded below as work completes.
 * ROS health probes now use short-lived read-only rclpy workers, avoiding ROS CLI
   auto-daemon startup. Core/server remain ROS-free. Existing ROS daemons are not
   adopted or killed.
+
+## Phase 5
+
+* Full final suite **714 PASS**, 91.546 s. Workspace-specific **18 PASS**,
+  plus registry/port checks **4 PASS**. Covers topology, required preflight,
+  optional failure, data-availability retry, two Agents, shared in-flight launch,
+  shared/manual baseline ownership, parallel HTTP conflicts, timeout, queued
+  cancellation, disconnected ownership, durable settings, restart reconciliation
+  and abandonment without cleanup claims.
+* `tests.tool_agent.workspaces_browser` (`tool-console-phase5-browser-final`):
+  real Chrome creates/saves/launches two actual process fixtures in dependency
+  order, edits without replacing live instances, stops/cleans both, loads a
+  preset, and renders desktop/mobile with no JS errors. Visually inspected.
+* `tests.tool_agent.native_workspace` (`tool-console-phase5-native-workspace`):
+  actual Gazebo + ROS observer READY; RViz GUI RUNNING without TF -> optional
+  failure / DEGRADED. Explicit Workspace stop cleans all three owned cohorts.
+  This is actual native software integration, not full navigation data readiness.
+* Generated matching `rover-coupled` Profiles via `--coupled-rover` and ran
+  `tests.tool_agent.coupled_workspace` (`tool-console-phase5-coupled`): actual
+  Gazebo ArduPilot plugin + JSON Rover SITL -> both READY; read-only TCP receives
+  unarmed Rover HEARTBEAT, ATTITUDE and GLOBAL_POSITION_INT. **Zero vehicle writes**,
+  clean owned exit. Source worlds/models unchanged; fresh per-instance EEPROM.
+* `tests.simulation.program_launch --kind plane --http-controls --run-dir
+  artifacts/phase4-mission/tool-console-phase5-plane`: actual signed Plane
+  SITL/Gazebo PASS, including Arm/Disarm, physical TAKEOFF, Guided turn, LOITER,
+  RTL approach and actual AUTOLAND/disarm. No zero-speed Plane stop; clean groups/
+  credential cleanup. Command requires `VAF_PYTHON=$PWD/.venv/bin/python` as above.

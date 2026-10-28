@@ -1,5 +1,25 @@
 # V1 framework boundary
 
+## Web control center and Tool Agent (2026-10-28)
+
+`app/tools` owns trusted manifests, bounded external process supervision,
+per-Agent authenticated outbound HTTP, lifecycle readiness and shared Workspace
+ownership. `app/web` adds `/console` and operator-only tool/configuration APIs.
+Agents receive no vehicle driver/command port. The existing `/control`, Action
+Lab and Mission APIs still use the original Action/Execution/Authority/Safety
+chain. Dashboard projections null stale/disconnected/per-field-invalid data.
+
+Tool commands select local registered profiles, never browser argv or paths.
+Backend/Agent traffic remains loopback HTTP via authenticated SSH forwarding for
+remote hosts. Workspace definitions/results persist privately, reuse compatible
+services and retain unknown ownership after restart. Remote process observation
+does not confer stop ownership. Optional coupled Rover resources prepare actual
+Gazebo/JSON SITL; they do not provision signing or Framework vehicle admission.
+Native ROS readiness and synthetic sensor inputs are distinguished in the
+[test report](WEB_TOOL_AGENT_TEST_REPORT.md). No new Mission editor, real vehicle
+control, qualified hardware navigation or arbitrary third-party UI linkage is
+implied. [Deployment](WEB_TOOL_AGENT_DEPLOYMENT.md) defines operational limits.
+
 This page describes the **implemented root**. The reusable framework's full
 target responsibilities and dependency rules are in [V1.0 系统架构规范](../Vehicle_Autonomy_V1.0.md).
 

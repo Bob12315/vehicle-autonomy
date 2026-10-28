@@ -104,7 +104,7 @@ def manifest(value):
     if type(profiles) is not dict or not 1 <= len(profiles) <= 16: raise ValueError('1..16 profiles required')
     for name, p in profiles.items():
         identifier(name)
-        object_fields(p, ('argv', 'env', 'health', 'ready', 'connection'), ('cwd', 'startup_timeout_s', 'stop_timeout_s', 'requires', 'observe_only'))
+        object_fields(p, ('argv', 'env', 'health', 'ready', 'connection'), ('cwd', 'startup_timeout_s', 'stop_timeout_s', 'requires', 'observe_only','exclusive_ports'))
         argv(p['argv'], empty=p.get('observe_only') is True)
         if type(p.get('observe_only', False)) is not bool: raise ValueError('observe_only must be boolean')
         if p.get('cwd') is not None and not string(p['cwd'], 4096).startswith('/'): raise ValueError('absolute trusted cwd required')
@@ -117,8 +117,14 @@ def manifest(value):
         string(p['connection']['kind'], 64); string(p['connection']['description'])
         if 'telemetry_only' in p['connection'] and type(p['connection']['telemetry_only']) is not bool: raise ValueError('boolean connection policy required')
         number(p.get('startup_timeout_s', 20), .2, 180); number(p.get('stop_timeout_s', 3), .1, 10)
+        if type(p.get('exclusive_ports',[])) is not list or len(p.get('exclusive_ports',[]))>8:raise ValueError('bounded exclusive simulation ports required')
+        for port in p.get('exclusive_ports',[]):
+            object_fields(port,('protocol','port'))
+            if port['protocol'] not in ('tcp','udp') or type(port['port']) is not int or not 1024<=port['port']<=65535:raise ValueError('invalid simulation port reservation')
+        if type(p.get('requires',[])) is not list or len(p.get('requires',[]))>32:raise ValueError('bounded profile dependencies required')
         for dep in p.get('requires', []):
             object_fields(dep, ('kind', 'value'))
             if dep['kind'] not in ('executable', 'file', 'directory', 'environment'): raise ValueError('invalid profile dependency')
             string(dep['value'], 4096)
+            if dep['kind'] in ('file','directory') and not dep['value'].startswith('/'):raise ValueError('absolute trusted dependency path required')
     return deepcopy(value)

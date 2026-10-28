@@ -129,7 +129,36 @@ UNKNOWN/UNCONFIRMED 和飞行资源约束。完成本阶段后停止，等待独
   --run-dir artifacts/phase4-mission/acceptance-UNIQUE
 ```
 
-## 仿真与 Web 基础控制
+## Web 控制中心与 Tool Agent V1
+
+`/console` 提供三车型 Dashboard、Tool Manager、Workspaces、Logs 和 Settings，
+Vehicle Control 复用 `/control` 原有 Action/Authority/Safety/Execution 链。
+过期或断开的遥测显示未知；不新增 Mission Studio 或专业地图/点云查看器。
+
+```bash
+vehicle-autonomy-console --port 8780 --token-file /absolute/private/web.private \
+  --data-dir /absolute/private/console-state \
+  --tool-agents /absolute/private/agents.json --tool-port 8791
+vehicle-autonomy-tool-agent --id desktop --role desktop \
+  --backend http://127.0.0.1:8791 --token-file /absolute/private/desktop.private \
+  --registry /absolute/private/tools.json --data-dir /absolute/private/agent-state
+```
+
+默认没有车辆连接或 SEND。工具命令仅选择受信主机 Registry 的 Profile，不接受浏览器
+Shell、argv 或文件路径。Agent 独立出站认证、重连和监督自有进程，支持 RViz2、QGC、
+Gazebo、Nav2、ROS 2 和 SITL；缺少依赖/桌面/TF 时不伪造就绪。Workspace 按依赖
+准备、共享引用、有限超时和显式重试，后端重启保持未知并要求实例对账。
+可选 `--coupled-rover` 生成实际 Gazebo/JSON SITL 联动 Profile；其就绪不等于
+Framework 车辆身份、运动授权或硬件导航资格。
+
+部署、私密令牌、SSH 跨主机和注册表生成见
+[部署说明](docs/WEB_TOOL_AGENT_DEPLOYMENT.md)，合同见
+[Tool Manifest](docs/TOOL_MANIFEST_SPEC.md) 和 [Workspace](docs/WORKSPACE_SPEC.md)，
+实际测试、真实软件证据、Mock 输入与未验收范围见
+[本轮测试报告](docs/WEB_TOOL_AGENT_TEST_REPORT.md)。真实硬件仍只读；QGC 仅允许明确
+配置的单向遥测，Nav2 工具不会取得车辆命令端口。
+
+## 仿真与 Web 基础控制入口
 
 三个独立启动入口，默认同时启动 Gazebo、SITL 和当前 Phase 4 Web 程序：
 

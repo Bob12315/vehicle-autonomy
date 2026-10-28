@@ -58,6 +58,14 @@ For a separately installed environment, source it before generation or use its
 trusted wrapper. Set `VAF_ROS2_ROOT` only for the repository's isolated Jazzy
 wrapper. Review generated paths and profiles before enabling the Agent.
 
+For an actual coupled Rover add `--coupled-rover --ardupilot-plugin
+/absolute/libArduPilotPlugin.so` and the explicit SITL directory. The generator
+creates new deployment world/model files and matching `rover-coupled` Profiles;
+Simulation Lab selects them on one Agent. Source models/worlds are never edited.
+This prepares Gazebo JSON FDM + native SITL, with port collision checks and fresh
+EEPROM directories. Framework vehicle admission and QGC relay remain separate
+explicit prerequisites, not inferred from a listening simulator socket.
+
 QGC additionally needs `--qgc /absolute/QGroundControl.AppImage --qgc-relay
 /absolute/relay.json`. Relay JSON must contain `telemetry_only:true` and a
 description of an **actual** one-way telemetry relay. The existing simulation
@@ -124,3 +132,14 @@ physics, TF/maps/sensors, GUI connection configuration and third-party Action
 binding require matching trusted deployment profiles. No launch or Workspace
 operation arms/moves a vehicle, imports optional ROS into Core, or creates another
 vehicle command writer.
+
+## Workspace operations
+
+Open Workspaces -> Create -> load a preset or select registered components.
+Select Agent/Tool/Profile, dependencies, optional flag and running/ready threshold,
+then save. Launch freezes the saved context. Progress and errors come from Agent
+results; retry handles failed components, Stop respects shared/baseline ownership.
+Editing a saved definition leaves running instances unchanged. See
+[Workspace contract](WORKSPACE_SPEC.md) for recovery, dependency and readiness
+semantics. After backend restart, inspect concrete instance IDs and explicitly
+resume records or release them without claiming process cleanup.

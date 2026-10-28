@@ -35,6 +35,12 @@ in argv, errors or process stdout. Environment values and launch argv are not
 published to the browser. Logs are bounded but are visible to authenticated
 operators; use token files instead of printing credentials.
 
+Optional `exclusive_ports` contains up to eight `{protocol:"tcp"|"udp",port:N}`
+loopback simulator reservations. Busy ports block launch without stopping any
+external process; they do not turn an installed program into uninstalled. The
+check is repeated before spawn. Default working directories are fresh per Tool
+instance, so simulator EEPROM/artifacts never silently cross vehicle profiles.
+
 Optional Tool `process_names` lists exact executable basenames for applications
 such as AppImage that re-exec with a different name. Otherwise discovery matches
 trusted argv prefixes, not every process sharing an interpreter. Owned process

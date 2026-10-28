@@ -2,6 +2,7 @@ from copy import deepcopy
 import os
 from pathlib import Path
 import tempfile
+import socket
 import unittest
 
 from vehicle_autonomy.app.tools.builtins import registry
@@ -34,3 +35,14 @@ class RegistryTests(unittest.TestCase):
         public=LocalTools.public_manifest(manifest(entry))
         self.assertEqual(public['id'],'another-custom-tool')
         self.assertNotIn('env',public['profiles']['default']);self.assertNotIn('argv',public['profiles']['default'])
+
+    def test_busy_simulator_port_is_installed_but_cannot_launch(self):
+        with tempfile.TemporaryDirectory() as directory,socket.socket() as external:
+            external.bind(('127.0.0.1',0));external.listen()
+            entry=tool();entry['profiles']['default']['exclusive_ports']=[dict(protocol='tcp',port=external.getsockname()[1])]
+            store=Store(Path(directory)/'state');local=LocalTools([entry],store)
+            try:
+                check=local.check('fixture','default');self.assertTrue(check['installed']);self.assertFalse(check['launchable'])
+                with self.assertRaisesRegex(ValueError,'busy simulation'):local.execute('launch','fixture','default',CTX)
+                self.assertEqual(external.getsockname()[0],'127.0.0.1');self.assertFalse(local.instances)
+            finally:local.close();store.close()

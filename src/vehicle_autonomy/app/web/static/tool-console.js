@@ -2,6 +2,7 @@
 const $=s=>document.querySelector(s),node=(tag,text,attrs={})=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text;for(const[k,v]of Object.entries(attrs))e.setAttribute(k,v);return e;};
 let snapshot=null,connected=false,busy=false,vehicleId='',kindFilter='',view='dashboard',lastReceived=0,settingsLoaded=false,detailSelection=null;
 const profileSelections=new Map();
+let workspaceDraft=null;
 const titles={dashboard:['车辆总览','遥测、执行状态与控制权，来自同一受控运行时。'],tools:['工具管理','选择运行主机，管理外部软件的生命周期与真实连接状态。'],workspaces:['工作环境','按声明的依赖准备工具，保留共享服务的所有权。'],logs:['日志与诊断','追踪工具启动、进程输出、失败和认证操作记录。'],settings:['设置','配置车辆上下文与已注册的工具 Profile。']};
 const kindNames={rover:'Rover · 地面车',copter:'Copter · 多旋翼',plane:'Plane · 固定翼'};
 let toolContext={vehicle_id:'rover',vehicle_type:'rover',environment:'simulation',ros_namespace:'/rover',ros_domain_id:91,mavlink_profile:'monitor'};
@@ -84,7 +85,57 @@ function showTool(agentId,toolId,mode){
  else detail.append(node('pre',JSON.stringify({profile:p,connection:t.manifest.profiles[p].connection,context:t.instance?.context||toolContext,external_pids:t.external_pids,integrations:t.manifest.integrations,last_operation:snapshot.tools.jobs.filter(j=>j.agent_id===agentId&&j.tool_id===toolId).at(-1)},null,2)));
  detail.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
-function renderWorkspaces(){}
+function workspaceCall(name,payload){return api('/api/workspaces/'+name,payload).then(async value=>{notice('Workspace '+name+' 请求已记录；准备状态以组件检测结果为准。');await poll();return value;});}
+function renderWorkspaces(){
+ const manager=snapshot.tools?.workspaces;if(!manager||view!=='workspaces')return;
+ const host=$('#workspaces-content');host.className='panel';host.replaceChildren();
+ if(manager.fault)host.append(node('p','持久化故障，新的准备操作已被隔离：'+manager.fault));
+ if(!manager.definitions.length)host.append(node('p','尚无已保存工作区。从预设开始，选择车辆、Agent 和 Profile，再保存启动。',{class:'muted'}));
+ for(const definition of manager.definitions){
+  const runs=manager.runs.filter(r=>r.spec.id===definition.id),run=runs.at(-1),row=node('div',undefined,{class:'workspace-row'}),heading=node('div',undefined,{class:'workspace-heading'});
+  const title=node('div');title.append(node('strong',definition.name),node('small',` / ${definition.id} · ${definition.context.vehicle_id} · ${definition.context.environment}`));heading.append(title,badge(run?.state||'SAVED',run?.state==='READY'?'good':['FAILED','UNKNOWN'].includes(run?.state)?'error':'warning'));row.append(heading);
+  row.append(node('p',definition.components.map(c=>`${c.id} @ ${c.agent_id} / ${c.profile_id}${c.optional?' (可选)':''}`).join(' → '),{class:'muted'}));
+  if(run){const completed=run.components.filter(c=>['READY','RUNNING'].includes(c.state)).length,progress=node('div',undefined,{class:'progress'}),bar=node('span');bar.style.width=(100*completed/run.components.length)+'%';progress.append(bar);row.append(progress,node('p',`${completed} / ${run.components.length} 已满足声明条件${run.state==='PREPARED'?' · 部分组件仅确认进程运行，功能/连接仍未确认':''}${run.error?' · '+run.error:''}`,{class:'muted'}));
+   for(const c of run.components)row.append(node('p',`${c.id}: ${c.state} · 功能就绪 ${c.observed_ready?'YES':'NO'}${c.instance_id?' · 实例 '+c.instance_id:''}${c.error?' · '+c.error:''}`,{class:'component-state'}));
+  }
+  const buttons=node('div',undefined,{class:'actions'}),owns=run&&Object.values(manager.leases).some(l=>l.owners.includes(run.id));
+  buttons.append(button('Launch Workspace',()=>workspaceCall('launch',{id:definition.id}),!!run&&(!['STOPPED','ABANDONED','FAILED'].includes(run.state)||owns)),button('修改',()=>editWorkspace(structuredClone(definition))));
+  if(run){buttons.append(button('Retry Failed',()=>workspaceCall('retry',{run_id:run.id}),run.recovering||!['FAILED','DEGRADED','PREPARED'].includes(run.state)),button('Stop Workspace',()=>workspaceCall('stop',{run_id:run.id}),run.recovering||['STOPPED','ABANDONED'].includes(run.state)));
+   if(run.recovering){
+    row.append(node('p','后端重启：实例身份与所有权需要明确对账。恢复记录不会重启工具；释放记录不代表进程已停止。',{class:'muted'}));
+    buttons.append(button('按当前实例恢复记录',async()=>{const instances={};for(const c of run.components){const[a,t]=findTool(c.agent_id,c.tool_id);if(a?.connected&&t?.instance)instances[c.id]=t.instance.instance_id;}await workspaceCall('reconcile',{run_id:run.id,decision:'resume',instances});}),button('释放未确认记录',()=>workspaceCall('reconcile',{run_id:run.id,decision:'release',instances:{}})));
+   }
+  }
+  row.append(buttons);
+  if(runs.length){const details=node('details'),summary=node('summary','启动历史 · '+runs.length+' 次');details.append(summary,node('pre',JSON.stringify(runs.map(r=>({id:r.id,state:r.state,started_at:r.started_at,error:r.error})),null,2)));row.append(details);}
+  host.append(row);
+ }
+}
+function freshComponent(){
+ const choices=[];for(const a of snapshot?.tools?.agents||[])for(const t of a.tools)choices.push([a,t]);const pair=choices.find(([a,t])=>!workspaceDraft?.components.some(c=>c.agent_id===a.id&&c.tool_id===t.manifest.id))||choices[0];
+ return {id:'component-'+((workspaceDraft?.components.length||0)+1),agent_id:pair?.[0].id||'select-agent',tool_id:pair?.[1].manifest.id||'select-tool',profile_id:pair?Object.keys(pair[1].manifest.profiles)[0]:'default',depends_on:[],optional:false,wait_for:'ready',timeout_s:120};
+}
+$('#workspace-new').onclick=guard(()=>{if(!snapshot?.tools?.workspaces)throw Error('请先连接 Tool 服务');editWorkspace({schema:1,id:'workspace-'+crypto.randomUUID().slice(0,8),name:'New Workspace',context:structuredClone(toolContext),components:[freshComponent()]});});
+function selectField(values,value,onchange,label){const select=node('select',undefined,{'aria-label':label});for(const[k,text]of values)select.append(node('option',text,{value:k}));if(!values.some(v=>v[0]===value))select.append(node('option',value+' (未注册)',{value}));select.value=value;select.onchange=()=>onchange(select.value);return select;}
+function editWorkspace(spec){
+ workspaceDraft=spec;const editor=$('#workspace-editor');editor.hidden=false;editor.replaceChildren(node('h2','编辑工作区'));
+ const presets=selectField([['blank','选择预设'],...(snapshot.tools.workspaces.templates||[]).map(t=>[t.id,t.name])],'blank',()=>{},'Workspace 预设');
+ editor.append(presets,button('载入预设',async()=>{if(presets.value==='blank')return;const value=await api('/api/workspaces/template',{template_id:presets.value,context:toolContext});editWorkspace(value);}));
+ const form=node('div',undefined,{class:'form-grid'});for(const[key,label]of [['id','Workspace ID'],['name','名称']]){const l=node('label',label),input=node('input',undefined,{value:spec[key],maxlength:'128'});input.oninput=()=>workspaceDraft[key]=input.value;l.append(input);form.append(l);}editor.append(form,node('pre',JSON.stringify(spec.context,null,2)),button('使用当前 Vehicle Context',()=>{workspaceDraft.context=structuredClone(toolContext);editWorkspace(workspaceDraft);}));
+ const table=node('table',undefined,{class:'tools-table workspace-components'}),header=node('tr');for(const title of ['COMPONENT','AGENT / TOOL / PROFILE','DEPENDENCIES','READINESS',''])header.append(node('th',title));const thead=node('thead');thead.append(header);table.append(thead);const body=node('tbody');table.append(body);
+ for(const c of spec.components){
+  const row=node('tr'),idCell=node('td'),id=node('input',undefined,{value:c.id,'aria-label':'Component ID'});id.oninput=()=>c.id=id.value;idCell.append(id);row.append(idCell);
+  const assignment=node('td'),agents=snapshot.tools.agents;
+  assignment.append(selectField(agents.map(a=>[a.id,a.id+(a.connected?'':' (离线)')]),c.agent_id,value=>{c.agent_id=value;const a=agents.find(a=>a.id===value);c.tool_id=a?.tools[0]?.manifest.id||'select-tool';c.profile_id=Object.keys(a?.tools[0]?.manifest.profiles||{default:null})[0];editWorkspace(spec);},'组件 Agent'));
+  const a=agents.find(a=>a.id===c.agent_id),tools=a?.tools||[];
+  assignment.append(selectField(tools.map(t=>[t.manifest.id,t.manifest.name]),c.tool_id,value=>{c.tool_id=value;c.profile_id=Object.keys(tools.find(t=>t.manifest.id===value)?.manifest.profiles||{default:null})[0];editWorkspace(spec);},'组件 Tool'));
+  const t=tools.find(t=>t.manifest.id===c.tool_id);assignment.append(selectField(Object.keys(t?.manifest.profiles||{}).map(p=>[p,p]),c.profile_id,value=>c.profile_id=value,'组件 Profile'));row.append(assignment);
+  const deps=node('td'),input=node('input',undefined,{value:c.depends_on.join(', '),placeholder:'组件 ID，用逗号分隔','aria-label':'依赖组件'});input.oninput=()=>c.depends_on=input.value.split(',').map(s=>s.trim()).filter(Boolean);deps.append(input);row.append(deps);
+  const policy=node('td');policy.append(selectField([['ready','功能就绪'],['running','仅进程运行']],c.wait_for,value=>c.wait_for=value,'组件等待条件'));const optional=node('input',undefined,{type:'checkbox','aria-label':'可选组件'});optional.checked=c.optional;optional.onchange=()=>c.optional=optional.checked;const label=node('label','可选');label.append(optional);policy.append(label);const timeout=node('input',undefined,{type:'number',min:'1',max:'180',value:String(c.timeout_s),'aria-label':'组件超时秒'});timeout.oninput=()=>c.timeout_s=Number(timeout.value);policy.append(timeout);row.append(policy);
+  const remove=node('td');remove.append(button('移除',()=>{spec.components=spec.components.filter(x=>x!==c);editWorkspace(spec);}));row.append(remove);body.append(row);
+ }
+ const wrap=node('div',undefined,{class:'table-wrap'});wrap.append(table);editor.append(wrap,button('添加组件',()=>{spec.components.push(freshComponent());editWorkspace(spec);}),button('保存 Workspace',async()=>{await workspaceCall('save',{spec:workspaceDraft});editor.hidden=true;}),button('关闭编辑',()=>editor.hidden=true));editor.append(node('p','先检查所有必需依赖，再按顺序等待。共享实例保持引用；缺少依赖或无图形环境时不会伪造成功。此操作不触发车辆 Arm 或运动。',{class:'muted'}));
+}
 function renderLogs(){const filter=$('#log-filter').value.toLowerCase(),lines=(snapshot?.tools?.events||[]).map(e=>JSON.stringify(e));for(const a of snapshot?.tools?.agents||[])for(const t of a.tools)for(const line of t.instance?.logs||[])lines.push(`[${a.id} / ${t.manifest.id}] ${line}`);if(snapshot?.fault)lines.push(snapshot.fault);$('#logs').textContent=lines.filter(s=>s.toLowerCase().includes(filter)).slice(-200).join('\n')||'没有匹配的记录。';}
 function fillContext(){const c=toolContext;$('#context-vehicle').value=c.vehicle_id;$('#context-type').value=c.vehicle_type;$('#context-env').value=c.environment;$('#context-namespace').value=c.ros_namespace;$('#context-domain').value=c.ros_domain_id;$('#context-mavlink').value=c.mavlink_profile;}
 $('#context-form').onsubmit=guard(async e=>{e.preventDefault();const c={vehicle_id:$('#context-vehicle').value,vehicle_type:$('#context-type').value,environment:$('#context-env').value,ros_namespace:$('#context-namespace').value,ros_domain_id:Number($('#context-domain').value),mavlink_profile:$('#context-mavlink').value};await api('/api/settings/context',c);toolContext=c;notice('上下文已保存。现有工具和车辆任务保持其当前上下文。');});fillContext();

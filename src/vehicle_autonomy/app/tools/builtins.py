@@ -8,9 +8,12 @@ import shutil
 import subprocess
 import sys
 from uuid import uuid4
+import xml.etree.ElementTree as ET
 
 from vehicle_autonomy._resources import resource_root
 from .schema import manifest
+
+ROS_KEYS=('PATH','PYTHONPATH','LD_LIBRARY_PATH','AMENT_PREFIX_PATH','COLCON_PREFIX_PATH','ROS_DISTRO','ROS_VERSION','ROS_PYTHON_VERSION','RMW_IMPLEMENTATION','ROS_AUTOMATIC_DISCOVERY_RANGE','ROS_LOCALHOST_ONLY')
 
 
 def profile(command, *, env=None, health=None, ready=None, connection=None, requires=None, timeout=30):
@@ -27,7 +30,7 @@ def make(tool_id, name, kind, profiles, *, permissions=(), dependencies=(), inte
 
 
 def registry(*, ros_env=None, qgc=None, qgc_relay=None, sitl_dir=None, plugin=None):
-    root = resource_root(); ros_env = ros_env or {}
+    root = resource_root(); ros_env = {k:os.environ[k] for k in ROS_KEYS if k in os.environ} if ros_env is None else ros_env
     python = sys.executable
     ros = lambda op: dict(argv=[python, '-m', 'vehicle_autonomy.app.tools.ros_tools', op], contains=['"status": "READY"'], timeout_s=3)
     dep = lambda kind, value: dict(kind=kind, value=str(value))
@@ -89,14 +92,49 @@ def registry(*, ros_env=None, qgc=None, qgc_relay=None, sitl_dir=None, plugin=No
         # SITL TCP listening is queried without making a MAVLink connection.
         sitl_profiles[kind]['health']=dict(argv=[python,'-m','vehicle_autonomy.app.tools.tcp_probe',str(port)],contains=['LISTEN'],timeout_s=1)
         sitl_profiles[kind]['ready']=deepcopy(sitl_profiles[kind]['health'])
+        sitl_profiles[kind]['exclusive_ports']=[dict(protocol='tcp',port=port+offset) for offset in (0,2,3)]
     sitl=make('sitl','ArduPilot SITL','simulation',sitl_profiles,permissions=['simulation'],integrations=['mavlink.sitl'])
     return dict(schema=1,tools=[rviz,qgc_tool,gazebo,nav2,ros_tool,sitl])
+
+
+def coupled_rover(value,output,sitl_dir,plugin,instance=70):
+    """Materialize matching owned deployment resources, never edit source worlds."""
+    if sitl_dir is None or plugin is None:raise ValueError('coupled Rover requires explicit SITL directory and ArduPilot plugin')
+    root=resource_root();binary=Path(sitl_dir).resolve()/'ardurover';plugin=Path(plugin).resolve()
+    inputs=[binary,plugin,root/'simulation/models/target_rover/model.sdf',root/'simulation/worlds/rover_runway.sdf']
+    for source in inputs:
+        if not source.is_file():raise ValueError('coupled Rover dependency missing: '+str(source))
+    directory=output.parent.resolve()/('rover-coupled-'+uuid4().hex[:10]);directory.mkdir(mode=0o700)
+    model=ET.parse(inputs[2]);model.find('.//fdm_port_in').text=str(9002+instance*10)
+    model_path=directory/'model.sdf';model.write(model_path,encoding='unicode')
+    world=ET.parse(inputs[3]);name='vaf_rover_'+uuid4().hex[:10];world.find('world').set('name',name)
+    world.find('.//include/uri').text=model_path.as_uri();world_path=directory/'world.sdf';world.write(world_path,encoding='unicode')
+    gazebo=next(t for t in value['tools'] if t['id']=='gazebo');sitl=next(t for t in value['tools'] if t['id']=='sitl')
+    env={'GZ_IP':'127.0.0.1','GZ_PARTITION':name,'GZ_SIM_RESOURCE_PATH':str(root/'simulation/models'),'GZ_SIM_SYSTEM_PLUGIN_PATH':str(plugin.parent)}
+    stats=dict(argv=['gz','topic','-e','-n','1','-t',f'/world/{name}/stats'],contains=['sim_time'],timeout_s=2)
+    gazebo['profiles']['rover-coupled']=profile(['gz','sim','-s','-r',str(world_path)],env=env,health=stats,ready=stats,
+        connection=dict(kind='gazebo.ardupilot',description=f'Actual target_rover world {name}, loopback JSON FDM {9002+instance*10}; paired with SITL rover-coupled'),
+        requires=[dict(kind='file',value=str(p)) for p in (world_path,model_path,plugin)],timeout=40)
+    gazebo['profiles']['rover-coupled']['exclusive_ports']=[dict(protocol='udp',port=9002+instance*10)]
+    params=root/'simulation/params/rover_phase2_rtl.parm'
+    defaults=root/'artifacts/phase2-control/ardupilot-source/Tools/autotest/default_params'
+    if not defaults.is_dir():defaults=Path(sitl_dir).resolve().parents[2]/'Tools/autotest/default_params'
+    parameter_files=[defaults/'rover.parm',defaults/'rover-skid.parm',root/'simulation/params/rover_telemetry.parm',params]
+    for path in parameter_files:
+        if not path.is_file():raise ValueError('trusted Rover defaults missing: '+str(path))
+    p=deepcopy(sitl['profiles']['rover']);p['argv']=[str(binary),'--model','JSON','--speedup','1','--instance',str(instance),'--base-port','6460','--sim-address','127.0.0.1','--defaults',','.join(map(str,parameter_files))]
+    p['requires']=[dict(kind='file',value=str(f)) for f in [binary,*parameter_files]]
+    p['connection']=dict(kind='mavlink.sitl',description=f'Coupled target_rover: loopback TCP 6460, JSON FDM {9002+instance*10}; requires matching Gazebo rover-coupled. No signing/vehicle authority provisioned.')
+    sitl['profiles']['rover-coupled']=p
+    for item in value['tools']:manifest(item)
+    return value
 
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--output',required=True,type=Path);p.add_argument('--ros-wrapper',type=Path)
     p.add_argument('--qgc',type=Path);p.add_argument('--qgc-relay',type=Path);p.add_argument('--sitl-dir',type=Path);p.add_argument('--ardupilot-plugin',type=Path)
+    p.add_argument('--coupled-rover',action='store_true',help='generate matching isolated Rover Gazebo/JSON SITL deployment profiles')
     a=p.parse_args();env=None
     if a.ros_wrapper:
         # Explicit local operator-selected environment; fixed argv, no shell
@@ -104,11 +142,12 @@ def main():
         result=subprocess.run([str(a.ros_wrapper.resolve()),'/usr/bin/env','-0'],stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=15,check=True)
         if len(result.stdout)>131072:raise ValueError('ROS environment too large')
         full=dict(part.decode().split('=',1) for part in result.stdout.split(b'\0') if b'=' in part)
-        allowed=('PATH','PYTHONPATH','LD_LIBRARY_PATH','AMENT_PREFIX_PATH','COLCON_PREFIX_PATH','ROS_DISTRO','ROS_VERSION','ROS_PYTHON_VERSION','RMW_IMPLEMENTATION','ROS_AUTOMATIC_DISCOVERY_RANGE','ROS_LOCALHOST_ONLY')
-        env={k:full[k] for k in allowed if k in full}
+        env={k:full[k] for k in ROS_KEYS if k in full}
     value=registry(ros_env=env,qgc=a.qgc,qgc_relay=a.qgc_relay,sitl_dir=a.sitl_dir,plugin=a.ardupilot_plugin)
     # Never overwrite existing operator configuration.
     a.output.parent.mkdir(parents=True,exist_ok=True,mode=0o700)
+    if a.output.exists():raise ValueError('registry exists; select a new output, existing configuration is never overwritten')
+    if a.coupled_rover:value=coupled_rover(value,a.output,a.sitl_dir,a.ardupilot_plugin)
     with a.output.open('x') as stream:json.dump(value,stream,indent=2)
     os.chmod(a.output,0o600)
     print('Registry created:',a.output)

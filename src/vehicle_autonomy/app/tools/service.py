@@ -15,7 +15,9 @@ class ToolService:
     def __init__(self, directory):
         self.store=Store(directory);self.lock=RLock();self.registry=AgentRegistry(self.store)
         self.settings=self.store.load('settings.json',dict(context=DEFAULT_CONTEXT,profiles={}))
-        context(self.settings['context']);self.workspaces=None
+        context(self.settings['context'])
+        from .workspaces import Workspaces
+        self.workspaces=Workspaces(self)
 
     def selected(self, agent_id, tool_id, profile_id):
         identifier(agent_id);identifier(tool_id);identifier(profile_id)
@@ -42,6 +44,8 @@ class ToolService:
                 object_fields(payload,('agent_id','tool_id','profile_id','operation','context'))
                 if self.workspaces and payload['operation'] in ('stop','restart'):
                     self.workspaces.assert_unshared(payload['agent_id'],payload['tool_id'])
+                if self.workspaces and payload['operation'] in ('launch','open'):
+                    self.workspaces.assert_compatible(payload,payload['context'])
                 result=self.registry.submit(payload['agent_id'],payload['operation'],payload['tool_id'],payload['profile_id'],payload['context'])
                 if self.workspaces:self.workspaces.manual_operation(payload,result)
                 return result

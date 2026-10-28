@@ -10,6 +10,7 @@ import platform
 import shutil
 import selectors
 import signal
+import socket
 import subprocess
 import sys
 from threading import Event, RLock, Thread
@@ -64,7 +65,14 @@ class LocalTools:
         if 'desktop' in tool['permissions'] and not desktop: missing.append('desktop session: choose a Desktop Agent with DISPLAY/WAYLAND_DISPLAY')
         if tool['id'] == 'qgroundcontrol' and (profile['connection'].get('telemetry_only') is not True or 'telemetry_only' not in tool['permissions']):
             missing.append('QGC requires an operator-provisioned telemetry-only relay profile')
-        result = dict(installed=not any(not m.startswith('desktop session:') for m in missing),
+        current=self.instances.get(tool_id)
+        if not current or current['profile_id']!=profile_id or current['process'].poll() is not None:
+            for port in profile.get('exclusive_ports',[]):
+                with socket.socket(socket.AF_INET,socket.SOCK_STREAM if port['protocol']=='tcp' else socket.SOCK_DGRAM) as sock:
+                    if port['protocol']=='tcp':sock.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
+                    try:sock.bind(('127.0.0.1',port['port']))
+                    except OSError:missing.append(f"busy simulation {port['protocol']} port: {port['port']} (no external process stopped)")
+        result = dict(installed=not any(not m.startswith(('desktop session:','busy simulation ')) for m in missing),
                       launchable=not missing and profile.get('observe_only') is not True,
                       missing=missing, desktop=desktop)
         return result
@@ -142,6 +150,11 @@ class LocalTools:
                 exe = self._which(command[0], self._environment(p, ctx))
                 command[0] = exe
                 record = self._record(tool_id, profile_id, ctx, 'STARTING')
+                working=p.get('cwd')
+                if not working:
+                    parent=self.store.root/'instances';parent.mkdir(mode=0o700,exist_ok=True)
+                    if parent.is_symlink():raise ValueError('instance directory symlink rejected')
+                    working=parent/record['instance_id'];working.mkdir(mode=0o700)
                 # Audit precedes spawn. Profile contents never originate in HTTP.
                 process = subprocess.Popen([sys.executable, '-m', 'vehicle_autonomy.app.tools.process_worker'],
                     stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
@@ -149,7 +162,7 @@ class LocalTools:
                 record['process'] = process; record['cleanup_confirmed'] = False
                 self.instances[tool_id] = record
                 process.stdin.write(json.dumps(dict(argv=command, env=self._environment(p, ctx),
-                    cwd=p.get('cwd') or str(self.store.root), stop_timeout_s=p.get('stop_timeout_s', 3))) + '\n')
+                    cwd=str(working), stop_timeout_s=p.get('stop_timeout_s', 3))) + '\n')
                 process.stdin.flush()
                 reader = Thread(target=self._read, args=(record,), daemon=True, name='tool-output')
                 self.readers.append(reader); reader.start()
