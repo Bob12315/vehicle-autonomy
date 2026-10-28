@@ -31,8 +31,10 @@ class StudioRuntimeTests(unittest.TestCase):
     def test_submission_pinned_input_output_mapping_uses_child_scope(self):
         child=definition(blackboard={},interface=dict(inputs={'item':dict(schema={'type':'integer'})},outputs={'count':dict(schema={'type':'integer'})}))
         child['mission_id']='child';child['nodes'][1].update(input_bindings={'count':{'ref':'submission.item'}},output_bindings={'count':{'ref':'submission.count'}})
-        parent=definition(blackboard={'result':dict(schema={'type':'integer'},default=0)})
-        parent['nodes'][1]=node('work','SubMission',sub_mission=dict(mission_id='child',version='1.0.0'),parameters={'item':3},output_bindings={'count':{'ref':'mission.result'}})
+        parent=definition(nodes=[node('start','Start'),node('parallel','Parallel'),
+            node('work','SubMission',sub_mission=dict(mission_id='child',version='1.0.0'),parameters={'item':3},output_bindings={'count':{'ref':'mission.result'}}),
+            node('wait','Wait',parameters={'duration_s':.05}),node('end','End')],edges=[edge('start','parallel'),edge('parallel','work','branch:0'),edge('parallel','wait','branch:1'),edge('parallel','end')],
+            blackboard={'result':dict(schema={'type':'integer'},default=0)})
         compiled=validate(parent,self.h.registry,{'v':self.h.driver},resolve=lambda *_:child)
         i=self.start(compiled);self.h.ticks(50);v=self.h.engine.view(i);self.assertEqual(v['state'],'SUCCEEDED',v['error'])
         value=next(c for c in v['studio']['blackboard']['values'] if c['scope_id']=='mission' and c['name']=='result');self.assertEqual(value['data']['value'],3)
@@ -76,4 +78,16 @@ class StudioRuntimeTests(unittest.TestCase):
         self.assertEqual(len(v['action_ids']),1)
         with self.assertRaises(ValueError):self.h.engine.debug(i,'resume')
         self.h.ticks(5);self.assertEqual(len(self.h.engine.view(i)['action_ids']),1)
+    def test_parallel_join_commits_disjoint_outputs_and_any_discards_cancelled_branch(self):
+        for completion in ('all','any'):
+            nodes=[node('start','Start'),node('parallel','Parallel',execution_policy=dict(completion=completion,max_concurrency=2)),
+                node('a','Action',action_type='ok',parameters={'count':3},output_bindings={'count':{'ref':'mission.a'}}),
+                node('b','Action',action_type='ok',parameters={'count':1},output_bindings={'count':{'ref':'mission.b'}}),node('end','End')]
+            edges=[edge('start','parallel'),edge('parallel','a','branch:0'),edge('parallel','b','branch:1'),edge('parallel','end')]
+            if completion=='any':nodes.append(node('stream','Action',action_type='stream'));edges.append(edge('b','stream'))
+            d=definition(nodes=nodes,edges=edges,blackboard={name:dict(schema={'type':'integer'},default=0) for name in ('a','b')});d['version']='1.0.'+str(len(self.h.engine.views()))
+            i=self.start(d);self.h.ticks(40);v=self.h.engine.view(i);self.assertEqual(v['state'],'SUCCEEDED',v['error'])
+            values={c['name']:c['data']['value'] for c in v['studio']['blackboard']['values'] if c['scope_id']=='mission'}
+            self.assertEqual(values['a'],3);self.assertEqual(values['b'],1 if completion=='all' else 0)
+            if completion=='any':self.assertEqual(next(e for e in v['studio']['executions'] if e['node_id']=='stream')['state'],'CANCELLED')
 

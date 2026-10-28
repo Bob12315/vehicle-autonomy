@@ -59,10 +59,11 @@ class Cell:
 
 
 class Blackboard:
-    def __init__(self,definitions,now,*,emit=None,external=None):
+    def __init__(self,definitions,now,*,emit=None,external=None,event_capacity=None):
         if type(definitions) is not dict or len(definitions)>64 or any(not NAME.fullmatch(k) for k in definitions):raise ValueError('bounded declared Blackboard required')
         self.scopes={};self.cells={};self.outputs={};self.history=[];self.emit=emit or (lambda *_a,**_k:None)
         self.external=external
+        self.event_capacity=event_capacity or (lambda _count:True)
         self.create('mission',None,definitions,now,identifier='mission')
 
     def create(self,kind,parent,definitions,now,*,identifier=None):
@@ -92,6 +93,7 @@ class Blackboard:
         if d.get('readonly') and not internal:raise ValueError('read-only external state cannot be assigned')
         validate_json(value,d['schema'],name)
         if len(json.dumps(value,allow_nan=False).encode())>16384:raise ValueError('use an Artifact Reference for large data')
+        if len(self.history)>=4096 or not self.event_capacity(1):raise ValueError('Blackboard/event history budget exhausted before write')
         previous=self.cells.get((sid,name));revision=1 if previous is None else previous.revision+1
         data=BlackboardValue(value,now,int(d.get('max_age_s',1800)*1e9),frame=d.get('frame'),source=producer)
         if original is not None:
@@ -108,13 +110,22 @@ class Blackboard:
         if target is None:raise ValueError('SubMission scope unavailable')
         return target,name
 
+    def staged(self,sid,target,name):
+        key=target+'.'+name
+        return next((self.scopes[s]['staged'][key] for s in self.ancestors(sid)
+            if self.scopes[s]['kind']=='parallel' and key in self.scopes[s]['staged']),None)
+
+    def shared_branch(self,sid,target):
+        branch=self.scope(sid,'parallel')
+        return branch if branch and target!=branch and target in self.ancestors(branch) else None
+
     def write(self,sid,ref,value,now,producer,*,original=None,mode='set'):
         target,name=self.destination(sid,ref)
-        branch=self.scope(sid,'parallel')
+        branch=self.shared_branch(sid,target)
         if mode=='append':
             old=self.cells.get((target,name))
             prior=None if old is None else old.data
-            staged=None if branch is None else self.scopes[branch]['staged'].get(target+'.'+name)
+            staged=self.staged(sid,target,name)
             if staged:prior=self._staged_data(staged)
             if prior is None or type(thaw_json(prior.value)) is not list:raise ValueError('append requires an initialized typed list')
             value=thaw_json(prior.value)+[value]
@@ -127,19 +138,38 @@ class Blackboard:
         elif mode!='set':raise ValueError('unknown output binding mode')
         if branch and target!=branch:
             s=self.scopes[branch];d=self.scopes[target]['declarations'][name];validate_json(value,d['schema'],name)
+            if s['closed'] or self.scopes[target]['closed'] or d.get('readonly'):raise ValueError('parallel write to closed/read-only state')
+            if original is not None and d.get('frame') and original.frame!=d['frame']:raise ValueError('parallel binding frame mismatch')
+            if len(json.dumps(value,allow_nan=False).encode())>16384:raise ValueError('use an Artifact Reference for large data')
             current=self.cells.get((target,name));s['staged'][target+'.'+name]=dict(target=target,name=name,value=deepcopy(value),now=now,producer=producer,original=original,expected=0 if current is None else current.revision)
             return
         return self._set(target,name,value,now,producer,original=original)
 
     def commit(self,branches):
+        if any(self.scopes[sid]['closed'] for sid in branches):raise ValueError('parallel scope already closed')
         entries=[v for sid in branches for v in self.scopes[sid]['staged'].values()]
+        parents={self.scopes[sid]['parent'] for sid in branches}
+        if len(parents)>1:raise ValueError('one Parallel join context required')
+        parent=next(iter(parents),None)
         keys=[(v['target'],v['name']) for v in entries]
         if len(set(keys))!=len(keys):raise ValueError('parallel Blackboard write conflict')
+        if len(self.history)+len(entries)>4096 or not self.event_capacity(len(entries)):raise ValueError('parallel event budget exhausted before commit')
         for v in entries:
             old=self.cells.get((v['target'],v['name']))
             if (0 if old is None else old.revision)!=v['expected']:raise ValueError('parallel Blackboard revision conflict')
             validate_json(v['value'],self.scopes[v['target']]['declarations'][v['name']]['schema'])
-        for v in entries:self._set(v['target'],v['name'],v['value'],v['now'],v['producer'],original=v['original'])
+            scope=self.scopes[v['target']];decl=scope['declarations'][v['name']]
+            if scope['closed'] or decl.get('readonly'):raise ValueError('parallel destination closed/read-only before commit')
+            if v['original'] is not None and decl.get('frame') and v['original'].frame!=decl['frame']:raise ValueError('parallel frame changed before commit')
+            if len(json.dumps(v['value'],allow_nan=False).encode())>16384:raise ValueError('parallel value budget exceeded')
+            outer=None if parent is None else self.shared_branch(parent,v['target'])
+            if outer:
+                previous=self.scopes[outer]['staged'].get(v['target']+'.'+v['name'])
+                if self.scopes[outer]['closed'] or previous and previous['expected']!=v['expected']:raise ValueError('outer Parallel context/revision changed')
+        for v in entries:
+            outer=None if parent is None else self.shared_branch(parent,v['target'])
+            if outer:self.scopes[outer]['staged'][v['target']+'.'+v['name']]=deepcopy(v)
+            else:self._set(v['target'],v['name'],v['value'],v['now'],v['producer'],original=v['original'])
         for sid in branches:self.scopes[sid]['closed']=True
 
     def output(self,sid,node_id,value,now,producer,*,original=None):
@@ -172,8 +202,7 @@ class Blackboard:
                 target=(self.scope(sid,'submission') or 'mission') if head=='mission' else sid if head=='local' else self.scope(sid,head)
                 if target is None:raise ValueError('reference scope unavailable')
                 name=parts.pop(0);cell=self.cells.get((target,name));data=None if cell is None else cell.data
-                branch=self.scope(sid,'parallel')
-                staged=None if branch is None else self.scopes[branch]['staged'].get(target+'.'+name)
+                staged=self.staged(sid,target,name)
                 if staged:data=self._staged_data(staged)
             if data is not None and parts:
                 data=blackboard_query({'value':data},'value.'+'.'.join(parts))

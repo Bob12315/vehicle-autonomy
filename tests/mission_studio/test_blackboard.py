@@ -57,4 +57,24 @@ class BlackboardTests(unittest.TestCase):
         b=Blackboard(dict(external=typed('string','known',readonly=True)),self.clock())
         with self.assertRaises(ValueError):b.write('mission','mission.external','new',self.clock(),'operator')
         with self.assertRaises(ValueError):Blackboard(dict(large=typed('string','x'*17000)),self.clock())
+    def test_parallel_admission_and_event_budget_fail_before_any_parent_write(self):
+        a=self.b.create('parallel','mission',{},self.clock());b=self.b.create('parallel','mission',{},self.clock())
+        self.b.write(a,'mission.count',1,self.clock(),'a');self.b.write(b,'mission.other',2,self.clock(),'b')
+        self.b.scopes['mission']['declarations']['other']['readonly']=True
+        with self.assertRaises(ValueError):self.b.commit([a,b])
+        self.assertEqual(self.b.read('mission',dict(ref='mission.count'),self.clock())[0],0)
+        self.b.scopes['mission']['declarations']['other']['readonly']=False;self.b.event_capacity=lambda count:count<2
+        with self.assertRaises(ValueError):self.b.commit([a,b])
+        self.assertEqual(self.b.read('mission',dict(ref='mission.count'),self.clock())[0],0)
+    def test_nested_parallel_inherits_staged_reads_without_early_root_commit(self):
+        outer=self.b.create('parallel','mission',{},self.clock());self.b.write(outer,'mission.count',1,self.clock(),'outer')
+        a=self.b.create('parallel',outer,{},self.clock());b=self.b.create('parallel',outer,{},self.clock())
+        self.assertEqual(self.b.read(a,dict(ref='mission.count'),self.clock())[0],1)
+        self.b.write(a,'mission.count',2,self.clock(),'inner');self.b.write(b,'mission.other',3,self.clock(),'inner')
+        self.b.commit([a,b]);self.assertEqual(self.b.read('mission',dict(ref='mission.count'),self.clock())[0],0)
+        self.assertEqual(self.b.read(outer,dict(ref='mission.count'),self.clock())[0],2)
+        child=self.b.create('submission',outer,dict(result=typed('integer',0)),self.clock())
+        self.b.write(child,'submission.result',7,self.clock(),'child');self.b.scopes[child]['closed']=True
+        self.b.commit([outer]);self.assertEqual(self.b.read('mission',dict(ref='mission.count'),self.clock())[0],2)
+        self.assertEqual(self.b.cells[child,'result'].data.value,7)
 

@@ -18,7 +18,8 @@ class StudioState:
     def __init__(self,engine,run,now):
         self.engine=engine;self.run=run;self.definition=run.spec['studio']['definition']
         self.board=Blackboard(self.definition['blackboard'],now,emit=lambda event,**kw:engine._event(run,event,**kw),
-            external=None if engine.external_inputs is None else lambda binding,stamp:engine.external_inputs(run.spec['target'],binding,stamp))
+            external=None if engine.external_inputs is None else lambda binding,stamp:engine.external_inputs(run.spec['target'],binding,stamp),
+            event_capacity=lambda count:len(run.history)+count<=run.history.maxlen)
         self.scopes={k:'mission' for k in run.nodes};self.archived=[]
         self.pause_requested=False;self.breakpoints=set(self.definition['execution_policy'].get('breakpoints',[]));self.bypass=set();self.step_remaining=None;self.overrides={}
         self.takeover=None

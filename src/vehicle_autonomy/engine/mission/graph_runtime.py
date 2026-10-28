@@ -166,7 +166,11 @@ class MissionGraphRuntime:
                 elif not self._action_safe(a): uncertain = True
         state = 'CANCELLING' if pending else 'UNKNOWN' if uncertain else outcome
         for n in nodes:
-            if n.state not in TERMINAL or n.id == key: self._set(r, n, state)
+            if n.state not in TERMINAL or n.id == key:
+                # A successful race must not label its cancelled background
+                # node successful merely because the parent safely completed.
+                node_state='CANCELLED' if r.studio and r.nodes[key]['type']=='Parallel' and outcome=='SUCCEEDED' and state=='SUCCEEDED' and n.id!=key else state
+                self._set(r, n, node_state)
         return state
 
     def cancel(self, identifier, *, outcome='CANCELLED'):
@@ -186,6 +190,12 @@ class MissionGraphRuntime:
             if r.studio:r.studio.archive(n)
             r.runs[n.id] = NodeRun(n.id)
 
+    def _commit_parallel(self,r,n):
+        if not r.studio or n.details.get('committed'):return
+        r.studio.board.commit(n.details.get('successful_branches',[]))
+        for scope in n.details['branches']:r.studio.board.scopes[scope]['closed']=True
+        n.details['committed']=True
+
     def _tick_node(self, r, key, now):
         n, spec = r.runs[key], r.nodes[key]
         if n.state=='SKIPPED':return 'SUCCEEDED'
@@ -200,6 +210,7 @@ class MissionGraphRuntime:
             n.pending_end = 'TIMED_OUT'
         if n.pending_end:
             state = self._cancel_tree(r, key, n.pending_end)
+            if state=='SUCCEEDED' and spec['type']=='Parallel':self._commit_parallel(r,n)
             if state != 'CANCELLING': self._set(r, n, state)
             return state
         t, children = spec['type'], spec['children']
@@ -290,13 +301,11 @@ class MissionGraphRuntime:
                 # Retained successful Plane scopes are not implicitly cancelled
                 # to make a race look safe. Such a graph remains UNKNOWN.
                 n.pending_end = chosen
+                if r.studio:n.details['successful_branches']=[scope for scope,value in zip(n.details['branches'],values) if value=='SUCCEEDED']
                 state = self._cancel_tree(r, key, chosen)
                 result = chosen if state == chosen else state
                 if r.studio and result=='SUCCEEDED' and not n.details.get('committed'):
-                    selected=[scope for scope,value in zip(n.details['branches'],values) if value=='SUCCEEDED']
-                    r.studio.board.commit(selected)
-                    for scope in n.details['branches']:r.studio.board.scopes[scope]['closed']=True
-                    n.details['committed']=True
+                    self._commit_parallel(r,n)
         elif t=='ForEach':
             if not r.studio.foreach_scope(key,now):result='SUCCEEDED'
             else:
