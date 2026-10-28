@@ -1,5 +1,9 @@
 # RViz2 Visualization Integration V1
 
+2026-10-29 更新：Vehicle Control 现采用一次 SEND ON，后续动作及人工点击「执行此目标」
+不再逐条勾选或弹出授权框；RViz 点选本身仍不执行。见 [SEND 开关说明](WEB_SEND_SWITCH.md)。
+下文旧的确认框描述属于此前验收记录，控制边界与已知 Rover 风险仍保留。
+
 2026-10-28。本报告只描述当前实现和实际证据；前置审计见
 [架构审计](RVIZ2_VISUALIZATION_AUDIT.md)，审计提交 `3fc0540`。
 

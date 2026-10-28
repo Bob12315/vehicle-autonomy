@@ -175,11 +175,11 @@ def rover_browser(base,token,api,oracle,directory):
             page=browser.new_page(viewport={'width':1680,'height':1100})
             page.on('pageerror',lambda error:errors.append(str(error)))
             login(page,base,token,'/control')
-            page.locator('#acquire-control').click();expect(page.locator('#top-authority')).to_have_text('Manual Control')
+            page.locator('#acquire-control').click();expect(page.locator('#top-authority')).to_have_text('SEND ON')
             check=BrowserControlCheck('rover',api,oracle,directory,page)
             check.perform('Arm',allow_send=False,expected='REJECTED')
             result=check.run()
-            page.locator('#release-control').click();expect(page.locator('#top-authority')).to_have_text('Observer')
+            page.locator('#release-control').click();expect(page.locator('#top-authority')).to_have_text('SEND OFF')
             page.screenshot(path=str(directory/'basic-controls.png'),full_page=True)
             assert not errors;result['javascript_errors']=errors
             return result

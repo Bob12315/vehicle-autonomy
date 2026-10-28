@@ -141,7 +141,8 @@ RViz。实际 ROS/GUI/SITL 证据、话题配置、控制边界及未关闭的 R
 Vehicle Control 复用 `/control` 原有 Action/Authority/Safety/Execution 链。
 过期或断开的遥测显示未知；不新增 Mission Studio 或专业地图/点云查看器。
 所有页面共用 `/login` 的后端会话：一次输入密钥后，页面切换和有效期内刷新均不重复输入，
-可主动退出。Vehicle Control 采用与 Dashboard 相同的样式，区分只读、申请操作权和人工控制。
+可主动退出。Vehicle Control 采用相同样式：点击一次 **SEND ON** 后直接操作，
+不再逐条授权；SEND OFF、断线或切换车辆后禁用控制，见 [SEND 开关说明](docs/WEB_SEND_SWITCH.md)。
 本轮实现、安全边界、测试证据和操作步骤见 [Vehicle Control UI 报告](docs/VEHICLE_CONTROL_UI_REPORT.md)。
 
 ```bash

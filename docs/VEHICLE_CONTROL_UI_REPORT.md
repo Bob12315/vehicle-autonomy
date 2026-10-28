@@ -1,5 +1,9 @@
 # Vehicle Control UI 与统一登录交付记录
 
+2026-10-29 操作流程已按用户要求改为一次 SEND ON，逐条授权和关键动作确认框已移除；
+见 [SEND 开关说明](WEB_SEND_SWITCH.md)。下文保留当时的实现与测试记录，不代表当前仍需
+Acquire Control 或反复勾选 SEND。
+
 日期：2026-10-28。范围：现有 Web UI 的 Vehicle Control、必要共享认证模块及其测试。
 未改动 Mission Studio 编辑器、规划算法、旧 CUADC 项目或 Tool Agent 内部架构。
 

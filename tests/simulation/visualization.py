@@ -76,7 +76,7 @@ class VisualizationAcceptance(ToolAcceptance):
                         visualization_lifecycle=self.lifecycle_test(page,base,api,actual,wait,context,directory))
                     assert {a['id'] for a in api('/api/instances')}==initial and not errors,errors
                     (directory/'web-control-result.json').write_text(json.dumps(result,indent=2));return result
-                page.locator('#acquire-control').click();expect(page.locator('#top-authority')).to_have_text('Manual Control')
+                page.locator('#acquire-control').click();expect(page.locator('#top-authority')).to_have_text('SEND ON')
                 acceptance=self
                 class Check(BrowserControlCheck):
                     def hover_or_ground(inner):
@@ -94,7 +94,7 @@ class VisualizationAcceptance(ToolAcceptance):
                 assert all(a['stamp_ns']<b['stamp_ns'] for a,b in zip(records,records[1:]))
                 proof.update(final=final,observed_displacement_m=displacement,monotonic_stamps=True,one_tf_authority=True)
                 result['visualization']=proof;result['javascript_errors']=errors;assert not errors;check.save()
-                page.locator('#release-control').click();expect(page.locator('#top-authority')).to_have_text('Observer');page.screenshot(path=str(directory/'vehicle-control-rviz.png'),full_page=True)
+                page.locator('#release-control').click();expect(page.locator('#top-authority')).to_have_text('SEND OFF');page.screenshot(path=str(directory/'vehicle-control-rviz.png'),full_page=True)
                 if kind=='rover' and self.extended:
                     result['visualization_lifecycle']=self.lifecycle_test(page,base,api,actual,wait,context,directory)
                     check.save()
@@ -117,10 +117,8 @@ class VisualizationAcceptance(ToolAcceptance):
         mouse=goal(tools['rviz2']['instance']['pid'])
         selected=wait(lambda:next((g for g in api('/api/visualization/candidates?target=rover') if g['id'] not in previous),None),8)
         assert before=={a['id'] for a in api('/api/instances')},'RViz selection executed without confirmation'
-        row=page.locator('[data-goal="'+selected['id']+'"]');row.get_by_role('button',name='核对并提交').click()
-        expect(page.locator('#command-confirm')).to_be_visible();expect(page.locator('#confirm-submit')).to_be_disabled()
-        assert before=={a['id'] for a in api('/api/instances')}
-        page.locator('#confirm-send').check();page.locator('#confirm-submit').click()
+        row=page.locator('[data-goal="'+selected['id']+'"]');row.get_by_role('button',name='执行此目标').click()
+        expect(page.locator('#command-confirm')).not_to_be_visible()
         action=wait(lambda:next((a for a in api('/api/instances') if a['id'] not in before),None),8)
         final=check.finish(action,65);truth=check.truth()
         check.result['rviz_pending_goal']=dict(source='actual owned native RViz SetGoal mouse drag, then Web confirmation',mouse=mouse,candidate=selected,

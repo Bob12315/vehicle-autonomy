@@ -105,7 +105,7 @@ class ToolAcceptance:
                 page.goto(base+'/control')
                 assert '/login' not in page.url
                 page.locator('#acquire-control').click()
-                expect(page.locator('#top-authority')).to_have_text('Manual Control')
+                expect(page.locator('#top-authority')).to_have_text('SEND ON')
                 check = BrowserControlCheck(kind, api, oracle, directory, page)
                 check.result['native_tool'] = dict(name='ROS2 graph observer',
                     actual_native=True, launch=True, restart=True, stop=True,
@@ -114,7 +114,7 @@ class ToolAcceptance:
                 check.perform('Arm', allow_send=False, expected='REJECTED')
                 result = check.run()
                 page.locator('#release-control').click()
-                expect(page.locator('#top-authority')).to_have_text('Observer')
+                expect(page.locator('#top-authority')).to_have_text('SEND OFF')
                 page.screenshot(path=str(directory/'browser-controls.png'), full_page=True,
                     mask=[])
                 assert not errors, errors
@@ -140,7 +140,7 @@ class BrowserControlCheck(ControlCheck):
         page=self.page;parameters=parameters or {}
         before={a['id'] for a in self.call('/api/instances')}
         if name=='SetMode':
-            page.locator('#mode').select_option(parameters['mode']);page.locator('#send').check();button=page.locator('#set-mode')
+            page.locator('#mode').select_option(parameters['mode']);button=page.locator('#set-mode')
         elif name=='Takeoff':
             if self.kind=='plane':
                 section=page.locator('[data-for=plane] details');section.locator('summary').click() if not section.get_attribute('open') else None
@@ -151,24 +151,21 @@ class BrowserControlCheck(ControlCheck):
             for key,field in [('x_m','#goto-x'),('y_m','#goto-y'),('z_m','#goto-z')]:
                 if page.locator(field).is_disabled():assert parameters[key]==0
                 else:page.locator(field).fill(str(parameters[key]))
-            page.locator('#send').check();button=page.locator('#goto')
+            button=page.locator('#goto')
         elif name=='SetGuidedTarget':
             for key,field in [('latitude_deg','#latitude'),('longitude_deg','#longitude'),('altitude_amsl_m','#altitude-amsl')]:page.locator(field).fill(str(parameters[key]))
-            page.locator('#send').check();button=page.locator('#guided-target')
-        elif name=='ReturnHome':page.locator('#send').check();button=page.locator('#return-control')
+            button=page.locator('#guided-target')
+        elif name=='ReturnHome':button=page.locator('#return-control')
         elif name=='Stop':button=page.locator('#hold-control')
         else:
-            page.locator('#send').check();button=page.locator('[data-action="'+name+'"]')
-        button.click()
-        if name in ('Arm','Disarm','Takeoff','AutoLand'):
-            expect(page.locator('#command-confirm')).to_be_visible()
-            if not allow_send:
-                expect(page.locator('#confirm-submit')).to_be_disabled();page.locator('#confirm-cancel').click()
-                assert {a['id'] for a in self.call('/api/instances')}==before
-                self.result['ui_without_confirmation']='blocked before submission'
-                print(f'{self.kind}: UI {name} blocked without explicit confirmation',flush=True)
-                return None
-            page.locator('#confirm-send').check();page.locator('#confirm-submit').click()
+            button=page.locator('[data-action="'+name+'"]')
+        if not allow_send:
+            page.locator('#release-control').click();expect(page.locator('#top-authority')).to_have_text('SEND OFF')
+            expect(button).to_be_disabled();assert {a['id'] for a in self.call('/api/instances')}==before
+            self.result['ui_without_send_on']='blocked before submission'
+            page.locator('#acquire-control').click();expect(page.locator('#top-authority')).to_have_text('SEND ON')
+            return None
+        button.click();expect(page.locator('#command-confirm')).not_to_be_visible()
         a=self.wait(lambda:next((a for a in self.call('/api/instances') if a['id'] not in before),None),12)
         final=self.finish(a,seconds,expected=expected)
         if name=='Takeoff' and self.kind=='plane':assert page.locator('[data-action="Disarm"]').is_disabled()
@@ -189,9 +186,8 @@ class BrowserControlCheck(ControlCheck):
         if self.kind=='copter':
             section=page.locator('#copter-advanced')
             if section.get_attribute('open') is None:section.locator('summary').click()
-        authorization=page.locator('#copter-manual-send' if self.kind=='copter' else '#manual-send')
         expect(page.locator('[data-key="'+key+'"]').last if self.kind=='copter' else page.locator('[data-key="'+key+'"]').first).to_be_enabled(timeout=15000)
-        authorization.check();authorization.focus();page.keyboard.down(key)
+        page.locator('#control-level').click();page.keyboard.down(key)
         try:
             a = self.wait(lambda: next((a for a in self.call('/api/instances') if a['id'] not in before), None), 8)
             def moved():
@@ -219,7 +215,7 @@ class BrowserControlCheck(ControlCheck):
         if panel.get_attribute('open') is None:panel.locator('summary').click()
         expect(page.locator('#copter-stream [data-key="w"]')).to_be_enabled()
         before={a['id'] for a in self.call('/api/instances')};start=self.truth()
-        page.locator('#copter-manual-send').check();page.locator('#copter-manual-send').focus();page.keyboard.down('w')
+        page.locator('#control-level').click();page.keyboard.down('w')
         a=self.wait(lambda:next((a for a in self.call('/api/instances') if a['id'] not in before),None),8)
         self.wait(lambda:math.hypot(self.truth().x_m-start.x_m,self.truth().y_m-start.y_m)>=.25,12)
         blocker=lambda route:route.abort()
@@ -255,9 +251,9 @@ class BrowserControlCheck(ControlCheck):
                 focus.send('Emulation.setFocusEmulationEnabled',{'enabled':True});focus.detach()
             page.keyboard.up('w')
         if mode=='offline':
-            expect(page.locator('#top-authority')).to_have_text('Observer',timeout=16000)
+            expect(page.locator('#top-authority')).to_have_text('SEND OFF',timeout=16000)
             page.locator('#acquire-control').click(timeout=20000)
-            expect(page.locator('#top-authority')).to_have_text('Manual Control')
+            expect(page.locator('#top-authority')).to_have_text('SEND ON')
         self.save()
 
     def hover_or_ground(self):

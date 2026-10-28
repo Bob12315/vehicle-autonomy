@@ -2,6 +2,7 @@
 const api=window.VAF,auth=window.VAFAuth,$=s=>document.querySelector(s);
 const terminal=new Set(['SUCCEEDED','FAILED','REJECTED','CANCELLED','TIMED_OUT','UNKNOWN']);
 let state=null,current=null,controller=null,session=null,input=null,keys=new Set(),pending=false,updating=false,polling=false,renewing=false,commandPending=false,confirmation=null,socket=null,retry=0,closing=false,lastAction=null,targetHeight=null,lastReceived=0;
+let sendChanging=false;
 const node=api.node.bind(api),fmt=(v,n=2)=>typeof v==='number'&&Number.isFinite(v)?v.toFixed(n):'未知';
 function notice(error){$('#notice').textContent=String(error?.message||error||'');$('#notice').dataset.tone=error?.message?'error':'info';}
 function guard(fn){return async(...args)=>{try{await fn(...args);}catch(e){notice(e);}};}
@@ -25,13 +26,12 @@ async function loseControl(message){
  await stop();
  if(token&&api.target)try{await api.call('/api/control/release',{target:api.target});}catch(_){}
  auth.control='';if(state?.operator_control?.[api.target])state.operator_control[api.target].mine=false;
- $('#manual-send').checked=false;$('#copter-manual-send').checked=false;$('#send').checked=false;
  if(message)notice(message);render();
 }
 async function renew(){
  if(!auth.control||renewing||closing)return;renewing=true;
  try{await api.call('/api/control/renew',{target:api.target});}
- catch(e){await loseControl('控制权已失效：'+e.message);}
+ catch(e){await loseControl('SEND 已关闭：'+e.message);}
  finally{renewing=false;}
 }
 function live(){
@@ -40,28 +40,26 @@ function live(){
  socket.onopen=()=>{$('#live-status').textContent='LIVE · WebSocket';retry=0;};
  socket.onmessage=e=>{try{const m=JSON.parse(e.data);if(m.type==='telemetry')merge(m.result);}catch(_){notice('状态帧无效；已暂停操作。');invalidate();loseControl();}};
  socket.onclose=e=>{
-  if(closing)return;$('#live-status').textContent='重连中 · HTTP 回退';invalidate();loseControl('实时连接中断，持续输入已退出；重连后需重新申请控制权。');
+  if(closing)return;$('#live-status').textContent='重连中 · HTTP 回退';invalidate();loseControl('实时连接中断，SEND 已关闭；重连后请重新点击 SEND ON。');
   if(e.code===4401){auth.lost();return;}setTimeout(live,Math.min(5000,700*2**retry++));
  };
  socket.onerror=()=>{};
 }
 function confirmOperation(title,description,fn){
  if(confirmation)throw Error('请先处理当前确认操作');
- confirmation=fn;$('#confirm-title').textContent=title;$('#confirm-description').textContent=description;$('#confirm-send').checked=false;$('#confirm-submit').disabled=true;$('#command-confirm').showModal();
+ confirmation=fn;$('#confirm-title').textContent=title;$('#confirm-description').textContent=description;$('#confirm-submit').disabled=false;$('#command-confirm').showModal();
 }
-$('#confirm-send').onchange=()=>$('#confirm-submit').disabled=!$('#confirm-send').checked;
 $('#confirm-cancel').onclick=()=>{$('#command-confirm').close();confirmation=null;};
 $('#command-confirm').addEventListener('cancel',()=>confirmation=null);
 $('#confirm-submit').onclick=guard(async()=>{
- if(!confirmation||!$('#confirm-send').checked)return;
+ if(!confirmation)return;
  const fn=confirmation;confirmation=null;$('#command-confirm').close();await fn();
 });
-function request(name,parameters={},critical=false){
- if(!canCommand())throw Error('请先申请控制权，等待有效遥测及当前动作退出');
+function request(name,parameters={}){
+ if(!canCommand())throw Error('请先点击 SEND ON，等待有效遥测及当前动作退出');
  if(!spec(name))throw Error('当前车型未注册此能力');
  const submit=async()=>{
   if(!canCommand())throw Error('控制状态已变化，请重新核查');
-   $('#send').checked=false;
   commandPending=true;render();
   try{
    const payload={name,version:spec(name).version,target:api.target,parameters,allow_send:true};
@@ -73,29 +71,29 @@ function request(name,parameters={},critical=false){
    await refresh();
   }finally{commandPending=false;render();}
  };
- if(critical){confirmOperation('确认 '+api.actionLabel(name),`${api.target} / ${api.kindLabel(selected().kind)}\n${name==='Takeoff'?'目标相对高度 '+parameters.height_m+' m · odom 向上':'请确认车辆、周边与飞控状态。'}\n此次授权仅适用于这一条动作。`,submit);}
- else{if(!$('#send').checked)throw Error('请勾选“授权下一条模式或目标指令”');$('#send').checked=false;return submit();}
+ return submit();
 }
 $('#acquire-control').onclick=guard(async()=>{
- if(!selected())throw Error('无车辆可申请');
- $('#control-level').textContent='Acquire Control · 申请中';$('#acquire-control').disabled=true;
- try{const r=await api.call('/api/control/acquire',{target:api.target});auth.control=r.control_token;notice('已获得页面操作权；SEND 仍按每个 Action 单独校验。');await refresh();}
- finally{render();}
+ if(sendChanging)return;
+ if(!selected())throw Error('无车辆可开启 SEND');
+ sendChanging=true;
+ $('#control-level').textContent='SEND · 开启中';$('#acquire-control').disabled=true;
+ try{const r=await api.call('/api/control/acquire',{target:api.target});auth.control=r.control_token;notice('SEND ON：本页本车已启用，后续按钮直接执行，不再逐条授权。');await refresh();}
+ finally{sendChanging=false;render();}
 });
 $('#release-control').onclick=guard(async()=>{await loseControl('已请求安全退出；确认释放状态以右侧证据为准。');await refresh();});
 $('#request-takeover').onclick=guard(()=>{
- confirmOperation('明确接管请求',`目标 ${api.target}\n先请求当前 Mission / Action 安全退出。此操作不会立即获得控制权；未确认退出时仍禁止新运动。`,async()=>{await api.call('/api/control/request-takeover',{target:api.target,confirmed:true});await loseControl();await refresh();notice('接管退出请求已提交；等待原主体释放后，再点击 Acquire Control。');});
+ confirmOperation('退出当前任务',`目标 ${api.target}\n先请求当前 Mission / Action 安全退出。未确认退出时仍禁止新运动。`,async()=>{await api.call('/api/control/request-takeover',{target:api.target,confirmed:true});await loseControl();await refresh();notice('退出请求已提交；等待原主体释放后，再点击 SEND ON。');});
 });
 $('#safety-entry').onclick=guard(async()=>{if(auth.control){await loseControl('安全退出已请求；不将取消等同于物理停止。');await refresh();}else $('#request-takeover').click();});
 $('#set-mode').onclick=guard(()=>request('SetMode',{mode:$('#mode').value}));
-for(const b of document.querySelectorAll('[data-action]'))b.onclick=guard(()=>request(b.dataset.action,{},['Arm','Disarm','AutoLand'].includes(b.dataset.action)));
-$('#takeoff').onclick=guard(()=>{const height=Number($('#takeoff-height').value);if(!Number.isFinite(height)||height<.2||height>2)throw Error('起飞高度须为 0.2–2 m');return request('Takeoff',{height_m:height},true);});
-$('#plane-takeoff').onclick=guard(()=>request('Takeoff',{height_m:Number($('#plane-height').value)},true));
+for(const b of document.querySelectorAll('[data-action]'))b.onclick=guard(()=>request(b.dataset.action));
+$('#takeoff').onclick=guard(()=>{const height=Number($('#takeoff-height').value);if(!Number.isFinite(height)||height<.2||height>2)throw Error('起飞高度须为 0.2–2 m');return request('Takeoff',{height_m:height});});
+$('#plane-takeoff').onclick=guard(()=>request('Takeoff',{height_m:Number($('#plane-height').value)}));
 $('#return-control').onclick=guard(()=>request(selected()?.kind==='plane'?'RTL':'ReturnHome'));
 $('#hold-control').onclick=guard(async()=>{
  if(session){await stop();return;}
- if(!canCommand())throw Error('需当前页面控制权与有效遥测');
- $('#send').checked=true;
+ if(!canCommand())throw Error('请先开启 SEND ON 并等待有效遥测');
  if(selected().kind==='rover')return request('Stop');
  if(selected().kind==='copter')return request('SetMode',{mode:'LOITER'});
  return request('Loiter');
@@ -113,7 +111,6 @@ $('#goto').onclick=guard(()=>{
 // Copter's existing velocity interface is deliberately behind the advanced panel.
 const stream=$('#copter-stream');
 stream.append(node('div',undefined,{class:'speed-row'}));stream.lastChild.append(node('label','速度限制',{for:'copter-speed'}),node('input',undefined,{id:'copter-speed',type:'range',min:'.1',max:'.5',step:'.05',value:'.3'}),node('output','0.30 m/s',{id:'copter-speed-value'}));
-const authorization=node('label',undefined,{class:'send-authorization'});authorization.append(node('input',undefined,{type:'checkbox',id:'copter-manual-send'}),document.createTextNode('授权下一次按住操控'));stream.append(authorization);
 const pad=node('div',undefined,{class:'direction-pad'});
 for(const[key,label,position]of [['w','↑ 前进','forward'],['a','← 左移','left'],['d','→ 右移','right'],['s','↓ 后退','back']]){const b=node('button',label,{'data-key':key,'data-needs-control':'',class:'key-'+position});pad.append(b);}
 const cstop=node('button','HOLD',{class:'key-stop danger',id:'copter-manual-stop','data-needs-control':''});pad.append(cstop);stream.append(pad);
@@ -130,7 +127,7 @@ async function begin(){
  if(!canCommand()||selected().kind==='plane'){keys.clear();throw Error('持续控制不可用');}
  const v=selected(),op=v.world?.vehicle?.operation,height=v.world?.vehicle?.reported_pose?.value.position.z;
  if(op?.armed!==true||op.native_mode!=='ARDUPILOT_CUSTOM_'+(v.kind==='rover'?15:4)||v.kind==='copter'&&!(height>.3)){keys.clear();throw Error('请先切换 GUIDED、解锁；多旋翼必须先起飞。');}
- const check=$('#'+streamPrefix()+'manual-send');if(!check.checked){keys.clear();throw Error('请重新授权下一次按住操控');}check.checked=false;pending=true;
+ pending=true;
  try{const r=await api.call('/api/manual/start',{name:v.kind==='rover'?'Drive':'SetVelocity',target:api.target,parameters:values(),allow_send:true});session=r.session;input=r.action;lastAction=input.id;if(!keys.size)await stop();}
  finally{pending=false;}
 }
@@ -174,8 +171,9 @@ function render(){
  $('#vehicle-name').textContent=v.target+' / '+({rover:'Rover',copter:'Copter',plane:'Plane'}[v.kind]||v.kind);$('#kind-label').textContent=api.kindLabel(v.kind);
  $('#environment').textContent=v.owned_simulation?'SITL · 自有仿真':'Real Hardware / 未准入 · 只读';$('#connection-state').textContent=v.connected?'MAVLink · Connected':'MAVLink · Disconnected';$('#link-dot').style.background=fresh?'#087e79':'#9a661b';
  $('#top-mode').textContent='Mode · '+(display.mode_name||'未知');$('#top-armed').textContent=op?.armed===true?'ARMED':op?.armed===false?'DISARMED':'Armed · 未知';$('#top-armed').dataset.tone=op?.armed===true?'warning':'';
- $('#top-authority').textContent=mine?'Manual Control':ctrl?.state==='RELEASING'?'Releasing':'Observer';$('#control-level').textContent=mine?'Manual Control · 人工控制':ctrl?.state==='RELEASING'?'安全退出中 · 未确认释放':'Observer · 只读观察';$('#control-badge').textContent=mine?'页面操作权已获得':'只读';
- $('#control-reason').textContent=ctrl?.reason||'页面操作权与实际执行 SEND 分开校验。';$('#acquire-control').disabled=!ctrl?.can_acquire;$('#acquire-control').hidden=mine;$('#release-control').hidden=!mine;
+ $('#top-authority').textContent=mine?'SEND ON':ctrl?.state==='RELEASING'?'Stopping':'SEND OFF';$('#control-level').textContent=mine?'SEND ON · 指令可发送':ctrl?.state==='RELEASING'?'SEND OFF · 安全退出中':'SEND OFF · 只读观察';$('#control-badge').textContent=mine?'SEND ON':'SEND OFF';
+ $('#control-reason').textContent=ctrl?.reason||'开启一次 SEND ON 后，按钮直接执行；关闭、断线、刷新或切换车辆后需重新开启。';$('#acquire-control').disabled=sendChanging||!ctrl?.can_acquire;$('#acquire-control').hidden=mine;$('#release-control').hidden=!mine;
+ $('#request-takeover').hidden=mine||!ctrl?.holder;
  $('#status-health').textContent=fresh?veh?.health?.quality||'UNKNOWN':'STALE / UNKNOWN';$('#status-health').dataset.tone=fresh?'good':'warning';
  let heading=typeof display.heading_enu_deg==='number'?(90-display.heading_enu_deg+360)%360:null;
  const rows=[['Vehicle ID / Type',v.target+' / '+v.kind],['Flight Mode',display.mode_name||'未知'],['Armed',op?.armed===true?'Armed':op?.armed===false?'Disarmed':'未知'],['Battery',display.battery?.remaining_percent==null?'未知':fmt(display.battery.remaining_percent,0)+' %'],['Voltage',display.battery?.voltage_v==null?'未知':fmt(display.battery.voltage_v)+' V'],['Ground Speed',fmt(display.horizontal_speed_mps)+' m/s'],['Altitude · odom U',fmt(pose?.position.z)+' m'],['Heading · N / CW',fmt(heading,1)+'°'],['GPS Fix / Satellites',diagnostic(display,'GPS_RAW_INT',g=>'Fix '+g.fix_type+' / '+(g.satellites??'未知'))],['EKF',diagnostic(display,'EKF_STATUS_REPORT',e=>'Flags '+e.flags)],['Failsafe',typeof display.failsafe==='boolean'?(display.failsafe?'触发':'未触发'):'未知 · 未提供独立标志'],['Telemetry',fresh?'有效 · '+fmt(display.pose_age_s,2)+' s':'过期 / 未知']];
@@ -184,7 +182,7 @@ function render(){
  const q=pose?.orientation;
  $('#roll').textContent=q?fmt(Math.atan2(2*(q.w*q.x+q.y*q.z),1-2*(q.x*q.x+q.y*q.y))*180/Math.PI,1)+'°':'未知';$('#pitch').textContent=q?fmt(Math.asin(Math.max(-1,Math.min(1,2*(q.w*q.y-q.z*q.x))))*180/Math.PI,1)+'°':'未知';$('#yaw').textContent=fmt(display.heading_enu_deg,1)+'°';
  $('#telemetry-warning').textContent=fresh?'已验证 '+v.verified_frames+' 帧 · 定位基于真实遥测':'遥测过期或未知，危险操作已禁用。';$('#telemetry-warning').dataset.tone=fresh?'':'warning';
- $('#control-hint').textContent=display.control_hint||'等待有效遥测。';$('#actual-height').textContent=fmt(pose?.position.z)+' m';$('#target-height').textContent=targetHeight==null?'尚未提交':fmt(targetHeight)+' m';
+ $('#control-hint').textContent=(display.control_hint||'等待有效遥测。').replaceAll('再授权','再');$('#actual-height').textContent=fmt(pose?.position.z)+' m';$('#target-height').textContent=targetHeight==null?'尚未提交':fmt(targetHeight)+' m';
  for(const section of document.querySelectorAll('[data-for]'))section.hidden=section.dataset.for!==v.kind;
  $('#position-advanced').hidden=v.kind==='plane';$('#goto-z').disabled=v.kind==='rover';if(v.kind==='rover')$('#goto-z').value='0';
  const choices=display.mode_choices||[],mode=$('#mode'),prior=mode.value;
@@ -199,7 +197,7 @@ function render(){
  $('#guided-target').disabled=!enabled||!spec('SetGuidedTarget')||!op?.armed||!(pose?.position.z>=10);$('#goto').disabled=!enabled||!spec('Goto')||!op?.armed;
  for(const b of document.querySelectorAll('[data-key]')){const movingAllowed=mine&&fresh&&op?.armed===true&&op.native_mode==='ARDUPILOT_CUSTOM_'+(v.kind==='rover'?15:4)&&(v.kind==='rover'||pose?.position.z>.3)&&(!activeAction()||!!session);b.disabled=!movingAllowed;b.classList.toggle('pressed',keys.has(b.dataset.key));}
  $('#manual-stop').disabled=!mine;$('#copter-manual-stop').disabled=!mine;
- list($('#authority-info'),[['控制者',ctrl?.holder||'无'],['页面状态',mine?'Manual Control':'Observer'],['系统 SEND',v.system_send?'ON':'OFF'],['Action SEND',v.action_send?'ON':'OFF'],['Execution Lease',v.lease_active?'ACTIVE':'无'],['Scope',v.scope||'无']]);
+ list($('#authority-info'),[['控制者',ctrl?.holder||'无'],['本页 SEND',mine?'ON':'OFF'],['当前指令系统 SEND',v.system_send?'ON':'OFF'],['当前 Action SEND',v.action_send?'ON':'OFF'],['Execution Lease',v.lease_active?'ACTIVE':'无'],['Scope',v.scope||'无']]);
  $('#preflight').replaceChildren();const labels={telemetry_valid:'有效遥测',owned_simulation:'明确自有仿真',deployment_send:'部署发送授权',runtime_healthy:'Runtime 无故障',physical_scope_free:'执行域可用'};
  for(const[k,label]of Object.entries(labels)){const row=node('div'),ok=ctrl?.preflight?.[k]===true;row.append(node('span',label),node('span',ok?'已满足':'未满足 / 未知',{class:'check-state','data-ok':String(ok)}));$('#preflight').append(row);}
  $('#safety-badge').textContent=fresh?'以动作准入检查为准':'BLOCKED';$('#safety-badge').dataset.tone=fresh?'':'warning';
@@ -213,12 +211,12 @@ function renderGoals(){
  for(const goal of goals.slice(-3).reverse()){
   const row=node('div',undefined,{class:'tool-shortcut','data-goal':goal.id}),text=node('div');
   text.append(node('strong',goal.position.map(v=>fmt(v)).join(' / ')+' m · '+goal.frame),node('small',goal.action_id?'已提交 '+goal.action_id:goal.reason||'剩余 '+Math.floor(goal.remaining_s)+' s · 尚未执行'),node('small','现有 Goto 只执行 odom ENU 位置；选定朝向仅预览。'));row.append(text);
-  const button=node('button','核对并提交');button.disabled=!goal.executable||!!goal.action_id||!canCommand();
-  button.onclick=guard(()=>confirmOperation('确认 RViz 候选目标',`${api.target}\nodom ENU：${goal.position.join(', ')} m\n这将请求现有 Goto Action；当前控制权、定位、安全围栏与逐条 SEND 仍由后端检查。`,async()=>{
-   if(!canCommand())throw Error('控制状态已变化');commandPending=true;$('#send').checked=false;render();
+  const button=node('button','执行此目标');button.disabled=!goal.executable||!!goal.action_id||!canCommand();
+  button.onclick=guard(async()=>{
+   if(!canCommand())throw Error('SEND 已关闭或控制状态已变化');commandPending=true;render();
    try{const a=await api.call('/api/visualization/confirm',{id:goal.id,target:api.target,allow_send:true});lastAction=a.id;notice('候选目标已提交现有 Action；等待实际确认。');await refresh();}
    finally{commandPending=false;render();}
-  }));row.append(button);root.append(row);
+  });row.append(button);root.append(row);
  }
 }
 function renderTools(){
