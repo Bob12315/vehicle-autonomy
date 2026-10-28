@@ -77,6 +77,8 @@ writer。任务占有和 UNCONFIRMED 停止语义没有放宽，打开或关闭 
 ```bash
 cd /home/level6/vehicle-autonomy-framework
 ./scripts/start_visualization_sim.sh --kind rover
+# 完整多旋翼桌面仿真（包含 Gazebo GUI，允许后续人工确认控制）：
+./scripts/start_visualization_sim.sh --kind copter --gazebo-gui --allow-send
 # 或 --kind copter / --kind plane；默认 Web 端口分别 8780 / 8781 / 8782。
 ```
 
