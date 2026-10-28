@@ -2,6 +2,7 @@
 
 --motion additionally uses real Chrome and independent Gazebo pose truth for
 Rover forward/turn/stop/Goto/ReturnHome. No test bypasses the Action SEND gate.
+--tool-registry tests browser controls and a native ROS2 Tool Agent for any kind.
 """
 import argparse
 import hashlib
@@ -22,13 +23,16 @@ ROOT = Path(__file__).resolve().parents[2]
 TERMINAL = {'SUCCEEDED','FAILED','REJECTED','CANCELLED','TIMED_OUT','UNKNOWN'}
 
 
-def run(kind, directory, *, motion=False, gui=False, read_only=False, http_controls=False):
+def run(kind, directory, *, motion=False, gui=False, read_only=False, http_controls=False, tool_registry=None):
     if motion and kind != 'rover':raise ValueError('motion acceptance is currently Rover only')
     directory = directory.resolve();directory.parent.mkdir(parents=True,exist_ok=True)
     port = {'rover':18880,'copter':18881,'plane':18882}[kind]
-    if motion and read_only:raise ValueError('motion requires explicit deployment authorization')
+    if (motion or http_controls or tool_registry) and read_only:raise ValueError('motion requires explicit deployment authorization')
     result = dict(kind=kind,motion=motion,gui=gui,read_only=read_only,passed=False)
-    launcher = None
+    launcher = None;tools = None
+    if tool_registry:
+        from tests.simulation.web_ui_controls import ToolAcceptance
+        tools = ToolAcceptance(directory.parent/(directory.name+'-tools'),tool_registry)
     with socket.socket(socket.AF_INET,socket.SOCK_DGRAM) as monitor:
         monitor.bind(('127.0.0.1',0));monitor.settimeout(.05)
         qgc_port = monitor.getsockname()[1]
@@ -36,6 +40,7 @@ def run(kind, directory, *, motion=False, gui=False, read_only=False, http_contr
                    '--web-port',str(port),'--qgc-port',str(qgc_port)]
         if not gui:command.append('--headless')
         if read_only:command.append('--read-only')
+        if tools:command.extend(tools.arguments())
         with (directory.parent/(directory.name+'-launcher.log')).open('w') as log:
             try:
                 launcher = subprocess.Popen(command,cwd='/tmp',stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
@@ -118,14 +123,17 @@ def run(kind, directory, *, motion=False, gui=False, read_only=False, http_contr
                         if message.get_type()=='PARAM_VALUE' and message.param_id=='ARMING_CHECK':leaked=True
                 assert not leaked
                 result['qgc_monitor']=dict(system_id=manifest['system_id'],signed_types=sorted(seen),request_forwarded=False)
-                if motion or http_controls:
+                if motion or http_controls or tools:
                     os.environ.update(GZ_IP='127.0.0.1',GZ_PARTITION=manifest['partition'])
                     from tests.simulation.oracle import GazeboTruthOracle
                     oracle=GazeboTruthOracle(manifest['world'],manifest['model'])
                     # Preserve the established 45-second native initialization.
                     ready=time.monotonic()+45
                     while time.monotonic()<ready:time.sleep(.1)
-                    if http_controls:
+                    if tools:
+                        tools.start()
+                        result['physical']=tools.exercise(kind,base,token,api,oracle,directory)
+                    elif http_controls:
                         from tests.simulation.web_controls import exercise
                         result['physical']=exercise(kind,api,oracle,directory)
                     else:result['physical']=rover_browser(base,token,api,oracle,directory)
@@ -136,6 +144,7 @@ def run(kind, directory, *, motion=False, gui=False, read_only=False, http_contr
                 result['gazebo_resource_errors']=False
                 result['passed']=True
             finally:
+                if tools:tools.close()
                 if launcher is not None and launcher.poll() is None:
                     os.killpg(launcher.pid,signal.SIGTERM)
                     launcher.wait(timeout=100)
@@ -234,8 +243,9 @@ if __name__=='__main__':
     parser.add_argument('--motion',action='store_true');parser.add_argument('--gui',action='store_true')
     parser.add_argument('--read-only',action='store_true')
     parser.add_argument('--http-controls',action='store_true')
-    args=parser.parse_args();result=run(args.kind,args.run_dir,motion=args.motion,gui=args.gui,read_only=args.read_only,http_controls=args.http_controls)
-    if args.http_controls:
+    parser.add_argument('--tool-registry',type=Path,help='Run real browser controls and native ROS2 tool UI using this trusted registry')
+    args=parser.parse_args();result=run(args.kind,args.run_dir,motion=args.motion,gui=args.gui,read_only=args.read_only,http_controls=args.http_controls,tool_registry=args.tool_registry)
+    if args.http_controls or args.tool_registry:
         result={k:result[k] for k in ('kind','passed','cleanup')}
         result['evidence']=str(args.run_dir/'web-control-result.json')
     print(json.dumps(result,ensure_ascii=False))

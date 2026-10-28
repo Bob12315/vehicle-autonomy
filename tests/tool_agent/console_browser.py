@@ -35,6 +35,9 @@ def run(directory):
         expect(page.locator('#link-state')).to_have_text('控制中心已连接')
         for kind in ('rover','copter','plane'):
             page.locator(f'[data-kind="{kind}"]').click();expect(page.locator('#vehicle-label')).to_contain_text(kind)
+            expect(page.locator('#context-vehicle')).to_have_value(kind)
+            expect(page.locator('#context-type')).to_have_value(kind)
+            expect(page.locator('#context-namespace')).to_have_value('/'+kind)
             expect(page.locator('#metric-connection')).to_have_text('Disconnected');expect(page.locator('#metric-armed')).to_have_text('未知')
         page.screenshot(path=str(directory/'dashboard-desktop.png'),full_page=True)
         for name in ('tools','workspaces','logs','settings','dashboard'):

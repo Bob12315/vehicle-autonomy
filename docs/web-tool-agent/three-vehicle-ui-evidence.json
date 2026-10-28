@@ -1,0 +1,515 @@
+{
+  "schema": 1,
+  "date": "2026-10-28",
+  "tested_base_commit": "e67366e7f83e120809a8fec4b7e49da74f3ba05b",
+  "scope": "Actual local signed ArduPilot SITL + Gazebo; real Chromium UI and native ROS2 graph observer; no hardware",
+  "units": {
+    "passed": true,
+    "count": 724,
+    "skipped": 0,
+    "duration_s": 94.994,
+    "log": {
+      "path": "artifacts/phase4-mission/web-ui-three-types-unit-20261028.log",
+      "sha256": "a69a97f5a4784b4e054bd6622360097914d19b846e69f95df9ecb9449c31ccc5"
+    }
+  },
+  "vehicles": {
+    "rover": {
+      "passed": true,
+      "control_origin": "real Chromium UI clicks and held keys; HTTP observations only",
+      "elapsed_control_s": 98.00908454501769,
+      "native_tool": {
+        "name": "ROS2 graph observer",
+        "actual_native": true,
+        "launch": true,
+        "restart": true,
+        "stop": true,
+        "context": {
+          "vehicle_id": "rover",
+          "vehicle_type": "rover",
+          "environment": "simulation",
+          "ros_namespace": "/rover",
+          "ros_domain_id": 114,
+          "mavlink_profile": "monitor"
+        },
+        "first_pid": 501577,
+        "second_pid": 501775
+      },
+      "initial_authority": {
+        "kind": "rover",
+        "session_id": "d6d2469e110f4c598fb11c8f0e38ee79",
+        "verified_frames": 24,
+        "fresh_vehicle_state": true,
+        "system_send": false,
+        "action_send": false,
+        "deployment_send": true
+      },
+      "ui_send_rejection": "REJECTED",
+      "final_armed": false,
+      "final_system_send": false,
+      "final_action_send": false,
+      "final_speed_mps": 1.0741551107706451e-05,
+      "final_height_above_initial_m": -4.429682620710196e-09,
+      "final_distance_from_home_m": 0.2679029411458549,
+      "final_cross_track_m": 0.20492241776759368,
+      "managed": [
+        {
+          "key": "w",
+          "parameters": {
+            "speed_mps": 0.3,
+            "yaw_rate_rad_s": 0
+          },
+          "measured": 0.5099347058556549,
+          "stop_speed_mps": 0.002153539483576029,
+          "stop_yaw_rate_rad_s": 6.575522539501564e-09,
+          "state": "CANCELLED"
+        },
+        {
+          "key": "s",
+          "parameters": {
+            "speed_mps": -0.3,
+            "yaw_rate_rad_s": 0
+          },
+          "measured": 0.4073748182369405,
+          "stop_speed_mps": 0.0009380710088314686,
+          "stop_yaw_rate_rad_s": 5.289035074386944e-09,
+          "state": "CANCELLED"
+        },
+        {
+          "key": "a",
+          "parameters": {
+            "speed_mps": 0,
+            "yaw_rate_rad_s": 0.25
+          },
+          "measured": 0.4257144802139823,
+          "stop_speed_mps": 3.128346893539639e-06,
+          "stop_yaw_rate_rad_s": 1.2319182090776295e-05,
+          "state": "CANCELLED"
+        }
+      ],
+      "javascript_errors": [],
+      "cleanup": {
+        "remaining_process_groups": [],
+        "cleanup_errors": [],
+        "credentials_removed": true
+      },
+      "raw": [
+        {
+          "path": "artifacts/phase4-mission/web-ui-three-types-20261028-rover-final-result.json",
+          "sha256": "88ee276edcc8700c0cd9d39d43688375a45aabbb513793aeee764b4e340e0794"
+        },
+        {
+          "path": "artifacts/phase4-mission/web-ui-three-types-20261028-rover-final/web-control-result.json",
+          "sha256": "1789621726e1c2e19b82ab69bf82f880a6c35ee5f43a7e3b3a6e1f323b49d00b"
+        },
+        {
+          "path": "artifacts/phase4-mission/web-ui-three-types-20261028-rover-final/web-control-truth.jsonl",
+          "sha256": "b62483871bb8ca96e801165759db9c3cea11e67723f68755321771eb4278de47"
+        },
+        {
+          "path": "artifacts/phase4-mission/web-ui-three-types-20261028-rover-final/native-tools.png",
+          "sha256": "f51f069907b10ab9e1479304c6053c32e34a2d4ffae59dec8c467acab7bd5be0"
+        },
+        {
+          "path": "artifacts/phase4-mission/web-ui-three-types-20261028-rover-final/browser-controls.png",
+          "sha256": "dc63b1c66230a8354f7eb3030a7707ce3b3365e8318c0b3837fc05d40937acc1"
+        }
+      ],
+      "action_results": [
+        {
+          "name": "Arm",
+          "state": "REJECTED"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Arm",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Disarm",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Arm",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Stop",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Drive",
+          "state": "CANCELLED"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Drive",
+          "state": "CANCELLED"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Drive",
+          "state": "CANCELLED"
+        },
+        {
+          "name": "Stop",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Goto",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "ReturnHome",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Disarm",
+          "state": "SUCCEEDED"
+        }
+      ]
+    },
+    "copter": {
+      "passed": true,
+      "control_origin": "real Chromium UI clicks and held keys; HTTP observations only",
+      "elapsed_control_s": 67.47303216799628,
+      "native_tool": {
+        "name": "ROS2 graph observer",
+        "actual_native": true,
+        "launch": true,
+        "restart": true,
+        "stop": true,
+        "context": {
+          "vehicle_id": "copter",
+          "vehicle_type": "copter",
+          "environment": "simulation",
+          "ros_namespace": "/copter",
+          "ros_domain_id": 115,
+          "mavlink_profile": "monitor"
+        },
+        "first_pid": 503787,
+        "second_pid": 503966
+      },
+      "initial_authority": {
+        "kind": "copter",
+        "session_id": "599fe05273a343e4a73e3ea68d997b9d",
+        "verified_frames": 33,
+        "fresh_vehicle_state": true,
+        "system_send": false,
+        "action_send": false,
+        "deployment_send": true
+      },
+      "ui_send_rejection": "REJECTED",
+      "final_armed": false,
+      "final_system_send": false,
+      "final_action_send": false,
+      "final_speed_mps": 2.0875181591917738e-11,
+      "final_height_above_initial_m": -9.07188338061804e-08,
+      "final_distance_from_home_m": 0.003726467812022104,
+      "final_cross_track_m": 0.0011637693634925052,
+      "managed": [
+        {
+          "key": "w",
+          "parameters": {
+            "vx_mps": 0.3,
+            "vy_mps": 0,
+            "vz_mps": 0,
+            "yaw_rate_rad_s": 0,
+            "frame": "base_link"
+          },
+          "measured": 0.5087611454004104,
+          "stop_speed_mps": 0.025503156650491243,
+          "stop_yaw_rate_rad_s": -4.2258280653824603e-05,
+          "state": "CANCELLED"
+        },
+        {
+          "key": "r",
+          "parameters": {
+            "vx_mps": 0,
+            "vy_mps": 0,
+            "vz_mps": 0,
+            "yaw_rate_rad_s": 0.25,
+            "frame": "base_link"
+          },
+          "measured": 0.419141888735477,
+          "stop_speed_mps": 0.0035809225307757383,
+          "stop_yaw_rate_rad_s": -0.0009233869634694969,
+          "state": "CANCELLED"
+        }
+      ],
+      "javascript_errors": [],
+      "cleanup": {
+        "remaining_process_groups": [],
+        "cleanup_errors": [],
+        "credentials_removed": true
+      },
+      "raw": [
+        {
+          "path": "artifacts/phase4-mission/web-ui-three-types-20261028-copter-final-result.json",
+          "sha256": "5d581bff033ab83a27bfd9538ede6bc2eb5a106310c064d8537f546fb5c9b113"
+        },
+        {
+          "path": "artifacts/phase4-mission/web-ui-three-types-20261028-copter-final/web-control-result.json",
+          "sha256": "1ad0cfebe9a484c3bc7c79f64d8b4e0aacecd01503402aaa4a3c5c6e69ab10d5"
+        },
+        {
+          "path": "artifacts/phase4-mission/web-ui-three-types-20261028-copter-final/web-control-truth.jsonl",
+          "sha256": "ef719b5ff69383b19bdf2d505120c5bb3e2914979ea5c0f6fdc241af8d1d93b4"
+        },
+        {
+          "path": "artifacts/phase4-mission/web-ui-three-types-20261028-copter-final/native-tools.png",
+          "sha256": "95cccc47df5ce09aeabb54aa232937f7fe8b9f287fa2640e6fec4252653001cc"
+        },
+        {
+          "path": "artifacts/phase4-mission/web-ui-three-types-20261028-copter-final/browser-controls.png",
+          "sha256": "b74dd8717311e1b63a17e691a856e8ff08d678added9fc886dcc9ccc68de8199"
+        }
+      ],
+      "takeoff_height_m": 1.4952538916721507,
+      "action_results": [
+        {
+          "name": "Arm",
+          "state": "REJECTED"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Arm",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Disarm",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Arm",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Takeoff",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "SetVelocity",
+          "state": "CANCELLED"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "SetVelocity",
+          "state": "CANCELLED"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Goto",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "ReturnHome",
+          "state": "SUCCEEDED"
+        }
+      ]
+    },
+    "plane": {
+      "passed": true,
+      "control_origin": "real Chromium UI clicks and held keys; HTTP observations only",
+      "elapsed_control_s": 172.66551416699076,
+      "native_tool": {
+        "name": "ROS2 graph observer",
+        "actual_native": true,
+        "launch": true,
+        "restart": true,
+        "stop": true,
+        "context": {
+          "vehicle_id": "plane",
+          "vehicle_type": "plane",
+          "environment": "simulation",
+          "ros_namespace": "/plane",
+          "ros_domain_id": 116,
+          "mavlink_profile": "monitor"
+        },
+        "first_pid": 505888,
+        "second_pid": 506066
+      },
+      "initial_authority": {
+        "kind": "plane",
+        "session_id": "8e87542f154b47088ffc70fba3c5d8eb",
+        "verified_frames": 29,
+        "fresh_vehicle_state": true,
+        "system_send": false,
+        "action_send": false,
+        "deployment_send": true
+      },
+      "ui_send_rejection": "REJECTED",
+      "final_armed": false,
+      "final_system_send": false,
+      "final_action_send": false,
+      "final_speed_mps": 0.0017765143749396614,
+      "final_height_above_initial_m": 6.525888524011592e-08,
+      "final_distance_from_home_m": 78.41013903928345,
+      "final_cross_track_m": 0.0638404583076884,
+      "managed": [],
+      "javascript_errors": [],
+      "cleanup": {
+        "remaining_process_groups": [],
+        "cleanup_errors": [],
+        "credentials_removed": true
+      },
+      "raw": [
+        {
+          "path": "artifacts/phase4-mission/web-ui-three-types-20261028-plane-final-result.json",
+          "sha256": "97bfc918dd62fff1c9f6a6e08b8df71013170d235001d7a44bdfe1ca753b4670"
+        },
+        {
+          "path": "artifacts/phase4-mission/web-ui-three-types-20261028-plane-final/web-control-result.json",
+          "sha256": "adecd2950ad2fd2759878aa22e6553112db1059215337ce598ddda248ae3e518"
+        },
+        {
+          "path": "artifacts/phase4-mission/web-ui-three-types-20261028-plane-final/web-control-truth.jsonl",
+          "sha256": "edefc4b7b5f4eed685f6b634a319606506f1ad34f2b7fc983aa2e5d9675a47f7"
+        },
+        {
+          "path": "artifacts/phase4-mission/web-ui-three-types-20261028-plane-final/native-tools.png",
+          "sha256": "332cbcfecc5b6154e23f272e77bc80e4ae644aca413719c025e5124db9fafdbf"
+        },
+        {
+          "path": "artifacts/phase4-mission/web-ui-three-types-20261028-plane-final/browser-controls.png",
+          "sha256": "83822e447404aeb56a869c4a89c0a5b3691c8eeefdc0efbf93de44c229b08d1a"
+        }
+      ],
+      "takeoff_height_m": 49.0530278173924,
+      "action_results": [
+        {
+          "name": "Arm",
+          "state": "REJECTED"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Arm",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Disarm",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Arm",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Takeoff",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "SetGuidedTarget",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Loiter",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "RTL",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "AutoLand",
+          "state": "SUCCEEDED"
+        }
+      ]
+    }
+  },
+  "browser_regressions": {
+    "context": {
+      "summary": {
+        "passed": true,
+        "source": "real Chromium + HTTP; fixture vehicles with unknown telemetry; no vehicle connection",
+        "widths": [
+          1440,
+          1024,
+          390
+        ],
+        "javascript_errors": [],
+        "writer_calls": 0,
+        "three_types": true,
+        "unknown_values_preserved": true
+      },
+      "raw": {
+        "path": "artifacts/phase4-mission/web-ui-three-types-context-20261028/summary.json",
+        "sha256": "375f33bf6fcade748aad528abc1eaabebd47c6e3f4e5850499ed211d241fb5c5"
+      }
+    },
+    "tools": {
+      "summary": {
+        "passed": true,
+        "source": "actual Chrome/HTTP/Agent/process integration; tool is a test executable, not native robotics software",
+        "javascript_errors": [],
+        "launch_stop_restart": true,
+        "profile_saved": true,
+        "disconnect_unknown": true,
+        "actual_instance_count": 2,
+        "vehicle_actions": 0
+      },
+      "raw": {
+        "path": "artifacts/phase4-mission/web-ui-three-types-tools-regression-20261028/summary.json",
+        "sha256": "b79ae653c0545c7b66399b8954fcfcdb02200029ddd06033d68cfb3fbda6c98d"
+      }
+    }
+  },
+  "production_tree_sha256": "1ae64646aca8e688713b8c6dabe44006e8788652116df7f63e929ea179b98f9f",
+  "production_tree_hash_definition": "sorted relative paths + NUL + contents + NUL; src/vehicle_autonomy excluding pycache, plus pyproject.toml README.md configs/tools/lab.sdf",
+  "safety": {
+    "real_hardware_opened": false,
+    "real_hardware_commanded": false,
+    "default_send_changed": false,
+    "tool_vehicle_command_port": false,
+    "all_final_send_gates_false": true
+  }
+}

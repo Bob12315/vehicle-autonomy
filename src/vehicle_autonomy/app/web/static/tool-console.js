@@ -25,12 +25,13 @@ async function poll(){if(busy||!connected)return;busy=true;try{snapshot=await ap
 $('#connection').onsubmit=guard(async e=>{e.preventDefault();connected=true;notice('');await poll();});
 $('#disconnect').onclick=()=>{connected=false;invalidate();$('#token').value='';};
 setInterval(()=>{if(connected)poll();if(lastReceived&&performance.now()-lastReceived>4500)invalidate();},750);
-$('#vehicle').onchange=()=>{vehicleId=$('#vehicle').value;const v=snapshot?.vehicles.find(v=>v.id===vehicleId);if(v){toolContext={...toolContext,vehicle_id:v.id,vehicle_type:v.type,environment:v.environment==='simulation'?'simulation':'hardware_readonly',ros_namespace:'/'+v.id.replace(/[^A-Za-z0-9_]/g,'_')};fillContext();}render();};
+function selectContext(v){if(!v)return;const changed=toolContext.vehicle_id!==v.id;toolContext={...toolContext,vehicle_id:v.id,vehicle_type:v.type,environment:v.environment==='simulation'?'simulation':'hardware_readonly',ros_namespace:changed?'/'+v.id.replace(/[^A-Za-z0-9_]/g,'_'):toolContext.ros_namespace};fillContext();}
+$('#vehicle').onchange=()=>{vehicleId=$('#vehicle').value;selectContext(snapshot?.vehicles.find(v=>v.id===vehicleId));render();};
 for(const b of document.querySelectorAll('[data-kind]'))b.onclick=()=>{kindFilter=b.dataset.kind;for(const x of document.querySelectorAll('[data-kind]'))x.setAttribute('aria-pressed',String(x===b));render();};
 function list(target,items){target.replaceChildren();for(const[k,v]of items){const row=node('div');row.append(node('dt',k),node('dd',v??'未知'));target.append(row);}}
 function render(){
  const available=snapshot.vehicles.filter(v=>!kindFilter||v.type===kindFilter),select=$('#vehicle');
- if(!available.some(v=>v.id===vehicleId))vehicleId=available[0]?.id||'';
+ if(!available.some(v=>v.id===vehicleId)){vehicleId=available.find(v=>v.id===toolContext.vehicle_id)?.id||available[0]?.id||'';selectContext(available.find(v=>v.id===vehicleId));}
  select.replaceChildren(...available.map(v=>node('option',`${kindNames[v.type]} / ${v.id}`,{value:v.id})));select.value=vehicleId;if(!available.length)select.append(node('option','未装配所选车型',{value:''}));
  const v=available.find(v=>v.id===vehicleId);$('#vehicle-empty').hidden=!!v;$('#dashboard-data').hidden=!v;
  $('#environment').textContent=v?(v.environment==='simulation'?'SITL · 自有仿真':'车辆环境未验证'):'无车辆 · 工具可独立运行';

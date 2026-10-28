@@ -2,10 +2,16 @@
 
 Date: 2026-10-28. Initial HEAD: `a49b8b9`. No real hardware is opened or commanded.
 
-Final tested implementation: **`17a4940f4f4a80494f152c9ce7dc2be1703eeb37`**.
+Initial accepted implementation: **`17a4940f4f4a80494f152c9ce7dc2be1703eeb37`**.
 Current-host development acceptance passes; unverified deployment/hardware scopes
 are listed below. Machine-readable results, raw evidence paths/hashes and the
 production-tree digest are in [evidence.json](web-tool-agent/evidence.json).
+
+Follow-up: [three-vehicle Web UI acceptance](WEB_UI_THREE_VEHICLE_ACCEPTANCE.md)
+tests real browser controls and native ROS2 Tool Agent operations for all three
+vehicle types, fixes initial/switching Tool Context selection, and records a
+fresh 724-test regression. Its separate evidence index identifies the updated
+production tree; the phased evidence below remains the initial acceptance.
 
 ## Baseline / Phase 0
 
