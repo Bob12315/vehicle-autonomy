@@ -33,6 +33,7 @@ def declaration(value):
     if type(value) is not dict or 'schema' not in value or value.keys()-{'schema','default','max_age_s','frame','unit','origin','readonly','description','category'}:raise ValueError('typed variable declaration required')
     if type(value['schema']) is not dict or len(json.dumps(value,allow_nan=False))>16384:raise ValueError('bounded variable schema required')
     schema_check(value['schema'])
+    if 'readonly' in value and type(value['readonly']) is not bool:raise ValueError('explicit read-only bool required')
     if type(value.get('max_age_s',1800)) not in (int,float) or not 0<value.get('max_age_s',1800)<=3600:raise ValueError('bounded data validity required')
     if value.get('category') in ('pose','pose_stamped','geographic_coordinate','region','path') and not all(value.get(k) for k in ('frame','unit','origin')):raise ValueError('spatial variable needs frame, unit and origin')
     if value.get('category')=='artifact_reference' and value['schema'].get('type')!='object':raise ValueError('artifact reference must be typed metadata')

@@ -1,0 +1,52 @@
+'use strict';
+window.StudioParams=(()=>{
+ const {el,json}=StudioDOM;
+ function initial(s){if('default'in s)return structuredClone(s.default);if('const'in s)return s.const;if(s.enum)return s.enum[0];if(s.anyOf)return initial(s.anyOf[0]);if(s.type==='object')return Object.fromEntries(Object.entries(s.properties||{}).filter(([k,v])=>s.required?.includes(k)||'default'in v).map(([k,v])=>[k,initial(v)]));return {boolean:false,integer:0,number:0,string:'',array:[],null:null}[s.type];}
+ function field(schema,value,change,path='value'){
+  const wrap=el('div',undefined,{class:'field-row'});if(schema.description)wrap.title=schema.description;
+  if(schema.anyOf){const pick=el('select',undefined,{'aria-label':path+' 类型'}),slot=el('div');let selected=schema.anyOf.findIndex(s=>s.type===(value===null?'null':Array.isArray(value)?'array':typeof value==='number'&&Number.isInteger(value)?'integer':typeof value));if(selected<0)selected=0;schema.anyOf.forEach((s,i)=>pick.append(el('option',s.title||s.type||JSON.stringify(s.const),{value:i})));pick.value=selected;const draw=()=>{slot.replaceChildren(field(schema.anyOf[Number(pick.value)],value,change,path));};pick.onchange=()=>{value=initial(schema.anyOf[Number(pick.value)]);change(value);draw();};wrap.append(pick,slot);draw();return wrap;}
+  if(schema.type==='object'){
+   const box=el('div',undefined,{class:'typed-object'});value=value&&typeof value==='object'?value:{};
+   for(const [name,s] of Object.entries(schema.properties||{})){const row=el('div',undefined,{class:'field-row'});row.append(el('label',(s.title||name)+(schema.required?.includes(name)?' *':'')),field(s,value[name]??initial(s),v=>change({...value,[name]:v}),path+'.'+name));box.append(row);}
+   if(!Object.keys(schema.properties||{}).length){const input=el('textarea');input.value=JSON.stringify(value,null,2);input.setAttribute('aria-label',path);input.onchange=()=>{try{const parsed=JSON.parse(input.value);if(parsed===null||Array.isArray(parsed)||typeof parsed!=='object')throw Error();input.setCustomValidity('');change(parsed);}catch{input.setCustomValidity('请输入对象 JSON');input.reportValidity();}};box.append(input);}wrap.append(box);return wrap;
+  }
+  if(schema.type==='array'){
+   value=Array.isArray(value)?value:[];const box=el('div',undefined,{class:'typed-array'});value.forEach((item,i)=>{const row=el('div',undefined,{class:'array-item'}),remove=el('button','移除 '+(i+1));remove.type='button';remove.onclick=()=>change(value.filter((_,j)=>j!==i));row.append(field(schema.items||{type:'string'},item,v=>change(value.map((x,j)=>i===j?v:x)),path+'.'+i),remove);box.append(row);});const add=el('button','＋ 添加项');add.type='button';add.disabled=Number.isFinite(schema.maxItems)&&value.length>=schema.maxItems;add.onclick=()=>change([...value,initial(schema.items||{type:'string'})]);box.append(add);wrap.append(box);return wrap;
+  }
+  let input;
+  if(schema.enum||'const'in schema){input=el('select');const values=schema.enum||[schema.const];values.forEach((v,i)=>input.append(el('option',String(v),{value:i})));input.value=Math.max(0,values.findIndex(v=>v===value));input.onchange=()=>change(values[Number(input.value)]);}
+  else if(schema.type==='null'){input=el('span','null');}
+  else {input=el('input');input.type=schema.type==='boolean'?'checkbox':['integer','number'].includes(schema.type)?'number':'text';
+   if(input.type==='checkbox')input.checked=Boolean(value);else input.value=value??'';
+   if(input.type==='number'){input.step=schema.type==='integer'?'1':'any';if(schema.minimum!==undefined)input.min=schema.minimum;if(schema.maximum!==undefined)input.max=schema.maximum;}
+   if(schema.maxLength)input.maxLength=schema.maxLength;if(schema.pattern)input.pattern=schema.pattern;
+   input.onchange=()=>{if(!input.reportValidity())return;change(input.type==='checkbox'?input.checked:input.type==='number'?Number(input.value):input.value);};}
+  input.setAttribute('aria-label',path);if(schema.readOnly)input.disabled=true;wrap.append(input);return wrap;
+ }
+ function compatible(a,b){if(a.anyOf)return a.anyOf.every(s=>compatible(s,b));if(b.anyOf)return b.anyOf.some(s=>compatible(a,s));return a.type===b.type||a.type==='integer'&&b.type==='number';}
+ function options(doc,node,catalog){
+  const list=[];function add(root,s,depth=0){list.push({ref:root,schema:s});if(depth<4)for(const [key,child]of Object.entries(s.properties||{}))add(root+'.'+key,child,depth+1);}
+  for(const [key,d]of Object.entries(doc.blackboard||{}))add('mission.'+key,d.schema);
+  for(const [key,d]of Object.entries(doc.interface?.inputs||{}))add('submission.'+key,d.schema);
+  for(const other of doc.nodes){if(other.node_id===node.node_id)continue;const s=catalog.actions.find(a=>a.name===other.action_type&&(!other.action_contract_version||a.version===other.action_contract_version))?.output;if(s)add('node.'+other.node_id+'.output',s);}
+  // Loop references are accepted only where the backend proves their scope.
+  for(const loop of doc.nodes.filter(n=>n.type==='ForEach')){const ref=loop.execution_policy?.collection?.ref;const variable=ref?.startsWith('mission.')?doc.blackboard?.[ref.split('.')[1]]:null;if(variable?.schema.items)add('loop.current_item',variable.schema.items);}
+  add('loop.index',{type:'integer'});add('loop.iteration_id',{type:'string'});return list;
+ }
+ function bindField(name,schema,node,doc,catalog,change){
+  const row=el('div',undefined,{class:'field-row'});row.append(el('label',(schema.title||name)+(schema.unit?' ('+schema.unit+')':'')));
+  const source=el('select',undefined,{class:'field-source','aria-label':name+' 输入来源'});for(const [value,label]of [['fixed','固定值'],['blackboard','Blackboard'],['upstream','上游 Action 输出'],['world','外部只读状态'],['tool','外部 Tool 导入']])source.append(el('option',label,{value}));
+  source.querySelector('option[value=tool]').disabled=true;source.querySelector('option[value=tool]').title='当前参数未装配 Tool 数据导入适配器';
+  const binding=node.input_bindings?.[name];source.value=binding?.source==='world'?'world':binding?.ref?.startsWith('node.')?'upstream':binding?'blackboard':'fixed';const slot=el('div');
+  function setBinding(value){change(()=>{node.input_bindings??={};node.parameters??={};if(value){node.input_bindings[name]=value;delete node.parameters[name];}else delete node.input_bindings[name];});}
+  function draw(){slot.replaceChildren();if(source.value==='fixed'){slot.append(field(schema,node.parameters?.[name]??initial(schema),value=>change(()=>{node.parameters??={};node.parameters[name]=value;if(node.input_bindings)delete node.input_bindings[name];}),name));return;}
+   if(source.value==='tool'){slot.append(el('p','Tool 目标必须先作为带来源与时间戳的数据导入；当前此参数没有已授权的导入适配器。',{class:'muted'}));return;}
+   const input=el('input',undefined,{'aria-label':name+' 变量引用',list:'refs_'+node.node_id+'_'+name});input.value=binding?.ref||binding?.path||'';input.placeholder=source.value==='world'?'vehicle.operation.armed':'mission.variable';const choices=el('datalist',undefined,{id:input.getAttribute('list')});for(const option of options(doc,node,catalog).filter(o=>compatible(o.schema,schema)&&(source.value==='upstream'?o.ref.startsWith('node.'):!o.ref.startsWith('node.'))))choices.append(el('option',undefined,{value:option.ref}));input.onchange=()=>setBinding(source.value==='world'?{source:'world',path:input.value,max_age_s:3}:{ref:input.value});slot.append(input,choices);
+  }source.onchange=()=>{if(source.value==='fixed')setBinding(null);draw();};row.append(source,slot);draw();return row;
+ }
+ function jsonField(label,value,change){const row=el('label',label),area=el('textarea');area.value=JSON.stringify(value,null,2);area.setAttribute('aria-label',label);area.onchange=()=>{try{const parsed=JSON.parse(area.value);area.setCustomValidity('');change(parsed);}catch(error){area.setCustomValidity(error.message);area.reportValidity();}};row.append(area);return row;}
+ function condition(value,change){const box=el('div'),e=value||{op:'eq',source:'blackboard',path:'mission.ready',value:true};
+  for(const [key,s]of Object.entries({source:{type:'string',enum:['blackboard','world']},path:{type:'string'},op:{type:'string',enum:['eq','ne','lt','le','gt','ge']},value:{anyOf:[{type:'boolean'},{type:'number'},{type:'string'}]}})){const label=el('label',key);label.append(field(s,e[key],v=>change({...e,[key]:v}),'condition.'+key));box.append(label);}return box;
+ }
+ return{field,initial,compatible,options,bindField,jsonField,condition};
+})();

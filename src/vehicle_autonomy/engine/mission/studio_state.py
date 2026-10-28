@@ -102,13 +102,23 @@ class StudioState:
 
     def submission_exit(self,key,now):
         n=self.run.runs[key];spec=self.run.nodes[key];scope=n.details['child_scope'];parent=self.context(key)
+        samples=[]
         for name in spec['interface']['outputs']:
             value,data=self.board.read(scope,dict(ref='submission.'+name),now)
+            samples.append(data)
             n.outputs[name]=to_json_value(data)
             binding=spec.get('output_bindings',{}).get(name)
             if binding:self.board.write(parent,binding['ref'],value,now,'submission:'+n.execution_id,original=data,mode=binding.get('mode','set'))
         result={name:thaw_json(self.board.cells[scope,name].data.value) for name in spec['interface']['outputs']}
-        self.board.output(parent,spec['source_node_id'],result,now,'submission:'+n.execution_id)
+        original=None
+        if samples:
+            oldest=min(samples,key=lambda d:d.observed_at.monotonic_ns)
+            # The aggregate may be older than any individual port; it may never
+            # become younger just because the child scope completed.
+            for sample in samples:sample.observed_at.elapsed_ns_since(oldest.observed_at)
+            original=BlackboardValue(result,oldest.observed_at,min(d.valid_for_ns for d in samples),
+                frame=oldest.frame if all(d.frame==oldest.frame for d in samples) else None,source='submission:'+n.execution_id)
+        self.board.output(parent,spec['source_node_id'],result,now,'submission:'+n.execution_id,original=original)
         self.board.scopes[scope]['closed']=True
         self.engine._event(self.run,'submission_completed',node_id=spec['source_node_id'],execution_id=n.execution_id,scope_id=scope)
 

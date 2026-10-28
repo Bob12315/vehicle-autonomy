@@ -1,0 +1,60 @@
+"""Actual browser + isolated HTTP/real executor acceptance, no vehicle transport."""
+import argparse,json,secrets,time
+from contextlib import ExitStack
+from pathlib import Path
+from threading import Thread
+from unittest.mock import patch
+from tests.browser_auth import login
+from tests.mission_graph.test_service import WebDriver
+from tests.action_system.test_runtime import Factory,Parameters
+from vehicle_autonomy.contracts.decision import ActionSpec
+from vehicle_autonomy.engine.action.registry import ActionRegistry
+from vehicle_autonomy.app.web.mission_control import MissionControl,MissionControlServer
+
+
+def run(directory):
+    from playwright.sync_api import sync_playwright,expect
+    directory.mkdir(parents=True,exist_ok=False);errors=[];driver=WebDriver();registry=ActionRegistry()
+    registry.register_typed(ActionSpec('BrowserWork',Parameters,external_lifecycle='typed_only'),Factory())
+    result=dict(passed=False,environment='isolated HTTP + Chrome + existing executor; no vehicle transport')
+    with ExitStack() as stack:
+        stack.enter_context(patch('vehicle_autonomy.app.web.mission_control.bind_simulations',return_value={}))
+        lab=MissionControl({'v':driver},directory/'application',registry=registry);stack.callback(lab.close)
+        token=secrets.token_urlsafe(32);server=MissionControlServer(('127.0.0.1',0),lab,token,directory/'http.jsonl')
+        thread=Thread(target=server.serve_forever,kwargs={'poll_interval':.02});thread.start()
+        def stop():server.shutdown();thread.join(3);server.server_close()
+        stack.callback(stop);base='http://127.0.0.1:'+str(server.server_address[1])
+        pw=stack.enter_context(sync_playwright());browser=pw.chromium.launch(executable_path='/usr/bin/google-chrome',headless=True,args=['--no-sandbox','--disable-dev-shm-usage']);stack.callback(browser.close)
+        page=browser.new_page(viewport={'width':1680,'height':1050});page.on('pageerror',lambda e:errors.append(str(e)))
+        try:
+            login(page,base,token,'/studio');expect(page.locator('h1')).to_have_text('Mission Library');expect(page.locator('#save-state')).to_contain_text('统一会话')
+            page.screenshot(path=str(directory/'01-library.png'),full_page=True)
+            page.locator('#new-mission').click();page.get_by_label('任务名称',exact=True).fill('Browser end-to-end');page.locator('#dialog-confirm').click()
+            expect(page.locator('#editor-view')).to_be_visible();expect(page.locator('.graph-node')).to_have_count(2)
+            page.locator('#palette button').filter(has_text='Wait').click();expect(page.locator('.graph-node')).to_have_count(3)
+            wait=page.locator('.graph-node').filter(has=page.locator('.node-category',has_text='Wait'));wait_id=wait.get_attribute('data-node')
+            page.get_by_label(wait_id+'.duration_s',exact=True).fill('0.15');page.get_by_label(wait_id+'.duration_s',exact=True).press('Tab')
+            def connect(source,target):
+                a=page.locator('[data-output="'+source+'"][data-port="next"]').bounding_box();b=page.locator('[data-input="'+target+'"]').bounding_box()
+                page.mouse.move(a['x']+a['width']/2,a['y']+a['height']/2);page.mouse.down();page.mouse.move(b['x']+b['width']/2,b['y']+b['height']/2,steps=12);page.mouse.up()
+            connect('start',wait_id);connect(wait_id,'end');page.locator('#layout').click();page.locator('#undo').click();page.locator('#redo').click()
+            page.locator('#save-draft').click();expect(page.locator('#save-state')).to_contain_text('已保存')
+            page.locator('#validate').click();expect(page.locator('#notice')).to_contain_text('静态验证通过')
+            page.screenshot(path=str(directory/'02-editor.png'),full_page=True)
+            page.locator('#publish').click();expect(page.locator('#notice')).to_contain_text('已发布不可变版本')
+            page.locator('[data-tab=runner]').click();page.locator('#run-start').click();expect(page.locator('#run-state')).to_contain_text('SUCCEEDED',timeout=8000)
+            page.locator('[data-inspect=events]').click();expect(page.locator('.inspector-event').first).to_be_visible()
+            page.screenshot(path=str(directory/'03-runner.png'),full_page=True)
+            run=lab.missions.views()[-1];assert run['state']=='SUCCEEDED' and run['release_safe'];assert run['studio']['definition']['nodes'];assert not driver.writes
+            page.reload();expect(page.locator('h1')).to_have_text('Mission Library');expect(page.locator('#save-state')).to_contain_text('统一会话')
+            page.goto(base+'/console');expect(page.locator('h1')).to_be_visible();page.goto(base+'/studio');expect(page.locator('h1')).to_have_text('Mission Library')
+            page.set_viewport_size({'width':820,'height':1050});page.screenshot(path=str(directory/'04-tablet.png'),full_page=True)
+            assert not errors,errors;result.update(passed=True,run=run['id'],checks=['Library first','dynamic palette','node add','port connections','schema input','undo/redo','CAS autosave','validate/publish','real executor Wait run','events','refresh + cross-page session','tablet layout'],browser_errors=errors)
+        except BaseException as exc:
+            page.screenshot(path=str(directory/'failure.png'),full_page=True);result.update(error=type(exc).__name__+': '+str(exc),browser_errors=errors);raise
+        finally:(directory/'result.json').write_text(json.dumps(result,indent=2,ensure_ascii=False)+'\n')
+    return result
+
+
+if __name__=='__main__':
+    parser=argparse.ArgumentParser();parser.add_argument('--output',type=Path,required=True);args=parser.parse_args();print(json.dumps(run(args.output),ensure_ascii=False))

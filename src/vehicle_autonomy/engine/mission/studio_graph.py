@@ -167,7 +167,11 @@ def compile_graph(document,registry,drivers,*,resolve=None,stack=(),pins=None):
         if key in active or key in used:raise ValueError('unbounded cycle or unstructured shared branch')
         active.add(key);used.add(key);n=nodes[key];t=n['type'];ports=out[key];env=variables if env is None else env
         policy=n['execution_policy'];rid=runtime_id(key);node=dict(id=rid,type=t,children=[],source_node_id=key)
-        if policy.keys()-{'timeout_s','join_id','max_iterations','max_concurrency','completion','failure','mode','count','event','expression','outcome','collection','on_item_failure','skippable','runtime_overrides'}:raise ValueError('unsupported node execution policy')
+        policies={'Start':set(),'End':{'outcome'},'Join':set(),'Action':{'skippable','runtime_overrides'},
+            'Condition':{'expression'},'Wait':{'mode','expression','event'},'ForEach':{'collection','max_iterations','on_item_failure'},
+            'Parallel':{'join_id','max_concurrency','completion','failure'},'Sequence':{'join_id'},'Recovery':{'join_id'},
+            'Retry':{'count'},'SubMission':set()}
+        if policy.keys()-policies[t]-{'timeout_s'}:raise ValueError('unsupported node execution policy for '+t)
         if 'timeout_s' in policy:bounded_number(policy['timeout_s'],.05,d['execution_policy']['timeout_s'],'node timeout');node['timeout_s']=policy['timeout_s']
         next_key=ports.get('next');join=policy.get('join_id')
         if join is not None:
@@ -203,7 +207,9 @@ def compile_graph(document,registry,drivers,*,resolve=None,stack=(),pins=None):
             mode=policy.get('mode','duration')
             if mode=='duration':node['duration_s']=n['parameters'].get('duration_s',1.);bounded_number(node['duration_s'],0,d['execution_policy']['timeout_s'],'Wait')
             elif mode=='condition':node.update(type='Await',expression=policy['expression']);check_expression(key,node['expression'],env)
-            elif mode=='event':node.update(type='Await',event=policy['event'])
+            elif mode=='event':
+                if type(policy.get('event')) is not str or not IDENTITY.fullmatch(policy['event']):raise ValueError('bounded Wait event name required')
+                node.update(type='Await',event=policy['event'])
             else:raise ValueError('unknown Wait mode')
         elif t=='Condition':
             node['expression']=policy.get('expression');check_expression(key,node['expression'],env)
@@ -242,6 +248,7 @@ def compile_graph(document,registry,drivers,*,resolve=None,stack=(),pins=None):
                 q=deepcopy(q);q['id']=renames[q['id']];q['children']=[renames[c] for c in q['children']];emit(q)
             node.update(children=[renames[sub['root']]],sub_mission=ref,interface=child['interface'],local_definitions=child['blackboard'],
                 parameters=deepcopy(n['parameters']),input_bindings=deepcopy(n['input_bindings']),output_bindings=deepcopy(n['output_bindings']))
+            node['timeout_s']=min(policy.get('timeout_s',d['execution_policy']['timeout_s']),child['execution_policy']['timeout_s'])
             for field,binding in n['output_bindings'].items():
                 if field not in child['interface']['outputs'] or type(binding) is not dict or binding.keys()-{'ref','mode'} or len(binding.get('ref','').split('.'))!=2:raise ValueError('declared SubMission output mapping required')
                 dest=binding_schema({'ref':binding['ref']},env,outputs)

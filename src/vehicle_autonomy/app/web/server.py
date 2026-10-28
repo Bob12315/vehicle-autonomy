@@ -283,6 +283,8 @@ class Handler(BaseHTTPRequestHandler):
             code = 200
         except Exception as exc:
             response = {'ok':False,'error':f'{type(exc).__name__}: {str(exc)[:500]}'}
+            from vehicle_autonomy.app.mission_designer.studio_library import RevisionConflict
+            if isinstance(exc,RevisionConflict):response['conflict']=exc.details
             code = 409
         if mutation:
             self.server.audit.info(json.dumps({'operation':operation,'ok':response['ok'],

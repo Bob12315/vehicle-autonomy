@@ -22,7 +22,7 @@ window.VAFAuth=(()=>{
   if(control)headers['X-VAF-Control']=control;
   const r=await fetch(path,options);const value=await r.json();
   if(r.status===401){lost();throw Error('登录已失效，请重新登录');}
-  if(!r.ok||!value.ok)throw Error(value.error||'请求失败');return value.result;
+  if(!r.ok||!value.ok){const error=Error(value.error||'请求失败');error.status=r.status;error.response=value;throw error;}return value.result;
  }
  async function logout(){
   await api('/api/auth/logout',{});if(channel)channel.postMessage('logout');lost();

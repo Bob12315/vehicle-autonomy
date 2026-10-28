@@ -29,6 +29,7 @@ class MissionControl(ActionLab):
         self._tracks = {}
         self.control_fault = None
         self.journal = None
+        self.studio = None
         from .operator_control import OperatorControls
         self.operator_controls=OperatorControls(self)
         from vehicle_autonomy.app.visualization.goals import PendingGoals
@@ -46,6 +47,8 @@ class MissionControl(ActionLab):
             self.events = events or LocalEvents()
             self.missions = MissionGraphRuntime(self.runtime, self.journal, self.events, clock=self.clock,
                 deployment_identities=self.deployment_identities,recovered_manual=self.recovered_manual)
+            from vehicle_autonomy.app.mission_designer.studio_service import StudioService
+            self.studio=StudioService(self,Path(data_dir)/'studio')
         except BaseException:
             self._stop.set();self._thread.join(5)
             if self.journal:self.journal.close()
@@ -207,6 +210,7 @@ class MissionControl(ActionLab):
             return dict(**info,world=projected,
                 signing_configured=verifier is not None,verified_frames=0 if verifier is None else verifier.accepted)
         with self._control_lock:
+            if operation.startswith('studio-b.'):return self.studio.handle(operation,payload)
             if operation == 'studio.state': return self._snapshot()
             if operation == 'mission.library': return list(self.journal.data['versions'].values())
             if operation == 'mission.types': return list(NODE_TYPES)
@@ -217,11 +221,11 @@ class MissionControl(ActionLab):
                 return spec.to_dict()
             if operation == 'mission.start':
                 if payload['spec']['target'] in self.operator_controls.records:raise ValueError('Web control reserved; release it before starting a Mission')
-                if payload.keys() - {'spec','allow_send','continuation_of'}: raise ValueError('unknown Mission start fields')
+                if payload.keys() - {'spec','allow_send','continuation_of','debug'}: raise ValueError('unknown Mission start fields')
                 self._require_operational()
                 self._idle(payload['spec']['target'], payload.get('continuation_of'))
                 return self.missions.start(payload['spec'], allow_send=payload.get('allow_send',False),
-                    continuation_of=payload.get('continuation_of'))
+                    continuation_of=payload.get('continuation_of'),debug=payload.get('debug',False))
             if operation == 'mission.cancel': return self.missions.cancel(payload['id'])
             if operation == 'manual.action' or operation == 'run': return self._manual_action(payload)
             if operation == 'manual.start': return self._manual_action(payload, continuous=True)
@@ -372,6 +376,7 @@ class MissionControl(ActionLab):
         try: super().close()
         finally:
             if self.journal: self.journal.close()
+            if self.studio:self.studio.close()
 
 
 class MissionControlServer(ActionLabServer):
@@ -394,7 +399,12 @@ class MissionControlHandler(ActionLabHandler):
             if self.path!='/ws/telemetry':self.reply(400,dict(ok=False,error='WebSocket URL takes no credentials or query'));return
             from .live import stream
             stream(self);return
-        static = {'/studio':('mission-studio.html','text/html; charset=utf-8'),
+        static = {'/studio':('studio-b.html','text/html; charset=utf-8'),
+            '/studio/legacy':('mission-studio.html','text/html; charset=utf-8'),
+            '/studio-b.js':('studio-b.js','application/javascript'),
+            '/studio-b.css':('studio-b.css','text/css'),
+            '/studio-canvas.js':('studio-canvas.js','application/javascript'),
+            '/studio-params.js':('studio-params.js','application/javascript'),
             '/console':('tool-console.html','text/html; charset=utf-8'),
             '/tool-console.js':('tool-console.js','application/javascript'),
             '/tool-console.css':('tool-console.css','text/css'),
@@ -426,6 +436,7 @@ class MissionControlHandler(ActionLabHandler):
             except ValueError as exc:self.reply(400,dict(ok=False,error=str(exc)));return
             self.invoke('manual.state',dict(session_id=identifier));return
         routes = {'/api/console/state':'console.state','/api/studio/state':'studio.state','/api/missions/library':'mission.library','/api/missions/types':'mission.types'}
+        routes.update({'/api/studio-b/catalog':'studio-b.catalog','/api/studio-b/library':'studio-b.library'})
         routes['/api/control/state']='control.snapshot'
         if self.path in routes:
             if self.authorized(): self.invoke(routes[self.path], {})
@@ -449,3 +460,6 @@ class MissionControlHandler(ActionLabHandler):
         '/api/control/release':'operator.release','/api/control/request-takeover':'operator.takeover'})
     post_routes.update({'/api/visualization/open':'visualization.open','/api/visualization/candidates':'visualization.propose',
         '/api/visualization/confirm':'visualization.confirm'})
+    post_routes.update({'/api/studio-b/'+op.replace('.','/'): 'studio-b.'+op for op in (
+        'draft.save','draft.validate','draft.publish','draft.clone','draft.restore','draft.import','template.apply','template.save',
+        'diff','run.start','run.get','run.cancel','run.debug')})
