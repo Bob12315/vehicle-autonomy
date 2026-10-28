@@ -347,4 +347,6 @@ class MissionControlHandler(ActionLabHandler):
         '/api/missions/start':'mission.start','/api/missions/cancel':'mission.cancel',
         '/api/manual/action':'manual.action','/api/manual/start':'manual.start',
         '/api/manual/update':'manual.update','/api/manual/stop':'manual.stop',
+        '/api/tools/operation':'tools.operation','/api/tools/configure':'tools.configure',
+        '/api/settings/context':'settings.context',
         '/api/control/takeover':'control.takeover','/api/control/reestablish':'control.reestablish'})

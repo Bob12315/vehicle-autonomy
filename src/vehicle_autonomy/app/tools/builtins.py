@@ -36,7 +36,7 @@ def registry(*, ros_env=None, qgc=None, qgc_relay=None, sitl_dir=None, plugin=No
     rviz = make('rviz2', 'RViz2', 'gui', {'default':profile(
         ['rviz2', '-d', str(rviz_config), '--ros-args', '-r', '__ns:={namespace}', '-r', '__node:=vaf_rviz',
          '-r', '/map:={namespace}/map', '-r', '/tf:={namespace}/tf', '-r', '/tf_static:={namespace}/tf_static', '-r', '/scan:={namespace}/scan'],
-        env=ros_env, health=dict(argv=['ros2','node','list'],contains=['{namespace}/vaf_rviz'],timeout_s=2), ready=ros('rviz'),
+        env=ros_env, health=ros('rviz-node'), ready=ros('rviz'),
         connection=dict(kind='ros2', description='RViz node plus live TF data in selected namespace; read-only configuration'),
         requires=[dep('file',rviz_config)], timeout=60)}, permissions=['desktop','ros_read'], dependencies=ros_deps, integrations=['ros2.topics', 'vehicle.context'])
     ros_tool = make('ros2', 'ROS 2 graph observer', 'service', {'default':profile(
@@ -53,12 +53,14 @@ def registry(*, ros_env=None, qgc=None, qgc_relay=None, sitl_dir=None, plugin=No
         nav2_deps.append(dep('file',found or Path('/NOT_CONFIGURED/nav2')/package/executable))
     nav2 = make('nav2','Nav2 isolated services','service',{'default':profile(
         [python,'-u','-m','vehicle_autonomy.app.tools.ros_tools','start-nav2','--params',str(nav2_params),'--behavior-tree',str(bt)], env=ros_env,
-        health=dict(argv=['ros2','node','list'],contains=['{namespace}/vaf_tools/controller_server'],timeout_s=2), ready=ros('nav2'),
+        health=ros('nav2-nodes'), ready=ros('nav2'),
         connection=dict(kind='ros2.action.NavigateToPose', description='Endpoint {namespace}/vaf_tools/navigate_to_pose; isolated cmd_vel, no vehicle authority'),
         requires=[dep('file',nav2_params),dep('file',bt)], timeout=120)}, permissions=['ros_read','ros_service'], dependencies=nav2_deps,
         integrations=['ros2.action.NavigateToPose', 'ros2.lifecycle.GetState'])
     relay = Path(qgc_relay).resolve() if qgc_relay else Path('/NOT_CONFIGURED/telemetry-only-relay.json')
-    qgc_profile = profile([str(Path(qgc).resolve()) if qgc else 'QGroundControl', '--appimage-extract-and-run'],
+    qgc_command=[str(Path(qgc).resolve()) if qgc else 'QGroundControl']
+    if qgc and str(qgc).lower().endswith('.appimage'):qgc_command.append('--appimage-extract-and-run')
+    qgc_profile = profile(qgc_command,
         connection=dict(kind='mavlink.telemetry_only', description='Use only the relay declared in the trusted local deployment; QGC internal settings are not remotely edited', telemetry_only=True),
         requires=[dep('file',relay)])
     # A real file must explicitly attest the one-way relay. Mere file presence

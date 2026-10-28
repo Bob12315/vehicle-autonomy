@@ -1,13 +1,14 @@
 'use strict';
 const $=s=>document.querySelector(s),node=(tag,text,attrs={})=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text;for(const[k,v]of Object.entries(attrs))e.setAttribute(k,v);return e;};
-let snapshot=null,connected=false,busy=false,vehicleId='',kindFilter='',view='dashboard',lastReceived=0;
+let snapshot=null,connected=false,busy=false,vehicleId='',kindFilter='',view='dashboard',lastReceived=0,settingsLoaded=false,detailSelection=null;
+const profileSelections=new Map();
 const titles={dashboard:['车辆总览','遥测、执行状态与控制权，来自同一受控运行时。'],tools:['工具管理','选择运行主机，管理外部软件的生命周期与真实连接状态。'],workspaces:['工作环境','按声明的依赖准备工具，保留共享服务的所有权。'],logs:['日志与诊断','追踪工具启动、进程输出、失败和认证操作记录。'],settings:['设置','配置车辆上下文与已注册的工具 Profile。']};
 const kindNames={rover:'Rover · 地面车',copter:'Copter · 多旋翼',plane:'Plane · 固定翼'};
 let toolContext={vehicle_id:'rover',vehicle_type:'rover',environment:'simulation',ros_namespace:'/rover',ros_domain_id:91,mavlink_profile:'monitor'};
 const num=(v,d=2)=>typeof v==='number'&&Number.isFinite(v)?v.toFixed(d):'未知';
 const vector=v=>v?`X ${num(v.x)} / Y ${num(v.y)} / Z ${num(v.z)}`:'未知';
 const badge=(text,tone='')=>node('span',text,{class:'badge','data-tone':tone});
-function notice(e){$('#notice').textContent=e?.message||String(e||'');}
+function notice(e){$('#notice').textContent=e?.message||String(e||'');$('#notice').dataset.tone=e?.message?'error':'info';}
 function guard(fn){return async(...args)=>{try{await fn(...args);}catch(e){notice(e);}};}
 async function api(path,payload){
  const token=$('#token').value.trim();if(!token)throw Error('请先输入访问令牌');
@@ -18,8 +19,8 @@ async function api(path,payload){
 function route(){view=location.hash.slice(1)||'dashboard';if(!titles[view])view='dashboard';for(const e of document.querySelectorAll('[data-panel]'))e.hidden=e.dataset.panel!==view;for(const e of document.querySelectorAll('[data-view]')){if(e.dataset.view===view)e.setAttribute('aria-current','page');else e.removeAttribute('aria-current');}$('#page-title').textContent=titles[view][0];$('#page-subtitle').textContent=titles[view][1];if(snapshot)render();}
 window.addEventListener('hashchange',route);route();
 function linkState(ok){$('#link-state').textContent=ok?'控制中心已连接':'控制中心已断开 · 状态未知';$('#link-dot').style.background=ok?'#087e79':'#ad3c32';}
-function invalidate(){if(!snapshot)return;snapshot.vehicles=[];$('#dashboard-data').hidden=true;$('#vehicle-empty').hidden=false;$('#vehicle-empty').replaceChildren(node('strong','连接中断，当前状态未知'),node('p','连接恢复后同步完整状态。已显示的旧遥测不能用于操作。'));linkState(false);}
-async function poll(){if(busy||!connected)return;busy=true;try{snapshot=await api('/api/console/state');lastReceived=performance.now();linkState(true);$('#updated').textContent='已同步 '+new Date().toLocaleTimeString();render();}catch(e){invalidate();notice(e);}finally{busy=false;}}
+function invalidate(){if(!snapshot)return;snapshot.vehicles=[];if(snapshot.tools)for(const a of snapshot.tools.agents){a.connected=false;for(const t of a.tools)if(t.instance)Object.assign(t.instance,{state:'DISCONNECTED',ready:false,process_running:null,service_health:'UNKNOWN',connection:'DISCONNECTED'});}renderTools();$('#dashboard-data').hidden=true;$('#vehicle-empty').hidden=false;$('#vehicle-empty').replaceChildren(node('strong','连接中断，当前状态未知'),node('p','连接恢复后同步完整状态。已显示的旧遥测不能用于操作。'));linkState(false);}
+async function poll(){if(busy||!connected)return;busy=true;try{snapshot=await api('/api/console/state');if(!settingsLoaded&&snapshot.tools?.settings){toolContext=snapshot.tools.settings.context;fillContext();settingsLoaded=true;}lastReceived=performance.now();linkState(true);$('#updated').textContent='已同步 '+new Date().toLocaleTimeString();render();}catch(e){invalidate();notice(e);}finally{busy=false;}}
 $('#connection').onsubmit=guard(async e=>{e.preventDefault();connected=true;notice('');await poll();});
 $('#disconnect').onclick=()=>{connected=false;invalidate();$('#token').value='';};
 setInterval(()=>{if(connected)poll();if(lastReceived&&performance.now()-lastReceived>4500)invalidate();},750);
@@ -43,9 +44,48 @@ function render(){
  }
  renderTools();renderWorkspaces();renderLogs();$('#settings-info').textContent=JSON.stringify({agents:snapshot.tools?.agents?.map(a=>({id:a.id,role:a.role,connected:a.connected})),poll_interval_ms:750,transport:'Authenticated HTTP / SSH forwarding',vehicle_command_path:'Existing MissionControl / ActionRuntime / Execution'},null,2);
 }
-function renderTools(){if(snapshot.tools)$('#tools-content').textContent='等待工具状态同步。';}
+function findTool(agentId,toolId){const a=snapshot.tools?.agents.find(a=>a.id===agentId);return[a,a?.tools.find(t=>t.manifest.id===toolId)];}
+function button(text,fn,disabled=false,title=''){const b=node('button',text,{type:'button',title});b.disabled=disabled;b.onclick=guard(fn);return b;}
+function profileFor(a,t){const key=a.id+':'+t.manifest.id;return profileSelections.get(key)||snapshot.tools.settings.profiles[key]?.profile_id||t.instance?.profile_id||Object.keys(t.manifest.profiles)[0];}
+async function operate(agentId,toolId,op){
+ const[a,t]=findTool(agentId,toolId);let profile=profileFor(a,t),ctx=toolContext;
+ if(['stop','restart'].includes(op)&&t.instance?.owned){profile=t.instance.profile_id;ctx=t.instance.context;}
+ const job=await api('/api/tools/operation',{agent_id:a.id,tool_id:toolId,profile_id:profile,operation:op,context:ctx});
+ notice(`已排队 ${op} · ${a.id} / ${toolId} · ${job.id.slice(0,8)}，等待 Agent 结果。`);await poll();
+}
+function renderTools(){
+ if(!snapshot.tools)return;
+ const host=$('#agents');host.replaceChildren();
+ for(const a of snapshot.tools.agents){const row=node('div');row.append(badge(a.connected?'Online':'Disconnected',a.connected?'good':'error'),node('strong',' '+a.name),node('small',`${a.id} · ${a.role} · 心跳 ${num(a.heartbeat_age_s,1)} s`));host.append(row);}
+ if(!snapshot.tools.agents.length){$('#tools-content').className='panel empty';$('#tools-content').replaceChildren(node('strong','等待 Agent 注册'),node('p','启动已授权的 Desktop、Server 或 Onboard Agent；无需固定 Agent IP。'));return;}
+ if(view!=='tools')return;
+ if($('#tools-content').contains(document.activeElement)&&document.activeElement.tagName==='SELECT')return;
+ const table=node('table',undefined,{class:'tools-table'}),thead=node('thead'),tr=node('tr');for(const name of ['TOOL / VERSION','HOST / PROFILE','INSTALL / PROCESS','HEALTH / READY','CONNECTION / ERROR','OPERATIONS'])tr.append(node('th',name));thead.append(tr);table.append(thead);const body=node('tbody');table.append(body);
+ for(const a of snapshot.tools.agents)for(const t of a.tools){
+  const m=t.manifest,p=profileFor(a,t),check=t.checks[p]||{},i=t.instance,key=a.id+':'+m.id;
+  const row=node('tr',undefined,{'data-tool':key}),identity=node('td');identity.append(node('strong',m.name),node('small',m.version));row.append(identity);
+  const cell=node('td');cell.append(node('strong',a.id));const select=node('select',undefined,{'aria-label':m.name+' Profile'});for(const name of Object.keys(m.profiles))select.append(node('option',name,{value:name}));select.value=p;select.onchange=()=>{profileSelections.set(key,select.value);select.blur();renderTools();};cell.append(node('br'),select);if(i&&i.profile_id!==p)cell.append(node('small','运行中: '+i.profile_id));row.append(cell);
+  const process=node('td');process.append(badge(a.connected?(check.installed?'Installed':'Missing Dependency'):'Unknown',a.connected&&check.installed?'good':'warning'));process.append(node('small',a.connected?(i?.state||(t.external_pids.length?'EXTERNAL · observe only':'STOPPED')):'DISCONNECTED'));if(i?.pid)process.append(node('small',`PID ${i.pid} · RSS ${num(i.resource?.rss_bytes/1048576,1)} MiB`));row.append(process);
+  const health=node('td');health.append(node('span',a.connected?(i?.service_health||'UNKNOWN'):'UNKNOWN'),node('br'),badge(a.connected&&i?.ready?'Ready':'Not Ready',a.connected&&i?.ready?'good':'warning'));row.append(health);
+  const connection=node('td'),last=snapshot.tools.jobs.filter(j=>j.agent_id===a.id&&j.tool_id===m.id).at(-1);connection.append(node('span',a.connected?(i?.connection||'UNKNOWN'):'DISCONNECTED'));const error=(!a.connected?'Agent 失联；远端进程状态未知':i?.error)||(['FAILED','EXPIRED','UNKNOWN'].includes(last?.state)?last.error:null)||check.missing?.join('; ');if(error)connection.append(node('small',error));else connection.append(node('small',i?.context?`车辆 ${i.context.vehicle_id} · ${i.context.ros_namespace}`:`将关联 ${toolContext.vehicle_id}`));row.append(connection);
+  const actions=node('td'),buttons=node('div',undefined,{class:'actions'}),active=i?.process_running===true;
+  buttons.append(button('Launch',()=>operate(a.id,m.id,'launch'),!a.connected||!check.launchable||active||t.external_pids.length>0,error||'启动选定 Profile'),button('Stop',()=>operate(a.id,m.id,'stop'),!a.connected||!active||!i?.owned,'只停止本 Agent 拥有的进程'),button('Restart',()=>operate(a.id,m.id,'restart'),!a.connected||!i?.owned||!check.launchable),button('Logs',()=>showTool(a.id,m.id,'logs')),button('Configure',()=>showTool(a.id,m.id,'configure')),button('Dependencies',()=>operate(a.id,m.id,'check'),!a.connected),button('Connection',()=>showTool(a.id,m.id,'connection')));
+  if(m.type==='gui')buttons.append(button('Open Window',()=>operate(a.id,m.id,'open'),!a.connected||active||!check.launchable,'在目标 Agent 桌面启动；不提供已有远端窗口置前'));
+  if(t.external_pids.length)buttons.append(button('Observe / Connect',()=>operate(a.id,m.id,'connect'),!a.connected));actions.append(buttons);row.append(actions);body.append(row);
+ }
+ const container=$('#tools-content');container.className='panel table-wrap';container.replaceChildren(node('p',`启动上下文：${toolContext.vehicle_id} / ${toolContext.vehicle_type} · ${toolContext.environment} · ROS ${toolContext.ros_domain_id} ${toolContext.ros_namespace}`,{class:'muted'}),table);
+ if(detailSelection?.mode==='logs'){const[a,t]=findTool(detailSelection.agent,detailSelection.tool);if(t)$('#tool-detail pre').textContent=t.instance?.logs?.join('')||'当前没有由 Agent 收集的进程输出。';}
+}
+function showTool(agentId,toolId,mode){
+ const[a,t]=findTool(agentId,toolId),p=profileFor(a,t),detail=$('#tool-detail');detailSelection={agent:agentId,tool:toolId,mode};detail.hidden=false;detail.replaceChildren(node('h2',`${t.manifest.name} / ${a.id}`));
+ if(mode==='configure'){
+  detail.append(node('p','选择主机预先授权的 Profile。保存选择不会修改正在运行的实例。',{class:'muted'}));const select=node('select',undefined,{'aria-label':'配置 Profile'});for(const name of Object.keys(t.manifest.profiles))select.append(node('option',name,{value:name}));select.value=p;detail.append(select,node('pre',JSON.stringify(toolContext,null,2)),button('保存选择',async()=>{await api('/api/tools/configure',{agent_id:agentId,tool_id:toolId,profile_id:select.value,context:toolContext});profileSelections.set(agentId+':'+toolId,select.value);notice('Profile 选择已保存；运行实例没有被重配。');await poll();}));
+ }else if(mode==='logs')detail.append(node('pre',t.instance?.logs?.join('')||'当前没有由 Agent 收集的进程输出。'));
+ else detail.append(node('pre',JSON.stringify({profile:p,connection:t.manifest.profiles[p].connection,context:t.instance?.context||toolContext,external_pids:t.external_pids,integrations:t.manifest.integrations,last_operation:snapshot.tools.jobs.filter(j=>j.agent_id===agentId&&j.tool_id===toolId).at(-1)},null,2)));
+ detail.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
 function renderWorkspaces(){}
-function renderLogs(){$('#logs').textContent=JSON.stringify(snapshot?.tools?.events||{vehicle_fault:snapshot?.fault||null},null,2);}
+function renderLogs(){const filter=$('#log-filter').value.toLowerCase(),lines=(snapshot?.tools?.events||[]).map(e=>JSON.stringify(e));for(const a of snapshot?.tools?.agents||[])for(const t of a.tools)for(const line of t.instance?.logs||[])lines.push(`[${a.id} / ${t.manifest.id}] ${line}`);if(snapshot?.fault)lines.push(snapshot.fault);$('#logs').textContent=lines.filter(s=>s.toLowerCase().includes(filter)).slice(-200).join('\n')||'没有匹配的记录。';}
 function fillContext(){const c=toolContext;$('#context-vehicle').value=c.vehicle_id;$('#context-type').value=c.vehicle_type;$('#context-env').value=c.environment;$('#context-namespace').value=c.ros_namespace;$('#context-domain').value=c.ros_domain_id;$('#context-mavlink').value=c.mavlink_profile;}
 $('#context-form').onsubmit=guard(async e=>{e.preventDefault();const c={vehicle_id:$('#context-vehicle').value,vehicle_type:$('#context-type').value,environment:$('#context-env').value,ros_namespace:$('#context-namespace').value,ros_domain_id:Number($('#context-domain').value),mavlink_profile:$('#context-mavlink').value};await api('/api/settings/context',c);toolContext=c;notice('上下文已保存。现有工具和车辆任务保持其当前上下文。');});fillContext();
 $('#log-filter').oninput=()=>renderLogs();

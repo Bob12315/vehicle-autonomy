@@ -24,7 +24,7 @@ def namespace():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('operation', choices=('observe', 'graph', 'rviz', 'nav2', 'start-nav2'))
+    parser.add_argument('operation', choices=('observe', 'graph', 'rviz', 'rviz-node', 'nav2', 'nav2-nodes', 'start-nav2'))
     parser.add_argument('--params', type=Path); parser.add_argument('--behavior-tree', type=Path)
     a = parser.parse_args()
     import rclpy
@@ -90,6 +90,8 @@ def main():
         topics = dict(node.get_topic_names_and_types()); actions = dict(get_action_names_and_types(node))
         result = dict(nodes=sorted(nodes), topics=topics, actions=actions, lifecycle={})
         if a.operation == 'graph': ready = ns + '/vaf_tool_observer' in nodes
+        elif a.operation == 'rviz-node': ready = ns + '/vaf_rviz' in nodes
+        elif a.operation == 'nav2-nodes': ready = ns + '/vaf_tools/controller_server' in nodes
         elif a.operation == 'rviz':
             from tf2_msgs.msg import TFMessage
             received = []

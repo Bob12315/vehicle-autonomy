@@ -79,6 +79,7 @@ class Agent:
             try:
                 if time.monotonic() >= deadline: raise ValueError('command expired before execution')
                 result['result'] = self.tools.execute(c['operation'], c['tool_id'], c['profile_id'], c['context'])
+                if type(result['result']) is dict:result['result'].pop('logs',None)
                 result['ok'] = True
             except Exception as exc: result['error'] = type(exc).__name__ + ': ' + str(exc)[:500]
             with self.lock:

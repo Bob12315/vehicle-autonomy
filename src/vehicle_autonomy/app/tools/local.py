@@ -248,7 +248,15 @@ class LocalTools:
 
     @staticmethod
     def _view(record):
-        return {k: deepcopy(v) for k, v in record.items() if k not in ('process', 'logs', 'last_probe', 'restart', 'started_mono')} | dict(logs=list(record['logs']))
+        resource=dict(rss_bytes=None,cpu_time_s=None,scope='primary process only')
+        if record['pid'] and record['process_running']:
+            try:
+                status=Path(f"/proc/{record['pid']}/status").read_text().splitlines()
+                rss=next(line.split()[1] for line in status if line.startswith('VmRSS:'))
+                fields=Path(f"/proc/{record['pid']}/stat").read_text().rsplit(')',1)[1].split()
+                resource.update(rss_bytes=int(rss)*1024,cpu_time_s=(int(fields[11])+int(fields[12]))/os.sysconf('SC_CLK_TCK'))
+            except (OSError,StopIteration,ValueError):pass
+        return {k: deepcopy(v) for k, v in record.items() if k not in ('process', 'logs', 'last_probe', 'restart', 'started_mono')} | dict(logs=list(record['logs']),resource=resource)
 
     def snapshot(self):
         with self.lock:

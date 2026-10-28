@@ -1,7 +1,9 @@
 """Loopback Action Lab; SEND remains disabled unless explicitly granted twice."""
 import argparse
+import json
 from pathlib import Path
 import signal
+from threading import Thread
 
 from vehicle_autonomy._resources import resource_root
 from vehicle_autonomy.app.bootstrap.action_ownership import OwnedActionSimulation
@@ -18,8 +20,11 @@ def main(*,studio=False):
     parser.add_argument('--port',type=int,default=8780 if studio else 8770);parser.add_argument('--data-dir',type=Path,default=Path('runtime/mission-control' if studio else 'runtime/action-lab'))
     parser.add_argument('--token-file',type=Path,required=True)
     parser.add_argument('--qgc-monitor-port',type=int,help='receive-only loopback UDP telemetry mirror; QGC commands are not forwarded')
+    parser.add_argument('--tool-agents',type=Path,help='trusted JSON Agent ID -> private token file allowlist; enables outbound Agent channel')
+    parser.add_argument('--tool-port',type=int,default=8791,help='loopback Agent channel, forward via SSH for remote hosts')
     parser.add_argument('--initialize-provider-registry',action='store_true',help='explicit one-time trusted Mission deployment bootstrap; never recovery')
-    args=parser.parse_args();drivers={};lab=server=None
+    args=parser.parse_args();drivers={};lab=server=tool_service=agent_server=agent_thread=None
+    if args.tool_agents and not studio:parser.error('Tool service requires the Mission/console entry')
     if args.qgc_monitor_port is not None and not 1024<=args.qgc_monitor_port<=65535:
         parser.error('QGC monitor port must be within 1024..65535')
     if args.initialize_provider_registry:
@@ -50,6 +55,21 @@ def main(*,studio=False):
         if studio:
             from vehicle_autonomy.app.web.mission_control import MissionControl,MissionControlServer
             lab=MissionControl(drivers,args.data_dir)
+            from vehicle_autonomy.app.tools.service import ToolService
+            tool_service=ToolService(args.data_dir/'tools');lab.tool_service=tool_service
+            if args.tool_agents:
+                from vehicle_autonomy.app.tools.broker import AgentServer
+                from vehicle_autonomy.app.tools.schema import object_fields,identifier
+                config=json.loads(args.tool_agents.read_text());object_fields(config,('schema','agents'))
+                if config['schema']!=1 or type(config['agents']) is not dict:raise ValueError('Agent allowlist schema 1 required')
+                credentials={}
+                for agent_id,item in config['agents'].items():
+                    identifier(agent_id);object_fields(item,('token_file',))
+                    path=Path(item['token_file'])
+                    if not path.is_absolute():raise ValueError('absolute Agent token-file path required')
+                    credentials[agent_id]=load_token(path)
+                agent_server=AgentServer(('127.0.0.1',args.tool_port),tool_service.registry,credentials,tool_service.store.root/'agent-http.jsonl')
+                agent_thread=Thread(target=agent_server.serve_forever,kwargs={'poll_interval':.2},daemon=True);agent_thread.start()
             server_class=MissionControlServer
         else:
             lab=ActionLab(drivers)
@@ -61,7 +81,12 @@ def main(*,studio=False):
         server.serve_forever(poll_interval=.2)
     except KeyboardInterrupt:pass
     finally:
+        if agent_server:
+            agent_server.shutdown()
+            if agent_thread:agent_thread.join(4)
+            agent_server.server_close()
         if server:server.server_close()
+        if tool_service:tool_service.close()
         if lab:lab.close()
         else:
             for driver in drivers.values():driver.close()
