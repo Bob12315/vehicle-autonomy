@@ -51,10 +51,17 @@ class ServiceTests(unittest.TestCase):
             with urlopen(req,timeout=3) as response:return response.status,json.load(response)
         except HTTPError as e:return e.code,json.load(e)
     def test_static_pages_and_original_action_lab_preserved(self):
-        for path in ('/','/studio','/control','/mission-api.js','/mission-studio.js','/manual-control.js','/mission-ui.css'):
+        for path in ('/','/studio','/control','/console','/tool-console.js','/tool-console.css','/mission-api.js','/mission-studio.js','/manual-control.js','/mission-ui.css'):
             with urlopen(self.base+path) as r:self.assertEqual(r.status,200)
         self.assertEqual(self.api('/api/studio/state')[1]['result']['vehicles'][0]['target'],'v')
         self.assertEqual(self.api('/api/actions')[0],200)
+
+    def test_console_uses_existing_state_and_preserves_auth_and_no_writes(self):
+        self.assertEqual(self.api('/api/console/state',auth=False)[0],401)
+        code,result=self.api('/api/console/state')
+        self.assertEqual(code,200);self.assertEqual(result['result']['vehicles'][0]['id'],'v')
+        self.assertIsNone(result['result']['vehicles'][0]['position'])
+        self.assertIsNone(result['result']['tools']);self.assertEqual(self.driver.writes,[])
     def test_readonly_vehicle_stream_endpoint_preserves_auth_and_no_effects(self):
         code,data=self.api('/api/world/vehicle?target=v')
         self.assertEqual(code,200);self.assertEqual(data['result']['target'],'v')

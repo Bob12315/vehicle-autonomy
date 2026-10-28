@@ -62,7 +62,7 @@ async function update(){
   input=await api.call('/api/manual/update',{session_id:session.id,sequence:input.input_sequence+1,deadline_ns:input.input_ticket,parameters:values()});
  }catch(e){await stop();api.report(e);}finally{updating=false;}
 }
-function down(key){if(!'wasdqerf'.includes(key)||selected()?.kind==='plane')return;keys.add(key);document.querySelector(`[data-key="${key}"]`)?.classList.add('pressed');begin().catch(api.report);}
+function down(key){if(!'wasdqerf'.includes(key)||selected()?.kind==='plane'||!selected()?.fresh_vehicle_state)return;keys.add(key);document.querySelector(`[data-key="${key}"]`)?.classList.add('pressed');begin().catch(api.report);}
 function up(key){keys.delete(key);if('wasdqerf'.includes(key)&&key.length===1)document.querySelector(`[data-key="${key}"]`)?.classList.remove('pressed');if(!keys.size)stop().catch(api.report);}
 for(const b of document.querySelectorAll('[data-key]')){
  b.onpointerdown=e=>{e.preventDefault();b.setPointerCapture(e.pointerId);down(b.dataset.key);};
@@ -75,8 +75,8 @@ setInterval(()=>update(),100);
 function render(){
  document.querySelectorAll('[data-key]').forEach(b=>b.classList.toggle('pressed',keys.has(b.dataset.key)));
  const v=selected();if(!v)return;
- const w=v.world,vehicle=w?.vehicle,pose=vehicle?.reported_pose,twist=vehicle?.reported_twist;
- const display=v.display||{};
+ const w=v.fresh_vehicle_state?v.world:null,vehicle=w?.vehicle,pose=vehicle?.reported_pose,twist=vehicle?.reported_twist;
+ const display=v.fresh_vehicle_state?(v.display||{}):{control_hint:'车辆遥测已过期或断开，当前状态未知。'};
  $('#control-hint').textContent=display.control_hint||'连接成功不代表可以解锁，请核查状态。';modeChoices();
  for(const key of ['q','e'])document.querySelector(`[data-key="${key}"]`).hidden=v.kind==='rover';
  $('#stream-controls').hidden=v.kind==='plane';$('#plane-manual-help').hidden=v.kind!=='plane';
@@ -133,6 +133,7 @@ function render(){
 function diagnostic(display,name,format){const field=display.diagnostics?.[name];if(!field?.value)return'未知';const value=format(field.value);return field.receive_fresh&&field.availability!=='STALE'?value+(field.availability==='UNKNOWN_CAPTURE_TIME'?'（采样时间未知）':''):value+'（已过期）';}
 function draw(v){
  const canvas=$('#field'),ctx=canvas.getContext('2d'),W=canvas.width,H=canvas.height;ctx.clearRect(0,0,W,H);ctx.strokeStyle='#244556';
+ if(!v.fresh_vehicle_state){mapTransform=null;$('#map-frame').textContent='遥测过期或断开，位置未知';return;}
  for(let x=0;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}for(let y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
  const vehicle=v.world?.vehicle,local=vehicle?.reported_pose,global=vehicle?.global_position;
  mapTransform=null;
@@ -168,4 +169,4 @@ $('#field').onclick=api.guard(e=>{
  $('#notice').textContent='目标参数已设置，请核对坐标/高度并显式执行。';
 });
 async function poll(){if(polling)return;polling=true;try{state=await api.call('/api/studio/state');render();}finally{polling=false;}}
-setInterval(()=>{if(api.target)poll().catch(api.report);},500);
+setInterval(()=>{if(api.target)poll().catch(e=>{stop();if(state){for(const v of state.vehicles){v.connected=false;v.fresh_vehicle_state=false;}render();}api.report(e);});},500);

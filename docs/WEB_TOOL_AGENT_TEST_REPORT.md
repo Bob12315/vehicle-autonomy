@@ -50,3 +50,22 @@ Date: 2026-10-28. Initial HEAD: `a49b8b9`. No real hardware is opened or command
 
 Later phase results, final native evidence, deployment verification and remaining
 limitations are recorded below as work completes.
+
+## Phase 3
+
+* New dashboard projection, per-field age/clock/disconnect checks and original
+  Mission HTTP compatibility: **13 focused PASS**. Full suite **691 PASS**,
+  79.056 s (`/tmp/vaf-agent-phase3-full.log`).
+* `python -m tests.tool_agent.console_browser --run-dir
+  artifacts/phase4-mission/tool-console-phase3-browser`: real Chromium/HTTP PASS,
+  three fixture vehicle types show unknown telemetry correctly, 1440/1024/390
+  widths, zero JS errors, zero writer calls. Screenshots visually inspected.
+* `VAF_PYTHON=$PWD/.venv/bin/python .venv/bin/python -m
+  tests.simulation.program_launch --kind rover --motion --run-dir
+  artifacts/phase4-mission/tool-console-phase3-rover`: real signed SITL/Gazebo
+  plus real Chrome PASS. Forward 0.357 m; turn 0.303 rad; release/stop verified;
+  Goto error 0.272 m, return error 0.222 m. Default Action SEND rejected.
+  QGC monitor drops inbound requests; clean owned groups and credentials cleanup.
+* Read-only `tests.tool_agent.console_capture` verified `/console` against this
+  live Rover and saved `dashboard.png`/`dashboard.json` in that run. This is
+  actual vehicle telemetry, distinct from the fixture browser check.

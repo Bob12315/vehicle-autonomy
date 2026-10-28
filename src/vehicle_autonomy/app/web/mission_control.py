@@ -182,6 +182,16 @@ class MissionControl(ActionLab):
             recovered_actions=list(self.recovered_manual.values()), fault=self.control_fault)
 
     def handle(self, operation, payload):
+        if operation == 'console.state':
+            if payload: raise ValueError('console snapshot takes no arguments')
+            from vehicle_autonomy.app.web.dashboard import dashboard
+            with self._control_lock: view=dashboard(self._snapshot(),self.clock())
+            tools=getattr(self,'tool_service',None)
+            return dict(**view,tools=None if tools is None else tools.snapshot())
+        if operation.startswith('tools.') or operation.startswith('workspace.') or operation.startswith('settings.'):
+            service=getattr(self,'tool_service',None)
+            if service is None: raise ValueError('Tool service not configured; launch with an Agent allowlist')
+            return service.handle(operation,payload)
         if operation == 'world.vehicle':
             if set(payload) not in ({'target'},{'target','projection'}) or payload.get('projection','full') not in ('full','ap'): raise ValueError('explicit target/projection required')
             driver=self.drivers[payload['target']]
@@ -298,6 +308,9 @@ class MissionControlServer(ActionLabServer):
 class MissionControlHandler(ActionLabHandler):
     def do_GET(self):
         static = {'/studio':('mission-studio.html','text/html; charset=utf-8'),
+            '/console':('tool-console.html','text/html; charset=utf-8'),
+            '/tool-console.js':('tool-console.js','application/javascript'),
+            '/tool-console.css':('tool-console.css','text/css'),
             '/control':('manual-control.html','text/html; charset=utf-8'),
             '/mission-ui.css':('mission-ui.css','text/css'),
             '/mission-studio.js':('mission-studio.js','application/javascript'),
@@ -322,7 +335,7 @@ class MissionControlHandler(ActionLabHandler):
                 if not re.fullmatch(r'manual:[a-f0-9]{32}',identifier):raise ValueError('invalid manual session')
             except ValueError as exc:self.reply(400,dict(ok=False,error=str(exc)));return
             self.invoke('manual.state',dict(session_id=identifier));return
-        routes = {'/api/studio/state':'studio.state','/api/missions/library':'mission.library','/api/missions/types':'mission.types'}
+        routes = {'/api/console/state':'console.state','/api/studio/state':'studio.state','/api/missions/library':'mission.library','/api/missions/types':'mission.types'}
         if self.path in routes:
             if self.authorized(): self.invoke(routes[self.path], {})
             return
