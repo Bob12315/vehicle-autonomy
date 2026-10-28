@@ -51,6 +51,9 @@ per Tool ID. Context is typed; `hardware_controlled` is never accepted.
    survives Workspace stop. External/unidentified programs are observation-only.
    Queued undelivered launches cancel without execution; delivered outcomes and
    cleanup must be confirmed. Unknown/disconnected remains unknown, not stopped.
+   Cleanup has a 25 s backend deadline; uncertainty retains references and requires
+   an explicit later stop retry. Browser loss clears live readiness displays but
+   does not cancel the backend Workspace or its services.
 
 The backend rejects direct Stop/Restart of a Workspace-owned Tool. A manual
 Launch of an already shared compatible service adds baseline ownership, so a

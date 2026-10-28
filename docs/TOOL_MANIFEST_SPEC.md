@@ -35,6 +35,13 @@ in argv, errors or process stdout. Environment values and launch argv are not
 published to the browser. Logs are bounded but are visible to authenticated
 operators; use token files instead of printing credentials.
 
+Connection metadata can additionally declare a trusted `endpoint`, with the same
+typed namespace/domain expansion as argv. `/api/tools/integration` takes
+`{agent_id,tool_id,profile_id}` through the authenticated operator API and returns
+`protocol=vaf.tools.integration/1`, Agent boot, instance, context, connection,
+readiness and `vehicle_authority=false`. This lets an existing integration inspect
+service availability; it cannot replace the Action/Execution admission path.
+
 Optional `exclusive_ports` contains up to eight `{protocol:"tcp"|"udp",port:N}`
 loopback simulator reservations. Busy ports block launch without stopping any
 external process; they do not turn an installed program into uninstalled. The
@@ -79,3 +86,7 @@ Agent/Tool/Profile IDs and VehicleContext. `open` can launch an absent GUI on it
 Agent desktop; focusing an existing remote window is explicitly unsupported.
 An operation's SUCCEEDED result means the lifecycle request was accepted;
 observe the Tool's separate running/ready state for actual startup.
+
+`connect` is an observation/connection-metadata query for an external process;
+it explicitly returns `connection_established=false`. It does not manipulate a
+third-party application's internal UI or acquire that process's stop ownership.

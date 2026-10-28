@@ -39,6 +39,13 @@ ownership and bounded read-only health probes. Standard RViz2, QGC, Gazebo,
 Nav2, ROS 2 and SITL entries are shipped; unavailable launch inputs stay missing.
 Custom tools register through the same schema with no frontend changes.
 
+The Agent wire snapshot is validated before advancing registration/state. A boot
+and sequence fence protects mailbox operations; orphaned old results after a
+backend restart are acknowledged without re-execution so they cannot starve the
+outbox. Private supervisor loss additionally uses per-instance ownership markers
+and pidfds; program names and stale process-group IDs cannot authorize a kill.
+Audit errors fail new launch admission while cleanup remains independent.
+
 Browser operations carry only tool/profile IDs and typed VehicleContext. Each
 tool has one active compatible instance per Agent; incompatible context/profile
 requires an explicit stop. Start, health and stop have separate state. A private

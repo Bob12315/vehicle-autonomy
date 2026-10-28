@@ -1,0 +1,440 @@
+{
+  "schema": 1,
+  "date": "2026-10-28",
+  "tested_code_commit": "17a4940f4f4a80494f152c9ce7dc2be1703eeb37",
+  "production_tree_sha256": "b4722a880164950cb628ad7c9cd7b8c8be0b8c17e0eb0d62148d356ad1a0cff8",
+  "production_tree_hash_definition": "sorted relative paths + NUL + contents + NUL; src/vehicle_autonomy excluding pycache, plus pyproject.toml README.md configs/tools/lab.sdf",
+  "environment": {
+    "os": "Ubuntu 24.04.1 LTS",
+    "python": "3.12.3",
+    "chrome": "152.0.7977.64",
+    "gazebo_sim": "8.15.0",
+    "ros_packages": {
+      "rviz2": "14.1.24",
+      "nav2_controller": "1.3.13",
+      "ros2cli": "0.32.13"
+    }
+  },
+  "final_units": {
+    "command": ".venv/bin/python -m unittest discover -s tests -v",
+    "passed": true,
+    "count": 724,
+    "duration_s": 92.625,
+    "skipped": 0,
+    "log_sha256": "66c58ad8f0e7424a8f1d3293f8ca56bcf8dc11dc2e9fa762e148e45f0319f1ea"
+  },
+  "phase_unit_counts": {
+    "baseline": 675,
+    "phase1": 689,
+    "phase2": 687,
+    "phase3": 691,
+    "phase4": 695,
+    "phase5": 714,
+    "phase6": 724
+  },
+  "safety": {
+    "vehicle_packages_unchanged_since_audit": true,
+    "real_hardware_opened": false,
+    "production_vehicle_authority_added": false,
+    "default_send_changed": false
+  },
+  "physical_regressions": {
+    "rover": {
+      "evidence": {
+        "path": "artifacts/phase4-mission/tool-console-phase3-rover-result.json",
+        "sha256": "4e50cc13a629567dfb582f376b0f1c573281b997ae55094cd52d14ec52ac1064"
+      },
+      "passed": true,
+      "cleanup": {
+        "remaining_process_groups": [],
+        "cleanup_errors": [],
+        "credentials_removed": true
+      },
+      "default_action_send": "REJECTED",
+      "qgc_inbound_request_forwarded": false,
+      "physical": {
+        "managed_inputs": [
+          {
+            "name": "forward",
+            "measured": 0.3567105851023293,
+            "state": "CANCELLED",
+            "stop_speed_mps": 0.001714198416589487,
+            "stop_yaw_rate_rad_s": 2.8447486649427313e-09
+          },
+          {
+            "name": "turn",
+            "measured": 0.3032646789265436,
+            "state": "CANCELLED",
+            "stop_speed_mps": 3.068215163004418e-06,
+            "stop_yaw_rate_rad_s": 1.2168228729309767e-05
+          }
+        ],
+        "goto_error_m": 0.2719748472080403,
+        "home_error_m": 0.2223022406824376,
+        "home_speed_mps": 7.927390834703431e-06,
+        "javascript_errors": []
+      },
+      "home_error_m": 0.2223022406824376
+    },
+    "copter": {
+      "evidence": {
+        "path": "artifacts/phase4-mission/tool-console-phase4-copter-result.json",
+        "sha256": "cb8dc9b35ab8f9937e2dccc4a6aa1dc1a08801590473f521b6ab9bf949df2967"
+      },
+      "passed": true,
+      "cleanup": {
+        "remaining_process_groups": [],
+        "cleanup_errors": [],
+        "credentials_removed": true
+      },
+      "default_action_send": "REJECTED",
+      "qgc_inbound_request_forwarded": false,
+      "action_results": [
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Arm",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Disarm",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Arm",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Takeoff",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "SetVelocity",
+          "state": "CANCELLED"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "SetVelocity",
+          "state": "CANCELLED"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Goto",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "ReturnHome",
+          "state": "SUCCEEDED"
+        }
+      ],
+      "managed": [
+        {
+          "parameters": {
+            "vx_mps": 0.3,
+            "vy_mps": 0,
+            "vz_mps": 0,
+            "yaw_rate_rad_s": 0,
+            "frame": "base_link"
+          },
+          "measured": 0.5002791683999126,
+          "stop_speed_mps": 0.023069123847086533,
+          "stop_yaw_rate_rad_s": 6.994784037169428e-05,
+          "state": "CANCELLED"
+        },
+        {
+          "parameters": {
+            "vx_mps": 0,
+            "vy_mps": 0,
+            "vz_mps": 0,
+            "yaw_rate_rad_s": 0.25,
+            "frame": "base_link"
+          },
+          "measured": 0.4106134085563413,
+          "stop_speed_mps": 0.009847790143874617,
+          "stop_yaw_rate_rad_s": -0.0009337304055792856,
+          "state": "CANCELLED"
+        }
+      ],
+      "checks": [],
+      "home_error_m": 0.004947390947884682
+    },
+    "plane": {
+      "evidence": {
+        "path": "artifacts/phase4-mission/tool-console-phase5-plane-result.json",
+        "sha256": "45d41f10de73ae17d5874e3044831675044abc53369cc65bf09771f75af4bdc8"
+      },
+      "passed": true,
+      "cleanup": {
+        "remaining_process_groups": [],
+        "cleanup_errors": [],
+        "credentials_removed": true
+      },
+      "default_action_send": "REJECTED",
+      "qgc_inbound_request_forwarded": false,
+      "action_results": [
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Arm",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Disarm",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Arm",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Takeoff",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "SetGuidedTarget",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Loiter",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "RTL",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "AutoLand",
+          "state": "SUCCEEDED"
+        }
+      ],
+      "managed": [],
+      "checks": [
+        "native RTL physically approached home; mode adoption alone is not arrival"
+      ]
+    }
+  },
+  "tool_browser": {
+    "evidence": {
+      "path": "artifacts/phase4-mission/tool-console-final-tools-browser/summary.json",
+      "sha256": "b79ae653c0545c7b66399b8954fcfcdb02200029ddd06033d68cfb3fbda6c98d"
+    },
+    "passed": true,
+    "source": "actual Chrome/HTTP/Agent/process integration; tool is a test executable, not native robotics software",
+    "javascript_errors": [],
+    "launch_stop_restart": true,
+    "disconnect_unknown": true,
+    "vehicle_actions": 0
+  },
+  "workspace_browser": {
+    "evidence": {
+      "path": "artifacts/phase4-mission/tool-console-final-workspace-browser/summary.json",
+      "sha256": "4b405674c38fda51b7b1f9df275253308aebc62efaf73c7115de17b08e815502"
+    },
+    "passed": true,
+    "source": "real Chromium/HTTP/Agent; two actual process fixtures, not native robotics integration",
+    "javascript_errors": [],
+    "actual_processes": 2,
+    "dependency_order": true,
+    "stop_cleanup": true,
+    "web_disconnect_unknown_and_reconnect": true
+  },
+  "deployment": {
+    "evidence": {
+      "path": "artifacts/phase4-mission/tool-console-final-deployment/summary.json",
+      "sha256": "aad757efc43fab25543753f8761893e1123928d7eed92a0edd65182c75cecc8c"
+    },
+    "passed": true,
+    "source": "independent CLI processes; real HTTP and owned process fixture",
+    "backend_restart_preserved_tool": true,
+    "workspace_reconciled": true,
+    "manual_baseline_preserved": true,
+    "supervisor_sigkill_cleanup": true,
+    "crash_cleanup": true,
+    "new_boot_reconnected": true,
+    "no_auto_restart": true,
+    "vehicle_actions": 0
+  },
+  "wheel": {
+    "evidence": {
+      "path": "artifacts/phase4-mission/tool-console-final-verified-wheel/summary.json",
+      "sha256": "260896993c2d9e6fef91a16b19273e8025093279eb4c2b25cbfb5ac1bd2c3b06"
+    },
+    "passed": true,
+    "source": "fresh independent wheel venv; actual backend/Agent/Workspace/process; cwd=/tmp",
+    "import": {
+      "origin": "/home/level6/vehicle-autonomy-framework/artifacts/phase4-mission/tool-console-final-verified-wheel/env/lib/python3.12/site-packages/vehicle_autonomy/__init__.py",
+      "resources": "/home/level6/vehicle-autonomy-framework/artifacts/phase4-mission/tool-console-final-verified-wheel/env/share/vehicle-autonomy",
+      "ros_imported": false
+    },
+    "wheel_sha256": "16573016df9ab171626cc1349d57f5f473e1c69fda0bf803bc1a041f8cbfdc8f",
+    "cli_help": true,
+    "static_resources": true,
+    "workspace_lifecycle": true,
+    "vehicle_connections": 0
+  },
+  "coupled_rover": {
+    "evidence": {
+      "path": "artifacts/phase4-mission/tool-console-final-coupled/summary.json",
+      "sha256": "4dce69e89828d12af906ce4753c9b3fdfaad1e0e046d326dc051e5e948da608e"
+    },
+    "passed": true,
+    "source": "actual coupled Gazebo ArduPilot plugin + JSON Rover SITL; no control writes",
+    "cleaned": true,
+    "vehicle_writes": 0,
+    "received_types": [
+      "AHRS",
+      "AHRS2",
+      "ATTITUDE",
+      "BATTERY_STATUS",
+      "EKF_STATUS_REPORT",
+      "GLOBAL_POSITION_INT",
+      "GPS_GLOBAL_ORIGIN",
+      "GPS_RAW_INT",
+      "HEARTBEAT",
+      "HOME_POSITION",
+      "LOCAL_POSITION_NED",
+      "MEMINFO",
+      "MISSION_CURRENT",
+      "POWER_STATUS",
+      "RAW_IMU",
+      "RC_CHANNELS",
+      "SCALED_IMU2",
+      "SCALED_IMU3",
+      "SCALED_PRESSURE",
+      "SCALED_PRESSURE2",
+      "SERVO_OUTPUT_RAW",
+      "SIMSTATE",
+      "STATUSTEXT",
+      "SYSTEM_TIME",
+      "SYS_STATUS",
+      "VFR_HUD",
+      "VIBRATION"
+    ]
+  },
+  "qgc_window": {
+    "evidence": {
+      "path": "artifacts/phase4-mission/tool-console-phase6-qgc-visible/summary.json",
+      "sha256": "2dfd2540f52d7f913a3dfd10bb03232b949d84deed558c5b5fa41d94560e37b6"
+    },
+    "passed": true,
+    "source": "actual QGC AppImage window + actual owned read-only Rover SITL relay; no hardware",
+    "window": {
+      "id": "0x4000027",
+      "title": "0x4000027 \"QGroundControl\": (\"QGroundControl\" \"QGroundControl\")  1393x836+14+49  +263+122",
+      "pid": 462304,
+      "width": 1393,
+      "height": 836,
+      "mapped": true
+    },
+    "qgc_cleanup": true,
+    "connection": "GUI launched; internal telemetry UI not asserted as functionally ready",
+    "vehicle_commands": 0
+  },
+  "original_ui": {
+    "evidence": {
+      "path": "artifacts/phase4-mission/tool-console-final-original-ui-fixed/summary.json",
+      "sha256": "564d7abadba25865185a6f5ada09b65dca7178804e08b62237a4eadda4216bc3"
+    },
+    "passed": true,
+    "source": "real Chrome / isolated HTTP / no vehicle transport",
+    "javascript_errors": [],
+    "writer_calls": 0,
+    "send_defaults_false": true,
+    "plane_continuation_serialization": true
+  },
+  "native_ros": {
+    "evidence": {
+      "path": "artifacts/phase4-mission/tool-console-phase6-ros-isolated/summary.json",
+      "sha256": "189b948221960d49414215e86ffd740a1ad713b16cb652b37acb8ad3c1f1c491"
+    },
+    "passed": true,
+    "source": "actual native ROS/Nav2/RViz executables with synthetic map/TF/scan/odom; no real sensors or vehicle",
+    "cleanup_confirmed": true,
+    "navigation_goals": 0,
+    "vehicle_writes": 0,
+    "components": [
+      {
+        "id": "data-fixture",
+        "state": "RUNNING",
+        "observed_ready": false,
+        "threshold": "running"
+      },
+      {
+        "id": "ros2",
+        "state": "READY",
+        "observed_ready": true,
+        "threshold": "ready"
+      },
+      {
+        "id": "nav2",
+        "state": "READY",
+        "observed_ready": true,
+        "threshold": "ready"
+      },
+      {
+        "id": "rviz2",
+        "state": "READY",
+        "observed_ready": true,
+        "threshold": "ready"
+      }
+    ]
+  },
+  "unified_vehicle_tools": {
+    "evidence": {
+      "path": "artifacts/phase4-mission/tool-console-final-unified/summary.json",
+      "sha256": "313b0de7580bdcc6ca2d4fb169bcb9166909b819758e4e7372e6aa266241620a"
+    },
+    "passed": true,
+    "source": "actual signed Rover SITL/Gazebo Web + independent Agent + real process fixture; no hardware",
+    "mission_state": "SUCCEEDED",
+    "tool_crash_cleanup": true,
+    "vehicle_actions": 0,
+    "send_gates": false,
+    "persistent_tool_state": true,
+    "final_vehicle": {
+      "id": "rover",
+      "type": "rover",
+      "fresh": true,
+      "environment": "simulation",
+      "armed": false,
+      "authority": {
+        "system_send": false,
+        "action_send": false,
+        "deployment_send": false,
+        "lease_active": false,
+        "scope": null,
+        "session_id": "b34c4d46e2a14b2b909ec0d12318f9da"
+      }
+    }
+  },
+  "not_verified": [
+    "Ubuntu 22.04 / Python 3.10 runtime on another host",
+    "two physical hosts and actual SSH forwarding",
+    "real sensors / real hardware navigation or movement",
+    "automatic coupled Copter/Plane Tool profiles (existing simulation launchers separately passed)",
+    "QGC internal telemetry UI readiness or remote existing-window focus",
+    "systemd production unit execution"
+  ]
+}

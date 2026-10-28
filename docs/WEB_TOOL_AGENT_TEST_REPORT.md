@@ -2,6 +2,11 @@
 
 Date: 2026-10-28. Initial HEAD: `a49b8b9`. No real hardware is opened or commanded.
 
+Final tested implementation: **`17a4940f4f4a80494f152c9ce7dc2be1703eeb37`**.
+Current-host development acceptance passes; unverified deployment/hardware scopes
+are listed below. Machine-readable results, raw evidence paths/hashes and the
+production-tree digest are in [evidence.json](web-tool-agent/evidence.json).
+
 ## Baseline / Phase 0
 
 * Isolated installation: `python3 -m venv --system-site-packages .venv` then
@@ -48,8 +53,8 @@ Date: 2026-10-28. Initial HEAD: `a49b8b9`. No real hardware is opened or command
   **Nav2 READY not passed**; clean group shutdown observed. No navigation goal
   or vehicle command is sent by these checks.
 
-Later phase results, final native evidence, deployment verification and remaining
-limitations are recorded below as work completes.
+Later phases below supersede the early missing-data/readiness observations only
+for the explicitly stated native software and input fixtures.
 
 ## Phase 3
 
@@ -119,3 +124,167 @@ limitations are recorded below as work completes.
   SITL/Gazebo PASS, including Arm/Disarm, physical TAKEOFF, Guided turn, LOITER,
   RTL approach and actual AUTOLAND/disarm. No zero-speed Plane stop; clean groups/
   credential cleanup. Command requires `VAF_PYTHON=$PWD/.venv/bin/python` as above.
+
+## Phase 6 — final acceptance
+
+Environment actually used: Ubuntu 24.04.1 LTS, Python 3.12.3, Chrome
+152.0.7977.64, Gazebo Sim 8.15.0. Complete isolated ROS prefix: RViz2 14.1.24,
+Nav2 Controller 1.3.13, ros2cli 0.32.13. The framework server imports no ROS.
+
+| Verification | Actual result / evidence directory under `artifacts/phase4-mission/` |
+| --- | --- |
+| Final full unittest suite | **724 PASS**, **0 skipped**, 92.625 s; `/tmp/vaf-agent-final-verified-unit.log` |
+| Tool Manager browser -> backend -> Agent -> OS process | PASS; `tool-console-final-tools-browser`; launch/stop/restart, logs, saved Profile, versioned connection metadata, disconnect unknown; 0 JS errors |
+| Workspace editor/dependencies/reconnect | PASS; `tool-console-final-workspace-browser`; 2 real fixture processes, save/edit without side effects, reverse cleanup, browser disconnect clears readiness while services stay live |
+| Original Mission/Control presentation and HTTP serialization | PASS; `tool-console-final-original-ui-fixed`; original Wait Mission, continuation wire identity, SEND defaults and 4 responsive widths preserved; 0 writer calls |
+| Separate backend/Agent processes, crash and backend restart | PASS; `tool-console-final-deployment`; live process survives backend restart, ownership UNKNOWN until pinned reconciliation, manual baseline survives Workspace stop, supervisor SIGKILL and Agent SIGKILL clean children, new boot does not auto-relaunch |
+| Coupled Gazebo/JSON Rover Workspace | PASS; `tool-console-final-coupled`; both actually READY, passive unarmed Rover telemetry received, 0 writes, confirmed cleanup |
+| Real native Nav2/ROS/RViz functional readiness | PASS **with synthetic input data**; `tool-console-phase6-ros-isolated`; six Nav2 lifecycle nodes active and NavigateToPose endpoint discovered, RViz receives live TF, 0 navigation goals / vehicle writes, confirmed cleanup |
+| QGC real visible main window | PASS; `tool-console-phase6-qgc-visible`; mapped **1393×836** window PID belongs to the owned group; fresh XDG settings, dedicated one-way SITL relay; no hardware or Framework motion commands |
+| Unified real vehicle + tools + Workspace + running Mission | PASS; `tool-console-final-unified`; signed Rover state and tool readiness share the same Web center; Agent SIGKILL cleans fixture, Wait Mission succeeds, vehicle stays connected/unarmed and deployment/system/Action SEND remain false |
+| Fresh wheel deployment from `/tmp` | PASS; `tool-console-final-verified-wheel`; separate clean venv, imports from installed wheel, 3 CLI entries, static/config resources, real backend/Agent/Workspace lifecycle; no source-path import, ROS import or vehicle connection |
+
+Final wheel SHA256:
+`16573016df9ab171626cc1349d57f5f473e1c69fda0bf803bc1a041f8cbfdc8f`.
+Production tree SHA256 (definition in evidence JSON):
+`b4722a880164950cb628ad7c9cd7b8c8be0b8c17e0eb0d62148d356ad1a0cff8`.
+
+### Implemented behavior and interfaces
+
+* `/console` provides three-type Dashboard, existing Vehicle Control link,
+  Tool Manager, Workspace editor/presets, logs/diagnostics and Settings.
+  Fields unavailable/stale/foreign-clock/disconnected become unknown. Airspeed
+  stays unknown because the current projection has no qualified source.
+* `app/tools` owns outbound registration/heartbeat, distinct credentials,
+  boot/sequence/TTL fences, validated redacted snapshots, idempotent commands,
+  trusted manifests, process discovery/ownership and bounded output/resources.
+  Supervisor pipe loss plus Linux pidfd/ownership-marker fallback handles crashes.
+* `tools.operation`, `tools.configure`, `tools.integration`, `settings.context`
+  and `workspace.*` use the existing HTTP authentication/CSRF/Host/Origin/request-ID
+  framework. The integration contract is `vaf.tools.integration/1`, explicitly
+  `vehicle_authority=false`. No browser argv/Shell/path upload or extra writer.
+* Workspace definitions/results/reference ownership persist atomically, required
+  dependencies preflight before launch, compatible in-flight starts deduplicate,
+  shared/manual services survive other Workspace stops, optional errors degrade,
+  stop/cancellation and restart reconciliation preserve unknown outcomes.
+* Optional Tool flags now pass through all three existing simulation launchers;
+  `--tool-data-dir` persists tool state separately from fresh Mission journals.
+  The existing Action/Engine/Vehicle/World/Autonomy/Contracts packages are unchanged
+  from the audit baseline. No new Mission Studio, hardware connection or motion
+  authority was introduced.
+
+### Final command inventory
+
+All commands below were actually run using `.venv/bin/python -m`; each output
+directory was new. Full invocations and generated registries are retained in the
+raw evidence. Repeating requires a different `--run-dir`.
+
+```text
+unittest discover -s tests -v
+tests.tool_agent.tools_browser --run-dir artifacts/phase4-mission/tool-console-final-tools-browser
+tests.tool_agent.workspaces_browser --run-dir artifacts/phase4-mission/tool-console-final-workspace-browser
+tests.simulation.mission_ui_smoke --run-dir artifacts/phase4-mission/tool-console-final-original-ui-fixed
+tests.tool_agent.deployment_smoke --run-dir artifacts/phase4-mission/tool-console-final-deployment
+tests.tool_agent.coupled_workspace --registry runtime/tool-agent-dev/registry-coupled-final.json --run-dir artifacts/phase4-mission/tool-console-final-coupled
+tests.tool_agent.ros_ready --registry runtime/tool-agent-dev/registry-native-final.json --run-dir artifacts/phase4-mission/tool-console-phase6-ros-isolated
+tests.tool_agent.qgc_window --qgc /home/level6/桌面/QGroundControl-x86_64.AppImage --run-dir artifacts/phase4-mission/tool-console-phase6-qgc-visible
+tests.tool_agent.vehicle_tools --run-dir artifacts/phase4-mission/tool-console-final-unified
+tests.tool_agent.wheel_smoke --run-dir artifacts/phase4-mission/tool-console-final-verified-wheel
+```
+
+Physical Rover/Copter/Plane commands and results are recorded in Phases 3–5.
+They use only fresh owned loopback simulators and the existing authorization,
+native confirmation and physical-stop/flight-continuation checks.
+
+### Failures encountered and corrected
+
+* New venv initially lacked Playwright; installed the repository's test-browser
+  extra and passed actual Chrome checks. First no-build-isolation wheel attempt
+  lacked setuptools; normal isolated PEP 517 build/install then passed.
+* Early native Nav2 prefix lacked controller/bt/etc. binaries; the manifest
+  correctly rejected it. Selected the already installed complete isolated prefix.
+  Missing TF/map then correctly prevented readiness; later native tests supplied
+  clearly marked synthetic data and verified true lifecycle readiness.
+* Parallel independent process tests initially used identical command fixtures;
+  the external-process guard correctly rejected a second owner. Isolated fixture
+  identities instead of relaxing ownership. Readiness assertions now wait for the
+  backend heartbeat, not only untransmitted local state.
+* The first QGC window check saw Qt's 10×10 bootstrap window. Strengthened it to
+  require a mapped main window at least 300×200 and a verified owned PID; rerun
+  passed with 1393×836. Bootstrap observation is not used as main-window evidence.
+* An original UI fixture intentionally had stale/no Plane world data but expected
+  a normal LOITER hint. The test now additionally checks that stale mode/hint is
+  unknown; the original continuation/SEND serialization assertions remain intact.
+* Final hardening covers redirection credential leakage, malformed/replayed
+  snapshots, orphaned result acknowledgements after backend restart, separate
+  credentials, private audit rotation/failure admission, supervisor SIGKILL,
+  namespaced Nav2 data inputs, and actual active-Mission isolation.
+
+### Mock scope, unverified scopes and known limitations
+
+* Unit fixtures and the editor/browser process fixtures are **not** native
+  robotics/flight evidence. Native ROS/Nav2/RViz tests run actual binaries and
+  RPCs but use **synthetic map/TF/scan/odom**, not real sensors or qualified
+  vehicle localization. They submit no navigation Goal and grant no vehicle lease.
+* Ubuntu 22.04/Python 3.10 runtime, another physical Agent host, actual SSH
+  forwarding, ARM64 and systemd deployment were not available for this run.
+  Agent code/manifest OS policy targets 22.04/24.04; the supplied Nav2 parameters
+  were verified on Jazzy. Humble needs a compatible trusted Profile and separate
+  validation. Follow deployment instructions on the target host and repeat native
+  smoke/lifecycle/reconnect checks before acceptance there.
+* Real vehicle Arm/movement, real sensor navigation, qualified flight and hardware
+  control were neither attempted nor claimed. HardwareReadOnly and rejection of
+  `hardware_controlled` remain unchanged. Telemetry VALID means data quality, not
+  arming/flight/navigation readiness.
+* QGC main-window launch and the real relay are verified; its internal telemetry
+  UI readiness is **not** asserted, so the Tool remains RUNNING/ready=false.
+  Connection queries for external programs return metadata and
+  `connection_established=false`; existing remote-window focus and arbitrary
+  third-party UI automation are unsupported. [Upstream AutoConnect settings](https://raw.githubusercontent.com/mavlink/qgroundcontrol/master/src/Settings/AutoConnect.SettingsGroup.json)
+  and its [settings-group compatibility logic](https://raw.githubusercontent.com/mavlink/qgroundcontrol/master/src/Settings/AutoConnectSettings.cc)
+  informed the isolated test settings; the user's saved QGC configuration was not
+  changed. Reproduce the visible-window test with a known one-way relay to verify
+  GUI behavior on another desktop.
+* The default empty Gazebo/native SITL profiles are independent; optional
+  `rover-coupled` is actually verified. Automatic coupled Tool Profiles for
+  Copter/Plane were not added; their existing coupled simulation launchers passed
+  physical control tests and now accept Tool channel flags. Tool-launched SITL
+  alone does not qualify Framework ownership/signing. QGC, TF, maps and sensors
+  must be genuinely configured before a complete preset can be READY.
+* Trusted local profiles run as the OS user and are not a sandbox for malicious
+  executables. QGC's telemetry-only declaration must refer to a real one-way relay;
+  it is not a firewall around manually configured third-party links. Use a dedicated
+  least-privilege account and user-service control groups for deployment. Deliberate
+  process-group/ownership-marker escape is unsupported; cleanup uncertainty is
+  retained, never advertised as confirmed stop.
+* Snapshot refresh is authenticated polling (750 ms), matching the original HTTP
+  stack; there was no preexisting WebSocket to reuse. Software version fields are
+  declared Profile versions or explicitly unverified, never fabricated detections.
+  Admission/state/history/log budgets are bounded and documented. Further work can
+  add measured version adapters, broader OS/host CI, richer read-only diagnostics
+  and verified per-environment profiles without changing the vehicle writer.
+
+## Commits and operator verification
+
+| Stage | Commit |
+| --- | --- |
+| Phase 0 audit/design | `99dd30d` |
+| Phase 1 authenticated Agent/process ownership | `092adfc` |
+| Phase 2 standard registry/adapters | `5891f1a` |
+| Phase 3 Dashboard/control compatibility | `eeaa3bc` |
+| Phase 4 real Tool Manager channel/UI | `93a9bc1` |
+| Phase 5 persistent shared Workspaces/coupled Rover | `d4e762c` |
+| Phase 6 final integrated qualification/hardening | `17a4940` |
+
+The final report/evidence follow-up is documentation only. All changes are local
+commits; no history rewrite or force push. Raw runtime state, credentials, wheel
+venvs and large evidence remain ignored; the compact credential-free evidence
+index is tracked. All test-owned backend/Agent/supervisor processes exited.
+
+To verify personally: follow the concrete private setup in
+[deployment](WEB_TOOL_AGENT_DEPLOYMENT.md), start the backend or the existing
+read-only Rover launcher with `--tool-agents`/`--tool-data-dir`, start the matching
+Agent in another terminal, open `/console` with the private browser token, and
+inspect actual Dashboard/Tool/Workspace states. Stop/retry/reconcile only the
+identified owned instances. The tool manifest and Workspace documents specify
+which missing dependencies/readiness conditions must remain visible.
