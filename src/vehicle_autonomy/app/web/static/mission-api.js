@@ -19,21 +19,7 @@ window.VAF = {
   connection(label, state) {
     const el=document.querySelector('#connection-state');if(el){el.textContent=label;el.dataset.state=state;}
   },
-  async call(path, payload) {
-    const token = document.querySelector('#token').value.trim();
-    if(!token)throw Error('请先输入本地访问令牌。');
-    const headers = {'Authorization': 'Bearer ' + token};
-    const options = {headers};
-    if (payload !== undefined) {
-      Object.assign(headers, {'Content-Type':'application/json', 'X-VAF-CSRF':token, 'X-VAF-Request-ID':crypto.randomUUID()});
-      Object.assign(options, {method:'POST', body:JSON.stringify(payload)});
-    }
-    const response = await fetch(path, options);
-    const data = await response.json();
-    if(response.status===401)this.connection('认证失败，请检查令牌','error');
-    if (!response.ok || !data.ok) throw Error(data.error || 'Request failed');
-    return data.result;
-  },
+  async call(path, payload) { return window.VAFAuth.api(path,payload); },
   node(tag, text, attrs={}) {
     const e = document.createElement(tag); if (text !== undefined) e.textContent = text;
     for (const [k,v] of Object.entries(attrs)) e.setAttribute(k,v); return e;

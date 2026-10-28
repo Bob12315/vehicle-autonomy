@@ -6,6 +6,7 @@ Blocking stop/recovery waits affect only this vehicle's owner thread.
 from concurrent.futures import Future
 from dataclasses import replace
 from queue import Empty,Queue
+from copy import deepcopy
 from threading import Event,RLock,Thread
 import time
 
@@ -44,7 +45,7 @@ class VehicleActionDriver:
         if self._native_input_fence is not None:self._native_input_fence.bind_authority(self._runtime.authority)
         self.clock=self._runtime.clock
         self._queue=Queue(maxsize=128);self._lock=RLock();self._stop=Event();self._ready=Event()
-        self._world=None;self._scope=None;self._effects={};self._results={};self._effect_sessions={};self._requested_scopes=set();self._cancelled=set();self._guards={};self._home=None
+        self._world=None;self._scope=None;self._effects={};self._results={};self._command_feedback={};self._effect_sessions={};self._requested_scopes=set();self._cancelled=set();self._guards={};self._home=None
         self._info={};self._fault=None;self._recovery=None
         self._thread=Thread(target=self._run,name='action-owner-'+target,daemon=True);self._thread.start()
         if not self._ready.wait(5):raise TimeoutError('vehicle owner startup timed out')
@@ -70,6 +71,13 @@ class VehicleActionDriver:
                     and self._runtime.authority.lease.expires_at.elapsed_ns_since(self.clock())>0),
                 scope=self._scope,fault=self._fault,capabilities=sorted(self.context().capabilities))
             for identifier,items in self._effects.items():
+                retained={str(env.effect_id) for env in items[-16:]}
+                cached={key:value for key,value in self._command_feedback.get(identifier,{}).items() if key in retained}
+                self._command_feedback[identifier]=cached
+                for env in items[-16:]:
+                    value=self._runtime.effect_status(str(env.effect_id))
+                    if value is not None:
+                        cached[str(env.effect_id)]=dict(effect_type=type(env.effect).__name__,**deepcopy(value))
                 self._results[identifier]=tuple(EffectResult(str(env.effect_id),identifier,
                     EffectPhase((status or {}).get('phase','REQUESTED')),(status or {}).get('command_id'),
                     self._effect_sessions.get(str(env.effect_id)),(status or {}).get('reason')) for env in items
@@ -136,6 +144,9 @@ class VehicleActionDriver:
         with self._lock:return dict(self._info)
     def effect_results(self,identifier):
         with self._lock:return self._results.get(identifier,())
+    def command_feedback(self,identifier):
+        """Published evidence only: no port/transport access from HTTP threads."""
+        with self._lock:return deepcopy(list(self._command_feedback.get(identifier,{}).values())[-8:])
 
     def open_scope(self,identifier,*,allow_send,continuation_of,deadline):
         with self._lock:self._requested_scopes.add(identifier)

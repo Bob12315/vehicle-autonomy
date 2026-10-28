@@ -1,4 +1,5 @@
 """Real Chromium against the real HTTP console; fixture vehicle status only."""
+from tests.browser_auth import login
 from contextlib import ExitStack
 import argparse
 import json
@@ -30,8 +31,7 @@ def run(directory):
         playwright=stack.enter_context(sync_playwright())
         browser=playwright.chromium.launch(executable_path='/usr/bin/google-chrome',headless=True,args=['--no-sandbox','--disable-dev-shm-usage']);stack.callback(browser.close)
         page=browser.new_page(viewport={'width':1440,'height':1000});page.on('pageerror',lambda error:errors.append(str(error)))
-        page.goto(f'http://127.0.0.1:{server.server_address[1]}/console')
-        page.locator('#token').fill(token);page.locator('#connection button[type=submit]').click()
+        login(page,f'http://127.0.0.1:{server.server_address[1]}',token,'/console')
         expect(page.locator('#link-state')).to_have_text('控制中心已连接')
         for kind in ('rover','copter','plane'):
             page.locator(f'[data-kind="{kind}"]').click();expect(page.locator('#vehicle-label')).to_contain_text(kind)
@@ -48,7 +48,7 @@ def run(directory):
             assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'),width
             report['widths'].append(width)
         page.screenshot(path=str(directory/'dashboard-mobile.png'),full_page=True)
-        page.locator('#disconnect').click();expect(page.locator('#dashboard-data')).to_be_hidden()
+        page.context.set_offline(True);expect(page.locator('#dashboard-data')).to_be_hidden();page.context.set_offline(False)
         report.update(passed=not errors,javascript_errors=errors,writer_calls=sum(len(d.writes) for d in drivers.values()),three_types=True,unknown_values_preserved=True)
         assert report['writer_calls']==0 and not errors
     (directory/'summary.json').write_text(json.dumps(report,indent=2))

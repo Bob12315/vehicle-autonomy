@@ -1,0 +1,521 @@
+{
+  "date": "2026-10-28",
+  "unit_tests": {
+    "command": ".venv/bin/python -m unittest discover -s tests -v",
+    "passed": true,
+    "count": 747,
+    "elapsed_s": 99.125,
+    "log": "/tmp/vaf-control-commit-unit.log"
+  },
+  "packaging": {
+    "pip_check": true,
+    "isolated_wheel": true,
+    "final_auth_control_assets_equal_source": 10
+  },
+  "native": {
+    "rover": {
+      "source": "actual Chromium UI + signed ArduPilot SITL + independent Gazebo truth",
+      "passed": true,
+      "elapsed_s": 98.7931302979996,
+      "actions": [
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Arm",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Disarm",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Arm",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Stop",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Drive",
+          "state": "CANCELLED"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Drive",
+          "state": "CANCELLED"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Drive",
+          "state": "CANCELLED"
+        },
+        {
+          "name": "Stop",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Goto",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "ReturnHome",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Disarm",
+          "state": "SUCCEEDED"
+        }
+      ],
+      "managed": [
+        {
+          "key": "w",
+          "parameters": {
+            "speed_mps": 0.3,
+            "yaw_rate_rad_s": 0
+          },
+          "measured": 0.5144168953732039,
+          "stop_speed_mps": 0.0021767645072836884,
+          "stop_yaw_rate_rad_s": 5.649863634507097e-09,
+          "state": "CANCELLED"
+        },
+        {
+          "key": "s",
+          "parameters": {
+            "speed_mps": -0.3,
+            "yaw_rate_rad_s": 0
+          },
+          "measured": 0.40301531633145043,
+          "stop_speed_mps": 0.0009294204577870383,
+          "stop_yaw_rate_rad_s": 4.527479655112491e-09,
+          "state": "CANCELLED"
+        },
+        {
+          "key": "a",
+          "parameters": {
+            "speed_mps": 0,
+            "yaw_rate_rad_s": 0.25
+          },
+          "measured": 0.41438533103490693,
+          "stop_speed_mps": 4.139219523903556e-06,
+          "stop_yaw_rate_rad_s": 1.642009260848036e-05,
+          "state": "CANCELLED"
+        }
+      ],
+      "browser_faults": [],
+      "home_error_m": 0.3291790469681548,
+      "checks": [],
+      "cleanup": {
+        "remaining_process_groups": [],
+        "cleanup_errors": [],
+        "credentials_removed": true
+      },
+      "evidence": "artifacts/phase4-mission/control-refactor-rover-final-20261028/web-control-result.json",
+      "sha256": "dda091baf2fe92557704a4bddcbe36b077bf5de1b2a39e9117eb5f3f48f89f3d",
+      "screenshot": "artifacts/phase4-mission/control-refactor-rover-final-20261028/basic-controls.png"
+    },
+    "copter": {
+      "source": "actual Chromium UI + signed ArduPilot SITL + independent Gazebo truth",
+      "passed": true,
+      "elapsed_s": 136.6785385629919,
+      "actions": [
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Arm",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Disarm",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Arm",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Takeoff",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "SetVelocity",
+          "state": "CANCELLED"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "SetVelocity",
+          "state": "CANCELLED"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "SetVelocity",
+          "state": "TIMED_OUT"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "SetVelocity",
+          "state": "CANCELLED"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "SetVelocity",
+          "state": "TIMED_OUT"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Goto",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Land",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Arm",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Takeoff",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Goto",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "ReturnHome",
+          "state": "SUCCEEDED"
+        }
+      ],
+      "managed": [
+        {
+          "key": "w",
+          "parameters": {
+            "vx_mps": 0.3,
+            "vy_mps": 0,
+            "vz_mps": 0,
+            "yaw_rate_rad_s": 0,
+            "frame": "base_link"
+          },
+          "measured": 0.5080502757824503,
+          "stop_speed_mps": 0.02691614206675399,
+          "stop_yaw_rate_rad_s": -1.9390697906610892e-05,
+          "state": "CANCELLED"
+        },
+        {
+          "key": "r",
+          "parameters": {
+            "vx_mps": 0,
+            "vy_mps": 0,
+            "vz_mps": 0,
+            "yaw_rate_rad_s": 0.25,
+            "frame": "base_link"
+          },
+          "measured": 0.4144221851411072,
+          "stop_speed_mps": 0.001992506538411111,
+          "stop_yaw_rate_rad_s": -0.0008692984677035674,
+          "state": "CANCELLED"
+        }
+      ],
+      "browser_faults": [
+        {
+          "mode": "watchdog",
+          "state": "TIMED_OUT",
+          "stop_speed_mps": 0.01468055970384896
+        },
+        {
+          "mode": "blur",
+          "state": "CANCELLED",
+          "stop_speed_mps": 0.014387748426399328
+        },
+        {
+          "mode": "offline",
+          "state": "TIMED_OUT",
+          "stop_speed_mps": 0.005396552225138096
+        }
+      ],
+      "home_error_m": 0.1526044222501969,
+      "checks": [],
+      "cleanup": {
+        "remaining_process_groups": [],
+        "cleanup_errors": [],
+        "credentials_removed": true
+      },
+      "evidence": "artifacts/phase4-mission/control-refactor-copter-final-20261028/web-control-result.json",
+      "sha256": "d20d3005e88235d00c7af3206114aaa78c6b7aded9c57dcfb5e6c730c73cefc9",
+      "screenshot": "artifacts/phase4-mission/control-refactor-copter-final-20261028/browser-controls.png"
+    },
+    "plane": {
+      "source": "actual Chromium UI + signed ArduPilot SITL + independent Gazebo truth",
+      "passed": true,
+      "elapsed_s": 162.92007743101567,
+      "actions": [
+        {
+          "name": "SetMode",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Arm",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Disarm",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Arm",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Takeoff",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "SetGuidedTarget",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "Loiter",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "RTL",
+          "state": "SUCCEEDED"
+        },
+        {
+          "name": "AutoLand",
+          "state": "SUCCEEDED"
+        }
+      ],
+      "managed": [],
+      "browser_faults": [],
+      "home_error_m": null,
+      "checks": [
+        "native RTL physically approached home; mode adoption alone is not arrival"
+      ],
+      "cleanup": {
+        "remaining_process_groups": [],
+        "cleanup_errors": [],
+        "credentials_removed": true
+      },
+      "evidence": "artifacts/phase4-mission/control-refactor-plane-v2-20261028/web-control-result.json",
+      "sha256": "dcc1f5f3673a91f4d46314f0c3dad10435ef2830e9abdc83d1ab37a33b3ab0ec",
+      "screenshot": "artifacts/phase4-mission/control-refactor-plane-v2-20261028/browser-controls.png"
+    }
+  },
+  "browser_reports": {
+    "artifacts/phase4-mission/control-ui-browser-delivery-20261028/summary.json": {
+      "summary": {
+        "passed": true,
+        "source": "Actual Chromium/HTTP UI with explicit fixture telemetry; not SITL evidence.",
+        "javascript_errors": [],
+        "three_types": true,
+        "observer_manual": true,
+        "confirmation_required": true,
+        "one_login_across_pages": true,
+        "refresh_restores_session": true,
+        "reconnect_stays_observer": true,
+        "logout": true,
+        "expiry": true,
+        "widths": [
+          1680,
+          1280,
+          1024,
+          768,
+          390
+        ],
+        "vehicle_writes": 0,
+        "tool_shortcut_actual_process": true
+      },
+      "sha256": "8895012e1ece2b0c74b5345a108426453eb9abe9a8069aff52d7209a677a4a64"
+    },
+    "artifacts/phase4-mission/control-mission-browser-20261028/summary.json": {
+      "summary": {
+        "passed": true,
+        "source": "real Chrome / isolated HTTP / no vehicle transport",
+        "edge_guards": [
+          "Action/Wait outgoing disabled",
+          "imported leaf children retained and blocked before validate/save/start",
+          "explicit disconnect repairs edge",
+          "cycle rejected",
+          "shared child rejected",
+          "child capacity enforced",
+          "blank required coordinates blocked before Mission submission"
+        ],
+        "javascript_errors": [],
+        "writer_calls": 0,
+        "localized_node_types": 10,
+        "responsive_widths": [
+          1680,
+          1280,
+          1024,
+          390
+        ],
+        "machine_identifiers_preserved": true,
+        "send_defaults_false": true,
+        "plane_stale_blocks_submission": true,
+        "observer_blocks_motion": true,
+        "wait_mission": "SUCCEEDED"
+      },
+      "sha256": "b6a62ead96df25d02a21eeb308e8b7c43710f4b2e97fec1133890e2f58b03ffc"
+    },
+    "artifacts/phase4-mission/control-dashboard-browser-20261028/summary.json": {
+      "summary": {
+        "passed": true,
+        "source": "real Chromium + HTTP; fixture vehicles with unknown telemetry; no vehicle connection",
+        "widths": [
+          1440,
+          1024,
+          390
+        ],
+        "javascript_errors": [],
+        "writer_calls": 0,
+        "three_types": true,
+        "unknown_values_preserved": true
+      },
+      "sha256": "375f33bf6fcade748aad528abc1eaabebd47c6e3f4e5850499ed211d241fb5c5"
+    },
+    "artifacts/phase4-mission/control-tools-browser-v2-20261028/summary.json": {
+      "summary": {
+        "passed": true,
+        "source": "actual Chrome/HTTP/Agent/process integration; tool is a test executable, not native robotics software",
+        "javascript_errors": [],
+        "launch_stop_restart": true,
+        "profile_saved": true,
+        "disconnect_unknown": true,
+        "actual_instance_count": 2,
+        "vehicle_actions": 0
+      },
+      "sha256": "b79ae653c0545c7b66399b8954fcfcdb02200029ddd06033d68cfb3fbda6c98d"
+    },
+    "artifacts/phase4-mission/control-workspaces-browser-v2-20261028/summary.json": {
+      "summary": {
+        "passed": true,
+        "source": "real Chromium/HTTP/Agent; two actual process fixtures, not native robotics integration",
+        "javascript_errors": [],
+        "actual_processes": 2,
+        "dependency_order": true,
+        "save_does_not_launch": true,
+        "edit_keeps_live_instances": true,
+        "stop_cleanup": true,
+        "template_loaded": true,
+        "web_disconnect_unknown_and_reconnect": true
+      },
+      "sha256": "4b405674c38fda51b7b1f9df275253308aebc62efaf73c7115de17b08e815502"
+    },
+    "artifacts/phase4-mission/control-refactor-rover-v2-20261028/web-control-result.json": {
+      "source": "actual native ROS2 Tool Manager launch/restart/stop + real UI Rover motion",
+      "native_tool": {
+        "name": "ROS2 graph observer",
+        "actual_native": true,
+        "launch": true,
+        "restart": true,
+        "stop": true,
+        "context": {
+          "vehicle_id": "rover",
+          "vehicle_type": "rover",
+          "environment": "simulation",
+          "ros_namespace": "/rover",
+          "ros_domain_id": 114,
+          "mavlink_profile": "monitor"
+        },
+        "first_pid": 602420,
+        "second_pid": 602597
+      },
+      "sha256": "b0fe2fde3deb11bbad17ee77aa39807486568611b5b1027a3cd0be6c14f45ff1"
+    }
+  },
+  "source_sha256": {
+    "src/vehicle_autonomy/app/web/vehicle_display.py": "7a26fbadd0bc92b6bbf84c4c0854baa68d533201c608c31b0a2b74d2003cd41a",
+    "src/vehicle_autonomy/app/web/mission_cli.py": "033726bd5f99d327dfc79fd28e83731b13057e0033b2746012d470c813f6187f",
+    "src/vehicle_autonomy/app/web/cli.py": "f7eaa327ec1f1ca2ce41d4b6a7cd9e6c911b2904b32db2415d63922a44e80da4",
+    "src/vehicle_autonomy/app/web/__init__.py": "928346925df7db341a3c55852495d9c9fe0348b417c1f46ca024160882c3c385",
+    "src/vehicle_autonomy/app/web/__main__.py": "ac9c4685ca114d1fe86f195de6d2138f6c967f657aa90d20ff6400d7d3ea4ec4",
+    "src/vehicle_autonomy/app/web/action_lab.py": "24b26b5e0361f503e4b52f19dca73592cb7acfb47b9596a6474054dacb793218",
+    "src/vehicle_autonomy/app/web/dashboard.py": "f50c44187ef6201e577e69f4fcfe9a9340a6e63285344e6a650a33196187ed68",
+    "src/vehicle_autonomy/app/web/server.py": "4c69799749e29008ea115090802a79bc02fe21cbcc640a420c8f279cb0adb708",
+    "src/vehicle_autonomy/app/web/action_cli.py": "674e44c5cf0eb039cd1ab03978de89844278eb76eac20823ca82bee671d8b497",
+    "src/vehicle_autonomy/app/web/auth.py": "33c5a8a8556c95f2b77bee06727d9e7986c71ca140c01c5bba5feb8a27616a54",
+    "src/vehicle_autonomy/app/web/live.py": "b8538f803cf8c11aa07c81eb290c25fbc1c9c21fb1f6851c02285132b4793ca1",
+    "src/vehicle_autonomy/app/web/mission_control.py": "e9c414539b0e70cc00ebe27a6362cc46c300dee20af298378c012a2f9981c959",
+    "src/vehicle_autonomy/app/web/operator_control.py": "3ceb7422525a3c8bae1153dc04028d117b548a010777bf7456e6ef54534e163d",
+    "src/vehicle_autonomy/app/web/static/tool-console.css": "05652c845b905e68726fadf14fc590d59e3fe4c1520840b2cdc9d3219e374d8d",
+    "src/vehicle_autonomy/app/web/static/action-lab.css": "e68960938af9c204dc60294f454f420d5c9c7e7c47bce548835e2716ac9a1aa4",
+    "src/vehicle_autonomy/app/web/static/index.html": "85441897287e6288e698eae830bb06385ccc8a361173b400026086820bca2ff6",
+    "src/vehicle_autonomy/app/web/static/manual-control.js": "267f0b99967ecf4552591009034c1e7d49ba43e0a170be23560737f7026494ee",
+    "src/vehicle_autonomy/app/web/static/login.js": "ebca4b4bc75622dcc1a4ffa97972b4ff254838d6d6f70c5a5879c87bf96be422",
+    "src/vehicle_autonomy/app/web/static/manual-control.html": "205ac3fa6680fc6ceee4eb06f185098d7ca188fd1af7736311176a4e1e99fb35",
+    "src/vehicle_autonomy/app/web/static/console.js": "64ce81fc9c2688bf3a24acb56e992d5669ff0e18d891f315e6c1f7dfe7c712c6",
+    "src/vehicle_autonomy/app/web/static/vehicle-control.css": "38af20dfee09414a7630e1428f2d7a527436698861871268479a021b823afa96",
+    "src/vehicle_autonomy/app/web/static/mission-api.js": "a0608c59e3baf7233d2c47fe793c182bf59124afb597f16eb08eeea5c4670d8d",
+    "src/vehicle_autonomy/app/web/static/action-lab.js": "a8ef35bb3c5bce309e419336fbe860a823c08c7e58dfa329f54bdbb1a136b8f0",
+    "src/vehicle_autonomy/app/web/static/mission-studio.js": "1da4730b50fe4b57a86ea37bfdec1948b48a1ae7ab79b7874cd65456011c6c97",
+    "src/vehicle_autonomy/app/web/static/login.css": "cef88cf6f5f22699a196b3322f1c966cea07ba11098e09498aaafdee1aad8b13",
+    "src/vehicle_autonomy/app/web/static/mission-studio.html": "f3f050e450f449e1fbe12bbfd1bc4e2f535c77aaf380b18827a7c51da8c774e1",
+    "src/vehicle_autonomy/app/web/static/auth.js": "6c66ae1527a9c8b1ba8e1fd7d6fbe0f7ae4af1d159fb308b84a40d7e1c79227a",
+    "src/vehicle_autonomy/app/web/static/login.html": "4314e2617b61c668bbeeb4ddda15e940fbc3df170551696b57311a0c930268e2",
+    "src/vehicle_autonomy/app/web/static/action-lab.html": "4b4196de95e556290c96aa282badcb93d11fb8be707d6081937118275cbd9452",
+    "src/vehicle_autonomy/app/web/static/tool-console.html": "f688919e2d6f01a0e14c7b6b5be210326f441cccceb3a763df0fb3d80e028fe2",
+    "src/vehicle_autonomy/app/web/static/console.css": "1decf9e17730f80d05062cc5a95c4994045f88fda0c67174ddf18c7835768ec4",
+    "src/vehicle_autonomy/app/web/static/mission-ui.css": "8c87c44cd235bcfe057678966f65e2057d5a3d4e2b810ff53384964730e8e83a",
+    "src/vehicle_autonomy/app/web/static/tool-console.js": "ad70086a269480c0429625ca0625f916cfffee361b6cefe2429d582d001a036f",
+    "src/vehicle_autonomy/app/bootstrap/action_driver.py": "a94c4443829f2fcde991a69dcfb5047ae5723e75788b6cd3e651e0066f358b1a"
+  }
+}

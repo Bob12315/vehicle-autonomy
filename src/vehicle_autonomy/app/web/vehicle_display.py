@@ -36,6 +36,7 @@ def vehicle_display(info,world,profile,now):
             if field.message_type not in diagnostics:continue
             try:recent=field.received_at is not None and 0<=now.elapsed_ns_since(field.received_at)<=3_000_000_000
             except ValueError:recent=False
+            diagnostics[field.message_type]['receive_fresh']=recent
             if not recent:
                 diagnostics[field.message_type]['receive_fresh']=False
                 if field.value is not None:diagnostics[field.message_type]['availability']='STALE'
@@ -49,5 +50,5 @@ def vehicle_display(info,world,profile,now):
         pose_age_s=age,heading_enu_deg=heading,
         horizontal_speed_mps=None if twist is None else math.hypot(twist.value.linear.x,twist.value.linear.y),
         vertical_speed_mps=None if twist is None else twist.value.linear.z,
-        battery=None if state is None else to_json_value(state.battery),diagnostics=diagnostics,
+        battery=diagnostics.get('SYS_STATUS',{}).get('value') if diagnostics.get('SYS_STATUS',{}).get('receive_fresh') and diagnostics.get('SYS_STATUS',{}).get('availability')!='STALE' else None,diagnostics=diagnostics,
         airspeed_mps=None,arming_readiness='飞控检查结果以动作反馈及状态消息为准')

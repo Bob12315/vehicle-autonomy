@@ -12,6 +12,11 @@ import secrets
 import re
 import stat
 import threading
+import ssl
+from http.cookies import SimpleCookie, CookieError
+from urllib.parse import urlsplit, quote
+
+from .auth import BrowserSessions
 
 
 def load_token(path):
@@ -40,6 +45,10 @@ class ConsoleServer(ThreadingHTTPServer):
         if address[0] not in ('127.0.0.1','::1'):
             raise ValueError('console must bind loopback; use an authenticated SSH tunnel')
         self.service, self.token = service, token
+        self.secure_cookies=False;self.browser_origin=None
+        self.sessions=BrowserSessions()
+        self.websocket_slots=threading.BoundedSemaphore(4)
+        self.closing=threading.Event()
         self.slots = threading.BoundedSemaphore(12)
         self.requests = {}
         self.request_lock = threading.RLock()
@@ -67,6 +76,7 @@ class ConsoleServer(ThreadingHTTPServer):
             self.slots.release()
 
     def server_close(self):
+        self.closing.set()
         super().server_close()
         self.audit.removeHandler(self.audit_handler)
         self.audit_handler.close()
@@ -82,7 +92,7 @@ class Handler(BaseHTTPRequestHandler):
     def log_message(self,*args):
         pass  # Do not place user input, tokens or arbitrary URL paths into logs.
 
-    def reply(self, code, body, content_type='application/json'):
+    def reply(self, code, body, content_type='application/json', headers=None):
         raw = json.dumps(body, allow_nan=False).encode() if content_type == 'application/json' else body
         self.send_response(code)
         self.send_header('Content-Type',content_type)
@@ -92,32 +102,115 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header('X-Frame-Options','DENY')
         self.send_header('Referrer-Policy','no-referrer')
         self.send_header('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'")
+        for key,value in (headers or {}).items():self.send_header(key,value)
         self.end_headers()
         self.wfile.write(raw)
 
-    def authorized(self, mutation=False):
+    def trusted_origin(self, *, required=False):
         port = self.server.server_address[1]
         host = self.headers.get('Host','')
         allowed_hosts = (f'127.0.0.1:{port}',f'localhost:{port}')
         origin = self.headers.get('Origin')
-        if host not in allowed_hosts or (origin is not None and origin not in tuple('http://'+h for h in allowed_hosts)):
+        scheme='https' if self.server.secure_cookies or isinstance(self.connection,ssl.SSLSocket) else 'http'
+        expected=self.server.browser_origin or scheme+'://'+host
+        if host not in allowed_hosts or (required and origin is None) or (origin is not None and origin!=expected):
             self.reply(403,{'ok':False,'error':'untrusted Host/Origin'})
-            return False
-        supplied = self.headers.get('Authorization','')
-        if not hmac.compare_digest(supplied.encode(),('Bearer '+self.server.token).encode()):
-            self.reply(401,{'ok':False,'error':'authentication required'})
-            return False
-        if mutation and not hmac.compare_digest(self.headers.get('X-VAF-CSRF','').encode(),self.server.token.encode()):
-            self.reply(403,{'ok':False,'error':'custom CSRF header required'})
             return False
         return True
 
+    @property
+    def cookie_name(self):return 'vaf_session_'+str(self.server.server_address[1])
+
+    def cookie(self):
+        try:
+            cookie=SimpleCookie();cookie.load(self.headers.get('Cookie',''))
+            return cookie[self.cookie_name].value if self.cookie_name in cookie else ''
+        except CookieError:return ''
+
+    def cookie_header(self, opaque='', *, clear=False):
+        value=f'{self.cookie_name}={opaque}; Path=/; HttpOnly; SameSite=Strict; Max-Age={0 if clear else self.server.sessions.lifetime_s}'
+        if self.server.secure_cookies or isinstance(self.connection,ssl.SSLSocket):value+='; Secure'
+        return value
+
+    def authorized(self, mutation=False):
+        if not self.trusted_origin():return False
+        self.browser_session=None;self.principal='api';self.control_token=self.headers.get('X-VAF-Control','')
+        supplied = self.headers.get('Authorization','')
+        if supplied:
+            if not self.server.token or not hmac.compare_digest(supplied.encode(),('Bearer '+self.server.token).encode()):
+                self.reply(401,{'ok':False,'error':'authentication required'});return False
+            csrf=self.server.token
+        else:
+            self.browser_session=self.server.sessions.lookup(self.cookie())
+            if self.browser_session is None:
+                self.reply(401,{'ok':False,'error':'session expired or authentication required'});return False
+            self.principal=self.browser_session.principal;csrf=self.browser_session.csrf
+        if mutation and not hmac.compare_digest(self.headers.get('X-VAF-CSRF','').encode(),csrf.encode()):
+            self.reply(403,{'ok':False,'error':'custom CSRF header required'});return False
+        return True
+
+    def page_authorized(self):
+        if not self.trusted_origin():return False
+        supplied=self.headers.get('Authorization','')
+        if self.server.sessions.lookup(self.cookie()) or self.server.token and hmac.compare_digest(supplied.encode(),('Bearer '+self.server.token).encode()):return True
+        self.reply(302,b'','text/plain',{'Location':'/login?next='+quote(self.path,safe='')})
+        return False
+
+    def auth_get(self):
+        path=urlsplit(self.path).path
+        assets={'/login':('login.html','text/html; charset=utf-8'),'/auth.js':('auth.js','application/javascript'),
+                '/login.js':('login.js','application/javascript'),'/login.css':('login.css','text/css'),'/tool-console.css':('tool-console.css','text/css')}
+        if path in assets:
+            if not self.trusted_origin():return True
+            name,kind=assets[path];self.reply(200,(Path(__file__).parent/'static'/name).read_bytes(),kind);return True
+        if path=='/api/auth/session':
+            if self.authorized():
+                if self.browser_session:self.reply(200,dict(ok=True,result=self.server.sessions.view(self.browser_session)))
+                else:self.reply(401,dict(ok=False,error='browser login required'))
+            return True
+        return False
+
+    def auth_post(self):
+        if self.path not in ('/api/auth/login','/api/auth/logout'):return False
+        if not self.trusted_origin(required=True):return True
+        if self.path=='/api/auth/logout':
+            if not self.authorized(mutation=True):return True
+            session=self.server.sessions.revoke(self.cookie())
+            release=getattr(self.server.service,'release_browser',None)
+            if session and callable(release):release(session.principal)
+            self.reply(200,dict(ok=True,result=dict(logged_out=True)),headers={'Set-Cookie':self.cookie_header(clear=True)})
+            return True
+        try:
+            if self.headers.get('Transfer-Encoding') or self.headers.get('Content-Type')!='application/json':raise ValueError()
+            length=int(self.headers.get('Content-Length','-1'))
+            if not 0<length<=1024:raise ValueError()
+            payload=json.loads(self.rfile.read(length))
+            if type(payload) is not dict or set(payload)!={'key'} or type(payload['key']) is not str or not 32<=len(payload['key'])<=256:raise ValueError()
+        except (ValueError,TypeError):
+            self.reply(400,dict(ok=False,error='bounded login key required'));return True
+        if not self.server.sessions.permitted_login(self.client_address[0]):
+            self.reply(429,dict(ok=False,error='login rate limit; retry later'));return True
+        if not self.server.token or not hmac.compare_digest(payload['key'].encode(),self.server.token.encode()):
+            self.server.sessions.failed_login(self.client_address[0])
+            self.reply(401,dict(ok=False,error='invalid login key'));return True
+        old=self.server.sessions.revoke(self.cookie())
+        release=getattr(self.server.service,'release_browser',None)
+        if old and callable(release):release(old.principal)
+        try:opaque,session=self.server.sessions.create()
+        except ValueError:
+            self.reply(429,dict(ok=False,error='browser session budget exhausted'));return True
+        self.server.audit.info(json.dumps(dict(operation='browser.login',ok=True)))
+        self.reply(200,dict(ok=True,result=self.server.sessions.view(session)),headers={'Set-Cookie':self.cookie_header(opaque)})
+        return True
+
     def do_GET(self):
+        if self.auth_get():return
         static = {'/':('index.html','text/html; charset=utf-8'),
                   '/console.js':('console.js','application/javascript'),
                   '/console.css':('console.css','text/css')}
         if self.path in static:
             name, content_type = static[self.path]
+            if name.endswith('.html') and not self.page_authorized():return
             self.reply(200,(Path(__file__).parent / 'static' / name).read_bytes(),content_type)
             return
         if not self.authorized():
@@ -133,6 +226,7 @@ class Handler(BaseHTTPRequestHandler):
         self.invoke(routes[self.path],{})
 
     def do_POST(self):
+        if self.auth_post():return
         if not self.authorized(mutation=True):
             return
         routes = {'/api/start':'start','/api/cancel':'cancel','/api/waypoint':'waypoint',
@@ -160,6 +254,7 @@ class Handler(BaseHTTPRequestHandler):
                 self.reply(400,{'ok':False,'error':'bounded mutation request ID required'})
                 return
             canonical=json.dumps([operation,payload],sort_keys=True,allow_nan=False)
+            identifier=(self.principal,identifier)
             with self.server.request_lock:
                 if identifier in self.server.requests:
                     old,code,response=self.server.requests[identifier]
@@ -178,7 +273,11 @@ class Handler(BaseHTTPRequestHandler):
 
     def invoke(self, operation, payload, mutation=False, send=True):
         try:
-            result = self.server.service.handle(operation,payload)
+            authenticated=getattr(self.server.service,'handle_authenticated',None)
+            if callable(authenticated):
+                result=authenticated(operation,payload,principal=getattr(self,'principal','api'),
+                    control_token=getattr(self,'control_token',''),sessions=self.server.sessions)
+            else:result = self.server.service.handle(operation,payload)
             response = {'ok':True,'result':result}
             code = 200
         except Exception as exc:

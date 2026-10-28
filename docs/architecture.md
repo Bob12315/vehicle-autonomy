@@ -1,5 +1,24 @@
 # V1 framework boundary
 
+## Shared browser sessions and Vehicle Control (2026-10-28)
+
+`app/web/auth.py` owns bounded opaque browser sessions, separate from Agent
+credentials. Common HTTP handling protects pages/APIs with an HttpOnly,
+SameSite cookie and per-session CSRF nonce; the read-only telemetry WebSocket
+uses the same session with exact Origin validation. Shared `auth.js` supplies
+all existing vanilla-JavaScript pages. HTTPS deployments explicitly configure
+the trusted origin and Secure cookies. Legacy authenticated CLI API access is
+retained, without exposing its management key to page components.
+
+`app/web/operator_control.py` reserves a browser ingress, without granting
+vehicle execution authority. It fences identities, expires idle control, and
+requests Runtime cancellation on lost sessions/epochs. Mission reservations,
+Action SEND, SafetyPolicy, execution Lease, the unique writer and UNCONFIRMED
+release remain authoritative. The control UI consumes published Driver command
+evidence and real telemetry; it has no vehicle command port. No hardware SEND,
+new vehicle command or flight algorithm is introduced. Implementation limits
+and actual evidence are in the [UI report](VEHICLE_CONTROL_UI_REPORT.md).
+
 ## Web control center and Tool Agent (2026-10-28)
 
 `app/tools` owns trusted manifests, bounded external process supervision,

@@ -19,12 +19,18 @@ def main(*,studio=False):
     parser.add_argument('--allow-send',action='store_true',help='deployment SEND only; every writing Action additionally needs allow_send=true')
     parser.add_argument('--port',type=int,default=8780 if studio else 8770);parser.add_argument('--data-dir',type=Path,default=Path('runtime/mission-control' if studio else 'runtime/action-lab'))
     parser.add_argument('--token-file',type=Path,required=True)
+    parser.add_argument('--https-origin',help='explicit trusted HTTPS reverse-proxy origin; enables Secure browser cookies')
     parser.add_argument('--qgc-monitor-port',type=int,help='receive-only loopback UDP telemetry mirror; QGC commands are not forwarded')
     parser.add_argument('--tool-agents',type=Path,help='trusted JSON Agent ID -> private token file allowlist; enables outbound Agent channel')
     parser.add_argument('--tool-port',type=int,default=8791,help='loopback Agent channel, forward via SSH for remote hosts')
     parser.add_argument('--tool-data-dir',type=Path,help='optional private persistent Tool/Workspace state, independent of the vehicle Mission journal')
     parser.add_argument('--initialize-provider-registry',action='store_true',help='explicit one-time trusted Mission deployment bootstrap; never recovery')
     args=parser.parse_args();drivers={};lab=server=tool_service=agent_server=agent_thread=None
+    if args.https_origin:
+        from urllib.parse import urlsplit
+        origin=urlsplit(args.https_origin)
+        if origin.scheme!='https' or not origin.hostname or origin.username or origin.password or origin.path or origin.query or origin.fragment:
+            parser.error('https-origin must be an HTTPS origin without credentials/path/query')
     if (args.tool_agents or args.tool_data_dir) and not studio:parser.error('Tool service requires the Mission/console entry')
     if args.qgc_monitor_port is not None and not 1024<=args.qgc_monitor_port<=65535:
         parser.error('QGC monitor port must be within 1024..65535')
@@ -77,6 +83,7 @@ def main(*,studio=False):
             lab=ActionLab(drivers)
             server_class=ActionLabServer
         server=server_class(('127.0.0.1',args.port),lab,load_token(args.token_file),args.data_dir/'audit.jsonl')
+        if args.https_origin:server.browser_origin=args.https_origin;server.secure_cookies=True
         def stop(*_):raise KeyboardInterrupt
         signal.signal(signal.SIGTERM,stop);signal.signal(signal.SIGINT,stop)
         print(f'Action Lab: http://127.0.0.1:{server.server_address[1]} (token is only in the private token file)',flush=True)

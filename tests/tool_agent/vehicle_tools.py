@@ -1,4 +1,5 @@
 """One actual owned Rover Web center: telemetry, Tool Agent, Workspace and Mission."""
+from tests.browser_auth import login
 import argparse
 import json
 from pathlib import Path
@@ -54,11 +55,11 @@ def main():
         with sync_playwright() as pw:
             browser=pw.chromium.launch(executable_path='/usr/bin/google-chrome',headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
             try:
-                page=browser.new_page(viewport={'width':1500,'height':1050});page.goto(base+'/console');page.locator('#token').fill(token);page.locator('#connection button[type=submit]').click()
+                page=browser.new_page(viewport={'width':1500,'height':1050});login(page,base,token,'/console')
                 expect(page.locator('#metric-connection')).to_have_text('Connected')
-                page.screenshot(path=str(root/'unified-dashboard.png'),full_page=True,mask=[page.locator('#token')],mask_color='#243d4a')
+                page.screenshot(path=str(root/'unified-dashboard.png'),full_page=True,mask=[],mask_color='#243d4a')
                 page.locator('[data-view=tools]').click();expect(page.locator('[data-tool="desktop:fixture"] td:nth-child(4) .badge')).to_have_text('Ready')
-                page.screenshot(path=str(root/'unified-tools.png'),full_page=True,mask=[page.locator('#token')],mask_color='#243d4a')
+                page.screenshot(path=str(root/'unified-tools.png'),full_page=True,mask=[],mask_color='#243d4a')
             finally:browser.close()
         graph=dict(schema_version=1,id='tool-loss-wait',name='Tool isolation wait',version='1.0.0',target='rover',root='wait',nodes=[dict(id='wait',type='Wait',duration_s=2.)])
         mission=api('/api/missions/start',dict(spec=graph,allow_send=False))

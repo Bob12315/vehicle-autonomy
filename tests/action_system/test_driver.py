@@ -29,6 +29,7 @@ class DriverTests(unittest.TestCase):
             try:f.set_result(function())
             except Exception as exc:f.set_exception(exc)
             return f
+        d._command_feedback={}
         d._task=task;d._publish()
     def tearDown(self):self.r.shutdown()
     def deadline(self,ns=5_000_000_000):
@@ -67,6 +68,12 @@ class DriverTests(unittest.TestCase):
         self.fixture.cycle(pack(self.fixture.sender.command_ack_encode(176,0),self.fixture.sender))
         self.fixture.cycle(self.fixture.heartbeat(mode=4));self.d._publish()
         self.assertEqual(self.d.effect_results('a')[0].phase.value,'COMPLETED')
+        feedback=self.d.command_feedback('a')
+        self.assertEqual(feedback[-1]['phase'],'COMPLETED')
+        self.assertEqual(feedback[-1]['ack_evidence']['result'],0)
+        self.assertTrue(feedback[-1]['state_confirmation'])
+        feedback[-1]['ack_evidence']['result']=99
+        self.assertEqual(self.d.command_feedback('a')[-1]['ack_evidence']['result'],0)
         self.d.begin_exit('a');self.assertTrue(self.d.finish_scope('a',succeeded=True).result().release_safe)
         self.assertEqual(len(self.fixture.transports[0].writes),1)
     def test_cleanup_cannot_reissue_arm_or_motion_after_action_cancellation(self):

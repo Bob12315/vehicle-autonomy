@@ -1,4 +1,5 @@
 """Actual Chrome UI operation, not direct fetch/evaluate as a UI substitute."""
+from tests.browser_auth import login
 import time
 
 
@@ -11,7 +12,7 @@ def exercise(base,token,lab,oracle,path,sample,actions):
         try:
             page=browser.new_page(viewport={'width':1360,'height':1000});errors=[]
             page.on('pageerror',lambda error:errors.append(str(error)))
-            page.goto(base);page.locator('#token').fill(token);page.locator('#connect').click()
+            login(page,base.rstrip('/'),token,'/')
             page.locator('#action option').first.wait_for(state='attached')
             def perform(name,parameters=None):
                 existing={r['id'] for r in lab.runtime.views()}
@@ -46,7 +47,7 @@ def exercise(base,token,lab,oracle,path,sample,actions):
             start=sample();identifier=perform('Drive',{'speed_mps':.3});report['actions'].append(identifier)
             until=time.monotonic()+2
             while time.monotonic()<until:sample();page.wait_for_timeout(100)
-            page.reload();page.locator('#token').fill(token);page.locator('#connect').click()
+            page.reload();page.wait_for_function('window.VAFAuth && window.VAFAuth.session')
             page.locator('.instance').filter(has_text=identifier).get_by_text('RUNNING',exact=False).first.wait_for()
             if lab.runtime.view(identifier)['state']!='RUNNING':raise AssertionError('browser refresh lost the active Action')
             finish=sample()
@@ -65,7 +66,7 @@ def exercise(base,token,lab,oracle,path,sample,actions):
             if (oracle.recent_speed_mps() or 0)>.1:raise AssertionError('UI cancel real Rover stop speed')
             card.get_by_text('CANCELLED',exact=False).first.wait_for()
             if errors:raise AssertionError('browser JavaScript error')
-            page.screenshot(path=str(path/'action-lab.png'),full_page=True,mask=[page.locator('#token')])
+            page.screenshot(path=str(path/'action-lab.png'),full_page=True,mask=[])
             for action_id in report['actions']:
                 r=lab.runtime.view(action_id)
                 actions.append({'name':r['name'],'id':r['id'],'source':'real Chrome UI','final':r})

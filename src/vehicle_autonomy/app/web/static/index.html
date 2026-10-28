@@ -1,8 +1,8 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Vehicle Autonomy · 任务与状态</title><link rel="stylesheet" href="/console.css"><script src="/console.js" defer></script></head>
-<body><header><div><small>VEHICLE AUTONOMY FRAMEWORK</small><h1>车辆任务与状态控制台</h1></div><span id="connection" class="badge">未认证</span></header>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Vehicle Autonomy · 任务与状态</title><link rel="stylesheet" href="/console.css"><script src="/auth.js" defer></script><script src="/console.js" defer></script></head>
+<body><header><div><small>VEHICLE AUTONOMY FRAMEWORK</small><h1>车辆任务与状态控制台</h1></div><span id="connection" class="badge">未认证</span><button data-logout type="button">退出登录</button></header>
 <div class="notice">当前真实车辆保持只读。软件停止请求不代表物理已停车。动作测试须人在场、物理急停有效、区域隔离。</div>
-<section class="auth"><label>访问令牌 <input id="token" type="password" autocomplete="off" placeholder="粘贴本机私有 token 文件内容"></label><button id="connect">连接</button><span id="error" role="status"></span></section>
+<section class="auth"><span>统一会话已登录</span><button id="connect">连接</button><span id="error" role="status"></span></section>
 <main><section class="panel"><h2>任务与车辆</h2><div id="summary" class="stats"></div><label>已注册任务 <select id="missions"></select></label><button id="start" disabled>启动所选任务</button><button id="cancel" class="danger">取消任务 / 软件停止请求</button><pre id="task">连接后查看任务结果</pre></section>
 <section class="panel"><h2>ROS 2 工具</h2><p>点云、扫描、地图、TF、定位和路径使用 RViz2 查看；建图、定位与规划由 ROS 2 工具处理。</p><pre id="ros-status">连接后查看传感器和地图状态</pre><p>在运行对应 ROS 数据源的主机上启动：</p><code>./scripts/ros2_view.sh lidar</code><p>合格的地图和 TF 数据可用后：</p><code>./scripts/ros2_view.sh navigation</code><p>当前配置只查看数据，不提供直接驱动车辆的 RViz 目标按钮。Web 负责选择已注册任务和查看执行结果。</p></section>
 <section class="panel"><h2>摄像头</h2><img id="camera" alt="无已验证的实时视频"><pre id="camera-health">尚无数据</pre></section>

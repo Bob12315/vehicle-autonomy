@@ -14,6 +14,7 @@ from pathlib import Path
 
 from vehicle_autonomy.app.web.server import load_token
 from tests.simulation.web_controls import ControlCheck, TERMINAL
+from tests.browser_auth import login
 
 
 class ToolAcceptance:
@@ -58,13 +59,12 @@ class ToolAcceptance:
             browser = pw.chromium.launch(executable_path='/usr/bin/google-chrome',
                 headless=True, args=['--no-sandbox', '--disable-dev-shm-usage'])
             try:
-                page = browser.new_page(viewport={'width':1680, 'height':1100})
+                context = browser.new_context(viewport={'width':1680, 'height':1100})
+                page = context.new_page()
                 errors = []
                 initial_actions = {a['id'] for a in api('/api/instances')}
                 page.on('pageerror', lambda error: errors.append(str(error)))
-                page.goto(base+'/console#tools')
-                page.locator('#token').fill(token)
-                page.locator('#connection button[type=submit]').click()
+                login(page,base,token,'/console#tools')
                 row = page.locator('[data-tool="desktop:ros2"]')
                 row.wait_for(timeout=30000)
                 # Initial automatic selection must also bind the Tool Context.
@@ -84,7 +84,7 @@ class ToolAcceptance:
                 expect(page.locator('#tool-detail')).to_contain_text('ros2')
                 row.get_by_role('button', name='Logs', exact=True).click()
                 expect(page.locator('#tool-detail')).to_contain_text('vaf_tool_observer', timeout=15000)
-                page.screenshot(path=str(directory/'native-tools.png'), full_page=True, mask=[page.locator('#token')])
+                page.screenshot(path=str(directory/'native-tools.png'), full_page=True, mask=[])
                 row.get_by_role('button', name='Restart', exact=True).click()
                 expect(row.locator('td:nth-child(4) .badge')).to_have_text('Ready', timeout=60000)
                 # A Ready badge can still be the previous instance while restart
@@ -103,8 +103,9 @@ class ToolAcceptance:
                 assert not authority['system_send'] and not authority['action_send']
                 assert {a['id'] for a in api('/api/instances')} == initial_actions
                 page.goto(base+'/control')
-                page.locator('#token').fill(token); page.locator('#connect').click()
-                page.locator('#action option').first.wait_for(state='attached')
+                assert '/login' not in page.url
+                page.locator('#acquire-control').click()
+                expect(page.locator('#top-authority')).to_have_text('Manual Control')
                 check = BrowserControlCheck(kind, api, oracle, directory, page)
                 check.result['native_tool'] = dict(name='ROS2 graph observer',
                     actual_native=True, launch=True, restart=True, stop=True,
@@ -112,12 +113,18 @@ class ToolAcceptance:
                 # Recheck the default Action SEND gate through the actual UI.
                 check.perform('Arm', allow_send=False, expected='REJECTED')
                 result = check.run()
+                page.locator('#release-control').click()
+                expect(page.locator('#top-authority')).to_have_text('Observer')
                 page.screenshot(path=str(directory/'browser-controls.png'), full_page=True,
-                    mask=[page.locator('#token')])
+                    mask=[])
                 assert not errors, errors
                 result['javascript_errors'] = errors
                 check.save()
                 return result
+            except Exception:
+                page.screenshot(path=str(directory/'failure-ui.png'),full_page=True)
+                (directory/'failure-ui.txt').write_text(page.locator('#notice').inner_text()+'\n'+page.locator('#diagnostics').inner_text())
+                raise
             finally:
                 browser.close()
 
@@ -129,29 +136,43 @@ class BrowserControlCheck(ControlCheck):
         self.result['control_origin'] = 'real Chromium UI clicks and held keys; HTTP observations only'
 
     def perform(self, name, parameters=None, seconds=45, *, allow_send=True, expected='SUCCEEDED'):
-        page = self.page
-        before = {a['id'] for a in self.call('/api/instances')}
-        page.locator('#action').select_option(name+'@1.0.0')
-        for key, value in (parameters or {}).items():
-            field = page.locator(f'#parameters [name="{key}"]')
-            if field.is_disabled():
-                # Rover deliberately fixes Goto Z at zero in the UI.
-                assert json.loads(field.input_value()) == value, (key, value)
-                continue
-            if field.evaluate('(e)=>e.tagName') == 'SELECT': field.select_option(json.dumps(value))
-            else: field.fill(str(value)); field.press('Tab')
-        page.locator('#continuation').fill(self.last or '')
-        page.locator('#send').set_checked(allow_send)
-        page.locator('#execute').click()
-        a = self.wait(lambda: next((a for a in self.call('/api/instances') if a['id'] not in before), None), 10)
-        if expected == 'REJECTED':
-            identifier = a['id']
-            final = self.wait(lambda: (v if (v := self.state(identifier))['state'] in TERMINAL else None), 10)
-            assert final['state'] == expected and not final['command_results'], final
-            self.result['actions'].append(final); self.save()
-            print(f'{self.kind}: UI {name} REJECTED without SEND', flush=True)
-            return final
-        return self.finish(a, seconds, expected=expected)
+        from playwright.sync_api import expect
+        page=self.page;parameters=parameters or {}
+        before={a['id'] for a in self.call('/api/instances')}
+        if name=='SetMode':
+            page.locator('#mode').select_option(parameters['mode']);page.locator('#send').check();button=page.locator('#set-mode')
+        elif name=='Takeoff':
+            if self.kind=='plane':
+                section=page.locator('[data-for=plane] details');section.locator('summary').click() if not section.get_attribute('open') else None
+            page.locator('#plane-height' if self.kind=='plane' else '#takeoff-height').fill(str(parameters['height_m']))
+            button=page.locator('#plane-takeoff' if self.kind=='plane' else '#takeoff')
+        elif name=='Goto':
+            section=page.locator('#position-advanced');section.locator('summary').click() if section.get_attribute('open') is None else None
+            for key,field in [('x_m','#goto-x'),('y_m','#goto-y'),('z_m','#goto-z')]:
+                if page.locator(field).is_disabled():assert parameters[key]==0
+                else:page.locator(field).fill(str(parameters[key]))
+            page.locator('#send').check();button=page.locator('#goto')
+        elif name=='SetGuidedTarget':
+            for key,field in [('latitude_deg','#latitude'),('longitude_deg','#longitude'),('altitude_amsl_m','#altitude-amsl')]:page.locator(field).fill(str(parameters[key]))
+            page.locator('#send').check();button=page.locator('#guided-target')
+        elif name=='ReturnHome':page.locator('#send').check();button=page.locator('#return-control')
+        elif name=='Stop':button=page.locator('#hold-control')
+        else:
+            page.locator('#send').check();button=page.locator('[data-action="'+name+'"]')
+        button.click()
+        if name in ('Arm','Disarm','Takeoff','AutoLand'):
+            expect(page.locator('#command-confirm')).to_be_visible()
+            if not allow_send:
+                expect(page.locator('#confirm-submit')).to_be_disabled();page.locator('#confirm-cancel').click()
+                assert {a['id'] for a in self.call('/api/instances')}==before
+                self.result['ui_without_confirmation']='blocked before submission'
+                print(f'{self.kind}: UI {name} blocked without explicit confirmation',flush=True)
+                return None
+            page.locator('#confirm-send').check();page.locator('#confirm-submit').click()
+        a=self.wait(lambda:next((a for a in self.call('/api/instances') if a['id'] not in before),None),12)
+        final=self.finish(a,seconds,expected=expected)
+        if name=='Takeoff' and self.kind=='plane':assert page.locator('[data-action="Disarm"]').is_disabled()
+        return final
 
     def managed(self, name, parameters, threshold):
         self._held(parameters, threshold)
@@ -160,12 +181,17 @@ class BrowserControlCheck(ControlCheck):
             self._held(dict(speed_mps=-.3, yaw_rate_rad_s=0), ('distance', .4))
 
     def _held(self, parameters, threshold):
+        from playwright.sync_api import expect
         page = self.page
         turn = threshold[0] == 'yaw'
         key = ('a' if self.kind == 'rover' else 'r') if turn else ('s' if parameters.get('speed_mps', .3) < 0 else 'w')
         start = self.truth(); before = {a['id'] for a in self.call('/api/instances')}
-        page.locator('#manual-send').check()
-        page.locator('#manual-send').focus(); page.keyboard.down(key)
+        if self.kind=='copter':
+            section=page.locator('#copter-advanced')
+            if section.get_attribute('open') is None:section.locator('summary').click()
+        authorization=page.locator('#copter-manual-send' if self.kind=='copter' else '#manual-send')
+        expect(page.locator('[data-key="'+key+'"]').last if self.kind=='copter' else page.locator('[data-key="'+key+'"]').first).to_be_enabled(timeout=15000)
+        authorization.check();authorization.focus();page.keyboard.down(key)
         try:
             a = self.wait(lambda: next((a for a in self.call('/api/instances') if a['id'] not in before), None), 8)
             def moved():
@@ -184,3 +210,71 @@ class BrowserControlCheck(ControlCheck):
         self.result['managed'].append(dict(key=key, parameters=parameters, measured=measured,
             stop_speed_mps=speed, stop_yaw_rate_rad_s=yaw_rate, state=final['state']))
         self.save()
+
+    def fault_stream(self, mode):
+        """Real physical motion followed by browser/HTTP failure, no port writes."""
+        from playwright.sync_api import expect
+        page=self.page;self.perform('SetMode',{'mode':'GUIDED'})
+        panel=page.locator('#copter-advanced')
+        if panel.get_attribute('open') is None:panel.locator('summary').click()
+        expect(page.locator('#copter-stream [data-key="w"]')).to_be_enabled()
+        before={a['id'] for a in self.call('/api/instances')};start=self.truth()
+        page.locator('#copter-manual-send').check();page.locator('#copter-manual-send').focus();page.keyboard.down('w')
+        a=self.wait(lambda:next((a for a in self.call('/api/instances') if a['id'] not in before),None),8)
+        self.wait(lambda:math.hypot(self.truth().x_m-start.x_m,self.truth().y_m-start.y_m)>=.25,12)
+        blocker=lambda route:route.abort()
+        alt=None
+        try:
+            if mode=='watchdog':
+                page.route('**/api/manual/update',blocker);page.route('**/api/manual/stop',blocker)
+            elif mode=='offline':page.context.set_offline(True)
+            else:
+                # Playwright gives each tab emulated permanent focus. Disable
+                # that for this native Chrome tab switch; do not synthesize a
+                # DOM blur event or bypass the page stop handler.
+                focus=page.context.new_cdp_session(page)
+                focus.send('Emulation.setFocusEmulationEnabled',{'enabled':False})
+                page.bring_to_front()
+                assert page.evaluate('document.hasFocus()')
+                alt=page.context.new_page();alt.bring_to_front()
+                page.wait_for_function('!document.hasFocus()',timeout=3000)
+            end=time.monotonic()+20
+            while time.monotonic()<end:
+                page.wait_for_timeout(100)
+                final=self.state(a['id'])
+                if final['state'] in TERMINAL:break
+            else:raise TimeoutError('physical stream did not exit after '+mode)
+            self.finish(a,20,expected='CANCELLED' if mode=='blur' else 'TIMED_OUT')
+            speed=self.oracle.recent_speed_mps();assert speed is not None and speed<=.15
+            self.result.setdefault('browser_faults',[]).append(dict(mode=mode,state=final['state'],stop_speed_mps=speed))
+        finally:
+            if mode=='watchdog':page.unroute('**/api/manual/update',blocker);page.unroute('**/api/manual/stop',blocker)
+            if mode=='offline':page.context.set_offline(False)
+            if alt:
+                alt.close();page.bring_to_front()
+                focus.send('Emulation.setFocusEmulationEnabled',{'enabled':True});focus.detach()
+            page.keyboard.up('w')
+        if mode=='offline':
+            expect(page.locator('#top-authority')).to_have_text('Observer',timeout=16000)
+            page.locator('#acquire-control').click(timeout=20000)
+            expect(page.locator('#top-authority')).to_have_text('Manual Control')
+        self.save()
+
+    def hover_or_ground(self):
+        if self.kind!='copter':return super().hover_or_ground()
+        self.perform('Takeoff',{'height_m':1.5},45);self.information('airborne',armed=True)
+        assert abs(self.truth().z_m-self.initial.z_m-1.5)<=.35
+        for turn in (False,True):
+            self.perform('SetMode',{'mode':'GUIDED'})
+            p=dict(vx_mps=0 if turn else .3,vy_mps=0,vz_mps=0,yaw_rate_rad_s=.25 if turn else 0,frame='base_link')
+            self.managed('SetVelocity',p,('yaw',.4) if turn else ('distance',.5))
+            self.information('turn stopped' if turn else 'forward stopped',armed=True)
+        for failure in ('watchdog','blur','offline'):self.fault_stream(failure)
+        self.perform('SetMode',{'mode':'GUIDED'});self.perform('Goto',dict(x_m=0.,y_m=0.,z_m=1.5),55)
+        self.perform('Land',seconds=45);self.information('explicit Land',armed=False)
+        self.perform('SetMode',{'mode':'GUIDED'});self.perform('Arm');self.perform('Takeoff',{'height_m':1.5},45)
+        self.perform('Goto',dict(x_m=2.,y_m=0.,z_m=1.5),55);self.information('goto',armed=True)
+        self.perform('ReturnHome',seconds=65);self.information('home stopped',armed=False)
+        t=self.truth();error=math.hypot(t.x_m-self.initial.x_m,t.y_m-self.initial.y_m)
+        assert error<=.75 and self.oracle.recent_speed_mps()<=.15
+        self.result['home_error_m']=error

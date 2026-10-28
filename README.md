@@ -134,6 +134,9 @@ UNKNOWN/UNCONFIRMED 和飞行资源约束。完成本阶段后停止，等待独
 `/console` 提供三车型 Dashboard、Tool Manager、Workspaces、Logs 和 Settings，
 Vehicle Control 复用 `/control` 原有 Action/Authority/Safety/Execution 链。
 过期或断开的遥测显示未知；不新增 Mission Studio 或专业地图/点云查看器。
+所有页面共用 `/login` 的后端会话：一次输入密钥后，页面切换和有效期内刷新均不重复输入，
+可主动退出。Vehicle Control 采用与 Dashboard 相同的样式，区分只读、申请操作权和人工控制。
+本轮实现、安全边界、测试证据和操作步骤见 [Vehicle Control UI 报告](docs/VEHICLE_CONTROL_UI_REPORT.md)。
 
 ```bash
 vehicle-autonomy-console --port 8780 --token-file /absolute/private/web.private \
@@ -169,7 +172,8 @@ Framework 车辆身份、运动授权或硬件导航资格。
 ```
 
 Web 控制页依次为 `http://127.0.0.1:8780/control`、`:8781/control`、`:8782/control`。
-终端打印访问令牌文件路径；粘贴令牌后连接，等待定位有效，再逐次授权操作。
+终端打印访问密钥文件路径；在统一登录页输入一次，等待有效遥测，点击 Acquire Control，
+再逐次授权操作。不同端口的独立后端分别建立会话；同一后端内的所有页面共享登录。
 汽车支持按住前进/转向、松开停止及返航测试。QGC 在 UDP 14550 接收遥测，
 默认不转发 QGC 指令；如需原先的独立 QGC 控制，给脚本加 `--qgc-only`。
 不接入 Phase 5，不自动解锁/运动。Ctrl+C 关闭本次自有程序和仿真，清理临时凭据。

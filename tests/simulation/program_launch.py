@@ -7,7 +7,6 @@ Rover forward/turn/stop/Goto/ReturnHome. No test bypasses the Action SEND gate.
 import argparse
 import hashlib
 import json
-import math
 import os
 from pathlib import Path
 import signal
@@ -162,78 +161,26 @@ def run(kind, directory, *, motion=False, gui=False, read_only=False, http_contr
 
 
 def rover_browser(base,token,api,oracle,directory):
-    from playwright.sync_api import sync_playwright
-    checks={};errors=[]
-    def truth():
-        sample=oracle.latest()
-        if sample is None or time.monotonic_ns()-sample.host_received_ns>500_000_000:raise AssertionError('fresh independent Gazebo truth missing')
-        return sample
+    """The --motion entry uses the same current console as native-tool checks."""
+    from playwright.sync_api import sync_playwright,expect
+    from tests.browser_auth import login
+    from tests.simulation.web_ui_controls import BrowserControlCheck
+    errors=[]
     with sync_playwright() as pw:
         browser=pw.chromium.launch(executable_path='/usr/bin/google-chrome',headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
         try:
             page=browser.new_page(viewport={'width':1680,'height':1100})
             page.on('pageerror',lambda error:errors.append(str(error)))
-            page.goto(base+'/control');page.locator('#token').fill(token);page.locator('#connect').click()
-            page.locator('#action option').first.wait_for(state='attached')
-            def wait(predicate,seconds=30):
-                end=time.monotonic()+seconds
-                while time.monotonic()<end:
-                    truth();value=predicate()
-                    if value:return value
-                    page.wait_for_timeout(60)
-                raise TimeoutError('browser operation: '+page.locator('#notice').inner_text()[:250])
-            def instances():return api('/api/instances')
-            def state(identifier):return next(a for a in instances() if a['id']==identifier)
-            def finish(a,expected='SUCCEEDED',seconds=40):
-                final=wait(lambda:state(a['id']) if state(a['id'])['state'] in TERMINAL else None,seconds)
-                assert final['state']==expected,(final['name'],final['state'],final['error'])
-                assert final['safety']['release_safe']
-                return final
-            def perform(name,parameters=None,seconds=40):
-                before={a['id'] for a in instances()}
-                page.locator('#action').select_option(name+'@1.0.0')
-                for key,value in (parameters or {}).items():
-                    field=page.locator(f'#parameters [name="{key}"]')
-                    if field.evaluate('(e)=>e.tagName')=='SELECT':field.select_option(json.dumps(value))
-                    else:field.fill(str(value));field.press('Tab')
-                page.locator('#send').check();page.locator('#execute').click()
-                action=wait(lambda:next((a for a in instances() if a['id'] not in before),None),8)
-                return finish(action,seconds=seconds)
-            initial=truth();perform('SetMode',{'mode':'GUIDED'});perform('Arm')
-            checks['managed_inputs']=[]
-            for key,name,threshold in [('w','forward',.35),('a','turn',.3)]:
-                perform('SetMode',{'mode':'GUIDED'})
-                start=truth();before={a['id'] for a in instances()}
-                page.locator('#manual-send').check()
-                if key=='w':
-                    page.locator('#manual-send').focus();page.keyboard.down(key)
-                else:page.locator(f'[data-key="{key}"]').hover();page.mouse.down()
-                action=wait(lambda:next((a for a in instances() if a['id'] not in before),None),5)
-                def measured():
-                    current=truth()
-                    return (math.hypot(current.x_m-start.x_m,current.y_m-start.y_m) if key=='w' else
-                        abs(math.atan2(math.sin(current.yaw_rad-start.yaw_rad),math.cos(current.yaw_rad-start.yaw_rad))))
-                try:wait(lambda:measured()>=threshold,12);motion=measured()
-                finally:
-                    if key=='w':page.keyboard.up(key)
-                    else:page.mouse.up()
-                final=finish(action,'CANCELLED',20)
-                speed=oracle.recent_speed_mps();yaw_rate=oracle.recent_yaw_rate_rad_s()
-                assert speed is not None and speed<=.1
-                assert yaw_rate is not None and abs(yaw_rate)<=.1
-                checks['managed_inputs'].append(dict(name=name,measured=motion,state=final['state'],stop_speed_mps=speed,stop_yaw_rate_rad_s=yaw_rate))
-            perform('SetMode',{'mode':'GUIDED'});perform('Goto',{'x_m':2,'y_m':0},seconds=60)
-            target=truth();checks['goto_error_m']=math.hypot(target.x_m-initial.x_m-2,target.y_m-initial.y_m)
-            assert checks['goto_error_m']<=.75
-            perform('Stop');assert oracle.recent_speed_mps()<=.1
-            perform('ReturnHome',seconds=80);perform('Disarm')
-            home=truth();checks['home_error_m']=math.hypot(home.x_m-initial.x_m,home.y_m-initial.y_m)
-            checks['home_speed_mps']=oracle.recent_speed_mps()
-            assert checks['home_error_m']<=.75 and checks['home_speed_mps']<=.1
-            assert not errors;checks['javascript_errors']=errors
-            page.screenshot(path=str(directory/'basic-controls.png'),full_page=True,mask=[page.locator('#token')])
+            login(page,base,token,'/control')
+            page.locator('#acquire-control').click();expect(page.locator('#top-authority')).to_have_text('Manual Control')
+            check=BrowserControlCheck('rover',api,oracle,directory,page)
+            check.perform('Arm',allow_send=False,expected='REJECTED')
+            result=check.run()
+            page.locator('#release-control').click();expect(page.locator('#top-authority')).to_have_text('Observer')
+            page.screenshot(path=str(directory/'basic-controls.png'),full_page=True)
+            assert not errors;result['javascript_errors']=errors
+            return result
         finally:browser.close()
-    return checks
 
 
 if __name__=='__main__':

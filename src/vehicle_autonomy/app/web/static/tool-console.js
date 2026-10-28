@@ -11,19 +11,15 @@ const vector=v=>v?`X ${num(v.x)} / Y ${num(v.y)} / Z ${num(v.z)}`:'未知';
 const badge=(text,tone='')=>node('span',text,{class:'badge','data-tone':tone});
 function notice(e){$('#notice').textContent=e?.message||String(e||'');$('#notice').dataset.tone=e?.message?'error':'info';}
 function guard(fn){return async(...args)=>{try{await fn(...args);}catch(e){notice(e);}};}
-async function api(path,payload){
- const token=$('#token').value.trim();if(!token)throw Error('请先输入访问令牌');
- const headers={Authorization:'Bearer '+token},options={headers,signal:AbortSignal.timeout(3500)};
- if(payload!==undefined){Object.assign(headers,{'Content-Type':'application/json','X-VAF-CSRF':token,'X-VAF-Request-ID':crypto.randomUUID()});Object.assign(options,{method:'POST',body:JSON.stringify(payload)});}
- const r=await fetch(path,options),data=await r.json();if(!r.ok||!data.ok)throw Error(data.error||'请求失败');return data.result;
-}
+async function api(path,payload){return window.VAFAuth.api(path,payload);}
 function route(){view=location.hash.slice(1)||'dashboard';if(!titles[view])view='dashboard';for(const e of document.querySelectorAll('[data-panel]'))e.hidden=e.dataset.panel!==view;for(const e of document.querySelectorAll('[data-view]')){if(e.dataset.view===view)e.setAttribute('aria-current','page');else e.removeAttribute('aria-current');}$('#page-title').textContent=titles[view][0];$('#page-subtitle').textContent=titles[view][1];if(snapshot)render();}
 window.addEventListener('hashchange',route);route();
 function linkState(ok){$('#link-state').textContent=ok?'控制中心已连接':'控制中心已断开 · 状态未知';$('#link-dot').style.background=ok?'#087e79':'#ad3c32';}
 function invalidate(){if(!snapshot)return;snapshot.vehicles=[];if(snapshot.tools){for(const a of snapshot.tools.agents){a.connected=false;for(const t of a.tools)if(t.instance)Object.assign(t.instance,{state:'DISCONNECTED',ready:false,process_running:null,service_health:'UNKNOWN',connection:'DISCONNECTED'});}for(const r of snapshot.tools.workspaces?.runs||[])if(!['STOPPED','ABANDONED'].includes(r.state)){r.state='UNKNOWN';r.error='Web 连接中断，远端状态未知';for(const c of r.components)c.observed_ready=false;}}$('#tool-detail').hidden=true;renderTools();renderWorkspaces();$('#dashboard-data').hidden=true;$('#vehicle-empty').hidden=false;$('#vehicle-empty').replaceChildren(node('strong','连接中断，当前状态未知'),node('p','连接恢复后同步完整状态。已显示的旧遥测不能用于操作。'));linkState(false);}
 async function poll(){if(busy||!connected)return;busy=true;try{snapshot=await api('/api/console/state');if(!settingsLoaded&&snapshot.tools?.settings){toolContext=snapshot.tools.settings.context;fillContext();settingsLoaded=true;}lastReceived=performance.now();linkState(true);$('#updated').textContent='已同步 '+new Date().toLocaleTimeString();render();}catch(e){invalidate();notice(e);}finally{busy=false;}}
-$('#connection').onsubmit=guard(async e=>{e.preventDefault();connected=true;notice('');await poll();});
-$('#disconnect').onclick=()=>{connected=false;invalidate();$('#token').value='';};
+$('#reconnect').onclick=guard(async()=>{connected=true;notice('');await poll();});
+window.addEventListener('vaf:auth-lost',()=>{connected=false;invalidate();});
+window.VAFAuth.ready.then(s=>{if(s){connected=true;poll();}});
 setInterval(()=>{if(connected)poll();if(lastReceived&&performance.now()-lastReceived>4500)invalidate();},750);
 function selectContext(v){if(!v)return;const changed=toolContext.vehicle_id!==v.id;toolContext={...toolContext,vehicle_id:v.id,vehicle_type:v.type,environment:v.environment==='simulation'?'simulation':'hardware_readonly',ros_namespace:changed?'/'+v.id.replace(/[^A-Za-z0-9_]/g,'_'):toolContext.ros_namespace};fillContext();}
 $('#vehicle').onchange=()=>{vehicleId=$('#vehicle').value;selectContext(snapshot?.vehicles.find(v=>v.id===vehicleId));render();};
@@ -59,7 +55,7 @@ function renderTools(){
  if(!snapshot.tools)return;
  const host=$('#agents');host.replaceChildren();
  for(const a of snapshot.tools.agents){const row=node('div');row.append(badge(a.connected?'Online':'Disconnected',a.connected?'good':'error'),node('strong',' '+a.name),node('small',`${a.id} · ${a.role} · 心跳 ${num(a.heartbeat_age_s,1)} s`));host.append(row);}
- if(!snapshot.tools.agents.length){$('#tools-content').className='panel empty';$('#tools-content').replaceChildren(node('strong','等待 Agent 注册'),node('p','启动已授权的 Desktop、Server 或 Onboard Agent；无需固定 Agent IP。'));return;}
+ if(!snapshot.tools.agents.length){$('#tools-content').className='panel empty';$('#tools-content').replaceChildren(node('strong','等待 Agent 上线'),node('p','首次授权后，Agent 每次启动都会自动连接，无需重复手动注册。'));return;}
  if(view!=='tools')return;
  if(snapshot.tools.agents.every(a=>a.connected)&&$('#tools-content').contains(document.activeElement)&&document.activeElement.tagName==='SELECT')return;
  const table=node('table',undefined,{class:'tools-table'}),thead=node('thead'),tr=node('tr');for(const name of ['TOOL / VERSION','HOST / PROFILE','INSTALL / PROCESS','HEALTH / READY','CONNECTION / ERROR','OPERATIONS'])tr.append(node('th',name));thead.append(tr);table.append(thead);const body=node('tbody');table.append(body);

@@ -1,6 +1,6 @@
 'use strict';
 const $ = id => document.getElementById(id);
-let token = '', state = null, proposal = null, active = false;
+let state = null, proposal = null, active = false;
 const logs = [];
 // Full clouds/maps belong to ROS visualizers; keep the operator view bounded.
 const json = value => JSON.stringify(value, (key, item) => key === 'preview_xyz' ? undefined : item, 2);
@@ -8,19 +8,7 @@ function log(text) {
   logs.unshift(new Date().toLocaleTimeString() + ' ' + text);
   $('logs').textContent = logs.slice(0, 100).join('\n');
 }
-async function api(path, payload) {
-  const headers = {'Authorization': 'Bearer ' + token};
-  const options = {headers};
-  if (payload !== undefined) {
-    Object.assign(headers, {'Content-Type': 'application/json', 'X-VAF-CSRF': token,
-      'X-VAF-Request-ID': crypto.randomUUID()});
-    options.method = 'POST'; options.body = JSON.stringify(payload);
-  }
-  const response = await fetch('/api/' + path, options);
-  const value = await response.json();
-  if (!value.ok) throw new Error(value.error || '请求失败');
-  return value.result;
-}
+async function api(path,payload){return window.VAFAuth.api('/api/'+path,payload);}
 async function action(fn) {
   try { $('error').textContent = ''; await fn(); }
   catch (e) { $('error').textContent = e.message; log(e.message); }
@@ -59,7 +47,6 @@ function showSummary(s) {
   if (!s.camera?.online) $('camera').removeAttribute('src');
 }
 $('connect').onclick = () => action(async () => {
-  token = $('token').value; $('token').value = '';
   state = await api('status');
   const missions = await api('catalog'); $('missions').replaceChildren();
   for (const mission of missions) {
@@ -150,3 +137,5 @@ async function camera() {
 }
 setInterval(refresh, 1500); setInterval(camera, 400);
 $('reports').onclick = () => action(async () => { $('report-text').textContent = (await api('reports')).text; });
+
+window.VAFAuth.ready.then(s=>{if(s)$('connect').click();});

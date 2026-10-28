@@ -1,172 +1,238 @@
 'use strict';
-const api=window.VAF,$=s=>document.querySelector(s);
-let state=null,parameters={},session=null,input=null,keys=new Set(),pending=false,updating=false,polling=false,mapTransform=null;
+const api=window.VAF,auth=window.VAFAuth,$=s=>document.querySelector(s);
 const terminal=new Set(['SUCCEEDED','FAILED','REJECTED','CANCELLED','TIMED_OUT','UNKNOWN']);
+let state=null,current=null,controller=null,session=null,input=null,keys=new Set(),pending=false,updating=false,polling=false,renewing=false,commandPending=false,confirmation=null,socket=null,retry=0,closing=false,lastAction=null,targetHeight=null,lastReceived=0;
+const node=api.node.bind(api),fmt=(v,n=2)=>typeof v==='number'&&Number.isFinite(v)?v.toFixed(n):'未知';
+function notice(error){$('#notice').textContent=String(error?.message||error||'');$('#notice').dataset.tone=error?.message?'error':'info';}
+function guard(fn){return async(...args)=>{try{await fn(...args);}catch(e){notice(e);}};}
 function selected(){return state?.vehicles.find(v=>v.target===api.target);}
-function chosen(){return api.catalog.find(s=>s.name+'@'+s.version===$('#action').value);}
-function form(){const s=chosen();parameters={};if(s)api.parameters($('#parameters'),s.parameters,parameters);modeChoices();}
-function modeChoices(){
- const v=selected(),field=$('#parameters [name="mode"]');if(!field||!v?.display)return;
- for(const option of field.options)option.disabled=!v.display.mode_choices.includes(JSON.parse(option.value));
- if(field.selectedOptions[0]?.disabled){const first=[...field.options].find(o=>!o.disabled);if(first){field.value=first.value;parameters.mode=JSON.parse(first.value);}}
+function activeAction(){return state?.actions.find(a=>a.target===api.target&&a.kind!=='Query'&&!terminal.has(a.state));}
+function spec(name){return api.catalog.find(a=>a.name===name);}
+function control(){return state?.operator_control?.[api.target];}
+function manual(){return !!(auth.control&&control()?.mine&&control()?.state==='MANUAL_CONTROL');}
+function canCommand(){return manual()&&selected()?.fresh_vehicle_state&&!activeAction()&&!commandPending;}
+function list(target,rows){target.replaceChildren();for(const[k,v]of rows){const row=node('div');row.append(node('dt',k),node('dd',v??'未知'));target.append(row);}}
+function diagnostic(display,type,fn){const field=display?.diagnostics?.[type];if(!field?.value)return'未知';if(!field.receive_fresh||field.availability==='STALE')return'过期 / 未知';return fn(field.value)+(field.availability==='UNKNOWN_CAPTURE_TIME'?' · 采样时间未知':'');}
+function actionStatus(a){return a.state==='CANCELLED'&&a.safety?.release_safe&&['Drive','SetVelocity'].includes(a.name)?'已停止输入':api.stateLabel(a.state);}
+function merge(value,withControl=false){
+ if(state?.observed_at_ns&&BigInt(value.observed_at_ns)<BigInt(state.observed_at_ns)){if(withControl)state.operator_control=value.operator_control;return;}
+ state={...value,operator_control:withControl?value.operator_control:state?.operator_control||{}};lastReceived=performance.now();render();
 }
-const fmt=value=>typeof value==='number'&&Number.isFinite(value)?value.toFixed(2):'未知';
-const vector=value=>value?`X ${fmt(value.x)} · Y ${fmt(value.y)} · Z ${fmt(value.z)}`:'未知';
-$('#speed').addEventListener('input',()=>{$('#speed-value').textContent=Number($('#speed').value).toFixed(2)+' m/s';});
-async function catalog(){await api.loadCatalog();$('#action').replaceChildren();for(const s of api.catalog)$('#action').append(api.node('option',api.actionLabel(s.name)+' · '+api.kindLabel(s.kind),{value:s.name+'@'+s.version}));form();}
-$('#connect').onclick=api.guard(async()=>{await api.connect();await catalog();await poll();});
-$('#target').onchange=api.guard(async()=>{await stop();await catalog();await poll();});$('#action').onchange=form;
-$('#execute').onclick=api.guard(async()=>{
- const s=chosen();if(!s)return;
- if(s.kind==='Continuous'&&s.name!=='Hold')throw Error('持续输入请使用右侧按住操控；Hold 可通过 Action Lab 有界执行。');
- api.validateParameters(s.parameters,parameters);
- if(s.name==='SetMode'&&selected()?.display&&!selected().display.mode_choices.includes(parameters.mode))throw Error(selected().display.control_hint);
- const p={name:s.name,version:s.version,target:api.target,parameters,allow_send:$('#send').checked};
- const retained=state?.actions.filter(a=>a.target===api.target&&a.state==='SUCCEEDED'&&a.safety?.continuation_allowed).at(-1);
- const continuation=$('#continuation').value.trim()||(selected()?.kind==='plane'?retained?.id:'');if(continuation)p.continuation_of=continuation;
- $('#send').checked=false;const a=await api.call('/api/manual/action',p);$('#log').textContent=JSON.stringify(a,null,2);await poll();
+async function refresh(){if(polling||closing)return;polling=true;try{merge(await api.call('/api/control/state'),true);}catch(e){invalidate();throw e;}finally{polling=false;}}
+function invalidate(){if(state)for(const v of state.vehicles){v.fresh_vehicle_state=false;v.connected=false;}render();}
+async function loseControl(message){
+ const token=auth.control;
+ await stop();
+ if(token&&api.target)try{await api.call('/api/control/release',{target:api.target});}catch(_){}
+ auth.control='';if(state?.operator_control?.[api.target])state.operator_control[api.target].mine=false;
+ $('#manual-send').checked=false;$('#copter-manual-send').checked=false;$('#send').checked=false;
+ if(message)notice(message);render();
+}
+async function renew(){
+ if(!auth.control||renewing||closing)return;renewing=true;
+ try{await api.call('/api/control/renew',{target:api.target});}
+ catch(e){await loseControl('控制权已失效：'+e.message);}
+ finally{renewing=false;}
+}
+function live(){
+ if(closing)return;
+ socket=new WebSocket((location.protocol==='https:'?'wss:':'ws:')+'//'+location.host+'/ws/telemetry');
+ socket.onopen=()=>{$('#live-status').textContent='LIVE · WebSocket';retry=0;};
+ socket.onmessage=e=>{try{const m=JSON.parse(e.data);if(m.type==='telemetry')merge(m.result);}catch(_){notice('状态帧无效；已暂停操作。');invalidate();loseControl();}};
+ socket.onclose=e=>{
+  if(closing)return;$('#live-status').textContent='重连中 · HTTP 回退';invalidate();loseControl('实时连接中断，持续输入已退出；重连后需重新申请控制权。');
+  if(e.code===4401){auth.lost();return;}setTimeout(live,Math.min(5000,700*2**retry++));
+ };
+ socket.onerror=()=>{};
+}
+function confirmOperation(title,description,fn){
+ if(confirmation)throw Error('请先处理当前确认操作');
+ confirmation=fn;$('#confirm-title').textContent=title;$('#confirm-description').textContent=description;$('#confirm-send').checked=false;$('#confirm-submit').disabled=true;$('#command-confirm').showModal();
+}
+$('#confirm-send').onchange=()=>$('#confirm-submit').disabled=!$('#confirm-send').checked;
+$('#confirm-cancel').onclick=()=>{$('#command-confirm').close();confirmation=null;};
+$('#command-confirm').addEventListener('cancel',()=>confirmation=null);
+$('#confirm-submit').onclick=guard(async()=>{
+ if(!confirmation||!$('#confirm-send').checked)return;
+ const fn=confirmation;confirmation=null;$('#command-confirm').close();await fn();
 });
-$('#reestablish').onclick=api.guard(async()=>{$('#log').textContent=JSON.stringify(await api.call('/api/control/reestablish',{target:api.target}),null,2);await poll();});
-$('#takeover').onclick=api.guard(async()=>{$('#log').textContent=JSON.stringify(await api.call('/api/control/takeover',{target:api.target}),null,2);});
+function request(name,parameters={},critical=false){
+ if(!canCommand())throw Error('请先申请控制权，等待有效遥测及当前动作退出');
+ if(!spec(name))throw Error('当前车型未注册此能力');
+ const submit=async()=>{
+  if(!canCommand())throw Error('控制状态已变化，请重新核查');
+   $('#send').checked=false;
+  commandPending=true;render();
+  try{
+   const payload={name,version:spec(name).version,target:api.target,parameters,allow_send:true};
+   const retained=state.actions.filter(a=>a.target===api.target&&a.state==='SUCCEEDED'&&a.safety?.continuation_allowed).at(-1);
+   if(selected().kind==='plane'&&retained)payload.continuation_of=retained.id;
+   const a=await api.call('/api/manual/action',payload);lastAction=a.id;
+   if(name==='Takeoff')targetHeight=parameters.height_m;
+   notice('已受理 '+api.actionLabel(name)+'；等待独立的飞控与状态确认。');
+   await refresh();
+  }finally{commandPending=false;render();}
+ };
+ if(critical){confirmOperation('确认 '+api.actionLabel(name),`${api.target} / ${api.kindLabel(selected().kind)}\n${name==='Takeoff'?'目标相对高度 '+parameters.height_m+' m · odom 向上':'请确认车辆、周边与飞控状态。'}\n此次授权仅适用于这一条动作。`,submit);}
+ else{if(!$('#send').checked)throw Error('请勾选“授权下一条模式或目标指令”');$('#send').checked=false;return submit();}
+}
+$('#acquire-control').onclick=guard(async()=>{
+ if(!selected())throw Error('无车辆可申请');
+ $('#control-level').textContent='Acquire Control · 申请中';$('#acquire-control').disabled=true;
+ try{const r=await api.call('/api/control/acquire',{target:api.target});auth.control=r.control_token;notice('已获得页面操作权；SEND 仍按每个 Action 单独校验。');await refresh();}
+ finally{render();}
+});
+$('#release-control').onclick=guard(async()=>{await loseControl('已请求安全退出；确认释放状态以右侧证据为准。');await refresh();});
+$('#request-takeover').onclick=guard(()=>{
+ confirmOperation('明确接管请求',`目标 ${api.target}\n先请求当前 Mission / Action 安全退出。此操作不会立即获得控制权；未确认退出时仍禁止新运动。`,async()=>{await api.call('/api/control/request-takeover',{target:api.target,confirmed:true});await loseControl();await refresh();notice('接管退出请求已提交；等待原主体释放后，再点击 Acquire Control。');});
+});
+$('#safety-entry').onclick=guard(async()=>{if(auth.control){await loseControl('安全退出已请求；不将取消等同于物理停止。');await refresh();}else $('#request-takeover').click();});
+$('#set-mode').onclick=guard(()=>request('SetMode',{mode:$('#mode').value}));
+for(const b of document.querySelectorAll('[data-action]'))b.onclick=guard(()=>request(b.dataset.action,{},['Arm','Disarm','AutoLand'].includes(b.dataset.action)));
+$('#takeoff').onclick=guard(()=>{const height=Number($('#takeoff-height').value);if(!Number.isFinite(height)||height<.2||height>2)throw Error('起飞高度须为 0.2–2 m');return request('Takeoff',{height_m:height},true);});
+$('#plane-takeoff').onclick=guard(()=>request('Takeoff',{height_m:Number($('#plane-height').value)},true));
+$('#return-control').onclick=guard(()=>request(selected()?.kind==='plane'?'RTL':'ReturnHome'));
+$('#hold-control').onclick=guard(async()=>{
+ if(session){await stop();return;}
+ if(!canCommand())throw Error('需当前页面控制权与有效遥测');
+ $('#send').checked=true;
+ if(selected().kind==='rover')return request('Stop');
+ if(selected().kind==='copter')return request('SetMode',{mode:'LOITER'});
+ return request('Loiter');
+});
+$('#guided-target').onclick=guard(()=>{
+ const parameters={latitude_deg:Number($('#latitude').value),longitude_deg:Number($('#longitude').value),altitude_amsl_m:Number($('#altitude-amsl').value)};
+ if(['#latitude','#longitude','#altitude-amsl'].some(id=>$(id).value.trim()==='')||Object.values(parameters).some(v=>!Number.isFinite(v)))throw Error('请填写完整的 WGS84 经纬度与 AMSL 目标海拔');
+ return request('SetGuidedTarget',parameters);
+});
+$('#goto').onclick=guard(()=>{
+ const fields=selected().kind==='rover'?['#goto-x','#goto-y']:['#goto-x','#goto-y','#goto-z'];
+ if(fields.some(id=>$(id).value.trim()===''||!Number.isFinite(Number($(id).value))))throw Error('请填写完整的有限位置坐标');
+ return request('Goto',{x_m:Number($('#goto-x').value),y_m:Number($('#goto-y').value),z_m:selected().kind==='rover'?0:Number($('#goto-z').value)});
+});
+// Copter's existing velocity interface is deliberately behind the advanced panel.
+const stream=$('#copter-stream');
+stream.append(node('div',undefined,{class:'speed-row'}));stream.lastChild.append(node('label','速度限制',{for:'copter-speed'}),node('input',undefined,{id:'copter-speed',type:'range',min:'.1',max:'.5',step:'.05',value:'.3'}),node('output','0.30 m/s',{id:'copter-speed-value'}));
+const authorization=node('label',undefined,{class:'send-authorization'});authorization.append(node('input',undefined,{type:'checkbox',id:'copter-manual-send'}),document.createTextNode('授权下一次按住操控'));stream.append(authorization);
+const pad=node('div',undefined,{class:'direction-pad'});
+for(const[key,label,position]of [['w','↑ 前进','forward'],['a','← 左移','left'],['d','→ 右移','right'],['s','↓ 后退','back']]){const b=node('button',label,{'data-key':key,'data-needs-control':'',class:'key-'+position});pad.append(b);}
+const cstop=node('button','HOLD',{class:'key-stop danger',id:'copter-manual-stop','data-needs-control':''});pad.append(cstop);stream.append(pad);
+const extra=node('div',undefined,{class:'extra-keys'});for(const[key,label]of [['q','Q · 上升'],['e','E · 下降'],['r','R · 左转向'],['f','F · 右转向']])extra.append(node('button',label,{'data-key':key,'data-needs-control':''}));stream.append(extra);
+for(const prefix of ['', 'copter-'])$('#'+prefix+'speed').oninput=()=>$('#'+prefix+'speed-value').textContent=Number($('#'+prefix+'speed').value).toFixed(2)+' m/s';
+function streamPrefix(){return selected()?.kind==='copter'?'copter-':'';}
 function values(){
- const k=selected()?.kind,speed=Number($('#speed').value),axis=(positive,negative)=>(keys.has(positive)?1:0)-(keys.has(negative)?1:0);
- if(k==='rover')return{speed_mps:speed*axis('w','s'),yaw_rate_rad_s:.25*(axis('a','d')||axis('r','f'))};
+ const speed=Number($('#'+streamPrefix()+'speed').value),axis=(p,n)=>(keys.has(p)?1:0)-(keys.has(n)?1:0);
+ if(selected()?.kind==='rover')return{speed_mps:speed*axis('w','s'),yaw_rate_rad_s:.25*(axis('a','d')||axis('r','f'))};
  return{vx_mps:speed*axis('w','s'),vy_mps:speed*axis('a','d'),vz_mps:.2*axis('q','e'),yaw_rate_rad_s:.25*axis('r','f'),frame:'base_link'};
 }
 async function begin(){
  if(pending||session||!keys.size)return;
- const v=selected();if(!v||v.kind==='plane')return;
- if(!$('#manual-send').checked){keys.clear();throw Error('请重新授权下一次按住操控');}
- if(v.world?.vehicle?.operation?.armed!==true||v.world?.vehicle?.operation?.native_mode!=='ARDUPILOT_CUSTOM_'+(v.kind==='rover'?15:4)){
-  keys.clear();$('#manual-send').checked=false;throw Error('请先切换 GUIDED 并解锁；多旋翼还需先起飞。');
- }
- $('#manual-send').checked=false;pending=true;
- try{
-  const r=await api.call('/api/manual/start',{name:v.kind==='rover'?'Drive':'SetVelocity',target:api.target,parameters:values(),allow_send:true});
-  session=r.session;input=r.action;if(!keys.size)await stop();
- }finally{pending=false;}
+ if(!canCommand()||selected().kind==='plane'){keys.clear();throw Error('持续控制不可用');}
+ const v=selected(),op=v.world?.vehicle?.operation,height=v.world?.vehicle?.reported_pose?.value.position.z;
+ if(op?.armed!==true||op.native_mode!=='ARDUPILOT_CUSTOM_'+(v.kind==='rover'?15:4)||v.kind==='copter'&&!(height>.3)){keys.clear();throw Error('请先切换 GUIDED、解锁；多旋翼必须先起飞。');}
+ const check=$('#'+streamPrefix()+'manual-send');if(!check.checked){keys.clear();throw Error('请重新授权下一次按住操控');}check.checked=false;pending=true;
+ try{const r=await api.call('/api/manual/start',{name:v.kind==='rover'?'Drive':'SetVelocity',target:api.target,parameters:values(),allow_send:true});session=r.session;input=r.action;lastAction=input.id;if(!keys.size)await stop();}
+ finally{pending=false;}
 }
-async function stop(){
- keys.clear();document.querySelectorAll('[data-key]').forEach(b=>b.classList.remove('pressed'));const s=session;session=null;input=null;
- if(s)try{await api.call('/api/manual/stop',{session_id:s.id});}catch(e){api.report('停止请求未确认；服务器 deadman 仍独立生效。'+e.message);}
-}
+async function stop(){keys.clear();for(const b of document.querySelectorAll('[data-key]'))b.classList.remove('pressed');const s=session;session=null;input=null;if(s)try{await api.call('/api/manual/stop',{session_id:s.id});}catch(e){notice('停止请求未确认；独立 watchdog 仍生效。'+e.message);}}
 async function update(){
  if(!session||!input||updating||!keys.size)return;
- if(terminal.has(input.state)){session=null;input=null;keys.clear();return;}
- if(input.state!=='RUNNING'){
-  try{input=await api.call('/api/manual/state?session_id='+encodeURIComponent(session.id));}catch(e){await stop();api.report(e);return;}
-  if(input.state!=='RUNNING')return;
- }
+ if(!manual()||!selected()?.fresh_vehicle_state){await stop();return;}
  updating=true;
  try{
-  input=await api.call('/api/manual/update',{session_id:session.id,sequence:input.input_sequence+1,deadline_ns:input.input_ticket,parameters:values()});
- }catch(e){await stop();api.report(e);}finally{updating=false;}
+  if(terminal.has(input.state)){session=null;input=null;keys.clear();return;}
+  if(input.state!=='RUNNING')input=await api.call('/api/manual/state?session_id='+encodeURIComponent(session.id));
+  if(input.state==='RUNNING')input=await api.call('/api/manual/update',{session_id:session.id,sequence:input.input_sequence+1,deadline_ns:input.input_ticket,parameters:values()});
+ }catch(e){await stop();notice(e);}finally{updating=false;}
 }
-function down(key){if(!'wasdqerf'.includes(key)||selected()?.kind==='plane'||!selected()?.fresh_vehicle_state)return;keys.add(key);document.querySelector(`[data-key="${key}"]`)?.classList.add('pressed');begin().catch(api.report);}
-function up(key){keys.delete(key);if('wasdqerf'.includes(key)&&key.length===1)document.querySelector(`[data-key="${key}"]`)?.classList.remove('pressed');if(!keys.size)stop().catch(api.report);}
-for(const b of document.querySelectorAll('[data-key]')){
- b.onpointerdown=e=>{e.preventDefault();b.setPointerCapture(e.pointerId);down(b.dataset.key);};
- b.onpointerup=()=>up(b.dataset.key);b.onpointercancel=()=>stop();
-}
-window.addEventListener('keydown',e=>{const editing=e.target.matches('textarea,select,input:not([type="checkbox"]):not([type="range"])')||e.target.isContentEditable;if(editing||e.repeat)return;if('wasdqerf'.includes(e.key.toLowerCase())){e.preventDefault();down(e.key.toLowerCase());}});
+function down(key){if(!'wasdqerf'.includes(key)||!manual()||selected()?.kind==='plane')return;keys.add(key);for(const b of document.querySelectorAll('[data-key]'))b.classList.toggle('pressed',keys.has(b.dataset.key));begin().catch(notice);}
+function up(key){keys.delete(key);for(const b of document.querySelectorAll('[data-key]'))b.classList.toggle('pressed',keys.has(b.dataset.key));if(!keys.size)stop();}
+for(const b of document.querySelectorAll('[data-key]')){b.onpointerdown=e=>{e.preventDefault();b.setPointerCapture(e.pointerId);down(b.dataset.key);};b.onpointerup=()=>up(b.dataset.key);b.onpointercancel=()=>stop();}
+window.addEventListener('keydown',e=>{if(e.repeat||e.target.matches('textarea,select,input:not([type="checkbox"]):not([type="range"])')||e.target.isContentEditable||$('#command-confirm').open)return;if('wasdqerf'.includes(e.key.toLowerCase())){e.preventDefault();down(e.key.toLowerCase());}});
 window.addEventListener('keyup',e=>up(e.key.toLowerCase()));window.addEventListener('blur',()=>stop());
-document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();});window.addEventListener('pagehide',()=>stop());$('#manual-stop').onclick=()=>stop();
-setInterval(()=>update(),100);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();});
+window.addEventListener('pagehide',()=>{closing=true;stop();if(auth.control)loseControl();if(socket)socket.close();});
+window.addEventListener('vaf:auth-lost',()=>{closing=true;stop();auth.control='';if(socket)socket.close();});
+$('#manual-stop').onclick=()=>stop();$('#copter-manual-stop').onclick=()=>stop();
+function renderFeedback(){
+ const actions=state.actions.filter(a=>a.target===api.target),a=actions.find(a=>a.id===lastAction)||actions.at(-1);
+ $('#recent-commands').replaceChildren();for(const old of actions.slice(-5).reverse()){const row=node('div');row.append(node('span',api.actionLabel(old.name)),node('span',actionStatus(old),{class:'badge','data-tone':old.state==='SUCCEEDED'||old.safety?.release_safe?'good':'warning'}));$('#recent-commands').append(row);}
+ if(!a)return;
+ $('#current-command').textContent=api.actionLabel(a.name);$('#command-state').textContent=actionStatus(a);
+ $('#stage-request').textContent='已受理 · '+a.id.slice(-8);
+ const evidence=a.command_evidence||[],phases=evidence.map(e=>e.phase),acks=evidence.filter(e=>e.ack_evidence);
+ $('#stage-send').textContent=phases.some(p=>['TRANSMITTED','ACKNOWLEDGED','COMPLETED'].includes(p))?'已写入 / 发送':phases.includes('UNKNOWN')?'发送结果未确认':a.state==='REJECTED'?'被拒绝，未放行':'等待执行 / 尚无证据';
+ $('#stage-ack').textContent=acks.length?'收到 ACK · result '+acks.at(-1).ack_evidence.result+'（仍须核对目标状态）':evidence.some(e=>e.effect_type==='TwistTargetEffect'||e.effect_type==='PoseTargetEffect')?'此类 setpoint 不提供 MAVLink ACK':'未收到 / 未提供';
+ $('#stage-state').textContent=phases.includes('COMPLETED')?(a.name==='SetGuidedTarget'?'目标配置已确认，非到达':a.name==='SetMode'||a.name==='Loiter'||a.name==='RTL'?'飞控配置已确认，非物理到达':'已有命令状态确认'):'等待实际状态确认';
+ if(a.result?.physical_goal_observed)$('#stage-state').textContent='实际目标已观察并确认';
+ if(['UNKNOWN','TIMED_OUT','FAILED'].includes(a.state)&&!a.safety?.release_safe)$('#stage-state').textContent='结果 / 安全退出未确认';
+ $('#command-error').textContent=a.error||a.safety?.reason||'';$('#command-error').dataset.tone=a.error?'error':'';
+}
 function render(){
- document.querySelectorAll('[data-key]').forEach(b=>b.classList.toggle('pressed',keys.has(b.dataset.key)));
  const v=selected();if(!v)return;
- const w=v.fresh_vehicle_state?v.world:null,vehicle=w?.vehicle,pose=vehicle?.reported_pose,twist=vehicle?.reported_twist;
- const display=v.fresh_vehicle_state?(v.display||{}):{control_hint:'车辆遥测已过期或断开，当前状态未知。'};
- $('#control-hint').textContent=display.control_hint||'连接成功不代表可以解锁，请核查状态。';modeChoices();
- for(const key of ['q','e'])document.querySelector(`[data-key="${key}"]`).hidden=v.kind==='rover';
- $('#stream-controls').hidden=v.kind==='plane';$('#plane-manual-help').hidden=v.kind!=='plane';
- api.connection(v.connected?'车辆已连接 · '+api.kindLabel(v.kind):'车辆连接已中断',v.connected?'connected':'error');
- const grid=$('#status');grid.replaceChildren();
- const metrics={
-  '连接状态':v.connected?'已连接':'已断开',
-  '签名验证':v.signing_configured?`已验证 ${v.verified_frames} 帧`:'未配置',
-  '状态新鲜度':v.fresh_vehicle_state?'有效':'未知',
-  '解锁状态':vehicle?.operation?.armed===true?'已解锁':vehicle?.operation?.armed===false?'未解锁':'未知',
-  '当前模式':display.mode_name||vehicle?.operation?.native_mode||'未知',
-  '飞控系统 ID':display.source_system??'未知',
-  '定位样本延迟（秒）':fmt(display.pose_age_s),
-  '发送授权':`系统 ${v.system_send?'开':'关'} · 动作 ${v.action_send?'开':'关'}`,
-  '车辆执行域':v.scope?'已占用 · 见控制权详情':'无活跃执行域',
-  '位置（米）':vector(pose?.value.position),
-  'ENU 航向（度）':pose?(Math.atan2(2*(pose.value.orientation.w*pose.value.orientation.z+pose.value.orientation.x*pose.value.orientation.y),1-2*(pose.value.orientation.y**2+pose.value.orientation.z**2))*180/Math.PI).toFixed(1):'未知',
-  'odom 向上高度（米）':fmt(pose?.value.position.z),
-  '速度（米/秒）':vector(twist?.value.linear),
-  '地速（米/秒）':fmt(display.horizontal_speed_mps),
-  '升降速度（米/秒）':fmt(display.vertical_speed_mps),
-  '空速（米/秒）':fmt(display.airspeed_mps),
-  '电池电压（V）':fmt(display.battery?.voltage_v),
-  '电池电量（%）':fmt(display.battery?.remaining_percent),
-  'GPS':diagnostic(display,'GPS_RAW_INT',v=>`定位 ${v.fix_type} · 卫星 ${v.satellites??'未知'} · HDOP ${fmt(v.hdop)}`),
-  'EKF':diagnostic(display,'EKF_STATUS_REPORT',v=>`标志 ${v.flags}`),
-  '飞控状态消息':diagnostic(display,'STATUSTEXT',v=>v.text),
-  '姿态四元数':pose?`W ${fmt(pose.value.orientation.w)} · X ${fmt(pose.value.orientation.x)} · Y ${fmt(pose.value.orientation.y)} · Z ${fmt(pose.value.orientation.z)}`:'未知'};
- for(const[k,value]of Object.entries(metrics)){
-  const cell=api.node('div');cell.append(api.node('strong',k),api.node('span',String(value)));
-  if(k==='连接状态')cell.dataset.tone=v.connected?'good':'warning';
-  if(k==='状态新鲜度')cell.dataset.tone=v.fresh_vehicle_state?'good':'warning';
-  grid.append(cell);
- }
- const actions=state.actions.filter(a=>a.target===api.target),missions=state.missions.filter(m=>m.target===api.target);
- if(actions.length)$('#log').textContent=JSON.stringify(actions.at(-1),null,2);
- $('#activity').textContent=JSON.stringify({missions:missions.map(m=>({id:m.id,state:m.state,release_safe:m.release_safe,continuation_of:m.continuation_of})),
-  restarted:state.recovered_actions.filter(a=>a.target===api.target),actions:actions.slice(-5).map(a=>({id:a.id,name:a.name,state:a.state,safety:a.safety})),resources:state.resources},null,2);
- const summary=$('#activity-summary');summary.replaceChildren();
- const row=(label,value,warning=false)=>{const el=api.node('div',undefined,{class:'activity-row'}),badge=api.node('span',value);if(warning)badge.dataset.tone='warning';el.append(api.node('strong',label),badge);summary.append(el);};
- row('任务',missions.length?api.stateLabel(missions.at(-1).state):'暂无任务',missions.at(-1)?.state==='UNKNOWN');
- for(const a of actions.slice(-3))row(api.actionLabel(a.name),api.stateLabel(a.state),['UNKNOWN','UNCONFIRMED','FAILED'].includes(a.state));
- row('资源记录',String(state.resources.length)+' 项 · 详见原始记录');
- const uncertain=missions.some(m=>m.state==='UNKNOWN'||!m.release_safe)||actions.some(a=>['UNKNOWN','UNCONFIRMED'].includes(a.state));
- if(uncertain)row('安全退出','含未确认记录，请核查资源',true);
- $('#manual-summary').textContent=session?'输入会话 · '+api.stateLabel(input?.state||'STARTING'):'当前无持续输入会话';
- if(session){const a=actions.find(a=>a.id===session.action_id);if(a&&(!input||a.input_sequence>input.input_sequence||a.input_sequence===input.input_sequence&&(['CANCELLING',...terminal].includes(a.state)||input.state!=='RUNNING')))input=a;
-  $('#session').textContent=JSON.stringify({session_id:session.id,action:input?.id,state:input?.state,input_sequence:input?.input_sequence,input_deadline_ns:input?.input_deadline_ns},null,2);
-  if(input&&terminal.has(input.state)){session=null;input=null;keys.clear();}}
- const retained=actions.filter(a=>a.state==='SUCCEEDED'&&a.safety?.continuation_allowed).at(-1);
- $('#continuation').placeholder=retained?'续接：'+retained.id:'固定翼续接动作 ID（可选）';
- draw(v);
+ const fresh=v.fresh_vehicle_state,veh=fresh?v.world?.vehicle:null,display=fresh?v.display||{}:{},pose=veh?.reported_pose?.value,op=veh?.operation,ctrl=control(),mine=manual();
+ $('#vehicle-name').textContent=v.target+' / '+({rover:'Rover',copter:'Copter',plane:'Plane'}[v.kind]||v.kind);$('#kind-label').textContent=api.kindLabel(v.kind);
+ $('#environment').textContent=v.owned_simulation?'SITL · 自有仿真':'Real Hardware / 未准入 · 只读';$('#connection-state').textContent=v.connected?'MAVLink · Connected':'MAVLink · Disconnected';$('#link-dot').style.background=fresh?'#087e79':'#9a661b';
+ $('#top-mode').textContent='Mode · '+(display.mode_name||'未知');$('#top-armed').textContent=op?.armed===true?'ARMED':op?.armed===false?'DISARMED':'Armed · 未知';$('#top-armed').dataset.tone=op?.armed===true?'warning':'';
+ $('#top-authority').textContent=mine?'Manual Control':ctrl?.state==='RELEASING'?'Releasing':'Observer';$('#control-level').textContent=mine?'Manual Control · 人工控制':ctrl?.state==='RELEASING'?'安全退出中 · 未确认释放':'Observer · 只读观察';$('#control-badge').textContent=mine?'页面操作权已获得':'只读';
+ $('#control-reason').textContent=ctrl?.reason||'页面操作权与实际执行 SEND 分开校验。';$('#acquire-control').disabled=!ctrl?.can_acquire;$('#acquire-control').hidden=mine;$('#release-control').hidden=!mine;
+ $('#status-health').textContent=fresh?veh?.health?.quality||'UNKNOWN':'STALE / UNKNOWN';$('#status-health').dataset.tone=fresh?'good':'warning';
+ let heading=typeof display.heading_enu_deg==='number'?(90-display.heading_enu_deg+360)%360:null;
+ const rows=[['Vehicle ID / Type',v.target+' / '+v.kind],['Flight Mode',display.mode_name||'未知'],['Armed',op?.armed===true?'Armed':op?.armed===false?'Disarmed':'未知'],['Battery',display.battery?.remaining_percent==null?'未知':fmt(display.battery.remaining_percent,0)+' %'],['Voltage',display.battery?.voltage_v==null?'未知':fmt(display.battery.voltage_v)+' V'],['Ground Speed',fmt(display.horizontal_speed_mps)+' m/s'],['Altitude · odom U',fmt(pose?.position.z)+' m'],['Heading · N / CW',fmt(heading,1)+'°'],['GPS Fix / Satellites',diagnostic(display,'GPS_RAW_INT',g=>'Fix '+g.fix_type+' / '+(g.satellites??'未知'))],['EKF',diagnostic(display,'EKF_STATUS_REPORT',e=>'Flags '+e.flags)],['Failsafe',typeof display.failsafe==='boolean'?(display.failsafe?'触发':'未触发'):'未知 · 未提供独立标志'],['Telemetry',fresh?'有效 · '+fmt(display.pose_age_s,2)+' s':'过期 / 未知']];
+ if(v.kind==='plane'){rows.splice(7,0,['Airspeed',fmt(display.airspeed_mps)+' m/s']);rows.push(['Relative Altitude',fmt(pose?.position.z)+' m'],['AMSL',fmt(veh?.global_position?.value.altitude_m)+' m']);}
+ list($('#vehicle-status'),rows);
+ const q=pose?.orientation;
+ $('#roll').textContent=q?fmt(Math.atan2(2*(q.w*q.x+q.y*q.z),1-2*(q.x*q.x+q.y*q.y))*180/Math.PI,1)+'°':'未知';$('#pitch').textContent=q?fmt(Math.asin(Math.max(-1,Math.min(1,2*(q.w*q.y-q.z*q.x))))*180/Math.PI,1)+'°':'未知';$('#yaw').textContent=fmt(display.heading_enu_deg,1)+'°';
+ $('#telemetry-warning').textContent=fresh?'已验证 '+v.verified_frames+' 帧 · 定位基于真实遥测':'遥测过期或未知，危险操作已禁用。';$('#telemetry-warning').dataset.tone=fresh?'':'warning';
+ $('#control-hint').textContent=display.control_hint||'等待有效遥测。';$('#actual-height').textContent=fmt(pose?.position.z)+' m';$('#target-height').textContent=targetHeight==null?'尚未提交':fmt(targetHeight)+' m';
+ for(const section of document.querySelectorAll('[data-for]'))section.hidden=section.dataset.for!==v.kind;
+ $('#position-advanced').hidden=v.kind==='plane';$('#goto-z').disabled=v.kind==='rover';if(v.kind==='rover')$('#goto-z').value='0';
+ const choices=display.mode_choices||[],mode=$('#mode'),prior=mode.value;
+ if(JSON.stringify([...mode.options].map(o=>o.value))!==JSON.stringify(choices)){mode.replaceChildren(...choices.map(m=>node('option',m,{value:m})));if(choices.includes(prior))mode.value=prior;}
+ const enabled=canCommand();for(const b of document.querySelectorAll('[data-needs-control]'))b.disabled=!enabled;
+ mode.disabled=!enabled||!choices.length;
+ for(const b of document.querySelectorAll('[data-action]')){b.disabled=!enabled||!spec(b.dataset.action);if(b.dataset.action==='Arm')b.disabled=b.disabled||op?.armed!==false;if(b.dataset.action==='Disarm')b.disabled=b.disabled||!op?.armed||!(Math.abs(pose?.position.z??Infinity)<.3);}
+ for(const b of document.querySelectorAll('[data-action="Loiter"],[data-action="RTL"]'))b.disabled=b.disabled||!op?.armed||v.kind==='plane'&&!(pose?.position.z>=10);
+ $('#set-mode').disabled=!enabled||!choices.length;$('#takeoff').disabled=!enabled||op?.armed!==true||op.native_mode!=='ARDUPILOT_CUSTOM_4'||!(pose?.position.z<.3);$('#plane-takeoff').disabled=!enabled||op?.armed!==true||!(pose?.position.z<.3);
+ $('#return-control').disabled=!enabled||!spec(v.kind==='plane'?'RTL':'ReturnHome')||!op?.armed;$('#hold-control').disabled=!mine||!fresh||(!session&&!enabled)||!op?.armed;
+ $('#hold-control').querySelector('strong').textContent=({rover:'停车 / HOLD',copter:'Hold / LOITER',plane:'LOITER · 盘旋'})[v.kind];$('#return-control').querySelector('small').textContent=v.kind==='plane'?'原生 RTL · 非着陆':'RETURN HOME';
+ $('#guided-target').disabled=!enabled||!spec('SetGuidedTarget')||!op?.armed||!(pose?.position.z>=10);$('#goto').disabled=!enabled||!spec('Goto')||!op?.armed;
+ for(const b of document.querySelectorAll('[data-key]')){const movingAllowed=mine&&fresh&&op?.armed===true&&op.native_mode==='ARDUPILOT_CUSTOM_'+(v.kind==='rover'?15:4)&&(v.kind==='rover'||pose?.position.z>.3)&&(!activeAction()||!!session);b.disabled=!movingAllowed;b.classList.toggle('pressed',keys.has(b.dataset.key));}
+ $('#manual-stop').disabled=!mine;$('#copter-manual-stop').disabled=!mine;
+ list($('#authority-info'),[['控制者',ctrl?.holder||'无'],['页面状态',mine?'Manual Control':'Observer'],['系统 SEND',v.system_send?'ON':'OFF'],['Action SEND',v.action_send?'ON':'OFF'],['Execution Lease',v.lease_active?'ACTIVE':'无'],['Scope',v.scope||'无']]);
+ $('#preflight').replaceChildren();const labels={telemetry_valid:'有效遥测',owned_simulation:'明确自有仿真',deployment_send:'部署发送授权',runtime_healthy:'Runtime 无故障',physical_scope_free:'执行域可用'};
+ for(const[k,label]of Object.entries(labels)){const row=node('div'),ok=ctrl?.preflight?.[k]===true;row.append(node('span',label),node('span',ok?'已满足':'未满足 / 未知',{class:'check-state','data-ok':String(ok)}));$('#preflight').append(row);}
+ $('#safety-badge').textContent=fresh?'以动作准入检查为准':'BLOCKED';$('#safety-badge').dataset.tone=fresh?'':'warning';
+ if(session){const a=state.actions.find(a=>a.id===session.action_id);if(a&&terminal.has(a.state)){session=null;input=null;keys.clear();}}
+ const goal=state.actions.filter(a=>a.target===api.target&&a.name==='SetGuidedTarget').at(-1);if(goal)$('#navigation-target').textContent=`请求目标：${goal.parameters.latitude_deg}°, ${goal.parameters.longitude_deg}° / ${goal.parameters.altitude_amsl_m} m AMSL · ${actionStatus(goal)}`;
+ renderFeedback();renderTools();$('#diagnostics').textContent=JSON.stringify({vehicle:v,control:ctrl,last_action:state.actions.find(a=>a.id===lastAction),resources:state.resources},null,2);
 }
-function diagnostic(display,name,format){const field=display.diagnostics?.[name];if(!field?.value)return'未知';const value=format(field.value);return field.receive_fresh&&field.availability!=='STALE'?value+(field.availability==='UNKNOWN_CAPTURE_TIME'?'（采样时间未知）':''):value+'（已过期）';}
-function draw(v){
- const canvas=$('#field'),ctx=canvas.getContext('2d'),W=canvas.width,H=canvas.height;ctx.clearRect(0,0,W,H);ctx.strokeStyle='#244556';
- if(!v.fresh_vehicle_state){mapTransform=null;$('#map-frame').textContent='遥测过期或断开，位置未知';return;}
- for(let x=0;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}for(let y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
- const vehicle=v.world?.vehicle,local=vehicle?.reported_pose,global=vehicle?.global_position;
- mapTransform=null;
- if(v.kind==='plane'){
-  if(!global){$('#map-frame').textContent='WGS84 位置未知：不能创建地图目标';return;}
-  const g=global.value;mapTransform={kind:'plane',x:g.longitude_deg,y:g.latitude_deg,sx:W/.008,sy:H/.004};
-  $('#map-frame').textContent=`WGS84 · 经度 ${g.longitude_deg.toFixed(6)}° · 纬度 ${g.latitude_deg.toFixed(6)}° · 海拔 ${g.altitude_m.toFixed(2)}m AMSL · 坐标系 ${global.frame_id}`;
-  ctx.strokeStyle='#6fcbc0';ctx.beginPath();let first=true;
-  for(const sample of v.track||[]){const g=sample.global_position?.value;if(!g)continue;
-   const x=W/2+(g.longitude_deg-mapTransform.x)*mapTransform.sx,y=H/2-(g.latitude_deg-mapTransform.y)*mapTransform.sy;
-   if(first){ctx.moveTo(x,y);first=false;}else ctx.lineTo(x,y);
-  }ctx.stroke();
-  ctx.fillStyle='#87ded6';ctx.beginPath();ctx.arc(W/2,H/2,6,0,Math.PI*2);ctx.fill();
- }else{
-  if(!local||local.frame_id!=='odom'){ $('#map-frame').textContent='合格 odom ENU 位置未知';return;}
-  const b=v.navigation_bounds||{min_x_m:-16,max_x_m:16,min_y_m:-10,max_y_m:10};
-  mapTransform={kind:v.kind,x:(b.min_x_m+b.max_x_m)/2,y:(b.min_y_m+b.max_y_m)/2,sx:W/(b.max_x_m-b.min_x_m),sy:H/(b.max_y_m-b.min_y_m)};
-  $('#map-frame').textContent=`odom ENU m · E ${local.value.position.x.toFixed(2)} · N ${local.value.position.y.toFixed(2)} · U ${local.value.position.z.toFixed(2)}`;
-  const project=p=>[W/2+(p.x-mapTransform.x)*mapTransform.sx,H/2-(p.y-mapTransform.y)*mapTransform.sy];
-  ctx.strokeStyle='#6fcbc0';ctx.lineWidth=2;ctx.beginPath();let first=true;
-  for(const s of v.track||[]){if(s.frame!=='odom')continue;const[x,y]=project(s.position);if(first){ctx.moveTo(x,y);first=false;}else ctx.lineTo(x,y);}ctx.stroke();
-  const[x,y]=project(local.value.position);ctx.fillStyle='#f1c67c';ctx.beginPath();ctx.arc(x,y,6,0,2*Math.PI);ctx.fill();
+function renderTools(){
+ const panel=$('#tool-shortcuts');panel.replaceChildren();
+ if(!state.tools?.agents?.length){panel.append(node('p','没有在线工具主机；启动已配置的 Desktop Agent 后自动连接。',{class:'muted small-note'}));return;}
+ for(const id of ['qgroundcontrol','rviz2','gazebo']){
+  const pair=state.tools.agents.flatMap(a=>a.tools.filter(t=>t.id===id).map(t=>[a,t])).sort((x,y)=>Number(y[0].connected)-Number(x[0].connected))[0];
+  if(!pair)continue;const[a,t]=pair,i=t.instance,profile=i?.profile_id||state.tools.settings?.profiles?.[a.id+':'+id]?.profile_id||t.profiles[0],check=t.checks[profile],running=i?.process_running===true;
+  const row=node('div',undefined,{class:'tool-shortcut'}),text=node('div');text.append(node('strong',t.name),node('small',!a.connected?'Agent 离线':running?(i.ready?'Ready':'运行中 · 数据就绪待确认'):check?.launchable?'可启动':'依赖 / 桌面不可用'));row.append(text);
+  const button=node('button',running?'已运行':t.type==='gui'?'打开窗口':'启动后台');button.disabled=running||!a.connected||!check?.launchable||t.external_pids.length>0;button.title=running?'请在 Agent 桌面查看窗口；Tool Manager 可停止或重启。':t.external_pids.length?'已有外部进程，仅可观察。':'';
+  button.onclick=guard(async()=>{
+   const saved=state.tools.settings?.context;const workspace=state.tools.workspaces?.runs?.find(r=>r.context?.vehicle_id===api.target&&r.state!=='STOPPED');
+   const ctx=workspace?.context||{vehicle_id:api.target,vehicle_type:selected().kind,environment:selected().owned_simulation?'simulation':'hardware_readonly',ros_namespace:saved?.vehicle_id===api.target?saved.ros_namespace:'/'+api.target.replace(/[^A-Za-z0-9_]/g,'_'),ros_domain_id:saved?.ros_domain_id??91,mavlink_profile:saved?.mavlink_profile||'monitor'};
+   await api.call('/api/tools/operation',{agent_id:a.id,tool_id:id,profile_id:profile,operation:t.type==='gui'?'open':'launch',context:ctx});notice('工具请求已排队；实际运行与就绪状态由 Agent 确认。');await refresh();
+  });row.append(button);panel.append(row);
  }
+ if(!panel.childElementCount)panel.append(node('p','当前主机未注册 QGroundControl、RViz2 或 Gazebo 快捷入口；请在 Tool Manager 查看实际能力。',{class:'muted small-note'}));
 }
-$('#field').onclick=api.guard(e=>{
- const v=selected();if(!v||!mapTransform||!v.fresh_vehicle_state)throw Error('缺少有效定位；地图目标不可用');
- const box=e.target.getBoundingClientRect(),x=(e.clientX-box.left)*e.target.width/box.width,y=(e.clientY-box.top)*e.target.height/box.height;
- const target={x:mapTransform.x+(x-e.target.width/2)/mapTransform.sx,y:mapTransform.y-(y-e.target.height/2)/mapTransform.sy};
- const name=v.kind==='plane'?'SetGuidedTarget':'Goto',s=api.catalog.find(a=>a.name===name);if(!s)throw Error('车型不支持地图目标');
- $('#action').value=s.name+'@'+s.version;form();
- const values=v.kind==='plane'?{latitude_deg:target.y,longitude_deg:target.x}: {x_m:target.x,y_m:target.y};
- for(const[k,value]of Object.entries(values)){parameters[k]=value;const c=$(`#parameters [name="${k}"]`);if(c)c.value=value;}
- $('#notice').textContent='目标参数已设置，请核对坐标/高度并显式执行。';
+$('#target').onchange=guard(async()=>{
+ const target=$('#target').value;commandPending=true;$('#target').disabled=true;render();
+ try{await loseControl();api.target=target;lastAction=null;targetHeight=null;await api.loadCatalog();await refresh();}
+ finally{commandPending=false;$('#target').disabled=false;render();}
 });
-async function poll(){if(polling)return;polling=true;try{state=await api.call('/api/studio/state');render();}finally{polling=false;}}
-setInterval(()=>{if(api.target)poll().catch(e=>{stop();if(state){for(const v of state.vehicles){v.connected=false;v.fresh_vehicle_state=false;}render();}api.report(e);});},500);
+async function initialize(){
+ await auth.ready;if(!auth.session)return;
+ const vehicles=await api.call('/api/vehicles');$('#target').replaceChildren(...vehicles.map(v=>node('option',api.kindLabel(v.kind)+' / '+v.target,{value:v.target})));
+ if(!vehicles.length){$('#vehicle-name').textContent='未装配车辆';notice('当前后端没有车辆。请使用已有的仿真启动入口。');return;}
+ api.target=$('#target').value;await api.loadCatalog();await refresh();live();
+}
+setInterval(()=>update(),100);setInterval(()=>renew(),2000);setInterval(()=>{if(api.target&&!closing)refresh().catch(notice);if(lastReceived&&performance.now()-lastReceived>3500){invalidate();stop();}},1500);
+initialize().catch(notice);

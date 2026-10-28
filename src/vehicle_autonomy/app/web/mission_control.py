@@ -29,6 +29,8 @@ class MissionControl(ActionLab):
         self._tracks = {}
         self.control_fault = None
         self.journal = None
+        from .operator_control import OperatorControls
+        self.operator_controls=OperatorControls(self)
         super().__init__(drivers, registry=registry, event_sink=event_sink,scheduler_period_s=scheduler_period_s)
         try:
             self.journal = MissionJournal(Path(data_dir) / 'missions')
@@ -60,6 +62,7 @@ class MissionControl(ActionLab):
                 try:
                     # Durable intent precedes every callback that may emit.
                     if self.control_fault is None:
+                        self.operator_controls.tick()
                         self.missions.tick()
                         self._sync_manual()
                     for session in tuple(self.manual.values()):
@@ -211,6 +214,7 @@ class MissionControl(ActionLab):
                 self.journal.save_version(spec)
                 return spec.to_dict()
             if operation == 'mission.start':
+                if payload['spec']['target'] in self.operator_controls.records:raise ValueError('Web control reserved; release it before starting a Mission')
                 if payload.keys() - {'spec','allow_send','continuation_of'}: raise ValueError('unknown Mission start fields')
                 self._require_operational()
                 self._idle(payload['spec']['target'], payload.get('continuation_of'))
@@ -289,6 +293,66 @@ class MissionControl(ActionLab):
                 return dict(requested=True, authorization_granted=False, instruction='Wait for trusted safe exit, then explicitly start new control.')
             return super().handle(operation, payload)
 
+    def release_browser(self, principal):
+        with self._control_lock:self.operator_controls.logout(principal)
+
+    def handle_authenticated(self, operation, payload, *, principal, control_token, sessions):
+        if principal!='api' and not sessions.alive(principal):raise ValueError('browser session expired before operation')
+        if operation not in ('control.snapshot','control.takeover','manual.action','manual.start','manual.update','manual.stop','run') and not operation.startswith('operator.'):
+            return self.handle(operation,payload)
+        with self._control_lock:
+            controls=self.operator_controls
+            if operation=='control.snapshot':
+                view=self._snapshot()
+                tools=getattr(self,'tool_service',None)
+                for v in view['vehicles']:
+                    v.pop('track',None)
+                    if v.get('world'):v['world']={k:v['world'][k] for k in ('version','published_at','vehicle')}
+                for a in view['actions']:
+                    a['history']=a['history'][-12:];a['feedback']=a['feedback'][-6:];a['command_results']=a['command_results'][-8:]
+                    reader=getattr(self.drivers[a['target']],'command_feedback',None)
+                    a['command_evidence']=reader(a['id']) if callable(reader) else []
+                view['actions']=view['actions'][-32:]
+                view['missions']=[{k:m.get(k) for k in ('id','target','state','release_safe','continuation_allowed','continuation_of','error')} for m in view['missions'][-20:]]
+                tool_view=None
+                if tools:
+                    raw=tools.snapshot()
+                    tool_view=dict(settings=raw['settings'],workspaces=raw['workspaces'],agents=[])
+                    for a in raw['agents']:
+                        tool_view['agents'].append(dict(id=a['id'],connected=a['connected'],tools=[dict(
+                            id=t['manifest']['id'],name=t['manifest']['name'],type=t['manifest']['type'],
+                            profiles=list(t['manifest']['profiles']),checks=t['checks'],instance=t['instance'],external_pids=t['external_pids']) for t in a['tools']]))
+                return dict(**view,operator_control=controls.snapshot(principal,control_token),tools=tool_view,observed_at_ns=str(self.clock().monotonic_ns))
+            if principal!='api' and operation=='control.takeover':raise ValueError('explicit confirmed takeover flow required')
+            if operation.startswith('operator.'):
+                if principal=='api' or not sessions.alive(principal):raise ValueError('browser session required')
+                if set(payload)!=({'target','confirmed'} if operation=='operator.takeover' else {'target'}):raise ValueError('strict control request required')
+                target=payload['target']
+                if operation=='operator.acquire':return controls.acquire(target,principal,sessions)
+                if operation=='operator.renew':return controls.renew(target,principal,control_token)
+                if operation=='operator.release':return controls.release(target,principal,control_token)
+                if operation=='operator.takeover':
+                    if payload['confirmed'] is not True:raise ValueError('explicit takeover confirmation required')
+                    old=controls.records.get(target)
+                    if old:controls.request_exit(old)
+                    return self.handle('control.takeover',dict(target=target))
+                raise ValueError('unknown operator operation')
+            target=payload.get('target')
+            if operation in ('manual.update','manual.stop'):
+                target=self.manual[payload['session_id']]['target']
+            record=None
+            if operation in ('manual.action','manual.start','manual.update','manual.stop','run'):
+                if principal!='api' and operation!='run':record=controls.check(target,principal,control_token,fresh=operation!='manual.stop')
+                elif target in controls.records:record=controls.check(target,principal,control_token,fresh=operation!='manual.stop')
+            result=self.handle(operation,payload)
+            if operation in ('manual.action','manual.start','run') and type(result) is dict:
+                a=result.get('action',result)
+                if a.get('id'):
+                    controls.owners[a['id']]=principal
+                    if principal!='api':controls.auth_stores[principal]=sessions
+                    if record:record['actions'].add(a['id'])
+            return result
+
     def close(self):
         if self.missions:
             with self._control_lock:
@@ -307,6 +371,11 @@ class MissionControlServer(ActionLabServer):
 
 class MissionControlHandler(ActionLabHandler):
     def do_GET(self):
+        if self.auth_get():return
+        if urlsplit(self.path).path=='/ws/telemetry':
+            if self.path!='/ws/telemetry':self.reply(400,dict(ok=False,error='WebSocket URL takes no credentials or query'));return
+            from .live import stream
+            stream(self);return
         static = {'/studio':('mission-studio.html','text/html; charset=utf-8'),
             '/console':('tool-console.html','text/html; charset=utf-8'),
             '/tool-console.js':('tool-console.js','application/javascript'),
@@ -315,9 +384,11 @@ class MissionControlHandler(ActionLabHandler):
             '/mission-ui.css':('mission-ui.css','text/css'),
             '/mission-studio.js':('mission-studio.js','application/javascript'),
             '/manual-control.js':('manual-control.js','application/javascript'),
+            '/vehicle-control.css':('vehicle-control.css','text/css'),
             '/mission-api.js':('mission-api.js','application/javascript')}
         if self.path in static:
             name, kind = static[self.path]
+            if name.endswith('.html') and not self.page_authorized():return
             self.reply(200, (Path(__file__).parent/'static'/name).read_bytes(), kind);return
         if urlsplit(self.path).path == '/api/world/vehicle':
             if not self.authorized():return
@@ -336,6 +407,7 @@ class MissionControlHandler(ActionLabHandler):
             except ValueError as exc:self.reply(400,dict(ok=False,error=str(exc)));return
             self.invoke('manual.state',dict(session_id=identifier));return
         routes = {'/api/console/state':'console.state','/api/studio/state':'studio.state','/api/missions/library':'mission.library','/api/missions/types':'mission.types'}
+        routes['/api/control/state']='control.snapshot'
         if self.path in routes:
             if self.authorized(): self.invoke(routes[self.path], {})
             return
@@ -354,3 +426,5 @@ class MissionControlHandler(ActionLabHandler):
         '/api/workspaces/launch':'workspace.launch','/api/workspaces/stop':'workspace.stop',
         '/api/workspaces/retry':'workspace.retry','/api/workspaces/reconcile':'workspace.reconcile',
         '/api/control/takeover':'control.takeover','/api/control/reestablish':'control.reestablish'})
+    post_routes.update({'/api/control/acquire':'operator.acquire','/api/control/renew':'operator.renew',
+        '/api/control/release':'operator.release','/api/control/request-takeover':'operator.takeover'})

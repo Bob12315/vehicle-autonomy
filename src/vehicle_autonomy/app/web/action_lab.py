@@ -70,10 +70,13 @@ class ActionLabHandler(Handler):
     post_routes={'/api/run':'run','/api/cancel':'cancel'}
     max_json_bytes=8192
     def do_GET(self):
+        if self.auth_get():return
         static={'/':('action-lab.html','text/html; charset=utf-8'),
             '/action-lab.js':('action-lab.js','application/javascript'),'/action-lab.css':('action-lab.css','text/css')}
         if self.path in static:
-            name,kind=static[self.path];self.reply(200,(Path(__file__).parent/'static'/name).read_bytes(),kind);return
+            name,kind=static[self.path]
+            if name.endswith('.html') and not self.page_authorized():return
+            self.reply(200,(Path(__file__).parent/'static'/name).read_bytes(),kind);return
         if not self.authorized():return
         try:parts=urlsplit(self.path);query=parse_qs(parts.query,strict_parsing=True)
         except ValueError:self.reply(400,{'ok':False,'error':'invalid Action query'});return
@@ -82,6 +85,7 @@ class ActionLabHandler(Handler):
             self.reply(404,{'ok':False,'error':'unknown Action route'});return
         self.invoke(routes[parts.path],{k:v[0] for k,v in query.items()})
     def do_POST(self):
+        if self.auth_post():return
         if not self.authorized(mutation=True):return
         operation=self.post_routes.get(self.path)
         try:
@@ -96,6 +100,7 @@ class ActionLabHandler(Handler):
         except (ValueError,TypeError) as exc:
             self.reply(400,{'ok':False,'error':str(exc)});return
         canonical=json.dumps([operation,payload],sort_keys=True,allow_nan=False)
+        identifier=(self.principal,identifier)
         with self.server.request_lock:
             if identifier in self.server.requests:
                 old,code,response=self.server.requests[identifier]

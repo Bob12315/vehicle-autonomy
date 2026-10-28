@@ -1,4 +1,5 @@
 """Chrome creates/saves/launches a real multi-process Workspace via the UI."""
+from tests.browser_auth import login
 import argparse
 import json
 from pathlib import Path
@@ -17,7 +18,7 @@ def run(directory):
             browser=pw.chromium.launch(executable_path='/usr/bin/google-chrome',headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
             try:
                 page=browser.new_page(viewport={'width':1560,'height':1080});page.on('pageerror',lambda e:errors.append(str(e)))
-                page.goto(h.base+'/console#workspaces');page.locator('#token').fill(h.web_token);page.locator('#connection button[type=submit]').click()
+                login(page,h.base,h.web_token,'/console#workspaces')
                 expect(page.locator('#link-state')).to_have_text('控制中心已连接')
                 page.locator('#workspace-new').click();editor=page.locator('#workspace-editor')
                 editor.locator('.form-grid input').nth(0).fill('ui-work');editor.locator('.form-grid input').nth(1).fill('UI dependency workspace')
@@ -33,10 +34,10 @@ def run(directory):
                 editor.get_by_role('button',name='保存 Workspace',exact=True).click();expect(row).to_contain_text('Saved while running')
                 assert h.local.counter==2 and all(v['process_running'] for v in h.local.instances.values())
                 page.evaluate('scrollTo(0,0)');page.wait_for_timeout(300)
-                page.screenshot(path=str(directory/'workspace-desktop.png'),full_page=True,mask=[page.locator('#token')],mask_color='#243d4a')
-                page.locator('#disconnect').click();expect(row.locator('.workspace-heading .badge')).to_have_text('UNKNOWN')
+                page.screenshot(path=str(directory/'workspace-desktop.png'),full_page=True,mask=[],mask_color='#243d4a')
+                page.context.set_offline(True);expect(row.locator('.workspace-heading .badge')).to_have_text('UNKNOWN')
                 assert all(v['process_running'] for v in h.local.instances.values())
-                page.locator('#token').fill(h.web_token);page.locator('#connection button[type=submit]').click()
+                page.context.set_offline(False);page.reload();page.wait_for_function('window.VAFAuth && window.VAFAuth.session')
                 expect(row.locator('.workspace-heading .badge')).to_have_text('READY')
                 row.get_by_role('button',name='Stop Workspace',exact=True).click();expect(row.locator('.workspace-heading .badge')).to_have_text('STOPPED',timeout=15000)
                 expect(row.locator('.component-state').first).to_contain_text('功能就绪 NO')
@@ -44,7 +45,7 @@ def run(directory):
                 page.locator('#workspace-new').click();editor.locator('[aria-label="Workspace 预设"]').select_option('rover-navigation');editor.get_by_role('button',name='载入预设',exact=True).click()
                 expect(editor.locator('.form-grid input').nth(0)).to_have_value('rover-navigation')
                 page.set_viewport_size({'width':390,'height':950});assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
-                page.screenshot(path=str(directory/'workspace-mobile.png'),full_page=True,mask=[page.locator('#token')],mask_color='#243d4a')
+                page.screenshot(path=str(directory/'workspace-mobile.png'),full_page=True,mask=[],mask_color='#243d4a')
                 report.update(passed=not errors,javascript_errors=errors,actual_processes=h.local.counter,dependency_order=True,save_does_not_launch=True,edit_keeps_live_instances=True,stop_cleanup=True,template_loaded=True,web_disconnect_unknown_and_reconnect=True)
                 assert not errors
             finally:browser.close()

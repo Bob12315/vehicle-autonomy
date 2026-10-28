@@ -1,4 +1,5 @@
 """Read-only Chrome verification of an explicitly launched real simulation."""
+from tests.browser_auth import login
 import argparse
 import json
 from pathlib import Path
@@ -17,9 +18,9 @@ def main():
         browser=pw.chromium.launch(executable_path='/usr/bin/google-chrome',headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
         try:
             page=browser.new_page(viewport={'width':1440,'height':1040});page.on('pageerror',lambda e:errors.append(str(e)))
-            page.goto(a.base_url+'/console');page.locator('#token').fill(token);page.locator('#connection button[type=submit]').click()
+            login(page,a.base_url,token,'/console')
             expect(page.locator('#metric-connection')).to_have_text('Connected');expect(page.locator('#environment')).to_have_text('SITL · 自有仿真')
-            page.screenshot(path=str(a.output),full_page=True,mask=[page.locator('#token')])
+            page.screenshot(path=str(a.output),full_page=True,mask=[])
             assert not errors
         finally:browser.close()
     a.output.with_suffix('.json').write_text(json.dumps(dict(passed=True,source='live owned SITL/Gazebo + real Chrome + HTTP',vehicles=data['vehicles'],javascript_errors=errors),indent=2))

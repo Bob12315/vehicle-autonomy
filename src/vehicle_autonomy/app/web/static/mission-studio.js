@@ -200,3 +200,5 @@ async function poll(){
  if(!runId&&state.missions.length)runId=state.missions.at(-1).id;$('#runs').value=runId||'';highlight();
 }
 setInterval(()=>{if(api.target)poll().catch(api.report);},700);render();
+
+window.VAFAuth.ready.then(s=>{if(s)$('#connect').click();});
