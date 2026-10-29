@@ -40,7 +40,19 @@ def run(directory):
      page.goto(h.base+path);page.wait_for_function('window.VAFAuth && window.VAFAuth.session');assert '/login' not in page.url
      assert page.locator('#login-key').count()==0 and page.locator('#token').count()==0
     page.goto(h.base+'/control');page.reload();expect(page.locator('#vehicle-name')).to_contain_text('地面车');expect(page.locator('#top-authority')).to_have_text('关闭指令发送')
-    assert page.evaluate('Object.keys(localStorage).length')==0
+    # Only presentation preferences may persist; credentials must remain in the
+    # HttpOnly session rather than browser storage, even after visiting Studio.
+    preferences=page.evaluate('Object.fromEntries(Object.entries(localStorage))')
+    assert set(preferences)<= {'vaf.studio.palette','vaf.studio.locale'}
+    serialized=json.dumps(preferences)
+    assert h.token not in serialized
+    csrf=page.evaluate('VAFAuth.session.csrf');assert csrf not in serialized
+    for cookie in context.cookies():
+     if len(cookie['value'])>=16:assert cookie['value'] not in serialized
+    if 'vaf.studio.palette' in preferences:
+     palette=json.loads(preferences['vaf.studio.palette'])
+     assert set(palette)=={'favorites','recent','closed'} and all(isinstance(v,list) for v in palette.values())
+    if 'vaf.studio.locale' in preferences:assert preferences['vaf.studio.locale'] in ('zh-CN','en-US')
     # Browser transport reconnect must restore data without acquiring control.
     page.locator('#acquire-control').click();expect(page.locator('#top-authority')).to_have_text('开启指令发送')
     context.set_offline(True);page.wait_for_timeout(2200);context.set_offline(False)

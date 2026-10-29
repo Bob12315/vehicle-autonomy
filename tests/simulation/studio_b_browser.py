@@ -50,7 +50,7 @@ def run(directory,*,demo=False):
             page.screenshot(path=str(directory/'01-library.png'),full_page=True)
             page.locator('#new-mission').click();page.get_by_label('任务名称',exact=True).fill('Browser end-to-end');page.locator('#dialog-confirm').click()
             expect(page.locator('#editor-view')).to_be_visible();expect(page.locator('.graph-node')).to_have_count(2)
-            page.locator('#palette button').filter(has_text='等待').click();expect(page.locator('.graph-node')).to_have_count(3)
+            page.locator('#palette [data-category=logic] summary').click();page.locator('#palette button').filter(has_text='等待').click();expect(page.locator('.graph-node')).to_have_count(3)
             wait=page.locator('.graph-node').filter(has=page.locator('.node-category',has_text='等待'));wait_id=wait.get_attribute('data-node')
             page.get_by_label(wait_id+'.duration_s',exact=True).fill('0.15');page.get_by_label(wait_id+'.duration_s',exact=True).press('Tab')
             page.get_by_label('断点',exact=True).check()
@@ -59,7 +59,7 @@ def run(directory,*,demo=False):
                 page.mouse.move(a['x']+a['width']/2,a['y']+a['height']/2);page.mouse.down();page.mouse.move(b['x']+b['width']/2,b['y']+b['height']/2,steps=12);page.mouse.up()
             connect('start',wait_id);connect(wait_id,'end');page.locator('#layout').click();page.locator('#undo').click();page.locator('#redo').click()
             # Exercise real HTML drag/drop and recursive typed forms.
-            page.locator('#palette button').filter(has_text='BrowserShape').drag_to(page.locator('#graph-viewport'),target_position={'x':200,'y':230})
+            page.locator('#palette [data-category=uncategorized] button.palette-item').filter(has_text='BrowserShape').drag_to(page.locator('#graph-viewport'),target_position={'x':200,'y':230})
             expect(page.locator('.graph-node')).to_have_count(4)
             shape=page.locator('.graph-node').filter(has_text='BrowserShape');shape.click();shape_id=shape.get_attribute('data-node')
             for label,value in [('position.x','2'),('position.y','3')]:page.get_by_label(label,exact=True).fill(value);page.get_by_label(label,exact=True).press('Tab')
@@ -68,7 +68,7 @@ def run(directory,*,demo=False):
             page.locator('#save-draft').click();expect(page.locator('#save-state')).to_contain_text('已保存')
             stored=next(v['definition'] for v in lab.studio.library.snapshot()['drafts'].values() if v['definition']['name']=='Browser end-to-end')
             params=next(n['parameters'] for n in stored['nodes'] if n['node_id']==shape_id);assert params==dict(position=dict(x=2.,y=3.),samples=[5,7],enabled=True),params
-            page.locator('#palette button').filter(has_text='BrowserWork').click();expect(page.locator('.graph-node')).to_have_count(5)
+            page.locator('#palette [data-category=uncategorized] button.palette-item').filter(has_text='BrowserWork').click();expect(page.locator('.graph-node')).to_have_count(5)
             page.locator('#properties').get_by_role('button',name='高级',exact=True).click();page.get_by_label('count 输出变量',exact=True).locator('..').get_by_role('button',name='＋ 结果列表',exact=True).click();page.locator('#dialog-confirm').click()
             page.locator('#save-draft').click();expect(page.locator('#save-state')).to_contain_text('已保存')
             stored=next(v['definition'] for v in lab.studio.library.snapshot()['drafts'].values() if v['definition']['name']=='Browser end-to-end');assert stored['blackboard']['count_list']['schema']['items']['type']=='integer'
@@ -80,7 +80,7 @@ def run(directory,*,demo=False):
             page.screenshot(path=str(directory/'02-editor.png'),full_page=True)
             page.locator('#publish').click();expect(page.locator('#notice')).to_contain_text('已发布不可变版本')
             page.locator('[data-tab=runner]').click();page.locator('#debug-run').check();page.locator('#run-start').click();expect(page.locator('#run-state')).to_contain_text('已暂停',timeout=8000)
-            page.locator('[data-debug=step]').click();page.wait_for_timeout(600);expect(page.locator('#run-state')).to_contain_text('已暂停');page.locator('[data-debug=resume]').click();expect(page.locator('#run-state')).to_contain_text('已成功',timeout=8000)
+            page.locator('[data-debug=step]').click();page.wait_for_timeout(600);expect(page.locator('#run-state')).to_contain_text('已暂停');page.locator('[data-debug=resume]').click();expect(page.locator('#run-state')).to_contain_text('执行成功',timeout=8000)
             page.locator('[data-inspect=events]').click();expect(page.locator('.inspector-event').first).to_be_visible()
             page.screenshot(path=str(directory/'03-runner.png'),full_page=True)
             run=lab.missions.views()[-1];assert run['state']=='SUCCEEDED' and run['release_safe'];assert run['studio']['definition']['nodes'];assert not driver.writes
@@ -90,7 +90,7 @@ def run(directory,*,demo=False):
                 page.locator('#publish').click();expect(page.locator('#notice')).to_contain_text('已发布不可变版本');page.locator('[data-tab=runner]').click();page.locator('#debug-run').uncheck();previous_runs=len(lab.missions.views());page.locator('#run-start').click()
                 until=time.monotonic()+10
                 while len(lab.missions.views())==previous_runs and time.monotonic()<until:page.wait_for_timeout(50)
-                assert len(lab.missions.views())==previous_runs+1;expect(page.locator('#run-state')).to_contain_text('已成功',timeout=15000)
+                assert len(lab.missions.views())==previous_runs+1;expect(page.locator('#run-state')).to_contain_text('执行成功',timeout=15000)
                 demo_run=lab.missions.views()[-1];values={c['name']:c['data']['value'] for c in demo_run['studio']['blackboard']['values'] if c['scope_id']=='mission'}
                 assert [r['target_id'] for r in values['results']]==['T-02','T-03'];assert values['simulated_payload_remaining']==0;assert not driver.writes
                 page.locator('[data-node=handle]').dblclick();expect(page.locator('#runner-breadcrumbs')).to_contain_text('处理目标');page.wait_for_timeout(1500);expect(page.locator('#runner-breadcrumbs')).to_contain_text('处理目标');page.get_by_role('button',name='← 返回父 任务',exact=True).click()

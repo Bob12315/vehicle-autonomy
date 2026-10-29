@@ -56,12 +56,31 @@ class StudioService:
 
     def catalog(self):
         from vehicle_autonomy.engine.mission.studio_graph import WORLD_TYPES
-        profiles={}
+        from .action_localization import catalog_entry,CATEGORIES,bilingual
+        profiles={};libraries={}
+        actions=[catalog_entry(self.service.registry,item) for item in self.service.registry.catalog()]
         for target,driver in self.service.drivers.items():
             context=driver.context();items=self.service.registry.catalog(vehicle_kind=context.target_kind,capabilities=context.capabilities)
-            for item in items:item['provider']=self.provider(item['name'],item['version'],target)
-            profiles[target]=items
-        return dict(node_types=deepcopy(TYPES),actions=self.service.registry.catalog(),action_sets=profiles,world_bindings=deepcopy(WORLD_TYPES),vehicles=[dict(target=k,kind=d.context().target_kind,
+            admitted={(item['name'],item['version']) for item in items}
+            full=[]
+            for original in actions:
+                item=catalog_entry(self.service.registry,self.service.registry.metadata(original['name'],original['version'],vehicle_kind=context.target_kind))
+                provider=self.provider(item['name'],item['version'],target)
+                item['provider']=provider
+                reasons=[]
+                vehicles=item['presentation']['vehicles']
+                if vehicles and context.target_kind not in vehicles:reasons.append(bilingual('不支持当前车辆类型','Unsupported vehicle type'))
+                missing=set(item['required_capabilities'])-set(context.capabilities)
+                if missing:reasons.append(bilingual('当前车辆缺少所需能力：'+', '.join(sorted(missing)),'Missing capabilities: '+', '.join(sorted(missing))))
+                if item['presentation']['simulation_only'] and not context.owned_simulation:reasons.append(bilingual('仅支持明确自有的仿真环境','Requires an explicitly owned simulation'))
+                if not provider['configured']:reasons.append(bilingual('能力提供方未绑定或生命周期契约不可验证','Provider is unbound or its lifecycle contract is not verified'))
+                item['availability']=dict(configurable=not reasons,reasons=reasons,
+                    note=bilingual('可配置；执行时仍须通过状态、控制权和安全检查','Configurable; execution still requires state, authority and safety admission'))
+                full.append(item)
+            libraries[target]=full
+            profiles[target]=[item for item in full if (item['name'],item['version']) in admitted]
+        return dict(node_types=deepcopy(TYPES),actions=actions,action_sets=profiles,library_sets=libraries,
+            categories=deepcopy(CATEGORIES),locales=['zh-CN','en-US'],default_locale='zh-CN',world_bindings=deepcopy(WORLD_TYPES),vehicles=[dict(target=k,kind=d.context().target_kind,
             capabilities=sorted(d.context().capabilities),connected=d.info().get('connected',False)) for k,d in self.service.drivers.items()])
 
     def handle(self,operation,p):

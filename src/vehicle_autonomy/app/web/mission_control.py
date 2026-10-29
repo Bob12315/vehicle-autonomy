@@ -409,6 +409,7 @@ class MissionControlHandler(ActionLabHandler):
             '/studio-b.js':('studio-b.js','application/javascript'),
             '/studio-b.css':('studio-b.css','text/css'),
             '/studio-canvas.js':('studio-canvas.js','application/javascript'),
+            '/studio-library.js':('studio-library.js','application/javascript'),
             '/studio-params.js':('studio-params.js','application/javascript'),
             '/console':('tool-console.html','text/html; charset=utf-8'),
             '/tool-console.js':('tool-console.js','application/javascript'),
