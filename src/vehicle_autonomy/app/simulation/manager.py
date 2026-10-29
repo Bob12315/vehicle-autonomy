@@ -350,6 +350,7 @@ class SimulationManager:
                     raise TimeoutError('Gazebo simulation time stalled for 30 seconds')
                 sample['estimated_vehicle']=None
                 sample['ground_truth']=owner.truth()
+                sample['software_link']=owner.link.diagnostics() if owner.link else None
                 driver_fault=None
                 if owner.driver:
                     info,world=owner.driver.read_view()
@@ -357,6 +358,8 @@ class SimulationManager:
                     sample['estimated_vehicle']=None if world is None else to_json_value(world.vehicle)
                     if info.get('fault') or not info.get('connected'):
                         driver_fault='Framework vehicle health failed: '+str(info.get('fault') or 'owned vehicle link disconnected')
+                    elif not self._vehicle_ready(owner):
+                        driver_fault='Framework vehicle state expired or is no longer VALID'
                 related=self._related(owner.target)
                 sample['actions']=[{key:item.get(key) for key in ('id','name','state')} for item in related['actions']]
                 sample['missions']=[{key:item.get(key) for key in ('id','name','state')} for item in related['missions']]

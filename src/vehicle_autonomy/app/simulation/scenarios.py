@@ -49,9 +49,12 @@ def box(world, name, pose, size, *, static=True, color='.55 .6 .65 1', shape='bo
 
 def moving_target(world, name, x, y):
     model = box(world, name, (x,y,.55,0,0,0), (1,1,1), static=False, color='.9 .15 .05 1', friction=.02)
+    decay=child(model.find('link'),'velocity_decay')
+    child(decay,'linear',1); child(decay,'angular',.5)
     plugin = child(model, 'plugin', filename='gz-sim-trajectory-follower-system', name='gz::sim::systems::TrajectoryFollower')
     child(plugin, 'link_name', 'body'); child(plugin, 'loop', 'true')
-    child(plugin, 'force', 4); child(plugin, 'torque', 4)
+    child(plugin, 'force', 1); child(plugin, 'torque', .5)
+    child(plugin, 'zero_vel_on_bearing_reached', 'true')
     points = child(plugin, 'waypoints')
     child(points, 'waypoint', f'{x} {y}'); child(points, 'waypoint', f'{x+8} {y}')
 

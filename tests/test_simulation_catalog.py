@@ -103,6 +103,18 @@ class AssetManagerTests(unittest.TestCase):
             (model/'missing.dae').write_text('<COLLADA/>')
             self.assertEqual('PASS',inspect_sdf(world,fuel_models={uri:model})['status'])
 
+    def test_versioned_fuel_file_requires_exact_model_lock(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory);model=root/'model';(model/'meshes').mkdir(parents=True)
+            (model/'meshes'/'Box.obj').write_text('v 0 0 0\n')
+            uri='https://fuel.gazebosim.org/1.0/OpenRobotics/models/Box/2'
+            world=root/'world.sdf'
+            content='<sdf version="1.9"><world name="w"><model name="m"><link name="l"><visual name="v"><geometry><mesh><uri>'+uri+'/files/meshes/Box.obj</uri></mesh></geometry></visual></link></model></world></sdf>'
+            world.write_text(content)
+            self.assertEqual('PASS',inspect_sdf(world,fuel_models={uri:model})['status'])
+            world.write_text(content.replace('/2/files','/3/files'))
+            self.assertEqual('BLOCKED',inspect_sdf(world,fuel_models={uri:model})['status'])
+
     def test_cancellation_preserves_previous_install_and_cleans_staging(self):
         with tempfile.TemporaryDirectory() as directory:
             root=Path(directory);data=b'<sdf version="1.9"><world name="empty"/></sdf>'

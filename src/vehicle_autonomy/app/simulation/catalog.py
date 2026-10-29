@@ -92,7 +92,9 @@ class SceneRegistry:
         if scene_id.startswith('U_'):
             path=self.assets.world_path(scene_id[2:]);context=self.assets.dependency_context()
         else:
-            path=self._legacy_path(scene_id[2:]);context=dict(search_paths=self._legacy_roots())
+            path=self._legacy_path(scene_id[2:])
+            context=self.assets.dependency_context() if self.assets is not None else {}
+            context['search_paths']=[*self._legacy_roots(),*context.get('search_paths',[])]
             if path is None or not path.is_file():raise ValueError('BLOCKED: historical source missing')
         report=inspect_sdf(path,**context)
         if report['status']!='PASS':raise ValueError('BLOCKED: source resources/plugins incomplete; inspect dependency report')

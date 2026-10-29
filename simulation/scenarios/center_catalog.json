@@ -412,7 +412,7 @@
       "scenario_id": "R05",
       "layout": "traffic",
       "source": "repository:simulation/scenarios/center_catalog.json",
-      "version": "1",
+      "version": "2",
       "license": "Repository-authored procedural SDF; no third-party mesh assets",
       "description": "动态交通区：可复现、无外部模型依赖的 Gazebo Harmonic 物理测试环境。",
       "extent_m": [
@@ -1314,7 +1314,7 @@
       "scenario_id": "C06",
       "layout": "moving",
       "source": "repository:simulation/scenarios/center_catalog.json",
-      "version": "1",
+      "version": "2",
       "license": "Repository-authored procedural SDF; no third-party mesh assets",
       "description": "运动目标场：可复现、无外部模型依赖的 Gazebo Harmonic 物理测试环境。",
       "extent_m": [

@@ -46,6 +46,13 @@ class SoftwareFaultLink:
         self.queue = deque()
         self.last = None
         self.dropped = 0
+        self.reads = self.received_chunks = self.received_bytes = 0
+
+    def diagnostics(self):
+        with self.lock:
+            return dict(reads=self.reads,received_chunks=self.received_chunks,
+                        received_bytes=self.received_bytes,dropped_chunks=self.dropped,
+                        queued_chunks=len(self.queue))
 
     def configure(self, payload):
         settings = FaultSettings.parse(payload)
@@ -58,6 +65,10 @@ class SoftwareFaultLink:
     def read(self, max_bytes=4096):
         incoming = self.transport.read(max_bytes)
         with self.lock:
+            self.reads += 1
+            if incoming:
+                self.received_chunks += 1
+                self.received_bytes += len(incoming)
             settings = self.settings
             if settings.sensor_interruption:
                 self.dropped += bool(incoming)

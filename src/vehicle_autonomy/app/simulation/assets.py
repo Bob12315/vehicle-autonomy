@@ -246,6 +246,13 @@ def inspect_sdf(path, *, search_paths=(), fuel_models=None, fuel_pins=None, mode
     def resolve(uri,source):
         parsed=urllib.parse.urlsplit(uri)
         if parsed.scheme in ('http','https'):
+            resource=re.fullmatch(r'(.*/models/[^/]+/[0-9]+)/files/(.+)',uri,re.I)
+            if resource:
+                model=fuel_models.get(normalize(resource[1]))
+                if model is not None:
+                    try:relative=_relative(urllib.parse.unquote(resource[2]))
+                    except ValueError:return None,'fuel-file-invalid'
+                    return model/relative,'fuel-file-pinned'
             canonical=fuel_pins.get(normalize(uri),uri)
             pinned=bool(re.search(r'/models/[^/]+/[0-9]+/?$',canonical,re.I))
             candidate=fuel_models.get(normalize(canonical)) if pinned else None
