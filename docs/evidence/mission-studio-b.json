@@ -1,0 +1,121 @@
+{
+  "schema": 1,
+  "software_commit": "a5e2a2d",
+  "parallel_safety_fix_commit": "934f5c3",
+  "unit": {
+    "passed": true,
+    "count": 813,
+    "seconds": 111.017,
+    "command": "python -m unittest discover -s tests -v"
+  },
+  "browser": {
+    "passed": true,
+    "environment": "isolated HTTP + Chrome + existing executor; no vehicle transport",
+    "cuadc": {
+      "run": "mission-run:e280530050e94033841d9738a0331e34",
+      "selected": [
+        "T-02",
+        "T-03"
+      ],
+      "results": [
+        {
+          "physical_action_confirmed": false,
+          "simulation": true,
+          "slot": 0,
+          "status": "SIMULATED_OPERATION_COMPLETE",
+          "target_id": "T-02"
+        },
+        {
+          "physical_action_confirmed": false,
+          "simulation": true,
+          "slot": 1,
+          "status": "SIMULATED_OPERATION_COMPLETE",
+          "target_id": "T-03"
+        }
+      ]
+    },
+    "run": "mission-run:db73fcf094db40d0932204815b23f89b",
+    "checks": [
+      "Library first",
+      "dynamic palette",
+      "node add",
+      "port connections",
+      "schema input",
+      "undo/redo",
+      "CAS autosave",
+      "validate/publish",
+      "real executor Wait run",
+      "events",
+      "refresh + cross-page session",
+      "tablet layout"
+    ],
+    "browser_errors": []
+  },
+  "native": [
+    {
+      "kind": "rover",
+      "passed": true,
+      "environment": "Chrome UI + owned signed native ArduPilot SITL + Gazebo",
+      "physical": {
+        "home_error_m": 0.3698764490800351,
+        "final_speed_mps": 0.00025628250925796353,
+        "final_height_m": -4.513388940363683e-09
+      },
+      "browser_errors": [],
+      "framework_sha": "e5d04cae02446561a938488c4b6dde00cc2b8a6e",
+      "source_sha256": "140e4b4275fe5b8beb76162d0cd8e722bdc1f530ceea95231b328fcc1c615720",
+      "remaining_process_groups": [],
+      "artifact": "artifacts/mission-studio-b/native-rover-final-browser"
+    },
+    {
+      "kind": "copter",
+      "passed": true,
+      "environment": "Chrome UI + owned signed native ArduPilot SITL + Gazebo",
+      "physical": {
+        "home_error_m": 0.006099729960088616,
+        "final_speed_mps": 0.0,
+        "final_height_m": -1.421600560880254e-07
+      },
+      "browser_errors": [],
+      "framework_sha": "a5e2a2dcbec7248ddc6a251b2ee4614db7ea2bdd",
+      "source_sha256": "14e7da6efb9ead573e7dbb2aa05c739a8874f62ff59eef8c900c0874655d38ce",
+      "remaining_process_groups": [],
+      "artifact": "artifacts/mission-studio-b/native-copter-final-browser"
+    },
+    {
+      "kind": "plane",
+      "passed": true,
+      "environment": "Chrome UI + owned signed native ArduPilot SITL + Gazebo",
+      "physical": {
+        "home_error_m": 1.2575159685170845,
+        "final_speed_mps": 0.5696960696508622,
+        "final_height_m": 3.4824882722994666e-05
+      },
+      "browser_errors": [],
+      "framework_sha": "a5e2a2dcbec7248ddc6a251b2ee4614db7ea2bdd",
+      "source_sha256": "14e7da6efb9ead573e7dbb2aa05c739a8874f62ff59eef8c900c0874655d38ce",
+      "remaining_process_groups": [],
+      "artifact": "artifacts/mission-studio-b/native-plane-final-browser"
+    }
+  ],
+  "launch": {
+    "passed": true,
+    "environment": "actual visualization launcher + owned SITL/Gazebo + Desktop Agent; deployment SEND disabled",
+    "registered_agent_count": 1,
+    "mission_count": 0,
+    "action_count": 0,
+    "templates": [
+      "CUADC_MultiTarget_Simulation",
+      "Copter_Inspection"
+    ],
+    "launcher_exit_code": 0
+  },
+  "limitations": [
+    "No real hardware qualification",
+    "No QGC goal importer or unqualified map transform",
+    "Closed linear Action/Wait extraction only",
+    "No interrupted-controller/cross-checkpoint reconstruction",
+    "Plane motion single-step disabled",
+    "Native flights precede the final parallel-only fix; final full unit and composed runtime tests cover that fix"
+  ]
+}

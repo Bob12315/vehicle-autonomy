@@ -79,3 +79,19 @@ same double SEND/Safety/Lease/TTL/session/generation/unique-writer chain.
 Browser APIs use existing shared Cookie/CSRF/Origin auth; Agent credentials are
 separate. On restart no old lease, Action controller or authorization resumes.
 History is observational replay only, never execution by seeking a timeline.
+
+## Implemented B details
+
+The concrete wire format is documented in [Schema](MISSION_SCHEMA_SPEC.md),
+[Blackboard](MISSION_BLACKBOARD_SPEC.md) and [SubMission](MISSION_SUBMISSION_SPEC.md).
+Private child scopes inside a parallel branch write locally. Nested joins merge
+back into their enclosing tentative branch; only the enclosing join publishes
+to its parent. Admission, revision, frame and event-capacity checks precede all
+parent writes. An Any join waits for asynchronous cancellation, commits only
+successful branches and reports cancelled background nodes as cancelled.
+
+`SUSPENDED` is an observational/ownership-release state after explicit takeover,
+not an automatically resumable controller. A checkpoint with no interrupted
+Action may resume only after new state checks and a fresh Mission permit.
+An interrupted Action cannot be silently restarted by Resume. Restarted runs
+remain observational. All original Mission deadlines continue to apply.

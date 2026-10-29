@@ -129,6 +129,16 @@ UNKNOWN/UNCONFIRMED 和飞行资源约束。完成本阶段后停止，等待独
   --run-dir artifacts/phase4-mission/acceptance-UNIQUE
 ```
 
+## Mission Studio B
+
+`/studio` 现在进入 Mission Library，支持共用画布编辑、Schema 参数与 Blackboard 绑定、
+CAS 自动保存、不可变发布、ForEach/SubMission、Runner/Debug 和只读历史回放。
+原编辑器保留在 `/studio/legacy`。仍使用原执行器、安全链路和统一登录会话。
+
+完整启动与测试步骤见 [使用指南](docs/MISSION_STUDIO_USER_GUIDE.md)，三车型 Chrome/SITL/Gazebo
+实测、813 项回归结果和 V1 限制见 [验收报告](docs/MISSION_STUDIO_TEST_REPORT.md)。
+`--studio-demo` 只提供纯软件 CUADC 示例，不自动运行或触发真实载荷。
+
 ## Web 控制中心与 Tool Agent V1
 
 RViz2 三车型可视化已接入 Vehicle Control / Dashboard 的 **Open RViz2**。
@@ -139,7 +149,7 @@ RViz。实际 ROS/GUI/SITL 证据、话题配置、控制边界及未关闭的 R
 
 `/console` 提供三车型 Dashboard、Tool Manager、Workspaces、Logs 和 Settings，
 Vehicle Control 复用 `/control` 原有 Action/Authority/Safety/Execution 链。
-过期或断开的遥测显示未知；不新增 Mission Studio 或专业地图/点云查看器。
+过期或断开的遥测显示未知；专业地图/点云继续使用原生工具，任务编排使用 Mission Studio B。
 所有页面共用 `/login` 的后端会话：一次输入密钥后，页面切换和有效期内刷新均不重复输入，
 可主动退出。Vehicle Control 采用相同样式：点击一次 **SEND ON** 后直接操作，
 不再逐条授权；SEND OFF、断线或切换车辆后禁用控制，见 [SEND 开关说明](docs/WEB_SEND_SWITCH.md)。
