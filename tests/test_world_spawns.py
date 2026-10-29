@@ -73,6 +73,14 @@ class WorldSpawnTests(unittest.TestCase):
             self.registry.validate('F01', DEFINITIONS['plane'], {'id': 'north'}, peers=[peer])
         self.assertEqual(6., self.registry.validate('F01', DEFINITIONS['plane'], {'id': 'north-far'}, peers=[peer])['y'])
 
+    def test_plane_corridor_accounts_for_custom_heading_and_lateral_spawn(self):
+        # A small heading offset accumulates lateral drift across 300 m.
+        self.registry.validate('F01',DEFINITIONS['plane'],
+            dict(x=0,y=0,z=.262,heading_deg=1))
+        with self.assertRaisesRegex(ValueError,'runway'):
+            self.registry.validate('F01',DEFINITIONS['plane'],
+                dict(x=0,y=6,z=.262,heading_deg=2))
+
     def test_strict_custom_spawn_input_and_ground_height(self):
         for spawn in ({}, {'id': 'center', 'z': 2}, {'id': '../center'}, {'x': 0, 'y': 0},
                       {'x': 0, 'y': 0, 'z': 0, 'heading_deg': 0, 'model': '/tmp/evil'}, [],

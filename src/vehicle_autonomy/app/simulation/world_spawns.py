@@ -250,9 +250,13 @@ class WorldSpawnRegistry:
                 raise ValueError('BLOCKED: Plane heading must align with the audited runway')
             # Ground corridor is along World +X. The declaration supplies its
             # dimensions; actual generated collisions are always checked again.
-            corridor = (x-radius, y-max(radius, runway['half_width_m']), ground_z+.05,
-                        x+runway['forward_length_m'], y+max(radius, runway['half_width_m']),
-                        ground_z+runway['clear_height_m'])
+            yaw=math.radians(heading)
+            width=max(radius,runway['half_width_m'])
+            corners=[(x+math.cos(yaw)*along-math.sin(yaw)*side,
+                      y+math.sin(yaw)*along+math.cos(yaw)*side)
+                for along in (-radius,runway['forward_length_m']) for side in (-width,width)]
+            corridor=(min(p[0] for p in corners),min(p[1] for p in corners),ground_z+.05,
+                max(p[0] for p in corners),max(p[1] for p in corners),ground_z+runway['clear_height_m'])
             runway_surface = next((item['bounds'] for item in audit['solids'] if item['name'] == runway['surface'] and item['support']), None)
             if runway_surface is None or any((corridor[0] < runway_surface[0], corridor[1] < runway_surface[1], corridor[3] > runway_surface[3], corridor[4] > runway_surface[4])):
                 raise ValueError('BLOCKED: finite runway does not contain the forward ground corridor')
