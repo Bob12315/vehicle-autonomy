@@ -2,7 +2,7 @@
 (()=>{
 const $=id=>document.getElementById(id), api=window.VAFAuth.api;
 let scenes=[],sessions=[],sceneId=null,sessionId=null,currentReport=null,busy=false,polling=false;const pendingAssets=new Set(), selectedVehicles=new Map(), switchResults=new Map();let vehicleLibrary=[],editorKey=null;
-const kinds={none:'仅场景 · 无车辆',rover:'地面车 Rover',copter:'多旋翼 Copter',plane:'固定翼 Plane',vtol:'垂直起降 VTOL'};
+const kinds={none:'仅场景 · 无车辆',rover:'地面车',copter:'多旋翼',plane:'固定翼',vtol:'垂直起降'};
 const stateNames={CREATED:'已创建',PREPARING:'准备中',STARTING:'启动中',READY:'已就绪',RUNNING:'运行中',STOPPING:'停止中',FINISHED:'已结束',FAILED:'失败',CANCELLED:'已取消'};
 const paramSpecs={obstacle_count:{label:'障碍物数量',min:0,max:80,step:1,value:12},wind_speed:{label:'风速 / m/s',min:0,max:20,step:0.1,value:0},wind_direction:{label:'风向 / °',min:-180,max:180,step:1,value:0},light_intensity:{label:'光照强度',min:0,max:1,step:0.1,value:1},friction:{label:'地面摩擦系数',min:0.1,max:3,step:0.1,value:1}};
 function el(tag,text,cls){const n=document.createElement(tag);if(text!==undefined)n.textContent=String(text);if(cls)n.className=cls;return n;}
