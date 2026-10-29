@@ -159,6 +159,14 @@ class UniversalRuntimeRollbackContracts(unittest.TestCase):
         runtime._aliases()
         return runtime, first
 
+    def test_world_only_sampling_does_not_wait_for_nonexistent_dynamic_pose_topic(self):
+        runtime=LocalRuntime.__new__(LocalRuntime)
+        runtime._state_lock=RLock();runtime.vehicles={}
+        with patch('vehicle_autonomy.app.simulation.runtime.LocalRuntime.sample',return_value={'metrics':{'sim_seconds':1}}), \
+                patch('vehicle_autonomy.app.simulation.universal_runtime.subprocess.run') as run:
+            self.assertEqual([],runtime.sample()['vehicles'])
+        run.assert_not_called()
+
     def test_prepare_failure_rolls_back_only_new_child(self):
         runtime, existing = self._runtime()
         failed = _Child('new-failure')

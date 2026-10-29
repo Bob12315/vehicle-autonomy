@@ -343,6 +343,9 @@ class LocalRuntime(WorldMetrics):
     @synchronized
     def sample(self):
         result=super().sample()
+        if not self.vehicles:
+            result['vehicles']=[]
+            return result
         reply=subprocess.run(['gz','topic','-e','-t',f'/world/{self.world}/pose/info','-n','1'],
             env=self.session.env,capture_output=True,text=True,timeout=3)
         raw=reply.stdout

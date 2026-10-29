@@ -49,14 +49,26 @@ class UniversalSimulationWebTests(unittest.TestCase):
     def test_selected_vehicle_mutation_is_fenced_to_its_world_and_owner(self):
         self.a.acquire('rover');self.b.acquire('copter')
         with patch.object(self.manager,'sample',return_value=self.record),patch.object(self.manager,'handle',return_value={'accepted':True}) as handle:
-            for operation in ('remove_vehicle','fault','test'):
+            for operation in ('remove_vehicle','test'):
                 path='/api/simulation/'+operation
                 payload={'id':self.record['id'],'vehicle_id':'vehicle-one'}
                 self.assertEqual(self.a.call(path,payload)[0],200)
                 self.assertEqual(self.b.call(path,payload)[0],409)
                 self.assertEqual(self.a.call(path,dict(payload,vehicle_id='vehicle-from-another-world'))[0],409)
                 self.assertEqual(self.a.call(path,{'id':self.record['id']})[0],409)
-            self.assertEqual(handle.call_count,3)
+            self.assertEqual(handle.call_count,2)
+        self.assertFalse(any(d.writes for d in self.h.drivers.values()))
+
+    def test_selected_receive_fault_cannot_indirectly_retire_another_owner(self):
+        self.a.acquire('rover');self.b.acquire('copter')
+        payload=dict(id=self.record['id'],vehicle_id='vehicle-one',settings={'freeze':True})
+        with patch.object(self.manager,'sample',return_value=self.record),patch.object(self.manager,'handle',return_value={'accepted':True}) as handle:
+            self.assertEqual(self.a.call('/api/simulation/fault',payload)[0],409)
+            self.assertEqual(self.b.call('/api/simulation/fault',payload)[0],409)
+            handle.assert_not_called()
+            self.assertEqual(self.b.call('/api/control/release',{'target':'copter'})[0],200)
+            self.assertEqual(self.a.call('/api/simulation/fault',payload)[0],200)
+            handle.assert_called_once_with('simulation.fault',payload)
         self.assertFalse(any(d.writes for d in self.h.drivers.values()))
 
     def test_explicit_release_allows_world_change_without_transferring_control(self):

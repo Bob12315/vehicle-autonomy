@@ -337,8 +337,12 @@ class MissionControl(ActionLab):
                 vehicles=record.get('vehicles') or [dict(id=record.get('target'),target=record.get('target'))]
                 selected=payload.get('vehicle_id')
                 if operation in ('simulation.remove_vehicle','simulation.fault','simulation.test') and selected:
-                    vehicles=[v for v in vehicles if v.get('id')==selected]
-                    if not vehicles:raise ValueError('vehicle does not belong to this World session')
+                    matches=[v for v in vehicles if v.get('id')==selected]
+                    if not matches:raise ValueError('vehicle does not belong to this World session')
+                    # Receive faults affect one link, but current fail-closed
+                    # supervision may retire the whole shared World. Do not let
+                    # one page indirectly stop another page's reserved vehicle.
+                    if operation!='simulation.fault':vehicles=matches
                 if record['state'] not in ('FINISHED','FAILED','CANCELLED'):
                     for vehicle in vehicles:
                         target=vehicle.get('target')
