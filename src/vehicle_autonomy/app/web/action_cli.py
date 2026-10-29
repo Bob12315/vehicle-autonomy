@@ -67,7 +67,7 @@ def main(*,studio=False):
                 source_time_sync=args.source_time_sync,cycle_period_ns=20_000_000 if args.source_time_sync else None)
         if studio:
             from vehicle_autonomy.app.web.mission_control import MissionControl,MissionControlServer
-            lab=MissionControl(drivers,args.data_dir,studio_demo=args.studio_demo)
+            lab=MissionControl(drivers,args.data_dir,studio_demo=args.studio_demo,simulation_allow_send=args.allow_send)
             from vehicle_autonomy.app.tools.service import ToolService
             tool_service=ToolService(args.tool_data_dir or args.data_dir/'tools');lab.tool_service=tool_service
             if args.tool_agents:

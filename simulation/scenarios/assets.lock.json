@@ -1,0 +1,2012 @@
+{
+  "schema": 1,
+  "checked_at": "2026-10-29",
+  "assets": [
+    {
+      "id": "ardupilot-gimbal",
+      "name": "gimbal",
+      "source": "https://github.com/ArduPilot/ardupilot_gazebo",
+      "version": "3ec51428fd43deb7b71137192ba16394b450d78e",
+      "license": "LGPL-3.0-or-later",
+      "world": "world.sdf",
+      "files": [
+        {
+          "path": "world.sdf",
+          "url": "https://raw.githubusercontent.com/ArduPilot/ardupilot_gazebo/3ec51428fd43deb7b71137192ba16394b450d78e/worlds/gimbal.sdf",
+          "sha256": "e732bc5d7776439116ef64057f0a1093edcd4efabf1d107fd095251e3bc4642a",
+          "size": 8514
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/ArduPilot/ardupilot_gazebo/3ec51428fd43deb7b71137192ba16394b450d78e/LICENSE.md",
+          "sha256": "1a45b1d0a8603dfe2cfc644f9dab970b1762f92babe2aac6eb2f5d4572c4a680",
+          "size": 7653
+        }
+      ],
+      "limitations": [
+        "Entry and repository license downloaded; recursive resources and per-model licenses require inspection.",
+        "Downloaded world does not establish vehicle/SITL/Framework compatibility."
+      ]
+    },
+    {
+      "id": "ardupilot-zephyr-parachute",
+      "name": "zephyr_parachute",
+      "source": "https://github.com/ArduPilot/ardupilot_gazebo",
+      "version": "3ec51428fd43deb7b71137192ba16394b450d78e",
+      "license": "LGPL-3.0-or-later",
+      "world": "world.sdf",
+      "files": [
+        {
+          "path": "world.sdf",
+          "url": "https://raw.githubusercontent.com/ArduPilot/ardupilot_gazebo/3ec51428fd43deb7b71137192ba16394b450d78e/worlds/zephyr_parachute.sdf",
+          "sha256": "76e10f25b08c1e2790ffc20197555dbd7b3171ec75787fad48323255061ca300",
+          "size": 5983
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/ArduPilot/ardupilot_gazebo/3ec51428fd43deb7b71137192ba16394b450d78e/LICENSE.md",
+          "sha256": "1a45b1d0a8603dfe2cfc644f9dab970b1762f92babe2aac6eb2f5d4572c4a680",
+          "size": 7653
+        }
+      ],
+      "limitations": [
+        "Entry and repository license downloaded; recursive resources and per-model licenses require inspection.",
+        "Downloaded world does not establish vehicle/SITL/Framework compatibility."
+      ]
+    },
+    {
+      "id": "clearpath-construction",
+      "name": "construction",
+      "source": "https://github.com/clearpathrobotics/clearpath_simulator",
+      "version": "a7c5cf377027cbbb6cb64e4eae9c786750b5b276",
+      "license": "BSD-3-Clause",
+      "world": "world.sdf",
+      "files": [
+        {
+          "path": "world.sdf",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/worlds/construction.sdf",
+          "sha256": "1ebb427c1e3ec0d48e0f5f69d512bfa52860a4ff249269bf4e41020dc429fc3c",
+          "size": 3239
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/LICENSE",
+          "sha256": "c5b036522ecf21b207daad625d10aff273d170b5cb46e3cae89129f67a6603c7",
+          "size": 1504
+        },
+        {
+          "path": "accessories/base_station_with_tripod.stl",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/accessories/base_station_with_tripod.stl",
+          "sha256": "e25712405f4a3d9d58f78f3a078c7733e67a90199ccd33506d6a10cb18914cf7",
+          "size": 373284
+        },
+        {
+          "path": "accessories/base_station_with_tripod.dae",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/accessories/base_station_with_tripod.dae",
+          "sha256": "08346146edf30af23d1083ab5858f6693aa5f941468d838bf4252c4895c944a7",
+          "size": 720341
+        },
+        {
+          "path": "accessories/base_station.dae",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/accessories/base_station.dae",
+          "sha256": "dbbd3ae7453b51c2d13bc8927027c5a4df597851dbbee249016a68b12506edbf",
+          "size": 705071
+        },
+        {
+          "path": "accessories/base_station.stl",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/accessories/base_station.stl",
+          "sha256": "1f1cd3944e9c13754ed50e2bf1a01d1b9be7944911f7ba6c8eb75d1f95c8d330",
+          "size": 354084
+        },
+        {
+          "path": "accessories/wibotic_tr301.stl",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/accessories/wibotic_tr301.stl",
+          "sha256": "5b7bfbb12242ebbc4fcbe34f5026afce15da805e27cc576bbb94986651f867bd",
+          "size": 2265134
+        },
+        {
+          "path": "office/ConcreteWall001_COL_VAR1_3K.jpg.002.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/office/ConcreteWall001_COL_VAR1_3K.jpg.002.jpg",
+          "sha256": "4e3619d839690f21cf9a216c8d997196cf19a5c22ac97ebd0f6f0306685b3dde",
+          "size": 1284085
+        },
+        {
+          "path": "office/Bricks01_COL_VAR1_3K.jpg.002.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/office/Bricks01_COL_VAR1_3K.jpg.002.jpg",
+          "sha256": "7f713a77b8f9d3bf55f242ad177635f9dc00f2a956e6b3c77b902bcd87a5b703",
+          "size": 5218892
+        },
+        {
+          "path": "office/MetalCorrugatedIronSheet002_METALNESS_3K_METALNESS.jpg.002.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/office/MetalCorrugatedIronSheet002_METALNESS_3K_METALNESS.jpg.002.jpg",
+          "sha256": "1b79acf0b03c9e0b6f44acd73a214feae06671e66043f797e57cd0e07924d3cd",
+          "size": 610762
+        },
+        {
+          "path": "office/InteriorDesignRugStarryNight001_COL_VAR1_3K.jpg.001.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/office/InteriorDesignRugStarryNight001_COL_VAR1_3K.jpg.001.jpg",
+          "sha256": "00af0f74ebf49b9b2b59cd96eaa4d71cefb02b736a58b689068db610f1e75bba",
+          "size": 5226220
+        },
+        {
+          "path": "office/GroundClay002_COL_VAR1_3K.jpg.001.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/office/GroundClay002_COL_VAR1_3K.jpg.001.jpg",
+          "sha256": "961f5e43fbd145bc336d636c9a810022cdec742a8bfa0a62052e5a9ab97fbed5",
+          "size": 8637461
+        },
+        {
+          "path": "office/MetalCorrodedHeavy001_COL_3K_METALNESS.jpg.002.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/office/MetalCorrodedHeavy001_COL_3K_METALNESS.jpg.002.jpg",
+          "sha256": "cbaffdbc7c5fb99f5fa28d2d2b6561070089783cc95a184a5bfaa7f8a34c8d1d",
+          "size": 5507306
+        },
+        {
+          "path": "office/TilesRectangularMirrorGray001_COL_3K.jpg.001.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/office/TilesRectangularMirrorGray001_COL_3K.jpg.001.jpg",
+          "sha256": "141c6ddb6191763a415f742ccc86d923ea9719a3e3effc370537c86f836dfb00",
+          "size": 1138777
+        },
+        {
+          "path": "office/MetalSpottyDiscoloration001_COL_3K_METALNESS.jpg.002.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/office/MetalSpottyDiscoloration001_COL_3K_METALNESS.jpg.002.jpg",
+          "sha256": "9ef162ba4273c9c968af36b20bf41994800d7addb37090074058e81bc4acae93",
+          "size": 3685020
+        },
+        {
+          "path": "office/Tiles05_COL_VAR1_3K.jpg.001.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/office/Tiles05_COL_VAR1_3K.jpg.001.jpg",
+          "sha256": "ecf0139bbe8065f3abb60eed5db4d5da224b64ddfd89c16c09a433e6a8c4f916",
+          "size": 4867894
+        },
+        {
+          "path": "accessories/wibotic_tr301.dae",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/accessories/wibotic_tr301.dae",
+          "sha256": "f207ae483556a61d1db986dc2a794e9edb68c4e36b55dd5d28fe00763ab3795e",
+          "size": 19355586
+        },
+        {
+          "path": "office/cardboard.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/office/cardboard.jpg",
+          "sha256": "90a5fcdb48326cd2a791b62a446d55ac4dd320ad7a7089a6603b7ed4c812470c",
+          "size": 128851
+        },
+        {
+          "path": "office/WoodFlooringMahoganyAfricanSanded001_COL_3K.jpg.001.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/office/WoodFlooringMahoganyAfricanSanded001_COL_3K.jpg.001.jpg",
+          "sha256": "3720e643a6c6559728a146ef81e9374ee8293b2a4078d88d64632d7bf85384f7",
+          "size": 5250519
+        },
+        {
+          "path": "office/concrete_bag.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/office/concrete_bag.jpg",
+          "sha256": "8ed26496105b483f61d7c8dc120cfe4e2b2a33e14c3b9662d1dadc04c45bb386",
+          "size": 47256
+        },
+        {
+          "path": "office/WoodFlooring061_COL_3K.jpg.001.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/office/WoodFlooring061_COL_3K.jpg.001.jpg",
+          "sha256": "13b48ee81931e9bfc93cb53778b1a0e570d08a822213b688d3431d06325928df",
+          "size": 7483669
+        },
+        {
+          "path": "office/WoodPlanksWorn33_COL_VAR1_3K.jpg.002.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/office/WoodPlanksWorn33_COL_VAR1_3K.jpg.002.jpg",
+          "sha256": "a1a711e460d0fe613a7baedcac4cbfd1582e7dae76a4ba5f7ed42b3683b8656d",
+          "size": 2468641
+        },
+        {
+          "path": "office/WoodFlooring044_COL_3K.jpg.001.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/office/WoodFlooring044_COL_3K.jpg.001.jpg",
+          "sha256": "7df5f0798631267e2a21df45db10337e590261f9f49804981c8f521216181635",
+          "size": 8977251
+        },
+        {
+          "path": "office/cp_walls.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/office/cp_walls.jpg",
+          "sha256": "654090dc884208eb1f84110b62f8aca582122cce66a33386ebe850ef27372ba6",
+          "size": 774
+        },
+        {
+          "path": "office/whiteboard.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/office/whiteboard.jpg",
+          "sha256": "dc7feca07e8fed4050a833b462b00269471248a339c7540e3c073d0cb0bdfb98",
+          "size": 168454
+        },
+        {
+          "path": "office/office_construction.dae",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/office/office_construction.dae",
+          "sha256": "9dea2702a6ffd8686897db915565b85a2c7d2793739f85a4e6dee72b42d3c801",
+          "size": 748174
+        },
+        {
+          "path": "office/office.dae",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/office/office.dae",
+          "sha256": "b3fe071a54093209e6b0073220c24f1adc74ce0b0f5c977df41369f5c3f2be05",
+          "size": 596874
+        }
+      ],
+      "limitations": [
+        "World and mesh/textures downloaded at locked commit; per-model licenses and true rendering/collision require acceptance.",
+        "No vehicle/SITL compatibility implied."
+      ]
+    },
+    {
+      "id": "clearpath-office",
+      "name": "office",
+      "source": "https://github.com/clearpathrobotics/clearpath_simulator",
+      "version": "a7c5cf377027cbbb6cb64e4eae9c786750b5b276",
+      "license": "BSD-3-Clause",
+      "world": "world.sdf",
+      "files": [
+        {
+          "path": "world.sdf",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/worlds/office.sdf",
+          "sha256": "ad9b9f34b42c69800ec91219fad4c3c0a1e623aabde938f5731e07901560aaa7",
+          "size": 3200
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/LICENSE",
+          "sha256": "c5b036522ecf21b207daad625d10aff273d170b5cb46e3cae89129f67a6603c7",
+          "size": 1504
+        },
+        {
+          "path": "accessories/base_station_with_tripod.stl",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/accessories/base_station_with_tripod.stl",
+          "sha256": "e25712405f4a3d9d58f78f3a078c7733e67a90199ccd33506d6a10cb18914cf7",
+          "size": 373284
+        },
+        {
+          "path": "accessories/base_station_with_tripod.dae",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/accessories/base_station_with_tripod.dae",
+          "sha256": "08346146edf30af23d1083ab5858f6693aa5f941468d838bf4252c4895c944a7",
+          "size": 720341
+        },
+        {
+          "path": "accessories/base_station.dae",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/accessories/base_station.dae",
+          "sha256": "dbbd3ae7453b51c2d13bc8927027c5a4df597851dbbee249016a68b12506edbf",
+          "size": 705071
+        },
+        {
+          "path": "accessories/base_station.stl",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/accessories/base_station.stl",
+          "sha256": "1f1cd3944e9c13754ed50e2bf1a01d1b9be7944911f7ba6c8eb75d1f95c8d330",
+          "size": 354084
+        },
+        {
+          "path": "accessories/wibotic_tr301.stl",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/accessories/wibotic_tr301.stl",
+          "sha256": "5b7bfbb12242ebbc4fcbe34f5026afce15da805e27cc576bbb94986651f867bd",
+          "size": 2265134
+        },
+        {
+          "path": "office/ConcreteWall001_COL_VAR1_3K.jpg.002.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/office/ConcreteWall001_COL_VAR1_3K.jpg.002.jpg",
+          "sha256": "4e3619d839690f21cf9a216c8d997196cf19a5c22ac97ebd0f6f0306685b3dde",
+          "size": 1284085
+        },
+        {
+          "path": "office/Bricks01_COL_VAR1_3K.jpg.002.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/office/Bricks01_COL_VAR1_3K.jpg.002.jpg",
+          "sha256": "7f713a77b8f9d3bf55f242ad177635f9dc00f2a956e6b3c77b902bcd87a5b703",
+          "size": 5218892
+        },
+        {
+          "path": "office/MetalCorrugatedIronSheet002_METALNESS_3K_METALNESS.jpg.002.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/office/MetalCorrugatedIronSheet002_METALNESS_3K_METALNESS.jpg.002.jpg",
+          "sha256": "1b79acf0b03c9e0b6f44acd73a214feae06671e66043f797e57cd0e07924d3cd",
+          "size": 610762
+        },
+        {
+          "path": "office/InteriorDesignRugStarryNight001_COL_VAR1_3K.jpg.001.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/office/InteriorDesignRugStarryNight001_COL_VAR1_3K.jpg.001.jpg",
+          "sha256": "00af0f74ebf49b9b2b59cd96eaa4d71cefb02b736a58b689068db610f1e75bba",
+          "size": 5226220
+        },
+        {
+          "path": "office/GroundClay002_COL_VAR1_3K.jpg.001.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/office/GroundClay002_COL_VAR1_3K.jpg.001.jpg",
+          "sha256": "961f5e43fbd145bc336d636c9a810022cdec742a8bfa0a62052e5a9ab97fbed5",
+          "size": 8637461
+        },
+        {
+          "path": "office/MetalCorrodedHeavy001_COL_3K_METALNESS.jpg.002.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/office/MetalCorrodedHeavy001_COL_3K_METALNESS.jpg.002.jpg",
+          "sha256": "cbaffdbc7c5fb99f5fa28d2d2b6561070089783cc95a184a5bfaa7f8a34c8d1d",
+          "size": 5507306
+        },
+        {
+          "path": "office/TilesRectangularMirrorGray001_COL_3K.jpg.001.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/office/TilesRectangularMirrorGray001_COL_3K.jpg.001.jpg",
+          "sha256": "141c6ddb6191763a415f742ccc86d923ea9719a3e3effc370537c86f836dfb00",
+          "size": 1138777
+        },
+        {
+          "path": "office/MetalSpottyDiscoloration001_COL_3K_METALNESS.jpg.002.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/office/MetalSpottyDiscoloration001_COL_3K_METALNESS.jpg.002.jpg",
+          "sha256": "9ef162ba4273c9c968af36b20bf41994800d7addb37090074058e81bc4acae93",
+          "size": 3685020
+        },
+        {
+          "path": "office/Tiles05_COL_VAR1_3K.jpg.001.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/office/Tiles05_COL_VAR1_3K.jpg.001.jpg",
+          "sha256": "ecf0139bbe8065f3abb60eed5db4d5da224b64ddfd89c16c09a433e6a8c4f916",
+          "size": 4867894
+        },
+        {
+          "path": "accessories/wibotic_tr301.dae",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/accessories/wibotic_tr301.dae",
+          "sha256": "f207ae483556a61d1db986dc2a794e9edb68c4e36b55dd5d28fe00763ab3795e",
+          "size": 19355586
+        },
+        {
+          "path": "office/cardboard.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/office/cardboard.jpg",
+          "sha256": "90a5fcdb48326cd2a791b62a446d55ac4dd320ad7a7089a6603b7ed4c812470c",
+          "size": 128851
+        },
+        {
+          "path": "office/WoodFlooringMahoganyAfricanSanded001_COL_3K.jpg.001.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/office/WoodFlooringMahoganyAfricanSanded001_COL_3K.jpg.001.jpg",
+          "sha256": "3720e643a6c6559728a146ef81e9374ee8293b2a4078d88d64632d7bf85384f7",
+          "size": 5250519
+        },
+        {
+          "path": "office/concrete_bag.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/office/concrete_bag.jpg",
+          "sha256": "8ed26496105b483f61d7c8dc120cfe4e2b2a33e14c3b9662d1dadc04c45bb386",
+          "size": 47256
+        },
+        {
+          "path": "office/WoodFlooring061_COL_3K.jpg.001.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/office/WoodFlooring061_COL_3K.jpg.001.jpg",
+          "sha256": "13b48ee81931e9bfc93cb53778b1a0e570d08a822213b688d3431d06325928df",
+          "size": 7483669
+        },
+        {
+          "path": "office/WoodPlanksWorn33_COL_VAR1_3K.jpg.002.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/office/WoodPlanksWorn33_COL_VAR1_3K.jpg.002.jpg",
+          "sha256": "a1a711e460d0fe613a7baedcac4cbfd1582e7dae76a4ba5f7ed42b3683b8656d",
+          "size": 2468641
+        },
+        {
+          "path": "office/WoodFlooring044_COL_3K.jpg.001.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/office/WoodFlooring044_COL_3K.jpg.001.jpg",
+          "sha256": "7df5f0798631267e2a21df45db10337e590261f9f49804981c8f521216181635",
+          "size": 8977251
+        },
+        {
+          "path": "office/cp_walls.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/office/cp_walls.jpg",
+          "sha256": "654090dc884208eb1f84110b62f8aca582122cce66a33386ebe850ef27372ba6",
+          "size": 774
+        },
+        {
+          "path": "office/whiteboard.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/office/whiteboard.jpg",
+          "sha256": "dc7feca07e8fed4050a833b462b00269471248a339c7540e3c073d0cb0bdfb98",
+          "size": 168454
+        },
+        {
+          "path": "office/office_construction.dae",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/office/office_construction.dae",
+          "sha256": "9dea2702a6ffd8686897db915565b85a2c7d2793739f85a4e6dee72b42d3c801",
+          "size": 748174
+        },
+        {
+          "path": "office/office.dae",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/office/office.dae",
+          "sha256": "b3fe071a54093209e6b0073220c24f1adc74ce0b0f5c977df41369f5c3f2be05",
+          "size": 596874
+        }
+      ],
+      "limitations": [
+        "World and mesh/textures downloaded at locked commit; per-model licenses and true rendering/collision require acceptance.",
+        "No vehicle/SITL compatibility implied."
+      ]
+    },
+    {
+      "id": "clearpath-orchard",
+      "name": "orchard",
+      "source": "https://github.com/clearpathrobotics/clearpath_simulator",
+      "version": "a7c5cf377027cbbb6cb64e4eae9c786750b5b276",
+      "license": "BSD-3-Clause",
+      "world": "world.sdf",
+      "files": [
+        {
+          "path": "world.sdf",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/worlds/orchard.sdf",
+          "sha256": "fa4ab6ed09d7462d407faed423f70d15f7d999f50add4474522a8b5041482623",
+          "size": 4507
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/LICENSE",
+          "sha256": "c5b036522ecf21b207daad625d10aff273d170b5cb46e3cae89129f67a6603c7",
+          "size": 1504
+        },
+        {
+          "path": "accessories/base_station_with_tripod.stl",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/accessories/base_station_with_tripod.stl",
+          "sha256": "e25712405f4a3d9d58f78f3a078c7733e67a90199ccd33506d6a10cb18914cf7",
+          "size": 373284
+        },
+        {
+          "path": "accessories/base_station_with_tripod.dae",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/accessories/base_station_with_tripod.dae",
+          "sha256": "08346146edf30af23d1083ab5858f6693aa5f941468d838bf4252c4895c944a7",
+          "size": 720341
+        },
+        {
+          "path": "accessories/base_station.dae",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/accessories/base_station.dae",
+          "sha256": "dbbd3ae7453b51c2d13bc8927027c5a4df597851dbbee249016a68b12506edbf",
+          "size": 705071
+        },
+        {
+          "path": "accessories/base_station.stl",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/accessories/base_station.stl",
+          "sha256": "1f1cd3944e9c13754ed50e2bf1a01d1b9be7944911f7ba6c8eb75d1f95c8d330",
+          "size": 354084
+        },
+        {
+          "path": "accessories/wibotic_tr301.stl",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/accessories/wibotic_tr301.stl",
+          "sha256": "5b7bfbb12242ebbc4fcbe34f5026afce15da805e27cc576bbb94986651f867bd",
+          "size": 2265134
+        },
+        {
+          "path": "accessories/wibotic_tr301.dae",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/accessories/wibotic_tr301.dae",
+          "sha256": "f207ae483556a61d1db986dc2a794e9edb68c4e36b55dd5d28fe00763ab3795e",
+          "size": 19355586
+        },
+        {
+          "path": "orchard/GroundForest003_COL_VAR1_3K.jpg.001.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/orchard/GroundForest003_COL_VAR1_3K.jpg.001.jpg",
+          "sha256": "3c7e134f31c03b6152605bd2fc9b6c38aca55e574ce2da13588231b65098fe62",
+          "size": 6313774
+        },
+        {
+          "path": "orchard/GroundMoss001_COL_1K.jpg.001.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/orchard/GroundMoss001_COL_1K.jpg.001.jpg",
+          "sha256": "898e7ac9cb542738e7b33b5f88d02c63605adaf1b43dc6bdb8bfbb66fb6d2047",
+          "size": 1673087
+        },
+        {
+          "path": "orchard/Ground.png",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/orchard/Ground.png",
+          "sha256": "02bb7174e9e56468f4b578d79638084b0c97be06bc4be0b8f457aac24394096f",
+          "size": 67222042
+        },
+        {
+          "path": "orchard/GroundTireTracks001_COL_3K.jpg.001.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/orchard/GroundTireTracks001_COL_3K.jpg.001.jpg",
+          "sha256": "64496572aff65586028edfd4b850eed931b23fa7a0db19cd4c5131c6c7b1b33b",
+          "size": 8313525
+        },
+        {
+          "path": "orchard/RustPlain007_COL_VAR1_3K.jpg.001.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/orchard/RustPlain007_COL_VAR1_3K.jpg.001.jpg",
+          "sha256": "d0455a631e99e7b5f3742c709d15b56e52daafff3498029f59ed87119af7774c",
+          "size": 4714661
+        },
+        {
+          "path": "orchard/orchard_leaves.dae",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/orchard/orchard_leaves.dae",
+          "sha256": "a4ead2315bcbc342279e112713c73af615bdea4eefe77fba76e677bec83d297f",
+          "size": 6324333
+        },
+        {
+          "path": "orchard/orchard_world.dae",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/orchard/orchard_world.dae",
+          "sha256": "cde8f3654cd63f0c2912714d6d383b42895bf5faeb67f51764a7731d736715ca",
+          "size": 522420
+        },
+        {
+          "path": "orchard/orchard_trunks.dae",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/orchard/orchard_trunks.dae",
+          "sha256": "3250554d49482f99a89d50f40eb7b3ac8ee1438496a3006fce4fdec94be933b8",
+          "size": 20570273
+        }
+      ],
+      "limitations": [
+        "World and mesh/textures downloaded at locked commit; per-model licenses and true rendering/collision require acceptance.",
+        "No vehicle/SITL compatibility implied."
+      ]
+    },
+    {
+      "id": "clearpath-pipeline",
+      "name": "pipeline",
+      "source": "https://github.com/clearpathrobotics/clearpath_simulator",
+      "version": "a7c5cf377027cbbb6cb64e4eae9c786750b5b276",
+      "license": "BSD-3-Clause",
+      "world": "world.sdf",
+      "files": [
+        {
+          "path": "world.sdf",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/worlds/pipeline.sdf",
+          "sha256": "76cb7925fb47d116bb74f3403328d4cfbdcbb060d9eb2eb08ce5aeaad8eb03b9",
+          "size": 3705
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/LICENSE",
+          "sha256": "c5b036522ecf21b207daad625d10aff273d170b5cb46e3cae89129f67a6603c7",
+          "size": 1504
+        },
+        {
+          "path": "accessories/base_station_with_tripod.stl",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/accessories/base_station_with_tripod.stl",
+          "sha256": "e25712405f4a3d9d58f78f3a078c7733e67a90199ccd33506d6a10cb18914cf7",
+          "size": 373284
+        },
+        {
+          "path": "accessories/base_station_with_tripod.dae",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/accessories/base_station_with_tripod.dae",
+          "sha256": "08346146edf30af23d1083ab5858f6693aa5f941468d838bf4252c4895c944a7",
+          "size": 720341
+        },
+        {
+          "path": "accessories/base_station.dae",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/accessories/base_station.dae",
+          "sha256": "dbbd3ae7453b51c2d13bc8927027c5a4df597851dbbee249016a68b12506edbf",
+          "size": 705071
+        },
+        {
+          "path": "accessories/base_station.stl",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/accessories/base_station.stl",
+          "sha256": "1f1cd3944e9c13754ed50e2bf1a01d1b9be7944911f7ba6c8eb75d1f95c8d330",
+          "size": 354084
+        },
+        {
+          "path": "accessories/wibotic_tr301.stl",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/accessories/wibotic_tr301.stl",
+          "sha256": "5b7bfbb12242ebbc4fcbe34f5026afce15da805e27cc576bbb94986651f867bd",
+          "size": 2265134
+        },
+        {
+          "path": "accessories/wibotic_tr301.dae",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/accessories/wibotic_tr301.dae",
+          "sha256": "f207ae483556a61d1db986dc2a794e9edb68c4e36b55dd5d28fe00763ab3795e",
+          "size": 19355586
+        },
+        {
+          "path": "pipeline/ConcreteWall001_COL_VAR1_3K.jpg.001.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/pipeline/ConcreteWall001_COL_VAR1_3K.jpg.001.jpg",
+          "sha256": "4e3619d839690f21cf9a216c8d997196cf19a5c22ac97ebd0f6f0306685b3dde",
+          "size": 1284085
+        },
+        {
+          "path": "pipeline/ConcreteWall001_COL_VAR1_3K.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/pipeline/ConcreteWall001_COL_VAR1_3K.jpg",
+          "sha256": "4e3619d839690f21cf9a216c8d997196cf19a5c22ac97ebd0f6f0306685b3dde",
+          "size": 1284085
+        },
+        {
+          "path": "pipeline/MetalSpottyDiscoloration001_COL_3K_METALNESS.jpg.001.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/pipeline/MetalSpottyDiscoloration001_COL_3K_METALNESS.jpg.001.jpg",
+          "sha256": "9ef162ba4273c9c968af36b20bf41994800d7addb37090074058e81bc4acae93",
+          "size": 3685020
+        },
+        {
+          "path": "pipeline/MetalSpottyDiscoloration001_COL_3K_METALNESS.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/pipeline/MetalSpottyDiscoloration001_COL_3K_METALNESS.jpg",
+          "sha256": "9ef162ba4273c9c968af36b20bf41994800d7addb37090074058e81bc4acae93",
+          "size": 3685020
+        },
+        {
+          "path": "pipeline/SolarPanelsPolycrystallineTypeBFramedClean001_COL_3K.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/pipeline/SolarPanelsPolycrystallineTypeBFramedClean001_COL_3K.jpg",
+          "sha256": "f6f53e8f520f31df49d377d1fb188dc70f40ce63caa50008502816dbb805fd54",
+          "size": 6403960
+        },
+        {
+          "path": "pipeline/inspection_water.dae",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/pipeline/inspection_water.dae",
+          "sha256": "25d03ad235ca0b283ff5afe97d50507cffec0a68a920d16d52eb107768887f2a",
+          "size": 4278
+        },
+        {
+          "path": "pipeline/WoodPlanksWorn33_COL_VAR1_3K.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/pipeline/WoodPlanksWorn33_COL_VAR1_3K.jpg",
+          "sha256": "a1a711e460d0fe613a7baedcac4cbfd1582e7dae76a4ba5f7ed42b3683b8656d",
+          "size": 2468641
+        },
+        {
+          "path": "pipeline/WoodPlanksWorn33_COL_VAR1_3K.jpg.001.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/pipeline/WoodPlanksWorn33_COL_VAR1_3K.jpg.001.jpg",
+          "sha256": "a1a711e460d0fe613a7baedcac4cbfd1582e7dae76a4ba5f7ed42b3683b8656d",
+          "size": 2468641
+        },
+        {
+          "path": "pipeline/SolarPanelsPolycrystallineTypeBFramedClean001_COL_3K.jpg.001.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/pipeline/SolarPanelsPolycrystallineTypeBFramedClean001_COL_3K.jpg.001.jpg",
+          "sha256": "f6f53e8f520f31df49d377d1fb188dc70f40ce63caa50008502816dbb805fd54",
+          "size": 6403960
+        },
+        {
+          "path": "pipeline/inspection_world.dae",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/pipeline/inspection_world.dae",
+          "sha256": "2ab85e1e733e409cedd298ddeedbbd5f6d6ed9e80d0e6983d55180a4fe9c24ca",
+          "size": 790284
+        },
+        {
+          "path": "pipeline/InspectionBakeLarge.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/pipeline/InspectionBakeLarge.jpg",
+          "sha256": "22d80d1b86149fbb049c62c41668ce4f097c1e02a9c023ed0330e4e93f98d373",
+          "size": 18965682
+        }
+      ],
+      "limitations": [
+        "World and mesh/textures downloaded at locked commit; per-model licenses and true rendering/collision require acceptance.",
+        "No vehicle/SITL compatibility implied."
+      ]
+    },
+    {
+      "id": "clearpath-solar-farm",
+      "name": "solar_farm",
+      "source": "https://github.com/clearpathrobotics/clearpath_simulator",
+      "version": "a7c5cf377027cbbb6cb64e4eae9c786750b5b276",
+      "license": "BSD-3-Clause",
+      "world": "world.sdf",
+      "files": [
+        {
+          "path": "world.sdf",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/worlds/solar_farm.sdf",
+          "sha256": "0e12ac20a7e9c6afb5dd6b0a69ef6ef463a48deba46ecbf6b46fa1cfb715f837",
+          "size": 3961
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/LICENSE",
+          "sha256": "c5b036522ecf21b207daad625d10aff273d170b5cb46e3cae89129f67a6603c7",
+          "size": 1504
+        },
+        {
+          "path": "accessories/base_station_with_tripod.stl",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/accessories/base_station_with_tripod.stl",
+          "sha256": "e25712405f4a3d9d58f78f3a078c7733e67a90199ccd33506d6a10cb18914cf7",
+          "size": 373284
+        },
+        {
+          "path": "accessories/base_station_with_tripod.dae",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/accessories/base_station_with_tripod.dae",
+          "sha256": "08346146edf30af23d1083ab5858f6693aa5f941468d838bf4252c4895c944a7",
+          "size": 720341
+        },
+        {
+          "path": "accessories/base_station.dae",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/accessories/base_station.dae",
+          "sha256": "dbbd3ae7453b51c2d13bc8927027c5a4df597851dbbee249016a68b12506edbf",
+          "size": 705071
+        },
+        {
+          "path": "accessories/base_station.stl",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/accessories/base_station.stl",
+          "sha256": "1f1cd3944e9c13754ed50e2bf1a01d1b9be7944911f7ba6c8eb75d1f95c8d330",
+          "size": 354084
+        },
+        {
+          "path": "accessories/wibotic_tr301.stl",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/accessories/wibotic_tr301.stl",
+          "sha256": "5b7bfbb12242ebbc4fcbe34f5026afce15da805e27cc576bbb94986651f867bd",
+          "size": 2265134
+        },
+        {
+          "path": "accessories/wibotic_tr301.dae",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/accessories/wibotic_tr301.dae",
+          "sha256": "f207ae483556a61d1db986dc2a794e9edb68c4e36b55dd5d28fe00763ab3795e",
+          "size": 19355586
+        },
+        {
+          "path": "solar_farm/MetalCorrugatedIronSheet002_METALNESS_3K_METALNESS.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/solar_farm/MetalCorrugatedIronSheet002_METALNESS_3K_METALNESS.jpg",
+          "sha256": "1b79acf0b03c9e0b6f44acd73a214feae06671e66043f797e57cd0e07924d3cd",
+          "size": 610762
+        },
+        {
+          "path": "solar_farm/SolarPanelsPolycrystallineTypeBFramedClean001_COL_3K.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/solar_farm/SolarPanelsPolycrystallineTypeBFramedClean001_COL_3K.jpg",
+          "sha256": "f6f53e8f520f31df49d377d1fb188dc70f40ce63caa50008502816dbb805fd54",
+          "size": 6403960
+        },
+        {
+          "path": "solar_farm/WoodPlanksWorn33_COL_VAR1_3K.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/solar_farm/WoodPlanksWorn33_COL_VAR1_3K.jpg",
+          "sha256": "a1a711e460d0fe613a7baedcac4cbfd1582e7dae76a4ba5f7ed42b3683b8656d",
+          "size": 2468641
+        },
+        {
+          "path": "solar_farm/WoodPlanksWornRed33_COL_VAR1_3K.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/solar_farm/WoodPlanksWornRed33_COL_VAR1_3K.jpg",
+          "sha256": "f64102a7b6f8da81b12363b42a5f8f9b6b4db001a70eff033eb83004339c0d0a",
+          "size": 3141794
+        },
+        {
+          "path": "solar_farm/WoodPlanksWornWhite33_COL_VAR1_3K.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/solar_farm/WoodPlanksWornWhite33_COL_VAR1_3K.jpg",
+          "sha256": "bd3188fb462e3024b9b166b9c1ebfa9c0b0266d7417c01bde395d6683718df58",
+          "size": 1981547
+        },
+        {
+          "path": "solar_farm/agriculture_world.dae",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/solar_farm/agriculture_world.dae",
+          "sha256": "bc612eba826ec61b99d41b6048eeecc95547e461832c98223ff5ac0bd69cb6dd",
+          "size": 2632705
+        },
+        {
+          "path": "solar_farm/AgriBakeLarge.jpg",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/meshes/solar_farm/AgriBakeLarge.jpg",
+          "sha256": "7499de69574593cecacf8354916c918e5a60badf02b537f27979e1ade00dad40",
+          "size": 25138896
+        }
+      ],
+      "limitations": [
+        "World and mesh/textures downloaded at locked commit; per-model licenses and true rendering/collision require acceptance.",
+        "No vehicle/SITL compatibility implied."
+      ]
+    },
+    {
+      "id": "clearpath-warehouse",
+      "name": "warehouse",
+      "source": "https://github.com/clearpathrobotics/clearpath_simulator",
+      "version": "a7c5cf377027cbbb6cb64e4eae9c786750b5b276",
+      "license": "BSD-3-Clause",
+      "world": "world.sdf",
+      "files": [
+        {
+          "path": "world.sdf",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/clearpath_gz/worlds/warehouse.sdf",
+          "sha256": "f28bfa410a467cc12bf3615413780315977bccd2b1c623e3ed4b0f56b61c9235",
+          "size": 7392
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/clearpathrobotics/clearpath_simulator/a7c5cf377027cbbb6cb64e4eae9c786750b5b276/LICENSE",
+          "sha256": "c5b036522ecf21b207daad625d10aff273d170b5cb46e3cae89129f67a6603c7",
+          "size": 1504
+        }
+      ],
+      "limitations": [
+        "Entry and repository license downloaded; recursive resources and per-model licenses require inspection.",
+        "Downloaded world does not establish vehicle/SITL/Framework compatibility."
+      ],
+      "requires": [
+        "fuel-movai-shelf-big-2",
+        "fuel-movai-shelf-1",
+        "fuel-openrobotics-table-4",
+        "fuel-openrobotics-chair-3",
+        "fuel-openrobotics-jersey-barrier-6",
+        "fuel-openrobotics-foldable-chair-3",
+        "fuel-openrobotics-warehouse-5",
+        "fuel-openrobotics-malevisitoronphone-2",
+        "fuel-plateau-casual-female-1"
+      ]
+    },
+    {
+      "id": "collection-f1-maze-s08-perfect-kr",
+      "name": "f1_maze_s08_perfect_kr",
+      "source": "https://github.com/mertgulerx/world-collection",
+      "version": "a0c262a497da1b0b9fd9970add6ff346e09afaeb",
+      "license": "Apache-2.0",
+      "world": "world.sdf",
+      "files": [
+        {
+          "path": "world.sdf",
+          "url": "https://raw.githubusercontent.com/mertgulerx/world-collection/a0c262a497da1b0b9fd9970add6ff346e09afaeb/worlds/F1_maze_s08_perfect_kr/F1_maze_s08_perfect_kr.sdf",
+          "sha256": "95f0e1a7bae77bab9980c35c6c7fc7d21bbbc81d8ad7ec15c5378f8ba8cbaf11",
+          "size": 32892
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/mertgulerx/world-collection/a0c262a497da1b0b9fd9970add6ff346e09afaeb/LICENSE",
+          "sha256": "4458503dd48e88c4e0b945fb252a08b93c40ec757309b8ffa7c594dfa1e35104",
+          "size": 10947
+        }
+      ],
+      "limitations": [
+        "Entry and repository license downloaded; recursive resources and per-model licenses require inspection.",
+        "Downloaded world does not establish vehicle/SITL/Framework compatibility."
+      ]
+    },
+    {
+      "id": "collection-f3-aisles-h30x20-a150-x1",
+      "name": "f3_aisles_h30x20_a150_x1",
+      "source": "https://github.com/mertgulerx/world-collection",
+      "version": "a0c262a497da1b0b9fd9970add6ff346e09afaeb",
+      "license": "Apache-2.0",
+      "world": "world.sdf",
+      "files": [
+        {
+          "path": "world.sdf",
+          "url": "https://raw.githubusercontent.com/mertgulerx/world-collection/a0c262a497da1b0b9fd9970add6ff346e09afaeb/worlds/F3_aisles_h30x20_a150_x1/F3_aisles_h30x20_a150_x1.sdf",
+          "sha256": "7a8bec3c52b0bb228548503d6668ed74297fb591d67ad445e80a0e3b95f055f0",
+          "size": 34846
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/mertgulerx/world-collection/a0c262a497da1b0b9fd9970add6ff346e09afaeb/LICENSE",
+          "sha256": "4458503dd48e88c4e0b945fb252a08b93c40ec757309b8ffa7c594dfa1e35104",
+          "size": 10947
+        }
+      ],
+      "limitations": [
+        "Entry and repository license downloaded; recursive resources and per-model licenses require inspection.",
+        "Downloaded world does not establish vehicle/SITL/Framework compatibility."
+      ]
+    },
+    {
+      "id": "collection-f4-forest-s40-d003",
+      "name": "f4_forest_s40_d003",
+      "source": "https://github.com/mertgulerx/world-collection",
+      "version": "a0c262a497da1b0b9fd9970add6ff346e09afaeb",
+      "license": "Apache-2.0",
+      "world": "world.sdf",
+      "files": [
+        {
+          "path": "world.sdf",
+          "url": "https://raw.githubusercontent.com/mertgulerx/world-collection/a0c262a497da1b0b9fd9970add6ff346e09afaeb/worlds/F4_forest_s40_d003/F4_forest_s40_d003.sdf",
+          "sha256": "ffc54c09848551c0f9b8cedf69d37a72914b8bd6d5d88b7f2d254623cedff8eb",
+          "size": 69483
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/mertgulerx/world-collection/a0c262a497da1b0b9fd9970add6ff346e09afaeb/LICENSE",
+          "sha256": "4458503dd48e88c4e0b945fb252a08b93c40ec757309b8ffa7c594dfa1e35104",
+          "size": 10947
+        }
+      ],
+      "limitations": [
+        "Entry and repository license downloaded; recursive resources and per-model licenses require inspection.",
+        "Downloaded world does not establish vehicle/SITL/Framework compatibility."
+      ]
+    },
+    {
+      "id": "collection-f5-urban-w06-b15",
+      "name": "f5_urban_w06_b15",
+      "source": "https://github.com/mertgulerx/world-collection",
+      "version": "a0c262a497da1b0b9fd9970add6ff346e09afaeb",
+      "license": "Apache-2.0",
+      "world": "world.sdf",
+      "files": [
+        {
+          "path": "world.sdf",
+          "url": "https://raw.githubusercontent.com/mertgulerx/world-collection/a0c262a497da1b0b9fd9970add6ff346e09afaeb/worlds/F5_urban_w06_b15/F5_urban_w06_b15.sdf",
+          "sha256": "df94f76911772785e084e340a4239631febcbb23ef38e4475a1d7611b689537b",
+          "size": 168502
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/mertgulerx/world-collection/a0c262a497da1b0b9fd9970add6ff346e09afaeb/LICENSE",
+          "sha256": "4458503dd48e88c4e0b945fb252a08b93c40ec757309b8ffa7c594dfa1e35104",
+          "size": 10947
+        }
+      ],
+      "limitations": [
+        "Entry and repository license downloaded; recursive resources and per-model licenses require inspection.",
+        "Downloaded world does not establish vehicle/SITL/Framework compatibility."
+      ]
+    },
+    {
+      "id": "collection-mo1-office-strip-moving",
+      "name": "mo1_office_strip_moving",
+      "source": "https://github.com/mertgulerx/world-collection",
+      "version": "a0c262a497da1b0b9fd9970add6ff346e09afaeb",
+      "license": "Apache-2.0",
+      "world": "world.sdf",
+      "files": [
+        {
+          "path": "world.sdf",
+          "url": "https://raw.githubusercontent.com/mertgulerx/world-collection/a0c262a497da1b0b9fd9970add6ff346e09afaeb/worlds/MO1_office_strip_moving/MO1_office_strip_moving.sdf",
+          "sha256": "ea7d4755f10a2173d51b418603b0f0a71c1a227082e295bf5cb207b60fdc120e",
+          "size": 24360
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/mertgulerx/world-collection/a0c262a497da1b0b9fd9970add6ff346e09afaeb/LICENSE",
+          "sha256": "4458503dd48e88c4e0b945fb252a08b93c40ec757309b8ffa7c594dfa1e35104",
+          "size": 10947
+        }
+      ],
+      "limitations": [
+        "Entry and repository license downloaded; recursive resources and per-model licenses require inspection.",
+        "Downloaded world does not establish vehicle/SITL/Framework compatibility."
+      ],
+      "requires": [
+        "collection-moving-objects-plugin"
+      ]
+    },
+    {
+      "id": "collection-mo2-warehouse-moving",
+      "name": "mo2_warehouse_moving",
+      "source": "https://github.com/mertgulerx/world-collection",
+      "version": "a0c262a497da1b0b9fd9970add6ff346e09afaeb",
+      "license": "Apache-2.0",
+      "world": "world.sdf",
+      "files": [
+        {
+          "path": "world.sdf",
+          "url": "https://raw.githubusercontent.com/mertgulerx/world-collection/a0c262a497da1b0b9fd9970add6ff346e09afaeb/worlds/MO2_warehouse_moving/MO2_warehouse_moving.sdf",
+          "sha256": "f1a2bf982a9dd502b28043aeba51d4e04ad70925fa26031c4d01fa0c3a6ef650",
+          "size": 70391
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/mertgulerx/world-collection/a0c262a497da1b0b9fd9970add6ff346e09afaeb/LICENSE",
+          "sha256": "4458503dd48e88c4e0b945fb252a08b93c40ec757309b8ffa7c594dfa1e35104",
+          "size": 10947
+        }
+      ],
+      "limitations": [
+        "Entry and repository license downloaded; recursive resources and per-model licenses require inspection.",
+        "Downloaded world does not establish vehicle/SITL/Framework compatibility."
+      ],
+      "requires": [
+        "collection-moving-objects-plugin"
+      ]
+    },
+    {
+      "id": "collection-sc1-square-loop",
+      "name": "sc1_square_loop",
+      "source": "https://github.com/mertgulerx/world-collection",
+      "version": "a0c262a497da1b0b9fd9970add6ff346e09afaeb",
+      "license": "Apache-2.0",
+      "world": "world.sdf",
+      "files": [
+        {
+          "path": "world.sdf",
+          "url": "https://raw.githubusercontent.com/mertgulerx/world-collection/a0c262a497da1b0b9fd9970add6ff346e09afaeb/worlds/SC1_square_loop/SC1_square_loop.sdf",
+          "sha256": "bca8497c77baf9bff2295f00c1ff1a21bff3182b4babe127360436aa12efea61",
+          "size": 18040
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/mertgulerx/world-collection/a0c262a497da1b0b9fd9970add6ff346e09afaeb/LICENSE",
+          "sha256": "4458503dd48e88c4e0b945fb252a08b93c40ec757309b8ffa7c594dfa1e35104",
+          "size": 10947
+        }
+      ],
+      "limitations": [
+        "Entry and repository license downloaded; recursive resources and per-model licenses require inspection.",
+        "Downloaded world does not establish vehicle/SITL/Framework compatibility."
+      ]
+    },
+    {
+      "id": "gazebo-air-pressure",
+      "name": "air-pressure",
+      "source": "https://github.com/gazebosim/gz-sim",
+      "version": "43d9baf13eac134914ebbd826de800724fca0a87",
+      "license": "Apache-2.0",
+      "world": "world.sdf",
+      "files": [
+        {
+          "path": "world.sdf",
+          "url": "https://raw.githubusercontent.com/gazebosim/gz-sim/43d9baf13eac134914ebbd826de800724fca0a87/test/worlds/air_pressure.sdf",
+          "sha256": "76e2f11619ecf5957a5647293c64bfbef2485356dbe525462ae10273a9f69df1",
+          "size": 1672
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/gazebosim/gz-sim/43d9baf13eac134914ebbd826de800724fca0a87/LICENSE",
+          "sha256": "a6cba85bc92e0cff7a450b1d873c0eaa2e9fc96bf472df0247a26bec77bf3ff9",
+          "size": 10173
+        }
+      ],
+      "limitations": [
+        "Official example; dependency presence and runtime acceptance required separately."
+      ]
+    },
+    {
+      "id": "gazebo-contact-sensor",
+      "name": "contact_sensor",
+      "source": "https://github.com/gazebosim/gz-sim",
+      "version": "43d9baf13eac134914ebbd826de800724fca0a87",
+      "license": "Apache-2.0",
+      "world": "world.sdf",
+      "files": [
+        {
+          "path": "world.sdf",
+          "url": "https://raw.githubusercontent.com/gazebosim/gz-sim/43d9baf13eac134914ebbd826de800724fca0a87/examples/worlds/contact_sensor.sdf",
+          "sha256": "939e4dbac5c5435292bc5681d3a88a1f673a848b5b00fd538c702214f427147a",
+          "size": 2637
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/gazebosim/gz-sim/43d9baf13eac134914ebbd826de800724fca0a87/LICENSE",
+          "sha256": "a6cba85bc92e0cff7a450b1d873c0eaa2e9fc96bf472df0247a26bec77bf3ff9",
+          "size": 10173
+        }
+      ],
+      "limitations": [
+        "Entry and repository license downloaded; recursive resources and per-model licenses require inspection.",
+        "Downloaded world does not establish vehicle/SITL/Framework compatibility."
+      ]
+    },
+    {
+      "id": "gazebo-imu",
+      "name": "imu",
+      "source": "https://github.com/gazebosim/gz-sim",
+      "version": "43d9baf13eac134914ebbd826de800724fca0a87",
+      "license": "Apache-2.0",
+      "world": "world.sdf",
+      "files": [
+        {
+          "path": "world.sdf",
+          "url": "https://raw.githubusercontent.com/gazebosim/gz-sim/43d9baf13eac134914ebbd826de800724fca0a87/test/worlds/imu.sdf",
+          "sha256": "f75f8ea8f8f8a882a5d2042f15cb889af433fc63734900b07e309ba9a5a47546",
+          "size": 2069
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/gazebosim/gz-sim/43d9baf13eac134914ebbd826de800724fca0a87/LICENSE",
+          "sha256": "a6cba85bc92e0cff7a450b1d873c0eaa2e9fc96bf472df0247a26bec77bf3ff9",
+          "size": 10173
+        }
+      ],
+      "limitations": [
+        "Official example; dependency presence and runtime acceptance required separately."
+      ]
+    },
+    {
+      "id": "gazebo-navsat",
+      "name": "navsat",
+      "source": "https://github.com/gazebosim/gz-sim",
+      "version": "43d9baf13eac134914ebbd826de800724fca0a87",
+      "license": "Apache-2.0",
+      "world": "world.sdf",
+      "files": [
+        {
+          "path": "world.sdf",
+          "url": "https://raw.githubusercontent.com/gazebosim/gz-sim/43d9baf13eac134914ebbd826de800724fca0a87/test/worlds/navsat.sdf",
+          "sha256": "b371a9d2131363dbeb34cf096dc7634658581892d737b4cad9abcd8f7649686e",
+          "size": 1204
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/gazebosim/gz-sim/43d9baf13eac134914ebbd826de800724fca0a87/LICENSE",
+          "sha256": "a6cba85bc92e0cff7a450b1d873c0eaa2e9fc96bf472df0247a26bec77bf3ff9",
+          "size": 10173
+        }
+      ],
+      "limitations": [
+        "Official example; dependency presence and runtime acceptance required separately."
+      ]
+    },
+    {
+      "id": "gazebo-sensors",
+      "name": "sensors",
+      "source": "https://github.com/gazebosim/gz-sim",
+      "version": "43d9baf13eac134914ebbd826de800724fca0a87",
+      "license": "Apache-2.0",
+      "world": "world.sdf",
+      "files": [
+        {
+          "path": "world.sdf",
+          "url": "https://raw.githubusercontent.com/gazebosim/gz-sim/43d9baf13eac134914ebbd826de800724fca0a87/examples/worlds/sensors.sdf",
+          "sha256": "4bf8718e7870b8b8e31893d1077f5fd036919f2536a3c2646f810c42b4116350",
+          "size": 7984
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/gazebosim/gz-sim/43d9baf13eac134914ebbd826de800724fca0a87/LICENSE",
+          "sha256": "a6cba85bc92e0cff7a450b1d873c0eaa2e9fc96bf472df0247a26bec77bf3ff9",
+          "size": 10173
+        }
+      ],
+      "limitations": [
+        "Official example; dependency presence and runtime acceptance required separately."
+      ]
+    },
+    {
+      "id": "gazebo-shapes",
+      "name": "shapes",
+      "source": "https://github.com/gazebosim/gz-sim",
+      "version": "43d9baf13eac134914ebbd826de800724fca0a87",
+      "license": "Apache-2.0",
+      "world": "world.sdf",
+      "files": [
+        {
+          "path": "world.sdf",
+          "url": "https://raw.githubusercontent.com/gazebosim/gz-sim/43d9baf13eac134914ebbd826de800724fca0a87/examples/worlds/shapes.sdf",
+          "sha256": "b30d0a3f8cd00af62e87813feec1b619efa02364ec39a726f113c164d479da9e",
+          "size": 7157
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/gazebosim/gz-sim/43d9baf13eac134914ebbd826de800724fca0a87/LICENSE",
+          "sha256": "a6cba85bc92e0cff7a450b1d873c0eaa2e9fc96bf472df0247a26bec77bf3ff9",
+          "size": 10173
+        }
+      ],
+      "limitations": [
+        "Entry and repository license downloaded; recursive resources and per-model licenses require inspection.",
+        "Downloaded world does not establish vehicle/SITL/Framework compatibility."
+      ]
+    },
+    {
+      "id": "gazebo-trajectory-follower",
+      "name": "trajectory_follower",
+      "source": "https://github.com/gazebosim/gz-sim",
+      "version": "43d9baf13eac134914ebbd826de800724fca0a87",
+      "license": "Apache-2.0",
+      "world": "world.sdf",
+      "files": [
+        {
+          "path": "world.sdf",
+          "url": "https://raw.githubusercontent.com/gazebosim/gz-sim/43d9baf13eac134914ebbd826de800724fca0a87/examples/worlds/trajectory_follower.sdf",
+          "sha256": "59fe2db99032a64c5b35860d9484622df7d4a15a292fe4017bc38be924abfc0c",
+          "size": 6665
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/gazebosim/gz-sim/43d9baf13eac134914ebbd826de800724fca0a87/LICENSE",
+          "sha256": "a6cba85bc92e0cff7a450b1d873c0eaa2e9fc96bf472df0247a26bec77bf3ff9",
+          "size": 10173
+        }
+      ],
+      "limitations": [
+        "Entry and repository license downloaded; recursive resources and per-model licenses require inspection.",
+        "Downloaded world does not establish vehicle/SITL/Framework compatibility."
+      ]
+    },
+    {
+      "id": "gazebo-wind",
+      "name": "wind",
+      "source": "https://github.com/gazebosim/gz-sim",
+      "version": "43d9baf13eac134914ebbd826de800724fca0a87",
+      "license": "Apache-2.0",
+      "world": "world.sdf",
+      "files": [
+        {
+          "path": "world.sdf",
+          "url": "https://raw.githubusercontent.com/gazebosim/gz-sim/43d9baf13eac134914ebbd826de800724fca0a87/examples/worlds/wind.sdf",
+          "sha256": "6349747a5d0b184a5d9126932bb21fa4b85968b3422bf5843a9193c9c9fc86d8",
+          "size": 11482
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/gazebosim/gz-sim/43d9baf13eac134914ebbd826de800724fca0a87/LICENSE",
+          "sha256": "a6cba85bc92e0cff7a450b1d873c0eaa2e9fc96bf472df0247a26bec77bf3ff9",
+          "size": 10173
+        }
+      ],
+      "limitations": [
+        "Entry and repository license downloaded; recursive resources and per-model licenses require inspection.",
+        "Downloaded world does not establish vehicle/SITL/Framework compatibility."
+      ]
+    },
+    {
+      "id": "px4-forest",
+      "name": "forest",
+      "source": "https://github.com/PX4/PX4-gazebo-models",
+      "version": "e5997f455e33ec071c7c677fc59a65781de496a4",
+      "license": "BSD-3-Clause",
+      "world": "world.sdf",
+      "files": [
+        {
+          "path": "world.sdf",
+          "url": "https://raw.githubusercontent.com/PX4/PX4-gazebo-models/e5997f455e33ec071c7c677fc59a65781de496a4/worlds/forest.sdf",
+          "sha256": "e68083acac56d51a19d1b14b3da6d97c8591a3a2d8293241f6e2dc2c45901372",
+          "size": 8547
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/PX4/PX4-gazebo-models/e5997f455e33ec071c7c677fc59a65781de496a4/LICENSE",
+          "sha256": "5fcb2a52fc0390cc8c7eccaa0cde9316c810f38811efb357e1ede7858e26e289",
+          "size": 1532
+        }
+      ],
+      "limitations": [
+        "Entry and repository license downloaded; recursive resources and per-model licenses require inspection.",
+        "Downloaded world does not establish vehicle/SITL/Framework compatibility."
+      ]
+    },
+    {
+      "id": "px4-frictionless",
+      "name": "frictionless",
+      "source": "https://github.com/PX4/PX4-gazebo-models",
+      "version": "e5997f455e33ec071c7c677fc59a65781de496a4",
+      "license": "BSD-3-Clause",
+      "world": "world.sdf",
+      "files": [
+        {
+          "path": "world.sdf",
+          "url": "https://raw.githubusercontent.com/PX4/PX4-gazebo-models/e5997f455e33ec071c7c677fc59a65781de496a4/worlds/frictionless.sdf",
+          "sha256": "cb375041eb76c7a1761b37c65368b84f79ff39ea6e5db2ce29bf929664568a85",
+          "size": 3554
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/PX4/PX4-gazebo-models/e5997f455e33ec071c7c677fc59a65781de496a4/LICENSE",
+          "sha256": "5fcb2a52fc0390cc8c7eccaa0cde9316c810f38811efb357e1ede7858e26e289",
+          "size": 1532
+        }
+      ],
+      "limitations": [
+        "Entry and repository license downloaded; recursive resources and per-model licenses require inspection.",
+        "Downloaded world does not establish vehicle/SITL/Framework compatibility."
+      ]
+    },
+    {
+      "id": "px4-moving-platform",
+      "name": "moving_platform",
+      "source": "https://github.com/PX4/PX4-gazebo-models",
+      "version": "e5997f455e33ec071c7c677fc59a65781de496a4",
+      "license": "BSD-3-Clause",
+      "world": "world.sdf",
+      "files": [
+        {
+          "path": "world.sdf",
+          "url": "https://raw.githubusercontent.com/PX4/PX4-gazebo-models/e5997f455e33ec071c7c677fc59a65781de496a4/worlds/moving_platform.sdf",
+          "sha256": "7c83df58ffd9f8b899590eaf30080d5cdee2e943df508aa4848836a4f30c49b7",
+          "size": 2869
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/PX4/PX4-gazebo-models/e5997f455e33ec071c7c677fc59a65781de496a4/LICENSE",
+          "sha256": "5fcb2a52fc0390cc8c7eccaa0cde9316c810f38811efb357e1ede7858e26e289",
+          "size": 1532
+        }
+      ],
+      "limitations": [
+        "Entry and repository license downloaded; recursive resources and per-model licenses require inspection.",
+        "Downloaded world does not establish vehicle/SITL/Framework compatibility."
+      ]
+    },
+    {
+      "id": "px4-ridge",
+      "name": "ridge",
+      "source": "https://github.com/PX4/PX4-gazebo-models",
+      "version": "e5997f455e33ec071c7c677fc59a65781de496a4",
+      "license": "BSD-3-Clause",
+      "world": "world.sdf",
+      "files": [
+        {
+          "path": "world.sdf",
+          "url": "https://raw.githubusercontent.com/PX4/PX4-gazebo-models/e5997f455e33ec071c7c677fc59a65781de496a4/worlds/ridge.sdf",
+          "sha256": "b993faea5c397d38c00688521b9291afb254362376c0e1704084a8b25743f716",
+          "size": 3425
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/PX4/PX4-gazebo-models/e5997f455e33ec071c7c677fc59a65781de496a4/LICENSE",
+          "sha256": "5fcb2a52fc0390cc8c7eccaa0cde9316c810f38811efb357e1ede7858e26e289",
+          "size": 1532
+        }
+      ],
+      "limitations": [
+        "Entry and repository license downloaded; recursive resources and per-model licenses require inspection.",
+        "Downloaded world does not establish vehicle/SITL/Framework compatibility."
+      ]
+    },
+    {
+      "id": "px4-walls",
+      "name": "walls",
+      "source": "https://github.com/PX4/PX4-gazebo-models",
+      "version": "e5997f455e33ec071c7c677fc59a65781de496a4",
+      "license": "BSD-3-Clause",
+      "world": "world.sdf",
+      "files": [
+        {
+          "path": "world.sdf",
+          "url": "https://raw.githubusercontent.com/PX4/PX4-gazebo-models/e5997f455e33ec071c7c677fc59a65781de496a4/worlds/walls.sdf",
+          "sha256": "a33409e9fbedacad0e8e85f0550e5681701b715c309a0cfec4d7141fff0e8ca6",
+          "size": 5238
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/PX4/PX4-gazebo-models/e5997f455e33ec071c7c677fc59a65781de496a4/LICENSE",
+          "sha256": "5fcb2a52fc0390cc8c7eccaa0cde9316c810f38811efb357e1ede7858e26e289",
+          "size": 1532
+        }
+      ],
+      "limitations": [
+        "Entry and repository license downloaded; recursive resources and per-model licenses require inspection.",
+        "Downloaded world does not establish vehicle/SITL/Framework compatibility."
+      ]
+    },
+    {
+      "id": "fuel-movai-shelf-big-2",
+      "kind": "model",
+      "name": "shelf_big",
+      "source": "https://fuel.gazebosim.org/1.0/MovAi/models/shelf_big/2",
+      "version": "2",
+      "license": "Creative Commons Attribution Non Commercial No Derivatives 4.0 International",
+      "world": "model.sdf",
+      "fuel_uri": "https://fuel.gazebosim.org/1.0/MovAi/models/shelf_big/2",
+      "fuel_aliases": [
+        "https://fuel.gazebosim.org/1.0/MovAi/models/shelf_big"
+      ],
+      "files": [
+        {
+          "path": "meshes/Box_paper_04_1_Base_Color.png",
+          "url": "https://fuel.gazebosim.org/1.0/MovAi/models/shelf_big/2/files/meshes/Box_paper_04_1_Base_Color.png",
+          "sha256": "011024eac091cc125b7addab56547a241558bcb76d2f3190d2932d4db0c4492b",
+          "size": 1016531
+        },
+        {
+          "path": "meshes/shelf_big_movai.dae",
+          "url": "https://fuel.gazebosim.org/1.0/MovAi/models/shelf_big/2/files/meshes/shelf_big_movai.dae",
+          "sha256": "2ade1557766e2bdda0325f6cfce6924c33f3434a8c74379c4764743c21a877bb",
+          "size": 228406
+        },
+        {
+          "path": "model.config",
+          "url": "https://fuel.gazebosim.org/1.0/MovAi/models/shelf_big/2/files/model.config",
+          "sha256": "16920d959a782311f3920ac03c744b4655279c085a040ae7052f5bf09e38ae3f",
+          "size": 334
+        },
+        {
+          "path": "model.sdf",
+          "url": "https://fuel.gazebosim.org/1.0/MovAi/models/shelf_big/2/files/model.sdf",
+          "sha256": "e2a8ee5bf763d5a03d1022e08b46045a397a6ca849b659b8eefc3d23adbc129c",
+          "size": 761
+        }
+      ],
+      "limitations": [
+        "Pinned Fuel dependency; license metadata matched this exact model version on 2026-10-29.",
+        "Model file presence is not scene/vehicle verification."
+      ],
+      "license_url": "http://creativecommons.org/licenses/by-nc-nd/4.0/",
+      "license_source": "https://fuel.gazebosim.org/1.0/MovAi/models/shelf_big",
+      "license_checked_at": "2026-10-29"
+    },
+    {
+      "id": "fuel-movai-shelf-1",
+      "kind": "model",
+      "name": "shelf",
+      "source": "https://fuel.gazebosim.org/1.0/MovAi/models/shelf/1",
+      "version": "1",
+      "license": "Creative Commons Attribution Non Commercial 4.0 International",
+      "world": "model.sdf",
+      "fuel_uri": "https://fuel.gazebosim.org/1.0/MovAi/models/shelf/1",
+      "fuel_aliases": [
+        "https://fuel.gazebosim.org/1.0/MovAi/models/shelf"
+      ],
+      "files": [
+        {
+          "path": "meshes/Box_paper_04_1_Base_Color.png",
+          "url": "https://fuel.gazebosim.org/1.0/MovAi/models/shelf/1/files/meshes/Box_paper_04_1_Base_Color.png",
+          "sha256": "011024eac091cc125b7addab56547a241558bcb76d2f3190d2932d4db0c4492b",
+          "size": 1016531
+        },
+        {
+          "path": "meshes/shelf_big_movai.dae",
+          "url": "https://fuel.gazebosim.org/1.0/MovAi/models/shelf/1/files/meshes/shelf_big_movai.dae",
+          "sha256": "2ade1557766e2bdda0325f6cfce6924c33f3434a8c74379c4764743c21a877bb",
+          "size": 228406
+        },
+        {
+          "path": "model.config",
+          "url": "https://fuel.gazebosim.org/1.0/MovAi/models/shelf/1/files/model.config",
+          "sha256": "0935cc457d5477eda3cca41fc832b70418d8ca3b7a4c3ce27cb3c479f0ceb555",
+          "size": 310
+        },
+        {
+          "path": "model.sdf",
+          "url": "https://fuel.gazebosim.org/1.0/MovAi/models/shelf/1/files/model.sdf",
+          "sha256": "e9ca4a695b13cd6a1f6e23f1946be0352ba52a02905b194df09102d0b7395c57",
+          "size": 742
+        }
+      ],
+      "limitations": [
+        "Pinned Fuel dependency; license metadata matched this exact model version on 2026-10-29.",
+        "Model file presence is not scene/vehicle verification."
+      ],
+      "license_url": "http://creativecommons.org/licenses/by-nc/4.0/",
+      "license_source": "https://fuel.gazebosim.org/1.0/MovAi/models/shelf",
+      "license_checked_at": "2026-10-29"
+    },
+    {
+      "id": "fuel-openrobotics-table-4",
+      "kind": "model",
+      "name": "Table",
+      "source": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Table/4",
+      "version": "4",
+      "license": "Creative Commons Zero v1.0 Universal",
+      "world": "model.sdf",
+      "fuel_uri": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Table/4",
+      "fuel_aliases": [
+        "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Table"
+      ],
+      "files": [
+        {
+          "path": "Table_Diffuse.jpg",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Table/4/files/Table_Diffuse.jpg",
+          "sha256": "d9891a81facea4747cf7b2b9c8891c0cadca50613b677bb8cab7ed5a8a601d23",
+          "size": 707345
+        },
+        {
+          "path": "model-1_2.sdf",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Table/4/files/model-1_2.sdf",
+          "sha256": "bf88c3ab3b045a307c681cbca58e677087e28195beefff418a704b4950579a65",
+          "size": 3614
+        },
+        {
+          "path": "model-1_3.sdf",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Table/4/files/model-1_3.sdf",
+          "sha256": "e524f0ab1225fbe90e69994895e3640d5be1f63ab25f955de9c7293ef80cdeb9",
+          "size": 3607
+        },
+        {
+          "path": "model-1_4.sdf",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Table/4/files/model-1_4.sdf",
+          "sha256": "f528ee4128390c49e8c83abcd45d4bb87abc80adefa0da620575f3615a517247",
+          "size": 3607
+        },
+        {
+          "path": "model.config",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Table/4/files/model.config",
+          "sha256": "135367bc4c08ce4757a069ad78f0f8d09868e645ba263fac6660ab34dc3cf3aa",
+          "size": 395
+        },
+        {
+          "path": "model.sdf",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Table/4/files/model.sdf",
+          "sha256": "dea3ecaed69529d4d292910b1ea10582672b958e989df5af224ba3d405b1d37c",
+          "size": 4006
+        }
+      ],
+      "limitations": [
+        "Pinned Fuel dependency; license metadata matched this exact model version on 2026-10-29.",
+        "Model file presence is not scene/vehicle verification."
+      ],
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "license_source": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Table",
+      "license_checked_at": "2026-10-29"
+    },
+    {
+      "id": "fuel-openrobotics-chair-3",
+      "kind": "model",
+      "name": "Chair",
+      "source": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Chair/3",
+      "version": "3",
+      "license": "Creative Commons Attribution 4.0 International",
+      "world": "model.sdf",
+      "fuel_uri": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Chair/3",
+      "fuel_aliases": [
+        "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Chair"
+      ],
+      "files": [
+        {
+          "path": "meshes/Chair.mtl",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Chair/3/files/meshes/Chair.mtl",
+          "sha256": "b6cff293530c53d6fc9ce96a423bcf6f54f2ef44e7137378be4461e352080290",
+          "size": 340
+        },
+        {
+          "path": "meshes/Chair.obj",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Chair/3/files/meshes/Chair.obj",
+          "sha256": "c15bd054d3a54a82ebfd00a3dcf89a37046f6157c453040e834c0e06e749a763",
+          "size": 19757
+        },
+        {
+          "path": "meshes/Chair.png",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Chair/3/files/meshes/Chair.png",
+          "sha256": "9302c9d08039537e19430206d9b0dc86c8e17e801f933cc24b4891112df7d951",
+          "size": 495952
+        },
+        {
+          "path": "meshes/Chair_Diffuse.png",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Chair/3/files/meshes/Chair_Diffuse.png",
+          "sha256": "5841f94e06c2bc246f17bd55ce56a44f9c9a620a522413df473dc75049e7dd10",
+          "size": 769123
+        },
+        {
+          "path": "meshes/Chair_Normal.png",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Chair/3/files/meshes/Chair_Normal.png",
+          "sha256": "668cc079c93d1477e51f0f3db31946ba51fae9e84a4099631f15cdbf1bf4deb3",
+          "size": 1092105
+        },
+        {
+          "path": "meshes/Chair_SpecGloss.png",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Chair/3/files/meshes/Chair_SpecGloss.png",
+          "sha256": "563218bd3e6a214f0aaef564a34b604d0b6560a52d729bdf71685638dd0536e5",
+          "size": 91912
+        },
+        {
+          "path": "model.config",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Chair/3/files/model.config",
+          "sha256": "70b823befc5c96877ae159c114288aae285d3fb2a24f935ad10b32299c6673a8",
+          "size": 283
+        },
+        {
+          "path": "model.sdf",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Chair/3/files/model.sdf",
+          "sha256": "163b511d1fe95cdeebbfcc09a6ce0da11570a3c0db5fcae0a532f9e4b5c5c4ad",
+          "size": 616
+        }
+      ],
+      "limitations": [
+        "Pinned Fuel dependency; license metadata matched this exact model version on 2026-10-29.",
+        "Model file presence is not scene/vehicle verification."
+      ],
+      "license_url": "http://creativecommons.org/licenses/by/4.0/",
+      "license_source": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Chair",
+      "license_checked_at": "2026-10-29"
+    },
+    {
+      "id": "fuel-openrobotics-jersey-barrier-6",
+      "kind": "model",
+      "name": "Jersey Barrier",
+      "source": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Jersey Barrier/6",
+      "version": "6",
+      "license": "Creative Commons Zero v1.0 Universal",
+      "world": "model.sdf",
+      "fuel_uri": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Jersey Barrier/6",
+      "fuel_aliases": [
+        "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Jersey Barrier"
+      ],
+      "files": [
+        {
+          "path": "materials/textures/jersey_barrier.jpg",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Jersey%20Barrier/6/files/materials/textures/jersey_barrier.jpg",
+          "sha256": "57f552ef666849bc3a21086aa89fccb12a3906eea743907ef05a90ceb5bfbaa2",
+          "size": 34516
+        },
+        {
+          "path": "materials/textures/jersey_barrier_diffuse.jpg",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Jersey%20Barrier/6/files/materials/textures/jersey_barrier_diffuse.jpg",
+          "sha256": "57f552ef666849bc3a21086aa89fccb12a3906eea743907ef05a90ceb5bfbaa2",
+          "size": 34516
+        },
+        {
+          "path": "materials/textures/jersey_barrier_spec.jpg",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Jersey%20Barrier/6/files/materials/textures/jersey_barrier_spec.jpg",
+          "sha256": "f0bb399b56d20246371a09b7390f0db5b863d0da03aafba4218dc196e72b622d",
+          "size": 33902
+        },
+        {
+          "path": "meshes/jersey_barrier.dae",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Jersey%20Barrier/6/files/meshes/jersey_barrier.dae",
+          "sha256": "4a32cf46cd5d82ba21add31465e37a2b57b7b0403364f94fc5a47379feed7a34",
+          "size": 57275
+        },
+        {
+          "path": "model.config",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Jersey%20Barrier/6/files/model.config",
+          "sha256": "0ba72cbf0ec684b897a234af39d95684ba7d39b86acea9ad952f4e1ce8e76808",
+          "size": 389
+        },
+        {
+          "path": "model.sdf",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Jersey%20Barrier/6/files/model.sdf",
+          "sha256": "c1d9ee78110a1e9b06045dec1fa3414c9c8acaa552b1a945f09dfda662232aaf",
+          "size": 1574
+        }
+      ],
+      "limitations": [
+        "Pinned Fuel dependency; license metadata matched this exact model version on 2026-10-29.",
+        "Model file presence is not scene/vehicle verification."
+      ],
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "license_source": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Jersey Barrier",
+      "license_checked_at": "2026-10-29"
+    },
+    {
+      "id": "fuel-openrobotics-foldable-chair-3",
+      "kind": "model",
+      "name": "foldable_chair",
+      "source": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/foldable_chair/3",
+      "version": "3",
+      "license": "Creative Commons Attribution 4.0 International",
+      "world": "model.sdf",
+      "fuel_uri": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/foldable_chair/3",
+      "fuel_aliases": [
+        "https://fuel.gazebosim.org/1.0/OpenRobotics/models/foldable_chair"
+      ],
+      "files": [
+        {
+          "path": "mesh/foldable_chair.dae",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/foldable_chair/3/files/mesh/foldable_chair.dae",
+          "sha256": "fd035ca9ddf21ffc6757bb6d5a794be5299df6329b8f1574945826ec3fe66345",
+          "size": 161587
+        },
+        {
+          "path": "mesh/foldable_chair.png",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/foldable_chair/3/files/mesh/foldable_chair.png",
+          "sha256": "d120f8068d09dd91bd3fde4401406cdf4c620dfb529bcbb535827532f4632a3a",
+          "size": 4790083
+        },
+        {
+          "path": "model.config",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/foldable_chair/3/files/model.config",
+          "sha256": "50e6d163666f7d591097dc6648e638cfdb7a5dc9c132f7e3547792362d8d20d7",
+          "size": 284
+        },
+        {
+          "path": "model.sdf",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/foldable_chair/3/files/model.sdf",
+          "sha256": "b0bc74f54875cc228a3933600b94253d223c6f4a28c104190e85c1ea1d0cbe91",
+          "size": 564
+        }
+      ],
+      "limitations": [
+        "Pinned Fuel dependency; license metadata matched this exact model version on 2026-10-29.",
+        "Model file presence is not scene/vehicle verification."
+      ],
+      "license_url": "http://creativecommons.org/licenses/by/4.0/",
+      "license_source": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/foldable_chair",
+      "license_checked_at": "2026-10-29"
+    },
+    {
+      "id": "fuel-openrobotics-warehouse-5",
+      "kind": "model",
+      "name": "Warehouse",
+      "source": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Warehouse/5",
+      "version": "5",
+      "license": "Creative Commons Attribution Non Commercial No Derivatives 4.0 International",
+      "world": "model.sdf",
+      "fuel_uri": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Warehouse/5",
+      "fuel_aliases": [
+        "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Warehouse"
+      ],
+      "files": [
+        {
+          "path": "meshes/Asphalt010_1K_Color.jpg",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Warehouse/5/files/meshes/Asphalt010_1K_Color.jpg",
+          "sha256": "95ddb95c812e6633a018f164b389ff4fe5488fefd85f177e617ea4a32f79fe7e",
+          "size": 968810
+        },
+        {
+          "path": "meshes/Rough_Square_Concrete_Block.jpg",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Warehouse/5/files/meshes/Rough_Square_Concrete_Block.jpg",
+          "sha256": "6b69ae3b6987d85103c2edf2810968c472fa0d456027c78c778c311272781e6d",
+          "size": 77244
+        },
+        {
+          "path": "meshes/Tape001_1K_Color.png",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Warehouse/5/files/meshes/Tape001_1K_Color.png",
+          "sha256": "c4975a44b4b7cc32838319b6ffa4e615f2640893374ae812bf9626b0680afdbb",
+          "size": 86373
+        },
+        {
+          "path": "meshes/Terrazzo005_1K_Color.jpg",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Warehouse/5/files/meshes/Terrazzo005_1K_Color.jpg",
+          "sha256": "e312b966741d492a2f507981093124ac005a63e562ef93b2d3b5ac6754d04582",
+          "size": 1461999
+        },
+        {
+          "path": "meshes/ground.png",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Warehouse/5/files/meshes/ground.png",
+          "sha256": "6f128ff6d25c1881f72f193856959821c6d0704410dbdd77170a9a5830b912ab",
+          "size": 20565
+        },
+        {
+          "path": "meshes/warehouse.dae",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Warehouse/5/files/meshes/warehouse.dae",
+          "sha256": "6ddfd0d97416e0af94a1087d25dcb313aee93992ed949c14e5ac671a3531fc52",
+          "size": 304435
+        },
+        {
+          "path": "meshes/warehouse_colision.stl",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Warehouse/5/files/meshes/warehouse_colision.stl",
+          "sha256": "78fa7f71edc7ec8347e647ca29a0f347036f8a9c253e502e74f8fc6e1180e0e8",
+          "size": 159684
+        },
+        {
+          "path": "model.config",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Warehouse/5/files/model.config",
+          "sha256": "4112eae762973474b0d79ad711ad3682c34f36c0ed6185df2e85da39eb3dd227",
+          "size": 329
+        },
+        {
+          "path": "model.sdf",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Warehouse/5/files/model.sdf",
+          "sha256": "8a2a1e3cf36d53d676841455c3d244a616230a584f81f6327542063c32973c24",
+          "size": 1499
+        }
+      ],
+      "limitations": [
+        "Pinned Fuel dependency; license metadata matched this exact model version on 2026-10-29.",
+        "Model file presence is not scene/vehicle verification."
+      ],
+      "license_url": "http://creativecommons.org/licenses/by-nc-nd/4.0/",
+      "license_source": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/Warehouse",
+      "license_checked_at": "2026-10-29"
+    },
+    {
+      "id": "fuel-openrobotics-malevisitoronphone-2",
+      "kind": "model",
+      "name": "MaleVisitorOnPhone",
+      "source": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/MaleVisitorOnPhone/2",
+      "version": "2",
+      "license": "Creative Commons Attribution 4.0 International",
+      "world": "model.sdf",
+      "fuel_uri": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/MaleVisitorOnPhone/2",
+      "fuel_aliases": [
+        "https://fuel.gazebosim.org/1.0/OpenRobotics/models/MaleVisitorOnPhone"
+      ],
+      "files": [
+        {
+          "path": "meshes/MaleVisitor.png",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/MaleVisitorOnPhone/2/files/meshes/MaleVisitor.png",
+          "sha256": "664169d68e9f792beedb9c5fb90f65f47d3bfb674605f37d54679e3fcb6d3b3d",
+          "size": 1183491
+        },
+        {
+          "path": "meshes/MaleVisitorStatic.mtl",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/MaleVisitorOnPhone/2/files/meshes/MaleVisitorStatic.mtl",
+          "sha256": "859499b3eebd371fecb18f4d8d1c6db0630341ab461aa22a566991f841d2b80a",
+          "size": 449
+        },
+        {
+          "path": "meshes/MaleVisitorStatic.obj",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/MaleVisitorOnPhone/2/files/meshes/MaleVisitorStatic.obj",
+          "sha256": "5a5508f4adf0b69df858727b8dbce97fc6e735f35c72da9aaf0fc7b364e20db3",
+          "size": 175699
+        },
+        {
+          "path": "meshes/MaleVisitorStatic_Col.mtl",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/MaleVisitorOnPhone/2/files/meshes/MaleVisitorStatic_Col.mtl",
+          "sha256": "5ea6cd44f150bbb4fff10386acdf556c56113d5d8d79af3b1fff2d6199b32200",
+          "size": 229
+        },
+        {
+          "path": "meshes/MaleVisitorStatic_Col.obj",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/MaleVisitorOnPhone/2/files/meshes/MaleVisitorStatic_Col.obj",
+          "sha256": "feded16115d772d51b75be16941e5ee376cd92bf1aee6b84f4d21fac4dc47878",
+          "size": 982
+        },
+        {
+          "path": "meshes/Phone.png",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/MaleVisitorOnPhone/2/files/meshes/Phone.png",
+          "sha256": "b60b4b932a7232d5449e846caed572f68c2755e0de3dc09da2e7dc622158bda9",
+          "size": 7571
+        },
+        {
+          "path": "model.config",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/MaleVisitorOnPhone/2/files/model.config",
+          "sha256": "e3c8edaa7c1cb0fd73af43386f83c2571553cfcf1975ca86e0ecb540df6448a2",
+          "size": 347
+        },
+        {
+          "path": "model.sdf",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/MaleVisitorOnPhone/2/files/model.sdf",
+          "sha256": "b64d94f5cb6b227dec44fd367516960123d14974d3a150dc51fa0a0f2858cdd3",
+          "size": 642
+        }
+      ],
+      "limitations": [
+        "Pinned Fuel dependency; license metadata matched this exact model version on 2026-10-29.",
+        "Model file presence is not scene/vehicle verification."
+      ],
+      "license_url": "http://creativecommons.org/licenses/by/4.0/",
+      "license_source": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/MaleVisitorOnPhone",
+      "license_checked_at": "2026-10-29"
+    },
+    {
+      "id": "fuel-openrobotics-ground-plane-5",
+      "kind": "model",
+      "name": "ground plane",
+      "source": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/ground plane/5",
+      "version": "5",
+      "license": "Creative Commons Zero v1.0 Universal",
+      "world": "model.sdf",
+      "fuel_uri": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/ground plane/5",
+      "fuel_aliases": [
+        "https://fuel.gazebosim.org/1.0/OpenRobotics/models/ground plane"
+      ],
+      "files": [
+        {
+          "path": "model-1_2.sdf",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/ground%20plane/5/files/model-1_2.sdf",
+          "sha256": "a099ecca53ba1d0af3babacb31a4e802099d896926ea9109d38f2e14e40a28d9",
+          "size": 944
+        },
+        {
+          "path": "model-1_3.sdf",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/ground%20plane/5/files/model-1_3.sdf",
+          "sha256": "cc2bf63d600f382bbbe81dbd3cd9363ee0436de6bda1c273cae47dfd8ea65bcf",
+          "size": 938
+        },
+        {
+          "path": "model-1_4.sdf",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/ground%20plane/5/files/model-1_4.sdf",
+          "sha256": "de8e04148a6b58735b63ea7500811ca1a1bae174d6da3a20f861c679534ddc99",
+          "size": 938
+        },
+        {
+          "path": "model.config",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/ground%20plane/5/files/model.config",
+          "sha256": "4fefe57461ff15dd0b8931e249616eb719cf6760767a85db84762d85186ca94b",
+          "size": 409
+        },
+        {
+          "path": "model.sdf",
+          "url": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/ground%20plane/5/files/model.sdf",
+          "sha256": "73be59778d84e631dd0996a0adc461af5e4c8717b93da7ee9151b9ae43e3ca25",
+          "size": 1229
+        }
+      ],
+      "limitations": [
+        "Pinned Fuel dependency; license metadata matched this exact model version on 2026-10-29.",
+        "Model file presence is not scene/vehicle verification."
+      ],
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "license_source": "https://fuel.gazebosim.org/1.0/OpenRobotics/models/ground plane",
+      "license_checked_at": "2026-10-29"
+    },
+    {
+      "id": "fuel-plateau-casual-female-1",
+      "kind": "model",
+      "name": "Casual female",
+      "source": "https://fuel.gazebosim.org/1.0/plateau/models/Casual female/1",
+      "version": "1",
+      "license": "Creative Commons Zero v1.0 Universal",
+      "world": "model.sdf",
+      "fuel_uri": "https://fuel.gazebosim.org/1.0/plateau/models/Casual female/1",
+      "fuel_aliases": [
+        "https://fuel.gazebosim.org/1.0/plateau/models/Casual female"
+      ],
+      "files": [
+        {
+          "path": "materials/textures/brown_eye.png",
+          "url": "https://fuel.gazebosim.org/1.0/plateau/models/Casual%20female/1/files/materials/textures/brown_eye.png",
+          "sha256": "4659691c7295ad6206c78b003e5fd0e5f91dcd53032fa914a229bb48cabe424b",
+          "size": 610817
+        },
+        {
+          "path": "materials/textures/casual_female.png",
+          "url": "https://fuel.gazebosim.org/1.0/plateau/models/Casual%20female/1/files/materials/textures/casual_female.png",
+          "sha256": "75bce8773b7fbaca854d4f7e3f6b7bef20dbbc38b027e529e026c675d619531e",
+          "size": 279501
+        },
+        {
+          "path": "materials/textures/eyebrow002.png",
+          "url": "https://fuel.gazebosim.org/1.0/plateau/models/Casual%20female/1/files/materials/textures/eyebrow002.png",
+          "sha256": "1de4e4cb69b3f4324390219ffbeb17a0b2555104d3211d1ac667655b69b64038",
+          "size": 96277
+        },
+        {
+          "path": "materials/textures/eyelashes01.png",
+          "url": "https://fuel.gazebosim.org/1.0/plateau/models/Casual%20female/1/files/materials/textures/eyelashes01.png",
+          "sha256": "4b69c0fff2648874460e9caf80c31413c444218a5c50afebc425aeaa65484a35",
+          "size": 91600
+        },
+        {
+          "path": "materials/textures/female_casualsuit01_diffuse.png",
+          "url": "https://fuel.gazebosim.org/1.0/plateau/models/Casual%20female/1/files/materials/textures/female_casualsuit01_diffuse.png",
+          "sha256": "414d46afa55fba09ad0913484d57df2ba6b597dc8193595a13a12436137dc21b",
+          "size": 3019656
+        },
+        {
+          "path": "materials/textures/female_casualsuit01_normal.png",
+          "url": "https://fuel.gazebosim.org/1.0/plateau/models/Casual%20female/1/files/materials/textures/female_casualsuit01_normal.png",
+          "sha256": "7bff7afbbc3f068e06f69abcddc8c2c9ce667ec181e0f2a918f8af78eba12610",
+          "size": 5744103
+        },
+        {
+          "path": "materials/textures/female_casualsuit02_diffuse.png",
+          "url": "https://fuel.gazebosim.org/1.0/plateau/models/Casual%20female/1/files/materials/textures/female_casualsuit02_diffuse.png",
+          "sha256": "23bd3c8e4df3993fe3bdb849daba7a4dd0476f3a28fd8402cd28abbb26666f49",
+          "size": 4340869
+        },
+        {
+          "path": "materials/textures/female_casualsuit02_normal.png",
+          "url": "https://fuel.gazebosim.org/1.0/plateau/models/Casual%20female/1/files/materials/textures/female_casualsuit02_normal.png",
+          "sha256": "37143dabd78647ca37689f0b65d969c958a962d728dffd94e60c9beacf76a3df",
+          "size": 1646961
+        },
+        {
+          "path": "materials/textures/ponytail01_diffuse.png",
+          "url": "https://fuel.gazebosim.org/1.0/plateau/models/Casual%20female/1/files/materials/textures/ponytail01_diffuse.png",
+          "sha256": "dcb364300cac06ce8bef91b2f7c0970baf310898bbdd06b0c6b884ee9306eb97",
+          "size": 3910782
+        },
+        {
+          "path": "materials/textures/shoes05_diffuse.png",
+          "url": "https://fuel.gazebosim.org/1.0/plateau/models/Casual%20female/1/files/materials/textures/shoes05_diffuse.png",
+          "sha256": "7fe5ea2600f6578cdf017da3392ae13aedabea8e8cc1dd6302a8f57e8fb7e5af",
+          "size": 1291907
+        },
+        {
+          "path": "materials/textures/tongue01_diffuse.png",
+          "url": "https://fuel.gazebosim.org/1.0/plateau/models/Casual%20female/1/files/materials/textures/tongue01_diffuse.png",
+          "sha256": "3150be398e48e8ba1feac164c3143c16c0b2e959d9ffb6155f0171f59cfb4ea9",
+          "size": 625419
+        },
+        {
+          "path": "materials/textures/young_lightskinned_female_diffuse.png",
+          "url": "https://fuel.gazebosim.org/1.0/plateau/models/Casual%20female/1/files/materials/textures/young_lightskinned_female_diffuse.png",
+          "sha256": "b2a6ac8cd4f9febdb447368e29c76cd68410bb66e46d9dcfa2d5f75126eea8fc",
+          "size": 4391156
+        },
+        {
+          "path": "meshes/casual_female.dae",
+          "url": "https://fuel.gazebosim.org/1.0/plateau/models/Casual%20female/1/files/meshes/casual_female.dae",
+          "sha256": "b0f47228b4a1cfa5026f24f5955d5f2b7cc7f7a770888951041a787b3e51d994",
+          "size": 3888035
+        },
+        {
+          "path": "model.config",
+          "url": "https://fuel.gazebosim.org/1.0/plateau/models/Casual%20female/1/files/model.config",
+          "sha256": "19d1bdb5e4a769c9dc48c21ffe9dd5c9c4cb20a198afabe229c2475f2ac9b771",
+          "size": 351
+        },
+        {
+          "path": "model.sdf",
+          "url": "https://fuel.gazebosim.org/1.0/plateau/models/Casual%20female/1/files/model.sdf",
+          "sha256": "70a3a24f3b80f6bbd780a05a5a2c10d974e2928bbc50427bb54fcbb000b05222",
+          "size": 706
+        }
+      ],
+      "limitations": [
+        "Pinned Fuel dependency; license metadata matched this exact model version on 2026-10-29.",
+        "Model file presence is not scene/vehicle verification."
+      ],
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "license_source": "https://fuel.gazebosim.org/1.0/plateau/models/Casual female",
+      "license_checked_at": "2026-10-29"
+    },
+    {
+      "id": "collection-moving-objects-plugin",
+      "kind": "plugin",
+      "name": "World Collection Moving Objects",
+      "source": "https://github.com/mertgulerx/world-collection",
+      "version": "a0c262a497da1b0b9fd9970add6ff346e09afaeb",
+      "license": "Apache-2.0",
+      "files": [
+        {
+          "path": "CMakeLists.txt",
+          "url": "https://raw.githubusercontent.com/mertgulerx/world-collection/a0c262a497da1b0b9fd9970add6ff346e09afaeb/plugins/moving_objects/CMakeLists.txt",
+          "sha256": "0329270faf261733986ecea00c4f5b25c583a84e06f8a3e6ee8cc700c0b18720",
+          "size": 2070
+        },
+        {
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/mertgulerx/world-collection/a0c262a497da1b0b9fd9970add6ff346e09afaeb/plugins/moving_objects/README.md",
+          "sha256": "e5738723bcb5447de67a3cca49721b429d7855995d8fe974c7260dfe9cc20a31",
+          "size": 1663
+        },
+        {
+          "path": "src/Kinematics.hh",
+          "url": "https://raw.githubusercontent.com/mertgulerx/world-collection/a0c262a497da1b0b9fd9970add6ff346e09afaeb/plugins/moving_objects/src/Kinematics.hh",
+          "sha256": "3db36f55938f246692d53405770f60f20475a3e25625e454f6becd218c77e8a6",
+          "size": 10553
+        },
+        {
+          "path": "src/MovingObjects.cc",
+          "url": "https://raw.githubusercontent.com/mertgulerx/world-collection/a0c262a497da1b0b9fd9970add6ff346e09afaeb/plugins/moving_objects/src/MovingObjects.cc",
+          "sha256": "845d4893c7d98c8d1e06332922f291635dbdabe9c4fc93975a6521e1af041e5e",
+          "size": 20684
+        },
+        {
+          "path": "src/MovingObjects.hh",
+          "url": "https://raw.githubusercontent.com/mertgulerx/world-collection/a0c262a497da1b0b9fd9970add6ff346e09afaeb/plugins/moving_objects/src/MovingObjects.hh",
+          "sha256": "34f3fb89ee0fe9e4ce2a861beb8a44a6be0c575d9d42c9dab5d8398758652c20",
+          "size": 2678
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/mertgulerx/world-collection/a0c262a497da1b0b9fd9970add6ff346e09afaeb/LICENSE",
+          "sha256": "4458503dd48e88c4e0b945fb252a08b93c40ec757309b8ffa7c594dfa1e35104",
+          "size": 10947
+        }
+      ],
+      "build_directory": "build/collection-moving-objects-a0c262a497da",
+      "limitations": [
+        "Plugin must be built against installed gz-sim8; a source download is not an ABI/runtime PASS."
+      ]
+    }
+  ],
+  "failed_source_probes": [
+    {
+      "source": "gazebo",
+      "name": "navsat_sensor",
+      "error": "HTTP Error 404: Not Found"
+    },
+    {
+      "source": "gazebo",
+      "name": "imu_sensor",
+      "error": "HTTP Error 404: Not Found"
+    },
+    {
+      "source": "gazebo",
+      "name": "air_pressure_sensor",
+      "error": "HTTP Error 404: Not Found"
+    }
+  ]
+}

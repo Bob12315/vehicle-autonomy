@@ -56,3 +56,10 @@ artifacts/phase3-round3/
 
 # Chinese UI browser evidence, screenshots and isolated runtime state.
 /artifacts/web-zh/
+
+# Local third-party scenario resources and test evidence
+/simulation/world_registry/assets/
+/simulation/world_registry/evidence/
+
+# Simulation center browser evidence and private application journals.
+/artifacts/simulation-center/

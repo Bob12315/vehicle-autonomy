@@ -13,7 +13,9 @@ TERMINAL={'SUCCEEDED','FAILED','REJECTED','CANCELLED','TIMED_OUT','UNKNOWN'}
 
 
 class ControlCheck:
-    def __init__(self,kind,api,oracle,directory):
+    def __init__(self,kind,api,oracle,directory,*,target=None,expected_system_id=None):
+        self.target=target or kind
+        self.expected_system_id=expected_system_id or {"rover":1,"copter":2,"plane":3}[kind]
         self.kind=kind;self.api=api;self.oracle=oracle;self.directory=directory
         self.result=dict(kind=kind,passed=False,actions=[],information=[],managed=[],checks=[])
         self.last=None;self.initial=self.truth();self.started=time.monotonic()
@@ -25,6 +27,8 @@ class ControlCheck:
 
     def call(self,path,payload=None):
         start=time.monotonic_ns()
+        if payload is not None and payload.get("target")==self.kind:
+            payload=dict(payload,target=self.target)
         try:value=self.api(path,payload)
         except HTTPError as exc:
             error=exc.read().decode(errors='replace')[:1000]
@@ -57,7 +61,7 @@ class ControlCheck:
         assert state['health']['quality']=='VALID'
         pose=state['reported_pose'];twist=state['reported_twist'];op=state['operation']
         if 'display' in v:
-            display=v['display'];assert display['mode_name'] and display['source_system']=={'rover':1,'copter':2,'plane':3}[self.kind]
+            display=v['display'];assert display['mode_name'] and display['source_system']==self.expected_system_id
             assert display['pose_age_s'] is not None and 0<=display['pose_age_s']<=3
             assert math.isfinite(display['horizontal_speed_mps']) and display['control_hint']
         assert pose['frame_id']=='odom' and twist['frame_id'] in ('odom','base_link')

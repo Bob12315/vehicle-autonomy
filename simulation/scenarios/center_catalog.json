@@ -1,0 +1,2420 @@
+{
+  "schema": 1,
+  "scenes": [
+    {
+      "id": "R01",
+      "name": "标准驾驶测试场",
+      "category": "rover",
+      "vehicles": [
+        "rover"
+      ],
+      "world_id": "procedural-driving",
+      "scenario_id": "R01",
+      "layout": "driving",
+      "source": "repository:simulation/scenarios/center_catalog.json",
+      "version": "1",
+      "license": "Repository-authored procedural SDF; no third-party mesh assets",
+      "description": "标准驾驶测试场：可复现、无外部模型依赖的 Gazebo Harmonic 物理测试环境。",
+      "extent_m": [
+        120,
+        120
+      ],
+      "spawn": [
+        0,
+        0,
+        0.3,
+        0,
+        0,
+        0
+      ],
+      "targets": [
+        {
+          "name": "A",
+          "position": [
+            10,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "B",
+          "position": [
+            20,
+            10,
+            0
+          ]
+        }
+      ],
+      "recommended_tests": [
+        "Drive",
+        "Turn",
+        "Hold"
+      ],
+      "limitations": [
+        "程序化工程测试几何，不等同高精度实景；车辆、任务和感知能力需分别验收。",
+        "独立 World 不内置飞控或车辆；候选车型并非已通过 SITL 的组合。"
+      ],
+      "verification": {
+        "L1": "NOT_TESTED",
+        "L2": "NOT_TESTED",
+        "L3": "NOT_TESTED",
+        "L4": "NOT_TESTED",
+        "L5": "NOT_TESTED",
+        "L6": "NOT_TESTED"
+      },
+      "installed": true,
+      "download_status": "BUILTIN",
+      "compatibility_status": "NOT_TESTED",
+      "sensor_support": [
+        "world IMU/NavSat systems; mounted sensors require vehicle profile"
+      ],
+      "parameter_schema": {
+        "obstacle_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 80,
+          "default": 8
+        },
+        "wind_speed": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 20,
+          "default": 0
+        },
+        "wind_direction": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180,
+          "default": 0
+        },
+        "light_intensity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.8
+        },
+        "friction": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 3,
+          "default": 1
+        }
+      }
+    },
+    {
+      "id": "R02",
+      "name": "GPS 户外导航场",
+      "category": "rover",
+      "vehicles": [
+        "rover"
+      ],
+      "world_id": "procedural-gps",
+      "scenario_id": "R02",
+      "layout": "gps",
+      "source": "repository:simulation/scenarios/center_catalog.json",
+      "version": "1",
+      "license": "Repository-authored procedural SDF; no third-party mesh assets",
+      "description": "GPS 户外导航场：可复现、无外部模型依赖的 Gazebo Harmonic 物理测试环境。",
+      "extent_m": [
+        120,
+        120
+      ],
+      "spawn": [
+        0,
+        0,
+        0.3,
+        0,
+        0,
+        0
+      ],
+      "targets": [
+        {
+          "name": "A",
+          "position": [
+            10,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "B",
+          "position": [
+            20,
+            10,
+            0
+          ]
+        }
+      ],
+      "recommended_tests": [
+        "Drive",
+        "Turn",
+        "Hold"
+      ],
+      "limitations": [
+        "程序化工程测试几何，不等同高精度实景；车辆、任务和感知能力需分别验收。",
+        "独立 World 不内置飞控或车辆；候选车型并非已通过 SITL 的组合。"
+      ],
+      "verification": {
+        "L1": "NOT_TESTED",
+        "L2": "NOT_TESTED",
+        "L3": "NOT_TESTED",
+        "L4": "NOT_TESTED",
+        "L5": "NOT_TESTED",
+        "L6": "NOT_TESTED"
+      },
+      "installed": true,
+      "download_status": "BUILTIN",
+      "compatibility_status": "NOT_TESTED",
+      "sensor_support": [
+        "world IMU/NavSat systems; mounted sensors require vehicle profile"
+      ],
+      "parameter_schema": {
+        "obstacle_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 80,
+          "default": 8
+        },
+        "wind_speed": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 20,
+          "default": 0
+        },
+        "wind_direction": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180,
+          "default": 0
+        },
+        "light_intensity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.8
+        },
+        "friction": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 3,
+          "default": 1
+        }
+      }
+    },
+    {
+      "id": "R03",
+      "name": "城市道路",
+      "category": "rover",
+      "vehicles": [
+        "rover"
+      ],
+      "world_id": "procedural-urban",
+      "scenario_id": "R03",
+      "layout": "urban",
+      "source": "repository:simulation/scenarios/center_catalog.json",
+      "version": "1",
+      "license": "Repository-authored procedural SDF; no third-party mesh assets",
+      "description": "城市道路：可复现、无外部模型依赖的 Gazebo Harmonic 物理测试环境。",
+      "extent_m": [
+        120,
+        120
+      ],
+      "spawn": [
+        0,
+        0,
+        0.3,
+        0,
+        0,
+        0
+      ],
+      "targets": [
+        {
+          "name": "A",
+          "position": [
+            10,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "B",
+          "position": [
+            20,
+            10,
+            0
+          ]
+        }
+      ],
+      "recommended_tests": [
+        "Drive",
+        "Turn",
+        "Hold"
+      ],
+      "limitations": [
+        "程序化工程测试几何，不等同高精度实景；车辆、任务和感知能力需分别验收。",
+        "独立 World 不内置飞控或车辆；候选车型并非已通过 SITL 的组合。"
+      ],
+      "verification": {
+        "L1": "NOT_TESTED",
+        "L2": "NOT_TESTED",
+        "L3": "NOT_TESTED",
+        "L4": "NOT_TESTED",
+        "L5": "NOT_TESTED",
+        "L6": "NOT_TESTED"
+      },
+      "installed": true,
+      "download_status": "BUILTIN",
+      "compatibility_status": "NOT_TESTED",
+      "sensor_support": [
+        "world IMU/NavSat systems; mounted sensors require vehicle profile"
+      ],
+      "parameter_schema": {
+        "obstacle_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 80,
+          "default": 8
+        },
+        "wind_speed": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 20,
+          "default": 0
+        },
+        "wind_direction": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180,
+          "default": 0
+        },
+        "light_intensity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.8
+        },
+        "friction": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 3,
+          "default": 1
+        }
+      }
+    },
+    {
+      "id": "R04",
+      "name": "仓储物流中心",
+      "category": "rover",
+      "vehicles": [
+        "rover"
+      ],
+      "world_id": "procedural-warehouse",
+      "scenario_id": "R04",
+      "layout": "warehouse",
+      "source": "repository:simulation/scenarios/center_catalog.json",
+      "version": "1",
+      "license": "Repository-authored procedural SDF; no third-party mesh assets",
+      "description": "仓储物流中心：可复现、无外部模型依赖的 Gazebo Harmonic 物理测试环境。",
+      "extent_m": [
+        120,
+        120
+      ],
+      "spawn": [
+        0,
+        0,
+        0.3,
+        0,
+        0,
+        0
+      ],
+      "targets": [
+        {
+          "name": "A",
+          "position": [
+            10,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "B",
+          "position": [
+            20,
+            10,
+            0
+          ]
+        }
+      ],
+      "recommended_tests": [
+        "Drive",
+        "Turn",
+        "Hold"
+      ],
+      "limitations": [
+        "程序化工程测试几何，不等同高精度实景；车辆、任务和感知能力需分别验收。",
+        "独立 World 不内置飞控或车辆；候选车型并非已通过 SITL 的组合。"
+      ],
+      "verification": {
+        "L1": "NOT_TESTED",
+        "L2": "NOT_TESTED",
+        "L3": "NOT_TESTED",
+        "L4": "NOT_TESTED",
+        "L5": "NOT_TESTED",
+        "L6": "NOT_TESTED"
+      },
+      "installed": true,
+      "download_status": "BUILTIN",
+      "compatibility_status": "NOT_TESTED",
+      "sensor_support": [
+        "world IMU/NavSat systems; mounted sensors require vehicle profile"
+      ],
+      "parameter_schema": {
+        "obstacle_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 80,
+          "default": 8
+        },
+        "wind_speed": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 20,
+          "default": 0
+        },
+        "wind_direction": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180,
+          "default": 0
+        },
+        "light_intensity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.8
+        },
+        "friction": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 3,
+          "default": 1
+        }
+      }
+    },
+    {
+      "id": "R05",
+      "name": "动态交通区",
+      "category": "rover",
+      "vehicles": [
+        "rover"
+      ],
+      "world_id": "procedural-traffic",
+      "scenario_id": "R05",
+      "layout": "traffic",
+      "source": "repository:simulation/scenarios/center_catalog.json",
+      "version": "1",
+      "license": "Repository-authored procedural SDF; no third-party mesh assets",
+      "description": "动态交通区：可复现、无外部模型依赖的 Gazebo Harmonic 物理测试环境。",
+      "extent_m": [
+        120,
+        120
+      ],
+      "spawn": [
+        0,
+        0,
+        0.3,
+        0,
+        0,
+        0
+      ],
+      "targets": [
+        {
+          "name": "A",
+          "position": [
+            10,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "B",
+          "position": [
+            20,
+            10,
+            0
+          ]
+        }
+      ],
+      "recommended_tests": [
+        "Drive",
+        "Turn",
+        "Hold"
+      ],
+      "limitations": [
+        "程序化工程测试几何，不等同高精度实景；车辆、任务和感知能力需分别验收。",
+        "独立 World 不内置飞控或车辆；候选车型并非已通过 SITL 的组合。",
+        "动态目标由 Gazebo TrajectoryFollower 实际施力运动；避障/跟踪算法不在 World 中。"
+      ],
+      "verification": {
+        "L1": "NOT_TESTED",
+        "L2": "NOT_TESTED",
+        "L3": "NOT_TESTED",
+        "L4": "NOT_TESTED",
+        "L5": "NOT_TESTED",
+        "L6": "NOT_TESTED"
+      },
+      "installed": true,
+      "download_status": "BUILTIN",
+      "compatibility_status": "NOT_TESTED",
+      "sensor_support": [
+        "world IMU/NavSat systems; mounted sensors require vehicle profile"
+      ],
+      "parameter_schema": {
+        "obstacle_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 80,
+          "default": 8
+        },
+        "wind_speed": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 20,
+          "default": 0
+        },
+        "wind_direction": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180,
+          "default": 0
+        },
+        "light_intensity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.8
+        },
+        "friction": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 3,
+          "default": 1
+        }
+      }
+    },
+    {
+      "id": "R06",
+      "name": "果园与林地",
+      "category": "rover",
+      "vehicles": [
+        "rover"
+      ],
+      "world_id": "procedural-forest",
+      "scenario_id": "R06",
+      "layout": "forest",
+      "source": "repository:simulation/scenarios/center_catalog.json",
+      "version": "1",
+      "license": "Repository-authored procedural SDF; no third-party mesh assets",
+      "description": "果园与林地：可复现、无外部模型依赖的 Gazebo Harmonic 物理测试环境。",
+      "extent_m": [
+        120,
+        120
+      ],
+      "spawn": [
+        0,
+        0,
+        0.3,
+        0,
+        0,
+        0
+      ],
+      "targets": [
+        {
+          "name": "A",
+          "position": [
+            10,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "B",
+          "position": [
+            20,
+            10,
+            0
+          ]
+        }
+      ],
+      "recommended_tests": [
+        "Drive",
+        "Turn",
+        "Hold"
+      ],
+      "limitations": [
+        "程序化工程测试几何，不等同高精度实景；车辆、任务和感知能力需分别验收。",
+        "独立 World 不内置飞控或车辆；候选车型并非已通过 SITL 的组合。"
+      ],
+      "verification": {
+        "L1": "NOT_TESTED",
+        "L2": "NOT_TESTED",
+        "L3": "NOT_TESTED",
+        "L4": "NOT_TESTED",
+        "L5": "NOT_TESTED",
+        "L6": "NOT_TESTED"
+      },
+      "installed": true,
+      "download_status": "BUILTIN",
+      "compatibility_status": "NOT_TESTED",
+      "sensor_support": [
+        "world IMU/NavSat systems; mounted sensors require vehicle profile"
+      ],
+      "parameter_schema": {
+        "obstacle_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 80,
+          "default": 8
+        },
+        "wind_speed": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 20,
+          "default": 0
+        },
+        "wind_direction": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180,
+          "default": 0
+        },
+        "light_intensity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.8
+        },
+        "friction": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 3,
+          "default": 1
+        }
+      }
+    },
+    {
+      "id": "R07",
+      "name": "山坡越野地形",
+      "category": "rover",
+      "vehicles": [
+        "rover"
+      ],
+      "world_id": "procedural-slope",
+      "scenario_id": "R07",
+      "layout": "slope",
+      "source": "repository:simulation/scenarios/center_catalog.json",
+      "version": "1",
+      "license": "Repository-authored procedural SDF; no third-party mesh assets",
+      "description": "山坡越野地形：可复现、无外部模型依赖的 Gazebo Harmonic 物理测试环境。",
+      "extent_m": [
+        120,
+        120
+      ],
+      "spawn": [
+        0,
+        0,
+        0.3,
+        0,
+        0,
+        0
+      ],
+      "targets": [
+        {
+          "name": "A",
+          "position": [
+            10,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "B",
+          "position": [
+            20,
+            10,
+            0
+          ]
+        }
+      ],
+      "recommended_tests": [
+        "Drive",
+        "Turn",
+        "Hold"
+      ],
+      "limitations": [
+        "程序化工程测试几何，不等同高精度实景；车辆、任务和感知能力需分别验收。",
+        "独立 World 不内置飞控或车辆；候选车型并非已通过 SITL 的组合。"
+      ],
+      "verification": {
+        "L1": "NOT_TESTED",
+        "L2": "NOT_TESTED",
+        "L3": "NOT_TESTED",
+        "L4": "NOT_TESTED",
+        "L5": "NOT_TESTED",
+        "L6": "NOT_TESTED"
+      },
+      "installed": true,
+      "download_status": "BUILTIN",
+      "compatibility_status": "NOT_TESTED",
+      "sensor_support": [
+        "world IMU/NavSat systems; mounted sensors require vehicle profile"
+      ],
+      "parameter_schema": {
+        "obstacle_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 80,
+          "default": 8
+        },
+        "wind_speed": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 20,
+          "default": 0
+        },
+        "wind_direction": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180,
+          "default": 0
+        },
+        "light_intensity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.8
+        },
+        "friction": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 3,
+          "default": 1
+        }
+      }
+    },
+    {
+      "id": "R08",
+      "name": "多楼层建筑",
+      "category": "rover",
+      "vehicles": [
+        "rover"
+      ],
+      "world_id": "procedural-multilevel",
+      "scenario_id": "R08",
+      "layout": "multilevel",
+      "source": "repository:simulation/scenarios/center_catalog.json",
+      "version": "1",
+      "license": "Repository-authored procedural SDF; no third-party mesh assets",
+      "description": "多楼层建筑：可复现、无外部模型依赖的 Gazebo Harmonic 物理测试环境。",
+      "extent_m": [
+        120,
+        120
+      ],
+      "spawn": [
+        0,
+        0,
+        0.3,
+        0,
+        0,
+        0
+      ],
+      "targets": [
+        {
+          "name": "A",
+          "position": [
+            10,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "B",
+          "position": [
+            20,
+            10,
+            0
+          ]
+        }
+      ],
+      "recommended_tests": [
+        "Drive",
+        "Turn",
+        "Hold"
+      ],
+      "limitations": [
+        "程序化工程测试几何，不等同高精度实景；车辆、任务和感知能力需分别验收。",
+        "独立 World 不内置飞控或车辆；候选车型并非已通过 SITL 的组合。",
+        "楼层由实体地板和坡道连接；未实现电梯与自主多层定位。"
+      ],
+      "verification": {
+        "L1": "NOT_TESTED",
+        "L2": "NOT_TESTED",
+        "L3": "NOT_TESTED",
+        "L4": "NOT_TESTED",
+        "L5": "NOT_TESTED",
+        "L6": "NOT_TESTED"
+      },
+      "installed": true,
+      "download_status": "BUILTIN",
+      "compatibility_status": "NOT_TESTED",
+      "sensor_support": [
+        "world IMU/NavSat systems; mounted sensors require vehicle profile"
+      ],
+      "parameter_schema": {
+        "obstacle_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 80,
+          "default": 8
+        },
+        "wind_speed": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 20,
+          "default": 0
+        },
+        "wind_direction": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180,
+          "default": 0
+        },
+        "light_intensity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.8
+        },
+        "friction": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 3,
+          "default": 1
+        }
+      }
+    },
+    {
+      "id": "C01",
+      "name": "开阔飞行场",
+      "category": "copter",
+      "vehicles": [
+        "copter"
+      ],
+      "world_id": "procedural-open",
+      "scenario_id": "C01",
+      "layout": "open",
+      "source": "repository:simulation/scenarios/center_catalog.json",
+      "version": "1",
+      "license": "Repository-authored procedural SDF; no third-party mesh assets",
+      "description": "开阔飞行场：可复现、无外部模型依赖的 Gazebo Harmonic 物理测试环境。",
+      "extent_m": [
+        120,
+        120
+      ],
+      "spawn": [
+        0,
+        0,
+        0.3,
+        0,
+        0,
+        0
+      ],
+      "targets": [
+        {
+          "name": "A",
+          "position": [
+            10,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "B",
+          "position": [
+            20,
+            10,
+            0
+          ]
+        }
+      ],
+      "recommended_tests": [
+        "Takeoff",
+        "Goto",
+        "Land"
+      ],
+      "limitations": [
+        "程序化工程测试几何，不等同高精度实景；车辆、任务和感知能力需分别验收。",
+        "独立 World 不内置飞控或车辆；候选车型并非已通过 SITL 的组合。"
+      ],
+      "verification": {
+        "L1": "NOT_TESTED",
+        "L2": "NOT_TESTED",
+        "L3": "NOT_TESTED",
+        "L4": "NOT_TESTED",
+        "L5": "NOT_TESTED",
+        "L6": "NOT_TESTED"
+      },
+      "installed": true,
+      "download_status": "BUILTIN",
+      "compatibility_status": "NOT_TESTED",
+      "sensor_support": [
+        "world IMU/NavSat systems; mounted sensors require vehicle profile"
+      ],
+      "parameter_schema": {
+        "obstacle_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 80,
+          "default": 8
+        },
+        "wind_speed": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 20,
+          "default": 0
+        },
+        "wind_direction": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180,
+          "default": 0
+        },
+        "light_intensity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.8
+        },
+        "friction": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 3,
+          "default": 1
+        }
+      }
+    },
+    {
+      "id": "C02",
+      "name": "三维障碍训练场",
+      "category": "copter",
+      "vehicles": [
+        "copter"
+      ],
+      "world_id": "procedural-obstacles3d",
+      "scenario_id": "C02",
+      "layout": "obstacles3d",
+      "source": "repository:simulation/scenarios/center_catalog.json",
+      "version": "1",
+      "license": "Repository-authored procedural SDF; no third-party mesh assets",
+      "description": "三维障碍训练场：可复现、无外部模型依赖的 Gazebo Harmonic 物理测试环境。",
+      "extent_m": [
+        120,
+        120
+      ],
+      "spawn": [
+        0,
+        0,
+        0.3,
+        0,
+        0,
+        0
+      ],
+      "targets": [
+        {
+          "name": "A",
+          "position": [
+            10,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "B",
+          "position": [
+            20,
+            10,
+            0
+          ]
+        }
+      ],
+      "recommended_tests": [
+        "Takeoff",
+        "Goto",
+        "Land"
+      ],
+      "limitations": [
+        "程序化工程测试几何，不等同高精度实景；车辆、任务和感知能力需分别验收。",
+        "独立 World 不内置飞控或车辆；候选车型并非已通过 SITL 的组合。"
+      ],
+      "verification": {
+        "L1": "NOT_TESTED",
+        "L2": "NOT_TESTED",
+        "L3": "NOT_TESTED",
+        "L4": "NOT_TESTED",
+        "L5": "NOT_TESTED",
+        "L6": "NOT_TESTED"
+      },
+      "installed": true,
+      "download_status": "BUILTIN",
+      "compatibility_status": "NOT_TESTED",
+      "sensor_support": [
+        "world IMU/NavSat systems; mounted sensors require vehicle profile"
+      ],
+      "parameter_schema": {
+        "obstacle_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 80,
+          "default": 8
+        },
+        "wind_speed": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 20,
+          "default": 0
+        },
+        "wind_direction": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180,
+          "default": 0
+        },
+        "light_intensity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.8
+        },
+        "friction": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 3,
+          "default": 1
+        }
+      }
+    },
+    {
+      "id": "C03",
+      "name": "室内仓库",
+      "category": "copter",
+      "vehicles": [
+        "copter"
+      ],
+      "world_id": "procedural-indoor",
+      "scenario_id": "C03",
+      "layout": "indoor",
+      "source": "repository:simulation/scenarios/center_catalog.json",
+      "version": "1",
+      "license": "Repository-authored procedural SDF; no third-party mesh assets",
+      "description": "室内仓库：可复现、无外部模型依赖的 Gazebo Harmonic 物理测试环境。",
+      "extent_m": [
+        120,
+        120
+      ],
+      "spawn": [
+        0,
+        0,
+        0.3,
+        0,
+        0,
+        0
+      ],
+      "targets": [
+        {
+          "name": "A",
+          "position": [
+            10,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "B",
+          "position": [
+            20,
+            10,
+            0
+          ]
+        }
+      ],
+      "recommended_tests": [
+        "Takeoff",
+        "Goto",
+        "Land"
+      ],
+      "limitations": [
+        "程序化工程测试几何，不等同高精度实景；车辆、任务和感知能力需分别验收。",
+        "独立 World 不内置飞控或车辆；候选车型并非已通过 SITL 的组合。"
+      ],
+      "verification": {
+        "L1": "NOT_TESTED",
+        "L2": "NOT_TESTED",
+        "L3": "NOT_TESTED",
+        "L4": "NOT_TESTED",
+        "L5": "NOT_TESTED",
+        "L6": "NOT_TESTED"
+      },
+      "installed": true,
+      "download_status": "BUILTIN",
+      "compatibility_status": "NOT_TESTED",
+      "sensor_support": [
+        "world IMU/NavSat systems; mounted sensors require vehicle profile"
+      ],
+      "parameter_schema": {
+        "obstacle_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 80,
+          "default": 8
+        },
+        "wind_speed": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 20,
+          "default": 0
+        },
+        "wind_direction": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180,
+          "default": 0
+        },
+        "light_intensity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.8
+        },
+        "friction": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 3,
+          "default": 1
+        }
+      }
+    },
+    {
+      "id": "C04",
+      "name": "城市建筑群",
+      "category": "copter",
+      "vehicles": [
+        "copter"
+      ],
+      "world_id": "procedural-urban",
+      "scenario_id": "C04",
+      "layout": "urban",
+      "source": "repository:simulation/scenarios/center_catalog.json",
+      "version": "1",
+      "license": "Repository-authored procedural SDF; no third-party mesh assets",
+      "description": "城市建筑群：可复现、无外部模型依赖的 Gazebo Harmonic 物理测试环境。",
+      "extent_m": [
+        120,
+        120
+      ],
+      "spawn": [
+        0,
+        0,
+        0.3,
+        0,
+        0,
+        0
+      ],
+      "targets": [
+        {
+          "name": "A",
+          "position": [
+            10,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "B",
+          "position": [
+            20,
+            10,
+            0
+          ]
+        }
+      ],
+      "recommended_tests": [
+        "Takeoff",
+        "Goto",
+        "Land"
+      ],
+      "limitations": [
+        "程序化工程测试几何，不等同高精度实景；车辆、任务和感知能力需分别验收。",
+        "独立 World 不内置飞控或车辆；候选车型并非已通过 SITL 的组合。"
+      ],
+      "verification": {
+        "L1": "NOT_TESTED",
+        "L2": "NOT_TESTED",
+        "L3": "NOT_TESTED",
+        "L4": "NOT_TESTED",
+        "L5": "NOT_TESTED",
+        "L6": "NOT_TESTED"
+      },
+      "installed": true,
+      "download_status": "BUILTIN",
+      "compatibility_status": "NOT_TESTED",
+      "sensor_support": [
+        "world IMU/NavSat systems; mounted sensors require vehicle profile"
+      ],
+      "parameter_schema": {
+        "obstacle_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 80,
+          "default": 8
+        },
+        "wind_speed": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 20,
+          "default": 0
+        },
+        "wind_direction": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180,
+          "default": 0
+        },
+        "light_intensity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.8
+        },
+        "friction": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 3,
+          "default": 1
+        }
+      }
+    },
+    {
+      "id": "C05",
+      "name": "森林和山谷",
+      "category": "copter",
+      "vehicles": [
+        "copter"
+      ],
+      "world_id": "procedural-valley",
+      "scenario_id": "C05",
+      "layout": "valley",
+      "source": "repository:simulation/scenarios/center_catalog.json",
+      "version": "1",
+      "license": "Repository-authored procedural SDF; no third-party mesh assets",
+      "description": "森林和山谷：可复现、无外部模型依赖的 Gazebo Harmonic 物理测试环境。",
+      "extent_m": [
+        120,
+        120
+      ],
+      "spawn": [
+        0,
+        0,
+        0.3,
+        0,
+        0,
+        0
+      ],
+      "targets": [
+        {
+          "name": "A",
+          "position": [
+            10,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "B",
+          "position": [
+            20,
+            10,
+            0
+          ]
+        }
+      ],
+      "recommended_tests": [
+        "Takeoff",
+        "Goto",
+        "Land"
+      ],
+      "limitations": [
+        "程序化工程测试几何，不等同高精度实景；车辆、任务和感知能力需分别验收。",
+        "独立 World 不内置飞控或车辆；候选车型并非已通过 SITL 的组合。"
+      ],
+      "verification": {
+        "L1": "NOT_TESTED",
+        "L2": "NOT_TESTED",
+        "L3": "NOT_TESTED",
+        "L4": "NOT_TESTED",
+        "L5": "NOT_TESTED",
+        "L6": "NOT_TESTED"
+      },
+      "installed": true,
+      "download_status": "BUILTIN",
+      "compatibility_status": "NOT_TESTED",
+      "sensor_support": [
+        "world IMU/NavSat systems; mounted sensors require vehicle profile"
+      ],
+      "parameter_schema": {
+        "obstacle_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 80,
+          "default": 8
+        },
+        "wind_speed": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 20,
+          "default": 0
+        },
+        "wind_direction": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180,
+          "default": 0
+        },
+        "light_intensity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.8
+        },
+        "friction": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 3,
+          "default": 1
+        }
+      }
+    },
+    {
+      "id": "C06",
+      "name": "运动目标场",
+      "category": "copter",
+      "vehicles": [
+        "copter"
+      ],
+      "world_id": "procedural-moving",
+      "scenario_id": "C06",
+      "layout": "moving",
+      "source": "repository:simulation/scenarios/center_catalog.json",
+      "version": "1",
+      "license": "Repository-authored procedural SDF; no third-party mesh assets",
+      "description": "运动目标场：可复现、无外部模型依赖的 Gazebo Harmonic 物理测试环境。",
+      "extent_m": [
+        120,
+        120
+      ],
+      "spawn": [
+        0,
+        0,
+        0.3,
+        0,
+        0,
+        0
+      ],
+      "targets": [
+        {
+          "name": "A",
+          "position": [
+            10,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "B",
+          "position": [
+            20,
+            10,
+            0
+          ]
+        }
+      ],
+      "recommended_tests": [
+        "Takeoff",
+        "Goto",
+        "Land"
+      ],
+      "limitations": [
+        "程序化工程测试几何，不等同高精度实景；车辆、任务和感知能力需分别验收。",
+        "独立 World 不内置飞控或车辆；候选车型并非已通过 SITL 的组合。",
+        "动态目标由 Gazebo TrajectoryFollower 实际施力运动；避障/跟踪算法不在 World 中。"
+      ],
+      "verification": {
+        "L1": "NOT_TESTED",
+        "L2": "NOT_TESTED",
+        "L3": "NOT_TESTED",
+        "L4": "NOT_TESTED",
+        "L5": "NOT_TESTED",
+        "L6": "NOT_TESTED"
+      },
+      "installed": true,
+      "download_status": "BUILTIN",
+      "compatibility_status": "NOT_TESTED",
+      "sensor_support": [
+        "world IMU/NavSat systems; mounted sensors require vehicle profile"
+      ],
+      "parameter_schema": {
+        "obstacle_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 80,
+          "default": 8
+        },
+        "wind_speed": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 20,
+          "default": 0
+        },
+        "wind_direction": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180,
+          "default": 0
+        },
+        "light_intensity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.8
+        },
+        "friction": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 3,
+          "default": 1
+        }
+      }
+    },
+    {
+      "id": "C07",
+      "name": "视觉降落平台",
+      "category": "copter",
+      "vehicles": [
+        "copter"
+      ],
+      "world_id": "procedural-landing",
+      "scenario_id": "C07",
+      "layout": "landing",
+      "source": "repository:simulation/scenarios/center_catalog.json",
+      "version": "1",
+      "license": "Repository-authored procedural SDF; no third-party mesh assets",
+      "description": "视觉降落平台：可复现、无外部模型依赖的 Gazebo Harmonic 物理测试环境。",
+      "extent_m": [
+        120,
+        120
+      ],
+      "spawn": [
+        0,
+        0,
+        0.3,
+        0,
+        0,
+        0
+      ],
+      "targets": [
+        {
+          "name": "A",
+          "position": [
+            10,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "B",
+          "position": [
+            20,
+            10,
+            0
+          ]
+        }
+      ],
+      "recommended_tests": [
+        "Takeoff",
+        "Goto",
+        "Land"
+      ],
+      "limitations": [
+        "程序化工程测试几何，不等同高精度实景；车辆、任务和感知能力需分别验收。",
+        "独立 World 不内置飞控或车辆；候选车型并非已通过 SITL 的组合。",
+        "平台为几何棋盘视觉标记；未实现自动视觉降落算法或 ArUco 解码保证。"
+      ],
+      "verification": {
+        "L1": "NOT_TESTED",
+        "L2": "NOT_TESTED",
+        "L3": "NOT_TESTED",
+        "L4": "NOT_TESTED",
+        "L5": "NOT_TESTED",
+        "L6": "NOT_TESTED"
+      },
+      "installed": true,
+      "download_status": "BUILTIN",
+      "compatibility_status": "NOT_TESTED",
+      "sensor_support": [
+        "world IMU/NavSat systems; mounted sensors require vehicle profile"
+      ],
+      "parameter_schema": {
+        "obstacle_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 80,
+          "default": 8
+        },
+        "wind_speed": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 20,
+          "default": 0
+        },
+        "wind_direction": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180,
+          "default": 0
+        },
+        "light_intensity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.8
+        },
+        "friction": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 3,
+          "default": 1
+        }
+      }
+    },
+    {
+      "id": "C08",
+      "name": "多目标任务场",
+      "category": "copter",
+      "vehicles": [
+        "copter"
+      ],
+      "world_id": "procedural-search",
+      "scenario_id": "C08",
+      "layout": "search",
+      "source": "repository:simulation/scenarios/center_catalog.json",
+      "version": "1",
+      "license": "Repository-authored procedural SDF; no third-party mesh assets",
+      "description": "多目标任务场：可复现、无外部模型依赖的 Gazebo Harmonic 物理测试环境。",
+      "extent_m": [
+        120,
+        120
+      ],
+      "spawn": [
+        0,
+        0,
+        0.3,
+        0,
+        0,
+        0
+      ],
+      "targets": [
+        {
+          "name": "A",
+          "position": [
+            10,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "B",
+          "position": [
+            20,
+            10,
+            0
+          ]
+        }
+      ],
+      "recommended_tests": [
+        "Takeoff",
+        "Goto",
+        "Land"
+      ],
+      "limitations": [
+        "程序化工程测试几何，不等同高精度实景；车辆、任务和感知能力需分别验收。",
+        "独立 World 不内置飞控或车辆；候选车型并非已通过 SITL 的组合。"
+      ],
+      "verification": {
+        "L1": "NOT_TESTED",
+        "L2": "NOT_TESTED",
+        "L3": "NOT_TESTED",
+        "L4": "NOT_TESTED",
+        "L5": "NOT_TESTED",
+        "L6": "NOT_TESTED"
+      },
+      "installed": true,
+      "download_status": "BUILTIN",
+      "compatibility_status": "NOT_TESTED",
+      "sensor_support": [
+        "world IMU/NavSat systems; mounted sensors require vehicle profile"
+      ],
+      "parameter_schema": {
+        "obstacle_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 80,
+          "default": 8
+        },
+        "wind_speed": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 20,
+          "default": 0
+        },
+        "wind_direction": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180,
+          "default": 0
+        },
+        "light_intensity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.8
+        },
+        "friction": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 3,
+          "default": 1
+        }
+      }
+    },
+    {
+      "id": "F01",
+      "name": "标准机场",
+      "category": "plane",
+      "vehicles": [
+        "plane"
+      ],
+      "world_id": "procedural-airport",
+      "scenario_id": "F01",
+      "layout": "airport",
+      "source": "repository:simulation/scenarios/center_catalog.json",
+      "version": "1",
+      "license": "Repository-authored procedural SDF; no third-party mesh assets",
+      "description": "标准机场：可复现、无外部模型依赖的 Gazebo Harmonic 物理测试环境。",
+      "extent_m": [
+        2000,
+        2000
+      ],
+      "spawn": [
+        0,
+        0,
+        0.3,
+        0,
+        0,
+        0
+      ],
+      "targets": [
+        {
+          "name": "A",
+          "position": [
+            10,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "B",
+          "position": [
+            20,
+            10,
+            0
+          ]
+        }
+      ],
+      "recommended_tests": [
+        "Takeoff",
+        "Loiter",
+        "ReturnHome"
+      ],
+      "limitations": [
+        "程序化工程测试几何，不等同高精度实景；车辆、任务和感知能力需分别验收。",
+        "独立 World 不内置飞控或车辆；候选车型并非已通过 SITL 的组合。",
+        "固定翼需独立验证最小空速、转弯半径和真实机型起降；禁止套用多旋翼悬停/零速停止。"
+      ],
+      "verification": {
+        "L1": "NOT_TESTED",
+        "L2": "NOT_TESTED",
+        "L3": "NOT_TESTED",
+        "L4": "NOT_TESTED",
+        "L5": "NOT_TESTED",
+        "L6": "NOT_TESTED"
+      },
+      "installed": true,
+      "download_status": "BUILTIN",
+      "compatibility_status": "NOT_TESTED",
+      "sensor_support": [
+        "world IMU/NavSat systems; mounted sensors require vehicle profile"
+      ],
+      "parameter_schema": {
+        "obstacle_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 80,
+          "default": 8
+        },
+        "wind_speed": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 20,
+          "default": 0
+        },
+        "wind_direction": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180,
+          "default": 0
+        },
+        "light_intensity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.8
+        },
+        "friction": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 3,
+          "default": 1
+        }
+      }
+    },
+    {
+      "id": "F02",
+      "name": "大型平原",
+      "category": "plane",
+      "vehicles": [
+        "plane"
+      ],
+      "world_id": "procedural-plain",
+      "scenario_id": "F02",
+      "layout": "plain",
+      "source": "repository:simulation/scenarios/center_catalog.json",
+      "version": "1",
+      "license": "Repository-authored procedural SDF; no third-party mesh assets",
+      "description": "大型平原：可复现、无外部模型依赖的 Gazebo Harmonic 物理测试环境。",
+      "extent_m": [
+        2000,
+        2000
+      ],
+      "spawn": [
+        0,
+        0,
+        0.3,
+        0,
+        0,
+        0
+      ],
+      "targets": [
+        {
+          "name": "A",
+          "position": [
+            10,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "B",
+          "position": [
+            20,
+            10,
+            0
+          ]
+        }
+      ],
+      "recommended_tests": [
+        "Takeoff",
+        "Loiter",
+        "ReturnHome"
+      ],
+      "limitations": [
+        "程序化工程测试几何，不等同高精度实景；车辆、任务和感知能力需分别验收。",
+        "独立 World 不内置飞控或车辆；候选车型并非已通过 SITL 的组合。",
+        "固定翼需独立验证最小空速、转弯半径和真实机型起降；禁止套用多旋翼悬停/零速停止。"
+      ],
+      "verification": {
+        "L1": "NOT_TESTED",
+        "L2": "NOT_TESTED",
+        "L3": "NOT_TESTED",
+        "L4": "NOT_TESTED",
+        "L5": "NOT_TESTED",
+        "L6": "NOT_TESTED"
+      },
+      "installed": true,
+      "download_status": "BUILTIN",
+      "compatibility_status": "NOT_TESTED",
+      "sensor_support": [
+        "world IMU/NavSat systems; mounted sensors require vehicle profile"
+      ],
+      "parameter_schema": {
+        "obstacle_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 80,
+          "default": 8
+        },
+        "wind_speed": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 20,
+          "default": 0
+        },
+        "wind_direction": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180,
+          "default": 0
+        },
+        "light_intensity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.8
+        },
+        "friction": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 3,
+          "default": 1
+        }
+      }
+    },
+    {
+      "id": "F03",
+      "name": "丘陵山谷",
+      "category": "plane",
+      "vehicles": [
+        "plane"
+      ],
+      "world_id": "procedural-hills",
+      "scenario_id": "F03",
+      "layout": "hills",
+      "source": "repository:simulation/scenarios/center_catalog.json",
+      "version": "1",
+      "license": "Repository-authored procedural SDF; no third-party mesh assets",
+      "description": "丘陵山谷：可复现、无外部模型依赖的 Gazebo Harmonic 物理测试环境。",
+      "extent_m": [
+        2000,
+        2000
+      ],
+      "spawn": [
+        0,
+        0,
+        0.3,
+        0,
+        0,
+        0
+      ],
+      "targets": [
+        {
+          "name": "A",
+          "position": [
+            10,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "B",
+          "position": [
+            20,
+            10,
+            0
+          ]
+        }
+      ],
+      "recommended_tests": [
+        "Takeoff",
+        "Loiter",
+        "ReturnHome"
+      ],
+      "limitations": [
+        "程序化工程测试几何，不等同高精度实景；车辆、任务和感知能力需分别验收。",
+        "独立 World 不内置飞控或车辆；候选车型并非已通过 SITL 的组合。",
+        "固定翼需独立验证最小空速、转弯半径和真实机型起降；禁止套用多旋翼悬停/零速停止。"
+      ],
+      "verification": {
+        "L1": "NOT_TESTED",
+        "L2": "NOT_TESTED",
+        "L3": "NOT_TESTED",
+        "L4": "NOT_TESTED",
+        "L5": "NOT_TESTED",
+        "L6": "NOT_TESTED"
+      },
+      "installed": true,
+      "download_status": "BUILTIN",
+      "compatibility_status": "NOT_TESTED",
+      "sensor_support": [
+        "world IMU/NavSat systems; mounted sensors require vehicle profile"
+      ],
+      "parameter_schema": {
+        "obstacle_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 80,
+          "default": 8
+        },
+        "wind_speed": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 20,
+          "default": 0
+        },
+        "wind_direction": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180,
+          "default": 0
+        },
+        "light_intensity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.8
+        },
+        "friction": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 3,
+          "default": 1
+        }
+      }
+    },
+    {
+      "id": "F04",
+      "name": "农田村庄",
+      "category": "plane",
+      "vehicles": [
+        "plane"
+      ],
+      "world_id": "procedural-village",
+      "scenario_id": "F04",
+      "layout": "village",
+      "source": "repository:simulation/scenarios/center_catalog.json",
+      "version": "1",
+      "license": "Repository-authored procedural SDF; no third-party mesh assets",
+      "description": "农田村庄：可复现、无外部模型依赖的 Gazebo Harmonic 物理测试环境。",
+      "extent_m": [
+        2000,
+        2000
+      ],
+      "spawn": [
+        0,
+        0,
+        0.3,
+        0,
+        0,
+        0
+      ],
+      "targets": [
+        {
+          "name": "A",
+          "position": [
+            10,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "B",
+          "position": [
+            20,
+            10,
+            0
+          ]
+        }
+      ],
+      "recommended_tests": [
+        "Takeoff",
+        "Loiter",
+        "ReturnHome"
+      ],
+      "limitations": [
+        "程序化工程测试几何，不等同高精度实景；车辆、任务和感知能力需分别验收。",
+        "独立 World 不内置飞控或车辆；候选车型并非已通过 SITL 的组合。",
+        "固定翼需独立验证最小空速、转弯半径和真实机型起降；禁止套用多旋翼悬停/零速停止。"
+      ],
+      "verification": {
+        "L1": "NOT_TESTED",
+        "L2": "NOT_TESTED",
+        "L3": "NOT_TESTED",
+        "L4": "NOT_TESTED",
+        "L5": "NOT_TESTED",
+        "L6": "NOT_TESTED"
+      },
+      "installed": true,
+      "download_status": "BUILTIN",
+      "compatibility_status": "NOT_TESTED",
+      "sensor_support": [
+        "world IMU/NavSat systems; mounted sensors require vehicle profile"
+      ],
+      "parameter_schema": {
+        "obstacle_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 80,
+          "default": 8
+        },
+        "wind_speed": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 20,
+          "default": 0
+        },
+        "wind_direction": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180,
+          "default": 0
+        },
+        "light_intensity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.8
+        },
+        "friction": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 3,
+          "default": 1
+        }
+      }
+    },
+    {
+      "id": "F05",
+      "name": "河流桥梁",
+      "category": "plane",
+      "vehicles": [
+        "plane"
+      ],
+      "world_id": "procedural-river",
+      "scenario_id": "F05",
+      "layout": "river",
+      "source": "repository:simulation/scenarios/center_catalog.json",
+      "version": "1",
+      "license": "Repository-authored procedural SDF; no third-party mesh assets",
+      "description": "河流桥梁：可复现、无外部模型依赖的 Gazebo Harmonic 物理测试环境。",
+      "extent_m": [
+        2000,
+        2000
+      ],
+      "spawn": [
+        0,
+        0,
+        0.3,
+        0,
+        0,
+        0
+      ],
+      "targets": [
+        {
+          "name": "A",
+          "position": [
+            10,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "B",
+          "position": [
+            20,
+            10,
+            0
+          ]
+        }
+      ],
+      "recommended_tests": [
+        "Takeoff",
+        "Loiter",
+        "ReturnHome"
+      ],
+      "limitations": [
+        "程序化工程测试几何，不等同高精度实景；车辆、任务和感知能力需分别验收。",
+        "独立 World 不内置飞控或车辆；候选车型并非已通过 SITL 的组合。",
+        "固定翼需独立验证最小空速、转弯半径和真实机型起降；禁止套用多旋翼悬停/零速停止。"
+      ],
+      "verification": {
+        "L1": "NOT_TESTED",
+        "L2": "NOT_TESTED",
+        "L3": "NOT_TESTED",
+        "L4": "NOT_TESTED",
+        "L5": "NOT_TESTED",
+        "L6": "NOT_TESTED"
+      },
+      "installed": true,
+      "download_status": "BUILTIN",
+      "compatibility_status": "NOT_TESTED",
+      "sensor_support": [
+        "world IMU/NavSat systems; mounted sensors require vehicle profile"
+      ],
+      "parameter_schema": {
+        "obstacle_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 80,
+          "default": 8
+        },
+        "wind_speed": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 20,
+          "default": 0
+        },
+        "wind_direction": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180,
+          "default": 0
+        },
+        "light_intensity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.8
+        },
+        "friction": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 3,
+          "default": 1
+        }
+      }
+    },
+    {
+      "id": "F06",
+      "name": "风场测试区",
+      "category": "plane",
+      "vehicles": [
+        "plane"
+      ],
+      "world_id": "procedural-wind",
+      "scenario_id": "F06",
+      "layout": "wind",
+      "source": "repository:simulation/scenarios/center_catalog.json",
+      "version": "1",
+      "license": "Repository-authored procedural SDF; no third-party mesh assets",
+      "description": "风场测试区：可复现、无外部模型依赖的 Gazebo Harmonic 物理测试环境。",
+      "extent_m": [
+        2000,
+        2000
+      ],
+      "spawn": [
+        0,
+        0,
+        0.3,
+        0,
+        0,
+        0
+      ],
+      "targets": [
+        {
+          "name": "A",
+          "position": [
+            10,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "B",
+          "position": [
+            20,
+            10,
+            0
+          ]
+        }
+      ],
+      "recommended_tests": [
+        "Takeoff",
+        "Loiter",
+        "ReturnHome"
+      ],
+      "limitations": [
+        "程序化工程测试几何，不等同高精度实景；车辆、任务和感知能力需分别验收。",
+        "独立 World 不内置飞控或车辆；候选车型并非已通过 SITL 的组合。",
+        "固定翼需独立验证最小空速、转弯半径和真实机型起降；禁止套用多旋翼悬停/零速停止。",
+        "Gazebo 风影响启用风的链接；不代表风已传递 ArduPilot JSON 内部飞行动力学。"
+      ],
+      "verification": {
+        "L1": "NOT_TESTED",
+        "L2": "NOT_TESTED",
+        "L3": "NOT_TESTED",
+        "L4": "NOT_TESTED",
+        "L5": "NOT_TESTED",
+        "L6": "NOT_TESTED"
+      },
+      "installed": true,
+      "download_status": "BUILTIN",
+      "compatibility_status": "NOT_TESTED",
+      "sensor_support": [
+        "world IMU/NavSat systems; mounted sensors require vehicle profile"
+      ],
+      "parameter_schema": {
+        "obstacle_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 80,
+          "default": 8
+        },
+        "wind_speed": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 20,
+          "default": 5
+        },
+        "wind_direction": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180,
+          "default": 0
+        },
+        "light_intensity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.8
+        },
+        "friction": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 3,
+          "default": 1
+        }
+      }
+    },
+    {
+      "id": "F07",
+      "name": "VTOL 综合测试场",
+      "category": "plane",
+      "vehicles": [
+        "plane"
+      ],
+      "world_id": "procedural-vtol",
+      "scenario_id": "F07",
+      "layout": "vtol",
+      "source": "repository:simulation/scenarios/center_catalog.json",
+      "version": "1",
+      "license": "Repository-authored procedural SDF; no third-party mesh assets",
+      "description": "VTOL 综合测试场：可复现、无外部模型依赖的 Gazebo Harmonic 物理测试环境。",
+      "extent_m": [
+        2000,
+        2000
+      ],
+      "spawn": [
+        0,
+        0,
+        0.3,
+        0,
+        0,
+        0
+      ],
+      "targets": [
+        {
+          "name": "A",
+          "position": [
+            10,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "B",
+          "position": [
+            20,
+            10,
+            0
+          ]
+        }
+      ],
+      "recommended_tests": [
+        "Takeoff",
+        "Loiter",
+        "ReturnHome"
+      ],
+      "limitations": [
+        "程序化工程测试几何，不等同高精度实景；车辆、任务和感知能力需分别验收。",
+        "独立 World 不内置飞控或车辆；候选车型并非已通过 SITL 的组合。",
+        "固定翼需独立验证最小空速、转弯半径和真实机型起降；禁止套用多旋翼悬停/零速停止。",
+        "VTOL 环境可加载；当前没有框架验收过的 QuadPlane 模型，VTOL 控制 BLOCKED。"
+      ],
+      "verification": {
+        "L1": "NOT_TESTED",
+        "L2": "NOT_TESTED",
+        "L3": "NOT_TESTED",
+        "L4": "NOT_TESTED",
+        "L5": "NOT_TESTED",
+        "L6": "NOT_TESTED"
+      },
+      "installed": true,
+      "download_status": "BUILTIN",
+      "compatibility_status": "NOT_TESTED",
+      "sensor_support": [
+        "world IMU/NavSat systems; mounted sensors require vehicle profile"
+      ],
+      "parameter_schema": {
+        "obstacle_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 80,
+          "default": 8
+        },
+        "wind_speed": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 20,
+          "default": 0
+        },
+        "wind_direction": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180,
+          "default": 0
+        },
+        "light_intensity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.8
+        },
+        "friction": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 3,
+          "default": 1
+        }
+      }
+    },
+    {
+      "id": "F08",
+      "name": "空地协同测试区",
+      "category": "plane",
+      "vehicles": [
+        "plane"
+      ],
+      "world_id": "procedural-cooperative",
+      "scenario_id": "F08",
+      "layout": "cooperative",
+      "source": "repository:simulation/scenarios/center_catalog.json",
+      "version": "1",
+      "license": "Repository-authored procedural SDF; no third-party mesh assets",
+      "description": "空地协同测试区：可复现、无外部模型依赖的 Gazebo Harmonic 物理测试环境。",
+      "extent_m": [
+        2000,
+        2000
+      ],
+      "spawn": [
+        0,
+        0,
+        0.3,
+        0,
+        0,
+        0
+      ],
+      "targets": [
+        {
+          "name": "A",
+          "position": [
+            10,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "B",
+          "position": [
+            20,
+            10,
+            0
+          ]
+        }
+      ],
+      "recommended_tests": [
+        "Takeoff",
+        "Loiter",
+        "ReturnHome"
+      ],
+      "limitations": [
+        "程序化工程测试几何，不等同高精度实景；车辆、任务和感知能力需分别验收。",
+        "独立 World 不内置飞控或车辆；候选车型并非已通过 SITL 的组合。",
+        "固定翼需独立验证最小空速、转弯半径和真实机型起降；禁止套用多旋翼悬停/零速停止。",
+        "环境含空地集合区；多车端口/通信隔离需专门验收。"
+      ],
+      "verification": {
+        "L1": "NOT_TESTED",
+        "L2": "NOT_TESTED",
+        "L3": "NOT_TESTED",
+        "L4": "NOT_TESTED",
+        "L5": "NOT_TESTED",
+        "L6": "NOT_TESTED"
+      },
+      "installed": true,
+      "download_status": "BUILTIN",
+      "compatibility_status": "NOT_TESTED",
+      "sensor_support": [
+        "world IMU/NavSat systems; mounted sensors require vehicle profile"
+      ],
+      "parameter_schema": {
+        "obstacle_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 80,
+          "default": 8
+        },
+        "wind_speed": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 20,
+          "default": 0
+        },
+        "wind_direction": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180,
+          "default": 0
+        },
+        "light_intensity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.8
+        },
+        "friction": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 3,
+          "default": 1
+        }
+      }
+    }
+  ]
+}

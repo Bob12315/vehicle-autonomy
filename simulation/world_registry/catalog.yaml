@@ -1,0 +1,127 @@
+{
+  "schema": 1,
+  "description": "JSON syntax is valid YAML. Assets and evidence are local and ignored by git.",
+  "scenes": {
+    "playpen": {
+      "name": "Rover 游乐场",
+      "sdf": "assets/playpen_adapted.sdf",
+      "source": "https://github.com/ArduPilot/ardupilot_gz",
+      "commit": "8df4dc1726e37504e6fc8b952d02e554cfa3176f",
+      "license": "GPL-3.0-or-later",
+      "dependencies": "SITL_Models 25bc38ed8c6c0345840159a8cbc0b02781d52f3c; Fuel OpenRobotics ground plane v5 and jersey barrier v6; SITL_Models license not established",
+      "plugin": "Gazebo Sim systems; vehicles may require ArduPilotPlugin",
+      "supported_vehicles": [],
+      "spawn": "unverified",
+      "verified": [
+        "60 s headless simulation time advancement; see matrix"
+      ],
+      "limitations": "See test matrix; no vehicle support implied."
+    },
+    "iris": {
+      "name": "Iris 跑道",
+      "sdf": "assets/iris_runway.sdf",
+      "source": "https://github.com/ArduPilot/ardupilot_gazebo",
+      "commit": "3ec51428fd43deb7b71137192ba16394b450d78e",
+      "license": "LGPL-3.0 (repository LICENSE; check individual assets)",
+      "dependencies": "runway, iris_with_gimbal",
+      "plugin": "Gazebo Sim systems; vehicles may require ArduPilotPlugin",
+      "supported_vehicles": [],
+      "spawn": "unverified",
+      "verified": [
+        "60 s headless simulation time advancement; see matrix",
+        "IMU and stationary scene NavSat sample"
+      ],
+      "limitations": "Copter SITL framework motion attempt failed fresh vehicle state; EGL warnings. See matrix."
+    },
+    "zephyr": {
+      "name": "Zephyr 跑道",
+      "sdf": "assets/zephyr_runway.sdf",
+      "source": "https://github.com/ArduPilot/ardupilot_gazebo",
+      "commit": "3ec51428fd43deb7b71137192ba16394b450d78e",
+      "license": "LGPL-3.0 (repository LICENSE; check individual assets)",
+      "dependencies": "runway, zephyr_with_ardupilot",
+      "plugin": "Gazebo Sim systems; vehicles may require ArduPilotPlugin",
+      "supported_vehicles": [],
+      "spawn": "unverified",
+      "verified": [
+        "60 s headless simulation time advancement; see matrix"
+      ],
+      "limitations": "See test matrix; no vehicle support implied."
+    },
+    "warehouse": {
+      "name": "仓库",
+      "sdf": "assets/warehouse_adapted.sdf",
+      "source": "https://github.com/clearpathrobotics/clearpath_simulator",
+      "commit": "a7c5cf377027cbbb6cb64e4eae9c786750b5b276",
+      "license": "BSD-3-Clause",
+      "dependencies": "Pinned local Fuel models; individual model licenses require review",
+      "plugin": "Gazebo Sim systems; vehicles may require ArduPilotPlugin",
+      "supported_vehicles": [],
+      "spawn": "unverified",
+      "verified": [
+        "60 s headless simulation time advancement; see matrix"
+      ],
+      "limitations": "See test matrix; no vehicle support implied."
+    },
+    "urban": {
+      "name": "城市街区",
+      "sdf": "assets/urban.sdf",
+      "source": "https://github.com/mertgulerx/world-collection",
+      "commit": "a0c262a497da1b0b9fd9970add6ff346e09afaeb",
+      "license": "Apache-2.0 (world LICENSE)",
+      "dependencies": "See SDF references",
+      "plugin": "Gazebo Sim systems; vehicles may require ArduPilotPlugin",
+      "supported_vehicles": [],
+      "spawn": "unverified",
+      "verified": [
+        "60 s headless simulation time advancement; see matrix",
+        "one reset service test",
+        "Rover model loaded briefly; physical acceptance incomplete"
+      ],
+      "limitations": "See test matrix; no vehicle support implied."
+    },
+    "orchard": {
+      "name": "果园",
+      "sdf": "assets/orchard.sdf",
+      "source": "https://github.com/clearpathrobotics/clearpath_simulator",
+      "commit": "a7c5cf377027cbbb6cb64e4eae9c786750b5b276",
+      "license": "BSD-3-Clause",
+      "dependencies": "orchard and accessories meshes/textures, from Clearpath; further runtime validation pending",
+      "plugin": "Gazebo Sim systems; vehicles may require ArduPilotPlugin",
+      "supported_vehicles": [],
+      "spawn": "unverified",
+      "verified": [
+        "60 s headless simulation time advancement; see matrix"
+      ],
+      "limitations": "See test matrix; no vehicle support implied."
+    },
+    "windy": {
+      "name": "风场",
+      "sdf": "assets/windy.sdf",
+      "source": "https://github.com/PX4/PX4-gazebo-models",
+      "commit": "e5997f455e33ec071c7c677fc59a65781de496a4",
+      "license": "BSD-3-Clause",
+      "dependencies": "See SDF references",
+      "plugin": "Gazebo Sim systems; vehicles may require ArduPilotPlugin",
+      "supported_vehicles": [],
+      "spawn": "unverified",
+      "verified": [
+        "60 s headless simulation time advancement; see matrix"
+      ],
+      "limitations": "See test matrix; no vehicle support implied."
+    },
+    "multiagent": {
+      "name": "多车辆",
+      "sdf": "",
+      "source": "https://github.com/ArduPilot/ardupilot_gz",
+      "commit": "8df4dc1726e37504e6fc8b952d02e554cfa3176f",
+      "license": "GPL-3.0-or-later",
+      "dependencies": "ROS 2, ros_gz, ArduPilot ROS packages",
+      "plugin": "Gazebo Sim systems; vehicles may require ArduPilotPlugin",
+      "supported_vehicles": [],
+      "spawn": "unverified",
+      "verified": [],
+      "limitations": "See test matrix; no vehicle support implied."
+    }
+  }
+}

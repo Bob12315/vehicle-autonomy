@@ -199,6 +199,24 @@ Web 控制页依次为 `http://127.0.0.1:8780/control`、`:8781/control`、`:878
 操作步骤与机型语义见 [Web 基础控制说明](docs/simulation/program-start.md)；
 独立 QGC 模式及模型来源见 [QGC 启动说明](docs/simulation/qgc-start.md)。
 
+## Gazebo 仿真中心
+
+统一登录后的 `/simulation` 提供场景库、白名单参数、真实本机 Gazebo 会话、
+运行监控、软件链路故障、日志和报告导出。24 个专项 World 与车辆、Mission 分离；
+R01 / C01 / F01 复用已有 Rover / Copter / Plane 的受控 SITL 装配。
+其他地图中的车型候选不等于已适配或通过运动测试，VTOL 当前保持禁用。
+第三方资源由锁定清单和本地缓存管理，不随 Git 或 wheel 分发。
+
+```bash
+vehicle-autonomy-simulation list
+vehicle-autonomy-simulation batch --data-dir artifacts/simulation/center-check --seconds 8 --seed 42
+vehicle-autonomy-missions --port 8780 --token-file /absolute/private/web.private --data-dir runtime/center
+```
+
+默认无 SEND；可信部署显式 `--allow-send` 仍要求原车辆控制 / Mission 的逐级授权。
+实际覆盖等级和未完成范围见 [仿真测试报告](docs/SIMULATION_TEST_REPORT.md)，
+入口与限制见 [仿真中心指南](docs/SIMULATION_WEB_UI_GUIDE.md)。
+
 ## Phase 5 开发状态
 
 通用 World/Sensor、真实 SLAM/YOLO 和原生 Nav2 受控 Rover 桥正在开发。

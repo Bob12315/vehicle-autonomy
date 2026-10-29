@@ -18,7 +18,7 @@ from vehicle_autonomy.app.web.action_lab import ActionLab, ActionLabHandler, Act
 
 
 class MissionControl(ActionLab):
-    def __init__(self, drivers, data_dir, *, registry=None, event_sink=None, events=None, scheduler_period_s=.05,studio_demo=False):
+    def __init__(self, drivers, data_dir, *, registry=None, event_sink=None, events=None, scheduler_period_s=.05,studio_demo=False,simulation_allow_send=False):
         if type(studio_demo) is not bool:raise ValueError('explicit software demo bool required')
         self.studio_demo=studio_demo
         self._control_lock = RLock()
@@ -32,6 +32,7 @@ class MissionControl(ActionLab):
         self.control_fault = None
         self.journal = None
         self.studio = None
+        self.simulation_manager = None
         from .operator_control import OperatorControls
         self.operator_controls=OperatorControls(self)
         from vehicle_autonomy.app.visualization.goals import PendingGoals
@@ -54,8 +55,12 @@ class MissionControl(ActionLab):
                 deployment_identities=self.deployment_identities,recovered_manual=self.recovered_manual,external_inputs=self.visualization_goals.read_input)
             from vehicle_autonomy.app.mission_designer.studio_service import StudioService
             self.studio=StudioService(self,Path(data_dir)/'studio')
+            from vehicle_autonomy.app.simulation.manager import SimulationManager
+            self.simulation_manager=SimulationManager(Path(data_dir)/'simulation',application=self,allow_send=simulation_allow_send)
         except BaseException:
             self._stop.set();self._thread.join(5)
+            if self.simulation_manager:self.simulation_manager.close()
+            if self.studio:self.studio.close()
             if self.journal:self.journal.close()
             # A failed assembly never closes a caller's already-owned Driver.
             raise
@@ -195,6 +200,9 @@ class MissionControl(ActionLab):
             recovered_actions=list(self.recovered_manual.values()), fault=self.control_fault)
 
     def handle(self, operation, payload):
+        if operation.startswith('simulation.'):
+            if self.simulation_manager is None:raise ValueError('Simulation manager unavailable')
+            return self.simulation_manager.handle(operation,payload)
         if operation == 'console.state':
             if payload: raise ValueError('console snapshot takes no arguments')
             from vehicle_autonomy.app.web.dashboard import dashboard
@@ -309,6 +317,18 @@ class MissionControl(ActionLab):
 
     def handle_authenticated(self, operation, payload, *, principal, control_token, sessions):
         if principal!='api' and not sessions.alive(principal):raise ValueError('browser session expired before operation')
+        if operation in ('simulation.stop','simulation.fault'):
+            # Lifecycle and fault operations can disrupt an active control
+            # owner's telemetry/commands. An ordinary login (including the
+            # management API credential) must not bypass that browser owner.
+            service=self.simulation_manager
+            if service is None:raise ValueError('Simulation manager unavailable')
+            record=service.sample(payload.get('id'))
+            with self._control_lock:
+                target=record.get('target')
+                if record['state'] not in ('FINISHED','FAILED','CANCELLED') and target in self.operator_controls.records:
+                    self.operator_controls.check(target,principal,control_token,fresh=False)
+                return self.handle(operation,payload)
         if operation=='visualization.open':
             if set(payload)!={'target'}:raise ValueError('one vehicle target required')
             from vehicle_autonomy.app.visualization.integration import open_rviz
@@ -374,6 +394,10 @@ class MissionControl(ActionLab):
             return result
 
     def close(self):
+        simulation_error=None
+        if self.simulation_manager:
+            try:self.simulation_manager.close()
+            except Exception as exc:simulation_error=exc
         if self.missions:
             with self._control_lock:
                 for m in self.missions.views():
@@ -382,6 +406,7 @@ class MissionControl(ActionLab):
         finally:
             if self.journal: self.journal.close()
             if self.studio:self.studio.close()
+        if simulation_error:raise simulation_error
 
 
 class MissionControlServer(ActionLabServer):
@@ -404,7 +429,10 @@ class MissionControlHandler(ActionLabHandler):
             if self.path!='/ws/telemetry':self.reply(400,dict(ok=False,error='WebSocket URL takes no credentials or query'));return
             from .live import stream
             stream(self);return
-        static = {'/studio':('studio-b.html','text/html; charset=utf-8'),
+        static = {'/simulation':('simulation-center.html','text/html; charset=utf-8'),
+            '/simulation-center.js':('simulation-center.js','application/javascript'),
+            '/simulation-center.css':('simulation-center.css','text/css'),
+            '/studio':('studio-b.html','text/html; charset=utf-8'),
             '/studio/legacy':('mission-studio.html','text/html; charset=utf-8'),
             '/studio-b.js':('studio-b.js','application/javascript'),
             '/studio-b.css':('studio-b.css','text/css'),
@@ -444,6 +472,7 @@ class MissionControlHandler(ActionLabHandler):
         routes = {'/api/console/state':'console.state','/api/studio/state':'studio.state','/api/missions/library':'mission.library','/api/missions/types':'mission.types'}
         routes.update({'/api/studio-b/catalog':'studio-b.catalog','/api/studio-b/library':'studio-b.library'})
         routes['/api/control/state']='control.snapshot'
+        routes.update({'/api/simulation/catalog':'simulation.catalog','/api/simulation/sessions':'simulation.sessions','/api/simulation/assets':'simulation.assets'})
         if self.path in routes:
             if self.authorized(): self.invoke(routes[self.path], {})
             return
@@ -462,6 +491,8 @@ class MissionControlHandler(ActionLabHandler):
         '/api/workspaces/launch':'workspace.launch','/api/workspaces/stop':'workspace.stop',
         '/api/workspaces/retry':'workspace.retry','/api/workspaces/reconcile':'workspace.reconcile',
         '/api/control/takeover':'control.takeover','/api/control/reestablish':'control.reestablish'})
+    post_routes.update({'/api/simulation/'+op:'simulation.'+op for op in (
+        'create','start','stop','pause','resume','reset','report','logs','test','fault','install','uninstall','asset_status')})
     post_routes.update({'/api/control/acquire':'operator.acquire','/api/control/renew':'operator.renew',
         '/api/control/release':'operator.release','/api/control/request-takeover':'operator.takeover'})
     post_routes.update({'/api/visualization/open':'visualization.open','/api/visualization/candidates':'visualization.propose',
