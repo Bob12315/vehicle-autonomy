@@ -43,12 +43,15 @@ def run(directory,*,demo=False):
         pw=stack.enter_context(sync_playwright());browser=pw.chromium.launch(executable_path='/usr/bin/google-chrome',headless=True,args=['--no-sandbox','--disable-dev-shm-usage']);stack.callback(browser.close)
         page=browser.new_page(viewport={'width':1680,'height':1050});page.on('pageerror',lambda e:errors.append(str(e)))
         try:
-            login(page,base,token,'/studio');expect(page.locator('h1')).to_have_text('Mission Library');expect(page.locator('#save-state')).to_contain_text('统一会话')
+            login(page,base,token,'/studio');expect(page.locator('h1')).to_have_text('任务库');expect(page.locator('#save-state')).to_contain_text('统一会话')
+            for source in ('/control','/console'):
+                page.goto(base+source);page.locator('nav a[href="/studio"]').click()
+                expect(page.locator('h1')).to_have_text('任务库');expect(page.locator('#save-state')).to_contain_text('统一会话')
             page.screenshot(path=str(directory/'01-library.png'),full_page=True)
             page.locator('#new-mission').click();page.get_by_label('任务名称',exact=True).fill('Browser end-to-end');page.locator('#dialog-confirm').click()
             expect(page.locator('#editor-view')).to_be_visible();expect(page.locator('.graph-node')).to_have_count(2)
-            page.locator('#palette button').filter(has_text='Wait').click();expect(page.locator('.graph-node')).to_have_count(3)
-            wait=page.locator('.graph-node').filter(has=page.locator('.node-category',has_text='Wait'));wait_id=wait.get_attribute('data-node')
+            page.locator('#palette button').filter(has_text='等待').click();expect(page.locator('.graph-node')).to_have_count(3)
+            wait=page.locator('.graph-node').filter(has=page.locator('.node-category',has_text='等待'));wait_id=wait.get_attribute('data-node')
             page.get_by_label(wait_id+'.duration_s',exact=True).fill('0.15');page.get_by_label(wait_id+'.duration_s',exact=True).press('Tab')
             page.get_by_label('断点',exact=True).check()
             def connect(source,target):
@@ -66,7 +69,7 @@ def run(directory,*,demo=False):
             stored=next(v['definition'] for v in lab.studio.library.snapshot()['drafts'].values() if v['definition']['name']=='Browser end-to-end')
             params=next(n['parameters'] for n in stored['nodes'] if n['node_id']==shape_id);assert params==dict(position=dict(x=2.,y=3.),samples=[5,7],enabled=True),params
             page.locator('#palette button').filter(has_text='BrowserWork').click();expect(page.locator('.graph-node')).to_have_count(5)
-            page.locator('#properties').get_by_role('button',name='Advanced',exact=True).click();page.get_by_label('count 输出变量',exact=True).locator('..').get_by_role('button',name='＋ 结果列表',exact=True).click();page.locator('#dialog-confirm').click()
+            page.locator('#properties').get_by_role('button',name='高级',exact=True).click();page.get_by_label('count 输出变量',exact=True).locator('..').get_by_role('button',name='＋ 结果列表',exact=True).click();page.locator('#dialog-confirm').click()
             page.locator('#save-draft').click();expect(page.locator('#save-state')).to_contain_text('已保存')
             stored=next(v['definition'] for v in lab.studio.library.snapshot()['drafts'].values() if v['definition']['name']=='Browser end-to-end');assert stored['blackboard']['count_list']['schema']['items']['type']=='integer'
             page.locator('#delete').click();expect(page.locator('.graph-node')).to_have_count(4);page.locator('[data-node="'+shape_id+'"]').click()
@@ -76,25 +79,25 @@ def run(directory,*,demo=False):
             page.locator('#validate').click();expect(page.locator('#notice')).to_contain_text('静态验证通过')
             page.screenshot(path=str(directory/'02-editor.png'),full_page=True)
             page.locator('#publish').click();expect(page.locator('#notice')).to_contain_text('已发布不可变版本')
-            page.locator('[data-tab=runner]').click();page.locator('#debug-run').check();page.locator('#run-start').click();expect(page.locator('#run-state')).to_contain_text('PAUSED',timeout=8000)
-            page.locator('[data-debug=step]').click();page.wait_for_timeout(600);expect(page.locator('#run-state')).to_contain_text('PAUSED');page.locator('[data-debug=resume]').click();expect(page.locator('#run-state')).to_contain_text('SUCCEEDED',timeout=8000)
+            page.locator('[data-tab=runner]').click();page.locator('#debug-run').check();page.locator('#run-start').click();expect(page.locator('#run-state')).to_contain_text('已暂停',timeout=8000)
+            page.locator('[data-debug=step]').click();page.wait_for_timeout(600);expect(page.locator('#run-state')).to_contain_text('已暂停');page.locator('[data-debug=resume]').click();expect(page.locator('#run-state')).to_contain_text('已成功',timeout=8000)
             page.locator('[data-inspect=events]').click();expect(page.locator('.inspector-event').first).to_be_visible()
             page.screenshot(path=str(directory/'03-runner.png'),full_page=True)
             run=lab.missions.views()[-1];assert run['state']=='SUCCEEDED' and run['release_safe'];assert run['studio']['definition']['nodes'];assert not driver.writes
             if demo:
-                page.locator('[data-tab=templates]').click();page.locator('.mission-card').filter(has_text='CUADC MultiTarget').get_by_role('button',name='从模板创建',exact=True).click()
-                page.locator('[data-node=handle]').dblclick();expect(page.locator('#breadcrumbs')).to_contain_text('HandleTarget');page.get_by_role('button',name='← 返回父 Mission',exact=True).click()
+                page.locator('[data-tab=templates]').click();page.locator('.mission-card').filter(has_text='CUADC 多目标').get_by_role('button',name='从模板创建',exact=True).click()
+                page.locator('[data-node=handle]').dblclick();expect(page.locator('#breadcrumbs')).to_contain_text('处理目标');page.get_by_role('button',name='← 返回父 任务',exact=True).click()
                 page.locator('#publish').click();expect(page.locator('#notice')).to_contain_text('已发布不可变版本');page.locator('[data-tab=runner]').click();page.locator('#debug-run').uncheck();previous_runs=len(lab.missions.views());page.locator('#run-start').click()
                 until=time.monotonic()+10
                 while len(lab.missions.views())==previous_runs and time.monotonic()<until:page.wait_for_timeout(50)
-                assert len(lab.missions.views())==previous_runs+1;expect(page.locator('#run-state')).to_contain_text('SUCCEEDED',timeout=15000)
+                assert len(lab.missions.views())==previous_runs+1;expect(page.locator('#run-state')).to_contain_text('已成功',timeout=15000)
                 demo_run=lab.missions.views()[-1];values={c['name']:c['data']['value'] for c in demo_run['studio']['blackboard']['values'] if c['scope_id']=='mission'}
                 assert [r['target_id'] for r in values['results']]==['T-02','T-03'];assert values['simulated_payload_remaining']==0;assert not driver.writes
-                page.locator('[data-node=handle]').dblclick();expect(page.locator('#runner-breadcrumbs')).to_contain_text('HandleTarget');page.wait_for_timeout(1500);expect(page.locator('#runner-breadcrumbs')).to_contain_text('HandleTarget');page.get_by_role('button',name='← 返回父 Mission',exact=True).click()
+                page.locator('[data-node=handle]').dblclick();expect(page.locator('#runner-breadcrumbs')).to_contain_text('处理目标');page.wait_for_timeout(1500);expect(page.locator('#runner-breadcrumbs')).to_contain_text('处理目标');page.get_by_role('button',name='← 返回父 任务',exact=True).click()
                 page.locator('[data-inspect=blackboard]').click();expect(page.locator('#inspector-content')).to_contain_text('selected_targets');page.screenshot(path=str(directory/'05-cuadc-scopes.png'),full_page=True)
                 result['cuadc']=dict(run=demo_run['id'],selected=[t['id'] for t in values['selected_targets']],results=values['results'])
-            page.reload();expect(page.locator('h1')).to_have_text('Mission Library');expect(page.locator('#save-state')).to_contain_text('统一会话')
-            page.goto(base+'/console');expect(page.locator('h1')).to_be_visible();page.goto(base+'/studio');expect(page.locator('h1')).to_have_text('Mission Library')
+            page.reload();expect(page.locator('h1')).to_have_text('任务库');expect(page.locator('#save-state')).to_contain_text('统一会话')
+            page.goto(base+'/console');expect(page.locator('h1')).to_be_visible();page.goto(base+'/studio');expect(page.locator('h1')).to_have_text('任务库')
             page.set_viewport_size({'width':820,'height':1050});page.screenshot(path=str(directory/'04-tablet.png'),full_page=True)
             assert not errors,errors;result.update(passed=True,run=run['id'],checks=['Library first','dynamic palette','node add','port connections','schema input','undo/redo','CAS autosave','validate/publish','real executor Wait run','events','refresh + cross-page session','tablet layout'],browser_errors=errors)
         except BaseException as exc:

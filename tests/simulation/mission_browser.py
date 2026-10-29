@@ -88,13 +88,13 @@ def manual(page,f,result):
     from playwright.sync_api import expect
     from tests.simulation.web_ui_controls import BrowserControlCheck
     login(page,f.base,f.token,'/control')
-    page.locator('#acquire-control').click();expect(page.locator('#top-authority')).to_have_text('SEND ON')
+    page.locator('#acquire-control').click();expect(page.locator('#top-authority')).to_have_text('开启指令发送')
     directory=f.path/'manual-browser';directory.mkdir()
     check=BrowserControlCheck(f.kind,f.api,f.oracle,directory,page)
     physical=check.run();result['manual_control']=physical
     result['manual_actions']=physical['actions'];result['managed_inputs']=physical['managed']
     t=f.truth();result['manual_final_truth']=dict(position=[t.x_m,t.y_m,t.z_m],speed_mps=f.oracle.recent_speed_mps())
-    page.locator('#release-control').click();expect(page.locator('#top-authority')).to_have_text('SEND OFF')
+    page.locator('#release-control').click();expect(page.locator('#top-authority')).to_have_text('关闭指令发送')
     page.screenshot(path=str(f.path/'manual-control.png'),full_page=True)
     return result
 

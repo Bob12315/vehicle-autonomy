@@ -5,7 +5,7 @@ const logs = [];
 // Full clouds/maps belong to ROS visualizers; keep the operator view bounded.
 const json = value => JSON.stringify(value, (key, item) => key === 'preview_xyz' ? undefined : item, 2);
 function log(text) {
-  logs.unshift(new Date().toLocaleTimeString() + ' ' + text);
+  logs.unshift(new Date().toLocaleTimeString('zh-CN',{hour12:false}) + ' ' + text);
   $('logs').textContent = logs.slice(0, 100).join('\n');
 }
 async function api(path,payload){return window.VAFAuth.api('/api/'+path,payload);}
@@ -17,8 +17,8 @@ function showSummary(s) {
   $('scenario-examples').hidden = !s.scenario;
   const items = {'运行状态': s.state, '车辆连接': s.connected ? '在线' : '离线 / 未接入',
     '飞控模式': s.vehicle?.mode ?? '未知',
-    '武装状态': s.vehicle?.armed === true ? 'ARMED' : s.vehicle?.armed === false ? 'Disarmed' : '未知',
-    '系统 / Action SEND': String(s.system_send) + ' / ' + String(s.action_send),
+    '解锁状态': s.vehicle?.armed === true ? '已解锁' : s.vehicle?.armed === false ? '已上锁' : '未知',
+    '系统 / 动作指令发送': (s.system_send===true?'开启':s.system_send===false?'关闭':'未知') + ' / ' + (s.action_send===true?'开启':s.action_send===false?'关闭':'未知'),
     '物理停车': s.physical_stop ?? '未由此界面确认'};
   $('summary').replaceChildren();
   for (const [name, value] of Object.entries(items)) {

@@ -16,20 +16,20 @@ def run(directory):
    browser=pw.chromium.launch(executable_path='/usr/bin/google-chrome',headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
    try:
     context=browser.new_context(viewport={'width':1680,'height':1100});page=context.new_page();page.on('pageerror',lambda e:errors.append(str(e)))
-    login(page,h.base,h.token,'/control');expect(page.locator('#vehicle-name')).to_contain_text('Rover')
+    login(page,h.base,h.token,'/control');expect(page.locator('#vehicle-name')).to_contain_text('地面车')
     assert page.locator('#token').count()==0
     expect(page.locator('[data-action="Arm"]')).to_be_disabled()
-    page.locator('#acquire-control').click();expect(page.locator('#top-authority')).to_have_text('SEND ON')
+    page.locator('#acquire-control').click();expect(page.locator('#top-authority')).to_have_text('开启指令发送')
     expect(page.locator('#command-confirm')).not_to_be_visible();assert not h.lab.runtime.views()
-    page.locator('#release-control').click();expect(page.locator('#top-authority')).to_have_text('SEND OFF')
+    page.locator('#release-control').click();expect(page.locator('#top-authority')).to_have_text('关闭指令发送')
     expect(page.locator('[data-action="Arm"]')).to_be_disabled()
     page.screenshot(path=str(directory/'rover-desktop.png'),full_page=True)
     for kind in ('copter','plane','rover'):
      page.locator('#target').select_option(kind);expect(page.locator('#vehicle-name')).to_contain_text(kind,ignore_case=True)
-     expect(page.locator('#top-authority')).to_have_text('SEND OFF')
+     expect(page.locator('#top-authority')).to_have_text('关闭指令发送')
      if kind=='plane':
       expect(page.locator('[data-for=plane]')).to_be_visible();expect(page.get_by_role('button',name='悬停 · 不支持',exact=True)).to_be_disabled()
-      expect(page.locator('#vehicle-status')).to_contain_text('Airspeed')
+      expect(page.locator('#vehicle-status')).to_contain_text('空速')
      if kind=='copter':
       expect(page.locator('#takeoff-height')).to_have_value('1.5');expect(page.locator('#takeoff')).to_be_disabled()
     for width in (1680,1280,1024,768,390):
@@ -39,15 +39,15 @@ def run(directory):
     for path in ('/console#dashboard','/console#tools','/console#workspaces','/console#logs','/console#settings','/studio','/control','/'):
      page.goto(h.base+path);page.wait_for_function('window.VAFAuth && window.VAFAuth.session');assert '/login' not in page.url
      assert page.locator('#login-key').count()==0 and page.locator('#token').count()==0
-    page.goto(h.base+'/control');page.reload();expect(page.locator('#vehicle-name')).to_contain_text('Rover');expect(page.locator('#top-authority')).to_have_text('SEND OFF')
+    page.goto(h.base+'/control');page.reload();expect(page.locator('#vehicle-name')).to_contain_text('地面车');expect(page.locator('#top-authority')).to_have_text('关闭指令发送')
     assert page.evaluate('Object.keys(localStorage).length')==0
     # Browser transport reconnect must restore data without acquiring control.
-    page.locator('#acquire-control').click();expect(page.locator('#top-authority')).to_have_text('SEND ON')
+    page.locator('#acquire-control').click();expect(page.locator('#top-authority')).to_have_text('开启指令发送')
     context.set_offline(True);page.wait_for_timeout(2200);context.set_offline(False)
-    expect(page.locator('#top-authority')).to_have_text('SEND OFF',timeout=16000)
-    expect(page.locator('#vehicle-name')).to_contain_text('Rover',timeout=15000)
+    expect(page.locator('#top-authority')).to_have_text('关闭指令发送',timeout=16000)
+    expect(page.locator('#vehicle-name')).to_contain_text('地面车',timeout=15000)
     page.locator('[data-logout]').click();page.wait_for_url('**/login?next=**');expect(page.locator('#login-key')).to_be_visible()
-    login(page,h.base,h.token,'/control');expect(page.locator('#top-authority')).to_have_text('SEND OFF')
+    login(page,h.base,h.token,'/control');expect(page.locator('#top-authority')).to_have_text('关闭指令发送')
     h.server.sessions.lifetime_s=.01;page.wait_for_url('**/login?next=**',timeout=6000)
     report.update(passed=not errors,javascript_errors=errors,three_types=True,send_switch=True,per_action_authorization=False,one_login_across_pages=True,refresh_restores_session=True,reconnect_stays_observer=True,logout=True,expiry=True,widths=[1680,1280,1024,768,390],vehicle_writes=sum(len(d.writes) for d in h.drivers.values()))
     assert not errors and report['vehicle_writes']==0

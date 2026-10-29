@@ -76,7 +76,7 @@ class VisualizationAcceptance(ToolAcceptance):
                         visualization_lifecycle=self.lifecycle_test(page,base,api,actual,wait,context,directory))
                     assert {a['id'] for a in api('/api/instances')}==initial and not errors,errors
                     (directory/'web-control-result.json').write_text(json.dumps(result,indent=2));return result
-                page.locator('#acquire-control').click();expect(page.locator('#top-authority')).to_have_text('SEND ON')
+                page.locator('#acquire-control').click();expect(page.locator('#top-authority')).to_have_text('开启指令发送')
                 acceptance=self
                 class Check(BrowserControlCheck):
                     def hover_or_ground(inner):
@@ -94,7 +94,7 @@ class VisualizationAcceptance(ToolAcceptance):
                 assert all(a['stamp_ns']<b['stamp_ns'] for a,b in zip(records,records[1:]))
                 proof.update(final=final,observed_displacement_m=displacement,monotonic_stamps=True,one_tf_authority=True)
                 result['visualization']=proof;result['javascript_errors']=errors;assert not errors;check.save()
-                page.locator('#release-control').click();expect(page.locator('#top-authority')).to_have_text('SEND OFF');page.screenshot(path=str(directory/'vehicle-control-rviz.png'),full_page=True)
+                page.locator('#release-control').click();expect(page.locator('#top-authority')).to_have_text('关闭指令发送');page.screenshot(path=str(directory/'vehicle-control-rviz.png'),full_page=True)
                 if kind=='rover' and self.extended:
                     result['visualization_lifecycle']=self.lifecycle_test(page,base,api,actual,wait,context,directory)
                     check.save()
@@ -141,25 +141,25 @@ class VisualizationAcceptance(ToolAcceptance):
         row=page.locator('.workspace-row').filter(has_text=run['spec']['id']);row.get_by_role('button',name='按当前实例恢复记录',exact=True).click()
         wait(lambda:next((r for r in api('/api/console/state')['tools']['workspaces']['runs'] if r['id']==run['id'] and r['state']=='READY'),None),25)
         pids={k:v['instance']['pid'] for k,v in actual().items() if k in ('rviz2','visualization-bridge')}
-        row.get_by_role('button',name='Stop Workspace',exact=True).click()
+        row.get_by_role('button',name='停止工作区',exact=True).click()
         wait(lambda:next((r for r in api('/api/console/state')['tools']['workspaces']['runs'] if r['id']==run['id'] and r['state']=='STOPPED'),None),35)
         assert all(not Path('/proc',str(pid)).exists() for pid in pids.values())
         state=next(m for m in api('/api/studio/state')['missions'] if m['id']==mission_id);assert state['state'] not in ('CANCELLED','FAILED','UNKNOWN')
         page.goto(base+'/console#tools');bridge=page.locator('[data-tool="desktop:visualization-bridge"]');rviz=page.locator('[data-tool="desktop:rviz2"]')
-        bridge.locator('select').select_option('rover');bridge.get_by_role('button',name='Launch',exact=True).click()
+        bridge.locator('select').select_option('rover');bridge.get_by_role('button',name='启动',exact=True).click()
         wait(lambda:next((t for a in api('/api/console/state')['tools']['agents'] for t in a['tools'] if t['manifest']['id']=='visualization-bridge' and t['instance'] and t['instance']['ready']),None),60)
-        rviz.locator('select').select_option('rover');rviz.get_by_role('button',name='Launch',exact=True).click();first=wait(actual,90)
+        rviz.locator('select').select_option('rover');rviz.get_by_role('button',name='启动',exact=True).click();first=wait(actual,90)
         old=first['rviz2']['instance']['pid'];stable=first['visualization-bridge']['instance']['pid']
-        rviz.get_by_role('button',name='Logs',exact=True).click();expect(page.locator('#tool-detail pre')).not_to_have_text('')
-        rviz.get_by_role('button',name='Restart',exact=True).click()
+        rviz.get_by_role('button',name='日志',exact=True).click();expect(page.locator('#tool-detail pre')).not_to_have_text('')
+        rviz.get_by_role('button',name='重启',exact=True).click()
         second=wait(lambda:(v if (v:=actual()) and v['rviz2']['instance']['pid']!=old else None),90)
         assert not Path('/proc',str(old)).exists() and second['visualization-bridge']['instance']['pid']==stable
         # The Simulation preset validates the *same* running owned simulator;
         # these non-owning observers never start a second SITL or kill it.
         definition=api('/api/workspaces/template',dict(template_id='simulation-visualization',context=context));api('/api/workspaces/save',dict(spec=definition))
-        page.goto(base+'/console#workspaces');sim=page.locator('.workspace-row').filter(has_text=definition['id']);sim.get_by_role('button',name='Launch Workspace',exact=True).click()
+        page.goto(base+'/console#workspaces');sim=page.locator('.workspace-row').filter(has_text=definition['id']);sim.get_by_role('button',name='启动工作区',exact=True).click()
         prepared=wait(lambda:next((r for r in api('/api/console/state')['tools']['workspaces']['runs'] if r['spec']['id']==definition['id'] and r['state']=='READY'),None),90)
-        sim.get_by_role('button',name='Stop Workspace',exact=True).click();wait(lambda:next((r for r in api('/api/console/state')['tools']['workspaces']['runs'] if r['id']==prepared['id'] and r['state']=='STOPPED'),None),30)
+        sim.get_by_role('button',name='停止工作区',exact=True).click();wait(lambda:next((r for r in api('/api/console/state')['tools']['workspaces']['runs'] if r['id']==prepared['id'] and r['state']=='STOPPED'),None),30)
         assert actual()['visualization-bridge']['instance']['pid']==stable
         assert before=={a['id'] for a in api('/api/instances')}
         wait(lambda:next((m for m in api('/api/studio/state')['missions'] if m['id']==mission_id and m['state']=='SUCCEEDED'),None),30)
@@ -175,7 +175,7 @@ class VisualizationAcceptance(ToolAcceptance):
             from tests.visualization.desktop import goal
             goal(second['rviz2']['instance']['pid'],capture=directory/'rviz-source-disconnected.png',select=False)
         finally:os.kill(sitl,signal.SIGCONT)
-        rviz_pid=second['rviz2']['instance']['pid'];page.goto(base+'/console#tools');rviz=page.locator('[data-tool="desktop:rviz2"]');rviz.locator('select').select_option('rover');rviz.get_by_role('button',name='Stop',exact=True).click()
+        rviz_pid=second['rviz2']['instance']['pid'];page.goto(base+'/console#tools');rviz=page.locator('[data-tool="desktop:rviz2"]');rviz.locator('select').select_option('rover');rviz.get_by_role('button',name='停止',exact=True).click()
         wait(lambda:not Path('/proc',str(rviz_pid)).exists(),20)
         page.screenshot(path=str(directory/'tool-lifecycle.png'),full_page=True)
         return dict(actual_native_rviz_restart=True,logs=True,old_pid=old,new_pid=rviz_pid,bridge_pid_unchanged=stable,

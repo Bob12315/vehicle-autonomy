@@ -4,10 +4,10 @@ window.VAFVisualization=(()=>{
  function render(root,snapshot,target){
   if(!root)return;
   if(!root._view){
-   const button=document.createElement('button'),status=document.createElement('p');button.textContent='Open RViz2';button.className='primary';button.id='open-rviz';status.className='muted small-note';status.setAttribute('role','status');root.append(button,status);
+   const button=document.createElement('button'),status=document.createElement('p');button.textContent='打开 RViz2';button.className='primary';button.id='open-rviz';status.className='muted small-note';status.setAttribute('role','status');root.append(button,status);
    root._view={button,status,busy:false,target:null};
    button.onclick=async()=>{
-    const view=root._view;if(view.busy||!view.target)return;view.busy=true;button.disabled=true;status.textContent='Starting · 正在准备匹配的 Bridge 与桌面 RViz2…';
+    const view=root._view;if(view.busy||!view.target)return;view.busy=true;button.disabled=true;status.textContent='启动中 · 正在准备匹配的数据桥接与桌面 RViz2…';
     try{
      const target=view.target;let value;
      for(let attempt=0;attempt<30;attempt++){
@@ -31,7 +31,7 @@ window.VAFVisualization=(()=>{
   const run=(snapshot?.tools?.workspaces?.runs||[]).filter(r=>r.spec?.context?.vehicle_id===target&&r.spec.id.startsWith('visualization-')&&r.state!=='STOPPED').at(-1);
   view.button.disabled=view.busy||!target||!eligible.length;
   if(view.busy)return;
-  if(!eligible.length)view.status.textContent='Not Available · 需要在线 Desktop Agent、ROS 2、匹配的 Bridge/RViz Profile 和图形环境。';
+  if(!eligible.length)view.status.textContent='不可用 · 需要在线桌面代理程序、ROS 2、匹配的数据桥接和 RViz 运行配置，以及图形环境。';
   else if(run)view.status.textContent=run.state+' · '+(run.error||'匹配车辆 '+target+'；窗口在 Agent 桌面，未嵌入网页。');
   else view.status.textContent='按当前车辆自动选择 Profile、ROS Domain 与 Namespace；数据未接通不会标记 Ready。';
  }

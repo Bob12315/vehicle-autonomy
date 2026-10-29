@@ -1,10 +1,10 @@
 'use strict';
-const $=s=>document.querySelector(s),node=(tag,text,attrs={})=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text;for(const[k,v]of Object.entries(attrs))e.setAttribute(k,v);return e;};
+const $=s=>document.querySelector(s),node=(tag,text,attrs={})=>{const e=document.createElement(tag);if(tag==='option'&&text!==undefined&&!('value'in attrs))e.setAttribute('value',text);if(text!==undefined)e.textContent='data-original-text'in attrs?text:window.VAFI18n.text(text);for(const[k,v]of Object.entries(attrs))e.setAttribute(k,v);return e;};
 let snapshot=null,connected=false,busy=false,vehicleId='',kindFilter='',view='dashboard',lastReceived=0,settingsLoaded=false,detailSelection=null;
 const profileSelections=new Map();
 let workspaceDraft=null;
 const titles={dashboard:['车辆总览','遥测、执行状态与控制权，来自同一受控运行时。'],tools:['工具管理','选择运行主机，管理外部软件的生命周期与真实连接状态。'],workspaces:['工作环境','按声明的依赖准备工具，保留共享服务的所有权。'],logs:['日志与诊断','追踪工具启动、进程输出、失败和认证操作记录。'],settings:['设置','配置车辆上下文与已注册的工具 Profile。']};
-const kindNames={rover:'Rover · 地面车',copter:'Copter · 多旋翼',plane:'Plane · 固定翼'};
+const kindNames={rover:'地面车',copter:'多旋翼',plane:'固定翼'};
 let toolContext={vehicle_id:'rover',vehicle_type:'rover',environment:'simulation',ros_namespace:'/rover',ros_domain_id:91,mavlink_profile:'monitor'};
 const num=(v,d=2)=>typeof v==='number'&&Number.isFinite(v)?v.toFixed(d):'未知';
 const vector=v=>v?`X ${num(v.x)} / Y ${num(v.y)} / Z ${num(v.z)}`:'未知';
@@ -16,7 +16,7 @@ function route(){view=location.hash.slice(1)||'dashboard';if(!titles[view])view=
 window.addEventListener('hashchange',route);route();
 function linkState(ok){$('#link-state').textContent=ok?'控制中心已连接':'控制中心已断开 · 状态未知';$('#link-dot').style.background=ok?'#087e79':'#ad3c32';}
 function invalidate(){if(!snapshot)return;snapshot.vehicles=[];if(snapshot.tools){for(const a of snapshot.tools.agents){a.connected=false;for(const t of a.tools)if(t.instance)Object.assign(t.instance,{state:'DISCONNECTED',ready:false,process_running:null,service_health:'UNKNOWN',connection:'DISCONNECTED'});}for(const r of snapshot.tools.workspaces?.runs||[])if(!['STOPPED','ABANDONED'].includes(r.state)){r.state='UNKNOWN';r.error='Web 连接中断，远端状态未知';for(const c of r.components)c.observed_ready=false;}}$('#tool-detail').hidden=true;renderTools();renderWorkspaces();$('#dashboard-data').hidden=true;$('#vehicle-empty').hidden=false;$('#vehicle-empty').replaceChildren(node('strong','连接中断，当前状态未知'),node('p','连接恢复后同步完整状态。已显示的旧遥测不能用于操作。'));linkState(false);}
-async function poll(){if(busy||!connected)return;busy=true;try{snapshot=await api('/api/console/state');if(!settingsLoaded&&snapshot.tools?.settings){toolContext=snapshot.tools.settings.context;fillContext();settingsLoaded=true;}lastReceived=performance.now();linkState(true);$('#updated').textContent='已同步 '+new Date().toLocaleTimeString();render();}catch(e){invalidate();notice(e);}finally{busy=false;}}
+async function poll(){if(busy||!connected)return;busy=true;try{snapshot=await api('/api/console/state');if(!settingsLoaded&&snapshot.tools?.settings){toolContext=snapshot.tools.settings.context;fillContext();settingsLoaded=true;}lastReceived=performance.now();linkState(true);$('#updated').textContent='已同步 '+new Date().toLocaleTimeString('zh-CN',{hour12:false});render();}catch(e){invalidate();notice(e);}finally{busy=false;}}
 $('#reconnect').onclick=guard(async()=>{connected=true;notice('');await poll();});
 window.addEventListener('vaf:auth-lost',()=>{connected=false;invalidate();});
 window.VAFAuth.ready.then(s=>{if(s){connected=true;poll();}});

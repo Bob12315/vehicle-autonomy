@@ -6,6 +6,6 @@ form.onsubmit=async e=>{
  try{
   const r=await fetch('/api/auth/login',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:key.value})});
   key.value='';const data=await r.json();if(!r.ok||!data.ok)throw Error(data.error||'登录失败');location.replace(destination());
- }catch(e){key.value='';error.textContent=e.message;document.querySelector('#login-submit').disabled=false;}
+ }catch(e){key.value='';error.textContent=window.VAFI18n.error(e.message);document.querySelector('#login-submit').disabled=false;}
 };
 fetch('/api/auth/session',{credentials:'same-origin',cache:'no-store'}).then(r=>{if(r.ok)location.replace(destination());}).catch(()=>{});

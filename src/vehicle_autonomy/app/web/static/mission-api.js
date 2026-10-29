@@ -12,19 +12,19 @@ window.VAF = {
   stateNames:{IDLE:'待执行',VALIDATING:'校验中',WAITING:'等待中',READY:'就绪',STARTING:'启动中',RUNNING:'运行中',CANCELLING:'正在请求退出',SUCCEEDED:'已成功',COMPLETED:'已完成',FAILED:'失败',REJECTED:'已拒绝',CANCELLED:'已取消',TIMED_OUT:'已超时',UNKNOWN:'未知',UNCONFIRMED:'未确认'},
   fieldNames:{mode:'飞行 / 驾驶模式',height_m:'起飞高度（米）',x_m:'东向位置 E（米）',y_m:'北向位置 N（米）',z_m:'向上高度 U（米）',speed_mps:'行驶速度（米/秒）',yaw_rate_rad_s:'转向角速度（弧度/秒）',vx_mps:'X 方向速度（米/秒）',vy_mps:'Y 方向速度（米/秒）',vz_mps:'Z 方向速度（米/秒）',yaw_rad:'航向角（弧度）',frame:'坐标系',latitude_deg:'纬度（度）',longitude_deg:'经度（度）',altitude_amsl_m:'海拔高度 AMSL（米）',timeout_s:'超时（秒）',duration_s:'等待时长（秒）',count:'重复次数',output:'输出 Blackboard 键',event:'事件名称',op:'比较运算',source:'数据来源',path:'数据字段路径','value (JSON scalar)':'比较值（JSON 标量）',completion:'并行完成策略',failure:'并行失败策略'},
   typeLabel(type) { return this.nodeTypes[type]?.[0] || type; },
-  actionLabel(name) { return this.actionNames[name] || name; },
-  stateLabel(state) { return this.stateNames[state] || state; },
+  actionLabel(name) { return window.VAFI18n.text(this.actionNames[name] || name); },
+  stateLabel(state) { return window.VAFI18n.text(this.stateNames[state] || state); },
   kindLabel(kind) { return ({rover:'地面车',copter:'多旋翼',plane:'固定翼',OneShot:'单次动作',Goal:'目标动作',Continuous:'持续动作',Query:'只读查询'})[kind] || kind; },
-  fieldLabel(name) { return this.fieldNames[name] || name; },
+  fieldLabel(name) { return this.fieldNames[name] || window.VAFI18n.field(name); },
   connection(label, state) {
     const el=document.querySelector('#connection-state');if(el){el.textContent=label;el.dataset.state=state;}
   },
   async call(path, payload) { return window.VAFAuth.api(path,payload); },
   node(tag, text, attrs={}) {
-    const e = document.createElement(tag); if (text !== undefined) e.textContent = text;
+    const e = document.createElement(tag); if(tag==='option'&&text!==undefined&&!('value'in attrs))e.setAttribute('value',text);if (text !== undefined) e.textContent = window.VAFI18n.text(text);
     for (const [k,v] of Object.entries(attrs)) e.setAttribute(k,v); return e;
   },
-  report(error) { document.querySelector('#notice').textContent = String(error.message || error); },
+  report(error) { const display=document.querySelector('#notice');display.textContent=window.VAFI18n.error(error.originalMessage||error.message||error);display.title='原始诊断：'+(error.originalMessage||error.message||error); },
   async connect() {
     const vehicles = await this.call('/api/vehicles');
     const select = document.querySelector('#target'); select.replaceChildren();

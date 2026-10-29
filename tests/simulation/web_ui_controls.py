@@ -76,17 +76,17 @@ class ToolAcceptance:
                 page.locator('#context-form button[type=submit]').click()
                 expect(page.locator('#notice')).to_contain_text('上下文已保存')
                 page.locator('[data-view=tools]').click()
-                row.get_by_role('button', name='Launch', exact=True).click()
-                expect(row.locator('td:nth-child(4) .badge')).to_have_text('Ready', timeout=60000)
+                row.get_by_role('button', name='启动', exact=True).click()
+                expect(row.locator('td:nth-child(4) .badge')).to_have_text('已就绪', timeout=60000)
                 first = api('/api/console/state')['tools']['agents'][0]['tools'][0]['instance']
                 assert first['context']['vehicle_id'] == kind and first['owned'] is True
-                row.get_by_role('button', name='Connection', exact=True).click()
+                row.get_by_role('button', name='连接信息', exact=True).click()
                 expect(page.locator('#tool-detail')).to_contain_text('ros2')
-                row.get_by_role('button', name='Logs', exact=True).click()
+                row.get_by_role('button', name='日志', exact=True).click()
                 expect(page.locator('#tool-detail')).to_contain_text('vaf_tool_observer', timeout=15000)
                 page.screenshot(path=str(directory/'native-tools.png'), full_page=True, mask=[])
-                row.get_by_role('button', name='Restart', exact=True).click()
-                expect(row.locator('td:nth-child(4) .badge')).to_have_text('Ready', timeout=60000)
+                row.get_by_role('button', name='重启', exact=True).click()
+                expect(row.locator('td:nth-child(4) .badge')).to_have_text('已就绪', timeout=60000)
                 # A Ready badge can still be the previous instance while restart
                 # is queued. Verify a new actual PID and matching context too.
                 end = time.monotonic()+60
@@ -96,8 +96,8 @@ class ToolAcceptance:
                     assert time.monotonic() < end, 'native ROS tool restart did not replace instance'
                     page.wait_for_timeout(150)
                 assert not Path(f'/proc/{first["pid"]}').exists()
-                row.get_by_role('button', name='Stop', exact=True).click()
-                expect(row.locator('td:nth-child(3) small').first).to_have_text('STOPPED', timeout=30000)
+                row.get_by_role('button', name='停止', exact=True).click()
+                expect(row.locator('td:nth-child(3) small').first).to_have_text('已停止', timeout=30000)
                 assert not Path(f'/proc/{second["pid"]}').exists()
                 authority = api('/api/console/state')['vehicles'][0]['authority']
                 assert not authority['system_send'] and not authority['action_send']
@@ -105,7 +105,7 @@ class ToolAcceptance:
                 page.goto(base+'/control')
                 assert '/login' not in page.url
                 page.locator('#acquire-control').click()
-                expect(page.locator('#top-authority')).to_have_text('SEND ON')
+                expect(page.locator('#top-authority')).to_have_text('开启指令发送')
                 check = BrowserControlCheck(kind, api, oracle, directory, page)
                 check.result['native_tool'] = dict(name='ROS2 graph observer',
                     actual_native=True, launch=True, restart=True, stop=True,
@@ -114,7 +114,7 @@ class ToolAcceptance:
                 check.perform('Arm', allow_send=False, expected='REJECTED')
                 result = check.run()
                 page.locator('#release-control').click()
-                expect(page.locator('#top-authority')).to_have_text('SEND OFF')
+                expect(page.locator('#top-authority')).to_have_text('关闭指令发送')
                 page.screenshot(path=str(directory/'browser-controls.png'), full_page=True,
                     mask=[])
                 assert not errors, errors
@@ -160,10 +160,10 @@ class BrowserControlCheck(ControlCheck):
         else:
             button=page.locator('[data-action="'+name+'"]')
         if not allow_send:
-            page.locator('#release-control').click();expect(page.locator('#top-authority')).to_have_text('SEND OFF')
+            page.locator('#release-control').click();expect(page.locator('#top-authority')).to_have_text('关闭指令发送')
             expect(button).to_be_disabled();assert {a['id'] for a in self.call('/api/instances')}==before
             self.result['ui_without_send_on']='blocked before submission'
-            page.locator('#acquire-control').click();expect(page.locator('#top-authority')).to_have_text('SEND ON')
+            page.locator('#acquire-control').click();expect(page.locator('#top-authority')).to_have_text('开启指令发送')
             return None
         button.click();expect(page.locator('#command-confirm')).not_to_be_visible()
         a=self.wait(lambda:next((a for a in self.call('/api/instances') if a['id'] not in before),None),12)
@@ -261,9 +261,9 @@ class BrowserControlCheck(ControlCheck):
                 focus.send('Emulation.setFocusEmulationEnabled',{'enabled':True});focus.detach()
             page.keyboard.up('w')
         if mode=='offline':
-            expect(page.locator('#top-authority')).to_have_text('SEND OFF',timeout=16000)
+            expect(page.locator('#top-authority')).to_have_text('关闭指令发送',timeout=16000)
             page.locator('#acquire-control').click(timeout=20000)
-            expect(page.locator('#top-authority')).to_have_text('SEND ON')
+            expect(page.locator('#top-authority')).to_have_text('开启指令发送')
         self.save()
 
     def hover_or_ground(self):

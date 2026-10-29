@@ -1,6 +1,6 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Vehicle Autonomy · 任务与状态</title><link rel="stylesheet" href="/console.css"><script src="/auth.js" defer></script><script src="/console.js" defer></script></head>
-<body><header><div><small>VEHICLE AUTONOMY FRAMEWORK</small><h1>车辆任务与状态控制台</h1></div><span id="connection" class="badge">未认证</span><button data-logout type="button">退出登录</button></header>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>车辆自主系统 · 任务与状态</title><link rel="stylesheet" href="/console.css"><script src="/auth.js" defer></script><script src="/console.js" defer></script></head>
+<body><header><div><small>车辆自主系统框架</small><h1>车辆任务与状态控制台</h1></div><span id="connection" class="badge">未认证</span><button data-logout type="button">退出登录</button></header>
 <div class="notice">当前真实车辆保持只读。软件停止请求不代表物理已停车。动作测试须人在场、物理急停有效、区域隔离。</div>
 <section class="auth"><span>统一会话已登录</span><button id="connect">连接</button><span id="error" role="status"></span></section>
 <main><section class="panel"><h2>任务与车辆</h2><div id="summary" class="stats"></div><label>已注册任务 <select id="missions"></select></label><button id="start" disabled>启动所选任务</button><button id="cancel" class="danger">取消任务 / 软件停止请求</button><pre id="task">连接后查看任务结果</pre></section>
@@ -10,4 +10,4 @@
 <section class="panel wide"><h2>定位 / 传感器 / 故障诊断</h2><pre id="diagnostics"></pre><details><summary>完整实时状态和测试边界</summary><pre id="raw"></pre></details></section>
 <section class="panel wide"><h2>运行日志与操作结果</h2><pre id="logs"></pre></section>
 <section class="panel wide"><h2>版本验收报告</h2><button id="reports">读取已提交报告</button><pre id="report-text">请先连接，再读取当前发布版本的审计。</pre></section></main>
-<footer>Hardware-Ready 软件验证 · 实物安装、标定、制动与急停尚须现场验收 · 受保护的 Application API</footer></body></html>
+<footer>硬件就绪软件验证 · 实物安装、标定、制动与急停尚须现场验收 · 受保护的 应用接口</footer></body></html>

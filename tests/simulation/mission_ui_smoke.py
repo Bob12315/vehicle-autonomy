@@ -96,7 +96,8 @@ def run(directory):
         page=browser.new_page(viewport={'width':1680,'height':1100})
         page.on('pageerror',lambda e:errors.append(str(e)))
         try:
-            login(page,base,token,'/studio')
+            login(page,base,token,'/console')
+            page.goto(base+'/studio/legacy')
             expect(page.locator('h1')).to_have_text('任务编排')
             expect(page.locator('#empty-graph')).to_be_visible()
             for kind,label in [('Sequence','顺序执行'),('Parallel','并行执行'),('Condition','条件判断'),('Fallback','失败备选'),('Recovery','故障恢复'),('Event','事件触发'),('Reactive','事件响应'),('Wait','等待'),('Timeout','超时限制'),('Repeat','有限重复')]:
@@ -139,7 +140,7 @@ def run(directory):
                 if width==390:page.screenshot(path=str(directory/'studio-mobile.png'),full_page=True,mask=[])
             page.set_viewport_size({'width':1680,'height':1100});page.goto(base+'/control')
             expect(page.locator('#vehicle-name')).to_contain_text('v')
-            expect(page.locator('#top-authority')).to_have_text('SEND OFF')
+            expect(page.locator('#top-authority')).to_have_text('关闭指令发送')
             expect(page.locator('[data-action="Arm"]')).to_be_disabled()
             expect(page.locator('#vehicle-status')).to_contain_text('未知')
             expect(page.locator('#telemetry-warning')).to_contain_text('过期或未知')
@@ -157,7 +158,7 @@ def run(directory):
             driver.info=lambda:dict(target='v',kind='plane',connected=True,session_id='fixture',system_send=False,action_send=False)
             driver.context=lambda:ActionContext('v','plane',frozenset(capabilities('plane')),True)
             page.set_viewport_size({'width':1680,'height':1100});page.goto(base+'/control')
-            expect(page.locator('#vehicle-name')).to_contain_text('Plane')
+            expect(page.locator('#vehicle-name')).to_contain_text('固定翼')
             expect(page.locator('[data-action="Loiter"]')).to_be_disabled()
             expect(page.locator('#guided-target')).to_be_disabled()
             expect(page.locator('#acquire-control')).to_be_disabled()

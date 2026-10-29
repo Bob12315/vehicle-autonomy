@@ -50,9 +50,9 @@ def run(directory):
             try:
                 context=b.new_context(viewport={'width':1440,'height':1100});page=context.new_page();page.on('pageerror',lambda e:errors.append(str(e)))
                 page.on('request',lambda r:requests.append((r.url.split(h.base)[-1],r.post_data_json)) if r.method=='POST' and '/api/' in r.url else None)
-                login(page,h.base,h.token,'/control');expect(page.locator('#top-authority')).to_have_text('SEND OFF')
+                login(page,h.base,h.token,'/control');expect(page.locator('#top-authority')).to_have_text('关闭指令发送')
                 expect(page.locator('[data-action="Arm"]')).to_be_disabled();assert not h.lab.runtime.views()
-                page.get_by_role('button',name='SEND ON',exact=True).click();expect(page.locator('#top-authority')).to_have_text('SEND ON')
+                page.get_by_role('button',name='开启指令发送',exact=True).click();expect(page.locator('#top-authority')).to_have_text('开启指令发送')
                 assert not h.lab.runtime.views(),'switch itself created an Action'
                 def action(button):
                     before=len(h.lab.runtime.views());button.click()
@@ -63,7 +63,7 @@ def run(directory):
                         if len(actions)>before and actions[-1]['state']=='SUCCEEDED':break
                         page.wait_for_timeout(50)
                     else:raise AssertionError([(a['name'],a['state'],a['error']) for a in actions])
-                    expect(page.locator('#top-authority')).to_have_text('SEND ON')
+                    expect(page.locator('#top-authority')).to_have_text('开启指令发送')
                 page.locator('#mode').select_option('GUIDED');action(page.locator('#set-mode'))
                 action(page.locator('[data-action="Arm"]'));page.locator('#takeoff-height').fill('1.5');action(page.locator('#takeoff'))
                 panel=page.locator('#copter-advanced');panel.locator('summary').click()
@@ -113,11 +113,11 @@ def run(directory):
                 sent=[body for path,body in requests if path in ('/api/manual/action','/api/manual/start')];assert len(sent)==7 and all(p['allow_send'] is True for p in sent)
                 assert all(p['timeout_s']==60 for p in sent if p['name']=='SetVelocity')
                 assert page.locator('#send,#manual-send,#copter-manual-send,#confirm-send').count()==0
-                page.get_by_role('button',name='SEND OFF',exact=True).click();expect(page.locator('#top-authority')).to_have_text('SEND OFF');expect(page.locator('[data-action="Arm"]')).to_be_disabled()
+                page.get_by_role('button',name='关闭指令发送',exact=True).click();expect(page.locator('#top-authority')).to_have_text('关闭指令发送');expect(page.locator('[data-action="Arm"]')).to_be_disabled()
                 for kind in ('rover','plane'):
-                    page.locator('#target').select_option(kind);expect(page.locator('#top-authority')).to_have_text('SEND OFF')
-                    page.get_by_role('button',name='SEND ON',exact=True).click();expect(page.locator('#top-authority')).to_have_text('SEND ON');action(page.locator('[data-action="Arm"]'));action(page.locator('[data-action="Disarm"]'))
-                    page.get_by_role('button',name='SEND OFF',exact=True).click();expect(page.locator('#top-authority')).to_have_text('SEND OFF')
+                    page.locator('#target').select_option(kind);expect(page.locator('#top-authority')).to_have_text('关闭指令发送')
+                    page.get_by_role('button',name='开启指令发送',exact=True).click();expect(page.locator('#top-authority')).to_have_text('开启指令发送');action(page.locator('[data-action="Arm"]'));action(page.locator('[data-action="Disarm"]'))
+                    page.get_by_role('button',name='关闭指令发送',exact=True).click();expect(page.locator('#top-authority')).to_have_text('关闭指令发送')
                 page.set_viewport_size({'width':390,'height':1000});assert page.evaluate('document.documentElement.scrollWidth<=innerWidth');page.screenshot(path=str(directory/'send-switch-mobile.png'),full_page=True)
                 assert not errors and not any(d.writes for d in h.drivers.values())
             except Exception:

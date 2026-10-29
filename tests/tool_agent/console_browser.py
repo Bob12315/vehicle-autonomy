@@ -38,7 +38,7 @@ def run(directory):
             expect(page.locator('#context-vehicle')).to_have_value(kind)
             expect(page.locator('#context-type')).to_have_value(kind)
             expect(page.locator('#context-namespace')).to_have_value('/'+kind)
-            expect(page.locator('#metric-connection')).to_have_text('Disconnected');expect(page.locator('#metric-armed')).to_have_text('未知')
+            expect(page.locator('#metric-connection')).to_have_text('已断开');expect(page.locator('#metric-armed')).to_have_text('未知')
         page.screenshot(path=str(directory/'dashboard-desktop.png'),full_page=True)
         for name in ('tools','workspaces','logs','settings','dashboard'):
             page.locator(f'[data-view={name}]').click();expect(page.locator(f'[data-panel={name}]')).to_be_visible()

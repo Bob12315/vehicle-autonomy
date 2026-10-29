@@ -105,7 +105,7 @@ function properties(){
  }panel.append(edges);
  if(n.type==='Action'){
   const s=api.catalog.find(s=>s.name===n.action&&s.version===(n.action_version||s.version));
-  if(s){const semantics=api.node('details',undefined,{class:'technical-details'});semantics.append(api.node('summary','原始完成条件（英文）'),api.node('p',s.success_semantics,{class:'muted'}));panel.append(semantics);const form=api.node('div');form.id='node-parameters';
+  if(s){const semantics=api.node('details',undefined,{class:'technical-details'});semantics.append(api.node('summary','完成条件'),api.node('p',s.success_semantics,{class:'muted',title:'原始契约：'+s.success_semantics}));panel.append(semantics);const form=api.node('div');form.id='node-parameters';
    api.parameters(form,s.parameters,n.parameters||={},()=>{remember(before);before=text();$('#json').value=JSON.stringify(draft,null,2);});let before=text();panel.append(form);}
   if(s){
    const box=api.node('details'),title=api.node('summary','类型化观测参数绑定');box.append(title);
