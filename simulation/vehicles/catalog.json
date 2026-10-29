@@ -1,0 +1,153 @@
+{
+  "schema_version": 1,
+  "scope": "owned localhost Gazebo / SITL only; READY describes locked inputs, not control acceptance",
+  "vehicles": {
+    "rover": {
+      "version": "1.0.0",
+      "model_name": "target_rover",
+      "model_path": "root:simulation/models/target_rover/model.sdf",
+      "profile_path": "root:simulation/profiles/rover_phase2.toml",
+      "binary": "ardupilot:build/sitl/bin/ardurover",
+      "parameters": [
+        "ardupilot:Tools/autotest/default_params/rover.parm",
+        "ardupilot:Tools/autotest/default_params/rover-skid.parm",
+        "root:simulation/params/rover_telemetry.parm",
+        "root:simulation/params/rover_phase2_rtl.parm"
+      ],
+      "clearance_z": 0,
+      "radius": 0.72,
+      "height": 0.5,
+      "compatibility": "World spawn/terrain/runway compatibility requires separate admission and native acceptance.",
+      "locks": {
+        "root:simulation/models/target_rover/model.config": "c5c97c0f63c9731b394d9ce119e7f34403523a2f2fbaaa2c14391b0e340c9246",
+        "root:simulation/models/target_rover/model.sdf": "1308b16b3d50142e50ffd6296d892be070ab006c4d9ebef8d5d08283e8ae50b0",
+        "root:simulation/models/target_rover/navigation.sdf": "e1c17c52b5c1a0329448425b91f7f42b82083212a700e9225ca576018c374a9c",
+        "ardupilot:build/sitl/bin/ardurover": "437d2226018c648eeeaedb40ef09739f828319e68a083e41f866c577186c5bd5",
+        "root:simulation/profiles/rover_phase2.toml": "128b41393106b2943be2b1d5d0415f78858c4d6192f2dd3d1a9ee71a03d92f0d",
+        "ardupilot:Tools/autotest/default_params/rover.parm": "6479879d3e625854a6c32cb4d3fe231bab81d935e07904eac8a411fd6f971bc4",
+        "ardupilot:Tools/autotest/default_params/rover-skid.parm": "45a572363fc0bb1459ec676eafcf379f9f7a0823a3cf2be7a3d9f54c2e2c53a9",
+        "root:simulation/params/rover_telemetry.parm": "6454dca91e80d62756d96aeb7db8d9dcae241d8b06899558d0ed4cb0c0f21274",
+        "root:simulation/params/rover_phase2_rtl.parm": "f63976f6fcc47756735712f4f18cd6651b1cd17b36bb35573363c9f8283052e0",
+        "plugin:build/libArduPilotPlugin.so": "3fa3870925bdba87f66bd931325388442cf9037bdd57dd04a557e253d64a778d",
+        "plugin:src/ArduPilotPlugin.cc": "e00c3fc98e2ef8e37c9fb6a537c4f6fb599b1e8e3f90885d4916eaa04baac868",
+        "plugin:CMakeLists.txt": "8362907b82bb36adf8d22f4ba0a1defa31cabcbdf2168a955f3f932eeed41875"
+      }
+    },
+    "copter": {
+      "version": "1.0.0",
+      "model_name": "iris_with_gimbal",
+      "model_path": "plugin:models/iris_with_gimbal/model.sdf",
+      "profile_path": "root:simulation/profiles/copter.toml",
+      "binary": "ardupilot:build/sitl/bin/arducopter",
+      "parameters": [
+        "ardupilot:Tools/autotest/default_params/copter.parm",
+        "ardupilot:Tools/autotest/default_params/gazebo-iris.parm",
+        "root:simulation/params/copter_telemetry.parm"
+      ],
+      "clearance_z": 0.195,
+      "radius": 0.65,
+      "height": 0.5,
+      "compatibility": "World spawn/terrain/runway compatibility requires separate admission and native acceptance.",
+      "locks": {
+        "plugin:models/iris_with_gimbal/model.config": "4adab40661c01797fc66d6a30249c979968558679e35bf2b1424f3630ba75982",
+        "plugin:models/iris_with_gimbal/model.sdf": "9071f778f924de31f754abc2b701fc66d3e8c98fb8fa2958430083d9c1f160ee",
+        "plugin:models/iris_with_standoffs/meshes/iris.dae": "697956cfc0fe608afc52a0f688de50354b89e5201056451cf6bb767de8f46323",
+        "plugin:models/iris_with_standoffs/meshes/iris_collision.stl": "66b85caa021497ea73dbaed08c72da381a6157116244ea3860a1ba445f50102c",
+        "plugin:models/iris_with_standoffs/meshes/iris_prop_ccw.dae": "5f8b01668ee24a5b663ca8c4dd56e294fd6480db7eec1e5a7c11e45ba9004e99",
+        "plugin:models/iris_with_standoffs/meshes/iris_prop_cw.dae": "6cbc686772dccd46253fb65ece000e7ffa6a74b9c097bda349884bd1e78cd879",
+        "plugin:models/iris_with_standoffs/model.config": "e419cc7681f730edf14398baa577a4f05cd34e2cebaa764c508119c4465b34b7",
+        "plugin:models/iris_with_standoffs/model.sdf": "2c4e8ccf4385f329af905cce1cbceff96656da4ace9353c0ec6ca09df3c442d0",
+        "plugin:models/gimbal_small_3d/meshes/base_plate.dae": "a657c60d7a35202d67c450a11211d757d423fbce4e03df8e14d03e69702a2b5b",
+        "plugin:models/gimbal_small_3d/meshes/camera_enclosure.dae": "0ca4024657bd4308f741b5200db75c04c6d4b8eb5dc213fcb718bc1ae0185809",
+        "plugin:models/gimbal_small_3d/meshes/roll_arm.dae": "66cd656cf30ef7f8cfae383433c2524269a6da55067116f5df980327510b3721",
+        "plugin:models/gimbal_small_3d/meshes/yaw_arm.dae": "139726d4d8e43bcd1778538d684e2edcab6812f262fdd0835c2a7c7947006ed5",
+        "plugin:models/gimbal_small_3d/model.config": "2bd4eb64a7784dcd16373c01107d9b38d65624592dd41c9c7a3f0365c274e5b7",
+        "plugin:models/gimbal_small_3d/model.sdf": "fe3ce1c87d28ea1136dc86df9a0f0606cb2e63e8d57e8e32e6db456ab8acb06c",
+        "ardupilot:build/sitl/bin/arducopter": "04497f6682095c319520fe9deb79367a959de6c05cb1d85a3b114e8f837ab878",
+        "root:simulation/profiles/copter.toml": "ecc4f3f563ad80c96684d72e4d24c7347840212360474f20e3181649eaa7102b",
+        "ardupilot:Tools/autotest/default_params/copter.parm": "5e01345b45d1c6190b28bece5638bbdd4cf1cce35e05bbbf480ab24d2b51aa0e",
+        "ardupilot:Tools/autotest/default_params/gazebo-iris.parm": "4aee140cbb29b967e4519e4c84c4b389a2172c30e542f36b4fba4c118b4d4750",
+        "root:simulation/params/copter_telemetry.parm": "d4ac5ffcf683655239c4b6484ec0d990679ddbaf4a9766cd819f7982a2554e88",
+        "plugin:build/libArduPilotPlugin.so": "3fa3870925bdba87f66bd931325388442cf9037bdd57dd04a557e253d64a778d",
+        "plugin:src/ArduPilotPlugin.cc": "e00c3fc98e2ef8e37c9fb6a537c4f6fb599b1e8e3f90885d4916eaa04baac868",
+        "plugin:CMakeLists.txt": "8362907b82bb36adf8d22f4ba0a1defa31cabcbdf2168a955f3f932eeed41875"
+      }
+    },
+    "plane": {
+      "version": "1.0.0",
+      "model_name": "twin_cessna",
+      "model_path": "twin:models/twin_cessna/model.sdf",
+      "profile_path": "root:simulation/profiles/plane.toml",
+      "binary": "ardupilot:build/sitl/bin/arduplane",
+      "parameters": [
+        "ardupilot:Tools/autotest/models/plane.parm",
+        "twin:config/twin.parm",
+        "root:simulation/params/twin_plane_control.parm"
+      ],
+      "clearance_z": 0.22,
+      "radius": 1.5,
+      "height": 0.65,
+      "compatibility": "World spawn/terrain/runway compatibility requires separate admission and native acceptance.",
+      "locks": {
+        "twin:models/twin_cessna/meshes/body.dae": "d33feef517d7dd84a902cc85022e492a9a4e411e7562d1f91d098a99af28e56c",
+        "twin:models/twin_cessna/meshes/elevators.dae": "bfe4f2065e2c25239f1c8f31bd7be4e7b74ca60a8dcf76451b45b1cb3d46c1cd",
+        "twin:models/twin_cessna/meshes/iris_prop_ccw.dae": "5f8b01668ee24a5b663ca8c4dd56e294fd6480db7eec1e5a7c11e45ba9004e99",
+        "twin:models/twin_cessna/meshes/iris_prop_cw.dae": "6cbc686772dccd46253fb65ece000e7ffa6a74b9c097bda349884bd1e78cd879",
+        "twin:models/twin_cessna/meshes/left_aileron.dae": "b3f472b648018fbeb777a4efd0482cd2d3076b091bcb63c33ccb9700c098d162",
+        "twin:models/twin_cessna/meshes/left_flap.dae": "3e311e33a9a0053e56e9d935b23202fb8cb35a31a41e32819e89d1c948b8cf78",
+        "twin:models/twin_cessna/meshes/propeller_ccw.dae": "3d8d39737cf6df9dfaa1cf7b05be4bac396001f53dcdb1c6af1a72cc925bf52c",
+        "twin:models/twin_cessna/meshes/propeller_cw.dae": "09994038cb7fe9e8f719e9944bddd084979ddb84cb8dfc7e1dbfef2e88355e0a",
+        "twin:models/twin_cessna/meshes/right_aileron.dae": "ea482f04045c6199d96c0e348647d6ee3735722aecff77ca04d857a3620bc864",
+        "twin:models/twin_cessna/meshes/right_flap.dae": "6cfb11bee2a8b73a75f258fd2092f377644dfbef3954e876c4ad37808c16248c",
+        "twin:models/twin_cessna/meshes/rudder.dae": "f2f2c1bc866f05d2c6453b64e91fb0cfc936d8549a8317ac19222b3baf31c2e4",
+        "twin:models/twin_cessna/model.config": "7c2e4665a80745ad3cb62d3f082d5784f538df433b8719ff939e935a7640558a",
+        "twin:models/twin_cessna/model.sdf": "eb39fc1b201463f7d1fde9f95d36aa83f41e4e7cd9fef88f2744146c63d2a9d6",
+        "ardupilot:build/sitl/bin/arduplane": "11bbd12067d4d6bac324766d9c926826e9dec02063c8565326829fb541dd8c1a",
+        "root:simulation/profiles/plane.toml": "bf2e01cb019cc226235d2355c8ac3c85c1a1e563e08514e1203c27c80dd813ab",
+        "ardupilot:Tools/autotest/models/plane.parm": "2409de9872166bbfe78cf33e5c69203cf0a2918da3c165be51ab567becabc248",
+        "twin:config/twin.parm": "126eb0a2e6af0d5334bc45919a417b98f8cd8ccd6591f69dbef38b9d8ce4cc6d",
+        "root:simulation/params/twin_plane_control.parm": "b1c680b44364013557f4d13fff47dd3cbc76b8cc87060995faff80da7df00673",
+        "plugin:build/libArduPilotPlugin.so": "3fa3870925bdba87f66bd931325388442cf9037bdd57dd04a557e253d64a778d",
+        "plugin:src/ArduPilotPlugin.cc": "e00c3fc98e2ef8e37c9fb6a537c4f6fb599b1e8e3f90885d4916eaa04baac868",
+        "plugin:CMakeLists.txt": "8362907b82bb36adf8d22f4ba0a1defa31cabcbdf2168a955f3f932eeed41875",
+        "twin:plugins/TwinPayload.cc": "64031101e72fc5b6134e7b90770ac7ccae15501590a1aaef6cc686255b66bb47",
+        "twin:plugins/CMakeLists.txt": "e94d1f20f74b79ee2bd0269137e58001eca1c52371a16a1f42f3d3ebed269b2b"
+      }
+    },
+    "vtol": {
+      "version": "blocked-1",
+      "model_name": null,
+      "model_path": null,
+      "profile_path": null,
+      "binary": null,
+      "parameters": [],
+      "clearance_z": null,
+      "radius": null,
+      "height": null,
+      "reason": "Official Gazebo QuadPlane candidate and AP JSON control mapping exist. Framework has no dedicated VTOL capability/profile/Safety/translator/Actions, and this candidate has not passed native SITL/flight/transition/landing acceptance. Model asset license clearance remains unresolved. Conventional Plane is not substituted.",
+      "audit_path": "simulation/vehicles/vtol-audit.json",
+      "candidates": [
+        {
+          "model_name": "skywalker_x8_quad",
+          "repository": "ArduPilot/SITL_Models",
+          "commit": "25bc38ed8c6c0345840159a8cbc0b02781d52f3c",
+          "model_available": true,
+          "framework_profile_available": false
+        },
+        {
+          "model_name": "alti_transition_quad",
+          "repository": "ArduPilot/ardupilot_gz",
+          "commit": "8df4dc1726e37504e6fc8b952d02e554cfa3176f",
+          "model_available": true,
+          "framework_profile_available": false
+        }
+      ]
+    }
+  },
+  "provenance": {
+    "ardupilot_commit": "b5fbe26515eddb9277e1b5e7a4fcf3f37cf449a6",
+    "ardupilot_gazebo_commit": "3ec51428fd43deb7b71137192ba16394b450d78e",
+    "plugin_abi": "gz-sim8/gz-transport13/gz-msgs10/sdformat14; binary hash is locked",
+    "twin_cessna": "Existing local twin-fixedwing model and payload source, all files SHA locked; no asset redistribution license claimed"
+  }
+}

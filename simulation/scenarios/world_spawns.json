@@ -1,0 +1,1472 @@
+{
+  "schema": 1,
+  "minimum_peer_margin_m": 0.5,
+  "ground_tolerance_m": 0.02,
+  "maximum_surface_step_m": 0.05,
+  "worlds": {
+    "R01": {
+      "audit": "generated-flat-primitives-v1",
+      "allowed_families": [
+        "rover",
+        "copter"
+      ],
+      "blocked_reasons": {
+        "vtol": "BLOCKED: no qualified VTOL vehicle model/control profile",
+        "plane": "BLOCKED: no audited conventional-plane runway corridor"
+      },
+      "regions": [
+        {
+          "id": "central-ground",
+          "bounds": [
+            -4,
+            4,
+            -9,
+            9
+          ],
+          "families": [
+            "rover",
+            "copter"
+          ]
+        }
+      ],
+      "presets": [
+        {
+          "id": "center",
+          "name": "中心",
+          "x": 0,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "north",
+          "name": "北侧 3 米",
+          "x": 0,
+          "y": 3,
+          "heading_deg": 0
+        },
+        {
+          "id": "south",
+          "name": "南侧 3 米",
+          "x": 0,
+          "y": -3,
+          "heading_deg": 0
+        },
+        {
+          "id": "north-far",
+          "name": "北侧 6 米",
+          "x": 0,
+          "y": 6,
+          "heading_deg": 0
+        },
+        {
+          "id": "south-far",
+          "name": "南侧 6 米",
+          "x": 0,
+          "y": -6,
+          "heading_deg": 0
+        }
+      ]
+    },
+    "R02": {
+      "audit": "generated-flat-primitives-v1",
+      "allowed_families": [
+        "rover",
+        "copter"
+      ],
+      "blocked_reasons": {
+        "vtol": "BLOCKED: no qualified VTOL vehicle model/control profile",
+        "plane": "BLOCKED: no audited conventional-plane runway corridor"
+      },
+      "regions": [
+        {
+          "id": "central-ground",
+          "bounds": [
+            -4,
+            4,
+            -9,
+            9
+          ],
+          "families": [
+            "rover",
+            "copter"
+          ]
+        }
+      ],
+      "presets": [
+        {
+          "id": "center",
+          "name": "中心",
+          "x": 0,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "north",
+          "name": "北侧 3 米",
+          "x": 0,
+          "y": 3,
+          "heading_deg": 0
+        },
+        {
+          "id": "south",
+          "name": "南侧 3 米",
+          "x": 0,
+          "y": -3,
+          "heading_deg": 0
+        },
+        {
+          "id": "north-far",
+          "name": "北侧 6 米",
+          "x": 0,
+          "y": 6,
+          "heading_deg": 0
+        },
+        {
+          "id": "south-far",
+          "name": "南侧 6 米",
+          "x": 0,
+          "y": -6,
+          "heading_deg": 0
+        }
+      ]
+    },
+    "R03": {
+      "audit": "generated-flat-primitives-v1",
+      "allowed_families": [
+        "rover",
+        "copter"
+      ],
+      "blocked_reasons": {
+        "vtol": "BLOCKED: no qualified VTOL vehicle model/control profile",
+        "plane": "BLOCKED: no audited conventional-plane runway corridor"
+      },
+      "regions": [
+        {
+          "id": "central-ground",
+          "bounds": [
+            -4,
+            4,
+            -9,
+            9
+          ],
+          "families": [
+            "rover",
+            "copter"
+          ]
+        }
+      ],
+      "presets": [
+        {
+          "id": "center",
+          "name": "中心",
+          "x": 0,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "north",
+          "name": "北侧 3 米",
+          "x": 0,
+          "y": 3,
+          "heading_deg": 0
+        },
+        {
+          "id": "south",
+          "name": "南侧 3 米",
+          "x": 0,
+          "y": -3,
+          "heading_deg": 0
+        },
+        {
+          "id": "north-far",
+          "name": "北侧 6 米",
+          "x": 0,
+          "y": 6,
+          "heading_deg": 0
+        },
+        {
+          "id": "south-far",
+          "name": "南侧 6 米",
+          "x": 0,
+          "y": -6,
+          "heading_deg": 0
+        }
+      ]
+    },
+    "R04": {
+      "audit": "generated-flat-primitives-v1",
+      "allowed_families": [
+        "rover",
+        "copter"
+      ],
+      "blocked_reasons": {
+        "vtol": "BLOCKED: no qualified VTOL vehicle model/control profile",
+        "plane": "BLOCKED: no audited conventional-plane runway corridor"
+      },
+      "regions": [
+        {
+          "id": "central-ground",
+          "bounds": [
+            -4,
+            4,
+            -9,
+            9
+          ],
+          "families": [
+            "rover",
+            "copter"
+          ]
+        }
+      ],
+      "presets": [
+        {
+          "id": "center",
+          "name": "中心",
+          "x": 0,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "north",
+          "name": "北侧 3 米",
+          "x": 0,
+          "y": 3,
+          "heading_deg": 0
+        },
+        {
+          "id": "south",
+          "name": "南侧 3 米",
+          "x": 0,
+          "y": -3,
+          "heading_deg": 0
+        },
+        {
+          "id": "north-far",
+          "name": "北侧 6 米",
+          "x": 0,
+          "y": 6,
+          "heading_deg": 0
+        },
+        {
+          "id": "south-far",
+          "name": "南侧 6 米",
+          "x": 0,
+          "y": -6,
+          "heading_deg": 0
+        }
+      ]
+    },
+    "R05": {
+      "audit": "generated-flat-primitives-v1",
+      "allowed_families": [],
+      "blocked_reasons": {
+        "vtol": "BLOCKED: no qualified VTOL vehicle model/control profile",
+        "plane": "BLOCKED: force-driven dynamic target envelope is not bounded for vehicle spawning",
+        "rover": "BLOCKED: force-driven dynamic target envelope is not bounded for vehicle spawning",
+        "copter": "BLOCKED: force-driven dynamic target envelope is not bounded for vehicle spawning"
+      },
+      "regions": [],
+      "presets": []
+    },
+    "R06": {
+      "audit": "generated-flat-primitives-v1",
+      "allowed_families": [
+        "rover",
+        "copter"
+      ],
+      "blocked_reasons": {
+        "vtol": "BLOCKED: no qualified VTOL vehicle model/control profile",
+        "plane": "BLOCKED: no audited conventional-plane runway corridor"
+      },
+      "regions": [
+        {
+          "id": "central-ground",
+          "bounds": [
+            -4,
+            4,
+            -9,
+            9
+          ],
+          "families": [
+            "rover",
+            "copter"
+          ]
+        }
+      ],
+      "presets": [
+        {
+          "id": "center",
+          "name": "中心",
+          "x": 0,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "north",
+          "name": "北侧 3 米",
+          "x": 0,
+          "y": 3,
+          "heading_deg": 0
+        },
+        {
+          "id": "south",
+          "name": "南侧 3 米",
+          "x": 0,
+          "y": -3,
+          "heading_deg": 0
+        },
+        {
+          "id": "north-far",
+          "name": "北侧 6 米",
+          "x": 0,
+          "y": 6,
+          "heading_deg": 0
+        },
+        {
+          "id": "south-far",
+          "name": "南侧 6 米",
+          "x": 0,
+          "y": -6,
+          "heading_deg": 0
+        }
+      ]
+    },
+    "R07": {
+      "audit": "generated-flat-primitives-v1",
+      "allowed_families": [
+        "rover",
+        "copter"
+      ],
+      "blocked_reasons": {
+        "vtol": "BLOCKED: no qualified VTOL vehicle model/control profile",
+        "plane": "BLOCKED: no audited conventional-plane runway corridor"
+      },
+      "regions": [
+        {
+          "id": "central-ground",
+          "bounds": [
+            -4,
+            4,
+            -9,
+            9
+          ],
+          "families": [
+            "rover",
+            "copter"
+          ]
+        }
+      ],
+      "presets": [
+        {
+          "id": "center",
+          "name": "中心",
+          "x": 0,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "north",
+          "name": "北侧 3 米",
+          "x": 0,
+          "y": 3,
+          "heading_deg": 0
+        },
+        {
+          "id": "south",
+          "name": "南侧 3 米",
+          "x": 0,
+          "y": -3,
+          "heading_deg": 0
+        },
+        {
+          "id": "north-far",
+          "name": "北侧 6 米",
+          "x": 0,
+          "y": 6,
+          "heading_deg": 0
+        },
+        {
+          "id": "south-far",
+          "name": "南侧 6 米",
+          "x": 0,
+          "y": -6,
+          "heading_deg": 0
+        }
+      ]
+    },
+    "R08": {
+      "audit": "generated-flat-primitives-v1",
+      "allowed_families": [
+        "rover",
+        "copter"
+      ],
+      "blocked_reasons": {
+        "vtol": "BLOCKED: no qualified VTOL vehicle model/control profile",
+        "plane": "BLOCKED: no audited conventional-plane runway corridor"
+      },
+      "regions": [
+        {
+          "id": "central-ground",
+          "bounds": [
+            -4,
+            4,
+            -9,
+            9
+          ],
+          "families": [
+            "rover",
+            "copter"
+          ]
+        }
+      ],
+      "presets": [
+        {
+          "id": "center",
+          "name": "中心",
+          "x": 0,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "north",
+          "name": "北侧 3 米",
+          "x": 0,
+          "y": 3,
+          "heading_deg": 0
+        },
+        {
+          "id": "south",
+          "name": "南侧 3 米",
+          "x": 0,
+          "y": -3,
+          "heading_deg": 0
+        },
+        {
+          "id": "north-far",
+          "name": "北侧 6 米",
+          "x": 0,
+          "y": 6,
+          "heading_deg": 0
+        },
+        {
+          "id": "south-far",
+          "name": "南侧 6 米",
+          "x": 0,
+          "y": -6,
+          "heading_deg": 0
+        }
+      ]
+    },
+    "C01": {
+      "audit": "generated-flat-primitives-v1",
+      "allowed_families": [
+        "rover",
+        "copter"
+      ],
+      "blocked_reasons": {
+        "vtol": "BLOCKED: no qualified VTOL vehicle model/control profile",
+        "plane": "BLOCKED: no audited conventional-plane runway corridor"
+      },
+      "regions": [
+        {
+          "id": "central-ground",
+          "bounds": [
+            -4,
+            4,
+            -9,
+            9
+          ],
+          "families": [
+            "rover",
+            "copter"
+          ]
+        }
+      ],
+      "presets": [
+        {
+          "id": "center",
+          "name": "中心",
+          "x": 0,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "north",
+          "name": "北侧 3 米",
+          "x": 0,
+          "y": 3,
+          "heading_deg": 0
+        },
+        {
+          "id": "south",
+          "name": "南侧 3 米",
+          "x": 0,
+          "y": -3,
+          "heading_deg": 0
+        },
+        {
+          "id": "north-far",
+          "name": "北侧 6 米",
+          "x": 0,
+          "y": 6,
+          "heading_deg": 0
+        },
+        {
+          "id": "south-far",
+          "name": "南侧 6 米",
+          "x": 0,
+          "y": -6,
+          "heading_deg": 0
+        }
+      ]
+    },
+    "C02": {
+      "audit": "generated-flat-primitives-v1",
+      "allowed_families": [
+        "rover",
+        "copter"
+      ],
+      "blocked_reasons": {
+        "vtol": "BLOCKED: no qualified VTOL vehicle model/control profile",
+        "plane": "BLOCKED: no audited conventional-plane runway corridor"
+      },
+      "regions": [
+        {
+          "id": "central-ground",
+          "bounds": [
+            -4,
+            4,
+            -9,
+            9
+          ],
+          "families": [
+            "rover",
+            "copter"
+          ]
+        }
+      ],
+      "presets": [
+        {
+          "id": "center",
+          "name": "中心",
+          "x": 0,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "north",
+          "name": "北侧 3 米",
+          "x": 0,
+          "y": 3,
+          "heading_deg": 0
+        },
+        {
+          "id": "south",
+          "name": "南侧 3 米",
+          "x": 0,
+          "y": -3,
+          "heading_deg": 0
+        },
+        {
+          "id": "north-far",
+          "name": "北侧 6 米",
+          "x": 0,
+          "y": 6,
+          "heading_deg": 0
+        },
+        {
+          "id": "south-far",
+          "name": "南侧 6 米",
+          "x": 0,
+          "y": -6,
+          "heading_deg": 0
+        }
+      ]
+    },
+    "C03": {
+      "audit": "generated-flat-primitives-v1",
+      "allowed_families": [
+        "rover",
+        "copter"
+      ],
+      "blocked_reasons": {
+        "vtol": "BLOCKED: no qualified VTOL vehicle model/control profile",
+        "plane": "BLOCKED: no audited conventional-plane runway corridor"
+      },
+      "regions": [
+        {
+          "id": "central-ground",
+          "bounds": [
+            -4,
+            4,
+            -9,
+            9
+          ],
+          "families": [
+            "rover",
+            "copter"
+          ]
+        }
+      ],
+      "presets": [
+        {
+          "id": "center",
+          "name": "中心",
+          "x": 0,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "north",
+          "name": "北侧 3 米",
+          "x": 0,
+          "y": 3,
+          "heading_deg": 0
+        },
+        {
+          "id": "south",
+          "name": "南侧 3 米",
+          "x": 0,
+          "y": -3,
+          "heading_deg": 0
+        },
+        {
+          "id": "north-far",
+          "name": "北侧 6 米",
+          "x": 0,
+          "y": 6,
+          "heading_deg": 0
+        },
+        {
+          "id": "south-far",
+          "name": "南侧 6 米",
+          "x": 0,
+          "y": -6,
+          "heading_deg": 0
+        }
+      ]
+    },
+    "C04": {
+      "audit": "generated-flat-primitives-v1",
+      "allowed_families": [
+        "rover",
+        "copter"
+      ],
+      "blocked_reasons": {
+        "vtol": "BLOCKED: no qualified VTOL vehicle model/control profile",
+        "plane": "BLOCKED: no audited conventional-plane runway corridor"
+      },
+      "regions": [
+        {
+          "id": "central-ground",
+          "bounds": [
+            -4,
+            4,
+            -9,
+            9
+          ],
+          "families": [
+            "rover",
+            "copter"
+          ]
+        }
+      ],
+      "presets": [
+        {
+          "id": "center",
+          "name": "中心",
+          "x": 0,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "north",
+          "name": "北侧 3 米",
+          "x": 0,
+          "y": 3,
+          "heading_deg": 0
+        },
+        {
+          "id": "south",
+          "name": "南侧 3 米",
+          "x": 0,
+          "y": -3,
+          "heading_deg": 0
+        },
+        {
+          "id": "north-far",
+          "name": "北侧 6 米",
+          "x": 0,
+          "y": 6,
+          "heading_deg": 0
+        },
+        {
+          "id": "south-far",
+          "name": "南侧 6 米",
+          "x": 0,
+          "y": -6,
+          "heading_deg": 0
+        }
+      ]
+    },
+    "C05": {
+      "audit": "generated-flat-primitives-v1",
+      "allowed_families": [
+        "rover",
+        "copter"
+      ],
+      "blocked_reasons": {
+        "vtol": "BLOCKED: no qualified VTOL vehicle model/control profile",
+        "plane": "BLOCKED: no audited conventional-plane runway corridor"
+      },
+      "regions": [
+        {
+          "id": "central-ground",
+          "bounds": [
+            -4,
+            4,
+            -9,
+            9
+          ],
+          "families": [
+            "rover",
+            "copter"
+          ]
+        }
+      ],
+      "presets": [
+        {
+          "id": "center",
+          "name": "中心",
+          "x": 0,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "north",
+          "name": "北侧 3 米",
+          "x": 0,
+          "y": 3,
+          "heading_deg": 0
+        },
+        {
+          "id": "south",
+          "name": "南侧 3 米",
+          "x": 0,
+          "y": -3,
+          "heading_deg": 0
+        },
+        {
+          "id": "north-far",
+          "name": "北侧 6 米",
+          "x": 0,
+          "y": 6,
+          "heading_deg": 0
+        },
+        {
+          "id": "south-far",
+          "name": "南侧 6 米",
+          "x": 0,
+          "y": -6,
+          "heading_deg": 0
+        }
+      ]
+    },
+    "C06": {
+      "audit": "generated-flat-primitives-v1",
+      "allowed_families": [],
+      "blocked_reasons": {
+        "vtol": "BLOCKED: no qualified VTOL vehicle model/control profile",
+        "plane": "BLOCKED: force-driven dynamic target envelope is not bounded for vehicle spawning",
+        "rover": "BLOCKED: force-driven dynamic target envelope is not bounded for vehicle spawning",
+        "copter": "BLOCKED: force-driven dynamic target envelope is not bounded for vehicle spawning"
+      },
+      "regions": [],
+      "presets": []
+    },
+    "C07": {
+      "audit": "generated-flat-primitives-v1",
+      "allowed_families": [
+        "rover",
+        "copter"
+      ],
+      "blocked_reasons": {
+        "vtol": "BLOCKED: no qualified VTOL vehicle model/control profile",
+        "plane": "BLOCKED: no audited conventional-plane runway corridor"
+      },
+      "regions": [
+        {
+          "id": "central-ground",
+          "bounds": [
+            -4,
+            4,
+            -9,
+            9
+          ],
+          "families": [
+            "rover",
+            "copter"
+          ]
+        }
+      ],
+      "presets": [
+        {
+          "id": "center",
+          "name": "中心",
+          "x": 0,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "north",
+          "name": "北侧 3 米",
+          "x": 0,
+          "y": 3,
+          "heading_deg": 0
+        },
+        {
+          "id": "south",
+          "name": "南侧 3 米",
+          "x": 0,
+          "y": -3,
+          "heading_deg": 0
+        },
+        {
+          "id": "north-far",
+          "name": "北侧 6 米",
+          "x": 0,
+          "y": 6,
+          "heading_deg": 0
+        },
+        {
+          "id": "south-far",
+          "name": "南侧 6 米",
+          "x": 0,
+          "y": -6,
+          "heading_deg": 0
+        }
+      ]
+    },
+    "C08": {
+      "audit": "generated-flat-primitives-v1",
+      "allowed_families": [
+        "rover",
+        "copter"
+      ],
+      "blocked_reasons": {
+        "vtol": "BLOCKED: no qualified VTOL vehicle model/control profile",
+        "plane": "BLOCKED: no audited conventional-plane runway corridor"
+      },
+      "regions": [
+        {
+          "id": "central-ground",
+          "bounds": [
+            -4,
+            4,
+            -9,
+            9
+          ],
+          "families": [
+            "rover",
+            "copter"
+          ]
+        }
+      ],
+      "presets": [
+        {
+          "id": "center",
+          "name": "中心",
+          "x": 0,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "north",
+          "name": "北侧 3 米",
+          "x": 0,
+          "y": 3,
+          "heading_deg": 0
+        },
+        {
+          "id": "south",
+          "name": "南侧 3 米",
+          "x": 0,
+          "y": -3,
+          "heading_deg": 0
+        },
+        {
+          "id": "north-far",
+          "name": "北侧 6 米",
+          "x": 0,
+          "y": 6,
+          "heading_deg": 0
+        },
+        {
+          "id": "south-far",
+          "name": "南侧 6 米",
+          "x": 0,
+          "y": -6,
+          "heading_deg": 0
+        }
+      ]
+    },
+    "F01": {
+      "audit": "generated-flat-primitives-v1",
+      "allowed_families": [
+        "rover",
+        "copter",
+        "plane"
+      ],
+      "blocked_reasons": {
+        "vtol": "BLOCKED: no qualified VTOL vehicle model/control profile"
+      },
+      "regions": [
+        {
+          "id": "central-ground",
+          "bounds": [
+            -4,
+            4,
+            -9,
+            9
+          ],
+          "families": [
+            "rover",
+            "copter",
+            "plane"
+          ]
+        }
+      ],
+      "presets": [
+        {
+          "id": "center",
+          "name": "中心",
+          "x": 0,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "north",
+          "name": "北侧 3 米",
+          "x": 0,
+          "y": 3,
+          "heading_deg": 0
+        },
+        {
+          "id": "south",
+          "name": "南侧 3 米",
+          "x": 0,
+          "y": -3,
+          "heading_deg": 0
+        },
+        {
+          "id": "north-far",
+          "name": "北侧 6 米",
+          "x": 0,
+          "y": 6,
+          "heading_deg": 0
+        },
+        {
+          "id": "south-far",
+          "name": "南侧 6 米",
+          "x": 0,
+          "y": -6,
+          "heading_deg": 0
+        }
+      ],
+      "runway": {
+        "heading_deg": 0,
+        "heading_tolerance_deg": 2,
+        "forward_length_m": 300,
+        "half_width_m": 2.5,
+        "clear_height_m": 3,
+        "surface": "runway"
+      }
+    },
+    "F02": {
+      "audit": "generated-flat-primitives-v1",
+      "allowed_families": [
+        "rover",
+        "copter",
+        "plane"
+      ],
+      "blocked_reasons": {
+        "vtol": "BLOCKED: no qualified VTOL vehicle model/control profile"
+      },
+      "regions": [
+        {
+          "id": "central-ground",
+          "bounds": [
+            -4,
+            4,
+            -9,
+            9
+          ],
+          "families": [
+            "rover",
+            "copter",
+            "plane"
+          ]
+        }
+      ],
+      "presets": [
+        {
+          "id": "center",
+          "name": "中心",
+          "x": 0,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "north",
+          "name": "北侧 3 米",
+          "x": 0,
+          "y": 3,
+          "heading_deg": 0
+        },
+        {
+          "id": "south",
+          "name": "南侧 3 米",
+          "x": 0,
+          "y": -3,
+          "heading_deg": 0
+        },
+        {
+          "id": "north-far",
+          "name": "北侧 6 米",
+          "x": 0,
+          "y": 6,
+          "heading_deg": 0
+        },
+        {
+          "id": "south-far",
+          "name": "南侧 6 米",
+          "x": 0,
+          "y": -6,
+          "heading_deg": 0
+        }
+      ],
+      "runway": {
+        "heading_deg": 0,
+        "heading_tolerance_deg": 2,
+        "forward_length_m": 300,
+        "half_width_m": 2.5,
+        "clear_height_m": 3,
+        "surface": "runway"
+      }
+    },
+    "F03": {
+      "audit": "generated-flat-primitives-v1",
+      "allowed_families": [
+        "rover",
+        "copter",
+        "plane"
+      ],
+      "blocked_reasons": {
+        "vtol": "BLOCKED: no qualified VTOL vehicle model/control profile"
+      },
+      "regions": [
+        {
+          "id": "central-ground",
+          "bounds": [
+            -4,
+            4,
+            -9,
+            9
+          ],
+          "families": [
+            "rover",
+            "copter",
+            "plane"
+          ]
+        }
+      ],
+      "presets": [
+        {
+          "id": "center",
+          "name": "中心",
+          "x": 0,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "north",
+          "name": "北侧 3 米",
+          "x": 0,
+          "y": 3,
+          "heading_deg": 0
+        },
+        {
+          "id": "south",
+          "name": "南侧 3 米",
+          "x": 0,
+          "y": -3,
+          "heading_deg": 0
+        },
+        {
+          "id": "north-far",
+          "name": "北侧 6 米",
+          "x": 0,
+          "y": 6,
+          "heading_deg": 0
+        },
+        {
+          "id": "south-far",
+          "name": "南侧 6 米",
+          "x": 0,
+          "y": -6,
+          "heading_deg": 0
+        }
+      ],
+      "runway": {
+        "heading_deg": 0,
+        "heading_tolerance_deg": 2,
+        "forward_length_m": 300,
+        "half_width_m": 2.5,
+        "clear_height_m": 3,
+        "surface": "runway"
+      }
+    },
+    "F04": {
+      "audit": "generated-flat-primitives-v1",
+      "allowed_families": [
+        "rover",
+        "copter",
+        "plane"
+      ],
+      "blocked_reasons": {
+        "vtol": "BLOCKED: no qualified VTOL vehicle model/control profile"
+      },
+      "regions": [
+        {
+          "id": "central-ground",
+          "bounds": [
+            -4,
+            4,
+            -9,
+            9
+          ],
+          "families": [
+            "rover",
+            "copter",
+            "plane"
+          ]
+        }
+      ],
+      "presets": [
+        {
+          "id": "center",
+          "name": "中心",
+          "x": 0,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "north",
+          "name": "北侧 3 米",
+          "x": 0,
+          "y": 3,
+          "heading_deg": 0
+        },
+        {
+          "id": "south",
+          "name": "南侧 3 米",
+          "x": 0,
+          "y": -3,
+          "heading_deg": 0
+        },
+        {
+          "id": "north-far",
+          "name": "北侧 6 米",
+          "x": 0,
+          "y": 6,
+          "heading_deg": 0
+        },
+        {
+          "id": "south-far",
+          "name": "南侧 6 米",
+          "x": 0,
+          "y": -6,
+          "heading_deg": 0
+        }
+      ],
+      "runway": {
+        "heading_deg": 0,
+        "heading_tolerance_deg": 2,
+        "forward_length_m": 300,
+        "half_width_m": 2.5,
+        "clear_height_m": 3,
+        "surface": "runway"
+      }
+    },
+    "F05": {
+      "audit": "generated-flat-primitives-v1",
+      "allowed_families": [
+        "rover",
+        "copter"
+      ],
+      "blocked_reasons": {
+        "vtol": "BLOCKED: no qualified VTOL vehicle model/control profile",
+        "plane": "BLOCKED: bridge/platform obstructs the forward runway corridor"
+      },
+      "regions": [
+        {
+          "id": "central-ground",
+          "bounds": [
+            -4,
+            4,
+            -9,
+            9
+          ],
+          "families": [
+            "rover",
+            "copter"
+          ]
+        }
+      ],
+      "presets": [
+        {
+          "id": "center",
+          "name": "中心",
+          "x": 0,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "north",
+          "name": "北侧 3 米",
+          "x": 0,
+          "y": 3,
+          "heading_deg": 0
+        },
+        {
+          "id": "south",
+          "name": "南侧 3 米",
+          "x": 0,
+          "y": -3,
+          "heading_deg": 0
+        },
+        {
+          "id": "north-far",
+          "name": "北侧 6 米",
+          "x": 0,
+          "y": 6,
+          "heading_deg": 0
+        },
+        {
+          "id": "south-far",
+          "name": "南侧 6 米",
+          "x": 0,
+          "y": -6,
+          "heading_deg": 0
+        }
+      ]
+    },
+    "F06": {
+      "audit": "generated-flat-primitives-v1",
+      "allowed_families": [
+        "rover",
+        "copter",
+        "plane"
+      ],
+      "blocked_reasons": {
+        "vtol": "BLOCKED: no qualified VTOL vehicle model/control profile"
+      },
+      "regions": [
+        {
+          "id": "central-ground",
+          "bounds": [
+            -4,
+            4,
+            -9,
+            9
+          ],
+          "families": [
+            "rover",
+            "copter",
+            "plane"
+          ]
+        }
+      ],
+      "presets": [
+        {
+          "id": "center",
+          "name": "中心",
+          "x": 0,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "north",
+          "name": "北侧 3 米",
+          "x": 0,
+          "y": 3,
+          "heading_deg": 0
+        },
+        {
+          "id": "south",
+          "name": "南侧 3 米",
+          "x": 0,
+          "y": -3,
+          "heading_deg": 0
+        },
+        {
+          "id": "north-far",
+          "name": "北侧 6 米",
+          "x": 0,
+          "y": 6,
+          "heading_deg": 0
+        },
+        {
+          "id": "south-far",
+          "name": "南侧 6 米",
+          "x": 0,
+          "y": -6,
+          "heading_deg": 0
+        }
+      ],
+      "runway": {
+        "heading_deg": 0,
+        "heading_tolerance_deg": 2,
+        "forward_length_m": 300,
+        "half_width_m": 2.5,
+        "clear_height_m": 3,
+        "surface": "runway"
+      }
+    },
+    "F07": {
+      "audit": "generated-flat-primitives-v1",
+      "allowed_families": [
+        "rover",
+        "copter"
+      ],
+      "blocked_reasons": {
+        "vtol": "BLOCKED: no qualified VTOL vehicle model/control profile",
+        "plane": "BLOCKED: bridge/platform obstructs the forward runway corridor"
+      },
+      "regions": [
+        {
+          "id": "central-ground",
+          "bounds": [
+            -4,
+            4,
+            -9,
+            9
+          ],
+          "families": [
+            "rover",
+            "copter"
+          ]
+        }
+      ],
+      "presets": [
+        {
+          "id": "center",
+          "name": "中心",
+          "x": 0,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "north",
+          "name": "北侧 3 米",
+          "x": 0,
+          "y": 3,
+          "heading_deg": 0
+        },
+        {
+          "id": "south",
+          "name": "南侧 3 米",
+          "x": 0,
+          "y": -3,
+          "heading_deg": 0
+        },
+        {
+          "id": "north-far",
+          "name": "北侧 6 米",
+          "x": 0,
+          "y": 6,
+          "heading_deg": 0
+        },
+        {
+          "id": "south-far",
+          "name": "南侧 6 米",
+          "x": 0,
+          "y": -6,
+          "heading_deg": 0
+        }
+      ]
+    },
+    "F08": {
+      "audit": "generated-flat-primitives-v1",
+      "allowed_families": [
+        "rover",
+        "copter",
+        "plane"
+      ],
+      "blocked_reasons": {
+        "vtol": "BLOCKED: no qualified VTOL vehicle model/control profile"
+      },
+      "regions": [
+        {
+          "id": "central-ground",
+          "bounds": [
+            -4,
+            4,
+            -9,
+            9
+          ],
+          "families": [
+            "rover",
+            "copter",
+            "plane"
+          ]
+        }
+      ],
+      "presets": [
+        {
+          "id": "center",
+          "name": "中心",
+          "x": 0,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "north",
+          "name": "北侧 3 米",
+          "x": 0,
+          "y": 3,
+          "heading_deg": 0
+        },
+        {
+          "id": "south",
+          "name": "南侧 3 米",
+          "x": 0,
+          "y": -3,
+          "heading_deg": 0
+        },
+        {
+          "id": "north-far",
+          "name": "北侧 6 米",
+          "x": 0,
+          "y": 6,
+          "heading_deg": 0
+        },
+        {
+          "id": "south-far",
+          "name": "南侧 6 米",
+          "x": 0,
+          "y": -6,
+          "heading_deg": 0
+        }
+      ],
+      "runway": {
+        "heading_deg": 0,
+        "heading_tolerance_deg": 2,
+        "forward_length_m": 300,
+        "half_width_m": 2.5,
+        "clear_height_m": 3,
+        "surface": "runway"
+      }
+    }
+  }
+}

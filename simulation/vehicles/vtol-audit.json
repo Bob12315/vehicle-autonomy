@@ -1,0 +1,160 @@
+{
+  "audit_date": "2026-10-29",
+  "status": "BLOCKED",
+  "model_exists": true,
+  "framework_vtol_profile_exists": false,
+  "candidate": "skywalker_x8_quad",
+  "reason": "Official Gazebo QuadPlane candidate and AP JSON control mapping exist. Framework has no dedicated VTOL capability/profile/Safety/translator/Actions, and this candidate has not passed native SITL/flight/transition/landing acceptance. Model asset license clearance remains unresolved. Conventional Plane is not substituted.",
+  "sources": [
+    {
+      "repository": "ArduPilot/SITL_Models",
+      "commit": "25bc38ed8c6c0345840159a8cbc0b02781d52f3c",
+      "path": "Gazebo/models/skywalker_x8_quad/model.sdf",
+      "url": "https://github.com/ArduPilot/SITL_Models/blob/25bc38ed8c6c0345840159a8cbc0b02781d52f3c/Gazebo/models/skywalker_x8_quad/model.sdf",
+      "sha256": "4bd81dab7ecf60845acf082f94d5af714283a4b057310e5d9a1436734fde8d08"
+    },
+    {
+      "repository": "ArduPilot/SITL_Models",
+      "commit": "25bc38ed8c6c0345840159a8cbc0b02781d52f3c",
+      "path": "Gazebo/models/skywalker_x8_quad/model.config",
+      "url": "https://github.com/ArduPilot/SITL_Models/blob/25bc38ed8c6c0345840159a8cbc0b02781d52f3c/Gazebo/models/skywalker_x8_quad/model.config",
+      "sha256": "9d6695b835178f37d0b12c116e7a98cbcad7ef0007d996f68a5a9c852568a95a"
+    },
+    {
+      "repository": "ArduPilot/SITL_Models",
+      "commit": "25bc38ed8c6c0345840159a8cbc0b02781d52f3c",
+      "path": "Gazebo/models/skywalker_x8/model.sdf",
+      "url": "https://github.com/ArduPilot/SITL_Models/blob/25bc38ed8c6c0345840159a8cbc0b02781d52f3c/Gazebo/models/skywalker_x8/model.sdf",
+      "sha256": "4b1e0be214d8dd1445213727778d93f250f4ae3d38d98a57bf82a4872a78dbb9"
+    },
+    {
+      "repository": "ArduPilot/SITL_Models",
+      "commit": "25bc38ed8c6c0345840159a8cbc0b02781d52f3c",
+      "path": "Gazebo/models/skywalker_x8/model.config",
+      "url": "https://github.com/ArduPilot/SITL_Models/blob/25bc38ed8c6c0345840159a8cbc0b02781d52f3c/Gazebo/models/skywalker_x8/model.config",
+      "sha256": "940fe36b759be5e34b5f2568bcaadf09212b8b7a7b82d120a53412c5096869c2"
+    },
+    {
+      "repository": "ArduPilot/SITL_Models",
+      "commit": "25bc38ed8c6c0345840159a8cbc0b02781d52f3c",
+      "path": "Gazebo/config/skywalker_x8_quad.param",
+      "url": "https://github.com/ArduPilot/SITL_Models/blob/25bc38ed8c6c0345840159a8cbc0b02781d52f3c/Gazebo/config/skywalker_x8_quad.param",
+      "sha256": "745f4efc051540106329cf27acb52d618a42630fdee551a0b055c83fe0b445bd"
+    },
+    {
+      "repository": "ArduPilot/SITL_Models",
+      "commit": "25bc38ed8c6c0345840159a8cbc0b02781d52f3c",
+      "path": "Gazebo/docs/SkywalkerX8.md",
+      "url": "https://github.com/ArduPilot/SITL_Models/blob/25bc38ed8c6c0345840159a8cbc0b02781d52f3c/Gazebo/docs/SkywalkerX8.md",
+      "sha256": "551235c18d8217eb469f51ac93c4bb551fb0fa8d19e10e96563a3c51e1123843"
+    },
+    {
+      "repository": "ArduPilot/ardupilot_gz",
+      "commit": "8df4dc1726e37504e6fc8b952d02e554cfa3176f",
+      "path": "README.md",
+      "url": "https://github.com/ArduPilot/ardupilot_gz/blob/8df4dc1726e37504e6fc8b952d02e554cfa3176f/README.md",
+      "sha256": "ccad7849dbc1ee68b040e73affeda97fddcd1d85c18b71874af504c513c1a2cc"
+    },
+    {
+      "repository": "ArduPilot/ardupilot_gz",
+      "commit": "8df4dc1726e37504e6fc8b952d02e554cfa3176f",
+      "path": "LICENSE",
+      "url": "https://github.com/ArduPilot/ardupilot_gz/blob/8df4dc1726e37504e6fc8b952d02e554cfa3176f/LICENSE",
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    {
+      "repository": "ArduPilot/ardupilot_gz",
+      "commit": "8df4dc1726e37504e6fc8b952d02e554cfa3176f",
+      "path": "ros2_gz.repos",
+      "url": "https://github.com/ArduPilot/ardupilot_gz/blob/8df4dc1726e37504e6fc8b952d02e554cfa3176f/ros2_gz.repos",
+      "sha256": "3ca65f0543007a0b456a1893951dc434d444a6b2717efd696ea19c6faf93696d"
+    },
+    {
+      "repository": "ArduPilot/ardupilot_gz",
+      "commit": "8df4dc1726e37504e6fc8b952d02e554cfa3176f",
+      "path": "ardupilot_gz_bringup/launch/robots/alti_transition.launch.py",
+      "url": "https://github.com/ArduPilot/ardupilot_gz/blob/8df4dc1726e37504e6fc8b952d02e554cfa3176f/ardupilot_gz_bringup/launch/robots/alti_transition.launch.py",
+      "sha256": "1db70f2b1160d86b28abb2c99f3550df133048f5f00e4e69d15b49bd056c7710"
+    }
+  ],
+  "dependency_resources": [
+    {
+      "uri": "model://skywalker_x8/meshes/x8_wing.dae",
+      "exists": true,
+      "sha256": "6a2ae1c4bc353b9b028b8e1c616dd552b617915b8d23203171aa20c3f2ff2a35"
+    },
+    {
+      "uri": "model://skywalker_x8/meshes/iris_prop_cw.dae",
+      "exists": true,
+      "sha256": "7e4ea3345e071023736c10a553c09d943b728b866689a3694078a0df975f35ee"
+    },
+    {
+      "uri": "model://skywalker_x8/meshes/iris_prop_cw.dae",
+      "exists": true,
+      "sha256": "7e4ea3345e071023736c10a553c09d943b728b866689a3694078a0df975f35ee"
+    },
+    {
+      "uri": "model://skywalker_x8/meshes/iris_prop_ccw.dae",
+      "exists": true,
+      "sha256": "c0a29f6d1d41e170211c957a9a1fd9266bd867e68960ce87e0e807178ad76a24"
+    },
+    {
+      "uri": "model://skywalker_x8/meshes/iris_prop_ccw.dae",
+      "exists": true,
+      "sha256": "c0a29f6d1d41e170211c957a9a1fd9266bd867e68960ce87e0e807178ad76a24"
+    },
+    {
+      "uri": "model://skywalker_x8/meshes/iris_prop_ccw.dae",
+      "exists": true,
+      "sha256": "c0a29f6d1d41e170211c957a9a1fd9266bd867e68960ce87e0e807178ad76a24"
+    },
+    {
+      "uri": "model://skywalker_x8/meshes/x8_elevon_left.dae",
+      "exists": true,
+      "sha256": "c0f7770a0f18c7cde63d6070c2a6cb237a51f3038183003ec44530f0e54a28e4"
+    },
+    {
+      "uri": "model://skywalker_x8/meshes/x8_elevon_right.dae",
+      "exists": true,
+      "sha256": "1894bc6462620f76d5c50f3b1b9856f4dfe9aa8565195c122c97d3bf8849ad54"
+    }
+  ],
+  "model_sdf_check_exit": 0,
+  "plugin_missing_libraries": false,
+  "plugin_abi": [
+    "gz-sim8",
+    "gz-transport13",
+    "gz-msgs10",
+    "sdformat14"
+  ],
+  "model_plugins": [
+    "ArduPilotPlugin",
+    "gz-sim-apply-joint-force-system",
+    "gz-sim-joint-state-publisher-system",
+    "gz-sim-lift-drag-system"
+  ],
+  "ap_control_channels": [
+    "2",
+    "0",
+    "1",
+    "4",
+    "5",
+    "6",
+    "7"
+  ],
+  "quadplane_parameters": {
+    "Q_ENABLE": 1,
+    "Q_FRAME_CLASS": 1,
+    "Q_FRAME_TYPE": 3
+  },
+  "license": {
+    "ardupilot_gazebo": "LGPL-3.0 license file and source headers; specific mesh provenance must also be retained",
+    "ardupilot": "GPL-3.0",
+    "ardupilot_gz": "GPL-3.0-or-later source headers",
+    "SITL_Models_skywalker": "No applicable model asset license found in selected model directory or repository root. scripts/VTOL_model/LICENSE is scoped to that separate script directory; it is not evidence for Gazebo meshes/textures. Credits link PX4/SwiftGust and RealFlight texture sources, requiring separate clearance."
+  },
+  "evidence_directory": "/home/level6/vehicle-autonomy-framework/artifacts/simulation/vehicle-library-audit",
+  "native_gazebo_started": false,
+  "native_sitl_started": false,
+  "api_failure_retained": "GitHub tree API returned 403 rate limit; official Git shallow sparse clone used instead."
+}
