@@ -52,6 +52,20 @@
           "heading_deg": 0
         },
         {
+          "id": "east",
+          "name": "东侧 3 米",
+          "x": 3,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "west",
+          "name": "西侧 3 米",
+          "x": -3,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
           "id": "north-far",
           "name": "北侧 6 米",
           "x": 0,
@@ -112,6 +126,20 @@
           "name": "南侧 3 米",
           "x": 0,
           "y": -3,
+          "heading_deg": 0
+        },
+        {
+          "id": "east",
+          "name": "东侧 3 米",
+          "x": 3,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "west",
+          "name": "西侧 3 米",
+          "x": -3,
+          "y": 0,
           "heading_deg": 0
         },
         {
@@ -178,6 +206,20 @@
           "heading_deg": 0
         },
         {
+          "id": "east",
+          "name": "东侧 3 米",
+          "x": 3,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "west",
+          "name": "西侧 3 米",
+          "x": -3,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
           "id": "north-far",
           "name": "北侧 6 米",
           "x": 0,
@@ -241,6 +283,20 @@
           "heading_deg": 0
         },
         {
+          "id": "east",
+          "name": "东侧 3 米",
+          "x": 3,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "west",
+          "name": "西侧 3 米",
+          "x": -3,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
           "id": "north-far",
           "name": "北侧 6 米",
           "x": 0,
@@ -266,7 +322,22 @@
         "copter": "BLOCKED: force-driven dynamic target envelope is not bounded for vehicle spawning"
       },
       "regions": [],
-      "presets": []
+      "presets": [
+        {
+          "id": "east",
+          "name": "东侧 3 米",
+          "x": 3,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "west",
+          "name": "西侧 3 米",
+          "x": -3,
+          "y": 0,
+          "heading_deg": 0
+        }
+      ]
     },
     "R06": {
       "audit": "generated-flat-primitives-v1",
@@ -313,6 +384,20 @@
           "name": "南侧 3 米",
           "x": 0,
           "y": -3,
+          "heading_deg": 0
+        },
+        {
+          "id": "east",
+          "name": "东侧 3 米",
+          "x": 3,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "west",
+          "name": "西侧 3 米",
+          "x": -3,
+          "y": 0,
           "heading_deg": 0
         },
         {
@@ -379,6 +464,20 @@
           "heading_deg": 0
         },
         {
+          "id": "east",
+          "name": "东侧 3 米",
+          "x": 3,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "west",
+          "name": "西侧 3 米",
+          "x": -3,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
           "id": "north-far",
           "name": "北侧 6 米",
           "x": 0,
@@ -439,6 +538,20 @@
           "name": "南侧 3 米",
           "x": 0,
           "y": -3,
+          "heading_deg": 0
+        },
+        {
+          "id": "east",
+          "name": "东侧 3 米",
+          "x": 3,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "west",
+          "name": "西侧 3 米",
+          "x": -3,
+          "y": 0,
           "heading_deg": 0
         },
         {
@@ -505,6 +618,20 @@
           "heading_deg": 0
         },
         {
+          "id": "east",
+          "name": "东侧 3 米",
+          "x": 3,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "west",
+          "name": "西侧 3 米",
+          "x": -3,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
           "id": "north-far",
           "name": "北侧 6 米",
           "x": 0,
@@ -565,6 +692,20 @@
           "name": "南侧 3 米",
           "x": 0,
           "y": -3,
+          "heading_deg": 0
+        },
+        {
+          "id": "east",
+          "name": "东侧 3 米",
+          "x": 3,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "west",
+          "name": "西侧 3 米",
+          "x": -3,
+          "y": 0,
           "heading_deg": 0
         },
         {
@@ -631,6 +772,20 @@
           "heading_deg": 0
         },
         {
+          "id": "east",
+          "name": "东侧 3 米",
+          "x": 3,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "west",
+          "name": "西侧 3 米",
+          "x": -3,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
           "id": "north-far",
           "name": "北侧 6 米",
           "x": 0,
@@ -691,6 +846,20 @@
           "name": "南侧 3 米",
           "x": 0,
           "y": -3,
+          "heading_deg": 0
+        },
+        {
+          "id": "east",
+          "name": "东侧 3 米",
+          "x": 3,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "west",
+          "name": "西侧 3 米",
+          "x": -3,
+          "y": 0,
           "heading_deg": 0
         },
         {
@@ -757,6 +926,20 @@
           "heading_deg": 0
         },
         {
+          "id": "east",
+          "name": "东侧 3 米",
+          "x": 3,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "west",
+          "name": "西侧 3 米",
+          "x": -3,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
           "id": "north-far",
           "name": "北侧 6 米",
           "x": 0,
@@ -782,7 +965,22 @@
         "copter": "BLOCKED: force-driven dynamic target envelope is not bounded for vehicle spawning"
       },
       "regions": [],
-      "presets": []
+      "presets": [
+        {
+          "id": "east",
+          "name": "东侧 3 米",
+          "x": 3,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "west",
+          "name": "西侧 3 米",
+          "x": -3,
+          "y": 0,
+          "heading_deg": 0
+        }
+      ]
     },
     "C07": {
       "audit": "generated-flat-primitives-v1",
@@ -829,6 +1027,20 @@
           "name": "南侧 3 米",
           "x": 0,
           "y": -3,
+          "heading_deg": 0
+        },
+        {
+          "id": "east",
+          "name": "东侧 3 米",
+          "x": 3,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "west",
+          "name": "西侧 3 米",
+          "x": -3,
+          "y": 0,
           "heading_deg": 0
         },
         {
@@ -895,6 +1107,20 @@
           "heading_deg": 0
         },
         {
+          "id": "east",
+          "name": "东侧 3 米",
+          "x": 3,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "west",
+          "name": "西侧 3 米",
+          "x": -3,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
           "id": "north-far",
           "name": "北侧 6 米",
           "x": 0,
@@ -956,6 +1182,20 @@
           "name": "南侧 3 米",
           "x": 0,
           "y": -3,
+          "heading_deg": 0
+        },
+        {
+          "id": "east",
+          "name": "东侧 3 米",
+          "x": 3,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "west",
+          "name": "西侧 3 米",
+          "x": -3,
+          "y": 0,
           "heading_deg": 0
         },
         {
@@ -1031,6 +1271,20 @@
           "heading_deg": 0
         },
         {
+          "id": "east",
+          "name": "东侧 3 米",
+          "x": 3,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "west",
+          "name": "西侧 3 米",
+          "x": -3,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
           "id": "north-far",
           "name": "北侧 6 米",
           "x": 0,
@@ -1100,6 +1354,20 @@
           "name": "南侧 3 米",
           "x": 0,
           "y": -3,
+          "heading_deg": 0
+        },
+        {
+          "id": "east",
+          "name": "东侧 3 米",
+          "x": 3,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "west",
+          "name": "西侧 3 米",
+          "x": -3,
+          "y": 0,
           "heading_deg": 0
         },
         {
@@ -1175,6 +1443,20 @@
           "heading_deg": 0
         },
         {
+          "id": "east",
+          "name": "东侧 3 米",
+          "x": 3,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "west",
+          "name": "西侧 3 米",
+          "x": -3,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
           "id": "north-far",
           "name": "北侧 6 米",
           "x": 0,
@@ -1246,6 +1528,20 @@
           "heading_deg": 0
         },
         {
+          "id": "east",
+          "name": "东侧 3 米",
+          "x": 3,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "west",
+          "name": "西侧 3 米",
+          "x": -3,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
           "id": "north-far",
           "name": "北侧 6 米",
           "x": 0,
@@ -1307,6 +1603,20 @@
           "name": "南侧 3 米",
           "x": 0,
           "y": -3,
+          "heading_deg": 0
+        },
+        {
+          "id": "east",
+          "name": "东侧 3 米",
+          "x": 3,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "west",
+          "name": "西侧 3 米",
+          "x": -3,
+          "y": 0,
           "heading_deg": 0
         },
         {
@@ -1381,6 +1691,20 @@
           "heading_deg": 0
         },
         {
+          "id": "east",
+          "name": "东侧 3 米",
+          "x": 3,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "west",
+          "name": "西侧 3 米",
+          "x": -3,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
           "id": "north-far",
           "name": "北侧 6 米",
           "x": 0,
@@ -1442,6 +1766,20 @@
           "name": "南侧 3 米",
           "x": 0,
           "y": -3,
+          "heading_deg": 0
+        },
+        {
+          "id": "east",
+          "name": "东侧 3 米",
+          "x": 3,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "west",
+          "name": "西侧 3 米",
+          "x": -3,
+          "y": 0,
           "heading_deg": 0
         },
         {

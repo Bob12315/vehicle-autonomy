@@ -213,7 +213,8 @@ class LocalRuntime:
         sim = duration(stats,'sim_time')
         metrics = dict(sim_seconds=sim,wall_seconds=time.monotonic()-self.started,
                        rtf=number(stats,'real_time_factor'),cpu_percent=None,rss_mib=None,gpu=None)
-        processes = [p for p,_,r in self.session.processes if not r.get('transient')]
+        sessions=[self.session,*[c.session for c in getattr(self,'vehicles',{}).values() if c.session is not None]]
+        processes = [p for session in sessions for p,_,r in session.processes if not r.get('transient')]
         # /proc is sampled for every descendant: gz's wrapper itself uses
         # negligible CPU and would misrepresent the actual server workload.
         groups = {p.pid for p in processes}

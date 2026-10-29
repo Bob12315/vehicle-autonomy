@@ -7,6 +7,7 @@ import hashlib
 import json
 import math
 from pathlib import Path
+from queue import Queue,Empty,Full
 import re
 import shutil
 import subprocess
@@ -16,8 +17,12 @@ from uuid import uuid4
 
 from vehicle_autonomy._resources import resource_root as default_root
 from vehicle_autonomy.contracts.core.serialization import to_json_value
+from vehicle_autonomy.app.bootstrap.simulation_profile import SimulationProfile
 from .catalog import SceneRegistry
-from .runtime import LocalRuntime, stamp
+from .runtime import stamp
+from .universal_runtime import LocalRuntime
+from .vehicles import VehicleRegistry
+from .world_spawns import WorldSpawnRegistry
 
 
 TERMINAL = frozenset({'FINISHED','FAILED','CANCELLED'})
@@ -46,6 +51,10 @@ class SimulationManager:
         self.directory=Path(data_dir).absolute()
         self.directory.mkdir(parents=True,exist_ok=True,mode=0o700)
         self.registry=registry or SceneRegistry(self.root)
+        self.world_spawns=WorldSpawnRegistry(self.registry)
+        self.vehicle_registry=VehicleRegistry(self.root,ardupilot_root=ardupilot_root,plugin_root=plugin_root,twin_root=twin_root)
+        self.operation_threads={}
+        self.progress={}
         self.application=application
         self.allow_send=allow_send
         self.startup_timeout=startup_timeout
@@ -85,6 +94,263 @@ class SimulationManager:
                 self._save(record)
             except (OSError,ValueError,KeyError,TypeError):
                 continue
+
+    def _specifications(self,scene_id,raw,parameters,seed,*,peers=()):
+        result=[]
+        occupied=list(peers)
+        slots={peer.get('slot_id') for peer in peers}
+        for index,item in enumerate(raw):
+            fields(item,('kind','spawn','slot_id'),('kind',))
+            kind=item['kind']
+            if type(kind) is not str:raise ValueError('registered vehicle kind required')
+            definition=self.vehicle_registry.get(kind)
+            if definition['status']!='READY':raise ValueError('BLOCKED: '+str(definition.get('reason')))
+            slot=item.get('slot_id','slot-'+str(index+1))
+            if type(slot) is not str or not re.fullmatch(r'[A-Za-z0-9_-]{1,48}',slot) or slot in slots:
+                raise ValueError('unique bounded slot_id required')
+            slots.add(slot)
+            spawn=item.get('spawn')
+            if type(spawn) is dict and set(spawn)=={'preset_id'}:spawn={'id':spawn['preset_id']}
+            spawn=self.world_spawns.validate(scene_id,definition,spawn,peers=[{k:p[k] for k in ('spawn','definition')} for p in occupied],
+                parameters=parameters,seed=seed)
+            bounds=SimulationProfile.load(definition['profile_path']).safety
+            if not (bounds.min_x_m<=spawn['x']<=bounds.max_x_m and bounds.min_y_m<=spawn['y']<=bounds.max_y_m):
+                raise ValueError('BLOCKED: spawn is outside the unchanged Framework vehicle profile geofence')
+            geo=self.world_spawns.describe(scene_id)['geographic_reference']
+            if geo['heading_deg']!=0:raise ValueError('BLOCKED: rotated World geography has no qualified ENU binding')
+            if kind!='plane' and (geo['latitude_deg'],geo['longitude_deg'],geo['elevation'])!=(-35.363262,149.165237,584.):
+                raise ValueError('BLOCKED: World origin differs from the fixed Framework environment binding')
+            spec=dict(kind=kind,slot_id=slot,spawn=spawn)
+            result.append(spec)
+            occupied.append(dict(spawn=spawn,definition=definition,slot_id=slot))
+        return result
+
+    def _project_vehicles(self,record,owner):
+        if not hasattr(owner,'vehicles'):return
+        vehicles=[]
+        for child in tuple(owner.vehicles.values()):
+            ready=self._vehicle_ready(child)
+            child.stages['framework_controlled']=ready
+            if ready and child.stages['plugin_connected']:child.state='RUNNING'
+            vehicles.append(child.view())
+        record['vehicles']=vehicles
+        record['retired_vehicles']=deepcopy(owner.retired)
+        record['target']=vehicles[0]['target'] if vehicles else None
+        record['vehicle_id']=vehicles[0]['id'] if vehicles else None
+        record['vehicle']=vehicles[0]['kind'] if vehicles else 'none'
+
+    def _selected_vehicle(self,record,identifier,*,required=True):
+        vehicles=record.get('vehicles',[])
+        if identifier is None:
+            if len(vehicles)>1:raise ValueError('vehicle_id required for a multi-vehicle World')
+            if vehicles:return vehicles[0]
+            if not required:return None
+        for item in vehicles:
+            if item['id']==identifier:return item
+        raise ValueError('unknown vehicle_id in this World')
+
+    def _require_safe(self,child):
+        if not self._vehicle_ready(child):raise ValueError('fresh VALID vehicle state required for safe retirement')
+        _,world=child.driver.read_view()
+        state=world.vehicle
+        linear=state.reported_twist.value.linear
+        speed=math.sqrt(linear.x**2+linear.y**2+linear.z**2)
+        if state.operation.armed is not False or abs(state.reported_pose.value.position.z)>1.5 or speed>.3:
+            raise ValueError('safe switch/removal requires disarmed stationary ground; use original control to land/stop/disarm')
+        related=self._related(child.target,bounded=False)
+        for action in related['actions']:
+            if action['state']=='REJECTED':continue
+            if action['state'] not in {'SUCCEEDED','FAILED','CANCELLED','TIMED_OUT','UNKNOWN'} or not (action.get('safety') or {}).get('release_safe'):
+                raise ValueError('unresolved Action safety barrier prevents epoch retirement')
+        for mission in related['missions']:
+            if mission['state'] not in {'SUCCEEDED','FAILED','REJECTED','CANCELLED','TIMED_OUT','UNKNOWN'} or mission.get('release_safe') is False:
+                raise ValueError('unresolved Mission safety barrier prevents epoch retirement')
+
+    def _detach(self,child):
+        if not self.application:return
+        app=self.application
+        with app._control_lock:
+            # Historical Action views still obtain their immutable command
+            # results from this closed Driver. Never delete that evidence port.
+            # The live vehicle selector excludes these retired targets.
+            retired=getattr(app,'_retired_simulation_targets',set())
+            retired.add(child.target)
+            app._retired_simulation_targets=retired
+            app._tracks.pop(child.target,None)
+
+    def retiring_targets(self):
+        with self.lock:
+            return {target for record in self.records.values() for target in record.get('retiring_targets',[])}
+
+    def _retire(self,record,children,value=True):
+        targets=set(record.get('retiring_targets',[]))
+        for child in children:
+            if child.driver:child.driver.set_retiring(value)
+            if value:targets.add(child.target)
+            else:targets.discard(child.target)
+        record['retiring_targets']=sorted(targets)
+
+    def _vehicle_operation(self,kind,payload):
+        with self.lock:
+            record=self._get(payload['id'])
+            if self.closed or record['state']!='RUNNING' or record.get('operation',{}).get('state')=='RUNNING' or record.get('switch',{}).get('state') in {'PREPARING','STOPPING','STARTING'}:
+                raise ValueError('idle RUNNING World required')
+            owner=self.owners[record['id']]
+            if kind=='add':
+                if len(owner.vehicles)>=4:raise ValueError('four vehicle budget exhausted')
+                peers=[dict(spawn=c.spawn,definition=self.vehicle_registry.get(c.vehicle),slot_id=c.slot_id) for c in owner.vehicles.values()]
+                vehicle=deepcopy(payload['vehicle'])
+                if type(vehicle) is dict:vehicle.setdefault('slot_id','slot-'+uuid4().hex[:12])
+                specification=self._specifications(record['scene_id'],[vehicle],record['configuration']['parameters'],record['configuration']['seed'],peers=peers)[0]
+            else:
+                selected=self._selected_vehicle(record,payload['vehicle_id'])
+                specification=selected['id']
+            self._retire(record,[owner.vehicles[specification]] if kind=='remove' else tuple(owner.vehicles.values()))
+            record['operation']=dict(kind=kind,state='RUNNING',started_at=stamp(),error=None)
+            try:self._save(record)
+            except Exception as exc:
+                self._persistence_failed(record,'vehicle operation dispatch',exc)
+                self.stops[record['id']].set()
+                raise
+            thread=Thread(target=self._do_vehicle_operation,args=(record['id'],kind,specification),daemon=True)
+            self.operation_threads[record['id']]=thread
+            thread.start()
+            return deepcopy(record)
+
+    def _do_vehicle_operation(self,identifier,kind,specification):
+        record=self.records[identifier]
+        owner=self.owners[identifier]
+        error=None
+        child=None
+        try:
+            if kind=='remove':
+                child=owner.vehicles[specification]
+                self._cancel(child)
+                self._require_safe(child)
+                owner.remove(child.id)
+                self._detach(child)
+            else:
+                owner.sample()
+                peers=[]
+                for peer in tuple(owner.vehicles.values()):
+                    self._require_safe(peer)
+                    truth=owner.truth(peer.id)
+                    if truth is None:raise ValueError('live Gazebo peer position required before spawn')
+                    peers.append(dict(spawn=truth['position'],definition=self.vehicle_registry.get(peer.vehicle),slot_id=peer.slot_id))
+                specification=self._specifications(record['scene_id'],[dict(kind=specification['kind'],slot_id=specification['slot_id'],
+                    spawn={k:specification['spawn'][k] for k in ('x','y','z','heading_deg')})],
+                    record['configuration']['parameters'],record['configuration']['seed'],peers=peers)[0]
+                child=owner.add(specification,self.stops[identifier].is_set)
+                deadline=time.monotonic()+self.startup_timeout
+                while time.monotonic()<deadline and not self.stops[identifier].is_set():
+                    owner.sample()
+                    if self._vehicle_ready(child) and child.stages['plugin_connected']:break
+                    time.sleep(.2)
+                else:raise TimeoutError('added vehicle readiness deadline expired')
+                with self.application._control_lock if self.application else nullcontext():
+                    if self.stops[identifier].is_set():raise InterruptedError('World stopping before added vehicle admission')
+                    self._attach(child)
+        except Exception as exc:
+            error=type(exc).__name__+': '+str(exc)
+            if kind=='add' and child is not None:
+                try:owner.remove(child.id)
+                except Exception:
+                    # A partial plugin failure can stall lockstep peers; retire
+                    # the World rather than publish false continuing health.
+                    self.stops[identifier].set()
+        finally:
+            with self.lock:
+                if record['state']=='RUNNING' and not self.stops[identifier].is_set():
+                    if kind=='remove' and error and child is not None:self._retire(record,[child],False)
+                    if kind=='add':self._retire(record,tuple(owner.vehicles.values()),False)
+                record['operation'].update(state='FAILED' if error else 'SUCCEEDED',error=error,ended_at=stamp())
+                self._project_vehicles(record,owner)
+                try:self._save(record)
+                except Exception as exc:
+                    self._persistence_failed(record,'vehicle operation completion',exc)
+                    self.stops[identifier].set()
+
+    def _switch(self,payload):
+        with self.lock:
+            record=self._get(payload['id'])
+            if self.closed or record['state']!='RUNNING' or record.get('operation',{}).get('state')=='RUNNING' or record.get('switch',{}).get('state') in {'PREPARING','STOPPING','STARTING'}:
+                raise ValueError('idle RUNNING World required')
+            spawns=payload.get('spawns',{})
+            if type(spawns) is not dict or set(spawns)-{c.slot_id for c in self.owners[record['id']].vehicles.values()}:
+                raise ValueError('spawns must map existing slot IDs')
+            vehicles=[dict(kind=c.vehicle,slot_id=c.slot_id,spawn=spawns.get(c.slot_id,{'id':c.spawn['preset_id']}) if c.spawn.get('preset_id') else spawns.get(c.slot_id,{k:c.spawn[k] for k in ('x','y','z','heading_deg')}))
+                for c in self.owners[record['id']].vehicles.values()]
+            destination=dict(scene_id=payload['scene_id'],vehicles=vehicles,
+                parameters=payload.get('parameters',{}),seed=payload.get('seed',record['configuration']['seed']))
+            # Make the exact destination concrete and validate before retiring
+            # a healthy World. New record never adopts old writers/credentials.
+            new=self.create(destination)
+            self._retire(record,tuple(self.owners[record['id']].vehicles.values()))
+            record['switch']=dict(state='PREPARING',new_session_id=new['id'],scene_id=payload['scene_id'],error=None,started_at=stamp())
+            try:self._save(record)
+            except Exception as exc:
+                self._persistence_failed(record,'World switch dispatch',exc)
+                self.stops[record['id']].set()
+                self.stop(new['id'])
+                raise
+            thread=Thread(target=self._do_switch,args=(record['id'],new['id']),daemon=True)
+            self.operation_threads[record['id']]=thread
+            thread.start()
+            return deepcopy(record)
+
+    def _do_switch(self,identifier,new_id):
+        record=self.records[identifier]
+        owner=self.owners[identifier]
+        try:
+            self._cancel(owner)
+            for child in tuple(owner.vehicles.values()):self._require_safe(child)
+            with self.lock:
+                record['switch']['state']='STOPPING'
+                self._save(record)
+            self.stop(identifier)
+            self.threads[identifier].join(self.startup_timeout+40)
+            if self.threads[identifier].is_alive() or record['cleanup']!='COMPLETE':
+                raise RuntimeError('old World cleanup not confirmed')
+            for child in tuple(owner.vehicles.values()):self._detach(child)
+            if self.closed:raise InterruptedError('service closing')
+            with self.lock:
+                record['switch']['state']='STARTING'
+                self._save(record)
+            self.start(new_id)
+            self.wait_ready(new_id,self.startup_timeout+10)
+            with self.lock:
+                record['switch'].update(state='SUCCEEDED',ended_at=stamp())
+                self.records[new_id]['previous_session_id']=identifier
+                self._save(record)
+                self._save(self.records[new_id])
+        except Exception as exc:
+            self.stop(new_id)
+            with self.lock:
+                if record['state']=='RUNNING':self._retire(record,tuple(owner.vehicles.values()),False)
+                record['switch'].update(state='FAILED',error=type(exc).__name__+': '+str(exc),ended_at=stamp())
+                self._save(record)
+
+    def _queue_progress(self,identifier,vehicle):
+        queue=self.progress[identifier]
+        try:queue.put_nowait(vehicle)
+        except Full:
+            try:queue.get_nowait()
+            except Empty:pass
+            queue.put_nowait(vehicle)
+
+    def _drain_progress(self,record):
+        queue=self.progress.get(record['id'])
+        if queue is None:return
+        updates={}
+        while True:
+            try:
+                vehicle=queue.get_nowait();updates[vehicle['id']]=vehicle
+            except Empty:break
+        if record['state'] not in {'PREPARING','STARTING'} and record.get('operation',{}).get('state')!='RUNNING':return
+        vehicles={v['id']:v for v in record.get('vehicles',[])}
+        vehicles.update(updates)
+        record['vehicles']=list(vehicles.values())
+        record['startup_progress']={v['id']:v['stages'] for v in record['vehicles']}
 
     def _save(self, record):
         path=self.directory/record['id']/'report.json'
@@ -138,34 +404,38 @@ class SimulationManager:
 
     def catalog(self):
         result=[]
-        representative={'R01':'rover','C01':'copter','F01':'plane'}
+        definitions={kind:self.vehicle_registry.get(kind) for kind in ('rover','copter','plane','vtol')}
         for entry in self.registry.list_scenes():
             item=deepcopy(entry)
-            ready=item.get('ready',True)
-            support={'none':dict(available=shutil.which('gz') is not None and ready,
-                               reason='仅加载真实 Gazebo 场景，不连接飞控' if ready else
-                               '场景入口或锁定依赖未安装完整，先安装资源并检查缺失项')}
+            spawn_info=self.world_spawns.describe(item['id'])
+            item['spawn_info']=spawn_info
+            ready=item.get('ready',True) and shutil.which('gz') is not None
+            support={'none':dict(available=ready,reason='仅加载 Gazebo World')}
             for kind in ('rover','copter','plane','vtol'):
-                compatible=representative.get(item['id'])==kind
-                reason=('复用受控本机 SITL 模型；须等待实际初始化，默认 SEND 关闭' if compatible
-                        else '尚无该场景/机型的受控启动适配；不能由候选车型推断已验收')
-                if kind=='vtol':
-                    reason='未配置经过验证的 QuadPlane 模型和专属控制 profile'
-                support[kind]=dict(available=compatible and shutil.which('gz') is not None,reason=reason)
+                definition=definitions[kind]
+                admission=spawn_info['vehicle_support'][kind]
+                support[kind]=dict(available=ready and admission['available'] and definition['status']=='READY',
+                    reason=admission['reason'] if not admission['available'] else definition.get('reason'),
+                    acceptance='NOT_TESTED: geometric admission is not native motion acceptance')
             item['vehicle_support']=support
             item['launchable_vehicles']=[k for k,v in support.items() if v['available']]
             result.append(item)
         return result
 
     def create(self, payload):
-        fields(payload,('scene_id','vehicle','seed','parameters'),('scene_id',))
+        fields(payload,('scene_id','vehicle','vehicles','spawn','seed','parameters'),('scene_id',))
         scene_id=payload['scene_id']
         scene=self.registry.get(scene_id)
-        vehicle=payload.get('vehicle','none')
-        if type(vehicle) is not str or vehicle not in ('none','rover','copter','plane','vtol'):
-            raise ValueError('unsupported simulation vehicle')
-        if vehicle!='none' and {'R01':'rover','C01':'copter','F01':'plane'}.get(scene_id)!=vehicle:
-            raise ValueError('BLOCKED: this scene/vehicle has no qualified local bootstrap')
+        if 'vehicles' in payload and ('vehicle' in payload or 'spawn' in payload):
+            raise ValueError('use either vehicles or legacy vehicle/spawn')
+        raw=payload.get('vehicles')
+        if raw is None:
+            kind=payload.get('vehicle','none')
+            if kind not in ('none','rover','copter','plane','vtol'):
+                raise ValueError('unsupported simulation vehicle')
+            raw=[] if kind=='none' else [dict(kind=kind,spawn=payload.get('spawn'))]
+        if type(raw) is not list or len(raw)>4:
+            raise ValueError('at most four fixed vehicles per World')
         seed=payload.get('seed',0)
         if type(seed) is not int or not 0<=seed<2**32:
             raise ValueError('seed must be an integer within 0..4294967295')
@@ -173,6 +443,8 @@ class SimulationManager:
         if type(parameters) is not dict:
             raise ValueError('scenario parameters must be an object')
         parameters=self.registry.validate(scene_id,seed=seed,parameters=parameters)
+        specifications=self._specifications(scene_id,raw,parameters,seed)
+        vehicle=specifications[0]['kind'] if specifications else 'none'
         with self.lock:
             if self.closed:
                 raise ValueError('simulation service is closed')
@@ -194,7 +466,7 @@ class SimulationManager:
                 raise
             record=dict(schema=1,id=identifier,test_id=identifier,scene_id=scene_id,
                 world_id=scene.get('world_id',scene_id),scenario_id=scene_id,vehicle=vehicle,
-                vehicle_id=None,target=None,state='CREATED',paused=False,
+                vehicle_id=None,target=None,vehicles=[],vehicle_specifications=specifications,retired_vehicles=[],state='CREATED',paused=False,
                 configuration=dict(seed=seed,parameters=parameters,scene_version=scene.get('version'),
                     generated_sdf_sha256=hashlib.sha256((directory/'scenario.sdf').read_bytes()).hexdigest()),created_at=stamp(),
                 started_at=None,ended_at=None,error=None,failure_domain=None,cleanup=None,
@@ -217,6 +489,7 @@ class SimulationManager:
                 raise ValueError('four-session concurrency budget exhausted')
             stop=Event()
             self.stops[identifier]=stop
+            self.progress[identifier]=Queue(maxsize=64)
             self._transition(record,'PREPARING')
             worker=Thread(target=self._run,args=(identifier,),name='simulation-'+identifier,daemon=True)
             self.threads[identifier]=worker
@@ -224,6 +497,9 @@ class SimulationManager:
             return deepcopy(record)
 
     def _attach(self, owner):
+        if hasattr(owner,'vehicles'):
+            for child in tuple(owner.vehicles.values()):self._attach(child)
+            return
         if not self.application or not owner.driver:
             return
         app=self.application
@@ -238,6 +514,9 @@ class SimulationManager:
             app.missions.identities.update(identities)
 
     def _cancel(self, owner):
+        if hasattr(owner,'vehicles'):
+            for child in tuple(owner.vehicles.values()):self._cancel(child)
+            return
         if not self.application or not owner.driver:
             return
         app=self.application
@@ -284,6 +563,9 @@ class SimulationManager:
                 self._transition(record,'STARTING')
             owner=LocalRuntime(self.root,directory,record['scene_id'],record['vehicle'],
                                seed=record['configuration']['seed'],
+                               vehicles=record.get('vehicle_specifications',[]),
+                               progress=lambda vehicle:self._queue_progress(identifier,vehicle),
+                               geographic_reference=self.world_spawns.describe(record['scene_id'])['geographic_reference'],
                                extra_plugin_paths=() if self.registry.assets is None else self.registry.assets.plugin_paths,
                                **self.runtime_options)
             self.owners[identifier]=owner
@@ -295,6 +577,13 @@ class SimulationManager:
                     sample=owner.sample()
                     if sample['error_lines']:
                         raise RuntimeError('Gazebo reported a required resource/plugin error')
+                    with self.lock:
+                        self._project_vehicles(record,owner)
+                        record['startup_progress']={v['id']:v['stages'] for v in record.get('vehicles',[])}
+                        self._save(record)
+                    for child in tuple(getattr(owner,'vehicles',{}).values()):
+                        info=child.driver.info() if child.driver else {}
+                        if info.get('fault'):raise FrameworkFailure('startup '+child.id+': '+str(info['fault']))
                     if sample['metrics']['sim_seconds'] is not None and sample['metrics']['sim_seconds']>0 and self._vehicle_ready(owner):
                         break
                 except subprocess.TimeoutExpired:
@@ -315,6 +604,7 @@ class SimulationManager:
                     except Exception as exc:
                         raise FrameworkFailure('Framework target admission failed: '+str(exc)) from exc
                     record['target']=record['vehicle_id']=owner.target if owner.driver else None
+                    self._project_vehicles(record,owner)
                     record['world_id']=owner.world
                     record['metrics']['load_seconds']=time.monotonic()-started
                     self._transition(record,'READY')
@@ -323,6 +613,10 @@ class SimulationManager:
             last_stats=last_progress=time.monotonic()
             latest_sim=first_sim
             while not stop.is_set():
+                if record.get('operation',{}).get('state')=='RUNNING' or record.get('switch',{}).get('state')=='PREPARING':
+                    last_stats=last_progress=time.monotonic()
+                    stop.wait(.2)
+                    continue
                 if record['paused']:
                     owner.alive()
                     last_stats=last_progress=time.monotonic()
@@ -360,7 +654,7 @@ class SimulationManager:
                         driver_fault='Framework vehicle health failed: '+str(info.get('fault') or 'owned vehicle link disconnected')
                     elif not self._vehicle_ready(owner):
                         driver_fault='Framework vehicle state expired or is no longer VALID'
-                related=self._related(owner.target)
+                related=self._world_related(owner)
                 sample['actions']=[{key:item.get(key) for key in ('id','name','state')} for item in related['actions']]
                 sample['missions']=[{key:item.get(key) for key in ('id','name','state')} for item in related['missions']]
                 with self.lock:
@@ -370,17 +664,20 @@ class SimulationManager:
                     sim=sample['metrics']['sim_seconds']
                     if sim is not None and sim>first_sim:
                         record['levels']['L2']='PASS'
+                    self._project_vehicles(record,owner)
                     record['metrics'].update(sample['metrics'])
                     record.update(related)
                     if owner.driver:
                         record['vehicle_status']=sample['vehicle_status']
-                    record['samples'].append(sample)
+                    record['samples'].append(self._history_sample(sample))
                     record['samples']=record['samples'][-512:]
                     self._sync_tests(record)
                     self._save(record)
                 with (directory/'samples.jsonl').open('a') as output:
                     output.write(json.dumps(sample,ensure_ascii=False,allow_nan=False)+'\n')
-                if driver_fault:
+                if not self._vehicle_ready(owner):
+                    driver_fault=driver_fault or 'one or more vehicle states expired or are no longer VALID'
+                if driver_fault and not (record.get('operation',{}).get('state')=='RUNNING' or record.get('switch',{}).get('state')=='PREPARING'):
                     raise FrameworkFailure(driver_fault)
                 stop.wait(1)
         except InterruptedError:
@@ -401,17 +698,22 @@ class SimulationManager:
                 persistence_errors.append(('STOPPING',exc))
             cleanup_errors=[]
             try:
+                operation=self.operation_threads.get(identifier)
+                if operation and record.get('operation',{}).get('state')=='RUNNING':operation.join(self.startup_timeout+40)
                 if owner:
                     cleanup_errors=self._cleanup_owner(identifier,owner)
                     # Post-cleanup projections are diagnostics, not prerequisites
                     # for shutting down the independently owned runtime.
                     try:
                         self._sync_tests(record)
-                        record.update(self._related(owner.target))
+                        record.update(self._world_related(owner))
                     except Exception as exc:
                         cleanup_errors.append('exit projection: '+type(exc).__name__+': '+str(exc))
+                    self._project_vehicles(record,owner)
                     if owner.driver:
                         record['vehicle_stop_status']='UNCONFIRMED: simulation processes retired; physical stop is not inferred'
+                    if hasattr(owner,'vehicles'):
+                        for child in tuple(owner.vehicles.values()):self._detach(child)
             except Exception as exc:
                 cleanup_errors.append(type(exc).__name__+': '+str(exc))
             record['cleanup']='FAILED' if cleanup_errors else 'COMPLETE'
@@ -443,6 +745,25 @@ class SimulationManager:
                 except Exception as exc:
                     self._persistence_failed(record,'terminal '+state,exc)
 
+    @staticmethod
+    def _history_sample(sample):
+        # Persist full raw cuts in JSONL; the bounded in-memory/UI timeline
+        # retains motion/health evidence without duplicating every telemetry
+        # field and immutable vehicle definition on every sample. Large JSON
+        # walks otherwise hold Python's GIL across strict Driver deadlines.
+        def estimate(value):
+            return None if value is None else {k:v for k,v in value.items() if k!='telemetry'}
+        result={k:v for k,v in sample.items() if k not in ('vehicles','estimated_vehicle','vehicle_status','stats_raw')}
+        result['estimated_vehicle']=estimate(sample.get('estimated_vehicle'))
+        result['vehicles']=[]
+        for vehicle in sample.get('vehicles',[]):
+            item={k:vehicle.get(k) for k in ('id','target','kind','state','ground_truth','stages')}
+            item['estimated_vehicle']=estimate(vehicle.get('estimated_vehicle'))
+            info=vehicle.get('vehicle_status',{})
+            item['vehicle_status']={k:info.get(k) for k in ('connected','session_id','fault','system_send','action_send')}
+            result['vehicles'].append(item)
+        return result
+
     def _sync_tests(self, record):
         if not self.application:
             return
@@ -454,8 +775,12 @@ class SimulationManager:
                 pass
 
     def _vehicle_ready(self, owner):
+        if hasattr(owner,'vehicles'):
+            with owner._state_lock:
+                return all(self._vehicle_ready(child) for child in tuple(owner.vehicles.values()))
+        if hasattr(owner,'stages') and (not owner.stages['plugin_connected'] or owner.owner.truth(owner.id) is None):return False
         if owner.driver is None:
-            return True
+            return not hasattr(owner,'stages')
         info,world=owner.driver.read_view()
         if not info.get('connected') or not info.get('owned_simulation') or world is None or world.vehicle is None:
             return False
@@ -469,17 +794,27 @@ class SimulationManager:
         except ValueError:
             return False
 
-    def _related(self, target):
+    def _related(self, target, *, bounded=True):
         if not self.application:
             return dict(actions=[],missions=[])
         app=self.application
         with app._control_lock:
-            actions=[deepcopy(item) for item in app.runtime.views() if item.get('target')==target][-64:]
-            missions=[deepcopy(item) for item in app.missions.views() if item.get('target')==target][-64:]
+            actions=[deepcopy(item) for item in app.runtime.views() if item.get('target')==target]
+            missions=[deepcopy(item) for item in app.missions.views() if item.get('target')==target]
+        if bounded:actions,missions=actions[-64:],missions[-64:]
         for item in actions:
             for key,limit in (('history',16),('feedback',8),('command_results',16)):
                 if isinstance(item.get(key),list):item[key]=item[key][-limit:]
         return dict(actions=actions,missions=missions)
+
+    def _world_related(self,owner):
+        if not hasattr(owner,'vehicles'):return self._related(owner.target)
+        result=dict(actions=[],missions=[])
+        targets={child.target for child in tuple(owner.vehicles.values())}|{item['target'] for item in owner.retired}
+        for target in sorted(targets):
+            related=self._related(target)
+            for key in result:result[key].extend(related[key])
+        return result
 
     def stop(self, identifier):
         with self.lock:
@@ -494,6 +829,8 @@ class SimulationManager:
                 except Exception as exc:self._persistence_failed(record,'cancel before startup',exc)
                 return deepcopy(record)
             record['cancelled_during_start']=record['state'] in ('PREPARING','STARTING')
+            owner=self.owners.get(identifier)
+            if owner and hasattr(owner,'vehicles'):self._retire(record,tuple(owner.vehicles.values()))
             self.stops[identifier].set()
             try:self._transition(record,'STOPPING')
             except Exception as exc:self._persistence_failed(record,'stop request',exc)
@@ -513,10 +850,23 @@ class SimulationManager:
 
     def sample(self, identifier):
         with self.lock:
+            self._drain_progress(self._get(identifier))
             record=deepcopy(self._get(identifier))
         return record
 
     def handle(self, operation, payload):
+        if operation=='simulation.vehicles':
+            fields(payload,())
+            return self.vehicle_registry.list_vehicles()
+        if operation=='simulation.add_vehicle':
+            fields(payload,('id','vehicle'),('id','vehicle'))
+            return self._vehicle_operation('add',payload)
+        if operation=='simulation.remove_vehicle':
+            fields(payload,('id','vehicle_id'),('id','vehicle_id'))
+            return self._vehicle_operation('remove',payload)
+        if operation=='simulation.switch':
+            fields(payload,('id','scene_id','seed','parameters','spawns'),('id','scene_id'))
+            return self._switch(payload)
         if operation=='simulation.assets':
             fields(payload,())
             return [] if self.registry.assets is None else self.registry.assets.list_assets()
@@ -557,6 +907,7 @@ class SimulationManager:
             with self.lock:
                 result=[]
                 for value in self.records.values():
+                    self._drain_progress(value)
                     compact=deepcopy({key:item for key,item in value.items() if key!='samples'})
                     compact['samples']=deepcopy(value['samples'][-1:])
                     compact['last_sample']=deepcopy(value['samples'][-1] if value['samples'] else None)
@@ -565,7 +916,7 @@ class SimulationManager:
         if operation=='simulation.create':
             return self.create(payload)
         if operation=='simulation.logs':
-            fields(payload,('id','offset','limit','stream'),('id',))
+            fields(payload,('id','offset','limit','stream','vehicle_id'),('id',))
             record=self._get(payload['id'])
             stream=payload.get('stream','gazebo')
             if stream not in ('gazebo','sitl','sdf-check'):
@@ -573,7 +924,8 @@ class SimulationManager:
             offset,limit=payload.get('offset',0),payload.get('limit',32768)
             if type(offset) is not int or offset<0 or type(limit) is not int or not 1<=limit<=65536:
                 raise ValueError('bounded log offset/limit required')
-            path=self.directory/record['id']/(stream+'.log')
+            child=self._selected_vehicle(record,payload.get('vehicle_id'),required=False)
+            path=self.directory/record['id']/(child['logs']['sitl'] if stream=='sitl' and child else stream+'.log')
             data=b''
             if path.is_file():
                 with path.open('rb') as source:
@@ -581,13 +933,14 @@ class SimulationManager:
             return dict(id=record['id'],stream=stream,offset=offset,next_offset=offset+len(data),
                         text=data.decode('utf-8',errors='replace'))
         if operation=='simulation.test':
-            fields(payload,('id','name','parameters','allow_send','timeout_s'),('id',))
+            fields(payload,('id','name','parameters','allow_send','timeout_s','vehicle_id'),('id',))
             if payload.get('name','GetVehicleState')!='GetVehicleState' or payload.get('parameters',{})!={} or payload.get('allow_send',False) is not False:
                 raise ValueError('simulation test only admits the read-only GetVehicleState query; use the existing control/Mission authorization for movement')
             record=self._get(payload['id'])
             if not self.application or not record['target'] or record['state']!='RUNNING' or record['paused']:
                 raise ValueError('running owned Framework vehicle session required')
-            request=dict(name=payload.get('name','GetVehicleState'),target=record['target'],
+            child=self._selected_vehicle(record,payload.get('vehicle_id'),required=False)
+            request=dict(name=payload.get('name','GetVehicleState'),target=child['target'] if child else record['target'],
                 parameters=payload.get('parameters',{}),allow_send=payload.get('allow_send',False),
                 timeout_s=payload.get('timeout_s',30))
             action=self.application.handle('run',request)
@@ -596,9 +949,11 @@ class SimulationManager:
                 self._save(record)
             return action
         if operation=='simulation.fault':
-            fields(payload,('id','settings'),('id','settings'))
+            fields(payload,('id','settings','vehicle_id'),('id','settings'))
             record=self._get(payload['id'])
             owner=self.owners.get(record['id'])
+            child=self._selected_vehicle(record,payload.get('vehicle_id'),required=False)
+            if child and owner:owner=owner.vehicles.get(child['id'])
             if record['state']!='RUNNING' or not owner or not owner.link:
                 raise ValueError('live owned Framework software receive link required')
             owner.link.configure(payload['settings'])
@@ -617,6 +972,7 @@ class SimulationManager:
         if operation=='simulation.report':
             with self.lock:
                 record=self._get(identifier)
+                self._drain_progress(record)
                 self._sync_tests(record)
                 return deepcopy(record)
         if operation in ('simulation.pause','simulation.resume','simulation.reset'):
@@ -624,7 +980,7 @@ class SimulationManager:
                 record=self._get(identifier)
                 if record['state']!='RUNNING':
                     raise ValueError('running session required')
-                if record['vehicle']!='none':
+                if record.get('vehicles') or record['vehicle']!='none':
                     raise ValueError('pause/reset of a live vehicle clock is fenced; stop and create a fresh SITL epoch')
                 owner=self.owners[identifier]
                 owner.control(operation.split('.')[1])
@@ -680,6 +1036,9 @@ class SimulationManager:
                 if cleanup_errors:errors.extend(identifier+': '+error for error in cleanup_errors)
                 try:self._save(record)
                 except Exception as exc:self._persistence_failed(record,'close fallback',exc)
+        for identifier,thread in tuple(self.operation_threads.items()):
+            thread.join(self.startup_timeout+40)
+            if thread.is_alive():errors.append('operation:'+identifier)
         for identifier,thread in tuple(self.asset_threads.items()):
             thread.join(40)
             if thread.is_alive():

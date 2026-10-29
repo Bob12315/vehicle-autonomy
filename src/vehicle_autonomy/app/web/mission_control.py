@@ -108,6 +108,12 @@ class MissionControl(ActionLab):
         if self.control_fault: raise ValueError(self.control_fault)
 
     def _idle(self, target, continuation=None):
+        # Lifecycle dispatch marks retiring targets before releasing this same
+        # ingress lock. New scopes must not race safe retirement in a worker.
+        manager=self.simulation_manager
+        retiring=getattr(manager,'retiring_targets',None)
+        if callable(retiring) and target in retiring():
+            raise ValueError('simulation target is retiring; wait for the World/vehicle operation to finish before acquiring control or starting a new task')
         for a in self.recovered_manual.values():
             if a['target'] == target and not a['release_safe']:
                 raise ValueError('restarted manual control remains UNKNOWN; trusted reconstruction required')
@@ -165,6 +171,7 @@ class MissionControl(ActionLab):
     def _snapshot(self):
         vehicles = []
         for target, d in self.drivers.items():
+            if target in getattr(self,'_retired_simulation_targets',set()):continue
             read=getattr(d,'read_view',None)
             info,world=read() if callable(read) else (d.info(),d.snapshot())
             track = self._tracks.setdefault(target, deque(maxlen=240))
@@ -317,17 +324,28 @@ class MissionControl(ActionLab):
 
     def handle_authenticated(self, operation, payload, *, principal, control_token, sessions):
         if principal!='api' and not sessions.alive(principal):raise ValueError('browser session expired before operation')
-        if operation in ('simulation.stop','simulation.fault'):
-            # Lifecycle and fault operations can disrupt an active control
-            # owner's telemetry/commands. An ordinary login (including the
-            # management API credential) must not bypass that browser owner.
+        if operation in ('simulation.stop','simulation.pause','simulation.resume','simulation.reset',
+                         'simulation.switch','simulation.add_vehicle','simulation.remove_vehicle',
+                         'simulation.fault','simulation.test'):
+            # A World change affects every attached control owner. Hold the
+            # existing ingress lock while collecting targets and dispatching;
+            # the management API credential cannot bypass a browser owner.
             service=self.simulation_manager
             if service is None:raise ValueError('Simulation manager unavailable')
-            record=service.sample(payload.get('id'))
             with self._control_lock:
-                target=record.get('target')
-                if record['state'] not in ('FINISHED','FAILED','CANCELLED') and target in self.operator_controls.records:
-                    self.operator_controls.check(target,principal,control_token,fresh=False)
+                record=service.sample(payload.get('id'))
+                vehicles=record.get('vehicles') or [dict(id=record.get('target'),target=record.get('target'))]
+                selected=payload.get('vehicle_id')
+                if operation in ('simulation.remove_vehicle','simulation.fault','simulation.test') and selected:
+                    vehicles=[v for v in vehicles if v.get('id')==selected]
+                    if not vehicles:raise ValueError('vehicle does not belong to this World session')
+                if record['state'] not in ('FINISHED','FAILED','CANCELLED'):
+                    for vehicle in vehicles:
+                        target=vehicle.get('target')
+                        if vehicle.get('state') not in ('FINISHED','FAILED','CANCELLED','REMOVED') and target in self.operator_controls.records:
+                            try:self.operator_controls.check(target,principal,control_token,fresh=False)
+                            except ValueError:
+                                raise ValueError('related vehicle is reserved by a control page; safely release SEND in the original control page before changing this World or vehicle') from None
                 return self.handle(operation,payload)
         if operation=='visualization.open':
             if set(payload)!={'target'}:raise ValueError('one vehicle target required')
@@ -472,7 +490,7 @@ class MissionControlHandler(ActionLabHandler):
         routes = {'/api/console/state':'console.state','/api/studio/state':'studio.state','/api/missions/library':'mission.library','/api/missions/types':'mission.types'}
         routes.update({'/api/studio-b/catalog':'studio-b.catalog','/api/studio-b/library':'studio-b.library'})
         routes['/api/control/state']='control.snapshot'
-        routes.update({'/api/simulation/catalog':'simulation.catalog','/api/simulation/sessions':'simulation.sessions','/api/simulation/assets':'simulation.assets'})
+        routes.update({'/api/simulation/vehicles':'simulation.vehicles','/api/simulation/catalog':'simulation.catalog','/api/simulation/sessions':'simulation.sessions','/api/simulation/assets':'simulation.assets'})
         if self.path in routes:
             if self.authorized(): self.invoke(routes[self.path], {})
             return
@@ -492,7 +510,7 @@ class MissionControlHandler(ActionLabHandler):
         '/api/workspaces/retry':'workspace.retry','/api/workspaces/reconcile':'workspace.reconcile',
         '/api/control/takeover':'control.takeover','/api/control/reestablish':'control.reestablish'})
     post_routes.update({'/api/simulation/'+op:'simulation.'+op for op in (
-        'create','start','stop','pause','resume','reset','report','logs','test','fault','install','uninstall','asset_status')})
+        'create','start','stop','pause','resume','reset','switch','add_vehicle','remove_vehicle','report','logs','test','fault','install','uninstall','asset_status')})
     post_routes.update({'/api/control/acquire':'operator.acquire','/api/control/renew':'operator.renew',
         '/api/control/release':'operator.release','/api/control/request-takeover':'operator.takeover'})
     post_routes.update({'/api/visualization/open':'visualization.open','/api/visualization/candidates':'visualization.propose',

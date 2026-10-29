@@ -1,6 +1,6 @@
 """Driver admission and exit using the actual signed in-memory AP composition."""
 from concurrent.futures import Future
-from threading import RLock
+from threading import Event,RLock
 import unittest
 
 from vehicle_autonomy.app.bootstrap.action_driver import VehicleActionDriver
@@ -23,7 +23,7 @@ class DriverTests(unittest.TestCase):
         self.r=self.fixture.runtime;self.r.connect();self.fixture.cycle(self.fixture.heartbeat(mode=4)+self.fixture.state_messages())
         d=self.d=VehicleActionDriver.__new__(VehicleActionDriver)
         d.target='copter';d.profile=self.r.profile;d.ownership=Proof();d.allow_send=True;d._runtime=self.r;d.clock=self.fixture.clock
-        d._lock=RLock();d._scope=None;d._effects={};d._results={};d._effect_sessions={};d._requested_scopes=set();d._cancelled=set();d._guards={};d._fault=None;d._world=None
+        d._lock=RLock();d._retiring=Event();d._scope=None;d._effects={};d._results={};d._effect_sessions={};d._requested_scopes=set();d._cancelled=set();d._guards={};d._fault=None;d._world=None
         def task(function):
             f=Future()
             try:f.set_result(function())
@@ -36,6 +36,18 @@ class DriverTests(unittest.TestCase):
         from dataclasses import replace
         return replace(self.d.clock(),monotonic_ns=self.d.clock().monotonic_ns+ns)
     def open(self,identifier='a',**kw):return self.d.open_scope(identifier,allow_send=kw.get('allow_send',True),continuation_of=None,deadline=kw.get('deadline',self.deadline()))
+    def test_retirement_blocks_new_scope_without_revoking_safe_cleanup(self):
+        before=len(self.fixture.transports[0].writes)
+        self.d.set_retiring()
+        with self.assertRaisesRegex(ActionAdmissionRejected,'retiring'):
+            self.open().result()
+        self.assertEqual(before,len(self.fixture.transports[0].writes))
+        self.d.set_retiring(False)
+        self.open().result()
+        self.d.set_retiring()
+        self.d.begin_exit('a')
+        self.d.finish_scope('a',succeeded=False).result()
+
     def test_default_gate_deadline_and_cancelled_admission_have_zero_writes(self):
         for kw in ({'allow_send':False},{'deadline':self.deadline(-1)}):
             with self.assertRaises(ActionAdmissionRejected):self.open(**kw).result()

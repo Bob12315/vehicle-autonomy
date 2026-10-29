@@ -37,6 +37,7 @@ class VehicleActionDriver:
         from vehicle_autonomy.app.bootstrap.cycle_maintenance import CycleMaintenance
         self._cycle_maintenance=CycleMaintenance() if source_time_sync else None
         self._native_input_fence=native_input_fence
+        self._retiring=Event()
         self.events=event_sink or (lambda e:None)
         if source_time_sync and ownership.manifest.get('phase5_clock_uart_baud')!={'SERIAL0_BAUD':115.}:raise ValueError('clock sync requires public owned SERIAL0 baud proof')
         self._runtime=SimulationRuntime(profile,translator=translator,receive_signing=ownership.receive_signing,source_time_sync=source_time_sync,time_sync_uart_baud=115200 if source_time_sync else None,
@@ -149,9 +150,15 @@ class VehicleActionDriver:
         """Published evidence only: no port/transport access from HTTP threads."""
         with self._lock:return deepcopy(list(self._command_feedback.get(identifier,{}).values())[-8:])
 
+    def set_retiring(self,retiring=True):
+        """Fence new scopes while preserving existing safety exit commands."""
+        if retiring:self._retiring.set()
+        else:self._retiring.clear()
+
     def open_scope(self,identifier,*,allow_send,continuation_of,deadline):
         with self._lock:self._requested_scopes.add(identifier)
         def admit():
+            if self._retiring.is_set():raise ActionAdmissionRejected('vehicle epoch retiring')
             if identifier in self._cancelled or deadline.elapsed_ns_since(self.clock())<=0:
                 raise ActionAdmissionRejected('admission cancelled or expired')
             if not self.allow_send or not allow_send:raise ActionAdmissionRejected('explicit deployment and Action SEND required')
@@ -177,7 +184,7 @@ class VehicleActionDriver:
                             and world.vehicle.reported_pose and world.vehicle.reported_pose.value.position.z>=10
                             and world.vehicle.global_position is not None
                             and 0<=self.clock().elapsed_ns_since(world.vehicle.global_position.captured_at)<=self.profile.safety.max_snapshot_age_ns):break
-                    time.sleep(max(0,self.profile.period_ns/1e9-(time.monotonic()-started)))
+                    time.sleep(max(0,self._cycle_period_ns/1e9-(time.monotonic()-started)))
                 else:raise RuntimeError('fresh read-only airborne LOITER evidence unavailable')
                 if self._runtime.authority.system_send or self._runtime.authority.lease:raise RuntimeError('reconnect inherited authorization')
             elif self._scope is not None:raise ActionAdmissionRejected('previous physical scope still owns authority')
@@ -190,6 +197,7 @@ class VehicleActionDriver:
                     raise ActionAdmissionRejected('new owner requires fresh disarmed ground; previous execution may be unresolved')
             if identifier in self._cancelled or deadline.elapsed_ns_since(self.clock())<=0:
                 raise ActionAdmissionRejected('admission cancelled or expired after recovery')
+            if self._retiring.is_set():raise ActionAdmissionRejected('vehicle epoch retiring')
             # Reconnection never grants authority: only this explicit new request.
             self._runtime.begin_run(allow_send=True,run_id=identifier,action_id=identifier)
             if continuation_of:self._guards.pop(continuation_of,None)

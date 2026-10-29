@@ -55,7 +55,7 @@ class ControlCheck:
         raise TimeoutError('HTTP control/physical observation timeout')
 
     def information(self,label,*,armed=None,mode=None):
-        v=self.call('/api/studio/state')['vehicles'][0];w=v['world'];state=w['vehicle']
+        v=next(item for item in self.call('/api/studio/state')['vehicles'] if item['target']==self.target);w=v['world'];state=w['vehicle']
         assert v['kind']==self.kind and v['connected'] and v['fresh_vehicle_state']
         assert v['verified_frames']>0 and not v['fault']
         assert state['health']['quality']=='VALID'

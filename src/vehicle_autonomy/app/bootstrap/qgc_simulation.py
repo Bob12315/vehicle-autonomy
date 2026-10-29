@@ -178,12 +178,12 @@ class Session(SimulationProvisioning):
             if process.poll() is not None or os.getpgid(process.pid) != record['pgid']:
                 raise RuntimeError('owned simulation ended')
 
-    def start(self, name, command, cwd=None, *, transient=False):
+    def start(self, name, command, cwd=None, *, transient=False, pass_fds=()):
         log = (self.directory / (name + '.log')).open('w')
         try:
             process = subprocess.Popen(command, cwd=cwd or self.directory, env=self.env,
                                        stdin=subprocess.DEVNULL, stdout=log,
-                                       stderr=subprocess.STDOUT, start_new_session=True)
+                                       stderr=subprocess.STDOUT, start_new_session=True, pass_fds=pass_fds)
         except BaseException:
             log.close()
             raise

@@ -2,6 +2,7 @@
 from dataclasses import asdict
 import json
 from pathlib import Path
+from queue import Queue
 import tempfile
 from threading import Event
 from types import SimpleNamespace
@@ -39,8 +40,34 @@ class ManagerContracts(unittest.TestCase):
 
     def test_unsupported_pair_does_not_create_session(self):
         with self.assertRaisesRegex(ValueError,'BLOCKED'):
-            self.manager.create(dict(scene_id='R02',vehicle='rover'))
+            self.manager.create(dict(scene_id='F05',vehicle='plane'))
         self.assertEqual(self.manager.records,{})
+
+    def test_world_spawn_must_also_fit_unchanged_framework_geofence(self):
+        with self.assertRaisesRegex(ValueError,'Framework.*geofence'):
+            self.manager.create(dict(scene_id='R01',vehicle='rover',spawn={'id':'north-far'}))
+        self.assertEqual({},self.manager.records)
+
+    def test_four_vehicle_presets_fit_existing_profile_and_keep_unique_slots(self):
+        record=self.manager.create(dict(scene_id='R01',vehicles=[
+            dict(kind='rover',spawn={'id':preset}) for preset in ('center','north','south','east')]))
+        self.assertEqual(4,len(record['vehicle_specifications']))
+        self.assertEqual(4,len({v['slot_id'] for v in record['vehicle_specifications']}))
+        self.assertEqual({},self.manager.owners)
+
+    def test_startup_progress_is_visible_without_adopting_stale_stage_updates(self):
+        created=self.manager.create(dict(scene_id='R01'))
+        record=self.manager.records[created['id']]
+        self.manager.progress[created['id']]=Queue(maxsize=64)
+        vehicle=dict(id='vehicle-progress',stages={'world_loaded':True},state='STARTING')
+        record['state']='STARTING'
+        try:
+            self.manager._queue_progress(created['id'],vehicle)
+            self.assertEqual([vehicle],self.manager.sample(created['id'])['vehicles'])
+            record['state']='RUNNING';record['vehicles'][0]['state']='RUNNING'
+            self.manager._queue_progress(created['id'],dict(vehicle,state='STARTING'))
+            self.assertEqual('RUNNING',self.manager.sample(created['id'])['vehicles'][0]['state'])
+        finally:record['state']='CREATED'
 
     def test_browser_paths_commands_and_deployment_send_are_rejected(self):
         for extra in ('path','command','argv','allow_send','instance','system_id'):
@@ -166,7 +193,8 @@ class ManagerContracts(unittest.TestCase):
 
     def test_catalog_distinguishes_candidate_and_adapted(self):
         catalog={r['id']:r for r in self.manager.catalog()}
-        self.assertFalse(catalog['R02']['vehicle_support']['rover']['available'])
+        self.assertTrue(catalog['R02']['vehicle_support']['rover']['available'])
+        self.assertIn('NOT_TESTED',catalog['R02']['vehicle_support']['rover']['acceptance'])
         self.assertFalse(catalog['F07']['vehicle_support']['vtol']['available'])
 
 
