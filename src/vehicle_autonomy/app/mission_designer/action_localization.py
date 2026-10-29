@@ -37,7 +37,7 @@ ACTION_TEXT = {
     'AutoLand': ('vehicle', '固定翼自动着陆', 'Fixed-wing autoland', '执行已审计的固定翼跑道着陆，观察近地高度、低速稳定和上锁。'),
     'Drive': ('navigation', '受控行驶', 'Drive', '持续发送地面车车体前向速度和转向角速度；取消后等待保持模式与停车确认。'),
     'Turn': ('navigation', '停车转向', 'Turn', '地面车以零线速度和有界偏航角速度转向；实际适用性由已审计驱动配置决定。'),
-    'Goto': ('navigation', '前往目标位置', 'Go to position', '前往里程计东北天坐标位置，等待空间到达、稳定和停止确认；地面车高度固定为零。'),
+    'Goto': ('navigation', '前往目标位置', 'Go to position', '前往里程计东北天坐标位置，等待空间到达、稳定和停止确认；地面车高度固定为零，退出后保持 HOLD，后续运动前需切换 GUIDED。'),
     'ReturnHome': ('navigation', '返回起点', 'Return home', '地面车观察回到起点并停车；多旋翼观察返航落地并上锁。'),
     'RTL': ('navigation', '原生返航', 'Native return to launch', '地面车和多旋翼按物理返航条件完成；固定翼只确认原生返航模式，不能声称抵达或着陆。'),
     'SetGuidedTarget': ('navigation', '设置固定翼导航目标', 'Set fixed-wing guided target', '配置固定翼经纬度及海拔目标；仅确认配置，不确认到达。飞行状态需满足准入条件。'),

@@ -40,3 +40,11 @@ vehicle-autonomy-missions --port 8780 --token-file /absolute/private/web.private
 `artifacts/simulation-center/browser-world-r2/result.json`：R01无车场景真实Chrome+Gazebo启动、暂停/继续/重置、日志、报告导出、停止清理及共享登录导航均PASS；零JavaScript错误。原始截图01–04与报告JSON同目录。此结果仅代表无车环境的网页生命周期，不包含SITL运动验收。
 
 `artifacts/simulation-center/browser-assets-r2/result.json`：锁定官方air-pressure资产通过真实Chrome卸载、重新安装及状态查询，零JavaScript错误。首次资产脚本因中文翻译后的提示断言不匹配失败；原件位于browser-assets。首次world脚本暴露忙碌请求提示与测试过早操作问题；修复后重跑，失败原件位于browser-world-r1。
+
+## Rover Goto 的停车模式
+
+本轮实测复现了原有 Goto 退出停车确认超时。标准 Rover Goto 现在先清零原速度流，
+再经原 Action/Execution 请求原生 HOLD；只有原停车确认、实际稳定窗和模式确认都满足
+才完成。没有放宽停止阈值或超时。Goto 后保持 HOLD；下一次 Goto/Drive 前请显式
+选择 GUIDED。编排连续多个 Goto 的自定义 Mission 时，也应在后续运动前加入
+SetMode(GUIDED)。原生 ReturnHome 可以从 HOLD 开始，已重新验证。

@@ -3,7 +3,7 @@ import math
 
 from vehicle_autonomy.actions.common.standard import Empty,ModeParameters,CommonFactory,QueryFactory,ContextFactory,NativeGoal,speed,ground
 from vehicle_autonomy.actions.copter.standard import BasicFactory,StreamFactory,TakeoffParameters,GotoParameters,VelocityParameters,YawParameters
-from vehicle_autonomy.actions.rover.standard import RoverStreamFactory,DriveParameters,TurnParameters,RoverReturnGoal,RoverStopFactory
+from vehicle_autonomy.actions.rover.standard import RoverStreamFactory,DriveParameters,TurnParameters,RoverReturnGoal,RoverStopFactory,RoverGotoFactory
 from vehicle_autonomy.actions.plane.standard import PlaneFactory,GuidedTargetParameters
 from vehicle_autonomy.contracts.action import ActionKind,ActionResource,ResourceMode
 from vehicle_autonomy.contracts.core.serialization import to_json_value
@@ -61,6 +61,12 @@ class ReturnFactory(ContextFactory):
         return NativeGoal('RTL',modes['RTL'],predicate)
 
 
+class GotoFactory(ContextFactory):
+    def select(self,c):return RoverGotoFactory() if c.target_kind=='rover' else BasicFactory('goto')
+    def validate_context(self,p,w,c):self.select(c).validate_context(p,w,c)
+    def start_with_context(self,p,w,c):return self.select(c).start_with_context(p,w,c)
+
+
 def register_standard(registry):
     def add(name,p,factory,*,kind=ActionKind.ONE_SHOT,vehicles=KINDS,cap=None,effects=(),resource='vehicle.motion',timeout=30,max_timeout=60,success='',overrides=None,timeouts=None):
         writing=bool(effects)
@@ -86,8 +92,8 @@ def register_standard(registry):
         success='Copter: measured climb +/-0.35 m, settled 2 s. Plane: 50 +/-5 m and 8..28 m/s, settled 2 s; flight remains reserved.')
     for name,p in [('Drive',DriveParameters),('Turn',TurnParameters)]:
         add(name,p,RoverStreamFactory(name),kind=ActionKind.CONTINUOUS,vehicles=frozenset({'rover'}),effects=(TwistTargetEffect,StopMotionEffect,ModeEffect),success='Continuous body setpoints until explicit cancel. Exit zeros the old stream, requests native HOLD and requires the existing observed stop barrier. New movement requires GUIDED again.')
-    add('Goto',GotoParameters,BasicFactory('goto'),kind=ActionKind.GOAL,vehicles=frozenset({'rover','copter'}),cap='goto',effects=MOTION,timeout=45,max_timeout=45,
-        overrides={'rover':{'z_m':{'const':0.,'default':0.}}},success='Existing spatial arrival, stability and stop barriers; ACK is not arrival.')
+    add('Goto',GotoParameters,GotoFactory(),kind=ActionKind.GOAL,vehicles=frozenset({'rover','copter'}),cap='goto',effects=MOTION+(ModeEffect,),timeout=45,max_timeout=45,
+        overrides={'rover':{'z_m':{'const':0.,'default':0.}}},success='Existing spatial arrival, stability and stop barriers; ACK is not arrival. Rover zeroes its stream and requests native HOLD for exit braking; subsequent movement requires GUIDED.')
     add('Stop',Empty,RoverStopFactory(),kind=ActionKind.GOAL,vehicles=frozenset({'rover'}),effects=(ModeEffect,),success='Native HOLD confirmation plus fresh observed speed <=0.1 m/s settled 2 s; does not require entering GUIDED to stop.')
     for name,p,cap,kind in [('SetVelocity',VelocityParameters,'velocity',ActionKind.CONTINUOUS),('SetYaw',YawParameters,'yaw',ActionKind.GOAL),('Hold',Empty,'hold',ActionKind.CONTINUOUS)]:
         add(name,p,StreamFactory(name),kind=kind,vehicles=frozenset({'copter'}),cap=cap,effects=MOTION,

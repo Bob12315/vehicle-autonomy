@@ -6,9 +6,9 @@ from vehicle_autonomy.actions.catalog import register_standard,capabilities
 from vehicle_autonomy.actions.common.standard import NativeGoal
 from vehicle_autonomy.contracts.action import ActionContext,ActionKind
 from vehicle_autonomy.contracts.core.serialization import to_json_value
-from vehicle_autonomy.contracts.core.geometry import Pose3,Quaternion,Vector3
+from vehicle_autonomy.contracts.core.geometry import Pose3,Quaternion,Vector3,Twist3
 from vehicle_autonomy.contracts.decision import ActionOutcome,EffectPhase,EffectResult,ExitReason
-from vehicle_autonomy.contracts.effects.vehicle import ModeEffect,TwistTargetEffect
+from vehicle_autonomy.contracts.effects.vehicle import ModeEffect,TwistTargetEffect,StopMotionEffect
 from vehicle_autonomy.engine.action.registry import ActionRegistry
 from tests import test_basic_actions as basic_tests
 
@@ -102,6 +102,51 @@ class LibraryTests(unittest.TestCase):
         decision=instance.tick_with_results(self.fixture.sample(3.1),completed)
         self.assertEqual(decision.outcome,ActionOutcome.SUCCEEDED)
         self.assertEqual(to_json_value(decision.result),{'physical_goal_observed':True})
+
+    def rover_goto_exit(self):
+        self.world=replace(self.world,vehicle=replace(self.world.vehicle,
+            operation=replace(self.world.vehicle.operation,native_mode='ARDUPILOT_CUSTOM_15')))
+        instance=self.instance('Goto','rover',dict(x_m=2,y_m=0,z_m=0))
+        for _ in range(3):
+            if instance.tick(self.world).effects:break
+        tx=(EffectResult('move','a',EffectPhase.TRANSMITTED),)
+        decision=instance.exit_with_results(self.fixture.sample(.1),ExitReason.CANCELLED,tx)
+        self.assertIsInstance(decision.effects[0],StopMotionEffect)
+        self.assertEqual(decision.effects[1],ModeEffect('HOLD'))
+        return instance,tx
+
+    def test_rover_goto_hold_confirmation_cannot_replace_the_stop_barrier(self):
+        instance,tx=self.rover_goto_exit()
+        complete=tx+(EffectResult('stop','a',EffectPhase.COMPLETED),EffectResult('hold','a',EffectPhase.COMPLETED))
+        unknown_stop=tx+(EffectResult('stop','a',EffectPhase.UNKNOWN),complete[-1])
+        with self.assertRaisesRegex(RuntimeError,'stop_exit_unconfirmed'):
+            instance.exit_with_results(self.fixture.sample(.2),ExitReason.CANCELLED,unknown_stop)
+        instance,tx=self.rover_goto_exit()
+        unknown_hold=tx+(EffectResult('stop','a',EffectPhase.COMPLETED),EffectResult('hold','a',EffectPhase.UNKNOWN))
+        with self.assertRaisesRegex(RuntimeError,'hold_unconfirmed'):
+            instance.exit_with_results(self.fixture.sample(.2),ExitReason.CANCELLED,unknown_hold)
+
+    def test_rover_goto_still_requires_physical_settling_and_copter_has_no_hold(self):
+        instance,tx=self.rover_goto_exit()
+        complete=tx+(EffectResult('stop','a',EffectPhase.COMPLETED),EffectResult('hold','a',EffectPhase.COMPLETED))
+        sample=self.fixture.sample(1)
+        turning=replace(sample,localization=replace(sample.localization,
+            twist=replace(sample.localization.twist,value=Twist3(Vector3(0,0,0),Vector3(0,0,.25)))))
+        self.assertFalse(instance.exit_with_results(turning,ExitReason.CANCELLED,complete).complete)
+        self.assertFalse(instance.exit_with_results(self.fixture.sample(2),ExitReason.CANCELLED,complete[:-1]).complete)
+        # A completed mode result alone cannot replace its observed state.
+        guided=self.fixture.sample(4.1)
+        guided=replace(guided,vehicle=replace(guided.vehicle,
+            operation=replace(guided.vehicle.operation,native_mode='ARDUPILOT_CUSTOM_15')))
+        self.assertFalse(instance.exit_with_results(guided,ExitReason.CANCELLED,complete).complete)
+        held=replace(self.fixture.sample(4.2),vehicle=replace(self.fixture.sample(4.2).vehicle,
+            operation=replace(self.world.vehicle.operation,native_mode='ARDUPILOT_CUSTOM_4')))
+        self.assertTrue(instance.exit_with_results(held,ExitReason.CANCELLED,complete).complete)
+        self.world=replace(self.fixture.world,vehicle=replace(self.fixture.world.vehicle,
+            operation=replace(self.fixture.world.vehicle.operation,native_mode='ARDUPILOT_CUSTOM_4')))
+        copter=self.instance('Goto','copter',dict(x_m=2,y_m=0,z_m=1.5));copter.tick(self.world)
+        effects=copter.exit_with_results(self.fixture.sample(.1),ExitReason.CANCELLED,tx).effects
+        self.assertEqual(len(effects),1);self.assertIsInstance(effects[0],StopMotionEffect)
 
 
 if __name__=='__main__':unittest.main()

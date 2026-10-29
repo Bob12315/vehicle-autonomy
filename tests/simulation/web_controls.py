@@ -163,7 +163,7 @@ class ControlCheck:
             self.information('Stop while already HOLD',armed=True,mode=4)
         self.perform('SetMode',{'mode':'GUIDED'})
         self.perform('Goto',dict(x_m=2.,y_m=0.,z_m=0. if self.kind=='rover' else 1.5),55)
-        self.information('goto',armed=True)
+        self.information('goto',armed=True,mode=4 if self.kind=='rover' else None)
         self.perform('ReturnHome',seconds=65)
         if self.kind=='rover':self.perform('Disarm')
         self.information('home stopped',armed=False)

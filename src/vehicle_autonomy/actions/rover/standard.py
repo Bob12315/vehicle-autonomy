@@ -9,6 +9,40 @@ from vehicle_autonomy.contracts.effects.vehicle import StopMotionEffect,ModeEffe
 from vehicle_autonomy.contracts.decision import ExitDecision
 from vehicle_autonomy.actions.common.standard import NativeGoal, ContextFactory, BAD, speed
 from vehicle_autonomy.contracts.decision import ActionDecision, ActionOutcome, EffectPhase
+from vehicle_autonomy.actions.copter.standard import BasicFactory, BasicFeedback
+
+
+class RoverGotoFeedback(BasicFeedback):
+    """Keep the existing stop proof, with native HOLD braking after zeroing."""
+    def __init__(self,instance):
+        super().__init__(instance)
+        self.hold_index=None
+
+    def exit(self,world,reason):return self.exit_with_results(world,reason,())
+
+    def exit_with_results(self,world,reason,results):
+        if self.hold_index is not None:
+            hold=results[self.hold_index:self.hold_index+1]
+            if hold and hold[0].phase in BAD:
+                raise RuntimeError('rover_goto_hold_unconfirmed')
+            # The original barrier must still inspect the StopMotion result,
+            # never mistake an ACK/completed mode request for physical stopping.
+            original=results[:self.hold_index]+results[self.hold_index+1:]
+            decision=super().exit_with_results(world,reason,original)
+            confirmed=bool(hold and hold[0].phase is EffectPhase.COMPLETED and
+                           world.vehicle.operation.native_mode=='ARDUPILOT_CUSTOM_4')
+            return ExitDecision(decision.complete and confirmed,decision.effects)
+        decision=super().exit_with_results(world,reason,results)
+        if any(isinstance(effect,StopMotionEffect) for effect in decision.effects):
+            self.hold_index=len(results)+len(decision.effects)
+            return ExitDecision(False,decision.effects+(ModeEffect('HOLD'),))
+        return decision
+
+
+class RoverGotoFactory(BasicFactory):
+    def __init__(self):super().__init__('goto')
+    def start_with_context(self,p,world,ctx):
+        return RoverGotoFeedback(super().start_with_context(p,world,ctx).instance)
 
 
 @dataclass(frozen=True,slots=True)

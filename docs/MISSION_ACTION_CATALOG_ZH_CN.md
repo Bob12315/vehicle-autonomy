@@ -430,9 +430,9 @@
 
 ### `Goto@1.0.0` — 前往目标位置
 
-前往里程计东北天坐标位置，等待空间到达、稳定和停止确认；地面车高度固定为零。
+前往里程计东北天坐标位置，等待空间到达、稳定和停止确认；地面车高度固定为零，退出后保持 HOLD，后续运动前需切换 GUIDED。
 
-- 实现：`vehicle_autonomy.actions.copter.standard.BasicFactory`；参数类型：`vehicle_autonomy.actions.copter.standard`。
+- 实现：`vehicle_autonomy.actions.catalog.GotoFactory`；参数类型：`vehicle_autonomy.actions.copter.standard`。
 - 主分类：`navigation`；支持车型：copter, rover。原始 Registry 车型字段：`['copter', 'rover']`（空列表不代表已验证全部车型）。
 - 生命周期：`typed_only`；所需能力：`['goto']`。
 - 依赖及限制：原有执行上下文、能力与安全检查；不随界面分类自动装配。
