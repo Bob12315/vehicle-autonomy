@@ -284,6 +284,9 @@ async function initialize(){
  await auth.ready;if(!auth.session)return;
  const vehicles=await api.call('/api/vehicles');$('#target').replaceChildren(...vehicles.map(v=>node('option',api.kindLabel(v.kind)+' / '+v.target,{value:v.target})));
  if(!vehicles.length){$('#vehicle-name').textContent='未装配车辆';notice('当前后端没有车辆。请使用已有的仿真启动入口。');return;}
+ let requested='';try{requested=decodeURIComponent(location.hash.slice(1));}catch(_){}
+ if(requested&&vehicles.some(v=>v.target===requested))$('#target').value=requested;
+ else if(requested){$('#target').selectedIndex=-1;api.target=null;notice('指定车辆未注册或已结束，请从车辆列表选择当前实例。');live();return;}
  api.target=$('#target').value;await api.loadCatalog();await refresh();live();
 }
 setInterval(()=>update(),100);setInterval(()=>renew(),2000);setInterval(()=>{if(api.target&&!closing)refresh().catch(notice);if(lastReceived&&performance.now()-lastReceived>3500){invalidate();stop();}},1500);
