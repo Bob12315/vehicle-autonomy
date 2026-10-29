@@ -1,5 +1,14 @@
 # V1 framework boundary
 
+## Universal fixed-vehicle World composition (2026-10-29)
+
+`app/simulation` now separates an immutable SHA-locked VehicleRegistry from
+WorldSpawnRegistry geometry admission. One owned Gazebo hosts independent SITL
+instances and existing signed Drivers. Dynamic add/remove and World replacement
+retain Action/Execution ownership and use fresh epochs; no new vehicle writer or
+hardware connection is introduced. Native acceptance and qualified limitations
+are recorded in [the universal simulation report](UNIVERSAL_SIMULATION_TEST_REPORT.md).
+
 ## Optional RViz2 visualization integration (2026-10-28)
 
 `app/visualization` reads the existing immutable Driver/VehicleState cut through

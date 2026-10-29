@@ -1,0 +1,4089 @@
+{
+  "date": "2026-10-30",
+  "started_date": "2026-10-29",
+  "timezone": "Asia/Ulaanbaatar",
+  "runtime_revision": "d76b937803844946102b943255378ff34d6d02f2",
+  "unit_tests": {
+    "status": "PASS",
+    "count": 909,
+    "log": "artifacts/simulation/universal-20261029/unit-final.log",
+    "sha256": "8fdb537f752255196664e7fce54cb3face13e09ff43821f82ee4735a5bd19a71"
+  },
+  "counts": {
+    "rover": {
+      "admitted_worlds": 22,
+      "actual_loaded_worlds": 6,
+      "actual_motion_worlds": 5,
+      "actual_web_worlds": 5,
+      "loaded_ids": [
+        "F01",
+        "F02",
+        "R01",
+        "R03",
+        "R04",
+        "R06"
+      ],
+      "motion_ids": [
+        "F01",
+        "R01",
+        "R03",
+        "R04",
+        "R06"
+      ],
+      "web_ids": [
+        "F01",
+        "F02",
+        "R01",
+        "R03",
+        "R04"
+      ]
+    },
+    "copter": {
+      "admitted_worlds": 22,
+      "actual_loaded_worlds": 9,
+      "actual_motion_worlds": 4,
+      "actual_web_worlds": 7,
+      "loaded_ids": [
+        "C01",
+        "C02",
+        "C04",
+        "C05",
+        "F01",
+        "F02",
+        "R01",
+        "R03",
+        "R04"
+      ],
+      "motion_ids": [
+        "C01",
+        "C02",
+        "C04",
+        "C05"
+      ],
+      "web_ids": [
+        "C01",
+        "C04",
+        "F01",
+        "F02",
+        "R01",
+        "R03",
+        "R04"
+      ]
+    },
+    "plane": {
+      "admitted_worlds": 6,
+      "actual_loaded_worlds": 3,
+      "actual_motion_worlds": 3,
+      "actual_web_worlds": 2,
+      "loaded_ids": [
+        "F01",
+        "F02",
+        "F03"
+      ],
+      "motion_ids": [
+        "F01",
+        "F02",
+        "F03"
+      ],
+      "web_ids": [
+        "F01",
+        "F02"
+      ]
+    },
+    "vtol": {
+      "admitted_worlds": 0,
+      "actual_loaded_worlds": 0,
+      "actual_motion_worlds": 0,
+      "actual_web_worlds": 0,
+      "loaded_ids": [],
+      "motion_ids": [],
+      "web_ids": []
+    }
+  },
+  "native": [
+    {
+      "scene_id": "R01",
+      "kind": "rover",
+      "status": "PASS",
+      "checks": {
+        "world_entity_plugin_sitl_framework": "PASS",
+        "basic_motion_and_safe_exit": "PASS"
+      },
+      "configuration": {
+        "seed": 0,
+        "parameters": {
+          "obstacle_count": 0,
+          "wind_speed": 0,
+          "wind_direction": 0,
+          "light_intensity": 0.8,
+          "friction": 1
+        },
+        "scene_version": "1",
+        "generated_sdf_sha256": "3dfc9fb442a609af3c09ca627a70524ee04a4b9474854422fc78fe1b1752acbc"
+      },
+      "definition_version": "1.0.0",
+      "fingerprint": "0bf00ea484792153f37e05fa16de56973be149fc2ea448406f40aaedbce7f0a1",
+      "model_hash": "c37164d9c05123d3207b1263617e2f8316ec0d5e122aec2ff03fa7447e5a441f",
+      "parameters_hash": "7714a8d174b3bfb5f5f13952f2229ccc9396a6c7888efc6dab944cdf21e1c2ff",
+      "sensor_hash": "475a91bd97e2f26d899fc30a1a42c0e9775d444a49f3041e1a902042d7592187",
+      "parameter_readback": {
+        "RTL_SPEED": 0.5,
+        "WP_SPEED": 0.5,
+        "WP_RADIUS": 0.20000000298023224
+      },
+      "metrics": {
+        "load_seconds": 7.64138632400136,
+        "sim_seconds": 59.118,
+        "wall_seconds": 63.37841933100208,
+        "rtf": 1.000473223834874,
+        "cpu_percent": 85.50828346116643,
+        "rss_mib": 216.09375,
+        "gpu": null
+      },
+      "evidence": {
+        "path": "artifacts/simulation/universal-20261029/final-R01-rover/result.json",
+        "sha256": "248ac0c414fdf55a2e22334b8d1f005451dd3594f52c9373f3c8f1d5f2971393"
+      }
+    },
+    {
+      "scene_id": "R04",
+      "kind": "rover",
+      "status": "PASS",
+      "checks": {
+        "world_entity_plugin_sitl_framework": "PASS",
+        "basic_motion_and_safe_exit": "PASS"
+      },
+      "configuration": {
+        "seed": 0,
+        "parameters": {
+          "obstacle_count": 0,
+          "wind_speed": 0,
+          "wind_direction": 0,
+          "light_intensity": 0.8,
+          "friction": 1
+        },
+        "scene_version": "1",
+        "generated_sdf_sha256": "b99e38ce00acbe585ddeaef152c6ca1393c23d70daffea496fc9c1417da5e356"
+      },
+      "definition_version": "1.0.0",
+      "fingerprint": "0bf00ea484792153f37e05fa16de56973be149fc2ea448406f40aaedbce7f0a1",
+      "model_hash": "c37164d9c05123d3207b1263617e2f8316ec0d5e122aec2ff03fa7447e5a441f",
+      "parameters_hash": "7714a8d174b3bfb5f5f13952f2229ccc9396a6c7888efc6dab944cdf21e1c2ff",
+      "sensor_hash": "475a91bd97e2f26d899fc30a1a42c0e9775d444a49f3041e1a902042d7592187",
+      "parameter_readback": {
+        "RTL_SPEED": 0.5,
+        "WP_SPEED": 0.5,
+        "WP_RADIUS": 0.20000000298023224
+      },
+      "metrics": {
+        "load_seconds": 6.574714620997838,
+        "sim_seconds": 59.19,
+        "wall_seconds": 63.28144599100051,
+        "rtf": 1.0002510630168173,
+        "cpu_percent": 87.8191274943733,
+        "rss_mib": 236.375,
+        "gpu": null
+      },
+      "evidence": {
+        "path": "artifacts/simulation/universal-20261029/final-R04-rover/result.json",
+        "sha256": "3a02cb6e74b7bcd868992f428175af500eba29eb78c3c2b084a6d50996004ae1"
+      }
+    },
+    {
+      "scene_id": "R06",
+      "kind": "rover",
+      "status": "PASS",
+      "checks": {
+        "world_entity_plugin_sitl_framework": "PASS",
+        "basic_motion_and_safe_exit": "PASS"
+      },
+      "configuration": {
+        "seed": 0,
+        "parameters": {
+          "obstacle_count": 0,
+          "wind_speed": 0,
+          "wind_direction": 0,
+          "light_intensity": 0.8,
+          "friction": 1
+        },
+        "scene_version": "1",
+        "generated_sdf_sha256": "83602e80c33c593ce435257354f17ffab77af02f966d3ce5a3a145042ed351a6"
+      },
+      "definition_version": "1.0.0",
+      "fingerprint": "0bf00ea484792153f37e05fa16de56973be149fc2ea448406f40aaedbce7f0a1",
+      "model_hash": "c37164d9c05123d3207b1263617e2f8316ec0d5e122aec2ff03fa7447e5a441f",
+      "parameters_hash": "7714a8d174b3bfb5f5f13952f2229ccc9396a6c7888efc6dab944cdf21e1c2ff",
+      "sensor_hash": "475a91bd97e2f26d899fc30a1a42c0e9775d444a49f3041e1a902042d7592187",
+      "parameter_readback": {
+        "RTL_SPEED": 0.5,
+        "WP_SPEED": 0.5,
+        "WP_RADIUS": 0.20000000298023224
+      },
+      "metrics": {
+        "load_seconds": 6.680727120001393,
+        "sim_seconds": 58.797,
+        "wall_seconds": 62.95295111700034,
+        "rtf": 0.9994163408569395,
+        "cpu_percent": 105.82870016109145,
+        "rss_mib": 429.03125,
+        "gpu": null
+      },
+      "evidence": {
+        "path": "artifacts/simulation/universal-20261029/final-R06-rover/result.json",
+        "sha256": "751fc44d3971496e29608aece15122d41b2ebc126f9af443b6ff51dc48f0a229"
+      }
+    },
+    {
+      "scene_id": "R03",
+      "kind": "rover",
+      "status": "PASS",
+      "checks": {
+        "world_entity_plugin_sitl_framework": "PASS",
+        "basic_motion_and_safe_exit": "PASS"
+      },
+      "configuration": {
+        "seed": 0,
+        "parameters": {
+          "obstacle_count": 0,
+          "wind_speed": 0,
+          "wind_direction": 0,
+          "light_intensity": 0.8,
+          "friction": 1
+        },
+        "scene_version": "1",
+        "generated_sdf_sha256": "db3ded39b60cf7a3bbbb6d13fa92dee9d8d28469502262e2d61bb868222d02a7"
+      },
+      "definition_version": "1.0.0",
+      "fingerprint": "0bf00ea484792153f37e05fa16de56973be149fc2ea448406f40aaedbce7f0a1",
+      "model_hash": "c37164d9c05123d3207b1263617e2f8316ec0d5e122aec2ff03fa7447e5a441f",
+      "parameters_hash": "7714a8d174b3bfb5f5f13952f2229ccc9396a6c7888efc6dab944cdf21e1c2ff",
+      "sensor_hash": "475a91bd97e2f26d899fc30a1a42c0e9775d444a49f3041e1a902042d7592187",
+      "parameter_readback": {
+        "RTL_SPEED": 0.5,
+        "WP_SPEED": 0.5,
+        "WP_RADIUS": 0.20000000298023224
+      },
+      "metrics": {
+        "load_seconds": 7.630718406999222,
+        "sim_seconds": 59.199,
+        "wall_seconds": 63.53542410099908,
+        "rtf": 1.0005743296652279,
+        "cpu_percent": 89.65467268341042,
+        "rss_mib": 243.2890625,
+        "gpu": null
+      },
+      "evidence": {
+        "path": "artifacts/simulation/universal-20261029/final-R03-rover/result.json",
+        "sha256": "8a1239fce5e27ae1874589e76cbcf8bcfd51731a2eb1ea7b328c0fabfed6e5d7"
+      }
+    },
+    {
+      "scene_id": "C01",
+      "kind": "copter",
+      "status": "PASS",
+      "checks": {
+        "world_entity_plugin_sitl_framework": "PASS",
+        "basic_motion_and_safe_exit": "PASS"
+      },
+      "configuration": {
+        "seed": 0,
+        "parameters": {
+          "obstacle_count": 0,
+          "wind_speed": 0,
+          "wind_direction": 0,
+          "light_intensity": 0.8,
+          "friction": 1
+        },
+        "scene_version": "1",
+        "generated_sdf_sha256": "a6254cdb156517b9eb7bf1744506634bcb7c0810c7ebc675faa162f54900645b"
+      },
+      "definition_version": "1.0.0",
+      "fingerprint": "b8274ff9c59cd3f28adaad5ae6e476d8c57b8e2466241b75149de49abce6054a",
+      "model_hash": "dd07901be64e6e5d98eb0435c0cd5e9afda3fe9ee10b378ec7ba7924ee7e473e",
+      "parameters_hash": "718e0192583c6aac97039d9946d6ad864b6d7a2d148602e1d99e73b9905dddde",
+      "sensor_hash": "12d0179598084169ce1473a2117197c086808fe7a6647f058b41d52d8ff7e9a1",
+      "parameter_readback": {
+        "RTL_ALT_M": 2.0,
+        "RTL_ALT_FINAL_M": 0.0,
+        "MAV1_POSITION": 10.0,
+        "MAV1_EXTRA1": 10.0
+      },
+      "metrics": {
+        "load_seconds": 7.652465067996673,
+        "sim_seconds": 71.986,
+        "wall_seconds": 98.95901775699895,
+        "rtf": 0.37780315775435314,
+        "cpu_percent": 134.34667281556244,
+        "rss_mib": 245.83984375,
+        "gpu": null
+      },
+      "evidence": {
+        "path": "artifacts/simulation/universal-20261029/final-C01-copter/result.json",
+        "sha256": "6ffe3aaf522592ade2186df278ae5d9a52d1b04d221fbb63d851e79f1a9f9c4d"
+      }
+    },
+    {
+      "scene_id": "C02",
+      "kind": "copter",
+      "status": "PASS",
+      "checks": {
+        "world_entity_plugin_sitl_framework": "PASS",
+        "basic_motion_and_safe_exit": "PASS"
+      },
+      "configuration": {
+        "seed": 0,
+        "parameters": {
+          "obstacle_count": 0,
+          "wind_speed": 0,
+          "wind_direction": 0,
+          "light_intensity": 0.8,
+          "friction": 1
+        },
+        "scene_version": "1",
+        "generated_sdf_sha256": "e28f380e726be33685f2b1f10d0f97784ba7af6de27a468d028e81be6c3f437b"
+      },
+      "definition_version": "1.0.0",
+      "fingerprint": "b8274ff9c59cd3f28adaad5ae6e476d8c57b8e2466241b75149de49abce6054a",
+      "model_hash": "dd07901be64e6e5d98eb0435c0cd5e9afda3fe9ee10b378ec7ba7924ee7e473e",
+      "parameters_hash": "718e0192583c6aac97039d9946d6ad864b6d7a2d148602e1d99e73b9905dddde",
+      "sensor_hash": "12d0179598084169ce1473a2117197c086808fe7a6647f058b41d52d8ff7e9a1",
+      "parameter_readback": {
+        "RTL_ALT_M": 2.0,
+        "RTL_ALT_FINAL_M": 0.0,
+        "MAV1_POSITION": 10.0,
+        "MAV1_EXTRA1": 10.0
+      },
+      "metrics": {
+        "load_seconds": 7.800989501000004,
+        "sim_seconds": 71.576,
+        "wall_seconds": 99.37514604800162,
+        "rtf": 0.6414384642423714,
+        "cpu_percent": 132.51267939048125,
+        "rss_mib": 268.7265625,
+        "gpu": null
+      },
+      "evidence": {
+        "path": "artifacts/simulation/universal-20261029/final-C02-copter/result.json",
+        "sha256": "59c6b1e61f5bb7d6d94258bd49c8027ab1d7108ba7a0c7fe0337a363a6cb4126"
+      }
+    },
+    {
+      "scene_id": "C04",
+      "kind": "copter",
+      "status": "PASS",
+      "checks": {
+        "world_entity_plugin_sitl_framework": "PASS",
+        "basic_motion_and_safe_exit": "PASS"
+      },
+      "configuration": {
+        "seed": 0,
+        "parameters": {
+          "obstacle_count": 0,
+          "wind_speed": 0,
+          "wind_direction": 0,
+          "light_intensity": 0.8,
+          "friction": 1
+        },
+        "scene_version": "1",
+        "generated_sdf_sha256": "c5f892e87c3d2974f738c0d811532c08aa84d6821a6ad2ce54624b8879aed6a6"
+      },
+      "definition_version": "1.0.0",
+      "fingerprint": "b8274ff9c59cd3f28adaad5ae6e476d8c57b8e2466241b75149de49abce6054a",
+      "model_hash": "dd07901be64e6e5d98eb0435c0cd5e9afda3fe9ee10b378ec7ba7924ee7e473e",
+      "parameters_hash": "718e0192583c6aac97039d9946d6ad864b6d7a2d148602e1d99e73b9905dddde",
+      "sensor_hash": "12d0179598084169ce1473a2117197c086808fe7a6647f058b41d52d8ff7e9a1",
+      "parameter_readback": {
+        "RTL_ALT_M": 2.0,
+        "RTL_ALT_FINAL_M": 0.0,
+        "MAV1_POSITION": 10.0,
+        "MAV1_EXTRA1": 10.0
+      },
+      "metrics": {
+        "load_seconds": 8.965567878000002,
+        "sim_seconds": 76.138,
+        "wall_seconds": 96.31386422099968,
+        "rtf": 0.6296210248089572,
+        "cpu_percent": 139.9579936539091,
+        "rss_mib": 295.3125,
+        "gpu": null
+      },
+      "evidence": {
+        "path": "artifacts/simulation/universal-20261029/final-C04-copter/result.json",
+        "sha256": "e098a41e1385edad4d373405c3c8ce8eb4655f43e6e2066d89a4880a3ef4d508"
+      }
+    },
+    {
+      "scene_id": "C05",
+      "kind": "copter",
+      "status": "PASS",
+      "checks": {
+        "world_entity_plugin_sitl_framework": "PASS",
+        "basic_motion_and_safe_exit": "PASS"
+      },
+      "configuration": {
+        "seed": 0,
+        "parameters": {
+          "obstacle_count": 0,
+          "wind_speed": 0,
+          "wind_direction": 0,
+          "light_intensity": 0.8,
+          "friction": 1
+        },
+        "scene_version": "1",
+        "generated_sdf_sha256": "ec5620f5a43d19d14dc87baa02391d4e992d6872b3f18fc2a59ba2c569137646"
+      },
+      "definition_version": "1.0.0",
+      "fingerprint": "b8274ff9c59cd3f28adaad5ae6e476d8c57b8e2466241b75149de49abce6054a",
+      "model_hash": "dd07901be64e6e5d98eb0435c0cd5e9afda3fe9ee10b378ec7ba7924ee7e473e",
+      "parameters_hash": "718e0192583c6aac97039d9946d6ad864b6d7a2d148602e1d99e73b9905dddde",
+      "sensor_hash": "12d0179598084169ce1473a2117197c086808fe7a6647f058b41d52d8ff7e9a1",
+      "parameter_readback": {
+        "RTL_ALT_M": 2.0,
+        "RTL_ALT_FINAL_M": 0.0,
+        "MAV1_POSITION": 10.0,
+        "MAV1_EXTRA1": 10.0
+      },
+      "metrics": {
+        "load_seconds": 9.381388443001924,
+        "sim_seconds": 73.224,
+        "wall_seconds": 97.838310086001,
+        "rtf": 0.6014321301884046,
+        "cpu_percent": 136.86821286611527,
+        "rss_mib": 486.921875,
+        "gpu": null
+      },
+      "evidence": {
+        "path": "artifacts/simulation/universal-20261029/final-C05-copter/result.json",
+        "sha256": "1f4e894d7cb7ba5c3e9dc4064019560c83be2e151842dd6ecd3e62ed05c66f7e"
+      }
+    },
+    {
+      "scene_id": "F01",
+      "kind": "plane",
+      "status": "PASS",
+      "checks": {
+        "world_entity_plugin_sitl_framework": "PASS",
+        "basic_motion_and_safe_exit": "PASS"
+      },
+      "configuration": {
+        "seed": 0,
+        "parameters": {
+          "obstacle_count": 0,
+          "wind_speed": 0,
+          "wind_direction": 0,
+          "light_intensity": 0.8,
+          "friction": 1
+        },
+        "scene_version": "1",
+        "generated_sdf_sha256": "85ed523c64bb13154fab1cedc120923f9df610b80046c0fa459ea6137ac7da7b"
+      },
+      "definition_version": "1.0.0",
+      "fingerprint": "6eb48e8373652f09a9d31185d48f02a722400729bea48845307deed6f280cac5",
+      "model_hash": "81a8c0b73452f3276df896df4102aeac320ae8e279d6c91b6d28dd66b0de7fb2",
+      "parameters_hash": "334e89e2148d3f75afb9a0051a99220ddf2d123cba9d6c512062cc11072a3904",
+      "sensor_hash": "0a65cd909f5a6168a97e78bb8061af78322aae08ab07c478e3e17c254fb7017a",
+      "parameter_readback": {
+        "TKOFF_ALT": 50.0,
+        "TKOFF_DIST": 300.0,
+        "WP_LOITER_RAD": 80.0,
+        "RTL_ALTITUDE": 50.0,
+        "FENCE_ENABLE": 1.0,
+        "FENCE_RADIUS": 2000.0,
+        "FENCE_ALT_MAX": 150.0
+      },
+      "metrics": {
+        "load_seconds": 8.857607537000149,
+        "sim_seconds": 207.507,
+        "wall_seconds": 215.76826205700127,
+        "rtf": 1.0001550240287245,
+        "cpu_percent": 93.37749092617797,
+        "rss_mib": 263.17578125,
+        "gpu": null
+      },
+      "evidence": {
+        "path": "artifacts/simulation/universal-20261029/causal-F01-plane/result.json",
+        "sha256": "6149278ffe2f2b4a5e88bb97e744a22d5a47d72fd16d40fa27bcd6957138b5ac"
+      }
+    },
+    {
+      "scene_id": "F02",
+      "kind": "plane",
+      "status": "PASS",
+      "checks": {
+        "world_entity_plugin_sitl_framework": "PASS",
+        "basic_motion_and_safe_exit": "PASS"
+      },
+      "configuration": {
+        "seed": 0,
+        "parameters": {
+          "obstacle_count": 0,
+          "wind_speed": 0,
+          "wind_direction": 0,
+          "light_intensity": 0.8,
+          "friction": 1
+        },
+        "scene_version": "1",
+        "generated_sdf_sha256": "096dd99a0eb29a8a328e5ca8c3a72bfcf05224062305aa586fa4321dfedec71e"
+      },
+      "definition_version": "1.0.0",
+      "fingerprint": "6eb48e8373652f09a9d31185d48f02a722400729bea48845307deed6f280cac5",
+      "model_hash": "81a8c0b73452f3276df896df4102aeac320ae8e279d6c91b6d28dd66b0de7fb2",
+      "parameters_hash": "334e89e2148d3f75afb9a0051a99220ddf2d123cba9d6c512062cc11072a3904",
+      "sensor_hash": "0a65cd909f5a6168a97e78bb8061af78322aae08ab07c478e3e17c254fb7017a",
+      "parameter_readback": {
+        "TKOFF_ALT": 50.0,
+        "TKOFF_DIST": 300.0,
+        "WP_LOITER_RAD": 80.0,
+        "RTL_ALTITUDE": 50.0,
+        "FENCE_ENABLE": 1.0,
+        "FENCE_RADIUS": 2000.0,
+        "FENCE_ALT_MAX": 150.0
+      },
+      "metrics": {
+        "load_seconds": 8.222741033998318,
+        "sim_seconds": 205.697,
+        "wall_seconds": 214.76838777300145,
+        "rtf": 0.9991597066866765,
+        "cpu_percent": 98.8944214282731,
+        "rss_mib": 264.234375,
+        "gpu": null
+      },
+      "evidence": {
+        "path": "artifacts/simulation/universal-20261029/causal-F02-plane/result.json",
+        "sha256": "f4d0b5f9c4a1c430812fbac932ddfeffda2b36efcd7e8da86129974b53386bc6"
+      }
+    },
+    {
+      "scene_id": "F03",
+      "kind": "plane",
+      "status": "PASS",
+      "checks": {
+        "world_entity_plugin_sitl_framework": "PASS",
+        "basic_motion_and_safe_exit": "PASS"
+      },
+      "configuration": {
+        "seed": 0,
+        "parameters": {
+          "obstacle_count": 0,
+          "wind_speed": 0,
+          "wind_direction": 0,
+          "light_intensity": 0.8,
+          "friction": 1
+        },
+        "scene_version": "1",
+        "generated_sdf_sha256": "c9a3c32431ef05c46cad55d9101ed8af98ca3450d37eff547add19fe8073adc0"
+      },
+      "definition_version": "1.0.0",
+      "fingerprint": "6eb48e8373652f09a9d31185d48f02a722400729bea48845307deed6f280cac5",
+      "model_hash": "81a8c0b73452f3276df896df4102aeac320ae8e279d6c91b6d28dd66b0de7fb2",
+      "parameters_hash": "334e89e2148d3f75afb9a0051a99220ddf2d123cba9d6c512062cc11072a3904",
+      "sensor_hash": "0a65cd909f5a6168a97e78bb8061af78322aae08ab07c478e3e17c254fb7017a",
+      "parameter_readback": {
+        "TKOFF_ALT": 50.0,
+        "TKOFF_DIST": 300.0,
+        "WP_LOITER_RAD": 80.0,
+        "RTL_ALTITUDE": 50.0,
+        "FENCE_ENABLE": 1.0,
+        "FENCE_RADIUS": 2000.0,
+        "FENCE_ALT_MAX": 150.0
+      },
+      "metrics": {
+        "load_seconds": 8.90179150500262,
+        "sim_seconds": 208.788,
+        "wall_seconds": 217.03781029400125,
+        "rtf": 1.000865748872775,
+        "cpu_percent": 95.44439692414812,
+        "rss_mib": 277.859375,
+        "gpu": null
+      },
+      "evidence": {
+        "path": "artifacts/simulation/universal-20261029/causal-F03-plane/result.json",
+        "sha256": "5e785cd7481b295628c5d363bbc61d1026803430553d3e343b00fa2a7894ae2e"
+      }
+    }
+  ],
+  "browsers": [
+    {
+      "name": "browser-rover-copter-r9",
+      "status": "PASS",
+      "scenes": [
+        "R01",
+        "R04"
+      ],
+      "kinds": [
+        "rover",
+        "copter"
+      ],
+      "checks": {
+        "same_world_independent_identity_and_profiles": "PASS",
+        "shared_login_and_selected_control_target": "PASS",
+        "original_control_ui_motion_and_other_vehicle_isolation": "PASS",
+        "single_vehicle_remove_preserves_world_and_peer": "PASS",
+        "live_add_independent_instance_same_fixed_profile": "PASS",
+        "controlled_world_switch_preserves_profiles_new_epoch_send_off": "PASS",
+        "real_logs_and_report_download": "PASS",
+        "final_cleanup": "PASS"
+      },
+      "javascript_errors": [],
+      "old_rtf": 0.7195761408699819,
+      "new_rtf": 0.6427548989171509,
+      "evidence": {
+        "path": "artifacts/simulation/universal-20261029/browser-rover-copter-r9/result.json",
+        "sha256": "d42b509d21c7d77a4b3d43a11f834ec6366350f5cddb6debdbc9078142690130"
+      }
+    },
+    {
+      "name": "two-rovers-r2",
+      "status": "PASS",
+      "scenes": [
+        "R01",
+        "R03"
+      ],
+      "kinds": [
+        "rover",
+        "rover"
+      ],
+      "checks": {
+        "same_world_independent_identity_and_profiles": "PASS",
+        "shared_login_and_selected_control_target": "PASS",
+        "original_control_ui_motion_and_other_vehicle_isolation": "PASS",
+        "single_vehicle_remove_preserves_world_and_peer": "PASS",
+        "live_add_independent_instance_same_fixed_profile": "PASS",
+        "controlled_world_switch_preserves_profiles_new_epoch_send_off": "PASS",
+        "real_logs_and_report_download": "PASS",
+        "final_cleanup": "PASS"
+      },
+      "javascript_errors": [],
+      "old_rtf": 1.000667445185939,
+      "new_rtf": 0.9993374392777589,
+      "evidence": {
+        "path": "artifacts/simulation/universal-20261029/two-rovers-r2/result.json",
+        "sha256": "24e0f6669cffd207b38950c93b53ff1d34d8b4b68214f5f3bf9e6aed55620daf"
+      }
+    },
+    {
+      "name": "two-copters-r2",
+      "status": "PASS",
+      "scenes": [
+        "C01",
+        "C04"
+      ],
+      "kinds": [
+        "copter",
+        "copter"
+      ],
+      "checks": {
+        "same_world_independent_identity_and_profiles": "PASS",
+        "shared_login_and_selected_control_target": "PASS",
+        "original_control_ui_motion_and_other_vehicle_isolation": "PASS",
+        "single_vehicle_remove_preserves_world_and_peer": "PASS",
+        "live_add_independent_instance_same_fixed_profile": "PASS",
+        "controlled_world_switch_preserves_profiles_new_epoch_send_off": "PASS",
+        "real_logs_and_report_download": "PASS",
+        "final_cleanup": "PASS"
+      },
+      "javascript_errors": [],
+      "old_rtf": 0.7197403176933762,
+      "new_rtf": 0.6864991700225035,
+      "evidence": {
+        "path": "artifacts/simulation/universal-20261029/two-copters-r2/result.json",
+        "sha256": "b60d5ffd8ca05fb98a08347ee67a1ada09fd637fe0dbc634576bfcee4a4f2707"
+      }
+    },
+    {
+      "name": "browser-mixed-three-qualified",
+      "status": "PASS",
+      "scenes": [
+        "F01",
+        "F02"
+      ],
+      "kinds": [
+        "plane",
+        "rover",
+        "copter"
+      ],
+      "checks": {
+        "same_world_independent_identity_and_profiles": "PASS",
+        "selected_vehicle_read_only_query": "PASS",
+        "shared_login_and_selected_control_target": "PASS",
+        "original_control_ui_motion_and_other_vehicle_isolation": "PASS",
+        "single_vehicle_remove_preserves_world_and_peer": "PASS",
+        "live_add_independent_instance_same_fixed_profile": "PASS",
+        "controlled_world_switch_preserves_profiles_new_epoch_send_off": "PASS",
+        "real_logs_and_report_download": "PASS",
+        "final_cleanup": "PASS"
+      },
+      "javascript_errors": [],
+      "old_rtf": 0.6913879336212273,
+      "new_rtf": 0.8694344242127054,
+      "evidence": {
+        "path": "artifacts/simulation/universal-20261029/browser-mixed-three-qualified/result.json",
+        "sha256": "4d739eeac9702589eb179df9c5d24f7eb8401a89300c37bf81c1f25ebb9fbd5d"
+      }
+    },
+    {
+      "name": "browser-four-qualified",
+      "status": "PASS",
+      "scenes": [
+        "R01",
+        "R03"
+      ],
+      "kinds": [
+        "rover",
+        "copter",
+        "rover",
+        "copter"
+      ],
+      "checks": {
+        "same_world_independent_identity_and_profiles": "PASS",
+        "selected_vehicle_read_only_query": "PASS",
+        "shared_login_and_selected_control_target": "PASS",
+        "original_control_ui_motion_and_other_vehicle_isolation": "PASS",
+        "single_vehicle_remove_preserves_world_and_peer": "PASS",
+        "live_add_independent_instance_same_fixed_profile": "PASS",
+        "controlled_world_switch_preserves_profiles_new_epoch_send_off": "PASS",
+        "real_logs_and_report_download": "PASS",
+        "final_cleanup": "PASS"
+      },
+      "javascript_errors": [],
+      "old_rtf": 0.44878630232399497,
+      "new_rtf": 0.4944554241018341,
+      "evidence": {
+        "path": "artifacts/simulation/universal-20261029/browser-four-qualified/result.json",
+        "sha256": "aa4af3b1ac7d063afe1ca47a4937084dcf8c80c7102f0de328975b71f01a0f4c"
+      }
+    }
+  ],
+  "stress": {
+    "status": "PASS",
+    "epochs": 6,
+    "rounds": [
+      {
+        "index": 0,
+        "scene_id": "R01",
+        "id": "sim-3563a7b33403481b921e481de2ed484e",
+        "target": "simulation-3742449720754ec484fc44d557989739",
+        "session_id": "dbad9eb7b5644d6cbf94ff8afd2ce0c6",
+        "generation": "7660bfc5860348c7b61feb23bf00914e",
+        "fingerprint": "0bf00ea484792153f37e05fa16de56973be149fc2ea448406f40aaedbce7f0a1",
+        "parameter_readback": {
+          "RTL_SPEED": 0.5,
+          "WP_SPEED": 0.5,
+          "WP_RADIUS": 0.20000000298023224
+        },
+        "rss_mib": 41.76171875,
+        "old_ingress_rejected": null,
+        "captured_old_ack": 1,
+        "captured_old_telemetry": 5,
+        "status": "PASS"
+      },
+      {
+        "index": 1,
+        "scene_id": "R04",
+        "id": "sim-e0527a5dc6dc401ca1b5c9658ba429a6",
+        "target": "simulation-1fa86097a5354c20ba842e59a494cb11",
+        "session_id": "54b8606d119a41929064782b54cf3658",
+        "generation": "d4d8aa8c2d9c40e78d4fcbf4a6ed884c",
+        "fingerprint": "0bf00ea484792153f37e05fa16de56973be149fc2ea448406f40aaedbce7f0a1",
+        "parameter_readback": {
+          "RTL_SPEED": 0.5,
+          "WP_SPEED": 0.5,
+          "WP_RADIUS": 0.20000000298023224
+        },
+        "rss_mib": 46.51171875,
+        "old_ingress_rejected": {
+          "unsigned": 0,
+          "signature": 5,
+          "replay": 0,
+          "stream": 0
+        },
+        "captured_old_ack": 1,
+        "captured_old_telemetry": 5,
+        "status": "PASS"
+      },
+      {
+        "index": 2,
+        "scene_id": "R06",
+        "id": "sim-6606f9c44a20400f9458a2060a542230",
+        "target": "simulation-7c1befa8e08a42439520b8480a035b34",
+        "session_id": "dab4899c35ed4771b3147c85732ac5c5",
+        "generation": "a468f806348a4f84ab5522348450e5e3",
+        "fingerprint": "0bf00ea484792153f37e05fa16de56973be149fc2ea448406f40aaedbce7f0a1",
+        "parameter_readback": {
+          "RTL_SPEED": 0.5,
+          "WP_SPEED": 0.5,
+          "WP_RADIUS": 0.20000000298023224
+        },
+        "rss_mib": 46.76171875,
+        "old_ingress_rejected": {
+          "unsigned": 0,
+          "signature": 5,
+          "replay": 0,
+          "stream": 0
+        },
+        "captured_old_ack": 1,
+        "captured_old_telemetry": 5,
+        "status": "PASS"
+      },
+      {
+        "index": 3,
+        "scene_id": "R03",
+        "id": "sim-19985547cabf4d4ebb9f27b9074fb99f",
+        "target": "simulation-8724b898b839444db4d7bf8b2a338588",
+        "session_id": "0171bf8224894acf839690bcc602093b",
+        "generation": "dc6d2f5d27234d3e8a647b85e1c92941",
+        "fingerprint": "0bf00ea484792153f37e05fa16de56973be149fc2ea448406f40aaedbce7f0a1",
+        "parameter_readback": {
+          "RTL_SPEED": 0.5,
+          "WP_SPEED": 0.5,
+          "WP_RADIUS": 0.20000000298023224
+        },
+        "rss_mib": 47.13671875,
+        "old_ingress_rejected": {
+          "unsigned": 0,
+          "signature": 5,
+          "replay": 0,
+          "stream": 0
+        },
+        "captured_old_ack": 1,
+        "captured_old_telemetry": 5,
+        "status": "PASS"
+      },
+      {
+        "index": 4,
+        "scene_id": "R01",
+        "id": "sim-ab1229b89b4749749e2e82c00777ebc3",
+        "target": "simulation-892849cb3af849c5acb47445ac1c71d4",
+        "session_id": "386d6d12eb5c459e8a282615151e880a",
+        "generation": "51035b2a5b3a473998af35149802aa2b",
+        "fingerprint": "0bf00ea484792153f37e05fa16de56973be149fc2ea448406f40aaedbce7f0a1",
+        "parameter_readback": {
+          "RTL_SPEED": 0.5,
+          "WP_SPEED": 0.5,
+          "WP_RADIUS": 0.20000000298023224
+        },
+        "rss_mib": 47.63671875,
+        "old_ingress_rejected": {
+          "unsigned": 0,
+          "signature": 5,
+          "replay": 0,
+          "stream": 0
+        },
+        "captured_old_ack": 1,
+        "captured_old_telemetry": 5,
+        "status": "PASS"
+      },
+      {
+        "index": 5,
+        "scene_id": "R04",
+        "id": "sim-932ba9cce7fb40d7bf3a8828e537a5d5",
+        "target": "simulation-e8f3dfee6da44cd890e07d849625b2c6",
+        "session_id": "9fb96537e9ab4a079e2e2e7be26fb228",
+        "generation": "9b70c4b714f24e079e39b8f0fd5a777b",
+        "fingerprint": "0bf00ea484792153f37e05fa16de56973be149fc2ea448406f40aaedbce7f0a1",
+        "parameter_readback": {
+          "RTL_SPEED": 0.5,
+          "WP_SPEED": 0.5,
+          "WP_RADIUS": 0.20000000298023224
+        },
+        "rss_mib": 48.13671875,
+        "old_ingress_rejected": {
+          "unsigned": 0,
+          "signature": 5,
+          "replay": 0,
+          "stream": 0
+        },
+        "captured_old_ack": 1,
+        "captured_old_telemetry": 5,
+        "status": "PASS"
+      }
+    ],
+    "evidence": {
+      "path": "artifacts/simulation/universal-20261029/stress-r2/result.json",
+      "sha256": "389e1fce5a82c10b2276a01aa4fc10609f1d1e872b71f9dd749a6fc44158f115"
+    }
+  },
+  "missions": {
+    "status": "PASS",
+    "targets": 2,
+    "evidence": {
+      "path": "artifacts/simulation/universal-20261029/query-missions/result.json",
+      "sha256": "2c6254e16758475e308efde6fc130c2bd2668bc7b036b6916813b561005b1610"
+    }
+  },
+  "receive_fault": {
+    "status": "PASS",
+    "evidence": {
+      "path": "artifacts/simulation/universal-20261029/final-receive-fault/result.json",
+      "sha256": "df7003692fb14bfe9d8dbec0982df001c814aed9a2add50a1ea77f9de796d144"
+    }
+  },
+  "world_only": {
+    "status": "PASS",
+    "evidence": {
+      "path": "artifacts/simulation/universal-20261029/world-only-final/result.json",
+      "sha256": "e05090ca5fa54bd07c1487fc5fb9744a4ebcbf181b21094a690b26875d8cbdde"
+    }
+  },
+  "multi_ground_truth": {
+    "status": "PASS",
+    "cases": [
+      {
+        "case": "browser-rover-copter-r9",
+        "status": "PASS",
+        "source": "independent Gazebo pose/info history, not AP estimates",
+        "vehicles": [
+          {
+            "id": "vehicle-4f58a17e1399475d90011cc0c629ce53",
+            "kind": "rover",
+            "controlled": true,
+            "max_displacement_m": 0.4464401227378225,
+            "samples": 52,
+            "status": "PASS"
+          },
+          {
+            "id": "vehicle-9cd8070de241446f84dec037aa29aa23",
+            "kind": "copter",
+            "controlled": false,
+            "max_displacement_m": 0.0,
+            "samples": 49,
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "case": "two-rovers-r2",
+        "status": "PASS",
+        "source": "independent Gazebo pose/info history, not AP estimates",
+        "vehicles": [
+          {
+            "id": "vehicle-8f28abedd6474a94981a89c513099317",
+            "kind": "rover",
+            "controlled": true,
+            "max_displacement_m": 0.4845200207848436,
+            "samples": 51,
+            "status": "PASS"
+          },
+          {
+            "id": "vehicle-ae5f79f512ca4b9094b0e2f12380a5e8",
+            "kind": "rover",
+            "controlled": false,
+            "max_displacement_m": 0.0,
+            "samples": 49,
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "case": "two-copters-r2",
+        "status": "PASS",
+        "source": "independent Gazebo pose/info history, not AP estimates",
+        "vehicles": [
+          {
+            "id": "vehicle-2d729e5428e24f16ba3d13e334cc58ed",
+            "kind": "copter",
+            "controlled": true,
+            "max_displacement_m": 1.534564793000448,
+            "samples": 69,
+            "status": "PASS"
+          },
+          {
+            "id": "vehicle-fc6257712a49456c8ea8927c93e1ff46",
+            "kind": "copter",
+            "controlled": false,
+            "max_displacement_m": 0.0,
+            "samples": 63,
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "case": "browser-mixed-three-qualified",
+        "status": "PASS",
+        "source": "independent Gazebo pose/info history, not AP estimates",
+        "vehicles": [
+          {
+            "id": "vehicle-288d9e3074a64728be9d90d4c8aa4720",
+            "kind": "plane",
+            "controlled": false,
+            "max_displacement_m": 0.0,
+            "samples": 53,
+            "status": "PASS"
+          },
+          {
+            "id": "vehicle-d33f4c89284f41d0a1f07706a8306bfa",
+            "kind": "rover",
+            "controlled": true,
+            "max_displacement_m": 0.2959489056946912,
+            "samples": 53,
+            "status": "PASS"
+          },
+          {
+            "id": "vehicle-84bac9d7f2b44012ba017c99bedc2408",
+            "kind": "copter",
+            "controlled": false,
+            "max_displacement_m": 0.0,
+            "samples": 48,
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "case": "browser-four-qualified",
+        "status": "PASS",
+        "source": "independent Gazebo pose/info history, not AP estimates",
+        "vehicles": [
+          {
+            "id": "vehicle-836965d67dff4379be56cd1a78d606d2",
+            "kind": "rover",
+            "controlled": true,
+            "max_displacement_m": 0.17500091858134406,
+            "samples": 55,
+            "status": "PASS"
+          },
+          {
+            "id": "vehicle-2028e243b1a14bb9a66dd05feb874a0f",
+            "kind": "copter",
+            "controlled": false,
+            "max_displacement_m": 0.0,
+            "samples": 55,
+            "status": "PASS"
+          },
+          {
+            "id": "vehicle-7e1bfa9128e042a28919d974f40f294a",
+            "kind": "rover",
+            "controlled": false,
+            "max_displacement_m": 0.0,
+            "samples": 55,
+            "status": "PASS"
+          },
+          {
+            "id": "vehicle-1915861e44b74f63a6f67ce238a6b0bd",
+            "kind": "copter",
+            "controlled": false,
+            "max_displacement_m": 0.0,
+            "samples": 52,
+            "status": "PASS"
+          }
+        ]
+      }
+    ]
+  },
+  "cleanup": {
+    "status": "PASS",
+    "sessions": 205,
+    "live_owned_processes": [],
+    "zombies": [],
+    "owned_group_members": [],
+    "occupied_instance_ports": [],
+    "unfinished_sessions": [],
+    "remaining_signing_credentials": [],
+    "current_recorded_port_release": 57,
+    "note": "All local universal-task manifests audited, including retained failed experiments; PID identity includes start_ticks. No process is adopted or killed by this audit."
+  },
+  "retained_failed_experiments": [
+    {
+      "path": "artifacts/simulation/universal-20261029/F01-plane/result.json",
+      "error": "AssertionError: ('AutoLand', 'UNKNOWN', 'physical outcome UNCONFIRMED')",
+      "retained": true
+    },
+    {
+      "path": "artifacts/simulation/universal-20261029/F02-plane/result.json",
+      "error": "AssertionError: ('RTL', 'CANCELLED', 'admission failed: ActionAdmissionRejected: admission cancelled or expired after recovery')",
+      "retained": true
+    },
+    {
+      "path": "artifacts/simulation/universal-20261029/F03-plane/result.json",
+      "error": "AssertionError: ('RTL', 'CANCELLED', 'admission failed: ActionAdmissionRejected: admission cancelled or expired after recovery')",
+      "retained": true
+    },
+    {
+      "path": "artifacts/simulation/universal-20261029/browser-mixed-three/result.json",
+      "error": "AssertionError: Locator expected to be enabled\nActual value: disabled \nCall log:\n  - Expect \"to_be_enabled\" with timeout 70000ms\n  - waiting for locator(\"#acquire-control\")\n    74 × locator resolved to <button disabled class=\"primary\" id=\"acquire-control\">开启指令发送</button>\n       - unexpected value \"disabled\"\n",
+      "retained": true
+    },
+    {
+      "path": "artifacts/simulation/universal-20261029/browser-mixed-three-causal/result.json",
+      "error": "AssertionError: Locator expected to be enabled\nActual value: disabled \nCall log:\n  - Expect \"to_be_enabled\" with timeout 70000ms\n  - waiting for locator(\"#acquire-control\")\n    73 × locator resolved to <button disabled class=\"primary\" id=\"acquire-control\">开启指令发送</button>\n       - unexpected value \"disabled\"\n",
+      "retained": true
+    },
+    {
+      "path": "artifacts/simulation/universal-20261029/browser-mixed-three-final/result.json",
+      "error": "AssertionError: {'id': 'vehicle-4cedd5dd64494209926dc776d62b77c1', 'vehicle_id': 'vehicle-4cedd5dd64494209926dc776d62b77c1', 'slot_id': 'slot-2', 'kind': 'rover', 'target': 'simulation-a7b98324968e4bf387e35d6df90779d7', 'state': 'RUNNING', 'error': None, 'stages': {'world_loaded': True, 'entity_spawned': True, 'plugin_connected': True, 'sitl_running': True, 'framework_controlled': True}, 'spawn': {'x': 0.0, 'y': 3.0, 'z': 0.03, 'heading_deg': 0.0, 'preset_id': 'north'}, 'definition_version': '1.0.0', 'fingerprint': '0bf00ea484792153f37e05fa16de56973be149fc2ea448406f40aaedbce7f0a1', 'model_hash': 'c37164d9c05123d3207b1263617e2f8316ec0d5e122aec2ff03fa7447e5a441f', 'parameters_hash': '7714a8d174b3bfb5f5f13952f2229ccc9396a6c7888efc6dab944cdf21e1c2ff', 'sensor_hash': '475a91bd97e2f26d899fc30a1a42c0e9775d444a49f3041e1a902042d7592187', 'entity_name': 'vaf_vehicle_4cedd5dd64494209926dc776d62b77c1', 'system_id': 42, 'ports': {'tcp': 6170, 'fdm': 9412, 'udp': 5911, 'tcp_aux': [6172, 6173]}, 'logs': {'sitl': 'vehicle-4cedd5dd64494209926dc776d62b77c1/sitl.log'}, 'ground_truth': {'source': 'gazebo_pose_info', 'model': 'vaf_vehicle_4cedd5dd64494209926dc776d62b77c1', 'world': 'vaf_sim_fa573a2ff6854e5796d9302a74cd7b39', 'simulation_seconds': 71.325, 'position': {'x': 0.3351336939660675, 'y': 2.9999999857195743, 'z': 0.029999995440929683}, 'received_at': '2026-10-29T15:31:59.733925+00:00'}, 'parameter_readback': {'RTL_SPEED': 0.5, 'WP_SPEED': 0.5, 'WP_RADIUS': 0.20000000298023224}, 'sensor_activation': {'imu': 'Gazebo Imu system', 'gps': 'Gazebo NavSat system', 'rendering': 'NOT_TESTED: rendering sensors retain fixed model configuration; no camera pipeline admission'}, 'vehicle_status': {'target': 'simulation-a7b98324968e4bf387e35d6df90779d7', 'kind': 'rover', 'connected': True, 'session_id': '57e02e6776fd454db6cc85eb320d0717', 'owned_simulation': True, 'local_reference': [-35.363262, 149.165237, 584.0], 'system_send': False, 'action_send': False, 'cycle_maintenance': {'collections': 1, 'max_duration_ns': 5614455, 'automatic_gc_enabled': True}, 'deployment_send': True, 'lease_active': False, 'scope': None, 'fault': None, 'capabilities': ['arm', 'disarm', 'drive', 'goto', 'mode', 'return_home', 'rtl', 'state', 'stop', 'turn']}, 'estimated_vehicle': {'schema_version': {'major': 1, 'minor': 1}, 'vehicle_id': 'simulation-a7b98324968e4bf387e35d6df90779d7', 'version': {'generation_id': '57e02e6776fd454db6cc85eb320d0717', 'revision': 81}, 'published_at': {'monotonic_ns': 29480617086534, 'utc': '2026-10-29T15:31:58.643628Z', 'clock_domain_id': 'host-monotonic-simulation'}, 'health': {'quality': 'VALID', 'faults': []}, 'reported_pose': {'frame_id': 'odom', 'captured_at': {'monotonic_ns': 29480597326187, 'utc': '2026-10-29T15:31:58.623868Z', 'clock_domain_id': 'host-monotonic-simulation'}, 'value': {'position': {'x': 0.3268095552921295, 'y': 2.9944770336151123, 'z': 0.20999999344348907}, 'orientation': {'x': 9.282357367739197e-16, 'y': -1.0611505008028755e-09, 'z': -3.774894979935439e-08, 'w': -0.9999999999999993}}}, 'reported_twist': {'frame_id': 'odom', 'captured_at': {'monotonic_ns': 29480597326187, 'utc': '2026-10-29T15:31:58.623868Z', 'clock_domain_id': 'host-monotonic-simulation'}, 'value': {'linear': {'x': 0.0003036666021216661, 'y': -3.2692076823437333e-10, 'z': 1.3649232060623882e-14}, 'angular': {'x': 0.0010399666672896183, 'y': -0.001030677618174669, 'z': -0.0010169321926030118}}}, 'global_position': {'frame_id': 'earth', 'captured_at': {'monotonic_ns': 29480497341501, 'utc': '2026-10-29T15:31:58.523883Z', 'clock_domain_id': 'host-monotonic-simulation'}, 'value': {'latitude_deg': -35.3632351, 'longitude_deg': 149.1652406, 'altitude_m': 584.21}}, 'operation': {'armed': False, 'motion_state': None, 'failsafe': None, 'native_mode': 'ARDUPILOT_CUSTOM_4'}, 'battery': {'voltage_v': 12.6, 'current_a': 0.0, 'remaining_percent': 100}, 'telemetry': {'link_session_id': '57e02e6776fd454db6cc85eb320d0717', 'source_system': 42, 'source_component': 1, 'published_at': {'monotonic_ns': 29480617086534, 'utc': '2026-10-29T15:31:58.643628Z', 'clock_domain_id': 'host-monotonic-simulation'}, 'fields': [{'message_type': 'HEARTBEAT', 'availability': 'UNKNOWN_CAPTURE_TIME', 'quality': 'DEGRADED', 'value': {'mav_type': 10, 'autopilot': 3, 'native_mode': 4, 'armed': False, 'system_status': 3}, 'frame_id': None, 'captured_at': None, 'received_at': {'monotonic_ns': 29480617086534, 'utc': '2026-10-29T15:31:58.643628Z', 'clock_domain_id': 'host-monotonic-simulation'}, 'receive_fresh': True, 'observations': 69, 'duplicates': 0, 'out_of_order': 0, 'invalid': 0}, {'message_type': 'ATTITUDE', 'availability': 'VALID', 'quality': 'VALID', 'value': {'orientation_flu_enu': {'x': 9.282357367739197e-16, 'y': -1.0611505008028755e-09, 'z': -3.774894979935439e-08, 'w': -0.9999999999999993}, 'angular_velocity_flu_rad_s': {'x': 0.0010399665916338563, 'y': -0.0010306776966899633, 'z': -0.0010169321903958917}}, 'frame_id': 'odom', 'captured_at': {'monotonic_ns': 29480597326187, 'utc': '2026-10-29T15:31:58.623868Z', 'clock_domain_id': 'host-monotonic-simulation'}, 'received_at': {'monotonic_ns': 29480617086534, 'utc': '2026-10-29T15:31:58.643628Z', 'clock_domain_id': 'host-monotonic-simulation'}, 'receive_fresh': True, 'observations': 66, 'duplicates': 0, 'out_of_order': 0, 'invalid': 0}, {'message_type': 'GLOBAL_POSITION_INT', 'availability': 'VALID', 'quality': 'VALID', 'value': {'position_enu_m': None, 'velocity_enu_mps': {'x': 0.0, 'y': 0.0, 'z': -0.0}, 'geographic': {'latitude_deg': -35.3632351, 'longitude_deg': 149.1652406, 'altitude_m': 584.21}}, 'frame_id': 'earth', 'captured_at': {'monotonic_ns': 29480597326187, 'utc': '2026-10-29T15:31:58.623868Z', 'clock_domain_id': 'host-monotonic-simulation'}, 'received_at': {'monotonic_ns': 29480617086534, 'utc': '2026-10-29T15:31:58.643628Z', 'clock_domain_id': 'host-monotonic-simulation'}, 'receive_fresh': True, 'observations': 66, 'duplicates': 0, 'out_of_order': 0, 'invalid': 0}, {'message_type': 'LOCAL_POSITION_NED', 'availability': 'VALID', 'quality': 'VALID', 'value': {'position_enu_m': {'x': 0.3268095552921295, 'y': 2.9944770336151123, 'z': 0.20999999344348907}, 'velocity_enu_mps': {'x': 0.0003036666021216661, 'y': -3.2692076823437333e-10, 'z': 1.3649232060623882e-14}, 'geographic': None}, 'frame_id': 'odom', 'captured_at': {'monotonic_ns': 29480597326187, 'utc': '2026-10-29T15:31:58.623868Z', 'clock_domain_id': 'host-monotonic-simulation'}, 'received_at': {'monotonic_ns': 29480617086534, 'utc': '2026-10-29T15:31:58.643628Z', 'clock_domain_id': 'host-monotonic-simulation'}, 'receive_fresh': True, 'observations': 66, 'duplicates': 0, 'out_of_order': 0, 'invalid': 0}, {'message_type': 'GPS_RAW_INT', 'availability': 'VALID', 'quality': 'VALID', 'value': {'fix_type': 6, 'satellites': 10, 'hdop': 1.21, 'vdop': 2.0}, 'frame_id': 'earth', 'captured_at': {'monotonic_ns': 29480497341501, 'utc': '2026-10-29T15:31:58.523883Z', 'clock_domain_id': 'host-monotonic-simulation'}, 'received_at': {'monotonic_ns': 29480617086534, 'utc': '2026-10-29T15:31:58.643628Z', 'clock_domain_id': 'host-monotonic-simulation'}, 'receive_fresh': True, 'observations': 66, 'duplicates': 0, 'out_of_order': 0, 'invalid': 0}, {'message_type': 'EKF_STATUS_REPORT', 'availability': 'UNKNOWN_CAPTURE_TIME', 'quality': 'DEGRADED', 'value': {'flags': 895, 'velocity_variance': 0.0, 'horizontal_position_variance': 0.0, 'vertical_position_variance': 0.0, 'compass_variance': 0.0, 'terrain_altitude_variance': 0.0}, 'frame_id': None, 'captured_at': None, 'received_at': {'monotonic_ns': 29480617086534, 'utc': '2026-10-29T15:31:58.643628Z', 'clock_domain_id': 'host-monotonic-simulation'}, 'receive_fresh': True, 'observations': 66, 'duplicates': 0, 'out_of_order': 0, 'invalid': 0}, {'message_type': 'SYS_STATUS', 'availability': 'UNKNOWN_CAPTURE_TIME', 'quality': 'DEGRADED', 'value': {'voltage_v': 12.6, 'current_a': 0.0, 'remaining_percent': 100}, 'frame_id': None, 'captured_at': None, 'received_at': {'monotonic_ns': 29480617086534, 'utc': '2026-10-29T15:31:58.643628Z', 'clock_domain_id': 'host-monotonic-simulation'}, 'receive_fresh': True, 'observations': 66, 'duplicates': 0, 'out_of_order': 0, 'invalid': 0}, {'message_type': 'POWER_STATUS', 'availability': 'UNKNOWN_CAPTURE_TIME', 'quality': 'DEGRADED', 'value': {'reported_5v_rail_v': 5.0, 'reported_servo_rail_v': 0.0, 'flags': 0}, 'frame_id': None, 'captured_at': None, 'received_at': {'monotonic_ns': 29480617086534, 'utc': '2026-10-29T15:31:58.643628Z', 'clock_domain_id': 'host-monotonic-simulation'}, 'receive_fresh': True, 'observations': 66, 'duplicates': 0, 'out_of_order': 0, 'invalid': 0}, {'message_type': 'COMMAND_ACK', 'availability': 'STALE', 'quality': 'INVALID', 'value': {'command': 400, 'result': 0, 'progress_percent': 0}, 'frame_id': None, 'captured_at': None, 'received_at': {'monotonic_ns': 29464255208336, 'utc': '2026-10-29T15:31:42.281750Z', 'clock_domain_id': 'host-monotonic-simulation'}, 'receive_fresh': False, 'observations': 4, 'duplicates': 0, 'out_of_order': 0, 'invalid': 0}, {'message_type': 'STATUSTEXT', 'availability': 'STALE', 'quality': 'INVALID', 'value': {'severity': 6, 'text': 'Throttle disarmed', 'message_id': 0, 'chunk_sequence': 0}, 'frame_id': None, 'captured_at': None, 'received_at': {'monotonic_ns': 29464255208336, 'utc': '2026-10-29T15:31:42.281750Z', 'clock_domain_id': 'host-monotonic-simulation'}, 'receive_fresh': False, 'observations': 18, 'duplicates': 0, 'out_of_order': 0, 'invalid': 0}]}}, 'software_link': {'reads': 4040, 'received_chunks': 2598, 'received_bytes': 183456, 'dropped_chunks': 0, 'queued_chunks': 0}}",
+      "retained": true
+    },
+    {
+      "path": "artifacts/simulation/universal-20261029/browser-rover-copter-r1/result.json",
+      "error": "TimeoutError: native browser condition; notice=操作已提交，运行状态来自后端。",
+      "retained": true
+    },
+    {
+      "path": "artifacts/simulation/universal-20261029/browser-rover-copter-r2/result.json",
+      "error": "AssertionError: Locator expected to be enabled\nActual value: disabled \nCall log:\n  - Expect \"to_be_enabled\" with timeout 70000ms\n  - waiting for locator(\"#acquire-control\")\n    74 × locator resolved to <button disabled class=\"primary\" id=\"acquire-control\">开启指令发送</button>\n       - unexpected value \"disabled\"\n",
+      "retained": true
+    },
+    {
+      "path": "artifacts/simulation/universal-20261029/browser-rover-copter-r3/result.json",
+      "error": "Error: LocatorAssertions.to_be_enabled: Error: strict mode violation: locator(\"[data-key=w]\") resolved to 2 elements:\n    1) <button disabled data-key=\"w\" class=\"key-forward\" data-needs-control=\"\">…</button> aka get_by_role(\"button\", name=\"↑ W · 前进\")\n    2) <button disabled data-key=\"w\" class=\"key-forward\" data-needs-control=\"\">↑ 前进</button> aka get_by_text(\"↑ 前进\")\n\nCall log:\n  - Expect \"to_be_enabled\" with timeout 10000ms\n  - waiting for locator(\"[data-key=w]\")\n",
+      "retained": true
+    },
+    {
+      "path": "artifacts/simulation/universal-20261029/browser-rover-copter-r4/result.json",
+      "error": "TimeoutError: native browser condition; notice=操作已提交，运行状态来自后端。",
+      "retained": true
+    },
+    {
+      "path": "artifacts/simulation/universal-20261029/browser-rover-copter-r5/result.json",
+      "error": "AssertionError: {'target': 'simulation-a366b2afc9414a12a746be983a201aab', 'kind': 'rover', 'connected': False, 'session_id': None, 'owned_simulation': True, 'local_reference': None, 'system_send': False, 'action_send': False, 'cycle_maintenance': {'collections': 10, 'max_duration_ns': 122997205, 'automatic_gc_enabled': True}, 'deployment_send': True, 'lease_active': False, 'scope': None, 'fault': 'cycle_deadline_missed', 'capabilities': ['arm', 'disarm', 'drive', 'goto', 'mode', 'return_home', 'rtl', 'state', 'stop', 'turn'], 'navigation_bounds': {'frame': 'odom', 'min_x_m': -5.0, 'max_x_m': 5.0, 'min_y_m': -5.0, 'max_y_m': 5.0, 'min_altitude_m': -0.25, 'max_altitude_m': 0.5}, 'world': {'version': {'generation_id': '860f5fd00dda43e0873ff71cd0a410bb', 'revision': 3306}, 'published_at': {'monotonic_ns': 26813439811016, 'utc': '2026-10-29T14:47:31.466351Z', 'clock_domain_id': 'host-monotonic-simulation'}, 'vehicle': {'schema_version': {'major': 1, 'minor': 1}, 'vehicle_id': 'simulation-a366b2afc9414a12a746be983a201aab', 'version': {'generation_id': '34c12aeeec144c498a9ae7afacd5c96f', 'revision': 66}, 'published_at': {'monotonic_ns': 26812815030965, 'utc': '2026-10-29T14:47:30.841572Z', 'clock_domain_id': 'host-monotonic-simulation'}, 'health': {'quality': 'VALID', 'faults': []}, 'reported_pose': {'frame_id': 'odom', 'captured_at': {'monotonic_ns': 26812723085947, 'utc': '2026-10-29T14:47:30.749627Z', 'clock_domain_id': 'host-monotonic-simulation'}, 'value': {'position': {'x': 0.2995753586292267, 'y': 0.0, 'z': 0.18000000715255737}, 'orientation': {'x': 2.8156160562316853e-15, 'y': -1.0611816980697963e-09, 'z': -3.774894979935439e-08, 'w': -0.9999999999999993}}}, 'reported_twist': {'frame_id': 'odom', 'captured_at': {'monotonic_ns': 26812723085947, 'utc': '2026-10-29T14:47:30.749627Z', 'clock_domain_id': 'host-monotonic-simulation'}, 'value': {'linear': {'x': 0.0009820940904319286, 'y': -3.1317901050265107e-10, 'z': 1.3582912768985659e-14}, 'angular': {'x': 0.0008203529862921041, 'y': -0.0007846018960679743, 'z': -0.0007805720105482949}}}, 'global_position': {'frame_id': 'earth', 'captured_at': {'monotonic_ns': 26812657603627, 'utc': '2026-10-29T14:47:30.684145Z', 'clock_domain_id': 'host-monotonic-simulation'}, 'value': {'latitude_deg': -35.363262, 'longitude_deg': 149.1652403, 'altitude_m': 584.18}}, 'operation': {'armed': False, 'motion_state': None, 'failsafe': None, 'native_mode': 'ARDUPILOT_CUSTOM_4'}, 'battery': {'voltage_v': 12.6, 'current_a': 0.0, 'remaining_percent': 100}, 'telemetry': {'link_session_id': '34c12aeeec144c498a9ae7afacd5c96f', 'source_system': 42, 'source_component': 1, 'published_at': {'monotonic_ns': 26812815030965, 'utc': '2026-10-29T14:47:30.841572Z', 'clock_domain_id': 'host-monotonic-simulation'}, 'fields': [{'message_type': 'HEARTBEAT', 'availability': 'UNKNOWN_CAPTURE_TIME', 'quality': 'DEGRADED', 'value': {'mav_type': 10, 'autopilot': 3, 'native_mode': 4, 'armed': False, 'system_status': 3}, 'frame_id': None, 'captured_at': None, 'received_at': {'monotonic_ns': 26812815030965, 'utc': '2026-10-29T14:47:30.841572Z', 'clock_domain_id': 'host-monotonic-simulation'}, 'receive_fresh': True, 'observations': 56, 'duplicates': 0, 'out_of_order': 0, 'invalid': 0}, {'message_type': 'ATTITUDE', 'availability': 'VALID', 'quality': 'VALID', 'value': {'orientation_flu_enu': {'x': 2.8156160562316853e-15, 'y': -1.0611816980697963e-09, 'z': -3.774894979935439e-08, 'w': -0.9999999999999993}, 'angular_velocity_flu_rad_s': {'x': 0.0008203529287129641, 'y': -0.0007846019580028951, 'z': -0.0007805720088072121}}, 'frame_id': 'odom', 'captured_at': {'monotonic_ns': 26812723085947, 'utc': '2026-10-29T14:47:30.749627Z', 'clock_domain_id': 'host-monotonic-simulation'}, 'received_at': {'monotonic_ns': 26812815030965, 'utc': '2026-10-29T14:47:30.841572Z', 'clock_domain_id': 'host-monotonic-simulation'}, 'receive_fresh': True, 'observations': 53, 'duplicates': 0, 'out_of_order': 0, 'invalid': 0}, {'message_type': 'GLOBAL_POSITION_INT', 'availability': 'VALID', 'quality': 'VALID', 'value': {'position_enu_m': None, 'velocity_enu_mps': {'x': 0.0, 'y': 0.0, 'z': -0.0}, 'geographic': {'latitude_deg': -35.363262, 'longitude_deg': 149.1652403, 'altitude_m': 584.18}}, 'frame_id': 'earth', 'captured_at': {'monotonic_ns': 26812723085947, 'utc': '2026-10-29T14:47:30.749627Z', 'clock_domain_id': 'host-monotonic-simulation'}, 'received_at': {'monotonic_ns': 26812815030965, 'utc': '2026-10-29T14:47:30.841572Z', 'clock_domain_id': 'host-monotonic-simulation'}, 'receive_fresh': True, 'observations': 53, 'duplicates': 0, 'out_of_order': 0, 'invalid': 0}, {'message_type': 'LOCAL_POSITION_NED', 'availability': 'VALID', 'quality': 'VALID', 'value': {'position_enu_m': {'x': 0.2995753586292267, 'y': 0.0, 'z': 0.18000000715255737}, 'velocity_enu_mps': {'x': 0.0009820940904319286, 'y': -3.1317901050265107e-10, 'z': 1.3582912768985659e-14}, 'geographic': None}, 'frame_id': 'odom', 'captured_at': {'monotonic_ns': 26812723085947, 'utc': '2026-10-29T14:47:30.749627Z', 'clock_domain_id': 'host-monotonic-simulation'}, 'received_at': {'monotonic_ns': 26812815030965, 'utc': '2026-10-29T14:47:30.841572Z', 'clock_domain_id': 'host-monotonic-simulation'}, 'receive_fresh': True, 'observations': 53, 'duplicates': 0, 'out_of_order': 0, 'invalid': 0}, {'message_type': 'GPS_RAW_INT', 'availability': 'VALID', 'quality': 'VALID', 'value': {'fix_type': 6, 'satellites': 10, 'hdop': 1.21, 'vdop': 2.0}, 'frame_id': 'earth', 'captured_at': {'monotonic_ns': 26812657603627, 'utc': '2026-10-29T14:47:30.684145Z', 'clock_domain_id': 'host-monotonic-simulation'}, 'received_at': {'monotonic_ns': 26812815030965, 'utc': '2026-10-29T14:47:30.841572Z', 'clock_domain_id': 'host-monotonic-simulation'}, 'receive_fresh': True, 'observations': 53, 'duplicates': 0, 'out_of_order': 0, 'invalid': 0}, {'message_type': 'EKF_STATUS_REPORT', 'availability': 'UNKNOWN_CAPTURE_TIME', 'quality': 'DEGRADED', 'value': {'flags': 895, 'velocity_variance': 0.0, 'horizontal_position_variance': 0.0, 'vertical_position_variance': 0.0, 'compass_variance': 0.0, 'terrain_altitude_variance': 0.0}, 'frame_id': None, 'captured_at': None, 'received_at': {'monotonic_ns': 26812815030965, 'utc': '2026-10-29T14:47:30.841572Z', 'clock_domain_id': 'host-monotonic-simulation'}, 'receive_fresh': True, 'observations': 53, 'duplicates': 0, 'out_of_order': 0, 'invalid': 0}, {'message_type': 'SYS_STATUS', 'availability': 'UNKNOWN_CAPTURE_TIME', 'quality': 'DEGRADED', 'value': {'voltage_v': 12.6, 'current_a': 0.0, 'remaining_percent': 100}, 'frame_id': None, 'captured_at': None, 'received_at': {'monotonic_ns': 26812815030965, 'utc': '2026-10-29T14:47:30.841572Z', 'clock_domain_id': 'host-monotonic-simulation'}, 'receive_fresh': True, 'observations': 53, 'duplicates': 0, 'out_of_order': 0, 'invalid': 0}, {'message_type': 'POWER_STATUS', 'availability': 'UNKNOWN_CAPTURE_TIME', 'quality': 'DEGRADED', 'value': {'reported_5v_rail_v': 5.0, 'reported_servo_rail_v': 0.0, 'flags': 0}, 'frame_id': None, 'captured_at': None, 'received_at': {'monotonic_ns': 26812815030965, 'utc': '2026-10-29T14:47:30.841572Z', 'clock_domain_id': 'host-monotonic-simulation'}, 'receive_fresh': True, 'observations': 53, 'duplicates': 0, 'out_of_order': 0, 'invalid': 0}, {'message_type': 'COMMAND_ACK', 'availability': 'UNKNOWN_CAPTURE_TIME', 'quality': 'DEGRADED', 'value': {'command': 400, 'result': 0, 'progress_percent': 0}, 'frame_id': None, 'captured_at': None, 'received_at': {'monotonic_ns': 26810468345539, 'utc': '2026-10-29T14:47:28.494887Z', 'clock_domain_id': 'host-monotonic-simulation'}, 'receive_fresh': True, 'observations': 4, 'duplicates': 0, 'out_of_order': 0, 'invalid': 0}, {'message_type': 'STATUSTEXT', 'availability': 'UNKNOWN_CAPTURE_TIME', 'quality': 'DEGRADED', 'value': {'severity': 6, 'text': 'Throttle disarmed', 'message_id': 0, 'chunk_sequence': 0}, 'frame_id': None, 'captured_at': None, 'received_at': {'monotonic_ns': 26810468345539, 'utc': '2026-10-29T14:47:28.494887Z', 'clock_domain_id': 'host-monotonic-simulation'}, 'receive_fresh': True, 'observations': 18, 'duplicates': 0, 'out_of_order': 0, 'invalid': 0}]}}}, 'signing_configured': True, 'verified_frames': 3356, 'rejected_frames': {'unsigned': 0, 'signature': 0, 'replay': 0, 'stream': 0}, 'fresh_vehicle_state': False, 'display': {'mode_name': 'HOLD', 'mode_choices': [], 'control_hint': '等待新鲜、有效的车辆状态；连接成功不代表可以解锁。', 'source_system': 42, 'pose_age_s': 9.79074743, 'heading_enu_deg': 4.325711009108446e-06, 'horizontal_speed_mps': 0.0009820940904319785, 'vertical_speed_mps': 1.3582912768985659e-14, 'battery': None, 'diagnostics': {'GPS_RAW_INT': {'message_type': 'GPS_RAW_INT', 'availability': 'STALE', 'quality': 'VALID', 'value': {'fix_type': 6, 'satellites': 10, 'hdop': 1.21, 'vdop': 2.0}, 'frame_id': 'earth', 'captured_at': {'monotonic_ns': 26812657603627, 'utc': '2026-10-29T14:47:30.684145Z', 'clock_domain_id': 'host-monotonic-simulation'}, 'received_at': {'monotonic_ns': 26812815030965, 'utc': '2026-10-29T14:47:30.841572Z', 'clock_domain_id': 'host-monotonic-simulation'}, 'receive_fresh': False, 'observations': 53, 'duplicates': 0, 'out_of_order': 0, 'invalid': 0}, 'EKF_STATUS_REPORT': {'message_type': 'EKF_STATUS_REPORT', 'availability': 'STALE', 'quality': 'DEGRADED', 'value': {'flags': 895, 'velocity_variance': 0.0, 'horizontal_position_variance': 0.0, 'vertical_position_variance': 0.0, 'compass_variance': 0.0, 'terrain_altitude_variance': 0.0}, 'frame_id': None, 'captured_at': None, 'received_at': {'monotonic_ns': 26812815030965, 'utc': '2026-10-29T14:47:30.841572Z', 'clock_domain_id': 'host-monotonic-simulation'}, 'receive_fresh': False, 'observations': 53, 'duplicates': 0, 'out_of_order': 0, 'invalid': 0}, 'SYS_STATUS': {'message_type': 'SYS_STATUS', 'availability': 'STALE', 'quality': 'DEGRADED', 'value': {'voltage_v': 12.6, 'current_a': 0.0, 'remaining_percent': 100}, 'frame_id': None, 'captured_at': None, 'received_at': {'monotonic_ns': 26812815030965, 'utc': '2026-10-29T14:47:30.841572Z', 'clock_domain_id': 'host-monotonic-simulation'}, 'receive_fresh': False, 'observations': 53, 'duplicates': 0, 'out_of_order': 0, 'invalid': 0}, 'STATUSTEXT': {'message_type': 'STATUSTEXT', 'availability': 'STALE', 'quality': 'DEGRADED', 'value': {'severity': 6, 'text': 'Throttle disarmed', 'message_id': 0, 'chunk_sequence': 0}, 'frame_id': None, 'captured_at': None, 'received_at': {'monotonic_ns': 26810468345539, 'utc': '2026-10-29T14:47:28.494887Z', 'clock_domain_id': 'host-monotonic-simulation'}, 'receive_fresh': False, 'observations': 18, 'duplicates': 0, 'out_of_order': 0, 'invalid': 0}}, 'airspeed_mps': None, 'arming_readiness': '飞控检查结果以动作反馈及状态消息为准'}}",
+      "retained": true
+    },
+    {
+      "path": "artifacts/simulation/universal-20261029/browser-rover-copter-r6/result.json",
+      "error": "AssertionError: {'state': 'FAILED', 'new_session_id': 'sim-bbb4544d88d84c04af7c6b7ac2a9211f', 'scene_id': 'R04', 'error': 'TimeoutError: simulation manager readiness wait timed out', 'started_at': '2026-10-29T14:51:23.474955+00:00', 'ended_at': '2026-10-29T14:53:50.538280+00:00'}",
+      "retained": true
+    },
+    {
+      "path": "artifacts/simulation/universal-20261029/browser-rover-copter-r7/result.json",
+      "error": "AssertionError: {'state': 'FAILED', 'new_session_id': 'sim-164fe3bd4a554f79a252f0a3a0069891', 'scene_id': 'R04', 'error': 'RuntimeError: FrameworkFailure: startup vehicle-af93da12e2e64a269e5a75dc6ffc227a: cycle_deadline_missed', 'started_at': '2026-10-29T14:57:21.800326+00:00', 'ended_at': '2026-10-29T14:58:06.307351+00:00'}",
+      "retained": true
+    },
+    {
+      "path": "artifacts/simulation/universal-20261029/browser-rover-copter-r8/result.json",
+      "error": "AssertionError: {'state': 'FAILED', 'new_session_id': 'sim-de448ccba8af43eda12492a58ba2c1ce', 'scene_id': 'R04', 'error': 'RuntimeError: FrameworkFailure: startup vehicle-c22b9c0243dc4a1189ea617069d55b24: cycle_deadline_missed', 'started_at': '2026-10-29T15:03:24.226348+00:00', 'ended_at': '2026-10-29T15:04:08.540250+00:00'}",
+      "retained": true
+    },
+    {
+      "path": "artifacts/simulation/universal-20261029/final-F01-plane/result.json",
+      "error": "AssertionError: ('AutoLand', 'UNKNOWN', 'ValueError: fresh VALID vehicle required')",
+      "retained": true
+    },
+    {
+      "path": "artifacts/simulation/universal-20261029/final-F02-plane/result.json",
+      "error": "AssertionError: ('AutoLand', 'UNKNOWN', 'ValueError: fresh VALID vehicle required')",
+      "retained": true
+    },
+    {
+      "path": "artifacts/simulation/universal-20261029/final-F03-plane/result.json",
+      "error": "AssertionError: ('AutoLand', 'UNKNOWN', 'ValueError: fresh VALID vehicle required')",
+      "retained": true
+    },
+    {
+      "path": "artifacts/simulation/universal-20261029/two-copters/result.json",
+      "error": "AssertionError: {'kind': 'remove', 'state': 'FAILED', 'started_at': '2026-10-29T14:49:43.155687+00:00', 'error': 'ValueError: fresh VALID vehicle state required for safe retirement', 'ended_at': '2026-10-29T14:49:43.385371+00:00'}",
+      "retained": true
+    },
+    {
+      "path": "artifacts/simulation/universal-20261029/two-rovers/result.json",
+      "error": "AssertionError: ",
+      "retained": true
+    }
+  ],
+  "matrix": [
+    {
+      "world": "R01",
+      "vehicle": "rover",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "current native vehicle combination",
+      "sitl": "PASS",
+      "framework": "PASS",
+      "web": "PASS",
+      "motion": "PASS",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "R01",
+      "vehicle": "copter",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "current native vehicle combination",
+      "sitl": "PASS",
+      "framework": "PASS",
+      "web": "PASS",
+      "motion": "NOT_TESTED",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "R01",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: no audited conventional-plane runway corridor"
+    },
+    {
+      "world": "R01",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: no qualified VTOL vehicle model/control profile"
+    },
+    {
+      "world": "R02",
+      "vehicle": "rover",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "NOT_TESTED",
+      "framework": "NOT_TESTED",
+      "web": "NOT_TESTED",
+      "motion": "NOT_TESTED",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "R02",
+      "vehicle": "copter",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "NOT_TESTED",
+      "framework": "NOT_TESTED",
+      "web": "NOT_TESTED",
+      "motion": "NOT_TESTED",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "R02",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: no audited conventional-plane runway corridor"
+    },
+    {
+      "world": "R02",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: no qualified VTOL vehicle model/control profile"
+    },
+    {
+      "world": "R03",
+      "vehicle": "rover",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "current native vehicle combination",
+      "sitl": "PASS",
+      "framework": "PASS",
+      "web": "PASS",
+      "motion": "PASS",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "R03",
+      "vehicle": "copter",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "current native vehicle combination",
+      "sitl": "PASS",
+      "framework": "PASS",
+      "web": "PASS",
+      "motion": "NOT_TESTED",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "R03",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: no audited conventional-plane runway corridor"
+    },
+    {
+      "world": "R03",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: no qualified VTOL vehicle model/control profile"
+    },
+    {
+      "world": "R04",
+      "vehicle": "rover",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "current native vehicle combination",
+      "sitl": "PASS",
+      "framework": "PASS",
+      "web": "PASS",
+      "motion": "PASS",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "R04",
+      "vehicle": "copter",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "current native vehicle combination",
+      "sitl": "PASS",
+      "framework": "PASS",
+      "web": "PASS",
+      "motion": "NOT_TESTED",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "R04",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: no audited conventional-plane runway corridor"
+    },
+    {
+      "world": "R04",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: no qualified VTOL vehicle model/control profile"
+    },
+    {
+      "world": "R05",
+      "vehicle": "rover",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World contains a dynamic collision envelope without reviewed bounds"
+    },
+    {
+      "world": "R05",
+      "vehicle": "copter",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World contains a dynamic collision envelope without reviewed bounds"
+    },
+    {
+      "world": "R05",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World contains a dynamic collision envelope without reviewed bounds"
+    },
+    {
+      "world": "R05",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World contains a dynamic collision envelope without reviewed bounds"
+    },
+    {
+      "world": "R06",
+      "vehicle": "rover",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "current native vehicle combination",
+      "sitl": "PASS",
+      "framework": "PASS",
+      "web": "NOT_TESTED",
+      "motion": "PASS",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "R06",
+      "vehicle": "copter",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "NOT_TESTED",
+      "framework": "NOT_TESTED",
+      "web": "NOT_TESTED",
+      "motion": "NOT_TESTED",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "R06",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: no audited conventional-plane runway corridor"
+    },
+    {
+      "world": "R06",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: no qualified VTOL vehicle model/control profile"
+    },
+    {
+      "world": "R07",
+      "vehicle": "rover",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "NOT_TESTED",
+      "framework": "NOT_TESTED",
+      "web": "NOT_TESTED",
+      "motion": "NOT_TESTED",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "R07",
+      "vehicle": "copter",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "NOT_TESTED",
+      "framework": "NOT_TESTED",
+      "web": "NOT_TESTED",
+      "motion": "NOT_TESTED",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "R07",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: no audited conventional-plane runway corridor"
+    },
+    {
+      "world": "R07",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: no qualified VTOL vehicle model/control profile"
+    },
+    {
+      "world": "R08",
+      "vehicle": "rover",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "NOT_TESTED",
+      "framework": "NOT_TESTED",
+      "web": "NOT_TESTED",
+      "motion": "NOT_TESTED",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "R08",
+      "vehicle": "copter",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "NOT_TESTED",
+      "framework": "NOT_TESTED",
+      "web": "NOT_TESTED",
+      "motion": "NOT_TESTED",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "R08",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: no audited conventional-plane runway corridor"
+    },
+    {
+      "world": "R08",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: no qualified VTOL vehicle model/control profile"
+    },
+    {
+      "world": "C01",
+      "vehicle": "rover",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "NOT_TESTED",
+      "framework": "NOT_TESTED",
+      "web": "NOT_TESTED",
+      "motion": "NOT_TESTED",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "C01",
+      "vehicle": "copter",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "current native vehicle combination",
+      "sitl": "PASS",
+      "framework": "PASS",
+      "web": "PASS",
+      "motion": "PASS",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "C01",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: no audited conventional-plane runway corridor"
+    },
+    {
+      "world": "C01",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: no qualified VTOL vehicle model/control profile"
+    },
+    {
+      "world": "C02",
+      "vehicle": "rover",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "NOT_TESTED",
+      "framework": "NOT_TESTED",
+      "web": "NOT_TESTED",
+      "motion": "NOT_TESTED",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "C02",
+      "vehicle": "copter",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "current native vehicle combination",
+      "sitl": "PASS",
+      "framework": "PASS",
+      "web": "NOT_TESTED",
+      "motion": "PASS",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "C02",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: no audited conventional-plane runway corridor"
+    },
+    {
+      "world": "C02",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: no qualified VTOL vehicle model/control profile"
+    },
+    {
+      "world": "C03",
+      "vehicle": "rover",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "NOT_TESTED",
+      "framework": "NOT_TESTED",
+      "web": "NOT_TESTED",
+      "motion": "NOT_TESTED",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "C03",
+      "vehicle": "copter",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "NOT_TESTED",
+      "framework": "NOT_TESTED",
+      "web": "NOT_TESTED",
+      "motion": "NOT_TESTED",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "C03",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: no audited conventional-plane runway corridor"
+    },
+    {
+      "world": "C03",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: no qualified VTOL vehicle model/control profile"
+    },
+    {
+      "world": "C04",
+      "vehicle": "rover",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "NOT_TESTED",
+      "framework": "NOT_TESTED",
+      "web": "NOT_TESTED",
+      "motion": "NOT_TESTED",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "C04",
+      "vehicle": "copter",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "current native vehicle combination",
+      "sitl": "PASS",
+      "framework": "PASS",
+      "web": "PASS",
+      "motion": "PASS",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "C04",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: no audited conventional-plane runway corridor"
+    },
+    {
+      "world": "C04",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: no qualified VTOL vehicle model/control profile"
+    },
+    {
+      "world": "C05",
+      "vehicle": "rover",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "NOT_TESTED",
+      "framework": "NOT_TESTED",
+      "web": "NOT_TESTED",
+      "motion": "NOT_TESTED",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "C05",
+      "vehicle": "copter",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "current native vehicle combination",
+      "sitl": "PASS",
+      "framework": "PASS",
+      "web": "NOT_TESTED",
+      "motion": "PASS",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "C05",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: no audited conventional-plane runway corridor"
+    },
+    {
+      "world": "C05",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: no qualified VTOL vehicle model/control profile"
+    },
+    {
+      "world": "C06",
+      "vehicle": "rover",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World contains a dynamic collision envelope without reviewed bounds"
+    },
+    {
+      "world": "C06",
+      "vehicle": "copter",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World contains a dynamic collision envelope without reviewed bounds"
+    },
+    {
+      "world": "C06",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World contains a dynamic collision envelope without reviewed bounds"
+    },
+    {
+      "world": "C06",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World contains a dynamic collision envelope without reviewed bounds"
+    },
+    {
+      "world": "C07",
+      "vehicle": "rover",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "NOT_TESTED",
+      "framework": "NOT_TESTED",
+      "web": "NOT_TESTED",
+      "motion": "NOT_TESTED",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "C07",
+      "vehicle": "copter",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "NOT_TESTED",
+      "framework": "NOT_TESTED",
+      "web": "NOT_TESTED",
+      "motion": "NOT_TESTED",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "C07",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: no audited conventional-plane runway corridor"
+    },
+    {
+      "world": "C07",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: no qualified VTOL vehicle model/control profile"
+    },
+    {
+      "world": "C08",
+      "vehicle": "rover",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "NOT_TESTED",
+      "framework": "NOT_TESTED",
+      "web": "NOT_TESTED",
+      "motion": "NOT_TESTED",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "C08",
+      "vehicle": "copter",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "NOT_TESTED",
+      "framework": "NOT_TESTED",
+      "web": "NOT_TESTED",
+      "motion": "NOT_TESTED",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "C08",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: no audited conventional-plane runway corridor"
+    },
+    {
+      "world": "C08",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: no qualified VTOL vehicle model/control profile"
+    },
+    {
+      "world": "F01",
+      "vehicle": "rover",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "current native vehicle combination",
+      "sitl": "PASS",
+      "framework": "PASS",
+      "web": "PASS",
+      "motion": "PASS",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "F01",
+      "vehicle": "copter",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "current native vehicle combination",
+      "sitl": "PASS",
+      "framework": "PASS",
+      "web": "PASS",
+      "motion": "NOT_TESTED",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "F01",
+      "vehicle": "plane",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "current native vehicle combination",
+      "sitl": "PASS",
+      "framework": "PASS",
+      "web": "PASS",
+      "motion": "PASS",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "F01",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: no qualified VTOL vehicle model/control profile"
+    },
+    {
+      "world": "F02",
+      "vehicle": "rover",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "current native vehicle combination",
+      "sitl": "PASS",
+      "framework": "PASS",
+      "web": "PASS",
+      "motion": "NOT_TESTED",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "F02",
+      "vehicle": "copter",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "current native vehicle combination",
+      "sitl": "PASS",
+      "framework": "PASS",
+      "web": "PASS",
+      "motion": "NOT_TESTED",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "F02",
+      "vehicle": "plane",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "current native vehicle combination",
+      "sitl": "PASS",
+      "framework": "PASS",
+      "web": "PASS",
+      "motion": "PASS",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "F02",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: no qualified VTOL vehicle model/control profile"
+    },
+    {
+      "world": "F03",
+      "vehicle": "rover",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "NOT_TESTED",
+      "framework": "NOT_TESTED",
+      "web": "NOT_TESTED",
+      "motion": "NOT_TESTED",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "F03",
+      "vehicle": "copter",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "NOT_TESTED",
+      "framework": "NOT_TESTED",
+      "web": "NOT_TESTED",
+      "motion": "NOT_TESTED",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "F03",
+      "vehicle": "plane",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "current native vehicle combination",
+      "sitl": "PASS",
+      "framework": "PASS",
+      "web": "NOT_TESTED",
+      "motion": "PASS",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "F03",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: no qualified VTOL vehicle model/control profile"
+    },
+    {
+      "world": "F04",
+      "vehicle": "rover",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "NOT_TESTED",
+      "framework": "NOT_TESTED",
+      "web": "NOT_TESTED",
+      "motion": "NOT_TESTED",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "F04",
+      "vehicle": "copter",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "NOT_TESTED",
+      "framework": "NOT_TESTED",
+      "web": "NOT_TESTED",
+      "motion": "NOT_TESTED",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "F04",
+      "vehicle": "plane",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "NOT_TESTED",
+      "framework": "NOT_TESTED",
+      "web": "NOT_TESTED",
+      "motion": "NOT_TESTED",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "F04",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: no qualified VTOL vehicle model/control profile"
+    },
+    {
+      "world": "F05",
+      "vehicle": "rover",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "NOT_TESTED",
+      "framework": "NOT_TESTED",
+      "web": "NOT_TESTED",
+      "motion": "NOT_TESTED",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "F05",
+      "vehicle": "copter",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "NOT_TESTED",
+      "framework": "NOT_TESTED",
+      "web": "NOT_TESTED",
+      "motion": "NOT_TESTED",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "F05",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: bridge/platform obstructs the forward runway corridor"
+    },
+    {
+      "world": "F05",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: no qualified VTOL vehicle model/control profile"
+    },
+    {
+      "world": "F06",
+      "vehicle": "rover",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "NOT_TESTED",
+      "framework": "NOT_TESTED",
+      "web": "NOT_TESTED",
+      "motion": "NOT_TESTED",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "F06",
+      "vehicle": "copter",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "NOT_TESTED",
+      "framework": "NOT_TESTED",
+      "web": "NOT_TESTED",
+      "motion": "NOT_TESTED",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "F06",
+      "vehicle": "plane",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "NOT_TESTED",
+      "framework": "NOT_TESTED",
+      "web": "NOT_TESTED",
+      "motion": "NOT_TESTED",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "F06",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: no qualified VTOL vehicle model/control profile"
+    },
+    {
+      "world": "F07",
+      "vehicle": "rover",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "NOT_TESTED",
+      "framework": "NOT_TESTED",
+      "web": "NOT_TESTED",
+      "motion": "NOT_TESTED",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "F07",
+      "vehicle": "copter",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "NOT_TESTED",
+      "framework": "NOT_TESTED",
+      "web": "NOT_TESTED",
+      "motion": "NOT_TESTED",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "F07",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: bridge/platform obstructs the forward runway corridor"
+    },
+    {
+      "world": "F07",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: no qualified VTOL vehicle model/control profile"
+    },
+    {
+      "world": "F08",
+      "vehicle": "rover",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "NOT_TESTED",
+      "framework": "NOT_TESTED",
+      "web": "NOT_TESTED",
+      "motion": "NOT_TESTED",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "F08",
+      "vehicle": "copter",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "NOT_TESTED",
+      "framework": "NOT_TESTED",
+      "web": "NOT_TESTED",
+      "motion": "NOT_TESTED",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "F08",
+      "vehicle": "plane",
+      "admission": "PASS",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "NOT_TESTED",
+      "framework": "NOT_TESTED",
+      "web": "NOT_TESTED",
+      "motion": "NOT_TESTED",
+      "reason": "Reviewed static spawn, unchanged Framework bounds, locked vehicle inputs; no promotion from geometry to motion"
+    },
+    {
+      "world": "F08",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: no qualified VTOL vehicle model/control profile"
+    },
+    {
+      "world": "U_ardupilot-gimbal",
+      "vehicle": "rover",
+      "admission": "BLOCKED",
+      "gazebo": "BLOCKED",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_ardupilot-gimbal",
+      "vehicle": "copter",
+      "admission": "BLOCKED",
+      "gazebo": "BLOCKED",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_ardupilot-gimbal",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "BLOCKED",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_ardupilot-gimbal",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "BLOCKED",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_ardupilot-zephyr-parachute",
+      "vehicle": "rover",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_ardupilot-zephyr-parachute",
+      "vehicle": "copter",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_ardupilot-zephyr-parachute",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_ardupilot-zephyr-parachute",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_clearpath-construction",
+      "vehicle": "rover",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_clearpath-construction",
+      "vehicle": "copter",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_clearpath-construction",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_clearpath-construction",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_clearpath-office",
+      "vehicle": "rover",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_clearpath-office",
+      "vehicle": "copter",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_clearpath-office",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_clearpath-office",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_clearpath-orchard",
+      "vehicle": "rover",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_clearpath-orchard",
+      "vehicle": "copter",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_clearpath-orchard",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_clearpath-orchard",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_clearpath-pipeline",
+      "vehicle": "rover",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_clearpath-pipeline",
+      "vehicle": "copter",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_clearpath-pipeline",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_clearpath-pipeline",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_clearpath-solar-farm",
+      "vehicle": "rover",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_clearpath-solar-farm",
+      "vehicle": "copter",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_clearpath-solar-farm",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_clearpath-solar-farm",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_clearpath-warehouse",
+      "vehicle": "rover",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_clearpath-warehouse",
+      "vehicle": "copter",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_clearpath-warehouse",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_clearpath-warehouse",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_collection-f1-maze-s08-perfect-kr",
+      "vehicle": "rover",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_collection-f1-maze-s08-perfect-kr",
+      "vehicle": "copter",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_collection-f1-maze-s08-perfect-kr",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_collection-f1-maze-s08-perfect-kr",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_collection-f3-aisles-h30x20-a150-x1",
+      "vehicle": "rover",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_collection-f3-aisles-h30x20-a150-x1",
+      "vehicle": "copter",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_collection-f3-aisles-h30x20-a150-x1",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_collection-f3-aisles-h30x20-a150-x1",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_collection-f4-forest-s40-d003",
+      "vehicle": "rover",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_collection-f4-forest-s40-d003",
+      "vehicle": "copter",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_collection-f4-forest-s40-d003",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_collection-f4-forest-s40-d003",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_collection-f5-urban-w06-b15",
+      "vehicle": "rover",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_collection-f5-urban-w06-b15",
+      "vehicle": "copter",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_collection-f5-urban-w06-b15",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_collection-f5-urban-w06-b15",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_collection-mo1-office-strip-moving",
+      "vehicle": "rover",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_collection-mo1-office-strip-moving",
+      "vehicle": "copter",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_collection-mo1-office-strip-moving",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_collection-mo1-office-strip-moving",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_collection-mo2-warehouse-moving",
+      "vehicle": "rover",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_collection-mo2-warehouse-moving",
+      "vehicle": "copter",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_collection-mo2-warehouse-moving",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_collection-mo2-warehouse-moving",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_collection-sc1-square-loop",
+      "vehicle": "rover",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_collection-sc1-square-loop",
+      "vehicle": "copter",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_collection-sc1-square-loop",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_collection-sc1-square-loop",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_gazebo-air-pressure",
+      "vehicle": "rover",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_gazebo-air-pressure",
+      "vehicle": "copter",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_gazebo-air-pressure",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_gazebo-air-pressure",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_gazebo-contact-sensor",
+      "vehicle": "rover",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_gazebo-contact-sensor",
+      "vehicle": "copter",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_gazebo-contact-sensor",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_gazebo-contact-sensor",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_gazebo-imu",
+      "vehicle": "rover",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_gazebo-imu",
+      "vehicle": "copter",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_gazebo-imu",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_gazebo-imu",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_gazebo-navsat",
+      "vehicle": "rover",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_gazebo-navsat",
+      "vehicle": "copter",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_gazebo-navsat",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_gazebo-navsat",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_gazebo-sensors",
+      "vehicle": "rover",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_gazebo-sensors",
+      "vehicle": "copter",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_gazebo-sensors",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_gazebo-sensors",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_gazebo-shapes",
+      "vehicle": "rover",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_gazebo-shapes",
+      "vehicle": "copter",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_gazebo-shapes",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_gazebo-shapes",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_gazebo-trajectory-follower",
+      "vehicle": "rover",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_gazebo-trajectory-follower",
+      "vehicle": "copter",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_gazebo-trajectory-follower",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_gazebo-trajectory-follower",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_gazebo-wind",
+      "vehicle": "rover",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_gazebo-wind",
+      "vehicle": "copter",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_gazebo-wind",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_gazebo-wind",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_px4-forest",
+      "vehicle": "rover",
+      "admission": "BLOCKED",
+      "gazebo": "BLOCKED",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_px4-forest",
+      "vehicle": "copter",
+      "admission": "BLOCKED",
+      "gazebo": "BLOCKED",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_px4-forest",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "BLOCKED",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_px4-forest",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "BLOCKED",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_px4-frictionless",
+      "vehicle": "rover",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_px4-frictionless",
+      "vehicle": "copter",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_px4-frictionless",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_px4-frictionless",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_px4-moving-platform",
+      "vehicle": "rover",
+      "admission": "BLOCKED",
+      "gazebo": "BLOCKED",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_px4-moving-platform",
+      "vehicle": "copter",
+      "admission": "BLOCKED",
+      "gazebo": "BLOCKED",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_px4-moving-platform",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "BLOCKED",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_px4-moving-platform",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "BLOCKED",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_px4-ridge",
+      "vehicle": "rover",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_px4-ridge",
+      "vehicle": "copter",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_px4-ridge",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_px4-ridge",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_px4-walls",
+      "vehicle": "rover",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_px4-walls",
+      "vehicle": "copter",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_px4-walls",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "U_px4-walls",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "H_playpen",
+      "vehicle": "rover",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "H_playpen",
+      "vehicle": "copter",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "H_playpen",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "H_playpen",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "H_iris",
+      "vehicle": "rover",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "H_iris",
+      "vehicle": "copter",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "H_iris",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "H_iris",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "H_zephyr",
+      "vehicle": "rover",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "H_zephyr",
+      "vehicle": "copter",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "H_zephyr",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "H_zephyr",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "H_warehouse",
+      "vehicle": "rover",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "H_warehouse",
+      "vehicle": "copter",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "H_warehouse",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "H_warehouse",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "H_urban",
+      "vehicle": "rover",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "H_urban",
+      "vehicle": "copter",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "H_urban",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "H_urban",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "H_orchard",
+      "vehicle": "rover",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "H_orchard",
+      "vehicle": "copter",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "H_orchard",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "H_orchard",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "H_windy",
+      "vehicle": "rover",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "H_windy",
+      "vehicle": "copter",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "H_windy",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "H_windy",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "PASS",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "H_multiagent",
+      "vehicle": "rover",
+      "admission": "BLOCKED",
+      "gazebo": "BLOCKED",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "H_multiagent",
+      "vehicle": "copter",
+      "admission": "BLOCKED",
+      "gazebo": "BLOCKED",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "H_multiagent",
+      "vehicle": "plane",
+      "admission": "BLOCKED",
+      "gazebo": "BLOCKED",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    },
+    {
+      "world": "H_multiagent",
+      "vehicle": "vtol",
+      "admission": "BLOCKED",
+      "gazebo": "BLOCKED",
+      "gazebo_basis": "previous native World-only evidence",
+      "sitl": "BLOCKED",
+      "framework": "BLOCKED",
+      "web": "BLOCKED",
+      "motion": "BLOCKED",
+      "reason": "BLOCKED: World has no reviewed ground spawn regions; loading a World does not grant vehicle admission"
+    }
+  ],
+  "limitations": [
+    "VTOL genuine official candidate exists but no qualified Framework VTOL profile/safety/transition and native flight acceptance; asset license unresolved",
+    "22/22/6 counts are static admission, not a claim all those combinations completed motion",
+    "R05/C06 dynamic motion envelopes and unreviewed upstream World spawns are BLOCKED; Plane F05/F07 runway obstruction BLOCKED",
+    "Fixed ±5m Rover/Copter Framework fence and fixed validated geographic origin are enforced; no per-World model/profile tuning",
+    "Armed/airborne/unresolved exit switch/removal is explicitly rejected; original control must land/stop/disarm",
+    "One selected vehicle moves while peers remain stationary in the tested multi cases; no coordinated multi-aircraft flight or collision avoidance claim",
+    "Unexpected lockstep SITL failure may retire the shared World; host overload that exceeds original deadlines fails closed",
+    "Camera/air-pressure/magnetometer pipelines and ROS/Tool deployments not exercised in this phase remain NOT_TESTED"
+  ],
+  "packaging": {
+    "status": "PASS",
+    "path": "artifacts/simulation/universal-20261029/wheel-final/vehicle_autonomy-0.1.0-py3-none-any.whl",
+    "sha256": "3409ba0dc420a109c76a0ce363906557bf01978260706c5972a2433c748cb3e7",
+    "resources": [
+      "simulation/scenarios/world_spawns.json",
+      "simulation/vehicles/catalog.json",
+      "simulation/vehicles/vtol-audit.json"
+    ],
+    "code_matches_workspace": true
+  },
+  "peer_review": {
+    "scope": "private worker proof, signing secrecy, typed IPC, Scope/Lease/SEND and owned cleanup",
+    "new_P1_P2_findings": 0,
+    "native_test_claim": false
+  }
+}

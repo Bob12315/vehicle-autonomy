@@ -26,7 +26,7 @@
 
 在“受控切换 World”中选择兼容的新 World，填写新环境参数与每个保留车辆槽位的出生点。切换保留固定 Vehicle Profile，使用新的实例身份和 epoch，旧 SEND 权限不会继承。
 
-先在原控制页让任务安全退出、解除解锁并释放 SEND。所有影响整个 World 的操作都会检查当前 World 中全部活动车辆的控制 owner；存在任何其他控制页预留时即拒绝，管理 API 凭据也不能绕过。单车移除、故障与查询测试在明确 `vehicle_id` 后检查所选车辆的 owner，不能引用其他 World 的 Vehicle ID。页面不会通过选另一辆车取得旧车辆的控制权。
+先在原控制页让任务安全退出、解除解锁并释放 SEND。所有影响整个 World 的操作都会检查当前 World 中全部活动车辆的控制 owner；存在任何其他控制页预留时即拒绝，管理 API 凭据也不能绕过。单车移除与查询测试在明确 `vehicle_id` 后检查所选车辆的 owner，不能引用其他 World 的 Vehicle ID。页面不会通过选另一辆车取得旧车辆的控制权。
 
 后端切换状态通过 `switch.state` 返回 PREPARING / STOPPING / STARTING / SUCCEEDED / FAILED、`new_session_id` 和错误。页面持续显示真实进度，新会话创建后自动选中；失败会保留旧操作结果，不假定为 READY。切换过程安全性与是否允许某次切换由原会话/车辆状态决定，页面按钮可点不代表后端准入成功。
 
@@ -44,3 +44,5 @@
 ```
 
 目录必须为新的名称，凭据和运行证据不提交 Git。真实执行结论以本轮测试报告的 PASS / FAIL / BLOCKED / NOT_TESTED 为准；测试代码存在不表示已经执行。外部模型兼容、VTOL 资格和未实测的 World × Vehicle 组合仍需分别记录。
+
+接收故障虽然只注入所选链接，当前失败清理可能结束整个共享 World，因此 fault 也检查全部车辆的控制页 reservation；须先在相关原控制页安全释放，不能间接终止另一页面保留的车辆。

@@ -339,3 +339,5 @@ python -m vehicle_autonomy.app.cli ctl --profile copter_sim start --mission cuad
 导航模型显式注入参考点、几何包络和运动界限；第二种已验收车型是不同轴距/轮距/质量的紧凑前驱 Rover，不能只换配置就声称既有世界已换车。地图锚点绑定 Environment/HOME、地图源及车辆会话；SLAM 位姿仍是只读候选，活动控制继续使用遥测 Localization。
 
 配置、实际 SDF、地图边界修复及阶段验收范围见 [自主导航说明](docs/rover_autonomy.md) 和 [验收记录](docs/autonomy/navigation-completion-audit.md)。顺序复现入口：`./scripts/test_autonomy_navigation.sh --allow-send`。各阶段以独立审计中的 PASS 为准；P26 统一版本/长运行及真实设备不由此完成。
+
+通用车辆库、多车共享 World 与受控切换的当前边界和实际验收见 [通用仿真报告](docs/UNIVERSAL_SIMULATION_TEST_REPORT.md)；固定输入与官方 VTOL 候选见 [车辆库](docs/VEHICLE_LIBRARY.md)。

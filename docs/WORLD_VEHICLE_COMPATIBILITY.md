@@ -25,3 +25,5 @@ Rover 和 Copter 的中央区域为 `x ∈ [-4,4]`、`y ∈ [-9,9]`，要求车�
 室内 Copter 的地面出生不意味着室内飞行、无 GPS 导航或穿越屋顶已被验证；河流不代表水动力，坡地不代表可通行性认证。后续扩展上游 World 需先完成原始资源与地形/网格碰撞审查，登记可证明的平坦安全区和地理参考，再实现适用于该资源结构的审阅器并做真实仿真；不能只把目录中的 `ready` 或历史 L1/L2 当作出生准入。所有出生检查不持有控制命令端口，也不改变 SEND、Lease、TTL、session、generation 或唯一写入器规则。
 
 接口：`WorldSpawnRegistry(scene_registry=None).describe(scene_id)` 返回 `scene_id`、`geographic_reference`、`extent_m`、`ground_height`、`spawn_presets`、`vehicle_support`、`constraints`。`validate(scene_id, vehicle_definition, spawn=None, *, peers=(), parameters=None, seed=0)` 返回规范的 `{x,y,z,heading_deg,preset_id}`，失败抛出 `ValueError`。`vehicle_definition` 含注册 `id`、车型族 `family` / `kind`、固定 `radius`、`clearance_z`、`height`；`peers` 为已经校验过的 `{spawn,definition}` 列表。返回值不携带模型路径或控制授权。
+
+集成层还检查原 Framework profile 的 geofence；north-far/south-far 对 Rover/Copter 超出原 ±5m 范围时拒绝。新增 east/west 预设支持四车默认安全布置。Plane 自定义航向按旋转后的全长跑道走廊重新检查。最终原生和 Web 结果见 [通用报告](UNIVERSAL_SIMULATION_TEST_REPORT.md)。

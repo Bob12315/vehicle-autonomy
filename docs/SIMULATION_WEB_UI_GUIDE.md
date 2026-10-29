@@ -1,5 +1,6 @@
 # 仿真中心 Web 使用指南
 
+> 2026-10-29 通用车辆组合阶段已继续更新。当前固定模型、多车、跨 World 和原生/Web 验收以 [通用仿真报告](UNIVERSAL_SIMULATION_TEST_REPORT.md) 为准；本页旧轮次数字保留为历史证据。
 仿真中心位于现有 Mission/Console 后端的 `/simulation`。车辆总览、车辆控制和任务编排侧栏均提供入口；继续使用 `/login` 的 HttpOnly 浏览器会话和原 CSRF 防护。页面不保存访问密钥，也不接收 Shell 命令、可执行参数或主机文件路径。
 
 ## 启动与操作

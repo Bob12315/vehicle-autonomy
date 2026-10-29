@@ -55,3 +55,41 @@ python -m vehicle_autonomy.app.simulation.cli compare \
 替换其网格、纹理和插件依赖。缓存更新使用互斥锁，忙时返回明确错误，可在会话退出后重试。
 浏览器对已被其他浏览器持有控制权的车辆执行 fault/stop，必须使用原控制 token 或先走
 既有明确接管流程；管理 API 密钥也不绕过该所有权检查。
+
+## 通用车辆组合接口（2026-10-29）
+
+所有接口保留同一登录、CSRF、Origin、Host 和请求 ID 校验。车型、World 和出生预设来自
+后端注册表，浏览器不能提交文件路径、命令、端口、System ID、二进制或 SEND 配置。
+
+- `GET /api/simulation/vehicles`：固定定义列表；READY 只表示 SHA 锁一致，VTOL 返回
+  BLOCKED 与明确原因。物理/传感器/飞控参数来源均可查看。
+- `GET /api/simulation/catalog`：新增 `spawn_info`、各车型 `vehicle_support` 与静态
+  准入说明。没有原生证据的组合保留 NOT_TESTED。
+- `POST /api/simulation/create`：支持旧 `{scene_id,vehicle,spawn?,seed?,parameters?}`，
+  或 `{scene_id,vehicles:[{kind,slot_id?,spawn?}],seed?,parameters?}`；两种车辆字段互斥，
+  最多四车、空列表为仅 World。spawn 是 `{id:"center"}` / `{preset_id:"north"}`，
+  或完整 `{x:0,y:3,z:0.195,heading_deg:0}`，严格校验实际支撑面与同伴间距。
+- `POST /api/simulation/add_vehicle`：`{id,vehicle:{kind,slot_id?,spawn?}}`。
+  已有同伴须均为安全静止地面状态；执行前按实际 Ground Truth 重验间距。
+- `POST /api/simulation/remove_vehicle`：`{id,vehicle_id}`，只退役选定车。
+- `POST /api/simulation/switch`：`{id,scene_id,seed?,parameters?,spawns?:{slot_id:spawn}}`。
+  校验新配置后异步停止旧会话并创建全新身份；固定 profile 不变。
+
+add/remove 返回原会话，`operation` 提供 RUNNING/SUCCEEDED/FAILED、时间和 error。
+switch 返回原会话，`switch` 提供 PREPARING/STOPPING/STARTING/SUCCEEDED/FAILED、
+`new_session_id`、目标场景和 error。旧报告不会被覆盖；新会话有 `previous_session_id`。
+空中、仍解锁、有运动或未解决安全屏障的切换/移除明确失败，原会话在可恢复时保留运行，
+须先经原控制页安全退出。运行时错误或无法确认的局部清理会退役整个 World。
+
+会话 `vehicles[]` 包含独立 id/slot_id/target/System ID/ports/entity_name、固定版本与
+fingerprint/model/parameter/sensor SHA、五个启动阶段、实际参数回读、估计状态、
+独立 Ground Truth 与日志定位。`retired_vehicles[]` 保留移除记录。顶层 vehicle/target
+继续作为首辆车的兼容别名，不适合在多车状态下隐式控制。
+
+`logs`、`fault`、只读 `test` 接口新增 `vehicle_id`；多车必须明确选择。日志 stream
+仍限 gazebo/sitl/sdf-check；SITL 流按所选车辆分离。查询测试继续只接受
+GetVehicleState/空参数/SEND=false，运动只能进入原 `/control`、Action、Tool/Mission 流程。
+World stop/switch/add 等操作检查全部相关控制页的 reservation；单车 remove/test
+检查相应车。控制页须安全关闭 SEND 后释放，不能用 API bearer 绕过另一页面的所有权。
+
+接收故障虽然只注入所选链接，当前失败清理可能结束整个共享 World，因此 fault 也检查全部车辆的控制页 reservation；须先在相关原控制页安全释放，不能间接终止另一页面保留的车辆。

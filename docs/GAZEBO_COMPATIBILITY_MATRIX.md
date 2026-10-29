@@ -1,5 +1,6 @@
 # Gazebo 场景兼容与验收矩阵
 
+> 2026-10-29 通用车辆组合阶段已继续更新。当前固定模型、多车、跨 World 和原生/Web 验收以 [通用仿真报告](UNIVERSAL_SIMULATION_TEST_REPORT.md) 为准；本页旧轮次数字保留为历史证据。
 日期：2026-10-29（Asia/Ulaanbaatar）。Copter/Plane 的固定版本原生/Chrome 回归在 `b3e820a` 执行；Rover 此次复跑失败后补上原生 HOLD 制动，并完成两轮完整成功重测。最终实现提交见机器索引，失败原件保留。60 是目录入口数，其中包含历史 launch 参考，不等于 60 个独立可运行世界。
 
 | 等级 | PASS | FAIL | BLOCKED | NOT_TESTED |

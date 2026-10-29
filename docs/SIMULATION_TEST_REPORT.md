@@ -1,5 +1,6 @@
 # 仿真系统测试与交付报告
 
+> 2026-10-29 通用车辆组合阶段已继续更新。当前固定模型、多车、跨 World 和原生/Web 验收以 [通用仿真报告](UNIVERSAL_SIMULATION_TEST_REPORT.md) 为准；本页旧轮次数字保留为历史证据。
 日期：2026-10-29（Asia/Ulaanbaatar）。基础实现提交 `b3e820a`；Rover 的退出停车确认问题随后按原安全边界定向修复，最终代码提交见机器索引。报告提交只整理文档与非敏感证据。原始大文件、进程日志、轨迹、EEPROM/签名临时状态和编译缓存不进入 Git。机器索引为 [center-evidence.json](simulation/center-evidence.json)，逐场景结论为 [兼容矩阵](GAZEBO_COMPATIBILITY_MATRIX.md)。
 
 ## 实际完成

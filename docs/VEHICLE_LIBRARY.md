@@ -91,3 +91,5 @@ model/parameters/sensor/fingerprint 全部一致，参数副本逐字节相同�
 首次 Copter 检查因 libsdformat 缺少 Gazebo URI callback 失败，保留在前一目录；
 绑定自有 include 路径后才重测通过。本子模块没有启动 Gazebo/SITL，也不将这些检查
 计为车辆物理运动或 World×Vehicle 跨地图验收。
+
+固定车型跨地图运动、独立 owner 与 Web 多车的后续实际结果见 [通用验收报告](UNIVERSAL_SIMULATION_TEST_REPORT.md)。本页“本子模块未启动仿真”仅描述车辆库子模块自身的装配检查，不覆盖后续集成测试。
