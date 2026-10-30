@@ -27,6 +27,23 @@ python -m unittest discover -s tests -v
 相对用户输入和输出路径仍相对调用目录。完整路径变化及验证见
 [架构迁移报告](docs/ARCHITECTURE_MIGRATION_REPORT.md)。
 
+## 本地生成文件
+
+统一使用 `.venv/` 安装环境；仿真启动和 Phase 3/4 测试脚本也使用该环境，
+可通过 `VAF_PYTHON` 指定其他已安装的环境。无需保留旧 `.venv-migration/`
+和一次性的 wheel/build 验证环境。
+
+`artifacts/` 整体忽略版本控制，包含原始验收记录、测试环境和本机依赖。
+其中 `artifacts/phase2-control/ardupilot-source/` 仍被默认仿真入口使用，
+不能把整个目录当缓存删除。`runtime/` 含任务持久状态、日志和本地配置，
+也不能按临时缓存一并清空。
+
+2026-10-30 清理了旧验证环境、浏览器测试配置、ROS 下载缓存和编译中间文件，
+共 66,486 个文件，释放约 5.05 GiB；保留源码、测试、原始验收记录和运行依赖。
+本机逐项清单在 `artifacts/cleanup/20261030/manifest.json`。
+清理后 932 项单元测试、5 个脚本入口检查及 R01 Rover / C01 Copter
+真实本机 SITL/Gazebo 运动与安全退出回归通过；未扩大实机或其他车型验收范围。
+
 ## 统一本地控制台
 
 安装上述独立环境后，在项目目录执行 `./control-center`，使用已设置的密码登录。浏览器自动打开

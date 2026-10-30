@@ -5,8 +5,6 @@ __pycache__/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
-artifacts/simulation/
-artifacts/hardware-ready/
 
 *.log
 *.bin
@@ -18,51 +16,17 @@ reasonix.toml
 # Generated local runtime state (source now lives under src/).
 runtime/
 
-# Local migration evidence and isolated packaging checks
-artifacts/migration/
 .venv*/
 *.egg-info/
 build/
 dist/
 
-# V1.1 phase-one raw simulation evidence
-artifacts/phase1-control/
-
-# Independent Phase 1 remediation evidence
-artifacts/phase1-remediation/
-artifacts/phase1-round3/
-
-# Ephemeral simulation credentials and cleanup evidence
+# Ephemeral simulation credentials
 receive-signing*.private
-artifacts/phase1-credential-cleanup/
 
-# Isolated three-vehicle builds and raw Phase 2 evidence
-artifacts/phase2-control/
-
-# Phase 3 raw acceptance runs contain large, host-specific simulation evidence.
-artifacts/phase3-actions/
-artifacts/phase3-remediation/
-artifacts/phase3-round3/
-
-# Phase 4 isolated evidence and runtime state
-/artifacts/phase4-mission/
-
-# Phase 5 isolated algorithm dependencies, private runtime and raw evidence.
-/artifacts/phase5-world-navigation/
-
-# Native RViz/ROS/SITL evidence and ephemeral private deployment files.
-/artifacts/rviz-v1/
-/artifacts/mission-studio-b/
-
-# Chinese UI browser evidence, screenshots and isolated runtime state.
-/artifacts/web-zh/
-
-# Local third-party scenario resources and test evidence
+# Local third-party scenario resource cache
 /simulation/world_registry/assets/
 /simulation/world_registry/evidence/
 
-# Simulation center browser evidence and private application journals.
-/artifacts/simulation-center/
-
-/artifacts/control-center/
-/artifacts/web-navigation/
+# Generated evidence, private run state and local builds; never source packages.
+/artifacts/
