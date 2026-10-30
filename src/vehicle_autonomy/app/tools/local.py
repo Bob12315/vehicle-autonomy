@@ -21,8 +21,9 @@ from .schema import compatibility, context, fingerprint, identifier, manifest, o
 
 
 class LocalTools:
-    def __init__(self, manifests, store, *, environment=None):
+    def __init__(self, manifests, store, *, environment=None, allow_external_instances=False, persist_logs=False):
         self.store = store; self.env = dict(os.environ if environment is None else environment)
+        self.allow_external_instances=allow_external_instances;self.persist_logs=persist_logs
         self.registry = {}
         for item in manifests:
             item = manifest(item)
@@ -146,7 +147,7 @@ class LocalTools:
                     if operation == 'open': raise ValueError('window activation unsupported; the existing window is on the Agent desktop')
                     return self._view(current)
                 if current and not current['cleanup_confirmed']: raise ValueError('prior process cleanup unconfirmed')
-                if self.discover(tool_id): raise ValueError('external process discovered; observation/connection only')
+                if not self.allow_external_instances and self.discover(tool_id): raise ValueError('external process discovered; observation/connection only')
                 check = self.check(tool_id, profile_id)
                 if not check['launchable']:
                     raise ValueError('Missing Dependency: ' + '; '.join(check['missing']) if check['missing'] else 'profile is observation-only')
@@ -154,11 +155,15 @@ class LocalTools:
                 exe = self._which(command[0], self._environment(p, ctx))
                 command[0] = exe
                 record = self._record(tool_id, profile_id, ctx, 'STARTING')
+                if self.persist_logs:
+                    logs=self.store.root/'logs';logs.mkdir(mode=0o700,exist_ok=True)
+                    record['log_path']=str(logs/(tool_id+'-'+record['instance_id']+'.log'))
                 working=p.get('cwd')
                 if not working:
                     parent=self.store.root/'instances';parent.mkdir(mode=0o700,exist_ok=True)
                     if parent.is_symlink():raise ValueError('instance directory symlink rejected')
                     working=parent/record['instance_id'];working.mkdir(mode=0o700)
+                if self.persist_logs:record['cwd']=str(working)
                 configuration=json.dumps(dict(argv=command,env=dict(self._environment(p,ctx),VAF_TOOL_OWNERSHIP=record['ownership_marker']),
                     cwd=str(working),stop_timeout_s=p.get('stop_timeout_s',3)))+'\n'
                 if len(configuration.encode())>262000:raise ValueError('bounded supervisor configuration exceeded')
@@ -193,7 +198,12 @@ class LocalTools:
                     if event['event'] == 'spawned':
                         record.update(pid=event['pid'], process_running=True, state='STOPPING' if record['stopping'] else 'RUNNING')
                         self.store.audit('tool.running', tool=record['tool_id'], instance_id=record['instance_id'], pid=event['pid'])
-                    elif event['event'] == 'log': record['logs'].append(event['text'][:2048])
+                    elif event['event'] == 'log':
+                        record['logs'].append(event['text'][:2048])
+                        if record.get('log_path'):
+                            path=Path(record['log_path'])
+                            if path.exists() and path.stat().st_size>8*1024*1024:path.replace(path.with_suffix('.log.1'))
+                            with path.open('a') as output:output.write(event['text'])
                     elif event['event'] == 'error': record['error'] = event['error']
                     elif event['event'] == 'exit':
                         exit_seen = True
@@ -296,7 +306,7 @@ class LocalTools:
                     if record['stopping'] or not record['process_running'] or time.monotonic() - record['last_probe'] < 1: continue
                     record['last_probe'] = time.monotonic()
                 try:
-                    env = self._environment(p, record['context'])
+                    env = dict(self._environment(p, record['context']),VAF_TOOL_OWNERSHIP=record['ownership_marker'])
                     health = self._probe(p['health'], record['context'], env)
                     ready = self._probe(p['ready'], record['context'], env)
                     with self.lock:

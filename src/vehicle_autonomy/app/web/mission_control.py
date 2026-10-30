@@ -108,6 +108,8 @@ class MissionControl(ActionLab):
         if self.control_fault: raise ValueError(self.control_fault)
 
     def _idle(self, target, continuation=None):
+        center=getattr(self,'control_center',None)
+        if center is not None and center.stop.is_set():raise ValueError('控制中心正在退出，不能启动新的控制任务。')
         # Lifecycle dispatch marks retiring targets before releasing this same
         # ingress lock. New scopes must not race safe retirement in a worker.
         manager=self.simulation_manager
@@ -202,9 +204,12 @@ class MissionControl(ActionLab):
             from vehicle_autonomy.app.web.vehicle_display import vehicle_display
             info['display']=vehicle_display(info,world,profile,self.clock())
             vehicles.append(info)
+        center=getattr(self,'control_center',None)
+        summary=getattr(center,'summary',None)
         return dict(vehicles=vehicles, actions=self.runtime.views(), missions=self.missions.views(),
             resources=self.runtime.resource_view(), manual_sessions=list(self.manual.values()),
-            recovered_actions=list(self.recovered_manual.values()), fault=self.control_fault)
+            recovered_actions=list(self.recovered_manual.values()), fault=self.control_fault,
+            **({'local_control_center':summary()} if callable(summary) else {}))
 
     def handle(self, operation, payload):
         if operation.startswith('simulation.'):
@@ -215,7 +220,10 @@ class MissionControl(ActionLab):
             from vehicle_autonomy.app.web.dashboard import dashboard
             with self._control_lock: view=dashboard(self._snapshot(),self.clock())
             tools=getattr(self,'tool_service',None)
-            return dict(**view,tools=None if tools is None else tools.snapshot())
+            center=getattr(self,'control_center',None)
+            summary=getattr(center,'summary',None)
+            return dict(**view,tools=None if tools is None else tools.snapshot(),
+                **({'local_control_center':summary()} if callable(summary) else {}))
         if operation.startswith('tools.') or operation.startswith('workspace.') or operation.startswith('settings.'):
             service=getattr(self,'tool_service',None)
             if service is None: raise ValueError('Tool service not configured; launch with an Agent allowlist')
@@ -324,6 +332,23 @@ class MissionControl(ActionLab):
 
     def handle_authenticated(self, operation, payload, *, principal, control_token, sessions):
         if principal!='api' and not sessions.alive(principal):raise ValueError('browser session expired before operation')
+        center=getattr(self,'control_center',None)
+        if center is not None and center.stop.is_set() and operation in (
+                'simulation.create','simulation.start','simulation.switch','simulation.add_vehicle',
+                'mission.start','run','manual.action','manual.start','operator.acquire','visualization.open'):
+            raise ValueError('控制中心正在退出，不能启动新的任务、仿真或工具。')
+        if operation.startswith('center.'):
+            center=getattr(self,'control_center',None)
+            if center is None:raise ValueError('统一本地控制中心未启动；请使用 ./control-center。')
+            if operation=='center.shutdown':
+                with self._control_lock:
+                    for target in self.operator_controls.records:
+                        try:self.operator_controls.check(target,principal,control_token,fresh=False)
+                        except ValueError:raise ValueError('车辆正由另一控制页保留；请先在原控制页安全退出并释放 SEND。') from None
+                    return center.handle(operation,payload)
+            # OS/window inspection must not block the existing Mission/control
+            # scheduler's ingress lock; tool operations carry no vehicle writer.
+            return center.handle(operation,payload)
         if operation in ('simulation.stop','simulation.pause','simulation.resume','simulation.reset',
                          'simulation.switch','simulation.add_vehicle','simulation.remove_vehicle',
                          'simulation.fault','simulation.test'):
@@ -353,6 +378,8 @@ class MissionControl(ActionLab):
                 return self.handle(operation,payload)
         if operation=='visualization.open':
             if set(payload)!={'target'}:raise ValueError('one vehicle target required')
+            center=getattr(self,'control_center',None)
+            if center is not None:return center.handle('center.tool',dict(session_id=center.session_id,tool_id='rviz2',action='start',target=payload['target']))
             from vehicle_autonomy.app.visualization.integration import open_rviz
             return open_rviz(self,payload['target'])
         if operation=='visualization.propose':return self.visualization_goals.submit(payload)
@@ -452,6 +479,8 @@ class MissionControlHandler(ActionLabHandler):
             from .live import stream
             stream(self);return
         static = {'/simulation':('simulation-center.html','text/html; charset=utf-8'),
+            '/center':('control-center.html','text/html; charset=utf-8'),
+            '/control-center.js':('control-center.js','application/javascript'),
             '/simulation-center.js':('simulation-center.js','application/javascript'),
             '/simulation-center.css':('simulation-center.css','text/css'),
             '/studio':('studio-b.html','text/html; charset=utf-8'),
@@ -494,6 +523,7 @@ class MissionControlHandler(ActionLabHandler):
         routes = {'/api/console/state':'console.state','/api/studio/state':'studio.state','/api/missions/library':'mission.library','/api/missions/types':'mission.types'}
         routes.update({'/api/studio-b/catalog':'studio-b.catalog','/api/studio-b/library':'studio-b.library'})
         routes['/api/control/state']='control.snapshot'
+        routes['/api/center/state']='center.state'
         routes.update({'/api/simulation/vehicles':'simulation.vehicles','/api/simulation/catalog':'simulation.catalog','/api/simulation/sessions':'simulation.sessions','/api/simulation/assets':'simulation.assets'})
         if self.path in routes:
             if self.authorized(): self.invoke(routes[self.path], {})
@@ -519,6 +549,7 @@ class MissionControlHandler(ActionLabHandler):
         '/api/control/release':'operator.release','/api/control/request-takeover':'operator.takeover'})
     post_routes.update({'/api/visualization/open':'visualization.open','/api/visualization/candidates':'visualization.propose',
         '/api/visualization/confirm':'visualization.confirm'})
+    post_routes.update({'/api/center/'+op:'center.'+op for op in ('tool','logs','shutdown')})
     post_routes.update({'/api/studio-b/'+op.replace('.','/'): 'studio-b.'+op for op in (
         'draft.save','draft.validate','draft.publish','draft.clone','draft.restore','draft.import','draft.extract','draft.new_version','template.apply','template.save',
         'diff','run.start','run.get','run.cancel','run.debug','run.takeover','inputs.goals')})

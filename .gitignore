@@ -63,3 +63,5 @@ artifacts/phase3-round3/
 
 # Simulation center browser evidence and private application journals.
 /artifacts/simulation-center/
+
+/artifacts/control-center/

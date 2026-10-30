@@ -1,5 +1,28 @@
 # V1 framework boundary
 
+## Local Control Center lifecycle (2026-10-30)
+
+`./control-center` composes the existing MissionControl/SimulationManager and
+LocalTools process owners inside one systemd user service. No new vehicle writer,
+Mission engine or simulator spawner is added. A per-workspace unit and locks prevent
+duplicate backends; each run uses a fresh control-center session and data directory.
+Gazebo `-g` is an independent registered client of an existing `-s` Server, bound
+to its partition. RViz reuses the existing optional real-state ROS bridge and
+vehicle profiles. QGC receives the existing one-way telemetry mirror and uses
+project-private Qt configuration; it has no path back to the vehicle command port.
+
+`KillMode=mixed` permits original owners to perform ordered shutdown; main-process
+exit or SIGKILL causes systemd to kill remaining cgroup members. ExecStopPost
+records OS cleanup and uses the original inode-checked OwnedCredentials cleanup
+only after other members are gone. Abnormal exit remains CRASHED/UNCONFIRMED and
+never resumes SEND or adopts old PIDs. Browser launch is outside this cgroup.
+Graphical readiness requires an owned mapped X11/XWayland window; Gazebo adds a
+live render camera pose and vehicle RViz adds actual ROS TF/odometry/subscriptions.
+Pure Wayland without XWayland is explicitly unsupported for ownership validation.
+The existing remote Tool Agent protocol remains unchanged; additional local log/
+working-directory metadata is enabled only for the local console composition.
+[Guide](CONTROL_CENTER_GUIDE.md) and [native evidence](CONTROL_CENTER_TEST_REPORT.md).
+
 ## Universal fixed-vehicle World composition (2026-10-29)
 
 `app/simulation` now separates an immutable SHA-locked VehicleRegistry from

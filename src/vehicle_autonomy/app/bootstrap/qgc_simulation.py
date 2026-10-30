@@ -154,6 +154,7 @@ def environment(root, model, partition):
 class Session(SimulationProvisioning):
     def __init__(self, directory, env, manifest):
         self.directory, self.env, self.manifest = directory, env, manifest
+        if env.get('VAF_CONTROL_CENTER_SESSION'):manifest['control_center_session']=env['VAF_CONTROL_CENTER_SESSION']
         self.run_dir = directory
         self.system_id = manifest['system_id']
         self.port = 5760 + 10 * manifest['instance']

@@ -1,6 +1,6 @@
 'use strict';
 const form=document.querySelector('#login-form'),key=document.querySelector('#login-key'),error=document.querySelector('#login-error');
-function destination(){let value=new URLSearchParams(location.search).get('next')||'/console';if(!value.includes('#'))value+=location.hash;return /^\/(?:console|control|studio|simulation)?(?:[?#]|$)/.test(value)&&!value.startsWith('//')?value:'/console';}
+function destination(){let value=new URLSearchParams(location.search).get('next')||'/console';if(!value.includes('#'))value+=location.hash;return /^\/(?:center|console|control|studio|simulation)?(?:[?#]|$)/.test(value)&&!value.startsWith('//')?value:'/console';}
 form.onsubmit=async e=>{
  e.preventDefault();error.textContent='';document.querySelector('#login-submit').disabled=true;
  try{

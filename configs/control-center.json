@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "qgc_port": 14550,
+  "ros_wrapper": null,
+  "workspace_setup": null,
+  "tools": {
+    "gazebo-gui": {
+      "name": "Gazebo 三维窗口",
+      "executable": null,
+      "args": [
+        "sim",
+        "-g",
+        "-v4"
+      ],
+      "env": {},
+      "dependencies": [
+        "active_world",
+        "desktop"
+      ],
+      "health": "owned_mapped_window_and_world",
+      "stop": "owned_process_group",
+      "cwd": null
+    },
+    "rviz2": {
+      "name": "RViz2 可视化",
+      "executable": null,
+      "args": [],
+      "env": {},
+      "dependencies": [
+        "ros2",
+        "desktop"
+      ],
+      "health": "owned_mapped_window_and_ros",
+      "stop": "owned_process_group",
+      "cwd": null
+    },
+    "qgroundcontrol": {
+      "name": "QGroundControl 地面站",
+      "executable": null,
+      "args": [
+        "--logging:Vehicle.MultiVehicleManager,Vehicle.VehicleLinkManager"
+      ],
+      "env": {},
+      "dependencies": [
+        "desktop",
+        "telemetry_only"
+      ],
+      "health": "owned_mapped_window",
+      "stop": "owned_process_group",
+      "cwd": null
+    }
+  }
+}

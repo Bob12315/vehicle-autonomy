@@ -60,7 +60,8 @@ class ProcessVehicleDriver:
         parent,child=Pipe(duplex=True);self.connection=parent
         config=session.directory/'framework-worker.json'
         config.write_text(json.dumps(dict(target=target,profile=str(session.directory/'profile.toml'),
-            manifest=str(session.directory/'manifest.json'),kind=model_kind,seed=seed,allow_send=allow_send)))
+            manifest=str(session.directory/'manifest.json'),kind=model_kind,seed=seed,allow_send=allow_send,
+            qgc_monitor_port=getattr(session,'qgc_monitor_port',None))))
         try:
             self.process=session.start('framework-worker',[sys.executable,'-m',__name__,str(config),str(child.fileno())],pass_fds=(child.fileno(),))
         finally:child.close()
@@ -166,7 +167,12 @@ def worker(config_path,descriptor):
     driver=proof=link=None;pending={};identifiers=set();capturing=False;captured=[];captured_size=0
     def factory(host,port,*,timeout_s):
         nonlocal link
-        link=SoftwareFaultLink(TcpByteTransport.connect(host,port,timeout_s=timeout_s),seed=configuration['seed'])
+        transport=TcpByteTransport.connect(host,port,timeout_s=timeout_s)
+        if configuration.get('qgc_monitor_port') is not None:
+            from vehicle_autonomy.vehicles.ardupilot.transports.monitor import TelemetryMirror
+            from vehicle_autonomy.vehicles.ardupilot.mavlink.monitor import MonitorFramer
+            transport=TelemetryMirror(transport,configuration['qgc_monitor_port'],frames=MonitorFramer().feed)
+        link=SoftwareFaultLink(transport,seed=configuration['seed'])
         read=link.read
         def tapped(max_bytes=4096):
             nonlocal captured_size

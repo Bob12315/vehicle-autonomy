@@ -1,0 +1,226 @@
+{
+  "date": "2026-10-30",
+  "timezone": "Asia/Ulaanbaatar",
+  "status": "PASS",
+  "baseline_commit": "3f9dc6892ae9663d51786eb4ea520c076833b644",
+  "branch": "codex/control-center-lifecycle",
+  "implementation_sha256": {
+    "configs/control-center.json": "1cc8241138d778bccf4afef29edbf7db6f5ed8c9a6fc29760cd2adfbc97af37c",
+    "control-center": "8186efe817801ffb0e7ffdeb80998c8790f84d771c15867e2d0679c75335fa64",
+    "pyproject.toml": "2e5e25acaf966892282cada584cd2afebeae51d76f10f796071229f15160b06b",
+    "src/vehicle_autonomy/app/bootstrap/qgc_simulation.py": "2e76331c78478422898687ef984e652a254a85c7e65b20afbf70aa4f789546b8",
+    "src/vehicle_autonomy/app/control_center/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/vehicle_autonomy/app/control_center/backend.py": "60aa811d769759c1e045b124c64f10f382471c8b91815b64a3bb6787750cf809",
+    "src/vehicle_autonomy/app/control_center/desktop.py": "9a6c1a4593a368953f9a77847207a032bad009ef6d53f6604da7cf966836e71f",
+    "src/vehicle_autonomy/app/control_center/finalize.py": "84b2e1f4049c1747e5e3ed5ad801d7ad7dadbbf8405dc3739972cec7bc03c7d4",
+    "src/vehicle_autonomy/app/control_center/launcher.py": "143370d0eeec659c7ad77c0b9a494528b6b4ce7036d380ef3c394031185837ae",
+    "src/vehicle_autonomy/app/control_center/registry.py": "61a2e9d6ffa043f01c75010a8efdcac9e93315e94c639d9fd03a5b8b9e711c47",
+    "src/vehicle_autonomy/app/control_center/service.py": "402247a58589526682795e7d5b50ab5b5b7116c9d8e1d71b6c5e474e86c825d4",
+    "src/vehicle_autonomy/app/control_center/supervisor.py": "f28d4e481b48d0679b5ea54993384d0b8ab1998ab5f307ff489c724cf3a76130",
+    "src/vehicle_autonomy/app/simulation/driver_worker.py": "e2f6980a1f661cd4d082218e5adf55305a35ceae5456be7c4ff6501d6e57328b",
+    "src/vehicle_autonomy/app/simulation/universal_runtime.py": "3a9e5a708bdea6f16a02ebf59346d597c662fa8cd5d6a5369043468e4a32186e",
+    "src/vehicle_autonomy/app/tools/local.py": "e228f41ebfa8c810e8ee9f7488f9512d787520a686fce05e080485982bbb6fe2",
+    "src/vehicle_autonomy/app/web/mission_control.py": "fa6913069ffea3e0f5f018626bd0ce9e2022c800ef7a9a8e582b93ed3ee38759",
+    "src/vehicle_autonomy/app/web/static/control-center.html": "4d8c60c7d2a5a24afaeef3dbaf736fb17dbaa874389beb3b81fdea955f952515",
+    "src/vehicle_autonomy/app/web/static/control-center.js": "18b3fc523324f4ac0549915e612a3e61104d43d14878860b7c9f7b0be59d4ddd",
+    "src/vehicle_autonomy/app/web/static/login.js": "b40310b7563ab26f79b8a2eae5fb7ef68baf68cce56c5259070b3802aa5e132e",
+    "src/vehicle_autonomy/app/web/static/manual-control.html": "877fdc5680ebaba6a9cec36ebf9fe8eaeb1f86257983a1cb39520ec65e6b6d5e",
+    "src/vehicle_autonomy/app/web/static/simulation-center.html": "e5c63d714e56c00c4fc805f3e5334b50f63cbd2f2a0177b04ae9548d83e444be",
+    "src/vehicle_autonomy/app/web/static/simulation-center.js": "397ba5b49983f1a43de8a2da3839f3ea6e3f5b8511269af77b596e90eae3c813",
+    "src/vehicle_autonomy/app/web/static/tool-console.html": "ff1b2f2663fdd661d7fca1f0a57a1e89593058888c160ce7ce77f75769d109f8",
+    "src/vehicle_autonomy/app/web/static/visualization-ui.js": "4388ad865dd0ac09b05b875af694dad9db70ff20257f8526ed0338c069cbd791",
+    "tests/control_center/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests/control_center/native.py": "cb69975445bfc70334e16d249d765df459fd3d61c0bcb2cfe2daddb191b9eca1",
+    "tests/test_control_center.py": "c855fccaac8bf3e2de96ebce6f6a42212a8b1391959c52d6a078907490aabb7c"
+  },
+  "unit": {
+    "status": "PASS",
+    "count": 920,
+    "log": "/home/level6/vehicle-autonomy-framework/artifacts/control-center/unit-final.log",
+    "sha256": "25beb6b225aa2c311e634c63d59680e85fc8629a375a815a1e6e2614888d449f"
+  },
+  "native": {
+    "status": "PASS",
+    "checks": {
+      "single_command_browser_no_autostart": "PASS",
+      "duplicate_launch_rejected": "PASS",
+      "gui_close_preserves_server_sitl_identity": "PASS",
+      "gui_reconnect_same_world": "PASS",
+      "existing_control_page_rviz_entry": "PASS",
+      "qgc_real_sitl": {
+        "status": "PASS",
+        "system_id": 41,
+        "log": "/home/level6/vehicle-autonomy-framework/artifacts/control-center/acceptance-verified/qgc-connect.log"
+      },
+      "three_real_windows_together": "PASS",
+      "original_action_query": "PASS",
+      "independent_tool_stop_restart": "PASS",
+      "close_all_tools_preserves_simulation": "PASS",
+      "stop_simulation_keep_console": "PASS",
+      "web_shutdown_cleans_all": "PASS",
+      "sigkill_kernel_cgroup_cleanup": "PASS",
+      "external_same_program_untouched": "PASS",
+      "restart_clean_and_stale_epoch_rejected": "PASS",
+      "ctrl_c_graceful_cleanup": "PASS",
+      "launcher_sigkill_watchdog_cleanup": "PASS",
+      "personal_qgc_configuration_unchanged": "PASS"
+    },
+    "epochs": [
+      {
+        "session_id": "center-4699e1bf71f4499583686f5218ca2892",
+        "run_dir": "/home/level6/vehicle-autonomy-framework/runtime/control-center/cc-7069e95ec1ff425d9e8925f9a9ff9fa4",
+        "cgroup": "/user.slice/user-1000.slice/user@1000.service/app.slice/vaf-control-center-353f69b3fec44ac5.service"
+      },
+      {
+        "session_id": "center-e7806e36323c423dbf83ace910d0545e",
+        "run_dir": "/home/level6/vehicle-autonomy-framework/runtime/control-center/cc-1772abf9fbb04d0aa01909befaf87ec5",
+        "cgroup": "/user.slice/user-1000.slice/user@1000.service/app.slice/vaf-control-center-353f69b3fec44ac5.service"
+      },
+      {
+        "session_id": "center-a911bb2c5a8541bb86d1cdec32d9c38b",
+        "run_dir": "/home/level6/vehicle-autonomy-framework/runtime/control-center/cc-82a46fa3f48048d4933e880b0debb5e2",
+        "cgroup": "/user.slice/user-1000.slice/user@1000.service/app.slice/vaf-control-center-353f69b3fec44ac5.service"
+      },
+      {
+        "session_id": "center-ff6368257cbe4f25b9cd02b165a1a87b",
+        "run_dir": "/home/level6/vehicle-autonomy-framework/runtime/control-center/cc-c9cbda9e48c64748b63cf3d2472281b8",
+        "cgroup": "/user.slice/user-1000.slice/user@1000.service/app.slice/vaf-control-center-353f69b3fec44ac5.service"
+      }
+    ],
+    "cleanup_audits": [
+      {
+        "service_result": "success",
+        "exit_code": "exited",
+        "exit_status": "0",
+        "remaining_owned_processes": [],
+        "credential_errors": [],
+        "finished_at": 1793331660.5195658
+      },
+      {
+        "service_result": "signal",
+        "exit_code": "killed",
+        "exit_status": "KILL",
+        "remaining_owned_processes": [],
+        "credential_errors": [],
+        "finished_at": 1793331697.2025702
+      },
+      {
+        "service_result": "success",
+        "exit_code": "exited",
+        "exit_status": "0",
+        "remaining_owned_processes": [],
+        "credential_errors": [],
+        "finished_at": 1793331707.5341856
+      },
+      {
+        "service_result": "success",
+        "exit_code": "exited",
+        "exit_status": "0",
+        "remaining_owned_processes": [],
+        "credential_errors": [],
+        "finished_at": 1793331714.1357708
+      }
+    ],
+    "javascript_errors": [],
+    "result": "/home/level6/vehicle-autonomy-framework/artifacts/control-center/acceptance-verified/result.json",
+    "sha256": "afa08bc1a29a7894ef2eb01eb0856eebf621d7709072ecd9f6c4f469b1b91d59"
+  },
+  "copter_motion": {
+    "status": "PASS",
+    "scene": "C01",
+    "checks": {
+      "world_entity_plugin_sitl_framework": "PASS",
+      "basic_motion_and_safe_exit": "PASS"
+    },
+    "cleanup": "COMPLETE",
+    "result": "/home/level6/vehicle-autonomy-framework/artifacts/control-center/copter-motion-regression/result.json",
+    "sha256": "3ba3a2fddcf5360ac0db33c3de43c1c44c172b1b794adae2b7c1fba29d5e5264"
+  },
+  "final_cleanup": {
+    "time": 1793331758.0499449,
+    "owned_live_pids": [],
+    "busy_ports": [],
+    "remaining_signing_credentials": [],
+    "cgroup_members": [],
+    "service": {
+      "MainPID": "0",
+      "Result": "success",
+      "ControlGroup": "",
+      "ActiveState": "inactive",
+      "SubState": "dead"
+    },
+    "checked_ports": 7,
+    "ports": [
+      {
+        "port": 5901,
+        "protocol": "UDP"
+      },
+      {
+        "port": 6160,
+        "protocol": "TCP"
+      },
+      {
+        "port": 6162,
+        "protocol": "TCP"
+      },
+      {
+        "port": 6163,
+        "protocol": "TCP"
+      },
+      {
+        "port": 8780,
+        "protocol": "TCP"
+      },
+      {
+        "port": 9402,
+        "protocol": "UDP"
+      },
+      {
+        "port": 14550,
+        "protocol": "UDP"
+      }
+    ],
+    "physical_stop": "UNCONFIRMED for forced OS exits; native Copter motion regression confirmed landed separately"
+  },
+  "screenshots": {
+    "/home/level6/vehicle-autonomy-framework/artifacts/control-center/acceptance-verified/qgc-live-copter.png": "b174a0fb1e07321273e991ce9b8211ed2c222754aa7a23756f2e58aaf9b1872c",
+    "/home/level6/vehicle-autonomy-framework/artifacts/control-center/acceptance-verified/gazebo-first.png": "59db12b06f11ab527b8fbf48099ea9227ebef6cec9f18a04f49e5748288a43b3",
+    "/home/level6/vehicle-autonomy-framework/artifacts/control-center/acceptance-verified/console-three-tools.png": "8d5af2aca298bee4c446f1a105d3fa0de4a482e856aa05074c171727f1e1a73c",
+    "/home/level6/vehicle-autonomy-framework/artifacts/control-center/acceptance-verified/rviz-copter.png": "bb350aa330de8f563375af39acaf18bf15c6b2a819dad38fa69fc8ae538f9ec5",
+    "/home/level6/vehicle-autonomy-framework/artifacts/control-center/acceptance-verified/gazebo-reconnected.png": "5c69dfb3d9c02f4f44f950fff3eb21d69a370dd53f87d805f3d82b36b1d4952e"
+  },
+  "retained_failures": [
+    {
+      "path": "/home/level6/vehicle-autonomy-framework/artifacts/control-center/acceptance-first",
+      "status": "FAIL",
+      "reason": "/center login redirect whitelist missing"
+    },
+    {
+      "path": "/home/level6/vehicle-autonomy-framework/artifacts/control-center/acceptance-r2",
+      "status": "FAIL",
+      "reason": "test wait expression violates CSP"
+    },
+    {
+      "path": "/home/level6/vehicle-autonomy-framework/artifacts/control-center/acceptance-r3",
+      "status": "FAIL",
+      "reason": "QGC logging category mismatch"
+    },
+    {
+      "path": "/home/level6/vehicle-autonomy-framework/artifacts/control-center/acceptance-r4",
+      "status": "FAIL",
+      "reason": "test used wrong query response field"
+    }
+  ],
+  "limitations": [
+    "X11/XWayland required for verified native window ownership; pure Wayland unsupported",
+    "QGC telemetry only; no parameter upload or command forwarding; online maps may be unavailable",
+    "Forced OS process cleanup does not prove physical landing; remains UNCONFIRMED",
+    "Only Copter motion re-run this stage; Rover/Plane full native motion not re-run",
+    "Single-workspace Linux user-systemd deployment tested; no kernel/systemd failure or real hardware qualification"
+  ],
+  "wheel": {
+    "path": "/home/level6/vehicle-autonomy-framework/artifacts/control-center/wheel-delivery/vehicle_autonomy-0.1.0-py3-none-any.whl",
+    "sha256": "d60d0c61f6d53f22585002443ffe011d380e1351e011bad334af96bbd41822da",
+    "new_modules_pages_and_configuration_verified": true
+  }
+}

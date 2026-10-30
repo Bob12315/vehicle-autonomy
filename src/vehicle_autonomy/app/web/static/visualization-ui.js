@@ -13,7 +13,7 @@ window.VAFVisualization=(()=>{
      for(let attempt=0;attempt<30;attempt++){
       if(view.target!==target)throw Error('车辆上下文已改变，请重新打开');
       value=await window.VAFAuth.api('/api/visualization/open',{target});
-      status.textContent=value.state+' · '+value.agent_id+(value.error?' · '+value.error:' · 查看 Tool Manager / Workspace 的实际就绪状态');
+      status.textContent=value.state+' · '+(value.agent_id||(view.local?'本地控制台':'工具代理程序'))+(value.error?' · '+value.error:view.local?' · 在本地控制台查看实际窗口与数据状态':' · 查看 Tool Manager / Workspace 的实际就绪状态');
       if(value.state!=='SWITCHING')break;
       await new Promise(resolve=>setTimeout(resolve,1000));
      }
@@ -29,9 +29,11 @@ window.VAFVisualization=(()=>{
    const m=t.manifest||t,matching=Array.isArray(m.profiles)?m.profiles.includes(kind):!!m.profiles?.[kind];return m.id===id&&matching&&t.checks?.[kind]?.installed&&(id!=='rviz2'||t.checks[kind].desktop);
   })));
   const run=(snapshot?.tools?.workspaces?.runs||[]).filter(r=>r.spec?.context?.vehicle_id===target&&r.spec.id.startsWith('visualization-')&&r.state!=='STOPPED').at(-1);
-  view.button.disabled=view.busy||!target||!eligible.length;
+  const local=snapshot?.local_control_center;view.local=!!local;
+  view.button.disabled=view.busy||!target||(!eligible.length&&!local?.rviz2_available);
   if(view.busy)return;
-  if(!eligible.length)view.status.textContent='不可用 · 需要在线桌面代理程序、ROS 2、匹配的数据桥接和 RViz 运行配置，以及图形环境。';
+  if(local?.rviz2_available)view.status.textContent=(local.operation?.state==='FAILED'?local.operation.error:local.rviz2_ready?'本地 RViz2 窗口与车辆数据已就绪。':local.rviz2_state+' · 本地控制台负责窗口与真实数据桥；缺失输入不会标记就绪。');
+  else if(!eligible.length)view.status.textContent='不可用 · 需要在线桌面代理程序、ROS 2、匹配的数据桥接和 RViz 运行配置，以及图形环境。';
   else if(run)view.status.textContent=run.state+' · '+(run.error||'匹配车辆 '+target+'；窗口在 Agent 桌面，未嵌入网页。');
   else view.status.textContent='按当前车辆自动选择 Profile、ROS Domain 与 Namespace；数据未接通不会标记 Ready。';
  }

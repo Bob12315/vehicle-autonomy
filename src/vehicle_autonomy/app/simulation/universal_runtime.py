@@ -103,6 +103,7 @@ class VehicleInstance:
             automatic_motion=False,deployment_send=o.allow_send,started_at=stamp(),ready=False,
             fixed_vehicle={key:p[key] for key in ('version','fingerprint','model_hash','parameters_hash','sensor_hash')})
         self.session = VehicleSession(self.directory,env,manifest,o.session)
+        self.session.qgc_monitor_port=o.qgc_monitor_port
         if cancelled(): raise InterruptedError('vehicle start cancelled')
         self.stages['world_loaded'] = True
         o.notify(self)
@@ -217,8 +218,9 @@ def synchronized(function):
 
 
 class LocalRuntime(WorldMetrics):
-    def __init__(self,*args,vehicles=(),geographic_reference=None,progress=None,**kwargs):
+    def __init__(self,*args,vehicles=(),geographic_reference=None,progress=None,qgc_monitor_port=None,**kwargs):
         self._state_lock=RLock()
+        self.qgc_monitor_port=qgc_monitor_port
         super().__init__(*args,**kwargs)
         self.library=VehicleRegistry(self.root,ardupilot_root=self.ardupilot_root,
             plugin_root=self.plugin_root,twin_root=self.twin_root)

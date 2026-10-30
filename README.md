@@ -27,6 +27,18 @@ python -m unittest discover -s tests -v
 相对用户输入和输出路径仍相对调用目录。完整路径变化及验证见
 [架构迁移报告](docs/ARCHITECTURE_MIGRATION_REPORT.md)。
 
+## 统一本地控制台
+
+安装上述独立环境后，在项目目录执行 `./control-center`，浏览器自动打开统一登录后的
+本地控制台。默认只启动后台与 Web；进入仿真中心选择 World、固定车型与出生点，再按需
+打开 Gazebo GUI、RViz2 或 QGC。工具可以单独关闭，GUI 重开连接原 World。
+需要手动操作自有仿真时使用 `./control-center --allow-send`，再在原车辆页开启 SEND。
+
+Ctrl+C 或页面“关闭整个控制台”调用原退出流程，独立 systemd 用户服务/cgroup 在后台
+异常退出时负责剩余进程清理。个人浏览器与外部同名程序不受影响。QGC 仅接收真实
+SITL 遥测，不转发指令；没有可验证图形会话时不声称 GUI 成功。
+[配置和使用](docs/CONTROL_CENTER_GUIDE.md)、[真实本机验收报告](docs/CONTROL_CENTER_TEST_REPORT.md)。
+
 ## V1.1 阶段一基础控制
 
 改造范围与增量合同见 [V1.1 记录目录](docs/v1.1/README.md)。专用入口只创建

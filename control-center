@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+vaf_center_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+if [[ ! -x "$vaf_center_root/.venv/bin/python" ]]; then
+  echo "缺少项目独立环境。请按 README 安装 .venv 后重试。" >&2
+  exit 2
+fi
+cd "$vaf_center_root"
+exec "$vaf_center_root/.venv/bin/python" -m vehicle_autonomy.app.control_center.launcher "$@"
