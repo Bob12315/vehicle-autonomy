@@ -14,6 +14,19 @@ from vehicle_autonomy.vehicles.ardupilot.mavlink.signing import ReceiveSigning
 from vehicle_autonomy.engine.action.durable import DurableRecord
 
 
+def _owned_command_matches(name, command, expected):
+    if name == 'sitl':
+        return command == expected
+    titles = [b' '.join(expected)]
+    # The distro gz launcher sets a basename-only process title even when
+    # invoked by an absolute indexed path. Keep every original CLI argument.
+    if expected and Path(os.fsdecode(expected[0])).name == 'gz':
+        titles.append(b' '.join([b'gz', *expected[1:]]))
+    return bool((command and command[0] in titles and all(not arg for arg in command[1:])) or
+                (len(command) >= len(expected) and command[-len(expected)+1:] == expected[1:]
+                 and any(Path(os.fsdecode(arg)).name == 'gz' for arg in command[:2])))
+
+
 def initialize_receive_floor(root,key,initial_timestamp):
     """Only the fresh-epoch provisioner calls this, before any Action receiver.
 
@@ -137,10 +150,7 @@ class OwnedActionSimulation:
             expected=[os.fsencode(arg) for arg in p['command']]
             # gz's launcher execs the distro Ruby interpreter. Require its
             # exact original CLI suffix and owned world, not argv[0] equality.
-            valid=(command==expected if p['name']=='sitl' else
-                   (command and command[0]==b' '.join(expected) and all(not arg for arg in command[1:])) or
-                   (len(command)>=len(expected) and command[-len(expected)+1:]==expected[1:]
-                    and any(Path(os.fsdecode(arg)).name=='gz' for arg in command[:2])))
+            valid=_owned_command_matches(p['name'],command,expected)
             if not valid:raise RuntimeError('owned process command changed: '+p['name'])
             if (proc/'cwd').resolve()!=Path(p['cwd']).resolve():raise RuntimeError('owned process cwd changed')
             if p['name']=='sitl':

@@ -125,7 +125,7 @@ class UniversalManagerContracts(unittest.TestCase):
         reply = SimpleNamespace(returncode=0,stdout='',stderr='')
         with patch('vehicle_autonomy.app.simulation.manager.LocalRuntime',return_value=owner), \
                 patch('vehicle_autonomy.app.simulation.manager.subprocess.run',return_value=reply), \
-                patch('vehicle_autonomy.app.simulation.manager.shutil.which',return_value='/offline/gz'), \
+                patch('vehicle_autonomy.app.simulation.manager.HostEnvironment.available',return_value=True), \
                 patch('vehicle_autonomy.app.simulation.manager.to_json_value',return_value={'fixture':True}):
             self.manager._run(self.identifier)
         self.assertEqual(2,len(samples))

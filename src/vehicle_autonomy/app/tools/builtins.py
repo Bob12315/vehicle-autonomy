@@ -11,6 +11,7 @@ from uuid import uuid4
 import xml.etree.ElementTree as ET
 
 from vehicle_autonomy._resources import resource_root
+from vehicle_autonomy.app.bootstrap.host_environment import HostEnvironment
 from .schema import manifest
 
 ROS_KEYS=('PATH','PYTHONPATH','LD_LIBRARY_PATH','AMENT_PREFIX_PATH','COLCON_PREFIX_PATH','ROS_DISTRO','ROS_VERSION','ROS_PYTHON_VERSION','RMW_IMPLEMENTATION','ROS_AUTOMATIC_DISCOVERY_RANGE','ROS_LOCALHOST_ONLY')
@@ -31,13 +32,16 @@ def make(tool_id, name, kind, profiles, *, permissions=(), dependencies=(), inte
 
 def registry(*, ros_env=None, qgc=None, qgc_relay=None, sitl_dir=None, plugin=None):
     root = resource_root(); ros_env = {k:os.environ[k] for k in ROS_KEYS if k in os.environ} if ros_env is None else ros_env
+    host = HostEnvironment(root)
+    qgc = qgc if qgc is not None else host.executable('qgroundcontrol')
+    sitl_dir = sitl_dir if sitl_dir is not None else host.path('ardupilot_root')/'build/sitl/bin'
     python = sys.executable
     ros = lambda op: dict(argv=[python, '-m', 'vehicle_autonomy.app.tools.ros_tools', op], contains=['"status": "READY"'], timeout_s=3)
     dep = lambda kind, value: dict(kind=kind, value=str(value))
     ros_deps = [dep('executable','ros2'), dep('environment','ROS_DISTRO')]
     rviz_config = root/'configs/rviz/navigation-readonly.rviz'
     rviz = make('rviz2', 'RViz2', 'gui', {'default':profile(
-        ['rviz2', '-d', str(rviz_config), '--ros-args', '-r', '__ns:={namespace}', '-r', '__node:=vaf_rviz',
+        [host.executable('rviz2') or 'rviz2', '-d', str(rviz_config), '--ros-args', '-r', '__ns:={namespace}', '-r', '__node:=vaf_rviz',
          '-r', '/map:={namespace}/map', '-r', '/tf:={namespace}/tf', '-r', '/tf_static:={namespace}/tf_static', '-r', '/scan:={namespace}/scan'],
         env=ros_env, health=ros('rviz-node'), ready=ros('rviz'),
         connection=dict(kind='ros2', description='RViz node plus live TF data in selected namespace; read-only configuration'),
@@ -77,8 +81,8 @@ def registry(*, ros_env=None, qgc=None, qgc_relay=None, sitl_dir=None, plugin=No
     partition = 'vaf_tools_' + uuid4().hex[:12]
     world = root/'configs/tools/lab.sdf'
     gz_env = {'GZ_IP':'127.0.0.1','GZ_PARTITION':partition}
-    stats = dict(argv=['gz','topic','-e','-n','1','-t','/world/vaf_tool_lab/stats'],contains=['sim_time'],timeout_s=2)
-    gazebo = make('gazebo','Gazebo Sim','simulation',{'headless':profile(['gz','sim','-s','-r',str(world)],env=gz_env,
+    stats = dict(argv=[HostEnvironment(root).executable('gazebo') or 'gz','topic','-e','-n','1','-t','/world/vaf_tool_lab/stats'],contains=['sim_time'],timeout_s=2)
+    gazebo = make('gazebo','Gazebo Sim','simulation',{'headless':profile([HostEnvironment(root).executable('gazebo') or 'gz','sim','-s','-r',str(world)],env=gz_env,
         health=stats, ready=stats, requires=[dep('file',world)], connection=dict(kind='gazebo',description=f'Isolated empty world vaf_tool_lab; partition {partition}. ArduPilot profile requires its plugin and world.'), timeout=30)}, permissions=['simulation'], integrations=['gazebo.stats'])
     if plugin:
         gazebo['dependencies'].append(dep('file',Path(plugin).resolve()))
@@ -111,14 +115,13 @@ def coupled_rover(value,output,sitl_dir,plugin,instance=70):
     world.find('.//include/uri').text=model_path.as_uri();world_path=directory/'world.sdf';world.write(world_path,encoding='unicode')
     gazebo=next(t for t in value['tools'] if t['id']=='gazebo');sitl=next(t for t in value['tools'] if t['id']=='sitl')
     env={'GZ_IP':'127.0.0.1','GZ_PARTITION':name,'GZ_SIM_RESOURCE_PATH':str(root/'simulation/models'),'GZ_SIM_SYSTEM_PLUGIN_PATH':str(plugin.parent)}
-    stats=dict(argv=['gz','topic','-e','-n','1','-t',f'/world/{name}/stats'],contains=['sim_time'],timeout_s=2)
-    gazebo['profiles']['rover-coupled']=profile(['gz','sim','-s','-r',str(world_path)],env=env,health=stats,ready=stats,
+    stats=dict(argv=[HostEnvironment(root).executable('gazebo') or 'gz','topic','-e','-n','1','-t',f'/world/{name}/stats'],contains=['sim_time'],timeout_s=2)
+    gazebo['profiles']['rover-coupled']=profile([HostEnvironment(root).executable('gazebo') or 'gz','sim','-s','-r',str(world_path)],env=env,health=stats,ready=stats,
         connection=dict(kind='gazebo.ardupilot',description=f'Actual target_rover world {name}, loopback JSON FDM {9002+instance*10}; paired with SITL rover-coupled'),
         requires=[dict(kind='file',value=str(p)) for p in (world_path,model_path,plugin)],timeout=40)
     gazebo['profiles']['rover-coupled']['exclusive_ports']=[dict(protocol='udp',port=9002+instance*10)]
     params=root/'simulation/params/rover_phase2_rtl.parm'
-    defaults=root/'artifacts/phase2-control/ardupilot-source/Tools/autotest/default_params'
-    if not defaults.is_dir():defaults=Path(sitl_dir).resolve().parents[2]/'Tools/autotest/default_params'
+    defaults=Path(sitl_dir).resolve().parents[2]/'Tools/autotest/default_params'
     parameter_files=[defaults/'rover.parm',defaults/'rover-skid.parm',root/'simulation/params/rover_telemetry.parm',params]
     for path in parameter_files:
         if not path.is_file():raise ValueError('trusted Rover defaults missing: '+str(path))
@@ -137,7 +140,7 @@ def main():
     p.add_argument('--coupled-rover',action='store_true',help='generate matching isolated Rover Gazebo/JSON SITL deployment profiles')
     p.add_argument('--visualization-config',type=Path,help='trusted narrow Framework feed config; adds matching bridge and three RViz profiles')
     p.add_argument('--owned-simulation',type=Path,help='with visualization-config: public current Framework simulation manifest for non-owning Workspace dependencies')
-    a=p.parse_args();env=None
+    a=p.parse_args();env=None;host=HostEnvironment()
     if a.ros_wrapper:
         # Explicit local operator-selected environment; fixed argv, no shell
         # interpolation and no environment values sent to the browser.
@@ -145,6 +148,20 @@ def main():
         if len(result.stdout)>131072:raise ValueError('ROS environment too large')
         full=dict(part.decode().split('=',1) for part in result.stdout.split(b'\0') if b'=' in part)
         env={k:full[k] for k in ROS_KEYS if k in full}
+    else:
+        try:
+            command,environment=host.ros_command(['/usr/bin/env','-0'])
+        except ValueError:
+            if any(key in host.values['paths'] for key in ('ros2_root','ros2_setup','ros2_workspace')) or os.environ.get('VAF_ROS2_ROOT'):
+                raise
+        else:
+            result=subprocess.run(command,env=environment,stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=15,check=True)
+            if len(result.stdout)>131072:raise ValueError('ROS environment too large')
+            full=dict(part.decode().split('=',1) for part in result.stdout.split(b'\0') if b'=' in part)
+            env={k:full[k] for k in ROS_KEYS if k in full}
+    if a.coupled_rover:
+        a.sitl_dir=a.sitl_dir or host.path('ardupilot_root')/'build/sitl/bin'
+        a.ardupilot_plugin=a.ardupilot_plugin or host.path('gazebo_plugin_root')/'build/libArduPilotPlugin.so'
     value=registry(ros_env=env,qgc=a.qgc,qgc_relay=a.qgc_relay,sitl_dir=a.sitl_dir,plugin=a.ardupilot_plugin)
     if a.visualization_config:
         from vehicle_autonomy.app.visualization.registry import configure

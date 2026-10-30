@@ -5,6 +5,7 @@ import argparse
 import json
 from pathlib import Path
 from vehicle_autonomy._resources import resource_root
+from vehicle_autonomy.app.bootstrap.paths import RuntimePaths
 import signal
 import time
 
@@ -17,7 +18,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--config', default=str(resource_root() / 'configs/deployment/hardware-readonly.json'))
     parser.add_argument('--control-socket')
-    parser.add_argument('--log-dir', default='artifacts/hardware-ready/onboard')
+    parser.add_argument('--log-dir', default=str(RuntimePaths().slot('sessions', 'hardware-readonly')))
     parser.add_argument('--check', action='store_true')
     parser.add_argument('--expected-lidar-epoch', help='owned SDK process epoch; rejects old files before admission')
     args = parser.parse_args()

@@ -25,3 +25,12 @@ in an isolated environment. Run `python -m unittest discover -s tests -v` and
 relevant simulation tests for each completed stage, then commit it. Optional
 ROS dependencies stay in explicitly launched workers. Generated runtime state,
 artifacts and external deployment configuration are not Python packages.
+
+External software and large third-party resources stay outside this checkout.
+Use `environments/tools.local.toml` (ignored) or `VAF_ENVIRONMENT_CONFIG` through
+`HostEnvironment`; version only the template, never machine paths or secrets.
+Normal startup must not use historical `artifacts/` trees as software inputs.
+Use `RuntimePaths` for `runtime/state`, `sessions`, `logs` and `cache`; preserve
+persistent state and ownership fences when moving paths. `artifacts/` contains
+test/export results only. Thin command wrappers may live under scripts or
+simulation, with reusable program implementation under `src/vehicle_autonomy/`.

@@ -13,6 +13,7 @@ import shutil
 import xml.etree.ElementTree as ET
 
 from vehicle_autonomy._resources import resource_root
+from vehicle_autonomy.app.bootstrap.host_environment import HostEnvironment
 from .spawner import bind_model
 
 
@@ -42,10 +43,10 @@ def _pose(element):
 class VehicleRegistry:
     def __init__(self, root=None, *, ardupilot_root=None, plugin_root=None, twin_root=None):
         self.root = Path(root or resource_root()).resolve()
-        isolated = self.root / 'artifacts/phase2-control/ardupilot-source'
-        self.ardupilot_root = Path(ardupilot_root or (isolated if isolated.is_dir() else Path.home() / 'ardupilot')).resolve()
-        self.plugin_root = Path(plugin_root or Path.home() / 'gz_ws/src/ardupilot_gazebo').resolve()
-        self.twin_root = Path(twin_root or Path.home() / 'twin-fixedwing').resolve()
+        host = HostEnvironment(self.root)
+        self.ardupilot_root = host.path('ardupilot_root', ardupilot_root)
+        self.plugin_root = host.path('gazebo_plugin_root', plugin_root)
+        self.twin_root = host.path('fixedwing_root', twin_root)
         self.roots = {'root': self.root, 'ardupilot': self.ardupilot_root,
                       'plugin': self.plugin_root, 'twin': self.twin_root}
         self.catalog = json.loads((self.root / 'simulation/vehicles/catalog.json').read_text())

@@ -22,6 +22,8 @@ from vehicle_autonomy.app.bootstrap.qgc_simulation import (
     Session, environment, preflight, prepare, resolve_model,
 )
 from .faults import SoftwareFaultLink
+from vehicle_autonomy.app.bootstrap.host_environment import HostEnvironment
+from vehicle_autonomy.app.bootstrap.paths import RuntimePaths
 
 
 def stamp():
@@ -46,11 +48,10 @@ class LocalRuntime:
                  extra_plugin_paths=()):
         self.root, self.directory = Path(root), Path(directory)
         self.scene_id, self.vehicle = scene_id, vehicle
-        self.ardupilot_root = Path(ardupilot_root) if ardupilot_root else self.root / 'artifacts/phase2-control/ardupilot-source'
-        if not self.ardupilot_root.is_dir():
-            self.ardupilot_root = Path.home() / 'ardupilot'
-        self.plugin_root = Path(plugin_root) if plugin_root else Path.home() / 'gz_ws/src/ardupilot_gazebo'
-        self.twin_root = Path(twin_root) if twin_root else Path.home() / 'twin-fixedwing'
+        self.host = HostEnvironment(self.root)
+        self.ardupilot_root = self.host.path('ardupilot_root', ardupilot_root)
+        self.plugin_root = self.host.path('gazebo_plugin_root', plugin_root)
+        self.twin_root = self.host.path('fixedwing_root', twin_root)
         self.allow_send, self.seed = allow_send, seed
         self.extra_plugin_paths=tuple(Path(path) for path in extra_plugin_paths)
         self.world = 'vaf_' + directory.name.replace('-', '_')
@@ -63,7 +64,7 @@ class LocalRuntime:
 
     def _allocate(self, kind):
         # The common root lock also isolates launchers with different data dirs.
-        locks = self.root / 'runtime/simulation-center-locks'
+        locks = RuntimePaths(self.root).slot('state', 'simulation-center-locks')
         locks.mkdir(parents=True, exist_ok=True, mode=0o700)
         for instance in range(40, 72):
             lock = (locks / f'instance-{instance}.lock').open('a')
@@ -81,10 +82,10 @@ class LocalRuntime:
         raise ValueError('BLOCKED: no isolated SITL instance ports available')
 
     def _base_env(self):
-        env = dict(os.environ, GZ_IP='127.0.0.1', GZ_PARTITION=self.partition)
+        env = dict(self.host.process_environment(), GZ_IP='127.0.0.1', GZ_PARTITION=self.partition)
         env['GZ_SIM_RESOURCE_PATH'] = ':'.join(map(str, (
-            self.root/'simulation/models', self.root/'simulation/world_registry/assets',
-            self.root/'simulation/world_registry/assets/adapter_models',
+            self.root/'simulation/models', self.host.path('legacy_assets'),
+            self.host.path('legacy_assets')/'adapter_models',
             self.plugin_root/'models', self.twin_root/'models',
         ))) + ':' + env.get('GZ_SIM_RESOURCE_PATH', '')
         env['GZ_SIM_SYSTEM_PLUGIN_PATH'] = ':'.join(map(str, (
@@ -93,7 +94,7 @@ class LocalRuntime:
         return env
 
     def start(self, world_path, cancelled=lambda: False):
-        if shutil.which('gz') is None:
+        if not self.host.available('gazebo'):
             raise ValueError('BLOCKED: Gazebo gz executable is missing')
         self.started = time.monotonic()
         tree = ET.parse(world_path)
@@ -150,7 +151,7 @@ class LocalRuntime:
             self.session.build_payload(self.model.twin_root/'plugins')
         if cancelled():
             raise InterruptedError('session cancelled during preparation')
-        self.session.start('gazebo', ['gz','sim','-s','-r','--headless-rendering','-v3', str(world_path)])
+        self.session.start('gazebo', [self.host.executable('gazebo') or 'gz','sim','-s','-r','--headless-rendering','-v3', str(world_path)])
         if self.model:
             aircraft = self.session.credentials.create_state('')
             self.session.save()
@@ -207,7 +208,7 @@ class LocalRuntime:
     def sample(self):
         if not self.alive():
             raise RuntimeError('owned simulation is not running')
-        result = subprocess.run(['gz','topic','-e','-t','/stats','-n','1'],
+        result = subprocess.run([self.host.executable('gazebo') or 'gz','topic','-e','-t','/stats','-n','1'],
             env=self.session.env,capture_output=True,text=True,timeout=4)
         stats = result.stdout
         sim = duration(stats,'sim_time')
@@ -249,7 +250,7 @@ class LocalRuntime:
         if self.model is None:
             return None
         try:
-            reply=subprocess.run(['gz','topic','-e','-t',f'/world/{self.world}/pose/info','-n','1'],
+            reply=subprocess.run([self.host.executable('gazebo') or 'gz','topic','-e','-t',f'/world/{self.world}/pose/info','-n','1'],
                 env=self.session.env,capture_output=True,text=True,timeout=3)
         except subprocess.TimeoutExpired:
             return None
@@ -269,7 +270,7 @@ class LocalRuntime:
             raise ValueError('unsupported world operation')
         request = {'pause':'pause: true','resume':'pause: false',
                    'reset':'reset: {all: true}'}[operation]
-        reply=subprocess.run(['gz','service','-s',f'/world/{self.world}/control',
+        reply=subprocess.run([self.host.executable('gazebo') or 'gz','service','-s',f'/world/{self.world}/control',
             '--reqtype','gz.msgs.WorldControl','--reptype','gz.msgs.Boolean',
             '--timeout','3000','--req',request], env=self.session.env,
             capture_output=True,text=True,timeout=5)

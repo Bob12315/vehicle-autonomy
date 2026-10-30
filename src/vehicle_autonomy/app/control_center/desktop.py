@@ -3,6 +3,7 @@ import json
 import argparse
 import os
 from pathlib import Path
+from vehicle_autonomy.app.bootstrap.host_environment import HostEnvironment
 import re
 import shutil
 import subprocess
@@ -69,7 +70,7 @@ def main():
         # CameraTracking publishes this pose from the render event. A visible
         # Qt shell and a Server world alone do not establish a rendered scene.
         try:
-            pose=output(['gz','topic','-e','-n','1','-t','/gui/camera/pose'],timeout=2)
+            pose=output([HostEnvironment().executable('gazebo') or 'gz','topic','-e','-n','1','-t','/gui/camera/pose'],timeout=2)
             if 'position {' not in pose or 'orientation {' not in pose:value=[]
         except (OSError,ValueError,subprocess.TimeoutExpired):value=[]
     if value and args.ros_config:

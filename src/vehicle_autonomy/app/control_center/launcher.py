@@ -10,6 +10,8 @@ import time
 from uuid import uuid4
 
 from vehicle_autonomy._resources import resource_root
+from vehicle_autonomy.app.bootstrap.paths import RuntimePaths
+from vehicle_autonomy.app.bootstrap.host_environment import HostEnvironment
 from .supervisor import lock_workspace,service_command,service_state,unit_name,process_identity,atomic
 
 
@@ -29,17 +31,19 @@ def parse_args(argv=None):
 
 def main():
     args=parse_args();root=resource_root().resolve()
+    host=HostEnvironment(root)
+    if host.config:os.environ['VAF_ENVIRONMENT_CONFIG']=str(host.config)
     if args.check:
         from .registry import inspect_host
         print(json.dumps(inspect_host(root,args.config),ensure_ascii=False,indent=2));return 0
-    if not 1024<=args.port<=65535:parser.error('port must be 1024..65535')
+    if not 1024<=args.port<=65535:raise ValueError('port must be 1024..65535')
     launcher_lock=lock_workspace(root,'launcher')
     check=subprocess.run(['systemctl','--user','show-environment'],stdout=subprocess.DEVNULL,stderr=subprocess.PIPE,text=True,timeout=5)
     if check.returncode:raise RuntimeError('用户级 systemd 不可用，无法保证异常退出清理。'+check.stderr)
     unit=unit_name(root)
     if service_state(unit).get('ActiveState') in ('active','activating','deactivating'):
         raise ValueError('现有控制中心服务仍在运行或退出中；不接管、不覆盖。')
-    password_file=root/'runtime/control-center/password.json'
+    password_file=RuntimePaths(root).slot('state', 'control-center/password.json')
     if args.set_password or not password_file.exists():
         from vehicle_autonomy.app.web.passwords import set_password
         password=getpass.getpass('设置控制台登录密码：')
@@ -48,7 +52,7 @@ def main():
         del password
         if args.set_password:
             print('登录密码已设置。');launcher_lock.close();return 0
-    directory=root/'runtime/control-center'/('cc-'+uuid4().hex)
+    directory=RuntimePaths(root).slot('sessions', 'control-center')/('cc-'+uuid4().hex)
     directory.mkdir(mode=0o700,parents=True)
     arguments=['--port',str(args.port)]
     if args.allow_send:arguments.append('--allow-send')

@@ -7,6 +7,7 @@ import hashlib
 import json
 import math
 from pathlib import Path
+from vehicle_autonomy.app.bootstrap.host_environment import HostEnvironment
 from queue import Queue,Empty,Full
 import re
 import shutil
@@ -409,7 +410,7 @@ class SimulationManager:
             item=deepcopy(entry)
             spawn_info=self.world_spawns.describe(item['id'])
             item['spawn_info']=spawn_info
-            ready=item.get('ready',True) and shutil.which('gz') is not None
+            ready=item.get('ready',True) and HostEnvironment(self.root).available('gazebo')
             support={'none':dict(available=ready,reason='仅加载 Gazebo World')}
             for kind in ('rover','copter','plane','vtol'):
                 definition=definitions[kind]
@@ -547,9 +548,9 @@ class SimulationManager:
         failed=None
         failure_domain=None
         try:
-            if shutil.which('gz') is None:
+            if not HostEnvironment(self.root).available('gazebo'):
                 raise ValueError('BLOCKED: Gazebo is unavailable')
-            checked=subprocess.run(['gz','sdf','-k',str(directory/'scenario.sdf')],
+            checked=subprocess.run([HostEnvironment(self.root).executable('gazebo') or 'gz','sdf','-k',str(directory/'scenario.sdf')],
                 capture_output=True,text=True,timeout=30)
             (directory/'sdf-check.log').write_text(checked.stdout+checked.stderr)
             if checked.returncode:

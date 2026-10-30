@@ -26,6 +26,8 @@ from uuid import uuid4
 import xml.etree.ElementTree as ET
 
 from vehicle_autonomy._resources import resource_root
+from vehicle_autonomy.app.bootstrap.host_environment import HostEnvironment
+from vehicle_autonomy.app.bootstrap.paths import RuntimePaths
 from vehicle_autonomy.app.bootstrap.simulation_credentials import OwnedCredentials
 from vehicle_autonomy.app.bootstrap.simulation_provisioning import SimulationProvisioning
 
@@ -85,7 +87,8 @@ def digest(path):
 
 
 def preflight(model, headless):
-    if shutil.which('gz') is None:
+    host = HostEnvironment()
+    if not host.available('gazebo'):
         raise ValueError('gz not found; configure the installed Gazebo environment first')
     if not headless and not (os.environ.get('DISPLAY') or os.environ.get('WAYLAND_DISPLAY')):
         raise ValueError('No desktop available; use --headless or run in a desktop terminal')
@@ -100,6 +103,7 @@ def preflight(model, headless):
     for path in inputs:
         if not path.is_file():
             raise ValueError('Required input missing: ' + str(path))
+        host.verify(path)
     if not os.access(model.binary, os.X_OK):
         raise ValueError('SITL binary is not executable: ' + str(model.binary))
     for port in (model.fdm_port, 5501 + 10 * model.instance):
@@ -139,7 +143,7 @@ def prepare(model, directory, world_name):
 
 
 def environment(root, model, partition):
-    env = dict(os.environ, GZ_IP='127.0.0.1', GZ_PARTITION=partition)
+    env = dict(HostEnvironment(root).process_environment(), GZ_IP='127.0.0.1', GZ_PARTITION=partition)
     resources = [root / 'simulation/models', model.plugin_root / 'models',
                  model.plugin_root / 'worlds']
     plugins = [model.plugin_root / 'build']
@@ -288,8 +292,8 @@ def main():
     parser.add_argument('--duration', type=float, help='Optional finite smoke-test duration in seconds')
     parser.add_argument('--run-dir', type=Path, help='Fresh output directory; never reuse EEPROM/state')
     parser.add_argument('--ardupilot-root', type=Path)
-    parser.add_argument('--plugin-root', type=Path, default=Path.home() / 'gz_ws/src/ardupilot_gazebo')
-    parser.add_argument('--twin-root', type=Path, default=Path.home() / 'twin-fixedwing')
+    parser.add_argument('--plugin-root', type=Path)
+    parser.add_argument('--twin-root', type=Path)
     args = parser.parse_args()
     if args.qgc_only and args.read_only:
         parser.error('--read-only belongs to Web mode; --qgc-only explicitly enables independent QGC control')
@@ -306,11 +310,9 @@ def main():
     if args.duration is not None and not 1 <= args.duration <= 86400:
         parser.error('--duration must be within 1..86400 seconds')
     root = resource_root()
-    ardupilot = args.ardupilot_root or root / 'artifacts/phase2-control/ardupilot-source'
-    if args.ardupilot_root is None and not ardupilot.is_dir():
-        ardupilot = Path.home() / 'ardupilot'
-    model = resolve_model(root, args.kind, ardupilot.expanduser().resolve(),
-                          args.plugin_root.expanduser().resolve(), args.twin_root.expanduser().resolve())
+    host = HostEnvironment(root)
+    model = resolve_model(root, args.kind, host.path('ardupilot_root', args.ardupilot_root),
+                          host.path('gazebo_plugin_root', args.plugin_root), host.path('fixedwing_root', args.twin_root))
     if not args.qgc_only and model.kind == 'plane':
         from dataclasses import replace
         model = replace(model, parameters=(*model.parameters, root / 'simulation/params/twin_plane_control.parm'))
@@ -329,7 +331,7 @@ def main():
                                   framework_runtime=not args.qgc_only, phase5=False,
                                   web=None if args.qgc_only else f'http://127.0.0.1:{web_port}/control')))
             return 0
-        lock_root = root / 'runtime/qgc-simulation'
+        lock_root = RuntimePaths(root).slot('state', 'qgc-simulation')
         lock_root.mkdir(parents=True, exist_ok=True, mode=0o700)
         lock = (lock_root / (args.kind + '.lock')).open('a')
         try:
@@ -337,7 +339,7 @@ def main():
         except BlockingIOError as exc:
             raise ValueError('This vehicle launcher is already running; no process was stopped') from exc
         stamp = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')
-        directory = (args.run_dir or root / f'artifacts/simulation/qgc-{args.kind}-{stamp}-{uuid4().hex[:6]}').resolve()
+        directory = (args.run_dir or RuntimePaths(root).slot('sessions', f'qgc-{args.kind}-{stamp}-{uuid4().hex[:6]}')).resolve()
         directory.mkdir(parents=True, exist_ok=False, mode=0o700)
         world_name = f'qgc_{args.kind}_{uuid4().hex[:12]}'
         world_path, params = prepare(model, directory, world_name)
@@ -364,7 +366,7 @@ def main():
             if model.twin_root:
                 print('Building the fixed-wing payload plugin in this run directory...', flush=True)
                 session.build_payload(model.twin_root / 'plugins')
-            server = ['gz', 'sim', '-s', '-r', '-v3']
+            server = [host.executable('gazebo') or 'gz', 'sim', '-s', '-r', '-v3']
             if model.twin_root:
                 server.append('--headless-rendering')
             session.start('gazebo', server + [str(world_path)])
@@ -382,7 +384,7 @@ def main():
                                   '--serial0', f'udpclient:127.0.0.1:{args.qgc_port}' if args.qgc_only else 'tcp:0',
                                   '--serial1', 'none', '--serial2', 'none'], cwd=aircraft)
             if not args.headless:
-                session.start('gui', ['gz', 'sim', '-g', '-v3'])
+                session.start('gui', [host.executable('gazebo') or 'gz', 'sim', '-g', '-v3'])
             if not args.qgc_only:
                 print('Preparing authenticated telemetry for the Web application...', flush=True)
                 deadline = time.monotonic() + 25

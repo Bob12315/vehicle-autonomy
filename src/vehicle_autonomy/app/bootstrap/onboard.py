@@ -152,7 +152,8 @@ def supervise(args,directory):
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('operation',choices=('start','stop','status','supervise'))
-    parser.add_argument('--state-dir',default=str(Path.home()/'.local/state/vehicle-autonomy'))
+    from vehicle_autonomy.app.bootstrap.paths import RuntimePaths
+    parser.add_argument('--state-dir',default=str(RuntimePaths().slot('state', 'onboard')))
     parser.add_argument('--config',default=str(ROOT/'configs/deployment/hardware-readonly.json'))
     parser.add_argument('--llm-config')
     parser.add_argument('--rs16-config',help='explicit official SDK receiver; never configures a NIC or LiDAR')

@@ -10,6 +10,7 @@ import sys
 from vehicle_autonomy.app.tools.builtins import ROS_KEYS,make,profile
 from vehicle_autonomy.app.tools.schema import object_fields,manifest
 from .desktop import diagnostic
+from vehicle_autonomy.app.bootstrap.host_environment import HostEnvironment
 
 IDS=('gazebo-gui','rviz2','qgroundcontrol')
 
@@ -31,18 +32,20 @@ def configuration(root,path=None):
 
 
 def ros_environment(root,config):
-    wrapper=Path(config['ros_wrapper'] or Path(root)/'scripts/with_ros2.sh').resolve()
+    host=HostEnvironment(root)
     # Optional setup paths are trusted host configuration, never HTTP inputs.
     workspace=config['workspace_setup']
-    if workspace is None:
-        candidate=Path(root)/'install/setup.bash'
-        workspace=str(candidate) if candidate.is_file() else None
-    command=[str(wrapper),'/usr/bin/env','-0']
+    if config['ros_wrapper']:
+        command=[str(Path(config['ros_wrapper']).resolve()),'/usr/bin/env','-0']
+        environment=host.process_environment()
+    else:
+        command,environment=host.ros_command(['/usr/bin/env','-0'],workspace=workspace is None)
     if workspace:
         setup=Path(workspace)
         if not setup.is_absolute() or not setup.is_file():raise ValueError('configured Framework ROS workspace setup is missing')
-        command=[str(wrapper),'/bin/bash','-c','source "$1" >&2; exec /usr/bin/env -0','vaf-workspace',str(setup)]
-    result=subprocess.run(command,capture_output=True,timeout=15)
+        wrapped=['/bin/bash','-c','source "$1" >&2 || exit; exec /usr/bin/env -0','vaf-workspace',str(setup)]
+        command=([str(Path(config['ros_wrapper']).resolve()),*wrapped] if config['ros_wrapper'] else host.ros_command(wrapped,workspace=False)[0])
+    result=subprocess.run(command,env=environment,capture_output=True,timeout=15)
     if result.returncode:raise ValueError(result.stderr.decode(errors='replace')[-600:])
     if len(result.stdout)>131072:raise ValueError('ROS environment too large')
     environment=dict(s.decode().split('=',1) for s in result.stdout.split(b'\0') if b'=' in s)
@@ -50,23 +53,16 @@ def ros_environment(root,config):
 
 
 def qgc_candidates():
-    found=[]
-    for name in ('QGroundControl','qgroundcontrol','QGroundControl.AppImage'):
-        value=shutil.which(name)
-        if value:found.append(Path(value))
-    for base in (Path.home()/'Desktop',Path.home()/'桌面',Path.home()/'Downloads',Path.home()/'Applications',Path.home()/'.local/bin',Path('/opt')):
-        if not base.is_dir():continue
-        for pattern in ('*QGroundControl*','*qgroundcontrol*','*/QGroundControl','*/bin/QGroundControl'):
-            found.extend(sorted(base.glob(pattern)))
-    return [str(p.resolve()) for p in found if p.is_file() and os.access(p,os.X_OK)]
+    value=HostEnvironment().executable('qgroundcontrol')
+    return [value] if value else []
 
 
 def inspect_host(root,path=None):
-    config=configuration(root,path);ros={};error=None
+    config=configuration(root,path);ros={};error=None;host=HostEnvironment(root)
     try:ros=ros_environment(root,config)
     except (ValueError,OSError,subprocess.TimeoutExpired) as exc:error=str(exc)
-    defaults={'gazebo-gui':shutil.which('gz'),'rviz2':shutil.which('rviz2',path=ros.get('PATH','')),
-        'qgroundcontrol':next(iter(qgc_candidates()),None)}
+    defaults={'gazebo-gui':host.executable('gazebo'),'rviz2':host.executable('rviz2') or shutil.which('rviz2',path=ros.get('PATH','')),
+        'qgroundcontrol':host.executable('qgroundcontrol')}
     tools={}
     for key,item in config['tools'].items():
         binary=item['executable'] or defaults[key]

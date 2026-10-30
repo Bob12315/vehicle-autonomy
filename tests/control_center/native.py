@@ -62,7 +62,7 @@ def run(directory,*,password=None):
         def ready():
             if process.poll() is not None:raise RuntimeError(path.read_text())
             try:
-                value=json.loads((ROOT/'runtime/control-center/current.json').read_text())
+                value=json.loads((ROOT/'runtime/state/control-center/current.json').read_text())
                 if value['state']=='READY' and value['session_id']!=previous:return value
             except (OSError,ValueError):pass
         current=wait(ready,60);key=Path(current['token_file']).read_text().strip();result['epochs'].append(current)

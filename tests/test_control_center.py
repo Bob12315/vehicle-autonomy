@@ -82,7 +82,7 @@ class SupervisorContracts(unittest.TestCase):
         from vehicle_autonomy.app.control_center.finalize import finalize
         from vehicle_autonomy.app.bootstrap.simulation_credentials import OwnedCredentials
         with tempfile.TemporaryDirectory() as folder:
-            root=Path(folder);directory=root/'runtime/control-center/cc-test'
+            root=Path(folder);directory=root/'runtime/sessions/control-center/cc-test'
             vehicle=directory/'application/simulation/sim-test/vehicle-test';vehicle.mkdir(parents=True)
             value={'framework_runtime':True};owner=OwnedCredentials(vehicle,value)
             sitl=owner.create_state('');(sitl/'eeprom.bin').write_bytes(b'local-test')
@@ -91,7 +91,7 @@ class SupervisorContracts(unittest.TestCase):
             (vehicle/'session.json').write_text(json.dumps(value))
             state={'state':'READY','session_id':'current','cgroup':'/owned-test'}
             (directory/'state.json').write_text(json.dumps(state))
-            (directory.parent/'current.json').write_text(json.dumps(state))
+            current=root/'runtime/state/control-center/current.json';current.parent.mkdir(parents=True);current.write_text(json.dumps(state))
             unowned=root/'unowned.private';unowned.write_text('keep')
             with patch('vehicle_autonomy.app.control_center.finalize.process_table',return_value=[]):finalize(root,directory)
             self.assertFalse(key.exists());self.assertFalse(sitl.exists());self.assertEqual(unowned.read_text(),'keep')
@@ -101,7 +101,7 @@ class SupervisorContracts(unittest.TestCase):
     def test_poststop_never_destroys_resources_while_members_remain(self):
         from vehicle_autonomy.app.control_center.finalize import finalize
         with tempfile.TemporaryDirectory() as folder:
-            root=Path(folder);directory=root/'runtime/control-center/cc-test';directory.mkdir(parents=True)
+            root=Path(folder);directory=root/'runtime/sessions/control-center/cc-test';directory.mkdir(parents=True)
             state={'state':'READY','session_id':'current','cgroup':'/owned-test'}
             (directory/'state.json').write_text(json.dumps(state));feed=directory/'visualization.private';feed.write_text('keep')
             with patch('vehicle_autonomy.app.control_center.finalize.process_table',return_value=[dict(pid=os.getpid()+1)]):finalize(root,directory)

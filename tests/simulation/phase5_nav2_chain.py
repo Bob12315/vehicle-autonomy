@@ -6,6 +6,7 @@ import argparse
 import json
 import os
 from pathlib import Path
+from vehicle_autonomy.app.bootstrap.host_environment import HostEnvironment
 import time
 
 from tests.simulation.launch import ROOT,install_signal_cleanup
@@ -23,7 +24,7 @@ def _is_control(row):
 
 def run(path,*,secure=False):
     f=SensorFixture(path,source_time_sync=True,secure=secure);report={'passed':False,'motion_bridge_assembled':False,'motion_requested':False}
-    os.environ['VAF_SLAM_BOUNDARY_LIBRARY']=str((ROOT/'artifacts/phase5-world-navigation/slam-boundary/libvaf_slam_boundary.so').resolve())
+    os.environ['VAF_SLAM_BOUNDARY_LIBRARY']=str((HostEnvironment(ROOT).path('slam_boundary_library')).resolve())
     try:
         f.start();start_slam(f,'slam',ROOT/'simulation/phase5/slam_mapping.yaml');origin=f.truth()
         graph=f.ros_start('graph-readiness',[str(ROOT/'scripts/with_ros2.sh'),'/usr/bin/python3','-m','tests.simulation.nav2_graph_probe','--result',str(path/'graph-readiness.json')],role='manager',transient=True)

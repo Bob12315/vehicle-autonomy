@@ -29,6 +29,8 @@ vehicle-autonomy-visualization-sim = "vehicle_autonomy.app.visualization.launch:
 vehicle-autonomy-plan = "vehicle_autonomy.app.planning:main"
 vehicle-autonomy-anchor = "vehicle_autonomy.app.anchor:main"
 vehicle-autonomy-onboard = "vehicle_autonomy.app.bootstrap.onboard:main"
+vehicle-autonomy-environment = "vehicle_autonomy.app.bootstrap.host_environment:main"
+vehicle-autonomy-control-center = "vehicle_autonomy.app.control_center.launcher:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -41,6 +43,7 @@ where = ["src"]
 "vehicle_autonomy.world.sensors.lidar" = ["robosense/*.cpp"]
 
 [tool.setuptools.data-files]
+"share/vehicle-autonomy/environments" = ["environments/tools.example.toml", "environments/README.md"]
 "share/vehicle-autonomy/configs/tools" = ["configs/tools/lab.sdf"]
 "share/vehicle-autonomy/simulation/phase5" = ["simulation/phase5/slam_mapping.yaml", "simulation/phase5/nav2_rover.yaml", "simulation/phase5/navigate_rover.xml"]
 "share/vehicle-autonomy/configs" = ["configs/control-center.json", "configs/llm.server-tunnel.json", "configs/rs16-scan.json", "configs/sitl.toml", "configs/sitl_arm.toml"]
@@ -59,7 +62,7 @@ where = ["src"]
 "share/vehicle-autonomy/simulation/planning/maps" = ["simulation/planning/maps/e0e7a625e27ed2ac86b9621543cd9fd934af395b04431efd884e63f71af34081.json"]
 "share/vehicle-autonomy/simulation/profiles" = ["simulation/profiles/compact_rover.toml", "simulation/profiles/copter.toml", "simulation/profiles/rover.toml", "simulation/profiles/rover_yard.toml", "simulation/profiles/plane.toml", "simulation/profiles/rover_phase2.toml"]
 "share/vehicle-autonomy/simulation/scenarios" = ["simulation/scenarios/acceptance-v1.json", "simulation/scenarios/center_catalog.json", "simulation/scenarios/assets.lock.json", "simulation/scenarios/world_spawns.json"]
-"share/vehicle-autonomy/simulation/world_registry" = ["simulation/world_registry/catalog.yaml"]
+"share/vehicle-autonomy/simulation/world_registry" = ["simulation/world_registry/catalog.yaml", "simulation/world_registry/sitl_models_files.txt"]
 "share/vehicle-autonomy/simulation/scenes" = ["simulation/scenes/yard.json"]
 "share/vehicle-autonomy/simulation/worlds" = ["simulation/worlds/rover_runway.sdf", "simulation/worlds/plane_runway.sdf"]
 

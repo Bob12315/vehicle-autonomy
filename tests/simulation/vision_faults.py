@@ -3,6 +3,7 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+from vehicle_autonomy.app.bootstrap.host_environment import HostEnvironment
 import subprocess
 import sys
 import time
@@ -139,7 +140,7 @@ def run(directory, recording):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--recording', type=Path, default=ROOT / 'artifacts/simulation/vision-assets/recording.json')
+    parser.add_argument('--recording', type=Path, default=HostEnvironment(ROOT).path('vision_assets')/'recording.json')
     parser.add_argument('--allow-send', action='store_true')
     parser.add_argument('--run-dir', type=Path)
     args = parser.parse_args()

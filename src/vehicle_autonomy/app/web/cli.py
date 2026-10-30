@@ -1,6 +1,7 @@
 """Web composition calls the existing Application Unix API; owns no hardware."""
 import argparse
 from pathlib import Path
+from vehicle_autonomy.app.bootstrap.paths import RuntimePaths
 import signal
 
 from vehicle_autonomy.app.api.control import request, socket_path
@@ -22,7 +23,7 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--control-socket')
     parser.add_argument('--port',type=int,default=8765)
-    parser.add_argument('--data-dir',default='artifacts/hardware-ready/console')
+    parser.add_argument('--data-dir',default=str(RuntimePaths().slot('state', 'operator-console')))
     parser.add_argument('--token-file',required=True)
     parser.add_argument('--llm-config')
     parser.add_argument('--missions',default='')

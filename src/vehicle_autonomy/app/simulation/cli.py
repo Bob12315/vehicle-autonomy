@@ -67,7 +67,7 @@ def main(argv=None):
         import tempfile
         with tempfile.TemporaryDirectory() as temp:
             world=registry.generate(args.scene_id,Path(temp)/'world.sdf')
-            result=subprocess.run(['gz','sdf','-k',str(world)],timeout=30,capture_output=True,text=True)
+            result=subprocess.run([registry.host.executable('gazebo') or 'gz','sdf','-k',str(world)],timeout=30,capture_output=True,text=True)
             print(result.stdout+result.stderr)
             return result.returncode
     if not 0<args.seconds<=3600 or not 1<=args.timeout<=3600:

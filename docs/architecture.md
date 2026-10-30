@@ -1,5 +1,23 @@
 # V1 framework boundary
 
+## Host software and writable workspace layout (2026-10-31)
+
+`app/bootstrap/host_environment.py` resolves one private host software index from
+`environments/tools.local.toml`, an explicit `VAF_ENVIRONMENT_CONFIG`, or the user
+configuration directory. Versioned templates contain no machine software. The
+existing simulation, tool and ROS worker compositions now use this shared index;
+ordinary startup has no dependency on historical artifacts software trees.
+
+`RuntimePaths` separates persistent state, owned sessions, logs and cache from
+read-only installed resources. Control Center passwords/settings and workspace
+locks live under state; fresh service runs live under sessions. Finalization
+retains exact directory ownership and inode-registered credential destruction.
+Absolute Gazebo launcher paths account for the distro's basename-only process
+title while preserving its exact CLI/world, PID, start-time, cgroup and cwd fences.
+Hardware permissions, the unique writer and UNCONFIRMED stopping are unchanged.
+The [organization specification](FILE_ORGANIZATION.md) and
+[migration report](WORKSPACE_LAYOUT_REPORT.md) define scope and actual validation.
+
 ## Shared Web navigation (2026-10-30)
 
 `app/web/navigation.py` describes available page entries through the authenticated

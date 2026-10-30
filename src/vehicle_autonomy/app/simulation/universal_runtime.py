@@ -9,6 +9,7 @@ import hashlib
 import json
 import math
 from pathlib import Path
+from vehicle_autonomy.app.bootstrap.paths import RuntimePaths
 import re
 import shutil
 import socket
@@ -86,7 +87,7 @@ class VehicleInstance:
 
     def start(self, cancelled):
         o = self.owner
-        self.lease = PortLease.acquire(o.root/'runtime/simulation-center-locks')
+        self.lease = PortLease.acquire(RuntimePaths(o.root).slot('state', 'simulation-center-locks'))
         entity = 'vaf_' + self.id.replace('-', '_')
         p = self.prepared = o.library.prepare(self.vehicle,self.directory,entity_name=entity,
             instance=self.lease.instance,system_id=self.lease.system_id)
@@ -236,7 +237,7 @@ class LocalRuntime(WorldMetrics):
 
     @synchronized
     def start(self,world_path,cancelled=lambda:False):
-        if not shutil.which('gz'):raise ValueError('BLOCKED: Gazebo unavailable')
+        if not self.host.available('gazebo'):raise ValueError('BLOCKED: Gazebo unavailable')
         self.started=time.monotonic()
         tree=ET.parse(world_path)
         world=tree.getroot().find('world')
@@ -262,12 +263,12 @@ class LocalRuntime(WorldMetrics):
         if self.library.get('plane')['status']=='READY':
             self.session.build_payload(self.twin_root/'plugins')
         if cancelled():raise InterruptedError('World preparation cancelled')
-        self.session.start('gazebo',['gz','sim','-s','-r','--headless-rendering','-v3',str(world_path)])
+        self.session.start('gazebo',[self.host.executable('gazebo') or 'gz','sim','-s','-r','--headless-rendering','-v3',str(world_path)])
         deadline=time.monotonic()+30
         while time.monotonic()<deadline:
             if cancelled():raise InterruptedError('World startup cancelled')
             self.alive()
-            reply=subprocess.run(['gz','service','-l'],env=self.session.env,capture_output=True,text=True,timeout=4)
+            reply=subprocess.run([self.host.executable('gazebo') or 'gz','service','-l'],env=self.session.env,capture_output=True,text=True,timeout=4)
             if f'/world/{self.world}/create' in reply.stdout:break
             time.sleep(.2)
         else:raise TimeoutError('World entity service unavailable')
@@ -316,7 +317,7 @@ class LocalRuntime(WorldMetrics):
         self._aliases()
 
     def service(self,name,request_type,request):
-        reply=subprocess.run(['gz','service','-s',f'/world/{self.world}/{name}',
+        reply=subprocess.run([self.host.executable('gazebo') or 'gz','service','-s',f'/world/{self.world}/{name}',
             '--reqtype',request_type,'--reptype','gz.msgs.Boolean','--timeout','5000','--req',request],
             env=self.session.env,capture_output=True,text=True,timeout=7)
         if reply.returncode or 'data: true' not in reply.stdout:
@@ -325,7 +326,7 @@ class LocalRuntime(WorldMetrics):
     def confirm_absent(self,entity):
         deadline=time.monotonic()+6
         while time.monotonic()<deadline:
-            reply=subprocess.run(['gz','topic','-e','-t',f'/world/{self.world}/pose/info','-n','1'],
+            reply=subprocess.run([self.host.executable('gazebo') or 'gz','topic','-e','-t',f'/world/{self.world}/pose/info','-n','1'],
                 env=self.session.env,capture_output=True,text=True,timeout=3)
             if reply.returncode==0 and reply.stdout and not re.search(r'name:\s*"'+re.escape(entity)+r'"',reply.stdout):return
             time.sleep(.1)
@@ -348,7 +349,7 @@ class LocalRuntime(WorldMetrics):
         if not self.vehicles:
             result['vehicles']=[]
             return result
-        reply=subprocess.run(['gz','topic','-e','-t',f'/world/{self.world}/pose/info','-n','1'],
+        reply=subprocess.run([self.host.executable('gazebo') or 'gz','topic','-e','-t',f'/world/{self.world}/pose/info','-n','1'],
             env=self.session.env,capture_output=True,text=True,timeout=3)
         raw=reply.stdout
         for child in tuple(self.vehicles.values()):

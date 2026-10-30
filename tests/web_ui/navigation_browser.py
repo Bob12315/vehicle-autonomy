@@ -111,7 +111,7 @@ def run(directory, *, native=False, password=None):
             assert not th.lab.runtime.views() and not h.lab.runtime.views()
             if native:
                 if password is None: password = getpass.getpass('控制台登录密码：')
-                current = ROOT/'runtime/control-center/current.json'
+                current = ROOT/'runtime/state/control-center/current.json'
                 if current.exists():
                     old = json.loads(current.read_text())
                     if old['state'] in ('STARTING', 'READY', 'STOPPING'):

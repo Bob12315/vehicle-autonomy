@@ -7,6 +7,7 @@ import importlib.metadata
 import json
 import os
 from pathlib import Path
+from vehicle_autonomy.app.bootstrap.host_environment import HostEnvironment
 import shutil
 import socket
 import subprocess
@@ -14,8 +15,8 @@ import sys
 
 
 ROOT = Path(__file__).resolve().parents[1]
-ARDUPILOT = Path("/home/level6/ardupilot")
-GAZEBO_PLUGIN = Path("/home/level6/gz_ws/src/ardupilot_gazebo")
+ARDUPILOT = HostEnvironment(ROOT).path('ardupilot_root')
+GAZEBO_PLUGIN = HostEnvironment(ROOT).path('gazebo_plugin_root')
 
 
 def command_output(*args: str) -> tuple[int, str]:

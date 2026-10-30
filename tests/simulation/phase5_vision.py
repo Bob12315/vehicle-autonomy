@@ -6,6 +6,7 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+from vehicle_autonomy.app.bootstrap.host_environment import HostEnvironment
 import time
 import xml.etree.ElementTree as ET
 
@@ -21,7 +22,7 @@ PHOTO_SHA='c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63'
 
 
 def board(owned):
-    photo=ROOT/'artifacts/simulation/vision-assets/bus.jpg';assert hashlib.sha256(photo.read_bytes()).hexdigest()==PHOTO_SHA
+    photo=HostEnvironment(ROOT).path('vision_assets')/'bus.jpg';assert hashlib.sha256(photo.read_bytes()).hexdigest()==PHOTO_SHA
     tree=ET.parse(owned.world_path)
     if tree.find("world/plugin[@name='gz::sim::systems::UserCommands']") is None:tree.find('world').append(ET.fromstring('<plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands"/>'))
     tree.find('world').append(ET.fromstring(f'''<model name="vision_photo_board"><static>true</static><pose>2 0 .65 0 0 0</pose><link name="board">
@@ -51,7 +52,7 @@ def run(path):
         else:raise AssertionError('real camera sample missing')
         import cv2
         cv2.imwrite(str(path/'actual-gazebo-camera.png'),bgr)
-        detector=YoloXDetector(ROOT/'artifacts/simulation/vision-assets/yolox.onnx',WEIGHTS_SHA)
+        detector=YoloXDetector(HostEnvironment(ROOT).path('vision_assets')/'yolox.onnx',WEIGHTS_SHA)
         start=time.monotonic_ns();detections=detector.detect(bgr);latency=time.monotonic_ns()-start
         report.update(input_header=to_json_value(item.header),detections=[dict(class_id=d.class_id,confidence=d.confidence,xyxy=d.xyxy) for d in detections],inference_ns=latency,backend='opencv_dnn_cpu',opencv=cv2.__version__,model_sha256=WEIGHTS_SHA)
         for d in detections:
@@ -83,7 +84,7 @@ def run_stream(path):
             except (KeyError,ValueError,OSError):f.truth();time.sleep(.1)
         else:raise AssertionError('camera never available')
         root=path/'perception';root.mkdir(mode=0o700);source='yolox:'+uuid4().hex
-        config=dict(schema=1,directory=str(root),camera_directory=str(path/'streams'),camera_source=f.sensor_config['source_id'],camera_generation=camera_state['generation'],source_id=source,frame_epoch=f.sensor_config['frame_epoch'],calibration_version=f.sensor_config['calibration_version'],model_path=str(ROOT/'artifacts/simulation/vision-assets/yolox.onnx'),model_sha256=WEIGHTS_SHA)
+        config=dict(schema=1,directory=str(root),camera_directory=str(path/'streams'),camera_source=f.sensor_config['source_id'],camera_generation=camera_state['generation'],source_id=source,frame_epoch=f.sensor_config['frame_epoch'],calibration_version=f.sensor_config['calibration_version'],model_path=str(HostEnvironment(ROOT).path('vision_assets')/'yolox.onnx'),model_sha256=WEIGHTS_SHA)
         (path/'perception-profile.json').write_text(json.dumps(config,indent=2))
         collector=PerceptionCollector(f.driver,root,source_id=source,origin_id=config['frame_epoch'],calibration_version=config['calibration_version'],events=events,camera_source=config['camera_source'],camera_generation=config['camera_generation'],model_sha256=WEIGHTS_SHA)
         def mission(identifier):

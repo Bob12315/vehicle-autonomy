@@ -1,11 +1,12 @@
 """Actual CPU YOLOX image/blank/augmentation accuracy and latency acceptance."""
 import argparse,json,math,time
 from pathlib import Path
+from vehicle_autonomy.app.bootstrap.host_environment import HostEnvironment
 import cv2
 import numpy as np
 from vehicle_autonomy.world.perception.vision.yolox import YoloXDetector
 from vehicle_autonomy.world.perception.vision.projection import PlaneCalibration
-from scripts.prepare_vision_fixture import prepare,WEIGHTS_SHA
+from vehicle_autonomy.app.bootstrap.vision_fixture import prepare,WEIGHTS_SHA
 
 def iou(a,b):
     area=lambda r:max(0,r[2]-r[0])*max(0,r[3]-r[1])
@@ -13,7 +14,7 @@ def iou(a,b):
     common=area(intersect);return common/(area(a)+area(b)-common)
 
 def run(directory):
-    directory.mkdir(parents=True,exist_ok=False);assets=Path('artifacts/simulation/vision-assets').resolve();prepare(assets)
+    directory.mkdir(parents=True,exist_ok=False);assets=HostEnvironment().path('vision_assets');prepare(assets)
     report={'passed':False,'backend':'OpenCV DNN CPU','opencv':cv2.__version__,'fixture_scope':'recorded virtual calibration only','frames':[]}
     try:
         detector=YoloXDetector(assets/'yolox.onnx',WEIGHTS_SHA);calibration=PlaneCalibration.load(assets/'calibration.toml');source=cv2.imread(str(assets/'bus.jpg'))

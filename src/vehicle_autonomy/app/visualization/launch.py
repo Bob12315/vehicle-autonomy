@@ -9,6 +9,7 @@ from urllib.request import Request,build_opener,ProxyHandler
 from uuid import uuid4
 
 from vehicle_autonomy._resources import resource_root
+from vehicle_autonomy.app.bootstrap.paths import RuntimePaths
 from vehicle_autonomy.app.web.server import load_token
 from vehicle_autonomy.app.tools.builtins import ROS_KEYS,registry
 from vehicle_autonomy.app.tools.schema import context,manifest
@@ -35,7 +36,7 @@ def main():
         probe.bind(('127.0.0.1',port))  # Fail before spawning, never kill an existing listener.
     with socket.socket() as probe:
         probe.bind(('127.0.0.1',0));agent_port=probe.getsockname()[1]
-    directory=(a.run_dir or Path('runtime/visualization')/f'{a.kind}-{uuid4().hex[:12]}').expanduser().resolve();directory.mkdir(mode=0o700,parents=True,exist_ok=False)
+    directory=(a.run_dir or RuntimePaths(root).slot('sessions', 'visualization')/f'{a.kind}-{uuid4().hex[:12]}').expanduser().resolve();directory.mkdir(mode=0o700,parents=True,exist_ok=False)
     simulation=directory/'simulation';feed=directory/'visualization.private';agent_key=directory/'desktop.private';load_token(feed);load_token(agent_key)
     cfg=directory/'source.json';cfg.write_text(json.dumps(dict(schema=1,url='http://127.0.0.1:'+str(port),token_file=str(feed),use_sim_time=False)))
     allow=directory/'agents.json';allow.write_text(json.dumps(dict(schema=1,agents=dict(desktop=dict(token_file=str(agent_key))))))

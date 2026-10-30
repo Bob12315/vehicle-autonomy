@@ -30,3 +30,6 @@ receive-signing*.private
 
 # Generated evidence, private run state and local builds; never source packages.
 /artifacts/
+
+# Private machine software index; only templates belong in Git.
+/environments/tools.local.toml

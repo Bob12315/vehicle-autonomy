@@ -1,10 +1,12 @@
 """OS-owned deployment boundary around the existing process/session owners."""
 from hashlib import sha256
+from vehicle_autonomy.app.bootstrap.paths import RuntimePaths
 import fcntl
 import json
 import os
 from pathlib import Path
 import subprocess
+import sys
 import time
 
 
@@ -18,7 +20,7 @@ def unit_name(root):
 
 
 def lock_workspace(root, name):
-    directory=Path(root)/'runtime';directory.mkdir(mode=0o700,exist_ok=True)
+    directory=RuntimePaths(root).slot('state', 'locks');directory.mkdir(mode=0o700,parents=True,exist_ok=True)
     path=directory/('control-center.'+name+'.lock')
     descriptor=os.open(path,os.O_CREAT|os.O_RDWR|os.O_NOFOLLOW,0o600)
     handle=os.fdopen(descriptor,'a+')
@@ -38,7 +40,7 @@ def service_command(root, directory, arguments, parent_pid, parent_ticks):
     # mixed allows the original owners to cancel/release in order; after main
     # exit (even SIGKILL), systemd kills ALL remaining cgroup descendants.
     def quote(value):return '"'+str(value).replace('\\','\\\\').replace('"','\\"').replace('%','%%').replace('$','$$')+'"'
-    finalizer=' '.join(quote(v) for v in (Path(root)/'.venv/bin/python','-m','vehicle_autonomy.app.control_center.finalize','--root',root,'--run-dir',directory))
+    finalizer=' '.join(quote(v) for v in (sys.executable,'-m','vehicle_autonomy.app.control_center.finalize','--root',root,'--run-dir',directory))
     return ['systemd-run','--user','--unit='+unit_name(root),'--collect','--service-type=exec',
         '--property=KillMode=mixed','--property=ExitType=main','--property=TimeoutStopSec=120s',
         '--property=ExecStopPost='+finalizer,
@@ -47,8 +49,9 @@ def service_command(root, directory, arguments, parent_pid, parent_ticks):
         '--property=StandardError=append:'+str(directory/'backend.log'),
         *['--setenv='+key+'='+value for key,value in os.environ.items() if key in (
             'DISPLAY','XAUTHORITY','WAYLAND_DISPLAY','XDG_RUNTIME_DIR','DBUS_SESSION_BUS_ADDRESS','PATH','LANG','LC_ALL',
-            'VAF_ROS2_ROOT','VAF_RESOURCE_ROOT')],
-        str(Path(root)/'.venv/bin/python'),'-m','vehicle_autonomy.app.control_center.backend',
+            'VAF_ROS2_ROOT','VAF_RESOURCE_ROOT','VAF_ENVIRONMENT_CONFIG','VAF_RUNTIME_ROOT','VAF_SIM_ASSET_CACHE',
+            'VAF_ARDUPILOT_ROOT','VAF_GAZEBO_PLUGIN_ROOT','VAF_FIXEDWING_ROOT','VAF_SIM_LEGACY_ASSETS')],
+        sys.executable,'-m','vehicle_autonomy.app.control_center.backend',
         '--run-dir',str(directory),'--root',str(root),'--parent-pid',str(parent_pid),'--parent-ticks',str(parent_ticks),*arguments]
 
 

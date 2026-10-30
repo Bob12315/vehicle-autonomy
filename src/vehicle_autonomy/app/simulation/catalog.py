@@ -11,6 +11,7 @@ from pathlib import Path
 import xml.etree.ElementTree as ET
 
 from vehicle_autonomy._resources import resource_root as default_resource_root
+from vehicle_autonomy.app.bootstrap.host_environment import HostEnvironment
 from .assets import AssetManager, inspect_sdf, model_sdf
 from .scenarios import generate_world, validate_parameters
 
@@ -18,14 +19,13 @@ from .scenarios import generate_world, validate_parameters
 class SceneRegistry:
     def __init__(self, resource_root=None, *, asset_cache=None):
         self.root=Path(resource_root) if resource_root is not None else default_resource_root()
+        self.host=HostEnvironment(self.root)
         catalog=json.loads((self.root/'simulation/scenarios/center_catalog.json').read_text())
         if catalog.get('schema')!=1:raise ValueError('unsupported scene catalog schema')
         self._scenes={scene['id']:scene for scene in catalog['scenes']}
         if len(self._scenes)!=len(catalog['scenes']):raise ValueError('duplicate scene identifier')
         lock=self.root/'simulation/scenarios/assets.lock.json'
-        default_cache=os.environ.get('VAF_SIM_ASSET_CACHE')
-        if not default_cache:
-            default_cache=(self.root/'simulation/world_registry/assets/center-source' if (self.root/'pyproject.toml').is_file() else Path(os.environ.get('XDG_CACHE_HOME',str(Path.home()/'.cache')))/'vehicle-autonomy/simulation-assets')
+        default_cache=self.host.path('asset_cache')
         self.assets=AssetManager(asset_cache or default_cache,lock_path=lock) if lock.is_file() else None
         legacy=self.root/'simulation/world_registry/catalog.yaml'
         self._legacy=json.loads(legacy.read_text())['scenes'] if legacy.is_file() else {}
@@ -47,15 +47,17 @@ class SceneRegistry:
     def _legacy_path(self, identifier):
         relative=self._legacy[identifier].get('sdf')
         if not relative:return None
-        path=(self.root/'simulation/world_registry'/relative).resolve()
-        if not path.is_relative_to((self.root/'simulation/world_registry').resolve()):raise ValueError('legacy source escapes registry')
+        base=self.host.path('legacy_assets') if relative.startswith('assets/') else self.root/'simulation/world_registry'
+        path=(base/relative.removeprefix('assets/')).resolve()
+        if not path.is_relative_to(base.resolve()):raise ValueError('legacy source escapes registry')
         return path
 
     def _legacy_roots(self):
-        roots=[self.root/'simulation/world_registry/assets/adapter_models',self.root/'simulation/world_registry/assets',self.root/'simulation/models']
+        assets=self.host.path('legacy_assets')
+        roots=[assets/'adapter_models',assets,self.root/'simulation/models']
         # This explicit local dependency matches the audited legacy registry;
         # no archived source or unrelated project is imported or modified.
-        local=Path('/home/level6/gz_ws/src/ardupilot_gazebo/models')
+        local=self.host.path('gazebo_plugin_root')/'models'
         if local.is_dir():roots.append(local)
         return roots
 

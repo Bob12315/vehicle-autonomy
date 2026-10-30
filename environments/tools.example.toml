@@ -1,0 +1,32 @@
+# Copy to tools.local.toml, fill only installed software, and use absolute paths.
+# Empty entries are unconfigured. This template is never loaded automatically.
+schema = 1
+
+[executables]
+gazebo = ""
+qgroundcontrol = ""
+rviz2 = ""
+
+[paths]
+ardupilot_root = ""
+gazebo_plugin_root = ""
+fixedwing_root = ""
+ros2_root = ""
+ros2_setup = ""
+ros2_workspace = ""
+ros2_humble_root = ""
+asset_cache = ""
+legacy_assets = ""
+vision_assets = ""
+slam_boundary_library = ""
+native_source_receiver = ""
+# runtime_root = "/absolute/private/runtime"
+
+[environment]
+# Additional trusted child-process environment; never credentials.
+
+[versions]
+# Informational labels; readiness still requires actual dependency checks.
+
+[checksums]
+# "/absolute/software/file" = "64-character lowercase SHA256"

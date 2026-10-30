@@ -6,6 +6,7 @@ import signal
 from threading import Thread
 
 from vehicle_autonomy._resources import resource_root
+from vehicle_autonomy.app.bootstrap.paths import RuntimePaths
 from vehicle_autonomy.app.bootstrap.action_ownership import OwnedActionSimulation
 from vehicle_autonomy.app.bootstrap.action_driver import VehicleActionDriver
 from vehicle_autonomy.app.bootstrap.simulation_profile import SimulationProfile
@@ -17,7 +18,7 @@ def main(*,studio=False):
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--simulation',action='append',default=[],metavar='TARGET=MANIFEST',help='explicit live owned SITL manifest, repeat per vehicle')
     parser.add_argument('--allow-send',action='store_true',help='deployment SEND only; every writing Action additionally needs allow_send=true')
-    parser.add_argument('--port',type=int,default=8780 if studio else 8770);parser.add_argument('--data-dir',type=Path,default=Path('runtime/mission-control' if studio else 'runtime/action-lab'))
+    parser.add_argument('--port',type=int,default=8780 if studio else 8770);parser.add_argument('--data-dir',type=Path,default=RuntimePaths().slot('state', 'mission-control' if studio else 'action-lab'))
     parser.add_argument('--token-file',type=Path,required=True)
     parser.add_argument('--https-origin',help='explicit trusted HTTPS reverse-proxy origin; enables Secure browser cookies')
     parser.add_argument('--visualization-token-file',type=Path,help='independent narrow state/proposal credential; no vehicle execution permission')

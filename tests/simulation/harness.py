@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 import json
 import os
 from pathlib import Path
+from vehicle_autonomy.app.bootstrap.host_environment import HostEnvironment
 import signal
 import subprocess
 import sys
@@ -202,7 +203,7 @@ def main():
             ('cuadc_second', 'tests.simulation.autonomy_process', ['--kind','copter','--allow-send','--mission','cuadc_demo','--objects']),
             ('rover_inspection', 'tests.simulation.autonomy_process', ['--kind','rover','--allow-send','--mission','object_inspection','--objects']),
             ('business_faults', 'tests.simulation.business_faults', ['--kind','copter','--allow-send']),
-            ('visual_business', 'tests.simulation.autonomy_process', ['--kind','copter','--allow-send','--mission','cuadc_demo','--vision-config',str(ROOT/'artifacts/simulation/vision-assets/recording.json')]),
+            ('visual_business', 'tests.simulation.autonomy_process', ['--kind','copter','--allow-send','--mission','cuadc_demo','--vision-config',str(HostEnvironment(ROOT).path('vision_assets')/'recording.json')]),
             ('copter_full', 'tests.simulation.copter_scenario', ['--allow-send', '--full']),
             ('copter_land', 'tests.simulation.copter_scenario', ['--allow-send']),
             ('rover_full', 'tests.simulation.rover_protocol', ['--allow-send', '--full']),

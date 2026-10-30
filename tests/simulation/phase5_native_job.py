@@ -1,6 +1,7 @@
 """Real managed native cohort lifecycle. No vehicle movement bridge assembled."""
 import argparse,json,os,time,hashlib
 from pathlib import Path
+from vehicle_autonomy.app.bootstrap.host_environment import HostEnvironment
 from uuid import uuid4
 from tests.simulation.launch import ROOT,install_signal_cleanup
 from tests.simulation.phase5_sensors import SensorFixture
@@ -16,8 +17,8 @@ from vehicle_autonomy.contracts.decision import ActionSpec
 
 def run(path):
     f=SensorFixture(path,source_time_sync=True,secure=True);jobs=[];report={'passed':False,'motion_bridge_assembled':False}
-    os.environ['VAF_SLAM_BOUNDARY_LIBRARY']=str((ROOT/'artifacts/phase5-world-navigation/slam-boundary/libvaf_slam_boundary.so').resolve())
-    binary=ROOT/'artifacts/phase5-world-navigation/source-receiver-qualified/vaf_native_source_receiver'
+    os.environ['VAF_SLAM_BOUNDARY_LIBRARY']=str((HostEnvironment(ROOT).path('slam_boundary_library')).resolve())
+    binary=HostEnvironment(ROOT).path('native_source_receiver')
     os.environ['VAF_NATIVE_SOURCE_RECEIVER']=str(binary);os.environ['VAF_NATIVE_SOURCE_RECEIVER_SHA256']=hashlib.sha256(binary.read_bytes()).hexdigest()
     try:
         f.start();start_slam(f,'slam',ROOT/'simulation/phase5/slam_mapping.yaml')

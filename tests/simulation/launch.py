@@ -8,6 +8,7 @@ from datetime import datetime, timezone
 import json
 import os
 from pathlib import Path
+from vehicle_autonomy.app.bootstrap.host_environment import HostEnvironment
 import signal
 import socket
 import subprocess
@@ -20,8 +21,8 @@ from tests.simulation.credentials import OwnedCredentials
 
 
 ROOT = Path(__file__).resolve().parents[2]
-ARDUPILOT = Path("/home/level6/ardupilot")
-PLUGIN = Path("/home/level6/gz_ws/src/ardupilot_gazebo")
+ARDUPILOT = HostEnvironment(ROOT).path('ardupilot_root')
+PLUGIN = HostEnvironment(ROOT).path('gazebo_plugin_root')
 
 
 def available(port: int, sock_type=socket.SOCK_STREAM) -> bool:

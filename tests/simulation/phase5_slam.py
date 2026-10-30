@@ -8,6 +8,7 @@ import json
 import math
 import os
 from pathlib import Path
+from vehicle_autonomy.app.bootstrap.host_environment import HostEnvironment
 import time
 from uuid import uuid4
 
@@ -76,7 +77,7 @@ def walls(grid,transform):
 
 def run(path):
     f=SensorFixture(path);collector=None;report={'passed':False,'native':'slam_toolbox 2.8.5','motion_requested':False}
-    os.environ['VAF_SLAM_BOUNDARY_LIBRARY']=str((ROOT/'artifacts/phase5-world-navigation/slam-boundary/libvaf_slam_boundary.so').resolve())
+    os.environ['VAF_SLAM_BOUNDARY_LIBRARY']=str((HostEnvironment(ROOT).path('slam_boundary_library')).resolve())
     def start_reader(name):
         nonlocal collector
         root=path/name;root.mkdir(mode=0o700);c=dict(schema=1,directory=str(root),source_id='slam:'+uuid4().hex,frame_epoch=f.sensor_config['frame_epoch'],map_epoch=map_epoch,calibration_version='owned-rover-sensors-v1')

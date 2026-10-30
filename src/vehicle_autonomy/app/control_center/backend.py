@@ -12,6 +12,7 @@ from vehicle_autonomy.app.web.mission_control import MissionControl,MissionContr
 from vehicle_autonomy.app.web.server import load_token
 from vehicle_autonomy.app.web.passwords import load_password
 from vehicle_autonomy.app.tools.service import ToolService
+from vehicle_autonomy.app.bootstrap.paths import RuntimePaths
 from .service import ControlCenter
 from .supervisor import atomic,lock_workspace,process_identity,unit_name
 
@@ -25,12 +26,12 @@ def main():
     if not cgroup.endswith('/'+unit_name(root)):raise ValueError('必须经 ./control-center 的独立 systemd 用户服务启动；拒绝无 OS 清理保障的后台。')
     lock=lock_workspace(root,'backend');stop=Event();app=server=center=tools=None;http_thread=None;errors=[]
     state=dict(session_id='center-'+uuid4().hex,state='STARTING',pid=os.getpid(),cgroup=cgroup,unit=unit_name(root),
-        url=f'http://127.0.0.1:{args.port}/center',token_file=str(root/'runtime/control-center/operator.private'),
-        authentication='password',password_file=str(root/'runtime/control-center/password.json'),
+        url=f'http://127.0.0.1:{args.port}/center',token_file=str(RuntimePaths(root).slot('state', 'control-center/operator.private')),
+        authentication='password',password_file=str(RuntimePaths(root).slot('state', 'control-center/password.json')),
         logs=str(directory),deployment_send=args.allow_send,system_send=False,action_send=False,started_at=time.time())
     atomic(directory/'state.json',state)
     os.environ['VAF_CONTROL_CENTER_SESSION']=state['session_id']
-    parent=root/'runtime/control-center';parent.mkdir(mode=0o700,exist_ok=True)
+    parent=RuntimePaths(root).slot('state', 'control-center');parent.mkdir(mode=0o700,parents=True,exist_ok=True)
     atomic(parent/'current.json',dict(run_dir=str(directory),**state))
     signal.signal(signal.SIGTERM,lambda *_:stop.set());signal.signal(signal.SIGINT,lambda *_:stop.set())
     try:

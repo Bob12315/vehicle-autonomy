@@ -5,6 +5,7 @@ import argparse
 from datetime import datetime, timezone
 import json
 from pathlib import Path
+from vehicle_autonomy.app.bootstrap.paths import RuntimePaths
 import time
 
 from vehicle_autonomy.autonomy.planning.service import ReadOnlyPlanningService
@@ -60,7 +61,7 @@ def main():
     parser.add_argument("--goal-yaw",type=float,default=0.)
     parser.add_argument("--clearance",type=float,default=.55)
     parser.add_argument("--timeout",type=float,default=15.)
-    parser.add_argument("--evidence-directory",type=Path,default=Path("artifacts/simulation/nav2-planning"))
+    parser.add_argument("--evidence-directory",type=Path,default=RuntimePaths().slot('sessions', 'nav2-planning'))
     parser.add_argument("--output",type=Path)
     args = parser.parse_args()
     if args.map_store is not None:

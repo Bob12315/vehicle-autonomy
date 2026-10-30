@@ -1,6 +1,7 @@
 """First actual managed native Nav2 -> existing Rover Execution motion path."""
 import argparse,json,math,os,time,hashlib
 from pathlib import Path
+from vehicle_autonomy.app.bootstrap.host_environment import HostEnvironment
 from uuid import uuid4
 from tests.simulation.launch import ROOT,install_signal_cleanup
 from tests.simulation.phase5_sensors import SensorFixture
@@ -18,8 +19,8 @@ from vehicle_autonomy.world.mapping.grid import pose_from_json
 def run(path,scenario='reach'):
     if scenario not in ('reach','cancel','bridge_loss','nav2_crash','lidar_loss','localization_loss','no_path','static_obstacle'):raise ValueError('explicit qualified scenario required')
     fence=NativeNavigationWriteFence();f=SensorFixture(path,source_time_sync=True,secure=True,native_input_fence=fence,contact_evidence=True,split_lidar_bridge=True);collector=None;report={'passed':False,'scenario':scenario};factory=None
-    os.environ['VAF_SLAM_BOUNDARY_LIBRARY']=str((ROOT/'artifacts/phase5-world-navigation/slam-boundary/libvaf_slam_boundary.so').resolve())
-    binary=ROOT/'artifacts/phase5-world-navigation/source-receiver-qualified/vaf_native_source_receiver'
+    os.environ['VAF_SLAM_BOUNDARY_LIBRARY']=str((HostEnvironment(ROOT).path('slam_boundary_library')).resolve())
+    binary=HostEnvironment(ROOT).path('native_source_receiver')
     os.environ['VAF_NATIVE_SOURCE_RECEIVER']=str(binary);os.environ['VAF_NATIVE_SOURCE_RECEIVER_SHA256']=hashlib.sha256(binary.read_bytes()).hexdigest()
     try:
         goal_x=0. if scenario=='static_obstacle' else 3. if scenario=='no_path' else 1.5

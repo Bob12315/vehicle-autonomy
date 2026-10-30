@@ -3,6 +3,7 @@ from copy import deepcopy
 import json
 import os
 from pathlib import Path
+from vehicle_autonomy.app.bootstrap.paths import RuntimePaths
 import sys
 from threading import Event,RLock,Thread
 import time
@@ -81,7 +82,7 @@ class ControlCenter:
             binding=dict(target=target,missing_topics=['PointCloud','Map','external Path'],note='仅显示真实 Framework TF、Odometry 和实际轨迹；未接入的点云、地图关闭。' if target else '未选择车辆：空白显示 Profile；缺少实时 TF、Odometry、点云、地图。')
         elif tool_id=='qgroundcontrol':
             # Persistent project-private Qt config; never touch ~/.config/QGroundControl.
-            private=self.root/'runtime/control-center/qgc';private.mkdir(mode=0o700,parents=True,exist_ok=True)
+            private=RuntimePaths(self.root).slot('state', 'control-center/qgc');private.mkdir(mode=0o700,parents=True,exist_ok=True)
             for name in ('config','cache','data'): (private/name).mkdir(mode=0o700,exist_ok=True)
             p['env'].update(XDG_CONFIG_HOME=str(private/'config'),XDG_CACHE_HOME=str(private/'cache'),XDG_DATA_HOME=str(private/'data'))
             for organization in ('QGroundControl','QGroundControl.org'):
@@ -104,7 +105,7 @@ class ControlCenter:
             parser.set(section,'udpTargetHostIP','127.0.0.1');parser.set(section,'udpTargetHostPort',str(self.host['config']['qgc_port']))
         if not parser.has_section('General'):parser.add_section('General')
         parser.set('General','SettingsVersion','9');parser.set('General','firstRunPromptIdsShown','3')
-        parser.set('General','savePath',str(self.root/'runtime/control-center/qgc/data'))
+        parser.set('General','savePath',str(RuntimePaths(self.root).slot('state', 'control-center/qgc/data')))
         temporary=path.with_suffix('.tmp')
         with temporary.open('w') as output:parser.write(output,space_around_delimiters=False)
         temporary.replace(path)

@@ -12,11 +12,12 @@ import time
 
 from vehicle_autonomy.app.bootstrap.simulation_credentials import OwnedCredentials
 from .supervisor import atomic,process_table
+from vehicle_autonomy.app.bootstrap.paths import RuntimePaths
 
 
 def finalize(root,directory):
     root=Path(root).resolve();directory=Path(directory)
-    if directory.resolve()!=directory or directory.parent!=root/'runtime/control-center' or not directory.name.startswith('cc-'):
+    if directory.resolve()!=directory or directory.parent!=RuntimePaths(root).slot('sessions', 'control-center') or not directory.name.startswith('cc-'):
         raise ValueError('unowned Control Center finalizer directory')
     path=directory/'state.json'
     if not path.exists():return
@@ -39,7 +40,7 @@ def finalize(root,directory):
     abnormal=state['state'] not in ('STOPPED','FAILED')
     if abnormal:state.update(state='CRASHED',physical_stop='UNCONFIRMED',ended_at=time.time())
     state['os_cleanup']=result;atomic(path,state)
-    current=root/'runtime/control-center/current.json'
+    current=RuntimePaths(root).slot('state', 'control-center/current.json')
     if current.exists() and json.loads(current.read_text()).get('session_id')==state['session_id']:
         atomic(current,dict(run_dir=str(directory),**state))
     atomic(directory/'os-cleanup.json',result)
