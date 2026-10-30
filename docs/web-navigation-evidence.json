@@ -1,0 +1,294 @@
+{
+  "status": "PASS",
+  "date": "2026-10-30",
+  "base_commit": "2184b44368c9ebab8e05857fc456b071b58e9b91",
+  "source_sha256": {
+    "src/vehicle_autonomy/app/web/action_cli.py": "970f8925d8e22d88edad7df126e5a8b92b019ab1bb901912e46fdc8048709759",
+    "src/vehicle_autonomy/app/web/action_lab.py": "21bb275797eeb5d3dfd30e34a8210ad72a4b35a309e8c3b4e38f79544304994f",
+    "src/vehicle_autonomy/app/web/mission_control.py": "63976af281f77d7c6f0dbb3745a03a68f868ba19c2cff8f8f041364c164e6ca5",
+    "src/vehicle_autonomy/app/web/static/action-lab.css": "19c88b0f2798638513053b5b0736844534f6f32ab15c64182c2b696b7761135f",
+    "src/vehicle_autonomy/app/web/static/action-lab.html": "6fe9e71ff406af7da4487fc621d3db66e8567e62a28d095834b024f11f7825e6",
+    "src/vehicle_autonomy/app/web/static/control-center.html": "ee077a5556d76788fcab696ca451f1ef65ea47e33574405ee85dcc8efb64ec45",
+    "src/vehicle_autonomy/app/web/static/control-center.js": "2e899006121cdd8ee43a095a5a5767d7e246699bbe465ec1da22ebf7d99dc4b8",
+    "src/vehicle_autonomy/app/web/static/login.html": "7d69ea7e54d7814b0e006c2145b046d5c3a396cad7a2bacabd2dd7f960a75b20",
+    "src/vehicle_autonomy/app/web/static/manual-control.html": "7b49463fd8f7865869bdb9eb1827eed191571cf557d37a8d3fabbeea00691f1f",
+    "src/vehicle_autonomy/app/web/static/manual-control.js": "cecd6ec85d1951232fcdb7726f6f905e79018c98ae66d96e1bf6fc8b439f4c66",
+    "src/vehicle_autonomy/app/web/static/simulation-center.html": "ceabfcec97858bc4dae6d36d6ae5a4bd79f125b19711389cec1eecd5fe3ccb2f",
+    "src/vehicle_autonomy/app/web/static/studio-b.html": "817106646fc558c344d0534748864e077682dfd605b8530a7f7242e7f86037ab",
+    "src/vehicle_autonomy/app/web/static/tool-console.css": "190072175fb2dbac43961ce4df2fd1c0e4d5df167bcd7c16b82c7f559a95add3",
+    "src/vehicle_autonomy/app/web/static/tool-console.html": "dccd2fb0823e4dc9aaf9cf5857fba009065d16f62f52ae67b6bbcae1d43ffae0",
+    "tests/mission_graph/test_service.py": "62f1395509d8c11fda540042720b1138b4dba1c647795e3d68c03307d9104edb",
+    "tests/test_simulation_web.py": "e5243528748204ceda199907f05a1f07e0288c6668e7eea8184b9832fca58abb",
+    "tests/tool_agent/console_browser.py": "35fbb25c8fe0efb40d4778e7f89b86759d4373335406cbb88ab680f10ab50bd3",
+    "tests/web_ui/chinese_browser.py": "41827cf07b22d78f6293390c0c103908ee4bc50e4555c864f3903a1f416015a9",
+    "src/vehicle_autonomy/app/web/navigation.py": "2552d46ea7ff78a2b7bbe6c227848db45f1a9c87b8ab8831e630dbdf22d8aa81",
+    "src/vehicle_autonomy/app/web/static/navigation.js": "59fcdccf7906a9975cd0cf2ba885b399a4835f59f5bfc518a77be8a900070dda",
+    "tests/web_ui/navigation_browser.py": "8deec7841bb0cd1df19d8782bf9e654337af4201b72fe1a88193a805dac8a14b",
+    "tests/web_ui/test_navigation.py": "7d2bd39cd5b0f92ff12310e61ca1a61d9dc427eca280b18defd0d416d6abfdc5"
+  },
+  "unit_tests": {
+    "passed": 932,
+    "log": "artifacts/web-navigation/unit-final.log"
+  },
+  "after_loading_state_change": {
+    "passed": 34,
+    "log": "artifacts/web-navigation/targeted.log"
+  },
+  "native": {
+    "status": "PASS",
+    "stages": [
+      {
+        "name": "mission-without-remote",
+        "local": false,
+        "remote": false,
+        "pages": [
+          "/console#dashboard",
+          "/simulation",
+          "/control",
+          "/studio",
+          "/"
+        ],
+        "redirects": [
+          "/console#dashboard",
+          "/console#dashboard",
+          "/console#dashboard",
+          "/console#dashboard"
+        ],
+        "menu": [
+          {
+            "id": "dashboard",
+            "href": "/console#dashboard",
+            "text": "01车辆总览遥测与运行状态"
+          },
+          {
+            "id": "simulation",
+            "href": "/simulation",
+            "text": "02仿真中心场景、车辆与出生点"
+          },
+          {
+            "id": "control",
+            "href": "/control",
+            "text": "03车辆控制手动操作与控制权"
+          },
+          {
+            "id": "studio",
+            "href": "/studio",
+            "text": "04任务编排任务编辑与运行"
+          },
+          {
+            "id": "actions",
+            "href": "/",
+            "text": "05动作实验室单个 动作 调试"
+          }
+        ],
+        "status": "PASS"
+      },
+      {
+        "name": "configured-remote",
+        "local": false,
+        "remote": true,
+        "pages": [
+          "/console#dashboard",
+          "/simulation",
+          "/control",
+          "/studio",
+          "/"
+        ],
+        "redirects": [
+          "/console#tools",
+          "/console#workspaces",
+          "/console#logs",
+          "/console#settings"
+        ],
+        "menu": [
+          {
+            "id": "dashboard",
+            "href": "/console#dashboard",
+            "text": "01车辆总览遥测与运行状态"
+          },
+          {
+            "id": "simulation",
+            "href": "/simulation",
+            "text": "02仿真中心场景、车辆与出生点"
+          },
+          {
+            "id": "control",
+            "href": "/control",
+            "text": "03车辆控制手动操作与控制权"
+          },
+          {
+            "id": "studio",
+            "href": "/studio",
+            "text": "04任务编排任务编辑与运行"
+          },
+          {
+            "id": "actions",
+            "href": "/",
+            "text": "05动作实验室单个 动作 调试"
+          },
+          {
+            "id": "tools",
+            "href": "/console#tools",
+            "text": "06远程工具已配置的代理主机"
+          },
+          {
+            "id": "workspaces",
+            "href": "/console#workspaces",
+            "text": "07远程工作区工具依赖与运行环境"
+          },
+          {
+            "id": "logs",
+            "href": "/console#logs",
+            "text": "08远程日志代理工具输出与审计"
+          },
+          {
+            "id": "settings",
+            "href": "/console#settings",
+            "text": "09远程设置车辆上下文与运行配置"
+          }
+        ],
+        "status": "PASS"
+      },
+      {
+        "name": "real-control-center",
+        "local": true,
+        "remote": false,
+        "pages": [
+          "/console#dashboard",
+          "/simulation",
+          "/control",
+          "/studio",
+          "/center",
+          "/"
+        ],
+        "redirects": [
+          "/center#tools",
+          "/center#tools",
+          "/center#tool-logs",
+          "/center#system-panel"
+        ],
+        "menu": [
+          {
+            "id": "dashboard",
+            "href": "/console#dashboard",
+            "text": "01车辆总览遥测与运行状态"
+          },
+          {
+            "id": "simulation",
+            "href": "/simulation",
+            "text": "02仿真中心场景、车辆与出生点"
+          },
+          {
+            "id": "control",
+            "href": "/control",
+            "text": "03车辆控制手动操作与控制权"
+          },
+          {
+            "id": "studio",
+            "href": "/studio",
+            "text": "04任务编排任务编辑与运行"
+          },
+          {
+            "id": "center",
+            "href": "/center",
+            "text": "05工具与系统桌面工具、日志与进程"
+          },
+          {
+            "id": "actions",
+            "href": "/",
+            "text": "06动作实验室单个 动作 调试"
+          }
+        ],
+        "status": "PASS"
+      }
+    ],
+    "javascript_errors": [],
+    "no_vehicle_actions": true,
+    "native_world": {
+      "id": "sim-d955a69bd33341b0af4a92461204afc7",
+      "scene": "C01",
+      "state": "RUNNING",
+      "stopped": true
+    },
+    "native_cleanup": {
+      "service_result": "success",
+      "exit_code": "exited",
+      "exit_status": "0",
+      "remaining_owned_processes": [],
+      "credential_errors": [],
+      "finished_at": 1793341488.3301992
+    }
+  },
+  "browser_regressions": {
+    "dashboard": {
+      "passed": true,
+      "source": "real Chromium + HTTP; fixture vehicles with unknown telemetry; no vehicle connection",
+      "widths": [
+        1440,
+        1024,
+        390
+      ],
+      "javascript_errors": [],
+      "writer_calls": 0,
+      "three_types": true,
+      "unknown_values_preserved": true
+    },
+    "chinese-v2": {
+      "passed": true,
+      "source": "Chinese UI acceptance in Chrome; isolated fixtures, no vehicle transport.",
+      "javascript_errors": [],
+      "all_pages": true,
+      "chinese_search": true,
+      "original_values_preserved": true,
+      "option_wire_values_preserved": true,
+      "user_names_preserved": true,
+      "zero_vehicle_writes": true
+    },
+    "control-regression": {
+      "passed": true,
+      "source": "Actual Chromium/HTTP UI with explicit fixture telemetry; not SITL evidence.",
+      "javascript_errors": [],
+      "three_types": true,
+      "send_switch": true,
+      "per_action_authorization": false,
+      "one_login_across_pages": true,
+      "refresh_restores_session": true,
+      "reconnect_stays_observer": true,
+      "logout": true,
+      "expiry": true,
+      "widths": [
+        1680,
+        1280,
+        1024,
+        768,
+        390
+      ],
+      "vehicle_writes": 0,
+      "tool_shortcut_actual_process": true
+    },
+    "remote-tools": {
+      "passed": true,
+      "source": "actual Chrome/HTTP/Agent/process integration; tool is a test executable, not native robotics software",
+      "javascript_errors": [],
+      "launch_stop_restart": true,
+      "profile_saved": true,
+      "disconnect_unknown": true,
+      "actual_instance_count": 2,
+      "vehicle_actions": 0
+    },
+    "workspaces": {
+      "passed": true,
+      "source": "real Chromium/HTTP/Agent; two actual process fixtures, not native robotics integration",
+      "javascript_errors": [],
+      "actual_processes": 2,
+      "dependency_order": true,
+      "save_does_not_launch": true,
+      "edit_keeps_live_instances": true,
+      "stop_cleanup": true,
+      "template_loaded": true,
+      "web_disconnect_unknown_and_reconnect": true
+    }
+  },
+  "raw_directory": "artifacts/web-navigation",
+  "scope": "Navigation, links, responsive UI, original auth/control regression and real owned C01 Copter lifecycle. No movement, GUI restart or new flight qualification claimed."
+}

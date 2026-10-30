@@ -40,6 +40,10 @@ Ctrl+C 或页面“关闭整个控制台”调用原退出流程，独立 system
 SITL 遥测，不转发指令；没有可验证图形会话时不声称 GUI 成功。
 [配置和使用](docs/CONTROL_CENTER_GUIDE.md)、[真实本机验收报告](docs/CONTROL_CENTER_TEST_REPORT.md)。
 
+Web 日常导航统一为“车辆总览 / 仿真中心 / 车辆控制 / 任务编排 / 工具与系统”。
+Gazebo GUI、RViz2、QGC 和本机日志集中在“工具与系统”；未配置的远程页面不显示。
+旧工具书签自动跳到新位置，动作实验室放在“高级功能”。
+
 ## V1.1 阶段一基础控制
 
 改造范围与增量合同见 [V1.1 记录目录](docs/v1.1/README.md)。专用入口只创建

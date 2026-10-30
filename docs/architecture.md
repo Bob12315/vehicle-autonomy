@@ -1,5 +1,16 @@
 # V1 framework boundary
 
+## Shared Web navigation (2026-10-30)
+
+`app/web/navigation.py` describes available page entries through the authenticated
+read-only `/api/ui/navigation` endpoint. All current Mission/Control Center pages
+use `static/navigation.js`; they no longer maintain independent sidebar lists.
+Local tools/logs/system information stay under `/center`. Remote menus are shown
+for explicitly configured or registered Agent hosts, including disconnected ones.
+Old local remote-tool bookmarks map to the corresponding local sections. The
+legacy Mission editor remains a compatibility route outside the daily menu.
+Navigation visibility grants no control, SEND, tool command or process ownership.
+
 ## Local Control Center lifecycle (2026-10-30)
 
 `./control-center` composes the existing MissionControl/SimulationManager and

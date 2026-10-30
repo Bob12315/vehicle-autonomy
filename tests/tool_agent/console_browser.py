@@ -40,8 +40,13 @@ def run(directory):
             expect(page.locator('#context-namespace')).to_have_value('/'+kind)
             expect(page.locator('#metric-connection')).to_have_text('已断开');expect(page.locator('#metric-armed')).to_have_text('未知')
         page.screenshot(path=str(directory/'dashboard-desktop.png'),full_page=True)
-        for name in ('tools','workspaces','logs','settings','dashboard'):
-            page.locator(f'[data-view={name}]').click();expect(page.locator(f'[data-panel={name}]')).to_be_visible()
+        # No ToolService is configured in this fixture; only real page entries
+        # are offered. Remote forms are covered by tools/workspaces_browser.
+        expect(page.locator('[data-view=tools]')).to_have_count(0)
+        for name in ('tools','workspaces','logs','settings'):
+            page.goto(f'http://127.0.0.1:{server.server_address[1]}/console#'+name)
+            page.wait_for_url('**/console#dashboard')
+            expect(page.locator('[data-panel=dashboard]')).to_be_visible()
         report['widths']=[]
         for width in (1440,1024,390):
             page.set_viewport_size({'width':width,'height':950})

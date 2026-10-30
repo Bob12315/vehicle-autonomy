@@ -26,6 +26,9 @@ class ActionLab:
     def _run(self):
         while not self._stop.wait(self.scheduler_period_s):self.runtime.tick()
     def handle(self,operation,payload):
+        if operation=='ui.navigation':
+            if payload:raise ValueError('navigation takes no arguments')
+            return dict(local=False,remote=False,items=[dict(id='actions',href='/',label='动作实验室',description='单个 Action 调试')],advanced=[])
         if operation=='vehicles':return [d.info() for d in self.drivers.values()]
         if operation=='catalog':
             target=payload.get('target')
@@ -72,6 +75,7 @@ class ActionLabHandler(Handler):
     def do_GET(self):
         if self.auth_get():return
         static={'/':('action-lab.html','text/html; charset=utf-8'),
+            '/navigation.js':('navigation.js','application/javascript'),'/tool-console.css':('tool-console.css','text/css'),
             '/action-lab.js':('action-lab.js','application/javascript'),'/action-lab.css':('action-lab.css','text/css')}
         if self.path in static:
             name,kind=static[self.path]
@@ -81,6 +85,7 @@ class ActionLabHandler(Handler):
         try:parts=urlsplit(self.path);query=parse_qs(parts.query,strict_parsing=True)
         except ValueError:self.reply(400,{'ok':False,'error':'invalid Action query'});return
         routes={'/api/vehicles':'vehicles','/api/actions':'catalog','/api/instances':'instances','/api/resources':'resources'}
+        routes['/api/ui/navigation']='ui.navigation'
         if parts.path not in routes or query.keys()-{'target'} or any(len(v)!=1 for v in query.values()):
             self.reply(404,{'ok':False,'error':'unknown Action route'});return
         self.invoke(routes[parts.path],{k:v[0] for k,v in query.items()})

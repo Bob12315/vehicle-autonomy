@@ -35,14 +35,19 @@ def run(directory):
             page.locator('#login-submit').click()
             expect(page.locator('#login-error')).to_contain_text('密码')
             login(page, h.base, h.token)
-            for name, title in [('dashboard','车辆总览'), ('tools','工具管理'),
-                                ('workspaces','工作环境'), ('logs','日志与诊断'), ('settings','设置')]:
+            for name, title in [('dashboard','车辆总览')]:
                 page.goto(h.base+'/console#'+name)
                 expect(page.locator('h1')).to_have_text(title)
-                expect(page.locator('nav')).to_contain_text('任务编排')
+                expect(page.get_by_role('navigation',name='主导航',exact=True)).to_contain_text('任务编排')
                 assert '/login' not in page.url
-                if name in ('dashboard', 'settings'):
-                    page.screenshot(path=str(directory/(name+'.png')), full_page=True)
+                page.screenshot(path=str(directory/(name+'.png')), full_page=True)
+            # This deployment has no remote Tool Agent configuration. Old links
+            # return to the usable overview instead of presenting inert forms.
+            for name in ('tools','workspaces','logs','settings'):
+                page.goto(h.base+'/console#'+name)
+                page.wait_for_url('**/console#dashboard')
+                expect(page.locator('#page-title')).to_have_text('车辆总览')
+            expect(page.locator('[data-nav-id=tools]')).to_have_count(0)
             page.goto(h.base+'/control')
             for kind, title in [('rover','地面车'), ('copter','多旋翼'), ('plane','固定翼')]:
                 page.locator('#target').select_option(kind)

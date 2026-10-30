@@ -57,9 +57,10 @@ class ServiceTests(unittest.TestCase):
         self.assertEqual(self.api('/api/actions')[0],200)
         for path in ('/control','/console'):
             with urlopen(Request(self.base+path,headers={'Authorization':'Bearer '+self.token})) as response:html=response.read().decode()
-            navigation=html.split('<nav ',1)[1].split('</nav>',1)[0]
-            self.assertIn('href="/studio"',navigation)
-            self.assertIn('任务编排',navigation)
+            self.assertIn('data-navigation',html)
+            self.assertIn('/navigation.js',html)
+        navigation=self.api('/api/ui/navigation')[1]['result']
+        self.assertIn(dict(id='studio',href='/studio',label='任务编排',description='任务编辑与运行'),navigation['items'])
 
     def test_console_uses_existing_state_and_preserves_auth_and_no_writes(self):
         self.assertEqual(self.api('/api/console/state',auth=False)[0],401)

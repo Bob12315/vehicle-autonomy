@@ -70,6 +70,7 @@ def main(*,studio=False):
             lab=MissionControl(drivers,args.data_dir,studio_demo=args.studio_demo,simulation_allow_send=args.allow_send)
             from vehicle_autonomy.app.tools.service import ToolService
             tool_service=ToolService(args.tool_data_dir or args.data_dir/'tools');lab.tool_service=tool_service
+            tool_service.remote_enabled=bool(args.tool_agents)
             if args.tool_agents:
                 from vehicle_autonomy.app.tools.broker import AgentServer
                 from vehicle_autonomy.app.tools.schema import object_fields,identifier

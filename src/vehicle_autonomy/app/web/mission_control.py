@@ -212,6 +212,10 @@ class MissionControl(ActionLab):
             **({'local_control_center':summary()} if callable(summary) else {}))
 
     def handle(self, operation, payload):
+        if operation == 'ui.navigation':
+            if payload: raise ValueError('navigation takes no arguments')
+            from .navigation import navigation
+            return navigation(self)
         if operation.startswith('simulation.'):
             if self.simulation_manager is None:raise ValueError('Simulation manager unavailable')
             return self.simulation_manager.handle(operation,payload)
@@ -479,6 +483,7 @@ class MissionControlHandler(ActionLabHandler):
             from .live import stream
             stream(self);return
         static = {'/simulation':('simulation-center.html','text/html; charset=utf-8'),
+            '/navigation.js':('navigation.js','application/javascript'),
             '/center':('control-center.html','text/html; charset=utf-8'),
             '/control-center.js':('control-center.js','application/javascript'),
             '/simulation-center.js':('simulation-center.js','application/javascript'),
@@ -521,6 +526,7 @@ class MissionControlHandler(ActionLabHandler):
             except ValueError as exc:self.reply(400,dict(ok=False,error=str(exc)));return
             self.invoke('manual.state',dict(session_id=identifier));return
         routes = {'/api/console/state':'console.state','/api/studio/state':'studio.state','/api/missions/library':'mission.library','/api/missions/types':'mission.types'}
+        routes['/api/ui/navigation']='ui.navigation'
         routes.update({'/api/studio-b/catalog':'studio-b.catalog','/api/studio-b/library':'studio-b.library'})
         routes['/api/control/state']='control.snapshot'
         routes['/api/center/state']='center.state'

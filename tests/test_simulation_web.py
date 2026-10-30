@@ -127,4 +127,6 @@ class SimulationWebTests(unittest.TestCase):
         self.assertIn('非实时渲染',html)
         self.assertIn('SEND 默认关闭',html)
         for route in ('/console','/control','/studio'):
-            self.assertIn('href="/simulation"',self.c.call(route)[1].decode())
+            self.assertIn('data-navigation',self.c.call(route)[1].decode())
+        navigation=self.c.call('/api/ui/navigation')[1]['result']
+        self.assertTrue(any(item['href']=='/simulation' for item in navigation['items']))
