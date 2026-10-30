@@ -16,13 +16,15 @@ MissionControl 与 Web，自动打开 `http://127.0.0.1:8780/center`。使用本
 就绪后可直接点击“打开 Gazebo 三维窗口”，也可回到“本地控制台”选择当前 World
 并打开工具。已有 `/control`、`/studio`、`/console` 保留，侧栏均有控制台入口。
 
-若需要亲自操作**自有本机仿真车辆**，启动时显式使用：
+默认启动已允许手动操作**自有本机仿真车辆**，以下两条命令等价：
 
 ```bash
+./control-center
 ./control-center --allow-send
 ```
 
-这只允许原部署授权；车辆页的 SEND 开关仍默认关闭。车辆指令继续经原
+这只允许原部署授权；车辆页的 SEND 开关仍默认关闭。仅观察时使用
+`./control-center --read-only`。修改启动参数需要退出旧控制台后再启动，不会原地提升旧仿真实例的授权。车辆指令继续经原
 Action、Execution、Safety、Authority、唯一 MAVLink Writer，Lease / TTL / session /
 generation 与物理退出不确定性不变。QGC 本轮只观察遥测，不能借此控制车辆。
 

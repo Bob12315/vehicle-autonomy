@@ -13,15 +13,22 @@ from vehicle_autonomy._resources import resource_root
 from .supervisor import lock_workspace,service_command,service_state,unit_name,process_identity,atomic
 
 
-def main():
-    parser=argparse.ArgumentParser(description='本地统一控制中心；默认无场景、无工具、无 SEND。')
+def parse_args(argv=None):
+    parser=argparse.ArgumentParser(description='本地统一控制中心；默认允许自有仿真部署授权，页面 SEND 默认关闭。')
     parser.add_argument('--port',type=int,default=8780)
-    parser.add_argument('--allow-send',action='store_true',help='允许自有仿真部署授权；页面 SEND 仍默认关闭')
+    authorization=parser.add_mutually_exclusive_group()
+    authorization.add_argument('--allow-send',dest='allow_send',action='store_true',help='允许自有仿真部署授权（默认）；页面 SEND 仍默认关闭')
+    authorization.add_argument('--read-only',dest='allow_send',action='store_false',help='仅观察，不允许获取仿真控制权')
+    parser.set_defaults(allow_send=True)
     parser.add_argument('--no-browser',action='store_true')
     parser.add_argument('--config',type=Path)
     parser.add_argument('--check',action='store_true',help='仅检查环境，不启动服务')
     parser.add_argument('--set-password',action='store_true',help='设置本机登录密码；运行中的控制台须先关闭')
-    args=parser.parse_args();root=resource_root().resolve()
+    return parser.parse_args(argv)
+
+
+def main():
+    args=parse_args();root=resource_root().resolve()
     if args.check:
         from .registry import inspect_host
         print(json.dumps(inspect_host(root,args.config),ensure_ascii=False,indent=2));return 0
@@ -69,6 +76,7 @@ def main():
             print('控制中心：'+state['url'],flush=True)
             print('登录方式：使用已设置的密码。',flush=True)
             print('日志目录：'+str(directory),flush=True)
+            print('自有仿真部署授权：'+('允许手动控制' if state['deployment_send'] else '只读观察'),flush=True)
             print('会话：'+state['session_id']+' · 默认无场景、无工具、SEND 关闭',flush=True)
             print('Ctrl+C 或页面“关闭控制台”会关闭本次自有仿真和工具。',flush=True)
             if not args.no_browser and (os.environ.get('DISPLAY') or os.environ.get('WAYLAND_DISPLAY')):

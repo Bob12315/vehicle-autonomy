@@ -329,5 +329,38 @@
       "src/vehicle_autonomy/app/web/static/manual-control.js": "20c2c8711fbea389898078e88fb7cb3701763f8d6eee93f2cbc99c096143b81c",
       "src/vehicle_autonomy/app/web/static/manual-control.html": "c94edbbb7f20c48e324d7c7d122422988f3e8b6d0eeef8621414eb03002d51b4"
     }
+  },
+  "default_simulation_authorization_update": {
+    "date": "2026-10-30",
+    "status": "PASS",
+    "unit_tests": 928,
+    "unit_log": "/home/level6/vehicle-autonomy-framework/artifacts/control-center/default-send-verified/unit.log",
+    "native_result": "/home/level6/vehicle-autonomy-framework/artifacts/control-center/default-send-verified/result.json",
+    "checks": [
+      {
+        "mode": "default",
+        "deployment_send": true,
+        "system_send": false,
+        "action_send": false,
+        "armed": false,
+        "control_button_enabled": true,
+        "session_id": "center-be456f27ae7849ddba4677638c38ed4e"
+      },
+      {
+        "mode": "readonly",
+        "deployment_send": false,
+        "system_send": false,
+        "action_send": false,
+        "armed": false,
+        "control_button_enabled": false,
+        "session_id": "center-34ed75183d69492c8f631fae62443309"
+      }
+    ],
+    "existing_backend_preserved": 154155,
+    "no_vehicle_actions": true,
+    "implementation_sha256": {
+      "src/vehicle_autonomy/app/control_center/launcher.py": "495e6fb4ac0a4a3476187ff0d89d8580bc5ed9feaa8c482d607f84cd99e99ed5",
+      "tests/test_control_center.py": "f43c6bdfb295420b4f5f4b6464815ed7942d7aa82437a5b9e49f0d756c43a64d"
+    }
   }
 }

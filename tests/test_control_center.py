@@ -18,6 +18,13 @@ ROOT=Path(__file__).resolve().parents[1]
 
 
 class SupervisorContracts(unittest.TestCase):
+    def test_launcher_defaults_to_owned_simulation_authorization_with_read_only_override(self):
+        from vehicle_autonomy.app.control_center.launcher import parse_args
+        self.assertTrue(parse_args([]).allow_send)
+        self.assertTrue(parse_args(['--allow-send']).allow_send)
+        self.assertFalse(parse_args(['--read-only']).allow_send)
+        with patch('sys.stderr'),self.assertRaises(SystemExit):parse_args(['--read-only','--allow-send'])
+
     def test_kernel_cleanup_boundary_and_no_restart(self):
         command=service_command(ROOT,Path('/tmp/center-evidence'),[],123,'456')
         for argument in ('--property=KillMode=mixed','--property=ExitType=main','--property=SendSIGKILL=yes','--property=Restart=no'):
