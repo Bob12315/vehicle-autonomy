@@ -1,0 +1,138 @@
+{
+  "schema_version": 2,
+  "mission_id": "Example_Air_HoverLand",
+  "revision": 0,
+  "version": "1.0.0",
+  "name": "多旋翼：起飞悬停后原地降落",
+  "target": "copter",
+  "supported_vehicles": [
+    "copter"
+  ],
+  "nodes": [
+    {
+      "node_id": "start",
+      "type": "Start"
+    },
+    {
+      "node_id": "state",
+      "type": "Action",
+      "action_type": "GetVehicleState",
+      "parameters": {},
+      "action_contract_version": "1.0.0"
+    },
+    {
+      "node_id": "guided",
+      "type": "Action",
+      "action_type": "SetMode",
+      "parameters": {
+        "mode": "GUIDED"
+      },
+      "action_contract_version": "1.0.0"
+    },
+    {
+      "node_id": "arm",
+      "type": "Action",
+      "action_type": "Arm",
+      "parameters": {},
+      "action_contract_version": "1.0.0"
+    },
+    {
+      "node_id": "takeoff",
+      "type": "Action",
+      "action_type": "Takeoff",
+      "parameters": {
+        "height_m": 1.5
+      },
+      "action_contract_version": "1.0.0"
+    },
+    {
+      "node_id": "hover",
+      "type": "Wait",
+      "parameters": {
+        "duration_s": 2.0
+      }
+    },
+    {
+      "node_id": "land",
+      "type": "Action",
+      "action_type": "Land",
+      "parameters": {},
+      "action_contract_version": "1.0.0"
+    },
+    {
+      "node_id": "final_state",
+      "type": "Action",
+      "action_type": "GetVehicleState",
+      "parameters": {},
+      "action_contract_version": "1.0.0"
+    },
+    {
+      "node_id": "end",
+      "type": "End"
+    }
+  ],
+  "edges": [
+    {
+      "edge_id": "e_start_next_state",
+      "source": "start",
+      "target": "state",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_state_next_guided",
+      "source": "state",
+      "target": "guided",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_guided_next_arm",
+      "source": "guided",
+      "target": "arm",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_arm_next_takeoff",
+      "source": "arm",
+      "target": "takeoff",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_takeoff_next_hover",
+      "source": "takeoff",
+      "target": "hover",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_hover_next_land",
+      "source": "hover",
+      "target": "land",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_land_next_final_state",
+      "source": "land",
+      "target": "final_state",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_final_state_next_end",
+      "source": "final_state",
+      "target": "end",
+      "port": "next"
+    }
+  ],
+  "metadata": {
+    "tags": [
+      "simulation",
+      "standard-example"
+    ],
+    "description": "自有 Copter SITL：起飞到 1.5 米，等待 2 秒，由 Land 确认落地和上锁；等待节点本身不是独立悬停控制器。",
+    "example_source": "04_air_hover_land.json",
+    "simulation_only": true,
+    "requires_send": true
+  },
+  "blackboard": {},
+  "execution_policy": {
+    "timeout_s": 90
+  }
+}

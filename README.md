@@ -63,6 +63,7 @@ GUI、RViz2、QGC 按需打开。关闭控制台只清理本次自有进程；�
 
 ## 使用入口与验证
 
+- [六个可直接使用的 Mission 示例](simulation/missions/examples/README.md)：只读采样、条件分支、地面巡检、多旋翼和固定翼任务。
 - [控制中心](docs/CONTROL_CENTER_GUIDE.md)、[仿真中心](docs/SIMULATION_WEB_UI_GUIDE.md)
 - [车辆基础仿真](docs/simulation/program-start.md)、[Mission Studio](docs/MISSION_STUDIO_USER_GUIDE.md)
 - [ROS 2 操作流程](docs/ROS2_OPERATOR_WORKFLOW.md)、[只读硬件部署](docs/hardware_deployment.md)

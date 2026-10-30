@@ -1,0 +1,172 @@
+{
+  "schema_version": 2,
+  "mission_id": "Example_Air_SurveyReturn",
+  "revision": 0,
+  "version": "1.0.0",
+  "name": "多旋翼：双点观测后返航降落",
+  "target": "copter",
+  "supported_vehicles": [
+    "copter"
+  ],
+  "nodes": [
+    {
+      "node_id": "start",
+      "type": "Start"
+    },
+    {
+      "node_id": "state",
+      "type": "Action",
+      "action_type": "GetVehicleState",
+      "parameters": {},
+      "action_contract_version": "1.0.0"
+    },
+    {
+      "node_id": "guided",
+      "type": "Action",
+      "action_type": "SetMode",
+      "parameters": {
+        "mode": "GUIDED"
+      },
+      "action_contract_version": "1.0.0"
+    },
+    {
+      "node_id": "arm",
+      "type": "Action",
+      "action_type": "Arm",
+      "parameters": {},
+      "action_contract_version": "1.0.0"
+    },
+    {
+      "node_id": "takeoff",
+      "type": "Action",
+      "action_type": "Takeoff",
+      "parameters": {
+        "height_m": 1.5
+      },
+      "action_contract_version": "1.0.0"
+    },
+    {
+      "node_id": "first",
+      "type": "Action",
+      "action_type": "Goto",
+      "parameters": {
+        "x_m": 1.0,
+        "y_m": 0.0,
+        "z_m": 1.5
+      },
+      "action_contract_version": "1.0.0"
+    },
+    {
+      "node_id": "observe",
+      "type": "Wait",
+      "parameters": {
+        "duration_s": 1.0
+      }
+    },
+    {
+      "node_id": "second",
+      "type": "Action",
+      "action_type": "Goto",
+      "parameters": {
+        "x_m": 1.0,
+        "y_m": 1.0,
+        "z_m": 1.5
+      },
+      "action_contract_version": "1.0.0"
+    },
+    {
+      "node_id": "return_home",
+      "type": "Action",
+      "action_type": "ReturnHome",
+      "parameters": {},
+      "action_contract_version": "1.0.0"
+    },
+    {
+      "node_id": "final_state",
+      "type": "Action",
+      "action_type": "GetVehicleState",
+      "parameters": {},
+      "action_contract_version": "1.0.0"
+    },
+    {
+      "node_id": "end",
+      "type": "End"
+    }
+  ],
+  "edges": [
+    {
+      "edge_id": "e_start_next_state",
+      "source": "start",
+      "target": "state",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_state_next_guided",
+      "source": "state",
+      "target": "guided",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_guided_next_arm",
+      "source": "guided",
+      "target": "arm",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_arm_next_takeoff",
+      "source": "arm",
+      "target": "takeoff",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_takeoff_next_first",
+      "source": "takeoff",
+      "target": "first",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_first_next_observe",
+      "source": "first",
+      "target": "observe",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_observe_next_second",
+      "source": "observe",
+      "target": "second",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_second_next_return_home",
+      "source": "second",
+      "target": "return_home",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_return_home_next_final_state",
+      "source": "return_home",
+      "target": "final_state",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_final_state_next_end",
+      "source": "final_state",
+      "target": "end",
+      "port": "next"
+    }
+  ],
+  "metadata": {
+    "tags": [
+      "simulation",
+      "standard-example"
+    ],
+    "description": "自有 Copter SITL：1.5 米高度依次观察 odom (1,0)、(1,1)，然后用原生 ReturnHome 等待返航落地和上锁。",
+    "example_source": "05_air_survey_return.json",
+    "simulation_only": true,
+    "requires_send": true
+  },
+  "blackboard": {},
+  "execution_policy": {
+    "timeout_s": 180
+  }
+}

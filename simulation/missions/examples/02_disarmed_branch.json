@@ -1,0 +1,116 @@
+{
+  "schema_version": 2,
+  "mission_id": "Example_DisarmedBranch",
+  "revision": 0,
+  "version": "1.0.0",
+  "name": "只读：上锁状态条件分支",
+  "target": "rover",
+  "supported_vehicles": [
+    "rover",
+    "copter",
+    "plane"
+  ],
+  "nodes": [
+    {
+      "node_id": "start",
+      "type": "Start"
+    },
+    {
+      "node_id": "snapshot",
+      "type": "Action",
+      "action_type": "GetVehicleState",
+      "parameters": {},
+      "action_contract_version": "1.0.0"
+    },
+    {
+      "node_id": "condition",
+      "type": "Condition",
+      "execution_policy": {
+        "expression": {
+          "op": "eq",
+          "source": "world",
+          "path": "vehicle.operation.armed",
+          "value": false,
+          "max_age_s": 3
+        }
+      }
+    },
+    {
+      "node_id": "confirmed",
+      "type": "Wait",
+      "parameters": {
+        "duration_s": 0.2
+      }
+    },
+    {
+      "node_id": "armed",
+      "type": "End",
+      "execution_policy": {
+        "outcome": "FAILED"
+      }
+    },
+    {
+      "node_id": "unknown",
+      "type": "End",
+      "execution_policy": {
+        "outcome": "UNKNOWN"
+      }
+    },
+    {
+      "node_id": "end",
+      "type": "End"
+    }
+  ],
+  "edges": [
+    {
+      "edge_id": "e_start_next_snapshot",
+      "source": "start",
+      "target": "snapshot",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_snapshot_next_condition",
+      "source": "snapshot",
+      "target": "condition",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_condition_true_confirmed",
+      "source": "condition",
+      "target": "confirmed",
+      "port": "true"
+    },
+    {
+      "edge_id": "e_condition_false_armed",
+      "source": "condition",
+      "target": "armed",
+      "port": "false"
+    },
+    {
+      "edge_id": "e_condition_unknown_unknown",
+      "source": "condition",
+      "target": "unknown",
+      "port": "unknown"
+    },
+    {
+      "edge_id": "e_condition_next_end",
+      "source": "condition",
+      "target": "end",
+      "port": "next"
+    }
+  ],
+  "metadata": {
+    "tags": [
+      "simulation",
+      "standard-example"
+    ],
+    "description": "只检查三秒内新鲜的解锁状态：已上锁走成功，已解锁走失败，缺失或过期走 UNKNOWN；不代表整车或起飞资格。",
+    "example_source": "02_disarmed_branch.json",
+    "simulation_only": true,
+    "requires_send": false
+  },
+  "blackboard": {},
+  "execution_policy": {
+    "timeout_s": 30
+  }
+}

@@ -1,0 +1,133 @@
+{
+  "schema_version": 2,
+  "mission_id": "Example_StateSurvey",
+  "revision": 0,
+  "version": "1.0.0",
+  "name": "只读：三次状态采样",
+  "target": "rover",
+  "supported_vehicles": [
+    "rover",
+    "copter",
+    "plane"
+  ],
+  "nodes": [
+    {
+      "node_id": "start",
+      "type": "Start"
+    },
+    {
+      "node_id": "samples",
+      "type": "ForEach",
+      "execution_policy": {
+        "collection": {
+          "ref": "mission.sample_numbers"
+        },
+        "max_iterations": 3,
+        "on_item_failure": "abort"
+      }
+    },
+    {
+      "node_id": "snapshot",
+      "type": "Action",
+      "action_type": "GetVehicleState",
+      "parameters": {},
+      "output_bindings": {
+        "read_only": {
+          "ref": "mission.read_only_flags",
+          "mode": "append"
+        },
+        "kind": {
+          "ref": "mission.vehicle_kinds",
+          "mode": "append"
+        }
+      },
+      "action_contract_version": "1.0.0"
+    },
+    {
+      "node_id": "interval",
+      "type": "Wait",
+      "parameters": {
+        "duration_s": 0.5
+      }
+    },
+    {
+      "node_id": "end",
+      "type": "End"
+    }
+  ],
+  "edges": [
+    {
+      "edge_id": "e_start_next_samples",
+      "source": "start",
+      "target": "samples",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_samples_body_snapshot",
+      "source": "samples",
+      "target": "snapshot",
+      "port": "body"
+    },
+    {
+      "edge_id": "e_snapshot_next_interval",
+      "source": "snapshot",
+      "target": "interval",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_samples_next_end",
+      "source": "samples",
+      "target": "end",
+      "port": "next"
+    }
+  ],
+  "metadata": {
+    "tags": [
+      "simulation",
+      "standard-example"
+    ],
+    "description": "保持 SEND 关闭，顺序读取三次状态，间隔 0.5 秒；完整观测在每次 Action 的结果中查看。",
+    "example_source": "01_state_survey.json",
+    "simulation_only": true,
+    "requires_send": false
+  },
+  "blackboard": {
+    "sample_numbers": {
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "integer"
+        }
+      },
+      "max_age_s": 120,
+      "default": [
+        1,
+        2,
+        3
+      ]
+    },
+    "read_only_flags": {
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "boolean"
+        }
+      },
+      "max_age_s": 120,
+      "default": []
+    },
+    "vehicle_kinds": {
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "max_age_s": 120,
+      "default": []
+    }
+  },
+  "execution_policy": {
+    "timeout_s": 30
+  }
+}

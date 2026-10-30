@@ -1,0 +1,203 @@
+{
+  "schema_version": 2,
+  "mission_id": "Example_Runway_Inspection",
+  "revision": 0,
+  "version": "1.0.0",
+  "name": "固定翼：跑道起飞导航与自动降落",
+  "target": "plane",
+  "supported_vehicles": [
+    "plane"
+  ],
+  "nodes": [
+    {
+      "node_id": "start",
+      "type": "Start"
+    },
+    {
+      "node_id": "state",
+      "type": "Action",
+      "action_type": "GetVehicleState",
+      "action_contract_version": "1.0.0"
+    },
+    {
+      "node_id": "manual",
+      "type": "Action",
+      "action_type": "SetMode",
+      "parameters": {
+        "mode": "MANUAL"
+      },
+      "action_contract_version": "1.0.0"
+    },
+    {
+      "node_id": "arm",
+      "type": "Action",
+      "action_type": "Arm",
+      "action_contract_version": "1.0.0"
+    },
+    {
+      "node_id": "takeoff",
+      "type": "Action",
+      "action_type": "Takeoff",
+      "parameters": {
+        "height_m": 50.0
+      },
+      "action_contract_version": "1.0.0"
+    },
+    {
+      "node_id": "navigate",
+      "type": "Action",
+      "action_type": "SetGuidedTarget",
+      "parameters": {
+        "altitude_amsl_m": 634.0
+      },
+      "input_bindings": {
+        "latitude_deg": {
+          "source": "world",
+          "path": "vehicle.global_position.value.latitude_deg",
+          "frame": "earth",
+          "max_age_s": 3,
+          "offset": 0.001347472926179282
+        },
+        "longitude_deg": {
+          "source": "world",
+          "path": "vehicle.global_position.value.longitude_deg",
+          "frame": "earth",
+          "max_age_s": 3
+        }
+      },
+      "action_contract_version": "1.0.0"
+    },
+    {
+      "node_id": "observe",
+      "type": "Wait",
+      "parameters": {
+        "duration_s": 90.0
+      }
+    },
+    {
+      "node_id": "loiter",
+      "type": "Action",
+      "action_type": "Loiter",
+      "action_contract_version": "1.0.0"
+    },
+    {
+      "node_id": "loiter_wait",
+      "type": "Wait",
+      "parameters": {
+        "duration_s": 5.0
+      }
+    },
+    {
+      "node_id": "rtl",
+      "type": "Action",
+      "action_type": "RTL",
+      "action_contract_version": "1.0.0"
+    },
+    {
+      "node_id": "rtl_wait",
+      "type": "Wait",
+      "parameters": {
+        "duration_s": 5.0
+      }
+    },
+    {
+      "node_id": "land",
+      "type": "Action",
+      "action_type": "AutoLand",
+      "action_contract_version": "1.0.0"
+    },
+    {
+      "node_id": "end",
+      "type": "End"
+    }
+  ],
+  "edges": [
+    {
+      "edge_id": "e_start_next_state",
+      "source": "start",
+      "target": "state",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_state_next_manual",
+      "source": "state",
+      "target": "manual",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_manual_next_arm",
+      "source": "manual",
+      "target": "arm",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_arm_next_takeoff",
+      "source": "arm",
+      "target": "takeoff",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_takeoff_next_navigate",
+      "source": "takeoff",
+      "target": "navigate",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_navigate_next_observe",
+      "source": "navigate",
+      "target": "observe",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_observe_next_loiter",
+      "source": "observe",
+      "target": "loiter",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_loiter_next_loiter_wait",
+      "source": "loiter",
+      "target": "loiter_wait",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_loiter_wait_next_rtl",
+      "source": "loiter_wait",
+      "target": "rtl",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_rtl_next_rtl_wait",
+      "source": "rtl",
+      "target": "rtl_wait",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_rtl_wait_next_land",
+      "source": "rtl_wait",
+      "target": "land",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_land_next_end",
+      "source": "land",
+      "target": "end",
+      "port": "next"
+    }
+  ],
+  "metadata": {
+    "tags": [
+      "simulation",
+      "standard-example"
+    ],
+    "description": "复用受测固定翼跑道任务：50 米起飞、634 米 AMSL 目标、盘旋、RTL、AutoLand。仅限已审计的自有跑道 profile，配置确认不代表到达。",
+    "warning": "Only the audited owned runway profile: 50 m takeoff / 634 m AMSL target. GUIDED/LOITER/RTL ACKs confirm configuration, not arrival.",
+    "example_source": "06_runway_inspection.json",
+    "simulation_only": true,
+    "requires_send": true
+  },
+  "blackboard": {},
+  "execution_policy": {
+    "timeout_s": 900
+  }
+}

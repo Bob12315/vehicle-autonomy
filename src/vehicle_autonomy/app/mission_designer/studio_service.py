@@ -20,6 +20,16 @@ class StudioService:
             data=self.library.snapshot()
             context=driver.context()
             if not context.owned_simulation:continue
+            from .mission_examples import examples
+            for definition in examples(target,context.target_kind):
+                identifier=definition['mission_id']
+                if identifier in data['templates']:continue
+                try:
+                    for n in definition['nodes']:
+                        if n['type']=='Action':self.service.registry.resolve_typed(n['action_type'],n['action_contract_version'])
+                except ValueError:continue
+                self.library.template(identifier,definition)
+                data=self.library.snapshot()
             if context.target_kind=='rover' and 'Rover_Inspection' not in data['templates']:
                 try:self.service.registry.resolve_typed('Goto');self.service.registry.resolve_typed('Stop')
                 except ValueError:continue
@@ -91,6 +101,9 @@ class StudioService:
             return dict(provider='navigation_goal',goals=self.service.visualization_goals.view(p['target']),
                 limitations='Only current odom position proposals. Orientation and unqualified map transforms are not imported. QGC import is not installed.')
         if op=='library':
+            # Control Center attaches explicitly owned Drivers after startup.
+            # Seed definitions lazily; this never grants SEND or starts a Run.
+            self.install_examples()
             data=self.library.snapshot()
             runs=[{k:v.get(k) for k in ('id','target','state','release_safe','error','started_at')} for v in self.service.missions.views()]
             return dict(**data,runs=runs,legacy_versions=list(self.service.journal.data['versions'].values()))

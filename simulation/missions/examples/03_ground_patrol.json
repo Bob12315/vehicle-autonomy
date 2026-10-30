@@ -1,0 +1,246 @@
+{
+  "schema_version": 2,
+  "mission_id": "Example_Ground_Patrol",
+  "revision": 0,
+  "version": "1.0.0",
+  "name": "地面车：直线三站巡检后停车上锁",
+  "target": "rover",
+  "supported_vehicles": [
+    "rover"
+  ],
+  "nodes": [
+    {
+      "node_id": "start",
+      "type": "Start"
+    },
+    {
+      "node_id": "state",
+      "type": "Action",
+      "action_type": "GetVehicleState",
+      "parameters": {},
+      "action_contract_version": "1.0.0"
+    },
+    {
+      "node_id": "guided",
+      "type": "Action",
+      "action_type": "SetMode",
+      "parameters": {
+        "mode": "GUIDED"
+      },
+      "action_contract_version": "1.0.0"
+    },
+    {
+      "node_id": "arm",
+      "type": "Action",
+      "action_type": "Arm",
+      "parameters": {},
+      "action_contract_version": "1.0.0"
+    },
+    {
+      "node_id": "point_1",
+      "type": "Action",
+      "action_type": "Goto",
+      "parameters": {
+        "x_m": 1.0,
+        "y_m": 0.0,
+        "z_m": 0.0
+      },
+      "action_contract_version": "1.0.0"
+    },
+    {
+      "node_id": "inspect_1",
+      "type": "Wait",
+      "parameters": {
+        "duration_s": 0.5
+      }
+    },
+    {
+      "node_id": "guided_2",
+      "type": "Action",
+      "action_type": "SetMode",
+      "parameters": {
+        "mode": "GUIDED"
+      },
+      "action_contract_version": "1.0.0"
+    },
+    {
+      "node_id": "point_2",
+      "type": "Action",
+      "action_type": "Goto",
+      "parameters": {
+        "x_m": 2.0,
+        "y_m": 0.0,
+        "z_m": 0.0
+      },
+      "action_contract_version": "1.0.0"
+    },
+    {
+      "node_id": "inspect_2",
+      "type": "Wait",
+      "parameters": {
+        "duration_s": 0.5
+      }
+    },
+    {
+      "node_id": "guided_3",
+      "type": "Action",
+      "action_type": "SetMode",
+      "parameters": {
+        "mode": "GUIDED"
+      },
+      "action_contract_version": "1.0.0"
+    },
+    {
+      "node_id": "point_3",
+      "type": "Action",
+      "action_type": "Goto",
+      "parameters": {
+        "x_m": 3.0,
+        "y_m": 0.0,
+        "z_m": 0.0
+      },
+      "action_contract_version": "1.0.0"
+    },
+    {
+      "node_id": "inspect_3",
+      "type": "Wait",
+      "parameters": {
+        "duration_s": 0.5
+      }
+    },
+    {
+      "node_id": "stop",
+      "type": "Action",
+      "action_type": "Stop",
+      "parameters": {},
+      "action_contract_version": "1.0.0"
+    },
+    {
+      "node_id": "disarm",
+      "type": "Action",
+      "action_type": "Disarm",
+      "parameters": {},
+      "action_contract_version": "1.0.0"
+    },
+    {
+      "node_id": "final_state",
+      "type": "Action",
+      "action_type": "GetVehicleState",
+      "parameters": {},
+      "action_contract_version": "1.0.0"
+    },
+    {
+      "node_id": "end",
+      "type": "End"
+    }
+  ],
+  "edges": [
+    {
+      "edge_id": "e_start_next_state",
+      "source": "start",
+      "target": "state",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_state_next_guided",
+      "source": "state",
+      "target": "guided",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_guided_next_arm",
+      "source": "guided",
+      "target": "arm",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_arm_next_point_1",
+      "source": "arm",
+      "target": "point_1",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_point_1_next_inspect_1",
+      "source": "point_1",
+      "target": "inspect_1",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_inspect_1_next_guided_2",
+      "source": "inspect_1",
+      "target": "guided_2",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_guided_2_next_point_2",
+      "source": "guided_2",
+      "target": "point_2",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_point_2_next_inspect_2",
+      "source": "point_2",
+      "target": "inspect_2",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_inspect_2_next_guided_3",
+      "source": "inspect_2",
+      "target": "guided_3",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_guided_3_next_point_3",
+      "source": "guided_3",
+      "target": "point_3",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_point_3_next_inspect_3",
+      "source": "point_3",
+      "target": "inspect_3",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_inspect_3_next_stop",
+      "source": "inspect_3",
+      "target": "stop",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_stop_next_disarm",
+      "source": "stop",
+      "target": "disarm",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_disarm_next_final_state",
+      "source": "disarm",
+      "target": "final_state",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_final_state_next_end",
+      "source": "final_state",
+      "target": "end",
+      "port": "next"
+    }
+  ],
+  "metadata": {
+    "tags": [
+      "simulation",
+      "standard-example"
+    ],
+    "description": "自有 Rover SITL：依次到 odom (1,0)、(2,0)、(3,0) 米，每站停留 0.5 秒，在第三站停车并上锁。只演示已验证直线路段；停车后下一段重新进入 GUIDED。",
+    "example_source": "03_ground_patrol.json",
+    "simulation_only": true,
+    "requires_send": true,
+    "coordinate_frame": "odom",
+    "coordinate_unit": "m",
+    "coordinate_origin": "qualified simulation deployment origin; not current vehicle position"
+  },
+  "blackboard": {},
+  "execution_policy": {
+    "timeout_s": 180
+  }
+}

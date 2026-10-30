@@ -82,6 +82,12 @@ SEND 关闭。若 Vehicle Control 已占用目标，先在那里释放。连接�
 
 ## 示例
 
+日常控制台连接自有仿真车辆后，可在“任务编排 → 模板”找到
+[六个新示例](../simulation/missions/examples/README.md)，也可直接导入该目录的 schema 2 JSON。
+包括只读三次采样、上锁状态条件分支、地面车三点巡检、多旋翼悬停降落、双点返航、
+固定翼跑道任务；这些模板不要求 `--studio-demo`，不会自动发布、运行或打开 SEND。
+导入或更换仿真后，先选择当前实际目标车辆，再验证、发布。
+
 `CUADC_MultiTarget_Simulation` 是纯软件场景：三个筒的尺寸来自声明的场景几何，像素框面积特意
 不同，选择 T-02、T-03。两个 ForEach/HandleTarget scope 分别追加结果。把 DetectContainers 的
 simulate_target_loss 设为 true，可验证一次目标丢失的 Recovery 和独立库存结果。
@@ -101,11 +107,11 @@ simulate_target_loss 设为 true，可验证一次目标丢失的 Recovery 和�
 ```
 
 原生脚本只创建并连接明确自有的新仿真进程；路径必须是新目录。Copter 同样支持 `--browser`。
-本机固定翼二进制在项目已有构建中，因此本轮使用：
+当前三车型二进制按 `environments` 的统一索引查找，不再使用历史 artifacts 软件目录。
+固定翼回归同样直接使用：
 
 ```bash
-VAF_SIMULATION_SITL_BIN_DIR=/home/level6/vehicle-autonomy-framework/artifacts/phase2-control/ardupilot-source/build/sitl/bin \
-  .venv/bin/python -m tests.simulation.studio_b_native --kind plane --browser \
+.venv/bin/python -m tests.simulation.studio_b_native --kind plane --browser \
   --run-dir artifacts/mission-studio-b/my-plane-test
 ```
 
