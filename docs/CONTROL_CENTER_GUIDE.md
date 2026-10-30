@@ -26,6 +26,9 @@ MissionControl 与 Web，自动打开 `http://127.0.0.1:8780/center`。使用本
 Action、Execution、Safety、Authority、唯一 MAVLink Writer，Lease / TTL / session /
 generation 与物理退出不确定性不变。QGC 本轮只观察遥测，不能借此控制车辆。
 
+如果从原“车辆总览 → 工具管理”进入，本机控制台模式会直接显示“本机工具已由控制台管理”
+及本机工具中心链接。无需注册远程代理程序；等待不会自动启动未配置的远程代理程序。
+
 ## 三种工具
 
 - **Gazebo GUI**：Server 仍由原 SimulationManager 用 `gz sim -s -r --headless-rendering`

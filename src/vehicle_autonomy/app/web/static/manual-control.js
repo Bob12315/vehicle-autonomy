@@ -258,6 +258,10 @@ function renderGoals(){
 }
 function renderTools(){
  const panel=$('#tool-shortcuts');panel.replaceChildren();
+ const manage=$('#tools-manage-link');if(manage)manage.href=state.local_control_center?'/center':'/console#tools';
+ if(state.local_control_center){
+  panel.append(node('p','本机工具由控制台直接管理，无需注册代理程序。',{class:'muted small-note'}),node('a','打开本机工具中心 ↗',{href:'/center',id:'local-tools-shortcut'}));return;
+ }
  if(!state.tools?.agents?.length){panel.append(node('p','没有在线工具主机；启动已配置的 Desktop Agent 后自动连接。',{class:'muted small-note'}));return;}
  for(const id of ['qgroundcontrol','rviz2','gazebo']){
   const pair=state.tools.agents.flatMap(a=>a.tools.filter(t=>t.id===id).map(t=>[a,t])).sort((x,y)=>Number(y[0].connected)-Number(x[0].connected))[0];

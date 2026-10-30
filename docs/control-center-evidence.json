@@ -312,5 +312,22 @@
       "tests/web_ui/test_passwords.py": "61abd9e42cb8e4a4701344d6d1380204c16dffc0aa3fc2a69af635147185ee15"
     },
     "wheel_sha256": "9b613cbf1a43453c35ea6e5623adb395d27b0b8e16c7f6374f259785b6234e1c"
+  },
+  "local_tool_hint_update": {
+    "date": "2026-10-30",
+    "status": "PASS",
+    "unit_tests": 927,
+    "unit_log": "/home/level6/vehicle-autonomy-framework/artifacts/control-center/agent-hint-verified/unit.log",
+    "browser_result": "/home/level6/vehicle-autonomy-framework/artifacts/control-center/agent-hint-verified/result.json",
+    "existing_simulations_preserved": [
+      "sim-d97a9a77e1d84bd09ff645d7998017ba"
+    ],
+    "no_tool_or_vehicle_operations_sent": true,
+    "backend_restart_required": false,
+    "implementation_sha256": {
+      "src/vehicle_autonomy/app/web/static/tool-console.js": "94f572700000a2417a1bf3136fca9870095699d39108b8a664a47acc2c1de905",
+      "src/vehicle_autonomy/app/web/static/manual-control.js": "20c2c8711fbea389898078e88fb7cb3701763f8d6eee93f2cbc99c096143b81c",
+      "src/vehicle_autonomy/app/web/static/manual-control.html": "c94edbbb7f20c48e324d7c7d122422988f3e8b6d0eeef8621414eb03002d51b4"
+    }
   }
 }

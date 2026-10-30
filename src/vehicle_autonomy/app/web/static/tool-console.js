@@ -55,7 +55,13 @@ function renderTools(){
  if(!snapshot.tools)return;
  const host=$('#agents');host.replaceChildren();
  for(const a of snapshot.tools.agents){const row=node('div');row.append(badge(a.connected?'Online':'Disconnected',a.connected?'good':'error'),node('strong',' '+a.name),node('small',`${a.id} · ${a.role} · 心跳 ${num(a.heartbeat_age_s,1)} s`));host.append(row);}
- if(!snapshot.tools.agents.length){$('#tools-content').className='panel empty';$('#tools-content').replaceChildren(node('strong','等待 Agent 上线'),node('p','首次授权后，Agent 每次启动都会自动连接，无需重复手动注册。'));return;}
+ if(!snapshot.tools.agents.length){
+  const content=$('#tools-content');content.className='panel empty';
+  if(snapshot.local_control_center){
+   content.replaceChildren(node('strong','本机工具已由控制台管理'),node('p','Gazebo、RViz2 和 QGroundControl 使用本地工具中心，无需注册或等待代理程序。'),node('a','打开本机工具中心 ↗',{href:'/center',id:'local-tools-link'}));
+  }else content.replaceChildren(node('strong','尚未连接远程工具主机'),node('p','需要先启动已配置的工具代理程序；仅等待不会自动安装或启动。'));
+  return;
+ }
  if(view!=='tools')return;
  if(snapshot.tools.agents.every(a=>a.connected)&&$('#tools-content').contains(document.activeElement)&&document.activeElement.tagName==='SELECT')return;
  const table=node('table',undefined,{class:'tools-table'}),thead=node('thead'),tr=node('tr');for(const name of ['TOOL / VERSION','HOST / PROFILE','INSTALL / PROCESS','HEALTH / READY','CONNECTION / ERROR','OPERATIONS'])tr.append(node('th',name));thead.append(tr);table.append(thead);const body=node('tbody');table.append(body);
