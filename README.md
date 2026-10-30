@@ -29,7 +29,7 @@ python -m unittest discover -s tests -v
 
 ## 统一本地控制台
 
-安装上述独立环境后，在项目目录执行 `./control-center`，浏览器自动打开统一登录后的
+安装上述独立环境后，在项目目录执行 `./control-center`，使用已设置的密码登录。浏览器自动打开
 本地控制台。默认只启动后台与 Web；进入仿真中心选择 World、固定车型与出生点，再按需
 打开 Gazebo GUI、RViz2 或 QGC。工具可以单独关闭，GUI 重开连接原 World。
 需要手动操作自有仿真时使用 `./control-center --allow-send`，再在原车辆页开启 SEND。

@@ -6,6 +6,7 @@ No GUI/telemetry/OS cleanup is mocked. Does not arm or fly the vehicle.
 import argparse
 import ctypes
 import hashlib
+import getpass
 import json
 import os
 from pathlib import Path
@@ -27,7 +28,8 @@ from vehicle_autonomy.app.control_center.desktop import windows
 ROOT=Path(__file__).resolve().parents[2]
 
 
-def run(directory):
+def run(directory,*,password=None):
+    if password is None:password=getpass.getpass("控制台登录密码：")
     from playwright.sync_api import sync_playwright,expect
     from PIL import ImageGrab
     directory=Path(directory).resolve();directory.mkdir(mode=0o700,parents=True,exist_ok=False)
@@ -126,7 +128,7 @@ def run(directory):
             browser=pw.chromium.launch(executable_path='/usr/bin/google-chrome',headless=False,args=['--no-sandbox','--disable-dev-shm-usage'])
             try:
                 page=browser.new_page(viewport={'width':1600,'height':1000});page.on('pageerror',lambda exc:result['javascript_errors'].append(str(exc)))
-                launcher=launch(1);login(page,'http://127.0.0.1:8780',key,'/center')
+                launcher=launch(1);login(page,'http://127.0.0.1:8780',password,'/center')
                 expect(page.locator('h1')).to_have_text('本地控制台');result['checks']['single_command_browser_no_autostart']='PASS'
                 duplicate=subprocess.run([str(ROOT/'control-center'),'--no-browser'],capture_output=True,text=True,timeout=10)
                 assert duplicate.returncode!=0 and '已在运行' in duplicate.stderr;result['checks']['duplicate_launch_rejected']='PASS'
@@ -181,7 +183,7 @@ def run(directory):
                 extdir=directory/'external-rviz';extdir.mkdir();external_log=(extdir/'log').open('w')
                 external=subprocess.Popen([host['tools']['rviz2']['executable'],'-d',str(ROOT/'configs/rviz/navigation-readonly.rviz')],env=env,cwd=extdir,stdout=external_log,stderr=subprocess.STDOUT,start_new_session=True)
                 wait(lambda:windows([external.pid]),30)
-                launcher=launch(2);login(page,'http://127.0.0.1:8780',key,'/center')
+                launcher=launch(2);login(page,'http://127.0.0.1:8780',password,'/center')
                 world=create_world_ui();identifier=world['id'];vehicle=world['vehicles'][0]
                 center_page();page.locator('#target').select_option(vehicle['target'])
                 for tool_id in ('gazebo-gui','rviz2','qgroundcontrol'):
@@ -192,7 +194,7 @@ def run(directory):
                     ports.extend((p,socket.SOCK_DGRAM if k in ('fdm','udp') else socket.SOCK_STREAM) for k,p in v['ports'].items() if isinstance(p,int))
                 os.kill(current['pid'],signal.SIGKILL);launcher.wait(timeout=140);cleaned(records,group,ports)
                 assert external.poll() is None and windows([external.pid]);result['checks']['sigkill_kernel_cgroup_cleanup']='PASS';result['checks']['external_same_program_untouched']='PASS'
-                launcher=launch(3);login(page,'http://127.0.0.1:8780',key,'/center');assert current['session_id']!=old_epoch
+                launcher=launch(3);login(page,'http://127.0.0.1:8780',password,'/center');assert current['session_id']!=old_epoch
                 try:api('/api/center/tool',dict(session_id=old_epoch,action='start',tool_id='rviz2'));raise AssertionError('stale epoch accepted')
                 except Exception as exc:
                     from urllib.error import HTTPError
@@ -201,7 +203,7 @@ def run(directory):
                 world=create_world_ui(kind='none');identifier=world['id'];center_page();button('gazebo-gui','start');wait(lambda:gui_ready('gazebo-gui'),70)
                 records=remember('before_ctrl_c');group=current['cgroup'];launcher.send_signal(signal.SIGINT);launcher.wait(timeout=140);cleaned(records,group,[(8780,socket.SOCK_STREAM)])
                 result['checks']['ctrl_c_graceful_cleanup']='PASS'
-                launcher=launch(4);login(page,'http://127.0.0.1:8780',key,'/center');world=create_world_ui(kind='none')
+                launcher=launch(4);login(page,'http://127.0.0.1:8780',password,'/center');world=create_world_ui(kind='none')
                 records=remember('before_launcher_sigkill');group=current['cgroup'];launcher.kill();launcher.wait(timeout=10);cleaned(records,group,[(8780,socket.SOCK_STREAM)])
                 result['checks']['launcher_sigkill_watchdog_cleanup']='PASS'
                 assert external.poll() is None;assert personal_hashes()==before;assert not result['javascript_errors'],result['javascript_errors']

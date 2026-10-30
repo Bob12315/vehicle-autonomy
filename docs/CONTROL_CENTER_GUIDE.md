@@ -8,8 +8,8 @@
 
 需要已经按 README 安装 `.venv`、Gazebo Harmonic 和固定车辆库所需的本机
 ArduPilot / Gazebo 插件。入口使用项目独立环境，检查用户级 systemd，启动原有
-MissionControl 与 Web，自动打开 `http://127.0.0.1:8780/center`。终端打印首次登录
-密钥的**文件路径**和本次日志目录，不打印密钥。所有页面复用原来的登录、CSRF
+MissionControl 与 Web，自动打开 `http://127.0.0.1:8780/center`。使用本机已设置的登录密码；首次未配置时，启动终端会引导设置。
+终端打印本次日志目录，不打印密码或认证密钥。所有页面复用原来的登录、CSRF
 与 Origin 校验。默认没有车辆、场景、图形工具或 SEND。
 
 进入“仿真中心”，选择 World、固定车辆模型和出生点，创建后点击启动。
@@ -98,7 +98,9 @@ ROS 环境、依赖、健康检查、停止策略、工作目录与日志位置�
 每次证据在 `runtime/control-center/cc-*/`：`state.json`、`backend.log`、
 `http-audit.jsonl`、`tool-registry.json`、`tools/logs/`、原 `application/simulation/`
 会话报告及 `os-cleanup.json`。`runtime/control-center/current.json` 指向最近一次运行
-的元信息。操作员密钥持久保存在私有 `operator.private`，不要公开该文件。
+的元信息。网页登录密码以带随机盐的 PBKDF2-SHA256 校验值保存在私有 `password.json`，不保存明文。
+更改密码：关闭控制台后执行 `./control-center --set-password`，再重新启动。
+`operator.private` 仅供内部 API 自动化使用，无需用户读取或输入，不能代替网页登录密码。
 
 当前系统必须有可用的 Linux 用户级 systemd / cgroup；没有时启动失败并解释原因，
 不退回到无法保障崩溃清理的运行方式。

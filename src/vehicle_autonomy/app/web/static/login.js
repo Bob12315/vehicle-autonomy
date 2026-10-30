@@ -4,7 +4,7 @@ function destination(){let value=new URLSearchParams(location.search).get('next'
 form.onsubmit=async e=>{
  e.preventDefault();error.textContent='';document.querySelector('#login-submit').disabled=true;
  try{
-  const r=await fetch('/api/auth/login',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:key.value})});
+  const r=await fetch('/api/auth/login',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:key.value})});
   key.value='';const data=await r.json();if(!r.ok||!data.ok)throw Error(data.error||'登录失败');location.replace(destination());
  }catch(e){key.value='';error.textContent=window.VAFI18n.error(e.message);document.querySelector('#login-submit').disabled=false;}
 };

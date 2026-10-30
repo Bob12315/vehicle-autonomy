@@ -1,5 +1,6 @@
 """One terminal entry; browsers are intentionally outside the owned cgroup."""
 import argparse
+import getpass
 import json
 import os
 from pathlib import Path
@@ -19,6 +20,7 @@ def main():
     parser.add_argument('--no-browser',action='store_true')
     parser.add_argument('--config',type=Path)
     parser.add_argument('--check',action='store_true',help='仅检查环境，不启动服务')
+    parser.add_argument('--set-password',action='store_true',help='设置本机登录密码；运行中的控制台须先关闭')
     args=parser.parse_args();root=resource_root().resolve()
     if args.check:
         from .registry import inspect_host
@@ -30,6 +32,15 @@ def main():
     unit=unit_name(root)
     if service_state(unit).get('ActiveState') in ('active','activating','deactivating'):
         raise ValueError('现有控制中心服务仍在运行或退出中；不接管、不覆盖。')
+    password_file=root/'runtime/control-center/password.json'
+    if args.set_password or not password_file.exists():
+        from vehicle_autonomy.app.web.passwords import set_password
+        password=getpass.getpass('设置控制台登录密码：')
+        if password!=getpass.getpass('再次输入密码：'):raise ValueError('两次输入的密码不一致。')
+        set_password(password_file,password)
+        del password
+        if args.set_password:
+            print('登录密码已设置。');launcher_lock.close();return 0
     directory=root/'runtime/control-center'/('cc-'+uuid4().hex)
     directory.mkdir(mode=0o700,parents=True)
     arguments=['--port',str(args.port)]
@@ -56,7 +67,7 @@ def main():
         if not ready and not stopped:raise RuntimeError('控制台启动未就绪；请查看 '+str(directory/'backend.log'))
         if ready:
             print('控制中心：'+state['url'],flush=True)
-            print('首次登录密钥文件：'+state['token_file'],flush=True)
+            print('登录方式：使用已设置的密码。',flush=True)
             print('日志目录：'+str(directory),flush=True)
             print('会话：'+state['session_id']+' · 默认无场景、无工具、SEND 关闭',flush=True)
             print('Ctrl+C 或页面“关闭控制台”会关闭本次自有仿真和工具。',flush=True)

@@ -7,6 +7,20 @@
 现有 Web 认证下的工具和系统控制页面、配置、自动化测试及说明。没有替换原
 SimulationManager、Vehicle Spawner、SITL 所有者或车辆控制引擎。
 
+## 密码登录补充验收（2026-10-30）
+
+统一本地控制台已改为密码登录，已按操作员指定值在本机设置；不把密码写入源码、
+版本库或应用日志。登录页显示“登录密码”，支持 8 至 256 字符；私有文件仅保存
+带随机盐的 PBKDF2-SHA256 校验值。终端不再要求读取登录密钥文件。
+`./control-center --set-password` 可在关闭后台后更改密码。
+
+新增 7 项密码存储和真实 HTTP 合同测试；完整 **927 项测试 PASS**。
+`artifacts/control-center/password-login-verified/` 的完整真实浏览器 / C01 / 三工具
+流程 PASS，连续四个后台会话都用密码登录，包含 SIGKILL 后重新登录及清理。
+原控制页 RViz 入口、QGC 真实遥测、独立工具启停和全部退出检查通过，7 个端口释放。
+网页登录不再接受旧登录 key 字段或内部 API 密钥代替密码；内部 API / Agent / 车辆
+签名凭据仍各自独立，车辆 SEND 和安全围栏未改变。原生桌面回归现在会提示输入已有密码。
+
 ## 审计与实现边界
 
 审计覆盖 `app/web/action_cli.py`、`mission_control.py`、`app/simulation/manager.py`、

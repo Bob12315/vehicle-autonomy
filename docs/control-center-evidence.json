@@ -222,5 +222,95 @@
     "path": "/home/level6/vehicle-autonomy-framework/artifacts/control-center/wheel-delivery/vehicle_autonomy-0.1.0-py3-none-any.whl",
     "sha256": "d60d0c61f6d53f22585002443ffe011d380e1351e011bad334af96bbd41822da",
     "new_modules_pages_and_configuration_verified": true
+  },
+  "password_login_update": {
+    "date": "2026-10-30",
+    "status": "PASS",
+    "storage": "private salted PBKDF2-SHA256 verifier; plaintext password excluded from Git and logs",
+    "unit_tests": 927,
+    "unit_log": "/home/level6/vehicle-autonomy-framework/artifacts/control-center/password-unit.log",
+    "unit_sha256": "ceba9538b6dafdabace2c9c78ada7575a66a115ad0270dfa7ebab6c6c006abf5",
+    "native_result": "/home/level6/vehicle-autonomy-framework/artifacts/control-center/password-login-verified/result.json",
+    "native_sha256": "f07d06f0c729621d9b874cd2b0fe84415a400704afb89b18bd9506c14c609d91",
+    "password_authenticated_epochs": 4,
+    "checks": {
+      "single_command_browser_no_autostart": "PASS",
+      "duplicate_launch_rejected": "PASS",
+      "gui_close_preserves_server_sitl_identity": "PASS",
+      "gui_reconnect_same_world": "PASS",
+      "existing_control_page_rviz_entry": "PASS",
+      "qgc_real_sitl": {
+        "status": "PASS",
+        "system_id": 41,
+        "log": "/home/level6/vehicle-autonomy-framework/artifacts/control-center/password-login-verified/qgc-connect.log"
+      },
+      "three_real_windows_together": "PASS",
+      "original_action_query": "PASS",
+      "independent_tool_stop_restart": "PASS",
+      "close_all_tools_preserves_simulation": "PASS",
+      "stop_simulation_keep_console": "PASS",
+      "web_shutdown_cleans_all": "PASS",
+      "sigkill_kernel_cgroup_cleanup": "PASS",
+      "external_same_program_untouched": "PASS",
+      "restart_clean_and_stale_epoch_rejected": "PASS",
+      "ctrl_c_graceful_cleanup": "PASS",
+      "launcher_sigkill_watchdog_cleanup": "PASS",
+      "personal_qgc_configuration_unchanged": "PASS"
+    },
+    "cleanup_audits": [
+      {
+        "service_result": "success",
+        "exit_code": "exited",
+        "exit_status": "0",
+        "remaining_owned_processes": [],
+        "credential_errors": [],
+        "finished_at": 1793334168.5249078
+      },
+      {
+        "service_result": "signal",
+        "exit_code": "killed",
+        "exit_status": "KILL",
+        "remaining_owned_processes": [],
+        "credential_errors": [],
+        "finished_at": 1793334214.788499
+      },
+      {
+        "service_result": "success",
+        "exit_code": "exited",
+        "exit_status": "0",
+        "remaining_owned_processes": [],
+        "credential_errors": [],
+        "finished_at": 1793334225.8299992
+      },
+      {
+        "service_result": "success",
+        "exit_code": "exited",
+        "exit_status": "0",
+        "remaining_owned_processes": [],
+        "credential_errors": [],
+        "finished_at": 1793334232.4511993
+      }
+    ],
+    "service": {
+      "MainPID": "0",
+      "Result": "success",
+      "ControlGroup": "",
+      "ActiveState": "inactive",
+      "SubState": "dead"
+    },
+    "ports_released": 7,
+    "implementation_sha256": {
+      "src/vehicle_autonomy/app/control_center/backend.py": "b5bf4079b0646122924116da7e2361ddd6155b22d79e3f1d29652e6c27426652",
+      "src/vehicle_autonomy/app/control_center/launcher.py": "015135e37e4ef9aefb3fe758e09f4bcaa07dc25cabafd8185037fab88f9989ad",
+      "src/vehicle_autonomy/app/web/server.py": "9adfa15d61521d9614ea129a1390faf6af36c8cffab4e613fe1a4f1a09e30b4b",
+      "src/vehicle_autonomy/app/web/static/auth.js": "cae6bbfe077f75a0645201cc3153fa416d8bcb91a9b76c2f8810958f234fbccd",
+      "src/vehicle_autonomy/app/web/static/login.html": "f143284a7d5a0145bb0eee25379d5534471d546482f0d9827c1b818a5c127295",
+      "src/vehicle_autonomy/app/web/static/login.js": "2b4d4773802b6423015653a091ee18aa5175d5d3b8979aa7499516ac2f3e27f5",
+      "tests/control_center/native.py": "70134d90536ccb487d27c2c955b3cbc366986383f5f29cf12571d21c4566f488",
+      "tests/web_ui/chinese_browser.py": "f369dcd316cdf906755023f007c7bd96cbbc67b6024b9b9a5622eab0669f7d15",
+      "src/vehicle_autonomy/app/web/passwords.py": "35984af363d26b3f65fd080fa4b7389902bf06fc80126812f8bcd6894ebed4a8",
+      "tests/web_ui/test_passwords.py": "61abd9e42cb8e4a4701344d6d1380204c16dffc0aa3fc2a69af635147185ee15"
+    },
+    "wheel_sha256": "9b613cbf1a43453c35ea6e5623adb395d27b0b8e16c7f6374f259785b6234e1c"
   }
 }

@@ -45,6 +45,7 @@ class ConsoleServer(ThreadingHTTPServer):
         if address[0] not in ('127.0.0.1','::1'):
             raise ValueError('console must bind loopback; use an authenticated SSH tunnel')
         self.service, self.token = service, token
+        self.password_auth=None
         self.secure_cookies=False;self.browser_origin=None
         self.visualization_token=None
         self.sessions=BrowserSessions()
@@ -186,14 +187,26 @@ class Handler(BaseHTTPRequestHandler):
             length=int(self.headers.get('Content-Length','-1'))
             if not 0<length<=1024:raise ValueError()
             payload=json.loads(self.rfile.read(length))
-            if type(payload) is not dict or set(payload)!={'key'} or type(payload['key']) is not str or not 32<=len(payload['key'])<=256:raise ValueError()
+            if type(payload) is not dict:raise ValueError()
+            if self.server.password_auth is not None:
+                if set(payload)!={'password'}:raise ValueError()
+                credential=payload['password']
+                if type(credential) is not str or not 8<=len(credential)<=256:raise ValueError()
+            else:
+                # Existing explicitly provisioned CLI deployments retain their
+                # protocol; the unified local console enables password-only login.
+                if set(payload) not in ({'password'},{'key'}):raise ValueError()
+                credential=next(iter(payload.values()))
+                if type(credential) is not str or not 8<=len(credential)<=256:raise ValueError()
         except (ValueError,TypeError):
-            self.reply(400,dict(ok=False,error='bounded login key required'));return True
+            self.reply(400,dict(ok=False,error='bounded login password required'));return True
         if not self.server.sessions.permitted_login(self.client_address[0]):
             self.reply(429,dict(ok=False,error='login rate limit; retry later'));return True
-        if not self.server.token or not hmac.compare_digest(payload['key'].encode(),self.server.token.encode()):
+        matched=(self.server.password_auth.verify(credential) if self.server.password_auth is not None
+            else bool(self.server.token and hmac.compare_digest(credential.encode(),self.server.token.encode())))
+        if not matched:
             self.server.sessions.failed_login(self.client_address[0])
-            self.reply(401,dict(ok=False,error='invalid login key'));return True
+            self.reply(401,dict(ok=False,error='invalid login password'));return True
         old=self.server.sessions.revoke(self.cookie())
         release=getattr(self.server.service,'release_browser',None)
         if old and callable(release):release(old.principal)

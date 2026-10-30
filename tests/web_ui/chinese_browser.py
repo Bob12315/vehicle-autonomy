@@ -33,7 +33,7 @@ def run(directory):
             expect(page.get_by_role('heading', name='登录控制台')).to_be_visible()
             page.locator('#login-key').fill('invalid-access-key-for-browser-test-only')
             page.locator('#login-submit').click()
-            expect(page.locator('#login-error')).to_contain_text('密钥')
+            expect(page.locator('#login-error')).to_contain_text('密码')
             login(page, h.base, h.token)
             for name, title in [('dashboard','车辆总览'), ('tools','工具管理'),
                                 ('workspaces','工作环境'), ('logs','日志与诊断'), ('settings','设置')]:

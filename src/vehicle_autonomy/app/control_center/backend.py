@@ -10,6 +10,7 @@ from uuid import uuid4
 
 from vehicle_autonomy.app.web.mission_control import MissionControl,MissionControlServer
 from vehicle_autonomy.app.web.server import load_token
+from vehicle_autonomy.app.web.passwords import load_password
 from vehicle_autonomy.app.tools.service import ToolService
 from .service import ControlCenter
 from .supervisor import atomic,lock_workspace,process_identity,unit_name
@@ -25,6 +26,7 @@ def main():
     lock=lock_workspace(root,'backend');stop=Event();app=server=center=tools=None;http_thread=None;errors=[]
     state=dict(session_id='center-'+uuid4().hex,state='STARTING',pid=os.getpid(),cgroup=cgroup,unit=unit_name(root),
         url=f'http://127.0.0.1:{args.port}/center',token_file=str(root/'runtime/control-center/operator.private'),
+        authentication='password',password_file=str(root/'runtime/control-center/password.json'),
         logs=str(directory),deployment_send=args.allow_send,system_send=False,action_send=False,started_at=time.time())
     atomic(directory/'state.json',state)
     os.environ['VAF_CONTROL_CENTER_SESSION']=state['session_id']
@@ -39,6 +41,7 @@ def main():
         app=MissionControl({},directory/'application',simulation_allow_send=args.allow_send)
         tools=ToolService(directory/'remote-tools');app.tool_service=tools
         server=MissionControlServer(('127.0.0.1',args.port),app,token,directory/'http-audit.jsonl');server.visualization_token=load_token(feed)
+        server.password_auth=load_password(state['password_file'])
         center=ControlCenter(app,root,directory,state['session_id'],source,stop,cgroup,args.config);app.control_center=center
         http_thread=Thread(target=server.serve_forever,kwargs={'poll_interval':.1},daemon=True);http_thread.start()
         state['availability']=dict(tools=center.host['tools'],desktop=center.host['desktop'],ros_error=center.host['ros_error'],
