@@ -18,9 +18,9 @@ def run(path,kind,*,browser_ui=False):
             from tests.browser_auth import login
             pw=sync_playwright().start();browser=pw.chromium.launch(executable_path='/usr/bin/google-chrome',headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
             page=browser.new_page(viewport={'width':1680,'height':1050});page.on('pageerror',lambda error:browser_errors.append(str(error)))
-            login(page,f.base,f.token,'/studio');page.locator('[data-tab=templates]').click()
+            login(page,f.base,f.token,'/studio');page.locator('#vehicle').select_option(kind);page.locator('[data-tab=templates]').click()
             page.locator('.mission-card').filter(has_text=kind.title()).get_by_role('button',name='从模板创建',exact=True).click()
-            page.locator('#publish').click();expect(page.locator('#notice')).to_contain_text('已发布不可变版本')
+            page.locator('#mission-target').select_option(kind);page.locator('#publish').click();expect(page.locator('#notice')).to_contain_text('已发布不可变版本')
             page.screenshot(path=str(path/'browser-native-editor.png'),full_page=True)
             page.locator('[data-tab=runner]').click();page.locator('#send').check();page.locator('#run-start').click();page.locator('#dialog-confirm').click()
             until=time.monotonic()+10
@@ -31,7 +31,8 @@ def run(path,kind,*,browser_ui=False):
             saved=f.api('/api/studio-b/draft/save',dict(definition=definition,expected_revision=0))
             revision=saved['definition']['revision'];result['validation']=f.api('/api/studio-b/draft/validate',dict(mission_id=identifier,revision=revision))
             publication=f.api('/api/studio-b/draft/publish',dict(mission_id=identifier,revision=revision))
-            mission=f.api('/api/studio-b/run/start',dict(publication=publication['key'],allow_send=True,debug=False))
+            binding=next(v['binding'] for v in f.api('/api/studio-b/catalog')['vehicles'] if v['target']==f.kind)
+            mission=f.api('/api/studio-b/run/start',dict(publication=publication['key'],definition_hash=publication['definition_hash'],binding=binding,allow_send=True,debug=False))
         result['run_id']=mission['id']
         result['checkpoints']={};until=time.monotonic()+(960 if kind=='plane' else 210);last=None
         while time.monotonic()<until:

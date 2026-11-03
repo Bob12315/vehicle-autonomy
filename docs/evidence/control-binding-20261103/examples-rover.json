@@ -1,0 +1,165 @@
+{
+  "passed": true,
+  "kind": "rover",
+  "missions": [
+    {
+      "mission_id": "Example_StateSurvey",
+      "state": "SUCCEEDED",
+      "error": null,
+      "release_safe": true,
+      "command_evidence_count": 0,
+      "checkpoints": [
+        {
+          "name": "GetVehicleState",
+          "position": [
+            -3.6428530677162075e-12,
+            4.594819567259533e-16,
+            -4.569306044643895e-11
+          ]
+        },
+        {
+          "name": "GetVehicleState",
+          "position": [
+            -3.6428530677162075e-12,
+            4.594819567259533e-16,
+            -4.569306044643895e-11
+          ]
+        },
+        {
+          "name": "GetVehicleState",
+          "position": [
+            -3.6428530677162075e-12,
+            4.594819567259533e-16,
+            -4.569306044643895e-11
+          ]
+        }
+      ],
+      "run_id": "mission-run:d92b03b9d70547b095d8d21741219799",
+      "vehicle_command_write_attempts": 0
+    },
+    {
+      "mission_id": "Example_DisarmedBranch",
+      "state": "SUCCEEDED",
+      "error": null,
+      "release_safe": true,
+      "command_evidence_count": 0,
+      "checkpoints": [
+        {
+          "name": "GetVehicleState",
+          "position": [
+            -3.6428530677162075e-12,
+            4.594819567259533e-16,
+            -4.569306044643895e-11
+          ]
+        }
+      ],
+      "run_id": "mission-run:cb22d72123774b5295c6e69b7508ddf2",
+      "vehicle_command_write_attempts": 0
+    },
+    {
+      "mission_id": "Example_Ground_Patrol",
+      "state": "SUCCEEDED",
+      "error": null,
+      "release_safe": true,
+      "command_evidence_count": 30,
+      "checkpoints": [
+        {
+          "name": "GetVehicleState",
+          "position": [
+            -3.6428530677162075e-12,
+            4.594819567259533e-16,
+            -4.569306044643895e-11
+          ]
+        },
+        {
+          "name": "SetMode",
+          "position": [
+            -3.6428530677162075e-12,
+            4.594819567259533e-16,
+            -4.569306044643895e-11
+          ]
+        },
+        {
+          "name": "Arm",
+          "position": [
+            -3.6428530677162075e-12,
+            4.594819567259533e-16,
+            -4.569306044643895e-11
+          ]
+        },
+        {
+          "name": "Goto",
+          "position": [
+            0.658704921719981,
+            -6.226354151120268e-08,
+            -4.559076227650394e-09
+          ]
+        },
+        {
+          "name": "SetMode",
+          "position": [
+            0.6605198505943544,
+            -6.497524877338756e-08,
+            -4.559075644783306e-09
+          ]
+        },
+        {
+          "name": "Goto",
+          "position": [
+            1.7160624088823884,
+            2.3077390547013924e-06,
+            -4.559081889787819e-09
+          ]
+        },
+        {
+          "name": "SetMode",
+          "position": [
+            1.7226196860165475,
+            2.3328662709584237e-06,
+            -4.5590797803640726e-09
+          ]
+        },
+        {
+          "name": "Goto",
+          "position": [
+            2.663770131441095,
+            1.640663992455649e-05,
+            -4.559081917543395e-09
+          ]
+        },
+        {
+          "name": "Stop",
+          "position": [
+            2.67816523440566,
+            1.6737756179524355e-05,
+            -4.55907719909554e-09
+          ]
+        },
+        {
+          "name": "Disarm",
+          "position": [
+            2.6823844546371456,
+            1.682731928294042e-05,
+            -4.5590758113167595e-09
+          ]
+        },
+        {
+          "name": "GetVehicleState",
+          "position": [
+            2.6829811340334913,
+            1.6839541659941e-05,
+            -4.559075644783306e-09
+          ]
+        }
+      ],
+      "run_id": "mission-run:e37b63e6deb2415e8ea66fea526544ce",
+      "physical": {
+        "home_error_m": 2.6834395197516017,
+        "speed_mps": 0.0018165603753991853,
+        "height_m": -4.513382445558989e-09
+      }
+    }
+  ],
+  "assembly": "Control Center isolated signed Driver",
+  "cleanup": "COMPLETE"
+}

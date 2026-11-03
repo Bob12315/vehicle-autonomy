@@ -3,7 +3,8 @@ from copy import deepcopy
 from uuid import uuid4
 
 from vehicle_autonomy.engine.mission.graph import validate
-from vehicle_autonomy.engine.mission.studio_graph import TYPES,migrate
+from vehicle_autonomy.engine.mission.studio_graph import TYPES,migrate,digest
+from vehicle_autonomy.app.bootstrap.mission_binding import live_instance
 from .studio_library import StudioLibrary,graph_diff
 
 
@@ -17,6 +18,7 @@ class StudioService:
         from .studio_examples import cuadc,rover_inspection,copter_inspection,plane_inspection
         data=self.library.snapshot()
         for target,driver in self.service.drivers.items():
+            if target in getattr(self.service,'_retired_simulation_targets',set()):continue
             data=self.library.snapshot()
             context=driver.context()
             if not context.owned_simulation:continue
@@ -47,11 +49,13 @@ class StudioService:
                     except ValueError:continue
                     self.library.template(identifier,(copter_inspection if context.target_kind=='copter' else plane_inspection)(target))
 
-    def compile(self,definition):
+    def compile(self,definition,*,pins=None):
         for path in definition.get('metadata',{}).get('unresolved_tool_inputs',[]):
             identifier,field=path.split('.',1);node=next((n for n in definition['nodes'] if n['node_id']==identifier),{})
             if field not in node.get('parameters',{}) and field not in node.get('input_bindings',{}):raise ValueError('template Tool input needs explicit replacement: '+path)
-        compiled=validate(definition,self.service.registry,self.service.drivers,resolve=self.library.publication)
+        live_drivers={k:d for k,d in self.service.drivers.items() if k not in getattr(self.service,'_retired_simulation_targets',set())}
+        compiled=validate(definition,self.service.registry,live_drivers,
+            resolve=self.library.publication if pins is None else lambda i,v:deepcopy(pins.get(i+'@'+v)))
         for n in compiled.to_dict()['nodes']:
             if n['type']=='Action' and not self.provider(n['action'],n['action_version'],definition['target'])['configured']:raise ValueError('Action Provider not bound: '+n['action'])
         return compiled
@@ -67,10 +71,15 @@ class StudioService:
     def catalog(self):
         from vehicle_autonomy.engine.mission.studio_graph import WORLD_TYPES
         from .action_localization import catalog_entry,CATEGORIES,bilingual
-        profiles={};libraries={}
+        profiles={};libraries={};instances=[]
         actions=[catalog_entry(self.service.registry,item) for item in self.service.registry.catalog()]
         for target,driver in self.service.drivers.items():
+            if target in getattr(self.service,'_retired_simulation_targets',set()):continue
             context=driver.context();items=self.service.registry.catalog(vehicle_kind=context.target_kind,capabilities=context.capabilities)
+            try:binding=live_instance(self.service,target);reason=None
+            except ValueError as exc:binding=None;reason=str(exc)
+            instances.append(dict(target=target,kind=context.target_kind,capabilities=sorted(context.capabilities),
+                connected=bool(driver.info().get('connected')),binding=binding,binding_error=reason))
             admitted={(item['name'],item['version']) for item in items}
             full=[]
             for original in actions:
@@ -90,8 +99,7 @@ class StudioService:
             libraries[target]=full
             profiles[target]=[item for item in full if (item['name'],item['version']) in admitted]
         return dict(node_types=deepcopy(TYPES),actions=actions,action_sets=profiles,library_sets=libraries,
-            categories=deepcopy(CATEGORIES),locales=['zh-CN','en-US'],default_locale='zh-CN',world_bindings=deepcopy(WORLD_TYPES),vehicles=[dict(target=k,kind=d.context().target_kind,
-            capabilities=sorted(d.context().capabilities),connected=d.info().get('connected',False)) for k,d in self.service.drivers.items()])
+            categories=deepcopy(CATEGORIES),locales=['zh-CN','en-US'],default_locale='zh-CN',world_bindings=deepcopy(WORLD_TYPES),vehicles=instances)
 
     def handle(self,operation,p):
         op=operation.removeprefix('studio-b.')
@@ -105,7 +113,7 @@ class StudioService:
             # Seed definitions lazily; this never grants SEND or starts a Run.
             self.install_examples()
             data=self.library.snapshot()
-            runs=[{k:v.get(k) for k in ('id','target','state','release_safe','error','started_at')} for v in self.service.missions.views()]
+            runs=[{k:v.get(k) for k in ('id','target','state','release_safe','error','started_at','execution_binding')} for v in self.service.missions.views()]
             return dict(**data,runs=runs,legacy_versions=list(self.service.journal.data['versions'].values()))
         if op=='draft.save':
             if set(p)!={'definition','expected_revision'}:raise ValueError('strict draft save request required')
@@ -127,7 +135,8 @@ class StudioService:
             data=self.library.snapshot();d=deepcopy(data['publications'][p['source']]['definition']);current=data['drafts'].get(d['mission_id'])
             if current is not None and current['state']!='Published':raise ValueError('an editable draft already exists; finish or export it before restoring another version')
             if d['mission_id']+'@'+p['new_version'] in data['publications']:raise ValueError('select an unpublished semantic version')
-            d['version']=p['new_version'];return self.library.save(d,p['expected_revision'])
+            d.update(version=p['new_version'],target='');self.clear_instance_inputs(d)
+            return self.library.save(d,p['expected_revision'])
         if op=='draft.validate':
             if set(p)!={'mission_id','revision'}:raise ValueError('explicit stored draft revision required')
             item=self.library.snapshot()['drafts'][p['mission_id']]
@@ -147,13 +156,15 @@ class StudioService:
             data=self.library.snapshot()
             source=data['templates'][p['source']]['definition'] if op=='template.apply' else (data['publications'][p['source']]['definition'] if op=='draft.restore' else data['drafts'][p['source']]['definition'])
             if p['new_mission_id'] in data['drafts']:raise ValueError('copy requires a new Mission ID')
-            d=deepcopy(source);d.update(mission_id=p['new_mission_id'],revision=0);d['name']+=' (copy)'
+            d=deepcopy(source);d.update(mission_id=p['new_mission_id'],revision=0,target='');d['name']+=' (copy)'
+            self.clear_instance_inputs(d)
             return self.library.save(d,0)
         if op=='draft.import':
             if set(p)!={'definition','new_mission_id'}:raise ValueError('explicit import source and fresh Mission ID required')
             d=deepcopy(p['definition'])
             if d.get('schema_version')==1:d=migrate(d,registry=self.service.registry,drivers=self.service.drivers)
-            d.update(mission_id=p['new_mission_id'],revision=0)
+            d.update(mission_id=p['new_mission_id'],revision=0,target='')
+            self.clear_instance_inputs(d)
             if p['new_mission_id'] in self.library.snapshot()['drafts']:raise ValueError('import requires a new Mission ID')
             return self.library.save(d,0)
         if op=='template.save':
@@ -173,18 +184,29 @@ class StudioService:
                 raise ValueError('unknown definition reference')
             return graph_diff(get(p['left']),get(p['right']))
         if op=='run.start':
-            if set(p)-{'publication','allow_send','debug'}:raise ValueError('strict publication run request required')
+            if not {'publication','definition_hash','binding'}<=p.keys() or set(p)-{'publication','definition_hash','binding','allow_send','debug'}:raise ValueError('explicit publication hash and selected instance binding required')
             self.service._require_operational();item=self.library.snapshot()['publications'][p['publication']]
+            if p['definition_hash']!=item['definition_hash'] or digest(item['definition'])!=item['definition_hash']:
+                raise ValueError('published definition hash changed or mismatched')
+            if digest(item['compiled']['studio']['definition'])!=item['definition_hash']:
+                raise ValueError('published compiled definition integrity mismatch')
+            if type(p['binding']) is not dict or digest(p['binding'])!=digest(live_instance(self.service,p['binding'].get('target'))):
+                raise ValueError('selected vehicle identity, epoch or generation changed; refresh and explicitly select again')
+            definition=deepcopy(item['definition']);definition['target']=p['binding']['target']
+            # Recompile from the pinned source definition, never retarget a
+            # compiled tree. Provider/capability/parameter/resource validation
+            # applies to this instance and every transitive SubMission.
+            compiled=self.compile(definition,pins=deepcopy(item['compiled']['studio']['dependencies']))
             from vehicle_autonomy.world.model.mission_inputs import usable
             now=self.service.clock()
-            for n in item['compiled']['nodes']:
+            for n in compiled.to_dict()['nodes']:
                 values=list(n.get('input_bindings',{}).values())+[v['$binding'] for v in n.get('parameters',{}).values() if type(v) is dict and set(v)=={'$binding'}]
                 for binding in values:
                     if binding.get('source')=='external':
-                        data=self.service.visualization_goals.read_input(item['compiled']['target'],binding,now)
+                        data=self.service.visualization_goals.read_input(definition['target'],binding,now)
                         if not usable(data,now,frame=binding.get('frame'),max_age_s=binding.get('max_age_s')):raise ValueError('external input stale or invalid before Run')
-            # Revalidate the stored compiled snapshot, including its pinned dependencies.
-            return self.service.handle('mission.start',dict(spec=item['compiled'],allow_send=p.get('allow_send',False),debug=p.get('debug',False)))
+            return self.service.start_bound_mission(compiled,dict(publication=p['publication'],definition_hash=item['definition_hash'],instance=deepcopy(p['binding'])),
+                item,allow_send=p.get('allow_send',False),debug=p.get('debug',False))
         if op=='run.get':
             if set(p)!={'id'}:raise ValueError('one run ID required')
             result=self.service.missions.view(p['id']);evidence=[]
@@ -214,3 +236,12 @@ class StudioService:
         raise ValueError('unknown Mission Studio operation')
 
     def close(self):self.library.close()
+
+    @staticmethod
+    def clear_instance_inputs(definition):
+        unresolved=[]
+        for node in definition['nodes']:
+            for name,binding in list(node.get('input_bindings',{}).items()):
+                if binding.get('source')=='external':
+                    del node['input_bindings'][name];unresolved.append(node['node_id']+'.'+name)
+        if unresolved:definition.setdefault('metadata',{})['unresolved_tool_inputs']=unresolved

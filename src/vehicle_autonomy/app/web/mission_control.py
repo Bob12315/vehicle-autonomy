@@ -3,6 +3,7 @@ from collections import deque
 from copy import deepcopy
 from pathlib import Path
 import re
+import time
 from urllib.parse import urlsplit,parse_qs
 from threading import RLock
 from uuid import uuid4
@@ -30,6 +31,7 @@ class MissionControl(ActionLab):
         self.deployment_identities = {}
         self._tracks = {}
         self.control_fault = None
+        self._closing = False
         self.journal = None
         self.studio = None
         self.simulation_manager = None
@@ -52,7 +54,8 @@ class MissionControl(ActionLab):
             self.deployment_identities = bind_simulations(self.drivers,self.journal)
             self.events = events or LocalEvents()
             self.missions = MissionGraphRuntime(self.runtime, self.journal, self.events, clock=self.clock,
-                deployment_identities=self.deployment_identities,recovered_manual=self.recovered_manual,external_inputs=self.visualization_goals.read_input)
+                deployment_identities=self.deployment_identities,recovered_manual=self.recovered_manual,external_inputs=self.visualization_goals.read_input,
+                binding_guard=self._check_mission_binding)
             from vehicle_autonomy.app.mission_designer.studio_service import StudioService
             self.studio=StudioService(self,Path(data_dir)/'studio')
             from vehicle_autonomy.app.simulation.manager import SimulationManager
@@ -81,6 +84,7 @@ class MissionControl(ActionLab):
                         self.missions.tick()
                         self._sync_manual()
                     for session in tuple(self.manual.values()):
+                        if self.runtime.view(session['action_id'])['state'] in TERMINAL:continue
                         if self.drivers[session['target']].info().get('session_id') != session['vehicle_session']:
                             self.runtime.cancel(session['action_id'])
                 except Exception as exc:
@@ -105,9 +109,47 @@ class MissionControl(ActionLab):
             if self.journal.data['manual'].get(identifier) != record: self.journal.save_manual(identifier, record)
 
     def _require_operational(self):
+        if self._closing:raise ValueError('application is closing; new control is fenced')
         if self.control_fault: raise ValueError(self.control_fault)
 
+    def start_bound_mission(self, compiled, binding, publication, *, allow_send=False, debug=False):
+        """Studio admission shares the original resource/authority/Safety chain."""
+        self._require_operational()
+        target=compiled.to_dict()['target']
+        if target in self.operator_controls.records:raise ValueError('Web control reserved; release it before starting a Mission')
+        self._idle(target)
+        from vehicle_autonomy.app.bootstrap.mission_binding import live_instance
+        if live_instance(self,target)!=binding['instance']:raise ValueError('vehicle instance changed during validation')
+        return self.missions.start(compiled,allow_send=allow_send,debug=debug,
+            execution_binding=binding,publication_spec=publication['compiled'])
+
+    def _check_mission_binding(self, run):
+        from vehicle_autonomy.app.bootstrap.mission_binding import live_instance
+        expected=run.expected_instance;target=expected['target']
+        # Plane's audited explicit native handoff reconnects receive-only before
+        # opening the next scope. It is not a replacement vehicle or a UI rebind.
+        handoff=next((self.runtime.view(a) for a in reversed(run.actions)
+            if self.runtime.view(a).get('continuation_of') and a not in run.adopted_handoffs),None)
+        try:current=live_instance(self,target)
+        except ValueError:
+            if expected['kind']=='plane' and handoff and handoff['state']=='VALIDATING' and target not in getattr(self,'_retired_simulation_targets',set()) and target not in self.simulation_manager.retiring_targets():return
+            raise
+        if current==expected:return
+        physical={k:v for k,v in expected.items() if k not in ('session_id','generation')}
+        if (expected['kind']=='plane' and handoff and handoff['state'] in ('RUNNING','SUCCEEDED')
+                and self.drivers[target].info().get('scope')==handoff['id']
+                and physical=={k:v for k,v in current.items() if k not in ('session_id','generation')}):
+            run.adopted_handoffs.add(handoff['id']);run.expected_instance=deepcopy(current)
+            self.missions._event(run,'native_continuation_epoch',action_id=handoff['id'],previous=expected,current=current)
+            return
+        if expected['kind']=='plane' and handoff and handoff['state']=='VALIDATING' and physical=={k:v for k,v in current.items() if k not in ('session_id','generation')}:return
+        raise ValueError('Mission instance binding changed; execution fenced')
+
     def _idle(self, target, continuation=None):
+        if target not in self.drivers or target in getattr(self,'_retired_simulation_targets',set()):
+            raise ValueError('vehicle instance removed or unknown')
+        info=getattr(self.drivers[target],'info',None)
+        if callable(info) and info().get('connected') is False:raise ValueError('vehicle instance offline')
         center=getattr(self,'control_center',None)
         if center is not None and center.stop.is_set():raise ValueError('控制中心正在退出，不能启动新的控制任务。')
         # Lifecycle dispatch marks retiring targets before releasing this same
@@ -217,6 +259,8 @@ class MissionControl(ActionLab):
             from .navigation import navigation
             return navigation(self)
         if operation.startswith('simulation.'):
+            if self._closing and operation in ('simulation.create','simulation.start','simulation.switch','simulation.add_vehicle'):
+                raise ValueError('application is closing; new simulation is fenced')
             if self.simulation_manager is None:raise ValueError('Simulation manager unavailable')
             return self.simulation_manager.handle(operation,payload)
         if operation == 'console.state':
@@ -232,6 +276,8 @@ class MissionControl(ActionLab):
             service=getattr(self,'tool_service',None)
             if service is None: raise ValueError('Tool service not configured; launch with an Agent allowlist')
             return service.handle(operation,payload)
+        if operation == 'vehicles':
+            with self._control_lock:return [d.info() for t,d in self.drivers.items() if t not in getattr(self,'_retired_simulation_targets',set())]
         if operation == 'world.vehicle':
             if set(payload) not in ({'target'},{'target','projection'}) or payload.get('projection','full') not in ('full','ap'): raise ValueError('explicit target/projection required')
             driver=self.drivers[payload['target']]
@@ -447,6 +493,18 @@ class MissionControl(ActionLab):
             return result
 
     def close(self):
+        # Keep telemetry, the scheduler and the sole writers alive for the
+        # original bounded Action exit. Removing a Gazebo entity first is not
+        # proof of physical stopping. Unconfirmed exits remain unconfirmed.
+        with self._control_lock:
+            self._closing=True
+            if self.missions:
+                for m in self.missions.views():
+                    if m['state'] not in TERMINAL or not m['release_safe']:self.missions.cancel(m['id'])
+            self._fence_all()
+        until=time.monotonic()+14  # Same existing ActionLab shutdown budget.
+        while time.monotonic()<until and any(a['state'] not in TERMINAL for a in self.runtime.views()):
+            time.sleep(.05)
         simulation_error=None
         if self.simulation_manager:
             try:self.simulation_manager.close()

@@ -1,0 +1,14 @@
+{
+  "acceptance.json": "bd6f476d1172cbdbfa36d9da7dd6b59087b933c97b1c1b38ef0d5a3b7700e2af",
+  "examples-copter.json": "6293f26ee6d0f20824c8524c3005bce57139aebade7673159d58f9e7a4d49d36",
+  "examples-plane.json": "fecacb6355c28d7c7bd152fe961dede83298e85425cd04461f2d090a4966dd9b",
+  "examples-rover.json": "ff55cb6622120d868404ad36afc4761267fea9429ff6a2e1ef6d726a834073bb",
+  "mission-B-confirm.png": "540881411f4b6bf163fd2f060048681dab15b2590756e1341f29c1b7d4f9e241",
+  "mission-B-result.png": "f48a2470f05ddedee6a44399ee323430742fa8ab319092ad14cd162d1edc2028",
+  "mission-writer-trajectories.png": "282d4ad64e8e67ea4161a3f6119dd856733766d03800852f98badc73488d4961",
+  "raw-sha256.json": "3a6ece2822d48d8dbf7289f129528bf5ba34dc874e66832ad36c5dbb69c97b40",
+  "rover-HOLD-ended.png": "d061ea1569aa12a4be2071f41e5520b7a9e275159d1ae4f4c4c8a58321922217",
+  "rover-stopping.png": "cd441c50001b5c2175a81c75c8d7bd35d4779766d17f3e42f66447961779f42c",
+  "rover-zero-hold.png": "dc21a27ce1d54faa0ebcfee7ad0063abf3faa5fb2706fae20ed6e96079febaa8",
+  "unit-full-final.txt": "b4ec60a2edc6872fd2d7a28ebb21b332da925f0399c5dc9751439053200d8874"
+}

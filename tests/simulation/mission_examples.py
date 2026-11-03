@@ -56,6 +56,7 @@ def run(path, kind):
         assert initial is not None
         templates = api('/api/studio-b/library')['templates']
         for definition in examples(target, kind):
+            writer_before=driver.info()['writer']['attempts']
             mission_id = definition['mission_id']
             assert mission_id in templates, 'late-attached simulation template missing'
             saved = api('/api/studio-b/draft/save', dict(definition=definition, expected_revision=0))
@@ -63,7 +64,8 @@ def run(path, kind):
             api('/api/studio-b/draft/validate', dict(mission_id=mission_id, revision=revision))
             publication = api('/api/studio-b/draft/publish', dict(mission_id=mission_id, revision=revision))
             motion = definition['metadata']['requires_send']
-            mission = api('/api/studio-b/run/start', dict(publication=publication['key'], allow_send=motion, debug=False))
+            binding = next(v['binding'] for v in api('/api/studio-b/catalog')['vehicles'] if v['target']==target)
+            mission = api('/api/studio-b/run/start', dict(publication=publication['key'], definition_hash=publication['definition_hash'], binding=binding, allow_send=motion, debug=False))
             deadline = time.monotonic()+definition['execution_policy']['timeout_s']+30
             checkpoints = {}
             while time.monotonic() < deadline:
@@ -91,6 +93,8 @@ def run(path, kind):
                 assert not commands
                 info = driver.info()
                 assert not info['system_send'] and not info['action_send'] and not info['lease_active']
+                assert info['writer']['attempts']==writer_before
+                result['vehicle_command_write_attempts']=info['writer']['attempts']-writer_before
                 continue
             state = driver.snapshot().vehicle
             speed = oracle.recent_speed_mps()

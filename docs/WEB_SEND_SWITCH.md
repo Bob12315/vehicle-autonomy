@@ -1,5 +1,11 @@
 # Vehicle Control: one SEND switch
 
+2026-11-03：Rover 新增独立“连续驾驶 ON/OFF”。先选择当前实例并开启 SEND，再进入
+GUIDED、解锁及开启连续驾驶。W/A/S/D 可组合；松键或“归零保持”继续同一 Drive，
+零速度停稳须有新鲜观测。停车/HOLD、关闭开关、失焦、断线及退出执行完整安全收尾。
+零目标在原 8 秒截止内未确认连续停稳时自动进入原 HOLD 制动，不允许持续滑行。下文为历史变更记录；
+本次实际证据及限制见 [控制与绑定报告](CONTROL_AND_MISSION_BINDING_REPORT.md)。
+
 2026-10-29 用户变更：Vehicle Control 只需点击一次 **SEND ON**，不再单独
 Acquire Control，也不再逐条授权或弹出 Arm/Disarm/Takeoff/AutoLand 的确认框。
 开启后，模式、目标、起飞/降落、每一段按住操控都直接由对应按钮触发。

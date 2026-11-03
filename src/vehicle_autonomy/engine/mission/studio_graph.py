@@ -87,6 +87,7 @@ def normalize(document):
     required={'schema_version','mission_id','revision','version','name','target','supported_vehicles','nodes','edges'}
     if type(d) is not dict or not required<=d.keys() or d.keys()-required-{'blackboard','execution_policy','resource_requirements','failure_policy','sub_mission_references','metadata','interface'}:raise ValueError('missing or unknown Studio definition fields')
     if d['schema_version']!=2 or type(d['schema_version']) is not int:raise ValueError('Studio schema_version=2 required')
+    if type(d['target']) is not str or d['target'] and not IDENTITY.fullmatch(d['target']):raise ValueError('explicit validation target or unbound empty target required')
     if not IDENTITY.fullmatch(d['mission_id']) or not SEMVER.fullmatch(d['version']):raise ValueError('stable Mission id and semantic version required')
     if type(d['revision']) is not int or d['revision']<0:raise ValueError('draft revision required')
     if type(d['name']) is not str or not 1<=len(d['name'])<=128:raise ValueError('bounded Mission name required')

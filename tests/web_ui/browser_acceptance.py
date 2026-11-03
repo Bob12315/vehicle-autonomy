@@ -16,7 +16,7 @@ def run(directory):
    browser=pw.chromium.launch(executable_path='/usr/bin/google-chrome',headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
    try:
     context=browser.new_context(viewport={'width':1680,'height':1100});page=context.new_page();page.on('pageerror',lambda e:errors.append(str(e)))
-    login(page,h.base,h.token,'/control');expect(page.locator('#vehicle-name')).to_contain_text('地面车')
+    login(page,h.base,h.token,'/control');page.locator('#target').select_option('rover');expect(page.locator('#vehicle-name')).to_contain_text('地面车')
     assert page.locator('#token').count()==0
     expect(page.locator('[data-action="Arm"]')).to_be_disabled()
     page.locator('#acquire-control').click();expect(page.locator('#top-authority')).to_have_text('开启指令发送')
@@ -39,7 +39,7 @@ def run(directory):
     for path in ('/console#dashboard','/console#tools','/console#workspaces','/console#logs','/console#settings','/studio','/control','/'):
      page.goto(h.base+path);page.wait_for_function('window.VAFAuth && window.VAFAuth.session');assert '/login' not in page.url
      assert page.locator('#login-key').count()==0 and page.locator('#token').count()==0
-    page.goto(h.base+'/control');page.reload();expect(page.locator('#vehicle-name')).to_contain_text('地面车');expect(page.locator('#top-authority')).to_have_text('关闭指令发送')
+    page.goto(h.base+'/control#rover');page.reload();expect(page.locator('#vehicle-name')).to_contain_text('地面车');expect(page.locator('#top-authority')).to_have_text('关闭指令发送')
     # Only presentation preferences may persist; credentials must remain in the
     # HttpOnly session rather than browser storage, even after visiting Studio.
     preferences=page.evaluate('Object.fromEntries(Object.entries(localStorage))')
@@ -59,7 +59,7 @@ def run(directory):
     expect(page.locator('#top-authority')).to_have_text('关闭指令发送',timeout=16000)
     expect(page.locator('#vehicle-name')).to_contain_text('地面车',timeout=15000)
     page.locator('[data-logout]').click();page.wait_for_url('**/login?next=**');expect(page.locator('#login-key')).to_be_visible()
-    login(page,h.base,h.token,'/control');expect(page.locator('#top-authority')).to_have_text('关闭指令发送')
+    login(page,h.base,h.token,'/control');page.locator('#target').select_option('rover');expect(page.locator('#top-authority')).to_have_text('关闭指令发送')
     h.server.sessions.lifetime_s=.01;page.wait_for_url('**/login?next=**',timeout=6000)
     report.update(passed=not errors,javascript_errors=errors,three_types=True,send_switch=True,per_action_authorization=False,one_login_across_pages=True,refresh_restores_session=True,reconnect_stays_observer=True,logout=True,expiry=True,widths=[1680,1280,1024,768,390],vehicle_writes=sum(len(d.writes) for d in h.drivers.values()))
     assert not errors and report['vehicle_writes']==0
@@ -72,7 +72,7 @@ def run(directory):
   with sync_playwright() as pw:
    b=pw.chromium.launch(executable_path='/usr/bin/google-chrome',headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
    try:
-    p=b.new_page();login(p,th.base,th.web_token,'/control')
+    p=b.new_page();login(p,th.base,th.web_token,'/control#copter')
     p.locator('.tool-shortcut').get_by_role('button',name='打开窗口',exact=True).click()
     expect(p.locator('.tool-shortcut button')).to_have_text('已运行',timeout=12000)
     assert th.local.counter==1 and not th.lab.runtime.views()

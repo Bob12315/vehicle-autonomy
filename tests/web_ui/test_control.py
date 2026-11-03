@@ -76,3 +76,18 @@ class OperatorTests(unittest.TestCase):
   self.assertEqual(self.c.call('/api/control/takeover',{'target':'rover'})[0],409)
   self.assertEqual(self.c.call('/api/control/request-takeover',{'target':'rover','confirmed':True})[0],200)
   self.assertFalse(self.h.drivers['rover'].info()['system_send'])
+
+ def test_application_exit_waits_for_action_before_retiring_simulation_and_fences_new_control(self):
+  self.c.acquire();code,data,_=self.c.call('/api/manual/action',dict(name='long',target='rover'))
+  self.assertEqual(code,200,data);identifier=data['result']['id']
+  self.wait(lambda:self.h.lab.runtime.view(identifier)['state']=='RUNNING')
+  manager=self.h.lab.simulation_manager;close=manager.close;observed=[]
+  def retire():
+   action=self.h.lab.runtime.view(identifier);observed.append(action['state'])
+   self.assertEqual(action['state'],'CANCELLED');self.assertTrue(action['safety']['release_safe'])
+   with self.assertRaisesRegex(ValueError,'closing'):
+    self.h.lab._manual_action(dict(name='ok',target='rover'))
+   return close()
+  manager.close=retire
+  self.h.lab.close()
+  self.assertTrue(observed)

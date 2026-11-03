@@ -56,9 +56,10 @@ class GraphRun:
 
 
 class MissionGraphRuntime:
-    def __init__(self, actions, journal, events, *, clock, deployment_identities=None, recovered_manual=None,external_inputs=None):
+    def __init__(self, actions, journal, events, *, clock, deployment_identities=None, recovered_manual=None,external_inputs=None,binding_guard=None):
         self.actions, self.journal, self.events, self.clock = actions, journal, events, clock
         self.external_inputs=external_inputs
+        self.binding_guard=binding_guard
         self.identities = deepcopy(deployment_identities or {})
         self.runs = {}
         self.recovered = deepcopy(journal.data['runs'])
@@ -97,7 +98,7 @@ class MissionGraphRuntime:
     def validate(self, document):
         return validate(document, self.actions.registry, self.actions.drivers)
 
-    def start(self, document, *, allow_send=False, continuation_of=None, debug=False):
+    def start(self, document, *, allow_send=False, continuation_of=None, debug=False, execution_binding=None, publication_spec=None):
         if type(allow_send) is not bool: raise ValueError('explicit Mission SEND bool required')
         if type(debug) is not bool:raise ValueError('explicit debug bool required')
         spec = self.validate(document)
@@ -107,8 +108,15 @@ class MissionGraphRuntime:
                 if not (old['continuation_allowed'] and old['continuation_of'] == continuation_of):
                     raise ValueError('target owned by active/uncertain Mission')
         if len(self.journal.data['runs']) >= 64: raise ValueError('Mission history budget exhausted')
-        self.journal.save_version(spec)
+        if execution_binding is not None and execution_binding['instance']['target'] != d['target']:
+            raise ValueError('execution binding target mismatch')
+        # A bound execution is a derived snapshot. The canonical published
+        # version remains immutable and is not overwritten by another instance.
+        self.journal.save_version(spec if publication_spec is None else publication_spec)
         r = GraphRun(spec, self.clock(), self.events.cursor, allow_send, continuation_of)
+        r.execution_binding=deepcopy(execution_binding)
+        r.expected_instance=None if execution_binding is None else deepcopy(execution_binding['instance'])
+        r.adopted_handoffs=set()
         r.studio=None
         if 'studio' in r.spec:
             from .studio_state import StudioState
@@ -378,9 +386,11 @@ class MissionGraphRuntime:
                     elif any(self.actions.assess(i)['state']=='UNKNOWN' for i in r.studio.takeover['interrupted_actions']):
                         r.state='UNKNOWN';r.error='takeover blocked by unconfirmed Action exit';self._event(r,'takeover_blocked')
                 elif r.state=='PAUSED':
+                    if self.binding_guard and r.execution_binding:self.binding_guard(r)
                     self._persist(r);continue
                 elif r.studio and r.studio.pause_requested and r.studio.safe_boundary():r.state='PAUSED'
                 else:
+                    if self.binding_guard and r.execution_binding:self.binding_guard(r)
                     state = self._tick_node(r, r.spec['root'], now)
                     if state in TERMINAL:
                         if state != 'SUCCEEDED':
@@ -409,6 +419,7 @@ class MissionGraphRuntime:
         continuation = r.state == 'SUCCEEDED' and not safe and latest is not None and latest['safety'] and latest['safety']['continuation_allowed'] and all(
             self._action_safe(a) or a['state'] == 'SUCCEEDED' and a['safety'] and a['safety']['continuation_allowed'] for a in views)
         result=dict(id=r.id, mission_id=r.spec['id'], version=r.spec['version'], target=r.spec['target'],
+            execution_binding=deepcopy(r.execution_binding),
             provider_bindings=deepcopy(r.provider_bindings),resource_claims=to_json_value(r.permit.resources),resource_group_id=r.permit.id,
             deployment_identity=deepcopy(r.deployment_identity), state=r.state, release_safe=safe, continuation_allowed=bool(continuation), continuation_of=r.continuation,
             error=r.error, deadline_ns=r.deadline_ns, spec=deepcopy(r.spec),
@@ -438,6 +449,7 @@ class MissionGraphRuntime:
         r=self.runs[identifier];s=r.studio
         if s is None:raise ValueError('Studio debug requires a schema-2 publication')
         if r.state in TERMINAL and not (r.state=='SUSPENDED' and operation=='resume'):raise ValueError('terminal/uncertain run cannot be resumed by debug')
+        if operation in ('resume','step','retry') and self.binding_guard and r.execution_binding:self.binding_guard(r)
         if operation=='takeover':
             if s.takeover is not None:raise ValueError('takeover already requested')
             interrupted=[i for i in r.actions if not self._action_safe(self.actions.assess(i))]

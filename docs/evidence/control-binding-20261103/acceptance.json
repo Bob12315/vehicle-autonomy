@@ -1,0 +1,1692 @@
+{
+  "unit_tests": {
+    "count": 969,
+    "seconds": 135.462,
+    "status": "PASS"
+  },
+  "rover_motion": {
+    "status": "PASS",
+    "checks": {
+      "ordinary Goto and observed HOLD exit": "PASS",
+      "rover continuous direction / zero stop / active HOLD / deadman": "PASS"
+    },
+    "stopping": [
+      {
+        "kind": "baseline release HOLD",
+        "action_id": "action:537a51360f2f4d8a85e28c211a05ff0b",
+        "state": "CANCELLED",
+        "release_safe": true,
+        "speed_before": 0.17012655987254852,
+        "stop_time_s": 0.563242153,
+        "stop_distance_m": 0.05360346411013961,
+        "final_speed_mps": 0.0022562387856637023,
+        "exit_time_s": 2.736015107
+      },
+      {
+        "kind": "neutral",
+        "action_id": "action:04694db682784f2ba7275cae1a1d252b",
+        "state": "RUNNING",
+        "error": null,
+        "speed_before": 0.2221878027961653,
+        "stop_time_s": 2.912312082,
+        "stop_distance_m": 0.37882428728569356,
+        "mode": "ARDUPILOT_CUSTOM_15"
+      },
+      {
+        "kind": "active HOLD",
+        "action_id": "action:04694db682784f2ba7275cae1a1d252b",
+        "state": "CANCELLED",
+        "release_safe": true,
+        "speed_before": 0.10719542716402566,
+        "stop_time_s": 0.357350479,
+        "stop_distance_m": 0.027074810545791757,
+        "final_speed_mps": 0.0027927504281106794,
+        "exit_time_s": 3.300347048
+      },
+      {
+        "kind": "neutral",
+        "action_id": "action:65e740408ab3493bae863867af473d62",
+        "state": "RUNNING",
+        "error": null,
+        "speed_before": 0.24704588283184917,
+        "stop_time_s": 4.190022613,
+        "stop_distance_m": 0.5715585457701874,
+        "mode": "ARDUPILOT_CUSTOM_15"
+      },
+      {
+        "kind": "active HOLD",
+        "action_id": "action:65e740408ab3493bae863867af473d62",
+        "state": "CANCELLED",
+        "release_safe": true,
+        "speed_before": 0.10800813273559469,
+        "stop_time_s": 0.326864054,
+        "stop_distance_m": 0.029354836322741294,
+        "final_speed_mps": 0.0044770258137896805,
+        "exit_time_s": 2.909166418
+      },
+      {
+        "kind": "deadman HOLD",
+        "action_id": "action:4166b24520e348c4a2e5722026592b9a",
+        "state": "TIMED_OUT",
+        "release_safe": true,
+        "speed_before": 0.16858200776126075,
+        "stop_time_s": 0.984682446,
+        "stop_distance_m": 0.1264623595298564,
+        "final_speed_mps": 0.00040662892873811313,
+        "exit_time_s": 4.015872879
+      }
+    ],
+    "direction_changes": [
+      {
+        "action_id": "action:65e740408ab3493bae863867af473d62",
+        "speed_target": 0.3,
+        "yaw_target": 0.25,
+        "seconds": 6.0,
+        "yaw_change": 1.0876410128324205,
+        "forward_displacement": 1.277096632965752,
+        "final_yaw_rate": 0.5180711770313853,
+        "final_body_speed": 0.18722567486098343
+      },
+      {
+        "action_id": "action:65e740408ab3493bae863867af473d62",
+        "speed_target": 0.3,
+        "yaw_target": -0.25,
+        "seconds": 6.0,
+        "yaw_change": 0.19421658902777406,
+        "forward_displacement": 1.522877516745343,
+        "final_yaw_rate": -0.22469226918645305,
+        "final_body_speed": 0.2927509323849665
+      },
+      {
+        "action_id": "action:65e740408ab3493bae863867af473d62",
+        "speed_target": -0.3,
+        "yaw_target": 0.0,
+        "seconds": 6.0,
+        "yaw_change": -1.1408737441149757,
+        "forward_displacement": 0.3914494658643256,
+        "final_yaw_rate": -0.2461635466787463,
+        "final_body_speed": -0.09322217447724421
+      },
+      {
+        "action_id": "action:65e740408ab3493bae863867af473d62",
+        "speed_target": -0.3,
+        "yaw_target": 0.25,
+        "seconds": 2.0,
+        "yaw_change": -0.32228224338979594,
+        "forward_displacement": -0.2388888984415081,
+        "final_yaw_rate": -0.10576659546041187,
+        "final_body_speed": -0.15172349685666695
+      },
+      {
+        "action_id": "action:65e740408ab3493bae863867af473d62",
+        "speed_target": 0.3,
+        "yaw_target": 0.0,
+        "seconds": 6.0,
+        "yaw_change": 0.6213225255957081,
+        "forward_displacement": 0.6009435275967183,
+        "final_yaw_rate": 0.26669119746153586,
+        "final_body_speed": 0.16001298673375713
+      }
+    ],
+    "cleanup": {
+      "sim-6a2afa610e0f4c7fb55b76697bef3059": {
+        "state": "FINISHED",
+        "cleanup": "COMPLETE"
+      }
+    }
+  },
+  "rover_browser": {
+    "status": "PASS",
+    "checks": {
+      "browser SEND revocation / HTTP+WS loss / no auto-resume": "PASS",
+      "real browser W+A / W+D / reverse / zero / toggle OFF / blur": "PASS",
+      "program exit while moving / observed stop before entity cleanup": "PASS"
+    },
+    "browser_errors": [],
+    "cleanup": {
+      "sim-524c8c95c10a4cb49d35b561b343dcc7": {
+        "state": "FINISHED",
+        "cleanup": "COMPLETE"
+      }
+    },
+    "shutdown": {
+      "state": "CANCELLED",
+      "safety": {
+        "release_safe": true,
+        "continuation_allowed": false,
+        "reason": "execution exit confirmed",
+        "evidence": {
+          "stops": {}
+        }
+      },
+      "last_truth": {
+        "at_ns": 2299166147237,
+        "target": "simulation-97eaea1942584711a5d567555fa063b2",
+        "truth": {
+          "model": "vaf_vehicle_d6b6b82ee02341649e375f1103f10ea2",
+          "host_received_ns": 2299138178151,
+          "simulation_ns": 114633000000,
+          "x_m": 2.367174739360201,
+          "y_m": 0.00040869538118991523,
+          "z_m": -4.559081057120551e-09,
+          "yaw_rad": 0.0017528445445747366
+        },
+        "speed_mps": 0.003573750900133394,
+        "yaw_rate": 1.1346164320072244e-05,
+        "writer": null,
+        "session_id": null
+      },
+      "action_id": "action:e10b91f5d2fb422fba9121ecd9a194a4"
+    }
+  },
+  "binding": {
+    "status": "PASS",
+    "checks": {
+      "rover_B_only_motion": "PASS",
+      "two_browser_independent_selection": "PASS",
+      "resource_conflict_no_extra_action": "PASS",
+      "running_binding_immutable": "PASS",
+      "readonly_no_SEND_no_motion_writes": "PASS",
+      "Rover + Copter incompatible reject": "PASS",
+      "remove A / add C never rebound": "PASS",
+      "catalog add / remove synchronized": "PASS",
+      "original publication unchanged": "PASS",
+      "World switch rejects old target / epoch": "PASS",
+      "new target with old epoch / link / generation rejects without Writer": "PASS",
+      "Copter A + B same immutable publication / real takeoff and landing": "PASS"
+    },
+    "missions": [
+      {
+        "id": "mission-run:f339bf7841e446d5979d47546956fa0e",
+        "mission_id": "Binding_Rover_Patrol",
+        "version": "1.0.0",
+        "target": "simulation-563dd68479a34e609cf8843270f8e601",
+        "execution_binding": {
+          "publication": "Binding_Rover_Patrol@1.0.0",
+          "definition_hash": "d593e15d408f6ab4b8383c7967da4be705982ff370dab38041beda27303982f3",
+          "instance": {
+            "target": "simulation-563dd68479a34e609cf8843270f8e601",
+            "kind": "rover",
+            "vehicle_id": "vehicle-6375f2e5595342a3a2909862dad1a8c4",
+            "system_id": 42,
+            "world": "vaf_sim_7d9692079ffd4306bbe2c1b7c93fe211",
+            "simulation_session": "sim-7d9692079ffd4306bbe2c1b7c93fe211",
+            "epoch": "51df362108df5c87b0f7b63c7546ad490fe811a63f12857740d29cd9bc43422c",
+            "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+            "generation": "19c0f79e32c94988bf8459ccdad6d90b"
+          }
+        },
+        "state": "SUCCEEDED",
+        "release_safe": true,
+        "error": null,
+        "action_ids": [
+          "action:427e5b9b73fe4f11bb204f945537b1a0",
+          "action:93d7ffde839a4e81aaa83f600ef00897",
+          "action:6ae963c0e34e4ce1baf909183997241d",
+          "action:5d2d42d3ea74497ea68157f8bf95747d",
+          "action:67c8f62b719f433381424d211038130e",
+          "action:e38eb0dd4f6c409aa86e732d1c96ad7d",
+          "action:23284c65557846829c9b6fdb614a8c2b",
+          "action:af13629d722044b88c1b59cd98112433",
+          "action:631eefed0589467ca4f59f55b55f59f8",
+          "action:e72fffeb95ac4f7db8f40251610a897e",
+          "action:85634916f5794db38654db2db25d08da"
+        ]
+      },
+      {
+        "id": "mission-run:481db3d6c83044aa8183665b6c0a81f1",
+        "mission_id": "Example_StateSurvey",
+        "version": "1.0.0",
+        "target": "simulation-5dd6fd8fd6644feeb9575d8266f50265",
+        "execution_binding": {
+          "publication": "Example_StateSurvey@1.0.0",
+          "definition_hash": "0be8739f35ce4031e5e3a48165679898d76357c1940b5e5e394c15d9dc276e31",
+          "instance": {
+            "target": "simulation-5dd6fd8fd6644feeb9575d8266f50265",
+            "kind": "rover",
+            "vehicle_id": "vehicle-9accf3b6ef554a298ebd6c9fe1b6e60c",
+            "system_id": 41,
+            "world": "vaf_sim_7d9692079ffd4306bbe2c1b7c93fe211",
+            "simulation_session": "sim-7d9692079ffd4306bbe2c1b7c93fe211",
+            "epoch": "836b3bbdb924c84c285850eeafa4ade7dfd76281d907fe65feb9e3106f00a458",
+            "session_id": "ff3aea688aa0464b9bcdd604fec5eafd",
+            "generation": "47e54aac7f42460281dc5f034631c4fc"
+          }
+        },
+        "state": "SUCCEEDED",
+        "release_safe": true,
+        "error": null,
+        "action_ids": [
+          "action:a161510b03e44ed59b18234a391aa597",
+          "action:e47e3bf0dc644294937db8dd67ad5128",
+          "action:e6b6606249394deca6dd2426ea41fbf5"
+        ]
+      },
+      {
+        "id": "mission-run:05e163ef157b41f39a6fa33fe8cfc898",
+        "mission_id": "Example_Air_HoverLand",
+        "version": "1.0.0",
+        "target": "simulation-1a6274cb5d674b0ab2a331b34b4fbae1",
+        "execution_binding": {
+          "publication": "Example_Air_HoverLand@1.0.0",
+          "definition_hash": "b33bde4b6ee2995230e325d488c069c5d47649e0f3e05c2a879be6ef38e62d55",
+          "instance": {
+            "target": "simulation-1a6274cb5d674b0ab2a331b34b4fbae1",
+            "kind": "copter",
+            "vehicle_id": "vehicle-c117ec276ce64d94b7e3a72e331b9517",
+            "system_id": 41,
+            "world": "vaf_sim_0163a09285a7478b8c957feafc1c409e",
+            "simulation_session": "sim-0163a09285a7478b8c957feafc1c409e",
+            "epoch": "d71a142cf735a66fa0bfcc5840a04b73da0cddf9c5ec5b8a920f639f139f1ef9",
+            "session_id": "4a993d46b4e24272900863636abe5a9a",
+            "generation": "1fb2fb20e2aa41deba31858ec32f8b66"
+          }
+        },
+        "state": "SUCCEEDED",
+        "release_safe": true,
+        "error": null,
+        "action_ids": [
+          "action:002730e837674745975df97dd4245cea",
+          "action:0123ad37d9a14ef4bf27c5c52d1bdfe8",
+          "action:c72072d7045d45d982e2c51e45e75302",
+          "action:375a4c4f22b84bdc9f94e6569e57ea1e",
+          "action:398a19af8b3e40e8baabb84b32ad27ca",
+          "action:6070db60b8b54546aa20e318634a9373"
+        ]
+      },
+      {
+        "id": "mission-run:f695c889440a437689adc747408c3d4c",
+        "mission_id": "Example_Air_HoverLand",
+        "version": "1.0.0",
+        "target": "simulation-68ff4cacc9fe401e95d47b3432bd09da",
+        "execution_binding": {
+          "publication": "Example_Air_HoverLand@1.0.0",
+          "definition_hash": "b33bde4b6ee2995230e325d488c069c5d47649e0f3e05c2a879be6ef38e62d55",
+          "instance": {
+            "target": "simulation-68ff4cacc9fe401e95d47b3432bd09da",
+            "kind": "copter",
+            "vehicle_id": "vehicle-0925d98507f448a09f94938a6c0f22b4",
+            "system_id": 42,
+            "world": "vaf_sim_0163a09285a7478b8c957feafc1c409e",
+            "simulation_session": "sim-0163a09285a7478b8c957feafc1c409e",
+            "epoch": "68b5ac1cd467f2f009a044be2a2ed5d89d52c8dac58c39c30d134801b4481774",
+            "session_id": "a5cb0a4ae3d4446387234194f04fe7d1",
+            "generation": "ee9671000bad4a8c8772eae0e7f9e49d"
+          }
+        },
+        "state": "SUCCEEDED",
+        "release_safe": true,
+        "error": null,
+        "action_ids": [
+          "action:29258634b02547e1a4ecff3e9cf93f9f",
+          "action:40ddce0c0e214d65bf8ebed58a32b634",
+          "action:8439dc5fe4214ca9901aa19f45201d32",
+          "action:a99cb0f834ed49c8a4a6b9eea17ff47a",
+          "action:a8155dd16535417fb8f3c867feae6736",
+          "action:c1712deee0cd46a1b35cfaf2ee14f7c2"
+        ]
+      }
+    ],
+    "vehicles": [
+      {
+        "vehicle_id": "vehicle-9accf3b6ef554a298ebd6c9fe1b6e60c",
+        "target": "simulation-5dd6fd8fd6644feeb9575d8266f50265",
+        "kind": "rover",
+        "system_id": 41,
+        "entity_name": "vaf_vehicle_9accf3b6ef554a298ebd6c9fe1b6e60c",
+        "spawn": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0,
+          "heading_deg": 0.0,
+          "preset_id": "center"
+        }
+      },
+      {
+        "vehicle_id": "vehicle-6375f2e5595342a3a2909862dad1a8c4",
+        "target": "simulation-563dd68479a34e609cf8843270f8e601",
+        "kind": "rover",
+        "system_id": 42,
+        "entity_name": "vaf_vehicle_6375f2e5595342a3a2909862dad1a8c4",
+        "spawn": {
+          "x": 0.0,
+          "y": 3.0,
+          "z": 0.0,
+          "heading_deg": 0.0,
+          "preset_id": "north"
+        }
+      }
+    ],
+    "writer_binding": {
+      "A": {
+        "target": "simulation-5dd6fd8fd6644feeb9575d8266f50265",
+        "system_id": 41,
+        "writer": {
+          "target_system": 41,
+          "attempts": 0,
+          "recent": []
+        }
+      },
+      "B": {
+        "target": "simulation-563dd68479a34e609cf8843270f8e601",
+        "system_id": 42,
+        "writer": {
+          "target_system": 42,
+          "attempts": 84,
+          "recent": [
+            {
+              "sequence": 21,
+              "command_id": "command:c7a533fc4a794dfca3b67770b3ebd859",
+              "run_id": "action:5d2d42d3ea74497ea68157f8bf95747d",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2455122643303,
+              "vx_mps": 0.1048303516950778,
+              "yaw_rate_rad_s": -0.002676765995664519
+            },
+            {
+              "sequence": 22,
+              "command_id": "command:e082c167585e41cf9c3e8d64c9e48713",
+              "run_id": "action:5d2d42d3ea74497ea68157f8bf95747d",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2455558108708,
+              "vx_mps": 0.1048303516950778,
+              "yaw_rate_rad_s": -0.002676765995664519
+            },
+            {
+              "sequence": 23,
+              "command_id": "command:1afbfd23b43a429b92cf4cb66c3a7aec",
+              "run_id": "action:5d2d42d3ea74497ea68157f8bf95747d",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2455918280483,
+              "vx_mps": 0.05036602397386574,
+              "yaw_rate_rad_s": -0.003160132995346449
+            },
+            {
+              "sequence": 24,
+              "command_id": "command:31697bf07d074dd88e25b25e1b156b27",
+              "run_id": "action:5d2d42d3ea74497ea68157f8bf95747d",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2456226740801,
+              "vx_mps": 0.05036602397386574,
+              "yaw_rate_rad_s": -0.003160132995346449
+            },
+            {
+              "sequence": 25,
+              "command_id": "command:992c1597194c4d129fb5ee217163de06",
+              "run_id": "action:5d2d42d3ea74497ea68157f8bf95747d",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2456538219838,
+              "vx_mps": 0.05036602397386574,
+              "yaw_rate_rad_s": -0.003160132995346449
+            },
+            {
+              "sequence": 26,
+              "command_id": "command:e7e2614b808e40baaf07d509e368d195",
+              "run_id": "action:5d2d42d3ea74497ea68157f8bf95747d",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2456849343473,
+              "vx_mps": 0.014058289340946785,
+              "yaw_rate_rad_s": -0.0036377930277489414
+            },
+            {
+              "sequence": 27,
+              "command_id": "command:e6307acb564a41179cb0329aa2b95aa3",
+              "run_id": "action:5d2d42d3ea74497ea68157f8bf95747d",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2457160115879,
+              "vx_mps": 0.014058289340946785,
+              "yaw_rate_rad_s": -0.0036377930277489414
+            },
+            {
+              "sequence": 28,
+              "command_id": "command:fbd0853808024bd1813deff27bc852f5",
+              "run_id": "action:5d2d42d3ea74497ea68157f8bf95747d",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2457591872977,
+              "vx_mps": 0.014058289340946785,
+              "yaw_rate_rad_s": -0.0036377930277489414
+            },
+            {
+              "sequence": 29,
+              "command_id": "command:13e15a5077ef4976a1ddbc7112385cdd",
+              "run_id": "action:5d2d42d3ea74497ea68157f8bf95747d",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "StopMotionCommand",
+              "at_ns": 2457902646885,
+              "vx_mps": 0.0,
+              "yaw_rate_rad_s": 0.0
+            },
+            {
+              "sequence": 30,
+              "command_id": "command:8b68e8c2077c4e7bad00cc4a54f5e5e0",
+              "run_id": "action:5d2d42d3ea74497ea68157f8bf95747d",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "ModeCommand",
+              "at_ns": 2457932678930,
+              "vx_mps": null,
+              "yaw_rate_rad_s": null
+            },
+            {
+              "sequence": 31,
+              "command_id": "command:b995cffd4d36435cb3edfd88bc14dd5c",
+              "run_id": "action:67c8f62b719f433381424d211038130e",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "ModeCommand",
+              "at_ns": 2461718824900,
+              "vx_mps": null,
+              "yaw_rate_rad_s": null
+            },
+            {
+              "sequence": 32,
+              "command_id": "command:f6bc27a877384170914187a0de45e579",
+              "run_id": "action:e38eb0dd4f6c409aa86e732d1c96ad7d",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2462199093478,
+              "vx_mps": 0.3499973264642582,
+              "yaw_rate_rad_s": -0.0014891540044250687
+            },
+            {
+              "sequence": 33,
+              "command_id": "command:34f7b17342724f3193ca1e4d12ab5664",
+              "run_id": "action:e38eb0dd4f6c409aa86e732d1c96ad7d",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2462520227290,
+              "vx_mps": 0.3499973264642582,
+              "yaw_rate_rad_s": -0.0014891540044250687
+            },
+            {
+              "sequence": 34,
+              "command_id": "command:847853ba9e47452caf19a444dde1cfc7",
+              "run_id": "action:e38eb0dd4f6c409aa86e732d1c96ad7d",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2462922220548,
+              "vx_mps": 0.3499971619833581,
+              "yaw_rate_rad_s": -0.0014700170381733066
+            },
+            {
+              "sequence": 35,
+              "command_id": "command:3776005e60084335b5a9e59a3b33ac29",
+              "run_id": "action:e38eb0dd4f6c409aa86e732d1c96ad7d",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2463303375259,
+              "vx_mps": 0.3499971619833581,
+              "yaw_rate_rad_s": -0.0014700170381733066
+            },
+            {
+              "sequence": 36,
+              "command_id": "command:4a5ba41b5f644fcd9ac26c02c9505909",
+              "run_id": "action:e38eb0dd4f6c409aa86e732d1c96ad7d",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2463624604590,
+              "vx_mps": 0.3499971619833581,
+              "yaw_rate_rad_s": -0.0014700170381733066
+            },
+            {
+              "sequence": 37,
+              "command_id": "command:713e39b258714dbf96b684169f239401",
+              "run_id": "action:e38eb0dd4f6c409aa86e732d1c96ad7d",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2463905745446,
+              "vx_mps": 0.3499966420458066,
+              "yaw_rate_rad_s": -0.0015402348716039129
+            },
+            {
+              "sequence": 38,
+              "command_id": "command:8a80fa9a848547a683a10573a4bd352b",
+              "run_id": "action:e38eb0dd4f6c409aa86e732d1c96ad7d",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2464337578685,
+              "vx_mps": 0.3499966420458066,
+              "yaw_rate_rad_s": -0.0015402348716039129
+            },
+            {
+              "sequence": 39,
+              "command_id": "command:2bf5feb7a899477a9d51e5ed6e513aca",
+              "run_id": "action:e38eb0dd4f6c409aa86e732d1c96ad7d",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2464648873078,
+              "vx_mps": 0.3499966420458066,
+              "yaw_rate_rad_s": -0.0015402348716039129
+            },
+            {
+              "sequence": 40,
+              "command_id": "command:d9d27cc6da7b4ec78fd94c2f1ca6528d",
+              "run_id": "action:e38eb0dd4f6c409aa86e732d1c96ad7d",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2464930573360,
+              "vx_mps": 0.3052504102732547,
+              "yaw_rate_rad_s": -0.0016609112578440154
+            },
+            {
+              "sequence": 41,
+              "command_id": "command:36aff9302dfa46f98f70f327af5843b2",
+              "run_id": "action:e38eb0dd4f6c409aa86e732d1c96ad7d",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2465280303960,
+              "vx_mps": 0.3052504102732547,
+              "yaw_rate_rad_s": -0.0016609112578440154
+            },
+            {
+              "sequence": 42,
+              "command_id": "command:7562281df20f402ca27f39f00d6a3342",
+              "run_id": "action:e38eb0dd4f6c409aa86e732d1c96ad7d",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2465582505379,
+              "vx_mps": 0.3052504102732547,
+              "yaw_rate_rad_s": -0.0016609112578440154
+            },
+            {
+              "sequence": 43,
+              "command_id": "command:77601c95819f46d29a03d952929d36aa",
+              "run_id": "action:e38eb0dd4f6c409aa86e732d1c96ad7d",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2465961497365,
+              "vx_mps": 0.21901056246881614,
+              "yaw_rate_rad_s": -0.0018415652133977412
+            },
+            {
+              "sequence": 44,
+              "command_id": "command:61c1347f116d416cab99b5b891969582",
+              "run_id": "action:e38eb0dd4f6c409aa86e732d1c96ad7d",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2466406627917,
+              "vx_mps": 0.21901056246881614,
+              "yaw_rate_rad_s": -0.0018415652133977412
+            },
+            {
+              "sequence": 45,
+              "command_id": "command:9e6ae4c3e4f042898424fdef37a38b35",
+              "run_id": "action:e38eb0dd4f6c409aa86e732d1c96ad7d",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2466721012802,
+              "vx_mps": 0.21901056246881614,
+              "yaw_rate_rad_s": -0.0018415652133977412
+            },
+            {
+              "sequence": 46,
+              "command_id": "command:9c5d5409668e4013968fdb8990f33799",
+              "run_id": "action:e38eb0dd4f6c409aa86e732d1c96ad7d",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2467107855934,
+              "vx_mps": 0.13731061976874662,
+              "yaw_rate_rad_s": -0.0021216927078372585
+            },
+            {
+              "sequence": 47,
+              "command_id": "command:5bf5542cf32c460da72ad321813b97f9",
+              "run_id": "action:e38eb0dd4f6c409aa86e732d1c96ad7d",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2467489139074,
+              "vx_mps": 0.13731061976874662,
+              "yaw_rate_rad_s": -0.0021216927078372585
+            },
+            {
+              "sequence": 48,
+              "command_id": "command:339142628c9f41bf9611f10621a1ae94",
+              "run_id": "action:e38eb0dd4f6c409aa86e732d1c96ad7d",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2467801149461,
+              "vx_mps": 0.06469027341151541,
+              "yaw_rate_rad_s": -0.002586374571823152
+            },
+            {
+              "sequence": 49,
+              "command_id": "command:4189db47c3744bf8bca2c131e6d21b85",
+              "run_id": "action:e38eb0dd4f6c409aa86e732d1c96ad7d",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2468151531727,
+              "vx_mps": 0.06469027341151541,
+              "yaw_rate_rad_s": -0.002586374571823152
+            },
+            {
+              "sequence": 50,
+              "command_id": "command:e81ebf5dd73e4dcbbdfbae18f6caa278",
+              "run_id": "action:e38eb0dd4f6c409aa86e732d1c96ad7d",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2468463393218,
+              "vx_mps": 0.06469027341151541,
+              "yaw_rate_rad_s": -0.002586374571823152
+            },
+            {
+              "sequence": 51,
+              "command_id": "command:650955afb857452aa39f9fbd14960d39",
+              "run_id": "action:e38eb0dd4f6c409aa86e732d1c96ad7d",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2468854853962,
+              "vx_mps": 0.0056893475001360905,
+              "yaw_rate_rad_s": -0.003248496880024902
+            },
+            {
+              "sequence": 52,
+              "command_id": "command:4cb07db8b276443484c1499aa299c006",
+              "run_id": "action:e38eb0dd4f6c409aa86e732d1c96ad7d",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2469156587850,
+              "vx_mps": 0.0056893475001360905,
+              "yaw_rate_rad_s": -0.003248496880024902
+            },
+            {
+              "sequence": 53,
+              "command_id": "command:f483af340aef464abc505e5c3eed1c9a",
+              "run_id": "action:e38eb0dd4f6c409aa86e732d1c96ad7d",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2469457639889,
+              "vx_mps": 0.0056893475001360905,
+              "yaw_rate_rad_s": -0.003248496880024902
+            },
+            {
+              "sequence": 54,
+              "command_id": "command:f96b05fb2be641228212e8f28635be02",
+              "run_id": "action:e38eb0dd4f6c409aa86e732d1c96ad7d",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2469768687738,
+              "vx_mps": 0.0056893475001360905,
+              "yaw_rate_rad_s": -0.003248496880024902
+            },
+            {
+              "sequence": 55,
+              "command_id": "command:c6e094f59f8e4bf086380ac7854349cd",
+              "run_id": "action:e38eb0dd4f6c409aa86e732d1c96ad7d",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "StopMotionCommand",
+              "at_ns": 2469918749045,
+              "vx_mps": 0.0,
+              "yaw_rate_rad_s": 0.0
+            },
+            {
+              "sequence": 56,
+              "command_id": "command:67ad92a4a80147ce98fb0c26a8f601b8",
+              "run_id": "action:e38eb0dd4f6c409aa86e732d1c96ad7d",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "ModeCommand",
+              "at_ns": 2469938705422,
+              "vx_mps": null,
+              "yaw_rate_rad_s": null
+            },
+            {
+              "sequence": 57,
+              "command_id": "command:1997944cae884ee9a7c3bccb98a64190",
+              "run_id": "action:23284c65557846829c9b6fdb614a8c2b",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "ModeCommand",
+              "at_ns": 2473734090242,
+              "vx_mps": null,
+              "yaw_rate_rad_s": null
+            },
+            {
+              "sequence": 58,
+              "command_id": "command:f0bc3c22ff5b4b369431c3c8afd50643",
+              "run_id": "action:af13629d722044b88c1b59cd98112433",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2474246512713,
+              "vx_mps": 0.34999934858659926,
+              "yaw_rate_rad_s": -0.0010720944866125948
+            },
+            {
+              "sequence": 59,
+              "command_id": "command:af122f52c1304209bbe1847ae5c67996",
+              "run_id": "action:af13629d722044b88c1b59cd98112433",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2474557615404,
+              "vx_mps": 0.34999934858659926,
+              "yaw_rate_rad_s": -0.0010720944866125948
+            },
+            {
+              "sequence": 60,
+              "command_id": "command:5f84817817004a07a38b9dd0c7c90ee9",
+              "run_id": "action:af13629d722044b88c1b59cd98112433",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2474829331961,
+              "vx_mps": 0.34999941133505924,
+              "yaw_rate_rad_s": -0.0007700158428655509
+            },
+            {
+              "sequence": 61,
+              "command_id": "command:0ca424a80c4c47cba0029d7b3557a4cc",
+              "run_id": "action:af13629d722044b88c1b59cd98112433",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2475100101174,
+              "vx_mps": 0.34999941133505924,
+              "yaw_rate_rad_s": -0.0007700158428655509
+            },
+            {
+              "sequence": 62,
+              "command_id": "command:3258819a4dfa4642a87e8bc64990e973",
+              "run_id": "action:af13629d722044b88c1b59cd98112433",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2475411651475,
+              "vx_mps": 0.34999941133505924,
+              "yaw_rate_rad_s": -0.0007700158428655509
+            },
+            {
+              "sequence": 63,
+              "command_id": "command:4a383152cbef4cf98885ce791ece3f88",
+              "run_id": "action:af13629d722044b88c1b59cd98112433",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2475773200111,
+              "vx_mps": 0.34999941133505924,
+              "yaw_rate_rad_s": -0.0007700158428655509
+            },
+            {
+              "sequence": 64,
+              "command_id": "command:adff25af264746e9b8885eb97702609b",
+              "run_id": "action:af13629d722044b88c1b59cd98112433",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2476124516657,
+              "vx_mps": 0.3499995291072762,
+              "yaw_rate_rad_s": -0.0005470217413540102
+            },
+            {
+              "sequence": 65,
+              "command_id": "command:5d55033812f84fe9b1ccc191150f2a15",
+              "run_id": "action:af13629d722044b88c1b59cd98112433",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2476465441326,
+              "vx_mps": 0.3499995291072762,
+              "yaw_rate_rad_s": -0.0005470217413540102
+            },
+            {
+              "sequence": 66,
+              "command_id": "command:6c609a1c95084d0da4a8bbefc800bd54",
+              "run_id": "action:af13629d722044b88c1b59cd98112433",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2476807247501,
+              "vx_mps": 0.3499995291072762,
+              "yaw_rate_rad_s": -0.0005470217413540102
+            },
+            {
+              "sequence": 67,
+              "command_id": "command:2e8c8373c21f43d4b50e86f9e3fbf1a3",
+              "run_id": "action:af13629d722044b88c1b59cd98112433",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2477088041477,
+              "vx_mps": 0.27872781990792306,
+              "yaw_rate_rad_s": -0.00018750068360797158
+            },
+            {
+              "sequence": 68,
+              "command_id": "command:3888b8fb2b7840758f510efcf87431ad",
+              "run_id": "action:af13629d722044b88c1b59cd98112433",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2477367177192,
+              "vx_mps": 0.27872781990792306,
+              "yaw_rate_rad_s": -0.00018750068360797158
+            },
+            {
+              "sequence": 69,
+              "command_id": "command:e1880b5803fb4579b9867da2a0475f9f",
+              "run_id": "action:af13629d722044b88c1b59cd98112433",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2477688194180,
+              "vx_mps": 0.27872781990792306,
+              "yaw_rate_rad_s": -0.00018750068360797158
+            },
+            {
+              "sequence": 70,
+              "command_id": "command:e8807224de2142a5babce4856ceefe69",
+              "run_id": "action:af13629d722044b88c1b59cd98112433",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2478008157747,
+              "vx_mps": 0.1924883611040949,
+              "yaw_rate_rad_s": 0.0001644510699653307
+            },
+            {
+              "sequence": 71,
+              "command_id": "command:b2db93f0a20442a690515f1fcc2acec3",
+              "run_id": "action:af13629d722044b88c1b59cd98112433",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2478408354773,
+              "vx_mps": 0.1924883611040949,
+              "yaw_rate_rad_s": 0.0001644510699653307
+            },
+            {
+              "sequence": 72,
+              "command_id": "command:0ad954bfdee04d6a9ffeec886166b63a",
+              "run_id": "action:af13629d722044b88c1b59cd98112433",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2478728107067,
+              "vx_mps": 0.1924883611040949,
+              "yaw_rate_rad_s": 0.0001644510699653307
+            },
+            {
+              "sequence": 73,
+              "command_id": "command:94dceb7991ca4648893f93f4c1c3ecf0",
+              "run_id": "action:af13629d722044b88c1b59cd98112433",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2479196745444,
+              "vx_mps": 0.11532745072712744,
+              "yaw_rate_rad_s": 0.0004556377390567345
+            },
+            {
+              "sequence": 74,
+              "command_id": "command:fed74d5fe5034072abcbde1907a136f5",
+              "run_id": "action:af13629d722044b88c1b59cd98112433",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2479628686703,
+              "vx_mps": 0.11532745072712744,
+              "yaw_rate_rad_s": 0.0004556377390567345
+            },
+            {
+              "sequence": 75,
+              "command_id": "command:1f837bdc59364c55b5cdb548d81f8801",
+              "run_id": "action:af13629d722044b88c1b59cd98112433",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2479950771711,
+              "vx_mps": 0.04724547373736518,
+              "yaw_rate_rad_s": 0.000595610673054096
+            },
+            {
+              "sequence": 76,
+              "command_id": "command:b3d4dae879364129892f3b57c5c4f3db",
+              "run_id": "action:af13629d722044b88c1b59cd98112433",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2480270952131,
+              "vx_mps": 0.04724547373736518,
+              "yaw_rate_rad_s": 0.000595610673054096
+            },
+            {
+              "sequence": 77,
+              "command_id": "command:76e3b8e9984e40ad84d2f65ea4575456",
+              "run_id": "action:af13629d722044b88c1b59cd98112433",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2480712792503,
+              "vx_mps": 0.04724547373736518,
+              "yaw_rate_rad_s": 0.000595610673054096
+            },
+            {
+              "sequence": 78,
+              "command_id": "command:5cde20aa14814612946a0cf98701fd55",
+              "run_id": "action:af13629d722044b88c1b59cd98112433",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2481114588924,
+              "vx_mps": 0,
+              "yaw_rate_rad_s": 0
+            },
+            {
+              "sequence": 79,
+              "command_id": "command:10ef10bd1e7f48c0bda39f05f8d2ce9c",
+              "run_id": "action:af13629d722044b88c1b59cd98112433",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2481425522592,
+              "vx_mps": 0,
+              "yaw_rate_rad_s": 0
+            },
+            {
+              "sequence": 80,
+              "command_id": "command:7d4ca9ee0db3421abd2a18e3fea97c4d",
+              "run_id": "action:af13629d722044b88c1b59cd98112433",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "TwistTargetCommand",
+              "at_ns": 2481686903819,
+              "vx_mps": 0,
+              "yaw_rate_rad_s": 0
+            },
+            {
+              "sequence": 81,
+              "command_id": "command:ff9148d31efc440ea2a445d95ad05ae8",
+              "run_id": "action:af13629d722044b88c1b59cd98112433",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "StopMotionCommand",
+              "at_ns": 2481987416018,
+              "vx_mps": 0.0,
+              "yaw_rate_rad_s": 0.0
+            },
+            {
+              "sequence": 82,
+              "command_id": "command:58e35e036e2e4c52a6c76d2dc18c2bfd",
+              "run_id": "action:af13629d722044b88c1b59cd98112433",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "ModeCommand",
+              "at_ns": 2482007223977,
+              "vx_mps": null,
+              "yaw_rate_rad_s": null
+            },
+            {
+              "sequence": 83,
+              "command_id": "command:bb8628f08e2c4dfabb7f650f3d5f0a62",
+              "run_id": "action:631eefed0589467ca4f59f55b55f59f8",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "ModeCommand",
+              "at_ns": 2485812119652,
+              "vx_mps": null,
+              "yaw_rate_rad_s": null
+            },
+            {
+              "sequence": 84,
+              "command_id": "command:1578490384aa4e179653a69741000d6b",
+              "run_id": "action:e72fffeb95ac4f7db8f40251610a897e",
+              "session_id": "1962faf8a0a74812b162dcfbb8b0314a",
+              "command_type": "DisarmCommand",
+              "at_ns": 2490179310609,
+              "vx_mps": null,
+              "yaw_rate_rad_s": null
+            }
+          ]
+        },
+        "mission_id": "mission-run:f339bf7841e446d5979d47546956fa0e",
+        "action_ids": [
+          "action:427e5b9b73fe4f11bb204f945537b1a0",
+          "action:93d7ffde839a4e81aaa83f600ef00897",
+          "action:6ae963c0e34e4ce1baf909183997241d",
+          "action:5d2d42d3ea74497ea68157f8bf95747d",
+          "action:67c8f62b719f433381424d211038130e",
+          "action:e38eb0dd4f6c409aa86e732d1c96ad7d",
+          "action:23284c65557846829c9b6fdb614a8c2b",
+          "action:af13629d722044b88c1b59cd98112433",
+          "action:631eefed0589467ca4f59f55b55f59f8",
+          "action:e72fffeb95ac4f7db8f40251610a897e",
+          "action:85634916f5794db38654db2db25d08da"
+        ]
+      }
+    },
+    "aircraft_bindings": [
+      {
+        "instance": {
+          "target": "simulation-1a6274cb5d674b0ab2a331b34b4fbae1",
+          "kind": "copter",
+          "vehicle_id": "vehicle-c117ec276ce64d94b7e3a72e331b9517",
+          "system_id": 41,
+          "world": "vaf_sim_0163a09285a7478b8c957feafc1c409e",
+          "simulation_session": "sim-0163a09285a7478b8c957feafc1c409e",
+          "epoch": "d71a142cf735a66fa0bfcc5840a04b73da0cddf9c5ec5b8a920f639f139f1ef9",
+          "session_id": "4a993d46b4e24272900863636abe5a9a",
+          "generation": "1fb2fb20e2aa41deba31858ec32f8b66"
+        },
+        "writer": {
+          "target_system": 41,
+          "attempts": 4,
+          "recent": [
+            {
+              "sequence": 1,
+              "command_id": "command:520e841540d541a0ae05178e26cc11c5",
+              "run_id": "action:0123ad37d9a14ef4bf27c5c52d1bdfe8",
+              "session_id": "4a993d46b4e24272900863636abe5a9a",
+              "command_type": "ModeCommand",
+              "at_ns": 2605958533501,
+              "vx_mps": null,
+              "yaw_rate_rad_s": null
+            },
+            {
+              "sequence": 2,
+              "command_id": "command:e63270b5b3434e1eb502db03440d2d3a",
+              "run_id": "action:c72072d7045d45d982e2c51e45e75302",
+              "session_id": "4a993d46b4e24272900863636abe5a9a",
+              "command_type": "ArmCommand",
+              "at_ns": 2606430178138,
+              "vx_mps": null,
+              "yaw_rate_rad_s": null
+            },
+            {
+              "sequence": 3,
+              "command_id": "command:c7896849a3744c53950f74c54ddd4f81",
+              "run_id": "action:375a4c4f22b84bdc9f94e6569e57ea1e",
+              "session_id": "4a993d46b4e24272900863636abe5a9a",
+              "command_type": "TakeoffCommand",
+              "at_ns": 2609493248496,
+              "vx_mps": null,
+              "yaw_rate_rad_s": null
+            },
+            {
+              "sequence": 4,
+              "command_id": "command:51d33995d57c476c83be51893fbf2d83",
+              "run_id": "action:398a19af8b3e40e8baabb84b32ad27ca",
+              "session_id": "4a993d46b4e24272900863636abe5a9a",
+              "command_type": "LandCommand",
+              "at_ns": 2618327197435,
+              "vx_mps": null,
+              "yaw_rate_rad_s": null
+            }
+          ]
+        },
+        "run_id": "mission-run:05e163ef157b41f39a6fa33fe8cfc898"
+      },
+      {
+        "instance": {
+          "target": "simulation-68ff4cacc9fe401e95d47b3432bd09da",
+          "kind": "copter",
+          "vehicle_id": "vehicle-0925d98507f448a09f94938a6c0f22b4",
+          "system_id": 42,
+          "world": "vaf_sim_0163a09285a7478b8c957feafc1c409e",
+          "simulation_session": "sim-0163a09285a7478b8c957feafc1c409e",
+          "epoch": "68b5ac1cd467f2f009a044be2a2ed5d89d52c8dac58c39c30d134801b4481774",
+          "session_id": "a5cb0a4ae3d4446387234194f04fe7d1",
+          "generation": "ee9671000bad4a8c8772eae0e7f9e49d"
+        },
+        "writer": {
+          "target_system": 42,
+          "attempts": 4,
+          "recent": [
+            {
+              "sequence": 1,
+              "command_id": "command:e7d6a70d822c43f4a5ba85d704c9da44",
+              "run_id": "action:40ddce0c0e214d65bf8ebed58a32b634",
+              "session_id": "a5cb0a4ae3d4446387234194f04fe7d1",
+              "command_type": "ModeCommand",
+              "at_ns": 2636093247274,
+              "vx_mps": null,
+              "yaw_rate_rad_s": null
+            },
+            {
+              "sequence": 2,
+              "command_id": "command:5003254afaaf4cfdbc70214a1747042a",
+              "run_id": "action:8439dc5fe4214ca9901aa19f45201d32",
+              "session_id": "a5cb0a4ae3d4446387234194f04fe7d1",
+              "command_type": "ArmCommand",
+              "at_ns": 2638070850897,
+              "vx_mps": null,
+              "yaw_rate_rad_s": null
+            },
+            {
+              "sequence": 3,
+              "command_id": "command:e8f4e877e8ee4989bd00fa3d40315448",
+              "run_id": "action:a99cb0f834ed49c8a4a6b9eea17ff47a",
+              "session_id": "a5cb0a4ae3d4446387234194f04fe7d1",
+              "command_type": "TakeoffCommand",
+              "at_ns": 2641173671556,
+              "vx_mps": null,
+              "yaw_rate_rad_s": null
+            },
+            {
+              "sequence": 4,
+              "command_id": "command:4e87daed2d794cada2d3937a27bf22a2",
+              "run_id": "action:a8155dd16535417fb8f3c867feae6736",
+              "session_id": "a5cb0a4ae3d4446387234194f04fe7d1",
+              "command_type": "LandCommand",
+              "at_ns": 2650339682765,
+              "vx_mps": null,
+              "yaw_rate_rad_s": null
+            }
+          ]
+        },
+        "run_id": "mission-run:f695c889440a437689adc747408c3d4c"
+      }
+    ],
+    "cleanup": {
+      "sim-7d9692079ffd4306bbe2c1b7c93fe211": {
+        "state": "FINISHED",
+        "cleanup": "COMPLETE"
+      },
+      "sim-0163a09285a7478b8c957feafc1c409e": {
+        "state": "FINISHED",
+        "cleanup": "COMPLETE"
+      }
+    }
+  },
+  "wheel": {
+    "passed": true,
+    "example_counts": {
+      "rover": 3,
+      "copter": 4,
+      "plane": 3
+    },
+    "wheel_sha256": "140ac96e52f61014bf35d29a3f11f327b602ad00d5c3a0fb2141050a150677df",
+    "bytes": 932789,
+    "source_bytes_match": true,
+    "installed_outside_checkout": true
+  },
+  "examples": {
+    "plane": {
+      "passed": true,
+      "kind": "plane",
+      "missions": [
+        {
+          "mission_id": "Example_StateSurvey",
+          "state": "SUCCEEDED",
+          "error": null,
+          "release_safe": true,
+          "command_evidence_count": 0,
+          "checkpoints": [
+            {
+              "name": "GetVehicleState",
+              "position": [
+                0.006028330975594345,
+                8.675003631236723e-09,
+                0.18133912911938024
+              ]
+            },
+            {
+              "name": "GetVehicleState",
+              "position": [
+                0.006028330975594345,
+                8.675003631236723e-09,
+                0.18133912911938024
+              ]
+            },
+            {
+              "name": "GetVehicleState",
+              "position": [
+                0.006028330975594345,
+                8.675003631236723e-09,
+                0.18133912911938024
+              ]
+            }
+          ],
+          "run_id": "mission-run:87129b721d0d48ddb67694bcdb5e3a01",
+          "vehicle_command_write_attempts": 0
+        },
+        {
+          "mission_id": "Example_DisarmedBranch",
+          "state": "SUCCEEDED",
+          "error": null,
+          "release_safe": true,
+          "command_evidence_count": 0,
+          "checkpoints": [
+            {
+              "name": "GetVehicleState",
+              "position": [
+                0.006028330975594345,
+                8.675003631236723e-09,
+                0.18133912911938024
+              ]
+            }
+          ],
+          "run_id": "mission-run:f54122e68707408c9c2840a5393e8000",
+          "vehicle_command_write_attempts": 0
+        },
+        {
+          "mission_id": "Example_Runway_Inspection",
+          "state": "SUCCEEDED",
+          "error": null,
+          "release_safe": true,
+          "command_evidence_count": 8,
+          "checkpoints": [
+            {
+              "name": "GetVehicleState",
+              "position": [
+                0.006028330975594345,
+                8.675003631236723e-09,
+                0.18133912911938024
+              ]
+            },
+            {
+              "name": "SetMode",
+              "position": [
+                0.006028330975594345,
+                8.675003631236723e-09,
+                0.18133912911938024
+              ]
+            },
+            {
+              "name": "Arm",
+              "position": [
+                0.006028330975594345,
+                8.675003631236723e-09,
+                0.18133912911938024
+              ]
+            },
+            {
+              "name": "Takeoff",
+              "position": [
+                266.2306639676269,
+                72.90633403681858,
+                49.14177010022054
+              ]
+            },
+            {
+              "name": "SetGuidedTarget",
+              "position": [
+                318.26691185068796,
+                92.26295249973317,
+                47.802323201215586
+              ]
+            },
+            {
+              "name": "Loiter",
+              "position": [
+                181.93345698590443,
+                267.9542075602648,
+                49.941295989212215
+              ]
+            },
+            {
+              "name": "RTL",
+              "position": [
+                265.35141134470985,
+                246.44014182741432,
+                49.82836814836
+              ]
+            },
+            {
+              "name": "AutoLand",
+              "position": [
+                30.224631414449657,
+                0.030698796678217257,
+                0.11762712663607898
+              ]
+            }
+          ],
+          "run_id": "mission-run:faf4ad69d4b14bfaa3d95efe8f485066",
+          "physical": {
+            "home_error_m": 30.216459138266377,
+            "speed_mps": 0.0022264660501323907,
+            "height_m": -0.06363772194862741
+          }
+        }
+      ],
+      "assembly": "Control Center isolated signed Driver",
+      "cleanup": "COMPLETE"
+    },
+    "rover": {
+      "passed": true,
+      "kind": "rover",
+      "missions": [
+        {
+          "mission_id": "Example_StateSurvey",
+          "state": "SUCCEEDED",
+          "error": null,
+          "release_safe": true,
+          "command_evidence_count": 0,
+          "checkpoints": [
+            {
+              "name": "GetVehicleState",
+              "position": [
+                -3.6428530677162075e-12,
+                4.594819567259533e-16,
+                -4.569306044643895e-11
+              ]
+            },
+            {
+              "name": "GetVehicleState",
+              "position": [
+                -3.6428530677162075e-12,
+                4.594819567259533e-16,
+                -4.569306044643895e-11
+              ]
+            },
+            {
+              "name": "GetVehicleState",
+              "position": [
+                -3.6428530677162075e-12,
+                4.594819567259533e-16,
+                -4.569306044643895e-11
+              ]
+            }
+          ],
+          "run_id": "mission-run:d92b03b9d70547b095d8d21741219799",
+          "vehicle_command_write_attempts": 0
+        },
+        {
+          "mission_id": "Example_DisarmedBranch",
+          "state": "SUCCEEDED",
+          "error": null,
+          "release_safe": true,
+          "command_evidence_count": 0,
+          "checkpoints": [
+            {
+              "name": "GetVehicleState",
+              "position": [
+                -3.6428530677162075e-12,
+                4.594819567259533e-16,
+                -4.569306044643895e-11
+              ]
+            }
+          ],
+          "run_id": "mission-run:cb22d72123774b5295c6e69b7508ddf2",
+          "vehicle_command_write_attempts": 0
+        },
+        {
+          "mission_id": "Example_Ground_Patrol",
+          "state": "SUCCEEDED",
+          "error": null,
+          "release_safe": true,
+          "command_evidence_count": 30,
+          "checkpoints": [
+            {
+              "name": "GetVehicleState",
+              "position": [
+                -3.6428530677162075e-12,
+                4.594819567259533e-16,
+                -4.569306044643895e-11
+              ]
+            },
+            {
+              "name": "SetMode",
+              "position": [
+                -3.6428530677162075e-12,
+                4.594819567259533e-16,
+                -4.569306044643895e-11
+              ]
+            },
+            {
+              "name": "Arm",
+              "position": [
+                -3.6428530677162075e-12,
+                4.594819567259533e-16,
+                -4.569306044643895e-11
+              ]
+            },
+            {
+              "name": "Goto",
+              "position": [
+                0.658704921719981,
+                -6.226354151120268e-08,
+                -4.559076227650394e-09
+              ]
+            },
+            {
+              "name": "SetMode",
+              "position": [
+                0.6605198505943544,
+                -6.497524877338756e-08,
+                -4.559075644783306e-09
+              ]
+            },
+            {
+              "name": "Goto",
+              "position": [
+                1.7160624088823884,
+                2.3077390547013924e-06,
+                -4.559081889787819e-09
+              ]
+            },
+            {
+              "name": "SetMode",
+              "position": [
+                1.7226196860165475,
+                2.3328662709584237e-06,
+                -4.5590797803640726e-09
+              ]
+            },
+            {
+              "name": "Goto",
+              "position": [
+                2.663770131441095,
+                1.640663992455649e-05,
+                -4.559081917543395e-09
+              ]
+            },
+            {
+              "name": "Stop",
+              "position": [
+                2.67816523440566,
+                1.6737756179524355e-05,
+                -4.55907719909554e-09
+              ]
+            },
+            {
+              "name": "Disarm",
+              "position": [
+                2.6823844546371456,
+                1.682731928294042e-05,
+                -4.5590758113167595e-09
+              ]
+            },
+            {
+              "name": "GetVehicleState",
+              "position": [
+                2.6829811340334913,
+                1.6839541659941e-05,
+                -4.559075644783306e-09
+              ]
+            }
+          ],
+          "run_id": "mission-run:e37b63e6deb2415e8ea66fea526544ce",
+          "physical": {
+            "home_error_m": 2.6834395197516017,
+            "speed_mps": 0.0018165603753991853,
+            "height_m": -4.513382445558989e-09
+          }
+        }
+      ],
+      "assembly": "Control Center isolated signed Driver",
+      "cleanup": "COMPLETE"
+    },
+    "copter": {
+      "passed": true,
+      "kind": "copter",
+      "missions": [
+        {
+          "mission_id": "Example_StateSurvey",
+          "state": "SUCCEEDED",
+          "error": null,
+          "release_safe": true,
+          "command_evidence_count": 0,
+          "checkpoints": [
+            {
+              "name": "GetVehicleState",
+              "position": [
+                2.5759345159132107e-10,
+                3.94231695203623e-12,
+                0.19499942681532334
+              ]
+            },
+            {
+              "name": "GetVehicleState",
+              "position": [
+                2.5759345159132107e-10,
+                3.94231695203623e-12,
+                0.19499942681532334
+              ]
+            },
+            {
+              "name": "GetVehicleState",
+              "position": [
+                2.5759345159132107e-10,
+                3.94231695203623e-12,
+                0.19499942681532334
+              ]
+            }
+          ],
+          "run_id": "mission-run:90c15aecc1064a5e96ab2f5bf618abec",
+          "vehicle_command_write_attempts": 0
+        },
+        {
+          "mission_id": "Example_DisarmedBranch",
+          "state": "SUCCEEDED",
+          "error": null,
+          "release_safe": true,
+          "command_evidence_count": 0,
+          "checkpoints": [
+            {
+              "name": "GetVehicleState",
+              "position": [
+                2.5759345159132107e-10,
+                3.94231695203623e-12,
+                0.19499942681532334
+              ]
+            }
+          ],
+          "run_id": "mission-run:47f39d006a0d454db186f655d0698397",
+          "vehicle_command_write_attempts": 0
+        },
+        {
+          "mission_id": "Example_Air_HoverLand",
+          "state": "SUCCEEDED",
+          "error": null,
+          "release_safe": true,
+          "command_evidence_count": 4,
+          "checkpoints": [
+            {
+              "name": "GetVehicleState",
+              "position": [
+                2.5759345159132107e-10,
+                3.94231695203623e-12,
+                0.19499942681532334
+              ]
+            },
+            {
+              "name": "SetMode",
+              "position": [
+                2.5759345159132107e-10,
+                3.94231695203623e-12,
+                0.19499942681532334
+              ]
+            },
+            {
+              "name": "Arm",
+              "position": [
+                2.5759345159132107e-10,
+                3.94231695203623e-12,
+                0.19499942681532334
+              ]
+            },
+            {
+              "name": "Takeoff",
+              "position": [
+                0.0021900308240275987,
+                0.00856117206158711,
+                1.6910516434936962
+              ]
+            },
+            {
+              "name": "Land",
+              "position": [
+                0.0028575865893518617,
+                0.008400909226480171,
+                0.19499974679981116
+              ]
+            },
+            {
+              "name": "GetVehicleState",
+              "position": [
+                0.0028575865893518617,
+                0.008400909226480171,
+                0.19499974679981116
+              ]
+            }
+          ],
+          "run_id": "mission-run:3dd2f7ff7fe242ef9b5fc1eed452d9b7",
+          "physical": {
+            "home_error_m": 0.008873616816652276,
+            "speed_mps": 0.0,
+            "height_m": 3.1998448782322164e-07
+          }
+        },
+        {
+          "mission_id": "Example_Air_SurveyReturn",
+          "state": "SUCCEEDED",
+          "error": null,
+          "release_safe": true,
+          "command_evidence_count": 19,
+          "checkpoints": [
+            {
+              "name": "GetVehicleState",
+              "position": [
+                0.0028575865893518617,
+                0.008400909226480171,
+                0.19499974679981116
+              ]
+            },
+            {
+              "name": "SetMode",
+              "position": [
+                0.0028575865893518617,
+                0.008400909226480171,
+                0.19499974679981116
+              ]
+            },
+            {
+              "name": "Arm",
+              "position": [
+                0.0028575865893518617,
+                0.008400909226480171,
+                0.19499974679981116
+              ]
+            },
+            {
+              "name": "Takeoff",
+              "position": [
+                0.006039416889663122,
+                0.0054977009566547315,
+                1.6911239026200995
+              ]
+            },
+            {
+              "name": "Goto",
+              "position": [
+                0.9761690830533449,
+                -0.0044151064291183505,
+                1.4997493545026455
+              ]
+            },
+            {
+              "name": "Goto",
+              "position": [
+                1.013395903507259,
+                0.9994502295997453,
+                1.49974754820852
+              ]
+            },
+            {
+              "name": "ReturnHome",
+              "position": [
+                0.0029677868404039067,
+                0.0028061642177751346,
+                0.19499961075376218
+              ]
+            },
+            {
+              "name": "GetVehicleState",
+              "position": [
+                0.0029677868404039067,
+                0.0028061642177751346,
+                0.19499961075376218
+              ]
+            }
+          ],
+          "run_id": "mission-run:fa05919e1a47443fb5ca7a0bc2a19402",
+          "physical": {
+            "home_error_m": 0.004084398951633607,
+            "speed_mps": 0.0,
+            "height_m": 1.8393843884134675e-07
+          }
+        }
+      ],
+      "assembly": "Control Center isolated signed Driver",
+      "cleanup": "COMPLETE"
+    }
+  }
+}

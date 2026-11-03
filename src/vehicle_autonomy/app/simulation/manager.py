@@ -513,6 +513,9 @@ class SimulationManager:
             app.runtime.drivers[owner.target]=owner.driver
             app.deployment_identities.update(identities)
             app.missions.identities.update(identities)
+            if not hasattr(app,'_simulation_instances'):app._simulation_instances={}
+            app._simulation_instances[owner.target]=dict(vehicle_id=owner.id,system_id=owner.model.system_id,
+                world=owner.world,simulation_session=owner.owner.directory.name)
 
     def _cancel(self, owner):
         if hasattr(owner,'vehicles'):

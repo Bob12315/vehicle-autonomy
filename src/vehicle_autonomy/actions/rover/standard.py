@@ -3,6 +3,7 @@ from dataclasses import dataclass, field, replace
 import math
 
 from vehicle_autonomy.actions.common.stream import StreamFactory, StreamInstance
+from vehicle_autonomy.actions.common.basic import STOP_TIMEOUT_NS, STOP_SETTLE_NS
 from vehicle_autonomy.contracts.core.geometry import Twist3, Vector3
 from vehicle_autonomy.contracts.effects.vehicle import TwistTargetEffect
 from vehicle_autonomy.contracts.effects.vehicle import StopMotionEffect,ModeEffect
@@ -57,15 +58,62 @@ class TurnParameters:
 
 
 class RoverStream(StreamInstance):
+    def __init__(self,*args):
+        super().__init__(*args)
+        self.neutral_since=None;self.neutral_stable=None
+        self.neutral_boundary=None
+        self.neutral_confirmed=False
+        self.hold_index=None
+
+    def update_input(self,parameters):
+        super().update_input(parameters)
+        self.refresh_ns=0
+
+    def tick_with_results(self,world,results):
+        decision=super().tick_with_results(world,results)
+        if decision.outcome is not ActionOutcome.RUNNING:return decision
+        neutral=(self.parameters.yaw_rate_rad_s==0 and (self.operation!='Drive' or self.parameters.speed_mps==0))
+        now=world.published_at.monotonic_ns
+        if not neutral:
+            self.neutral_since=self.neutral_stable=None
+            self.neutral_boundary=None
+            self.neutral_confirmed=False
+            return replace(decision,feedback=dict(stage='driving',stream_id=self.stream))
+        if self.neutral_since is None:self.neutral_since=now;self.neutral_boundary=now
+        stamp=world.localization.twist.captured_at.monotonic_ns
+        fresh=stamp>self.neutral_boundary
+        steady=fresh and self._steady(world)
+        if self.neutral_confirmed and not steady:
+            self.neutral_since=now;self.neutral_boundary=now;self.neutral_confirmed=False
+        self.neutral_stable=(self.neutral_stable if self.neutral_stable is not None else stamp) if steady else None
+        # Reuse the original full stop deadline AND continuous settling period.
+        # Two seconds is a settling duration, not a new response deadline.
+        confirmed=self.neutral_stable is not None and stamp-self.neutral_stable>=STOP_SETTLE_NS
+        self.neutral_confirmed=confirmed
+        if not confirmed and now-self.neutral_since>=STOP_TIMEOUT_NS:
+            return ActionDecision(ActionOutcome.FAILED,error='rover_zero_velocity_stop_unconfirmed; safety HOLD required',
+                feedback={'stage':'safety HOLD braking','stream_id':self.stream})
+        return replace(decision,feedback=dict(stage='zero velocity hold' if confirmed else 'zero velocity stopping',
+            physical_stop_observed=confirmed,stream_id=self.stream))
+
     def setpoint(self):
         return TwistTargetEffect('base_link',Twist3(Vector3(self.parameters.speed_mps if self.operation=='Drive' else 0,0,0),
             Vector3(0,0,self.parameters.yaw_rate_rad_s)),self.stream)
     def exit_with_results(self,world,reason,results):
+        if self.hold_index is not None:
+            hold=results[self.hold_index:self.hold_index+1]
+            if hold and hold[0].phase in BAD:raise RuntimeError('rover_drive_hold_unconfirmed')
+            original=results[:self.hold_index]+results[self.hold_index+1:]
+            decision=super().exit_with_results(world,reason,original)
+            confirmed=bool(hold and hold[0].phase is EffectPhase.COMPLETED and
+                world.vehicle.operation.native_mode=='ARDUPILOT_CUSTOM_4')
+            return ExitDecision(decision.complete and confirmed,decision.effects)
         decision=super().exit_with_results(world,reason,results)
         if any(isinstance(effect,StopMotionEffect) for effect in decision.effects):
             # Zero the old stream before requesting AP's audited native HOLD.
             # This avoids relying on slow Guided speed-controller integral
             # decay. Existing 8 s / 0.1 m/s / 2 s stop limits are unchanged.
+            self.hold_index=len(results)+len(decision.effects)
             return ExitDecision(False,decision.effects+(ModeEffect('HOLD'),))
         return decision
 

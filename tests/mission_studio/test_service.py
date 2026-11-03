@@ -7,6 +7,8 @@ from tests.mission_studio.test_compiler import definition
 class StudioServiceTests(unittest.TestCase):
     def setUp(self):
         self.h=legacy.ServiceTests();self.h.setUp();self.addCleanup(self.h.doCleanups)
+        from tests.web_ui.helpers import FixtureDriver
+        self.h.driver.snapshot=FixtureDriver('rover').snapshot
     def api(self,op,p=None,**kw):return self.h.api('/api/studio-b/'+op.replace('.','/'),p,**kw)
     def test_authenticated_draft_publish_run_immutable_snapshot_chain(self):
         self.assertEqual(self.api('library',auth=False)[0],401)
@@ -14,7 +16,8 @@ class StudioServiceTests(unittest.TestCase):
         code,result=self.api('draft.save',dict(definition=definition(),expected_revision=0));self.assertEqual(code,200,result)
         code,result=self.api('draft.validate',dict(mission_id='studio',revision=1));self.assertEqual(code,200,result)
         code,result=self.api('draft.publish',dict(mission_id='studio',revision=1));self.assertEqual(code,200,result)
-        code,result=self.api('run.start',dict(publication='studio@1.0.0',allow_send=False));self.assertEqual(code,200,result);identifier=result['result']['id']
+        publication=result['result'];binding=self.api('catalog')[1]['result']['vehicles'][0]['binding']
+        code,result=self.api('run.start',dict(publication='studio@1.0.0',definition_hash=publication['definition_hash'],binding=binding,allow_send=False));self.assertEqual(code,200,result);identifier=result['result']['id']
         d=definition();d['name']='Edited after start';self.api('draft.save',dict(definition=d,expected_revision=1))
         until=time.monotonic()+3
         while time.monotonic()<until:

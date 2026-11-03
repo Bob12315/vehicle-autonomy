@@ -1,0 +1,141 @@
+{
+  "passed": true,
+  "kind": "plane",
+  "missions": [
+    {
+      "mission_id": "Example_StateSurvey",
+      "state": "SUCCEEDED",
+      "error": null,
+      "release_safe": true,
+      "command_evidence_count": 0,
+      "checkpoints": [
+        {
+          "name": "GetVehicleState",
+          "position": [
+            0.006028330975594345,
+            8.675003631236723e-09,
+            0.18133912911938024
+          ]
+        },
+        {
+          "name": "GetVehicleState",
+          "position": [
+            0.006028330975594345,
+            8.675003631236723e-09,
+            0.18133912911938024
+          ]
+        },
+        {
+          "name": "GetVehicleState",
+          "position": [
+            0.006028330975594345,
+            8.675003631236723e-09,
+            0.18133912911938024
+          ]
+        }
+      ],
+      "run_id": "mission-run:87129b721d0d48ddb67694bcdb5e3a01",
+      "vehicle_command_write_attempts": 0
+    },
+    {
+      "mission_id": "Example_DisarmedBranch",
+      "state": "SUCCEEDED",
+      "error": null,
+      "release_safe": true,
+      "command_evidence_count": 0,
+      "checkpoints": [
+        {
+          "name": "GetVehicleState",
+          "position": [
+            0.006028330975594345,
+            8.675003631236723e-09,
+            0.18133912911938024
+          ]
+        }
+      ],
+      "run_id": "mission-run:f54122e68707408c9c2840a5393e8000",
+      "vehicle_command_write_attempts": 0
+    },
+    {
+      "mission_id": "Example_Runway_Inspection",
+      "state": "SUCCEEDED",
+      "error": null,
+      "release_safe": true,
+      "command_evidence_count": 8,
+      "checkpoints": [
+        {
+          "name": "GetVehicleState",
+          "position": [
+            0.006028330975594345,
+            8.675003631236723e-09,
+            0.18133912911938024
+          ]
+        },
+        {
+          "name": "SetMode",
+          "position": [
+            0.006028330975594345,
+            8.675003631236723e-09,
+            0.18133912911938024
+          ]
+        },
+        {
+          "name": "Arm",
+          "position": [
+            0.006028330975594345,
+            8.675003631236723e-09,
+            0.18133912911938024
+          ]
+        },
+        {
+          "name": "Takeoff",
+          "position": [
+            266.2306639676269,
+            72.90633403681858,
+            49.14177010022054
+          ]
+        },
+        {
+          "name": "SetGuidedTarget",
+          "position": [
+            318.26691185068796,
+            92.26295249973317,
+            47.802323201215586
+          ]
+        },
+        {
+          "name": "Loiter",
+          "position": [
+            181.93345698590443,
+            267.9542075602648,
+            49.941295989212215
+          ]
+        },
+        {
+          "name": "RTL",
+          "position": [
+            265.35141134470985,
+            246.44014182741432,
+            49.82836814836
+          ]
+        },
+        {
+          "name": "AutoLand",
+          "position": [
+            30.224631414449657,
+            0.030698796678217257,
+            0.11762712663607898
+          ]
+        }
+      ],
+      "run_id": "mission-run:faf4ad69d4b14bfaa3d95efe8f485066",
+      "physical": {
+        "home_error_m": 30.216459138266377,
+        "speed_mps": 0.0022264660501323907,
+        "height_m": -0.06363772194862741
+      }
+    }
+  ],
+  "assembly": "Control Center isolated signed Driver",
+  "cleanup": "COMPLETE"
+}

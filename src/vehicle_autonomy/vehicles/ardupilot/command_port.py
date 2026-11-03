@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from collections import deque
 from dataclasses import dataclass, replace
 import time
 import math
@@ -69,6 +70,8 @@ class ArduPilotCommandPort:
         self.reasons: dict[CommandId, str] = {}
         self._write_uncertain = False
         self._wire_attempted_bytes=0
+        self._command_wire_attempts=0
+        self._command_wire_history=deque(maxlen=64)
         self._receive_ticket = -1
         self._sent_ticket: dict[CommandId, int] = {}
         self._sent_signature: dict[CommandId, int] = {}
@@ -81,6 +84,16 @@ class ArduPilotCommandPort:
 
     def uses(self, *, authority: ControlAuthority, transport: ByteTransport, codec: MavlinkCodec) -> bool:
         return self._authority is authority and self._transport is transport and self._codec is codec
+
+    def command_write_evidence(self):
+        """Bounded evidence of actual vehicle-command transport attempts.
+
+        Read-only clock maintenance is excluded. An attempt is not an ACK,
+        physical success or a confirmed transport outcome.
+        """
+        with self._authority.lock:
+            return dict(target_system=self._codec.target_system,attempts=self._command_wire_attempts,
+                        recent=[dict(item) for item in self._command_wire_history])
 
     def submit(self, command: VehicleCommandEnvelope) -> CommandReceipt:
         with self._authority.lock:
@@ -242,6 +255,13 @@ class ArduPilotCommandPort:
                         if self._codec.receive_signing is not None:
                             self._sent_signature[command_id] = self._codec.receive_signing.watermark
                         self._wire_attempted_bytes+=len(data)
+                        self._command_wire_attempts+=1
+                        self._command_wire_history.append(dict(sequence=self._command_wire_attempts,
+                            command_id=str(command_id),run_id=str(command.run_id),
+                            session_id=str(command.expected_link_session_id),
+                            command_type=type(command.command).__name__,at_ns=final_at.monotonic_ns,
+                            vx_mps=instruction.vx if isinstance(instruction,LocalSetpoint) else None,
+                            yaw_rate_rad_s=instruction.yaw_rate if isinstance(instruction,LocalSetpoint) else None))
                         self._transport.write(data)
                     except (OSError, ConnectionError) as exc:
                         self._write_uncertain = True

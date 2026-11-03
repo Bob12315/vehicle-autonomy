@@ -1,5 +1,24 @@
 # V1 framework boundary
 
+## Continuous Rover control and explicit Mission instance binding (2026-11-03)
+
+Vehicle Control keeps one bounded, explicitly enabled Rover Drive while updating
+inputs; key release requests zero velocity. Fresh motion observations qualify
+neutral holding, and failed neutral stopping enters the original StopMotion/HOLD
+exit. Resource ownership, dual SEND, input tickets/TTL, Lease and UNCONFIRMED
+semantics remain authoritative. Ordered application shutdown requests these
+existing exits before retiring simulation processes.
+
+Studio execution requires a selected live instance identity and publication
+digest. It recompiles the pinned source and SubMissions for that instance through
+the existing validator and provider/resource admission, saving a separate immutable
+execution binding. Published definitions and historical bindings are preserved;
+retired Drivers supply historical evidence but never become selector defaults.
+Native continuation of the same fixed-wing deployment retains its original
+explicit handoff/reconnect contract and records each transition. The
+[implementation and acceptance report](CONTROL_AND_MISSION_BINDING_REPORT.md)
+records exact native coverage, retained failures and remaining limits.
+
 ## Host software and writable workspace layout (2026-10-31)
 
 `app/bootstrap/host_environment.py` resolves one private host software index from

@@ -50,7 +50,7 @@ def run(directory):
             try:
                 context=b.new_context(viewport={'width':1440,'height':1100});page=context.new_page();page.on('pageerror',lambda e:errors.append(str(e)))
                 page.on('request',lambda r:requests.append((r.url.split(h.base)[-1],r.post_data_json)) if r.method=='POST' and '/api/' in r.url else None)
-                login(page,h.base,h.token,'/control');expect(page.locator('#top-authority')).to_have_text('关闭指令发送')
+                login(page,h.base,h.token,'/control#copter');expect(page.locator('#top-authority')).to_have_text('关闭指令发送')
                 expect(page.locator('[data-action="Arm"]')).to_be_disabled();assert not h.lab.runtime.views()
                 page.get_by_role('button',name='开启指令发送',exact=True).click();expect(page.locator('#top-authority')).to_have_text('开启指令发送')
                 assert not h.lab.runtime.views(),'switch itself created an Action'

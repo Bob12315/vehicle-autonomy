@@ -18,7 +18,7 @@ from vehicle_autonomy.contracts.action_ports import ActionAdmissionRejected
 from vehicle_autonomy.contracts.core.primitives import SchemaVersion
 from vehicle_autonomy.contracts.core.serialization import to_json_value
 from vehicle_autonomy.contracts.core.time import TimePoint
-from vehicle_autonomy.contracts.decision import ActionDecision, ActionOutcome, ExitDecision, ExitReason
+from vehicle_autonomy.contracts.decision import ActionDecision, ActionOutcome, ExitDecision, ExitReason, EffectResult, EffectPhase
 from vehicle_autonomy.contracts.effects.payload import PayloadEffectEnvelope, ReleasePayloadEffect
 from vehicle_autonomy.contracts.effects.vehicle import EffectEnvelope
 from vehicle_autonomy.engine.action.resources import ActionResources
@@ -432,7 +432,14 @@ class ActionRuntime:
                 world=driver.snapshot()
                 reason={ActionState.SUCCEEDED:ExitReason.SUCCEEDED,ActionState.CANCELLED:ExitReason.CANCELLED}.get(r.requested_end,ExitReason.FAILED)
                 try:
-                    results=driver.effect_results(r.id)
+                    published={str(item.effect_id):item for item in driver.effect_results(r.id)}
+                    # A Driver publishes post-cycle cuts asynchronously. Keep
+                    # every issued request's position during exit, including a
+                    # pending/cancelled final stream refresh. REQUESTED is only
+                    # absence of published evidence, never a synthetic ACK.
+                    results=tuple(published.get(str(envelope.effect_id),
+                        EffectResult(str(envelope.effect_id),r.id,EffectPhase.REQUESTED))
+                        for envelope,_ in r.effects)
                     with r.external.callback():
                         decision=(r.instance.exit_with_results(world,reason,results) if hasattr(r.instance,'exit_with_results') else r.instance.exit(world,reason))
                     if not isinstance(decision,ExitDecision):raise TypeError('typed Action exit required')

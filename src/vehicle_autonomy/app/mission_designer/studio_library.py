@@ -95,6 +95,7 @@ class StudioLibrary:
 
     def template(self,identifier,definition,*,expected_hash=None):
         d=normalize(definition)
+        d['target']=''  # Templates are reusable definitions, never live instances.
         def change(data):
             old=data['templates'].get(identifier)
             if old and expected_hash!=old['definition_hash']:raise ValueError('template changed; explicitly select its current hash')

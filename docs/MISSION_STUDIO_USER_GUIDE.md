@@ -26,8 +26,8 @@ Rover 改为 `--kind rover`，页面端口 8780；Plane 改为 `--kind plane`，
 
 ## 创建、编辑和发布
 
-1. 进入 Mission Library，新建任务、复制现有任务，或在 Templates 中“从模板创建”。
-2. 选择目标车辆，设置名称和新版本号。
+1. 明确选择当前车辆实例后新建任务，或在任务库复制、从模板创建。
+2. 在编辑器选择“验证实例”，设置名称和新版本号。模板、复制、导入、恢复的草稿会清空旧实例，需重新选择。
 3. 从左侧后端 Registry 生成的节点库拖入 Action；拖动输出端口到输入端口。
    Action → Action 用 next；ForEach 用 body；Condition 用 true/false/unknown。
 4. 拖动空白平移、滚轮缩放；Shift 多选/框选，支持复制、粘贴、删除、Undo/Redo、布局和分组。
@@ -55,8 +55,14 @@ Join 前的结果应显式写入不同 Blackboard 变量；禁止两个分支并
 
 ## 执行和调试
 
-Runner 中选择发布版本。原生控制任务勾选 SEND，核对确认框中的实际目标后运行；软件示例可保持
-SEND 关闭。若 Vehicle Control 已占用目标，先在那里释放。连接状态不代表获得控制权。
+Runner 中选择发布版本和当前在线的实际执行实例。顶部车辆和 Runner 执行车辆同步；
+不会自动选择第一辆，也不会用发布时的验证对象代替执行选择。核对确认框中的唯一 target、
+vehicle_id、System ID、World/Session，再运行；原生运动任务勾选 SEND，只读任务保持关闭。
+若 Vehicle Control 已占用目标，先在那里释放。连接状态不代表获得控制权。
+
+后端按所选实例重新验证整个任务及固定子任务。发布版本不变，每次运行单独保存绑定；
+运行中不能换车，历史记录保留实际对象。新增、移除、换图和重连会更新目录，身份失效后
+须重新选择。绝对 odom 航点不会随绑定平移，需确认其位于所选车辆的合格空旷区域。
 
 请求发送、后端接受、Action 执行、Action 完成和实际确认是不同阶段。Diagnostics 包含原始命令
 结果、MAVLink ACK 与 Driver 状态证据。固定翼 GUIDED/LOITER/RTL 的节点成功表示契约所定义的

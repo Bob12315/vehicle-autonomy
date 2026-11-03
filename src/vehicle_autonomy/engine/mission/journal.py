@@ -41,7 +41,7 @@ class MissionJournal:
         self.data = data
 
     def save_version(self, spec):
-        d = spec.to_dict()
+        d = spec.to_dict() if hasattr(spec, 'to_dict') else deepcopy(spec)
         key = d['id'] + '@' + d['version']
         def change(data):
             if key in data['versions'] and data['versions'][key] != d:

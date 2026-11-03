@@ -32,6 +32,8 @@ def run(directory,*,demo=False):
     registry.register_typed(ActionSpec('BrowserWork',Parameters,external_lifecycle='typed_only',output_schema={'type':'object','properties':{'count':{'type':'integer'}},'required':['count']}),Factory())
     registry.register_typed(ActionSpec('BrowserShape',Shape,external_lifecycle='typed_only'),Factory())
     if demo:driver.context=lambda:ActionContext('v','copter',frozenset(),True)
+    from tests.web_ui.helpers import FixtureDriver
+    driver.snapshot=FixtureDriver('copter' if demo else 'rover').snapshot
     result=dict(passed=False,environment='isolated HTTP + Chrome + existing executor; no vehicle transport')
     with ExitStack() as stack:
         stack.enter_context(patch('vehicle_autonomy.app.web.mission_control.bind_simulations',return_value={}))
@@ -48,7 +50,7 @@ def run(directory,*,demo=False):
                 page.goto(base+source);page.locator('nav a[href="/studio"]').click()
                 expect(page.locator('h1')).to_have_text('任务库');expect(page.locator('#save-state')).to_contain_text('统一会话')
             page.screenshot(path=str(directory/'01-library.png'),full_page=True)
-            page.locator('#new-mission').click();page.get_by_label('任务名称',exact=True).fill('Browser end-to-end');page.locator('#dialog-confirm').click()
+            page.locator('#vehicle').select_option('v');page.locator('#new-mission').click();page.get_by_label('任务名称',exact=True).fill('Browser end-to-end');page.locator('#dialog-confirm').click()
             expect(page.locator('#editor-view')).to_be_visible();expect(page.locator('.graph-node')).to_have_count(2)
             page.locator('#palette [data-category=logic] summary').click();page.locator('#palette button').filter(has_text='等待').click();expect(page.locator('.graph-node')).to_have_count(3)
             wait=page.locator('.graph-node').filter(has=page.locator('.node-category',has_text='等待'));wait_id=wait.get_attribute('data-node')
@@ -79,7 +81,7 @@ def run(directory,*,demo=False):
             page.locator('#validate').click();expect(page.locator('#notice')).to_contain_text('静态验证通过')
             page.screenshot(path=str(directory/'02-editor.png'),full_page=True)
             page.locator('#publish').click();expect(page.locator('#notice')).to_contain_text('已发布不可变版本')
-            page.locator('[data-tab=runner]').click();page.locator('#debug-run').check();page.locator('#run-start').click();expect(page.locator('#run-state')).to_contain_text('已暂停',timeout=8000)
+            page.locator('[data-tab=runner]').click();page.locator('#debug-run').check();page.locator('#run-start').click();page.locator('#dialog-confirm').click();expect(page.locator('#run-state')).to_contain_text('已暂停',timeout=8000)
             page.locator('[data-debug=step]').click();page.wait_for_timeout(600);expect(page.locator('#run-state')).to_contain_text('已暂停');page.locator('[data-debug=resume]').click();expect(page.locator('#run-state')).to_contain_text('执行成功',timeout=8000)
             page.locator('[data-inspect=events]').click();expect(page.locator('.inspector-event').first).to_be_visible()
             page.screenshot(path=str(directory/'03-runner.png'),full_page=True)
@@ -87,7 +89,7 @@ def run(directory,*,demo=False):
             if demo:
                 page.locator('[data-tab=templates]').click();page.locator('.mission-card').filter(has_text='CUADC 多目标').get_by_role('button',name='从模板创建',exact=True).click()
                 page.locator('[data-node=handle]').dblclick();expect(page.locator('#breadcrumbs')).to_contain_text('处理目标');page.get_by_role('button',name='← 返回父 任务',exact=True).click()
-                page.locator('#publish').click();expect(page.locator('#notice')).to_contain_text('已发布不可变版本');page.locator('[data-tab=runner]').click();page.locator('#debug-run').uncheck();previous_runs=len(lab.missions.views());page.locator('#run-start').click()
+                page.locator('#mission-target').select_option('v');page.locator('#publish').click();expect(page.locator('#notice')).to_contain_text('已发布不可变版本');page.locator('[data-tab=runner]').click();page.locator('#debug-run').uncheck();previous_runs=len(lab.missions.views());page.locator('#run-start').click();page.locator('#dialog-confirm').click()
                 until=time.monotonic()+10
                 while len(lab.missions.views())==previous_runs and time.monotonic()<until:page.wait_for_timeout(50)
                 assert len(lab.missions.views())==previous_runs+1;expect(page.locator('#run-state')).to_contain_text('执行成功',timeout=15000)

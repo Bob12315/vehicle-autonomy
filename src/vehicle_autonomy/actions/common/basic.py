@@ -12,6 +12,8 @@ from vehicle_autonomy.world.environment.resources import ResolvedTarget
 
 BAD = (EffectPhase.REJECTED, EffectPhase.UNKNOWN, EffectPhase.CANCELLED)
 WRITTEN = (EffectPhase.TRANSMITTED, EffectPhase.ACKNOWLEDGED, EffectPhase.COMPLETED)
+STOP_TIMEOUT_NS = 8_000_000_000
+STOP_SETTLE_NS = 2_000_000_000
 
 
 @dataclass(frozen=True, slots=True)
@@ -278,7 +280,7 @@ class BasicInstance:
     def exit_with_results(self, world, reason, results):
         now=world.published_at.monotonic_ns
         if self.exit_ns is None:self.exit_ns=now
-        if now-self.exit_ns>8_000_000_000:
+        if now-self.exit_ns>STOP_TIMEOUT_NS:
             raise RuntimeError('stop_exit_deadline_unconfirmed')
         # Interrupted takeoff first establishes a controlled zero-velocity stream.
         if self.name=='takeoff' and reason is not ExitReason.SUCCEEDED and world.vehicle and world.vehicle.operation.armed:
@@ -303,4 +305,4 @@ class BasicInstance:
         steady=(bool(feedback and feedback[-1].phase is EffectPhase.COMPLETED) and
                 self._world_error(world, True) is None and self._steady(world))
         self.exit_stable_ns=(self.exit_stable_ns if self.exit_stable_ns is not None else now) if steady else None
-        return ExitDecision(self.exit_stable_ns is not None and now-self.exit_stable_ns>=2_000_000_000)
+        return ExitDecision(self.exit_stable_ns is not None and now-self.exit_stable_ns>=STOP_SETTLE_NS)
