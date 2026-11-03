@@ -1,0 +1,20 @@
+{
+  "acceptance.json": "e8225a3d497a15b4823a44178eb450440d2622b725dd05d9c1323df9ecc0b527",
+  "browser-snapshot.jpg": "115c16c179738d919bfb7cafa5c37142dbf33e97b87c21ae8d3d0c6e1c5d5a0d",
+  "camera-stale-cleared.png": "9be7e858bf15cca39b6084697af8bfd96e547872ba7dc5ad32cb91a916f79ea2",
+  "examples-copter.json": "546829043a874ba60494f2e757814aa15b28982446bc93c11401e484f0b6e991",
+  "examples-plane.json": "f59c6b06877205fa3a13cc968fef9971c4c61005d0dff5f21e601c7a31b69b80",
+  "examples-rover.json": "e510f156d7fe67d761964a92ab70a8d8b58d2ddb56cf4e25c99ee9ade23228a6",
+  "fullscreen-camera.png": "96c98d031b7c9bf46d716d9621e08e4aefd27e952b55b3955b893502aaa8c429",
+  "hardware-inventory.json": "76b70778c086cdb5c0be9b329fe7d13df23a5579262f4db4f85e3c6ee918bffa",
+  "native-video-metrics.png": "effd48cef932ec140c2c5261c0bed91465749e35497d671f79d15686036e5923",
+  "preview-down_camera.png": "af12763cbd12d811e4e33d1930168a9bced9df250051e3585eb4ae0284cb5c70",
+  "preview-front_camera.png": "dd1ef858364ca1b653e09b948161885406e72f35175a02ba3c307f2fd3122a5c",
+  "preview-gimbal-camera.png": "99f6083223eb45f171f68cca9fb0aa6d30723e9bafaac16a484e5552e20b92af",
+  "preview-rover-A.png": "e2d4111d4a71cb1134e94438458a7233a3ea9217737ec037d520ad2efbd9d3da",
+  "preview-rover-B.png": "faa6f4ae1e75ef3b128e5d222909f851f8898b1d39d1794e773f80abebb0f0b0",
+  "raw-sha256.json": "5669a7ffbd6d8b8cc474d032d2e2d55bae16f528fd8650bd03b4f3a0e841a8da",
+  "real-control-center-camera.png": "5f48826654eaa49f799066f1f37967ae97fb08eb4fb2791cf976f3e2c23233a1",
+  "source-sha256.json": "19a2eab52773bbc3d5bce6b96c3a4f67c49e99c50b29fc4a87717623393888cb",
+  "unittest.txt": "4e4e908042178d43f91a2c5f0ce28e35d797d04278ff2622de964027d19907e5"
+}

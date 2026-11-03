@@ -178,6 +178,8 @@ class SimulationManager:
             retired.add(child.target)
             app._retired_simulation_targets=retired
             app._tracks.pop(child.target,None)
+            cameras=getattr(app,'cameras',None)
+            if cameras:cameras.retire(child.target)
 
     def retiring_targets(self):
         with self.lock:
@@ -516,6 +518,11 @@ class SimulationManager:
             if not hasattr(app,'_simulation_instances'):app._simulation_instances={}
             app._simulation_instances[owner.target]=dict(vehicle_id=owner.id,system_id=owner.model.system_id,
                 world=owner.world,simulation_session=owner.owner.directory.name)
+            cameras=getattr(app,'cameras',None)
+            if cameras:
+                epoch=hashlib.sha256(json.dumps(identities[owner.target],sort_keys=True,separators=(',', ':')).encode()).hexdigest()
+                binding=dict(target=owner.target,vehicle_id=owner.id,world=owner.world,session=owner.owner.directory.name,epoch=epoch)
+                for slot,source in getattr(owner,'camera_sources',{}).items():cameras.register(binding,slot,source)
 
     def _cancel(self, owner):
         if hasattr(owner,'vehicles'):

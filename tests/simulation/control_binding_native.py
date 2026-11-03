@@ -76,8 +76,8 @@ class Native:
             time.sleep(.1)
         raise TimeoutError('native acceptance wait')
 
-    def create(self, kinds):
-        r = self.api('/api/simulation/create', dict(scene_id='R01', vehicles=[dict(kind=k, spawn={'id': p})
+    def create(self, kinds, *, scene_id='R01'):
+        r = self.api('/api/simulation/create', dict(scene_id=scene_id, vehicles=[dict(kind=k, spawn={'id': p})
             for k, p in zip(kinds, ('center', 'north', 'south', 'east'))], parameters={'obstacle_count': 0}))
         self.api('/api/simulation/start', {'id': r['id']})
         self.app.simulation_manager.wait_ready(r['id'], 150)

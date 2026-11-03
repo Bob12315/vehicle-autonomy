@@ -63,6 +63,8 @@ GUI、RViz2、QGC 按需打开。关闭控制台只清理本次自有进程；�
 
 ## 使用入口与验证
 
+- [车载摄像头预览 V1](docs/CAMERA_WEB_PREVIEW_V1.md)：认证 MJPEG、实例隔离、真实 Gazebo 图像及验收边界。
+
 - [连续驾驶与多实例任务绑定](docs/CONTROL_AND_MISSION_BINDING_REPORT.md)：接口、根因及真实仿真验收记录。
 - [六个可直接使用的 Mission 示例](simulation/missions/examples/README.md)：只读采样、条件分支、地面巡检、多旋翼和固定翼任务。
 - [控制中心](docs/CONTROL_CENTER_GUIDE.md)、[仿真中心](docs/SIMULATION_WEB_UI_GUIDE.md)

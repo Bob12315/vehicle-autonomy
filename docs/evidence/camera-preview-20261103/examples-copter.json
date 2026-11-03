@@ -1,0 +1,204 @@
+{
+  "passed": true,
+  "kind": "copter",
+  "missions": [
+    {
+      "mission_id": "Example_StateSurvey",
+      "state": "SUCCEEDED",
+      "error": null,
+      "release_safe": true,
+      "command_evidence_count": 0,
+      "checkpoints": [
+        {
+          "name": "GetVehicleState",
+          "position": [
+            2.5759345159132107e-10,
+            3.94231695203623e-12,
+            0.19499942681532334
+          ]
+        },
+        {
+          "name": "GetVehicleState",
+          "position": [
+            2.5759345159132107e-10,
+            3.94231695203623e-12,
+            0.19499942681532334
+          ]
+        },
+        {
+          "name": "GetVehicleState",
+          "position": [
+            2.5759345159132107e-10,
+            3.94231695203623e-12,
+            0.19499942681532334
+          ]
+        }
+      ],
+      "run_id": "mission-run:77b2d3ceeba6422ebcaf658ce43c83fe",
+      "vehicle_command_write_attempts": 0
+    },
+    {
+      "mission_id": "Example_DisarmedBranch",
+      "state": "SUCCEEDED",
+      "error": null,
+      "release_safe": true,
+      "command_evidence_count": 0,
+      "checkpoints": [
+        {
+          "name": "GetVehicleState",
+          "position": [
+            2.5759345159132107e-10,
+            3.94231695203623e-12,
+            0.19499942681532334
+          ]
+        }
+      ],
+      "run_id": "mission-run:a782cbecf22a48bcbef49a858086a973",
+      "vehicle_command_write_attempts": 0
+    },
+    {
+      "mission_id": "Example_Air_HoverLand",
+      "state": "SUCCEEDED",
+      "error": null,
+      "release_safe": true,
+      "command_evidence_count": 4,
+      "checkpoints": [
+        {
+          "name": "GetVehicleState",
+          "position": [
+            2.5759345159132107e-10,
+            3.94231695203623e-12,
+            0.19499942681532334
+          ]
+        },
+        {
+          "name": "SetMode",
+          "position": [
+            2.5759345159132107e-10,
+            3.94231695203623e-12,
+            0.19499942681532334
+          ]
+        },
+        {
+          "name": "Arm",
+          "position": [
+            2.5759345159132107e-10,
+            3.94231695203623e-12,
+            0.19499942681532334
+          ]
+        },
+        {
+          "name": "Takeoff",
+          "position": [
+            0.002327290006358124,
+            0.004881995697084122,
+            1.6905799829090593
+          ]
+        },
+        {
+          "name": "Land",
+          "position": [
+            0.0025539790052583836,
+            0.006078746608047232,
+            0.19499994679303573
+          ]
+        },
+        {
+          "name": "GetVehicleState",
+          "position": [
+            0.0025539790052583836,
+            0.006078746608047232,
+            0.19499994679303573
+          ]
+        }
+      ],
+      "run_id": "mission-run:b250593ee90944338eac21c20bf3b6dd",
+      "physical": {
+        "home_error_m": 0.006593479181770514,
+        "speed_mps": 0.0,
+        "height_m": 5.199777123876537e-07
+      }
+    },
+    {
+      "mission_id": "Example_Air_SurveyReturn",
+      "state": "SUCCEEDED",
+      "error": null,
+      "release_safe": true,
+      "command_evidence_count": 18,
+      "checkpoints": [
+        {
+          "name": "GetVehicleState",
+          "position": [
+            0.0025539790052583836,
+            0.006078746608047232,
+            0.19499994679303573
+          ]
+        },
+        {
+          "name": "SetMode",
+          "position": [
+            0.0025539790052583836,
+            0.006078746608047232,
+            0.19499994679303573
+          ]
+        },
+        {
+          "name": "Arm",
+          "position": [
+            0.0025539790052583836,
+            0.006078746608047232,
+            0.19499994679303573
+          ]
+        },
+        {
+          "name": "Takeoff",
+          "position": [
+            0.005155940973420622,
+            0.0024609073810387626,
+            1.690490452410204
+          ]
+        },
+        {
+          "name": "Goto",
+          "position": [
+            0.9844107910932264,
+            -0.006782869183568341,
+            1.4928263664401835
+          ]
+        },
+        {
+          "name": "Goto",
+          "position": [
+            1.0138402257264767,
+            0.9677712161607661,
+            1.499264591408771
+          ]
+        },
+        {
+          "name": "ReturnHome",
+          "position": [
+            0.002378830685744999,
+            0.0027881118628760946,
+            0.1949995535497638
+          ]
+        },
+        {
+          "name": "GetVehicleState",
+          "position": [
+            0.002378830685744999,
+            0.0027881118628760946,
+            0.1949995535497638
+          ]
+        }
+      ],
+      "run_id": "mission-run:8f231be0c2b649c09096f4bc73466dd6",
+      "physical": {
+        "home_error_m": 0.003665024139596742,
+        "speed_mps": 0.0,
+        "height_m": 1.267344404698445e-07
+      }
+    }
+  ],
+  "assembly": "Control Center isolated signed Driver",
+  "cleanup": "COMPLETE"
+}

@@ -2,7 +2,7 @@
 const api=window.VAF,auth=window.VAFAuth,$=s=>document.querySelector(s);
 const terminal=new Set(['SUCCEEDED','FAILED','REJECTED','CANCELLED','TIMED_OUT','UNKNOWN']);
 let state=null,current=null,controller=null,session=null,input=null,keys=new Set(),pending=false,updating=false,polling=false,renewing=false,commandPending=false,confirmation=null,socket=null,retry=0,closing=false,lastAction=null,targetHeight=null,lastReceived=0;
-let sendChanging=false;
+let sendChanging=false,cameraSelectionPending=false;
 let velocityEnabled=false,velocityUntil=0,motionGeneration=0;
 let lastInputReplyAt=0;
 const node=api.node.bind(api),fmt=(v,n=2)=>typeof v==='number'&&Number.isFinite(v)?v.toFixed(n):'未知';
@@ -28,6 +28,7 @@ function syncTargets(){
   select.value=names.includes(api.target)?api.target:'';
  }
  if(api.target&&!names.includes(api.target)){loseControl('车辆实例已移除，原会话不能绑定其他车辆。');api.target=null;select.value='';}
+ if(!cameraSelectionPending)window.VAFCamera?.select(api.target||null);
 }
 async function refresh(){if(polling||closing)return;polling=true;try{merge(await api.call('/api/control/state'),true);}catch(e){invalidate();throw e;}finally{polling=false;}}
 function invalidate(){if(state)for(const v of state.vehicles){v.fresh_vehicle_state=false;v.connected=false;}render();}
@@ -302,9 +303,9 @@ function renderTools(){
  if(!panel.childElementCount)panel.append(node('p','当前主机未注册 QGroundControl、RViz2 或 Gazebo 快捷入口；请在 Tool Manager 查看实际能力。',{class:'muted small-note'}));
 }
 $('#target').onchange=guard(async()=>{
- const target=$('#target').value;commandPending=true;$('#target').disabled=true;render();
+ const target=$('#target').value;cameraSelectionPending=true;window.VAFCamera?.select(null);commandPending=true;$('#target').disabled=true;render();
  try{await loseControl();api.target=target;lastAction=null;targetHeight=null;await api.loadCatalog();await refresh();}
- finally{commandPending=false;$('#target').disabled=false;render();}
+ finally{cameraSelectionPending=false;window.VAFCamera?.select(api.target||null);commandPending=false;$('#target').disabled=false;render();}
 });
 async function initialize(){
  await auth.ready;if(!auth.session)return;

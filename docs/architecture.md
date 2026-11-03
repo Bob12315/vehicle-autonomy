@@ -1,5 +1,20 @@
 # V1 framework boundary
 
+## Read-only camera preview (2026-11-03)
+
+The unified Vehicle Control page reads authenticated MJPEG from a bounded camera
+registry. Each source pins a target, vehicle, World/session and physical deployment
+epoch. Gazebo Image capture runs in owned optional workers; CameraSource also
+retains explicit USB/V4L2 and finite recording adapters. Preview does not acquire
+Operator control, SEND, a Lease or any vehicle command port. Inference stays separate.
+
+A separately attested camera assembly adds the Rover optical sensor and scopes
+existing Copter/Plane camera topics in owned snapshots after base-library lock
+validation. Base and derived hashes stay distinct; external model sources and
+actuator configuration are not modified. Stale/retired sources and browser sessions
+terminate streams; ordered original vehicle cleanup remains authoritative. Exact
+coverage and limits are in the [Camera Preview V1 report](CAMERA_WEB_PREVIEW_V1.md).
+
 ## Continuous Rover control and explicit Mission instance binding (2026-11-03)
 
 Vehicle Control keeps one bounded, explicitly enabled Rover Drive while updating

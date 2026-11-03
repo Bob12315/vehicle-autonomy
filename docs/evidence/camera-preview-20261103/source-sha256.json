@@ -1,0 +1,17 @@
+{
+  "pyproject.toml": "eb4cd8b43cfb2665f694f4b6386c9cee0dcabcf2892377b1fea93e64cc264e53",
+  "simulation/sensors/rover-front-v1.sdf": "bcec07d7afdcbc154c70d627aa9c128f166b6772e04b845585528e04c125d07a",
+  "src/vehicle_autonomy/app/simulation/camera_assembly.py": "1f45930600290dc6e8851eb0827e407d5a2de2670a92ad2b51562581a8dbf62f",
+  "src/vehicle_autonomy/app/simulation/manager.py": "af4492adef98c73b0a8da04792499243ac2464c09842a202b303cf644aeba9dd",
+  "src/vehicle_autonomy/app/simulation/universal_runtime.py": "aad140ec05761bd66e22df0d8acf629853a278cb6a0882a03038ea2ad95dc152",
+  "src/vehicle_autonomy/app/web/camera_http.py": "57ef0448b66cda371fece84e680ce7924645607a448aa5d5875aa23935d0ca26",
+  "src/vehicle_autonomy/app/web/mission_control.py": "6d5aa46118df72a9e8f9997fb4502e0c0bc5181e2cb2e616df634ee5a1cee5c6",
+  "src/vehicle_autonomy/app/web/static/camera-preview.css": "aa29315e92f4a9a9a204011c16bfb565e9ae63d00c1bba796babcc11e4314c35",
+  "src/vehicle_autonomy/app/web/static/camera-preview.js": "e801e315249dea6d3c4b185af3eb9de368fd49d495ac5e22cfe5063545d61afd",
+  "src/vehicle_autonomy/app/web/static/manual-control.html": "3bc42afaf6c3d414c68c5ecc041a396ede6b4282f1ddea9f39d21a0806b7e609",
+  "src/vehicle_autonomy/app/web/static/manual-control.js": "b91f0ca8010381369fde65c33eada2204844cd01dde67a53b7d5986b593d9765",
+  "src/vehicle_autonomy/world/sensors/camera/gazebo.py": "d7a3b5ad6af59790a6535b3874ea40f609c40ffd7502f9fc2dcbfcf2eb53130b",
+  "src/vehicle_autonomy/world/sensors/camera/live.py": "a41cbef88d9fe8f2c1eb89f0ff5ef7160cef9f328e80f6ae408a9eb7a2f94e0b",
+  "src/vehicle_autonomy/world/sensors/camera/manager.py": "b4aa1bb79d619458c50c3e0f423064b7c6bd414d547d1b1b68d7b8fabd5ea683",
+  "src/vehicle_autonomy/world/sensors/camera/packet.py": "a088c5e10ca91d994307c29a7df50f40cf81f818f931db31edf798572b6b0010"
+}

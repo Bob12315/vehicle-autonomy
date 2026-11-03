@@ -12,6 +12,8 @@ import sys
 import tempfile
 import time
 
+from .packet import encode, decode, MAX_PACKET, STALE_NS
+
 
 def discover():
     """Inventory only: a device node is not evidence of a working camera."""
@@ -66,10 +68,13 @@ def capture(config, directory):
             health = {'kind': config['kind'], 'source': source, 'frames': frames, 'dropped': dropped,
                       'sensor_drop_count': None, 'drop_metric_scope': 'preview processing only; device drop counter unavailable',
                       'fps': frames / max(elapsed, .001), 'received_ns': received_ns,
+                      'sequence': frames, 'received_utc_ns': time.time_ns(), 'width': image.shape[1], 'height': image.shape[0],
+                      'configured_fps': config['fps'], 'captured_ns': None, 'capture_clock': 'unknown',
+                      'encoded_ns': time.monotonic_ns(),
                       'capture_time': 'unknown; acquisition completion diagnostic',
                       'frame': 'camera_optical', 'spatial_calibration': 'unverified',
                       'exposure': 'unknown', 'error': None}
-            atomic(directory / 'latest.jpg', encoded.tobytes())
+            atomic(directory / 'latest.packet', encode(health, encoded.tobytes()))
             atomic(directory / 'health.json', json.dumps(health).encode())
             delay = 1 / config['fps'] - (time.monotonic() - tick)
             if delay > 0:
@@ -86,30 +91,45 @@ def capture(config, directory):
 
 
 class CameraSource:
-    def __init__(self, config):
-        self.directory = tempfile.TemporaryDirectory(prefix='vaf-camera-')
-        self.path = Path(self.directory.name)
-        self.process = subprocess.Popen([sys.executable, '-m', 'vehicle_autonomy.world.sensors.camera.live',
-            '--config-json', json.dumps(config), '--output', str(self.path)],
-            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
+    def __init__(self, config, *, owner=None, name='camera', environment=None):
+        if config.get('kind') not in ('gazebo', 'v4l2', 'recording') or type(config.get('fps')) not in (int, float) or not 1 <= config['fps'] <= 15:
+            raise ValueError('explicit supported camera source and 1..15 FPS required')
+        if config['kind'] == 'gazebo' and (not config.get('topic', '').startswith('/') or not config.get('world')):
+            raise ValueError('explicit Gazebo topic required')
+        self.directory = None if owner else tempfile.TemporaryDirectory(prefix='vaf-camera-')
+        self.path = Path(owner.directory)/name if owner else Path(self.directory.name)
+        self.path.mkdir(mode=0o700, exist_ok=True)
+        command = [sys.executable, '-m', 'vehicle_autonomy.world.sensors.camera.live',
+            '--config-json', json.dumps(config), '--output', str(self.path)]
+        self.process = owner.start(name, command, transient=True) if owner else subprocess.Popen(command,
+            env=environment, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
 
     def health(self):
         try:
             health = json.loads((self.path / 'health.json').read_text())
-        except FileNotFoundError:
+        except (OSError, ValueError):
             health = {'error': 'awaiting first camera frame'}
-        age = None if 'received_ns' not in health else time.monotonic_ns() - health['received_ns']
-        health.update(age_ns=age, online=(not health.get('error') and self.process.poll() is None
-                                        and age is not None and 0 <= age <= 1_000_000_000))
-        return health
+        if type(health) is not dict:health={'error':'invalid camera health packet'}
+        received=health.get('received_ns')
+        age = None if type(received) is not int else time.monotonic_ns() - received
+        alive = self.process.poll() is None
+        online = bool(not health.get('error') and alive and age is not None and 0 <= age <= STALE_NS)
+        reason = health.get('error') or (None if online else 'camera worker exited' if not alive else 'camera data stale')
+        return dict(health, age_ns=age, online=online, reason=reason, worker_pid=self.process.pid,
+                    state='ONLINE' if online else 'FAULT' if not alive else 'STALE')
 
-    def frame(self):
+    def packet(self):
         if not self.health()['online']:
             raise ValueError('fresh camera frame unavailable')
-        data = (self.path / 'latest.jpg').read_bytes()
-        if len(data) > 1_000_000:
-            raise ValueError('camera frame too large')
-        return {'mime': 'image/jpeg', 'base64': base64.b64encode(data).decode()}
+        with (self.path/'latest.packet').open('rb') as stream:
+            metadata, jpeg = decode(stream.read(MAX_PACKET+1))
+        if not 0 <= time.monotonic_ns()-metadata['received_ns'] <= STALE_NS or self.process.poll() is not None:
+            raise ValueError('camera packet stale or worker stopped')
+        return metadata, jpeg
+
+    def frame(self):
+        _, jpeg = self.packet()
+        return {'mime': 'image/jpeg', 'base64': base64.b64encode(jpeg).decode()}
 
     def close(self):
         if self.process.poll() is None:
@@ -119,7 +139,7 @@ class CameraSource:
             except subprocess.TimeoutExpired:
                 os.killpg(self.process.pid, signal.SIGKILL)
                 self.process.wait(timeout=2)
-        self.directory.cleanup()
+        if self.directory:self.directory.cleanup()
 
 
 def main():
@@ -127,7 +147,15 @@ def main():
     parser.add_argument('--config-json', required=True)
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
-    return capture(json.loads(args.config_json), args.output)
+    config = json.loads(args.config_json)
+    try:
+        if config['kind'] == 'gazebo':
+            from .gazebo import capture as gazebo_capture
+            return gazebo_capture(config, args.output)
+        return capture(config, args.output)
+    except Exception as exc:
+        atomic(args.output/'health.json',json.dumps(dict(kind=config['kind'],error=type(exc).__name__+': '+str(exc)[:300])).encode())
+        return 1
 
 
 if __name__ == '__main__':

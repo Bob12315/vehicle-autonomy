@@ -68,3 +68,5 @@ where = ["src"]
 "share/vehicle-autonomy/simulation/worlds" = ["simulation/worlds/rover_runway.sdf", "simulation/worlds/plane_runway.sdf"]
 
 "share/vehicle-autonomy/simulation/vehicles" = ["simulation/vehicles/catalog.json", "simulation/vehicles/vtol-audit.json"]
+
+"share/vehicle-autonomy/simulation/sensors" = ["simulation/sensors/rover-front-v1.sdf"]

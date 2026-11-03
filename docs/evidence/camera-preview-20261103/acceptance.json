@@ -1,0 +1,1688 @@
+{
+  "rover-verified-final": {
+    "status": "PASS",
+    "checks": {
+      "slow reader bounded / other streams stay live": "PASS",
+      "stationary native video without SEND / control / Writer": "PASS",
+      "camera interruption / stale clearing / recovery": "PASS",
+      "authenticated browser preview / snapshot / fullscreen / close and reopen": "PASS",
+      "moving and turning real image change / Rover A B isolation": "PASS",
+      "remove and recreate clears old video / fresh identity": "PASS",
+      "World replacement fences previous source / epoch / frame": "PASS",
+      "independent Gazebo pixel and capture stamp match": "PASS"
+    },
+    "camera_catalogs": [
+      {
+        "target": "simulation-6df5b358e70c4395b741a4bfa72d5723",
+        "observed_at_ns": 5158083806488,
+        "cameras": [
+          {
+            "camera_id": "camera-b8c62638a5073dbb76231ea70b2e69d2",
+            "slot": "preview_front",
+            "binding": {
+              "target": "simulation-6df5b358e70c4395b741a4bfa72d5723",
+              "vehicle_id": "vehicle-07e208155299434292f20a87fb81fec9",
+              "world": "vaf_sim_cc380d8eadb841debf27e94ff9868a63",
+              "session": "sim-cc380d8eadb841debf27e94ff9868a63",
+              "epoch": "0b2915fd16f93cc7abf23ab6693bcd99017f855827726c933858a99fa930f1fa"
+            },
+            "kind": "gazebo",
+            "source": "/vaf/camera/vaf_sim_cc380d8eadb841debf27e94ff9868a63/vaf_vehicle_07e208155299434292f20a87fb81fec9/preview_front/image",
+            "sequence": 473,
+            "frames": 473,
+            "width": 640,
+            "height": 480,
+            "source_width": 640,
+            "source_height": 480,
+            "fps": 9.66537600712514,
+            "configured_fps": 10,
+            "dropped": 9,
+            "received_utc_ns": 1793683516567350605,
+            "captured_ns": 49900000000,
+            "capture_clock": "gazebo-simulation",
+            "received_ns": 5158007583561,
+            "encoded_ns": 5158016715732,
+            "clock_sim_ns": 49915000000,
+            "clock_host_ns": 5158014846123,
+            "capture_time": "Gazebo image header; not host wall time",
+            "frame": "camera_optical",
+            "spatial_calibration": "unverified",
+            "error": null,
+            "age_ns": 76319176,
+            "online": true,
+            "reason": null,
+            "worker_pid": 70334,
+            "state": "ONLINE"
+          }
+        ]
+      },
+      {
+        "target": "simulation-27d093d865ef485abe319b0bd5853393",
+        "observed_at_ns": 5158085655993,
+        "cameras": [
+          {
+            "camera_id": "camera-82b10ce94a18af2233fc1e8ac8b2d0c9",
+            "slot": "preview_front",
+            "binding": {
+              "target": "simulation-27d093d865ef485abe319b0bd5853393",
+              "vehicle_id": "vehicle-6e1e19a6118a4f7c9ad50ba90f4e9d66",
+              "world": "vaf_sim_cc380d8eadb841debf27e94ff9868a63",
+              "session": "sim-cc380d8eadb841debf27e94ff9868a63",
+              "epoch": "b1d56266c807b0a59acc5cf81df2d189d103d604a466f3802dcb695bea90a35d"
+            },
+            "kind": "gazebo",
+            "source": "/vaf/camera/vaf_sim_cc380d8eadb841debf27e94ff9868a63/vaf_vehicle_6e1e19a6118a4f7c9ad50ba90f4e9d66/preview_front/image",
+            "sequence": 449,
+            "frames": 449,
+            "width": 640,
+            "height": 480,
+            "source_width": 640,
+            "source_height": 480,
+            "fps": 9.66458622917663,
+            "configured_fps": 10,
+            "dropped": 8,
+            "received_utc_ns": 1793683516571824088,
+            "captured_ns": 49900000000,
+            "capture_clock": "gazebo-simulation",
+            "received_ns": 5158012069709,
+            "encoded_ns": 5158023864314,
+            "clock_sim_ns": 49922000000,
+            "clock_host_ns": 5158021846002,
+            "capture_time": "Gazebo image header; not host wall time",
+            "frame": "camera_optical",
+            "spatial_calibration": "unverified",
+            "error": null,
+            "age_ns": 73713495,
+            "online": true,
+            "reason": null,
+            "worker_pid": 70520,
+            "state": "ONLINE"
+          }
+        ]
+      },
+      {
+        "target": "simulation-6eb66901392f4b3e8d1aa71914177953",
+        "observed_at_ns": 5213273613128,
+        "cameras": [
+          {
+            "camera_id": "camera-bdd45fa5f85ed000947688744993da70",
+            "slot": "preview_front",
+            "binding": {
+              "target": "simulation-6eb66901392f4b3e8d1aa71914177953",
+              "vehicle_id": "vehicle-3876e62b4d92454b867f58ffb16af315",
+              "world": "vaf_sim_cc380d8eadb841debf27e94ff9868a63",
+              "session": "sim-cc380d8eadb841debf27e94ff9868a63",
+              "epoch": "366f261fd08137f95e10b26795bb2af265abf42eecc24dd7456a65ff4556aeda"
+            },
+            "kind": "gazebo",
+            "source": "/vaf/camera/vaf_sim_cc380d8eadb841debf27e94ff9868a63/vaf_vehicle_3876e62b4d92454b867f58ffb16af315/preview_front/image",
+            "sequence": 6,
+            "frames": 6,
+            "width": 640,
+            "height": 480,
+            "source_width": 640,
+            "source_height": 480,
+            "fps": 8.11322605389768,
+            "configured_fps": 10,
+            "dropped": 1,
+            "received_utc_ns": 1793683571736085639,
+            "captured_ns": 104000000000,
+            "capture_clock": "gazebo-simulation",
+            "received_ns": 5213176324714,
+            "encoded_ns": 5213211411693,
+            "clock_sim_ns": 104047000000,
+            "clock_host_ns": 5213208641955,
+            "capture_time": "Gazebo image header; not host wall time",
+            "frame": "camera_optical",
+            "spatial_calibration": "unverified",
+            "error": null,
+            "age_ns": 97496796,
+            "online": true,
+            "reason": null,
+            "worker_pid": 74714,
+            "state": "ONLINE"
+          }
+        ]
+      },
+      {
+        "target": "simulation-0c78edd8264a47d2a7feff2b67951275",
+        "observed_at_ns": 5247435836197,
+        "cameras": [
+          {
+            "camera_id": "camera-1b440170793c7e86be03ac4f602d3ecd",
+            "slot": "preview_front",
+            "binding": {
+              "target": "simulation-0c78edd8264a47d2a7feff2b67951275",
+              "vehicle_id": "vehicle-06bcfc032e004028bcc3143d5411fce0",
+              "world": "vaf_sim_c147c73470094529b3e369602c02a6a0",
+              "session": "sim-c147c73470094529b3e369602c02a6a0",
+              "epoch": "d35119c5630902cb024c7a786aa279a27eb604ec9a2221c02fc229b0875bce05"
+            },
+            "kind": "gazebo",
+            "source": "/vaf/camera/vaf_sim_c147c73470094529b3e369602c02a6a0/vaf_vehicle_06bcfc032e004028bcc3143d5411fce0/preview_front/image",
+            "sequence": 30,
+            "frames": 30,
+            "width": 640,
+            "height": 480,
+            "source_width": 640,
+            "source_height": 480,
+            "fps": 8.503558535748258,
+            "configured_fps": 10,
+            "dropped": 0,
+            "received_utc_ns": 1793683605837950082,
+            "captured_ns": 5400000000,
+            "capture_clock": "gazebo-simulation",
+            "received_ns": 5247277851514,
+            "encoded_ns": 5247338239603,
+            "clock_sim_ns": 5467000000,
+            "clock_host_ns": 5247335994210,
+            "capture_time": "Gazebo image header; not host wall time",
+            "frame": "camera_optical",
+            "spatial_calibration": "unverified",
+            "error": null,
+            "age_ns": 158086691,
+            "online": true,
+            "reason": null,
+            "worker_pid": 76170,
+            "state": "ONLINE"
+          }
+        ]
+      },
+      {
+        "target": "simulation-6a98d693e00949dabdc6b6cebca02ef0",
+        "observed_at_ns": 5247437877284,
+        "cameras": [
+          {
+            "camera_id": "camera-49539abb1cef91c0d799696e1df99284",
+            "slot": "preview_front",
+            "binding": {
+              "target": "simulation-6a98d693e00949dabdc6b6cebca02ef0",
+              "vehicle_id": "vehicle-cdbd474a4199435dbe2beaea51c239b6",
+              "world": "vaf_sim_c147c73470094529b3e369602c02a6a0",
+              "session": "sim-c147c73470094529b3e369602c02a6a0",
+              "epoch": "6bf0a1de4b48324dd3a625c3fd1f54de2bc9ffb41f050b277d4603dcb10da192"
+            },
+            "kind": "gazebo",
+            "source": "/vaf/camera/vaf_sim_c147c73470094529b3e369602c02a6a0/vaf_vehicle_cdbd474a4199435dbe2beaea51c239b6/preview_front/image",
+            "sequence": 6,
+            "frames": 6,
+            "width": 640,
+            "height": 480,
+            "source_width": 640,
+            "source_height": 480,
+            "fps": 9.811235132623331,
+            "configured_fps": 10,
+            "dropped": 0,
+            "received_utc_ns": 1793683605942580648,
+            "captured_ns": 5500000000,
+            "capture_clock": "gazebo-simulation",
+            "received_ns": 5247382505236,
+            "encoded_ns": 5247392479378,
+            "clock_sim_ns": 5522000000,
+            "clock_host_ns": 5247390987275,
+            "capture_time": "Gazebo image header; not host wall time",
+            "frame": "camera_optical",
+            "spatial_calibration": "unverified",
+            "error": null,
+            "age_ns": 55462792,
+            "online": true,
+            "reason": null,
+            "worker_pid": 76340,
+            "state": "ONLINE"
+          }
+        ]
+      }
+    ],
+    "streams": [
+      {
+        "phase": "stationary-0",
+        "target": "simulation-6df5b358e70c4395b741a4bfa72d5723",
+        "camera_id": "camera-b8c62638a5073dbb76231ea70b2e69d2",
+        "frames": 140,
+        "fps": 9.8325476371231,
+        "source_to_web_ms_median": 54.7635415,
+        "source_to_web_ms_p95": 110.067432,
+        "web_transfer_ms_median": 0.0976055,
+        "unique_jpegs": 1,
+        "error": null
+      },
+      {
+        "phase": "stationary-1",
+        "target": "simulation-27d093d865ef485abe319b0bd5853393",
+        "camera_id": "camera-82b10ce94a18af2233fc1e8ac8b2d0c9",
+        "frames": 141,
+        "fps": 9.832481177988194,
+        "source_to_web_ms_median": 54.183464,
+        "source_to_web_ms_p95": 101.645708,
+        "web_transfer_ms_median": 0.152375,
+        "unique_jpegs": 1,
+        "error": null
+      },
+      {
+        "phase": "moving-turning",
+        "target": "simulation-6df5b358e70c4395b741a4bfa72d5723",
+        "camera_id": "camera-b8c62638a5073dbb76231ea70b2e69d2",
+        "frames": 225,
+        "fps": 9.805990378520537,
+        "source_to_web_ms_median": 65.973418,
+        "source_to_web_ms_p95": 112.274431,
+        "web_transfer_ms_median": 0.099563,
+        "unique_jpegs": 196,
+        "error": null
+      }
+    ],
+    "motion": {
+      "action_id": "action:2f3fd7036bb94595a540526130d4400e",
+      "distance_m": 1.174026224325453,
+      "yaw_change_rad": -2.6049528594862776,
+      "final_speed_mps": 0.014403084034739843
+    },
+    "resource_samples": [
+      [
+        {
+          "pid": 69718,
+          "component": "web-test-host",
+          "at_ns": 5158099517159,
+          "cpu_ticks": 357,
+          "rss_bytes": 66027520
+        },
+        {
+          "pid": 70125,
+          "component": "world:gazebo",
+          "at_ns": 5158099547307,
+          "cpu_ticks": 5209,
+          "rss_bytes": 787492864
+        },
+        {
+          "pid": 70165,
+          "component": "vehicle-07e208155299434292f20a87fb81fec9:sitl",
+          "at_ns": 5158099572888,
+          "cpu_ticks": 371,
+          "rss_bytes": 8388608
+        },
+        {
+          "pid": 70324,
+          "component": "vehicle-07e208155299434292f20a87fb81fec9:framework-worker",
+          "at_ns": 5158099598549,
+          "cpu_ticks": 450,
+          "rss_bytes": 32309248
+        },
+        {
+          "pid": 70334,
+          "component": "vehicle-07e208155299434292f20a87fb81fec9:camera-preview_front",
+          "at_ns": 5158099630510,
+          "cpu_ticks": 889,
+          "rss_bytes": 68349952
+        },
+        {
+          "pid": 70398,
+          "component": "vehicle-6e1e19a6118a4f7c9ad50ba90f4e9d66:sitl",
+          "at_ns": 5158099654262,
+          "cpu_ticks": 345,
+          "rss_bytes": 8257536
+        },
+        {
+          "pid": 70513,
+          "component": "vehicle-6e1e19a6118a4f7c9ad50ba90f4e9d66:framework-worker",
+          "at_ns": 5158099678273,
+          "cpu_ticks": 426,
+          "rss_bytes": 32198656
+        },
+        {
+          "pid": 70520,
+          "component": "vehicle-6e1e19a6118a4f7c9ad50ba90f4e9d66:camera-preview_front",
+          "at_ns": 5158099712368,
+          "cpu_ticks": 839,
+          "rss_bytes": 65306624
+        }
+      ],
+      [
+        {
+          "pid": 69718,
+          "component": "web-test-host",
+          "at_ns": 5166113577852,
+          "cpu_ticks": 446,
+          "rss_bytes": 67338240
+        },
+        {
+          "pid": 70125,
+          "component": "world:gazebo",
+          "at_ns": 5166113611972,
+          "cpu_ticks": 6075,
+          "rss_bytes": 787492864
+        },
+        {
+          "pid": 70165,
+          "component": "vehicle-07e208155299434292f20a87fb81fec9:sitl",
+          "at_ns": 5166113640683,
+          "cpu_ticks": 432,
+          "rss_bytes": 8388608
+        },
+        {
+          "pid": 70324,
+          "component": "vehicle-07e208155299434292f20a87fb81fec9:framework-worker",
+          "at_ns": 5166113666977,
+          "cpu_ticks": 524,
+          "rss_bytes": 32309248
+        },
+        {
+          "pid": 70334,
+          "component": "vehicle-07e208155299434292f20a87fb81fec9:camera-preview_front",
+          "at_ns": 5166113702993,
+          "cpu_ticks": 983,
+          "rss_bytes": 68448256
+        },
+        {
+          "pid": 70398,
+          "component": "vehicle-6e1e19a6118a4f7c9ad50ba90f4e9d66:sitl",
+          "at_ns": 5166113728528,
+          "cpu_ticks": 405,
+          "rss_bytes": 8257536
+        },
+        {
+          "pid": 70513,
+          "component": "vehicle-6e1e19a6118a4f7c9ad50ba90f4e9d66:framework-worker",
+          "at_ns": 5166113755046,
+          "cpu_ticks": 501,
+          "rss_bytes": 32198656
+        },
+        {
+          "pid": 70520,
+          "component": "vehicle-6e1e19a6118a4f7c9ad50ba90f4e9d66:camera-preview_front",
+          "at_ns": 5166113790473,
+          "cpu_ticks": 937,
+          "rss_bytes": 68734976
+        }
+      ]
+    ],
+    "slow_client": {
+      "received_frames": 5,
+      "error": null,
+      "global_stream_limit": 4,
+      "send_buffer_bytes": 65536,
+      "write_timeout_s": 0.5
+    },
+    "native_image_match": [
+      {
+        "topic": "/vaf/camera/vaf_sim_cc380d8eadb841debf27e94ff9868a63/vaf_vehicle_07e208155299434292f20a87fb81fec9/preview_front/image",
+        "matches": 29,
+        "capture_stamps": [
+          58100000000,
+          58200000000,
+          58300000000,
+          58400000000,
+          58500000000,
+          58600000000,
+          58700000000,
+          58800000000,
+          58900000000,
+          59000000000,
+          59100000000,
+          59200000000,
+          59300000000,
+          59500000000,
+          59600000000,
+          59700000000,
+          59800000000,
+          59900000000,
+          60000000000,
+          60100000000,
+          60200000000,
+          60300000000,
+          60400000000,
+          60500000000,
+          60600000000,
+          60700000000,
+          60800000000,
+          60900000000,
+          61000000000
+        ]
+      },
+      {
+        "topic": "/vaf/camera/vaf_sim_cc380d8eadb841debf27e94ff9868a63/vaf_vehicle_6e1e19a6118a4f7c9ad50ba90f4e9d66/preview_front/image",
+        "matches": 29,
+        "capture_stamps": [
+          61100000000,
+          61200000000,
+          61300000000,
+          61400000000,
+          61500000000,
+          61600000000,
+          61700000000,
+          61800000000,
+          61900000000,
+          62000000000,
+          62100000000,
+          62200000000,
+          62300000000,
+          62400000000,
+          62500000000,
+          62600000000,
+          62700000000,
+          62800000000,
+          62900000000,
+          63000000000,
+          63100000000,
+          63200000000,
+          63300000000,
+          63400000000,
+          63500000000,
+          63600000000,
+          63700000000,
+          63800000000,
+          63900000000
+        ]
+      }
+    ],
+    "browser_errors": [],
+    "cleanup": {
+      "sim-cc380d8eadb841debf27e94ff9868a63": {
+        "state": "FINISHED",
+        "cleanup": "COMPLETE"
+      },
+      "sim-c147c73470094529b3e369602c02a6a0": {
+        "state": "FINISHED",
+        "cleanup": "COMPLETE"
+      }
+    },
+    "camera_process_cleanup": {
+      "70334": true,
+      "70520": true,
+      "74714": true,
+      "76170": true,
+      "76340": true
+    }
+  },
+  "copter-final": {
+    "status": "PASS",
+    "checks": {
+      "slow reader bounded / other streams stay live": "PASS",
+      "stationary native video without SEND / control / Writer": "PASS",
+      "multiple source browser selection / readonly": "PASS",
+      "independent Gazebo pixel and capture stamp match": "PASS"
+    },
+    "camera_catalogs": [
+      {
+        "target": "simulation-dc83e5946fc34648a7c834c20ae2731d",
+        "observed_at_ns": 4888202620020,
+        "cameras": [
+          {
+            "camera_id": "camera-228b18954cbe8518e82dad52ca135258",
+            "slot": "gimbal-camera",
+            "binding": {
+              "target": "simulation-dc83e5946fc34648a7c834c20ae2731d",
+              "vehicle_id": "vehicle-28da2d3ee77c4802baafe46dba54d05b",
+              "world": "vaf_sim_06f5997aeb974c1f94bad515e57f2031",
+              "session": "sim-06f5997aeb974c1f94bad515e57f2031",
+              "epoch": "c104a12604b4490d6bed959288e104bc8abced7e3d54abf60cb4a5613d1461dd"
+            },
+            "kind": "gazebo",
+            "source": "/vaf/camera/vaf_sim_06f5997aeb974c1f94bad515e57f2031/vaf_vehicle_28da2d3ee77c4802baafe46dba54d05b/gimbal-camera/image",
+            "sequence": 443,
+            "frames": 443,
+            "width": 640,
+            "height": 480,
+            "source_width": 640,
+            "source_height": 480,
+            "fps": 9.851438757874481,
+            "configured_fps": 10,
+            "dropped": 5,
+            "received_utc_ns": 1793683246734674733,
+            "captured_ns": 46500000000,
+            "capture_clock": "gazebo-simulation",
+            "received_ns": 4888174918497,
+            "encoded_ns": 4888192767840,
+            "clock_sim_ns": 46530000000,
+            "clock_host_ns": 4888191475445,
+            "capture_time": "Gazebo image header; not host wall time",
+            "frame": "camera_optical",
+            "spatial_calibration": "unverified",
+            "error": null,
+            "age_ns": 27803980,
+            "online": true,
+            "reason": null,
+            "worker_pid": 63025,
+            "state": "ONLINE"
+          }
+        ]
+      }
+    ],
+    "streams": [
+      {
+        "phase": "stationary-0",
+        "target": "simulation-dc83e5946fc34648a7c834c20ae2731d",
+        "camera_id": "camera-228b18954cbe8518e82dad52ca135258",
+        "frames": 107,
+        "fps": 9.502781963400862,
+        "source_to_web_ms_median": 82.194498,
+        "source_to_web_ms_p95": 111.000248,
+        "web_transfer_ms_median": 0.100117,
+        "unique_jpegs": 36,
+        "error": null
+      }
+    ],
+    "resource_samples": [
+      [
+        {
+          "pid": 62361,
+          "component": "web-test-host",
+          "at_ns": 4888217600241,
+          "cpu_ticks": 302,
+          "rss_bytes": 60653568
+        },
+        {
+          "pid": 62813,
+          "component": "world:gazebo",
+          "at_ns": 4888217637602,
+          "cpu_ticks": 6530,
+          "rss_bytes": 1064448000
+        },
+        {
+          "pid": 62843,
+          "component": "vehicle-28da2d3ee77c4802baafe46dba54d05b:sitl",
+          "at_ns": 4888217667307,
+          "cpu_ticks": 420,
+          "rss_bytes": 8519680
+        },
+        {
+          "pid": 63007,
+          "component": "vehicle-28da2d3ee77c4802baafe46dba54d05b:framework-worker",
+          "at_ns": 4888217697350,
+          "cpu_ticks": 468,
+          "rss_bytes": 32845824
+        },
+        {
+          "pid": 63025,
+          "component": "vehicle-28da2d3ee77c4802baafe46dba54d05b:camera-gimbal-camera",
+          "at_ns": 4888217737519,
+          "cpu_ticks": 747,
+          "rss_bytes": 67481600
+        }
+      ],
+      [
+        {
+          "pid": 62361,
+          "component": "web-test-host",
+          "at_ns": 4896229190952,
+          "cpu_ticks": 369,
+          "rss_bytes": 61440000
+        },
+        {
+          "pid": 62813,
+          "component": "world:gazebo",
+          "at_ns": 4896229222801,
+          "cpu_ticks": 7613,
+          "rss_bytes": 1064448000
+        },
+        {
+          "pid": 62843,
+          "component": "vehicle-28da2d3ee77c4802baafe46dba54d05b:sitl",
+          "at_ns": 4896229247445,
+          "cpu_ticks": 497,
+          "rss_bytes": 8519680
+        },
+        {
+          "pid": 63007,
+          "component": "vehicle-28da2d3ee77c4802baafe46dba54d05b:framework-worker",
+          "at_ns": 4896229272514,
+          "cpu_ticks": 554,
+          "rss_bytes": 32976896
+        },
+        {
+          "pid": 63025,
+          "component": "vehicle-28da2d3ee77c4802baafe46dba54d05b:camera-gimbal-camera",
+          "at_ns": 4896229306196,
+          "cpu_ticks": 832,
+          "rss_bytes": 67469312
+        }
+      ]
+    ],
+    "slow_client": {
+      "received_frames": 5,
+      "error": null,
+      "global_stream_limit": 4,
+      "send_buffer_bytes": 65536,
+      "write_timeout_s": 0.5
+    },
+    "native_image_match": [
+      {
+        "topic": "/vaf/camera/vaf_sim_06f5997aeb974c1f94bad515e57f2031/vaf_vehicle_28da2d3ee77c4802baafe46dba54d05b/gimbal-camera/image",
+        "matches": 28,
+        "capture_stamps": [
+          54400000000,
+          54500000000,
+          54600000000,
+          54700000000,
+          54800000000,
+          54900000000,
+          55000000000,
+          55100000000,
+          55200000000,
+          55300000000,
+          55400000000,
+          55500000000,
+          55600000000,
+          55700000000,
+          55800000000,
+          55900000000,
+          56000000000,
+          56100000000,
+          56200000000,
+          56300000000,
+          56400000000,
+          56500000000,
+          56600000000,
+          56700000000,
+          56800000000,
+          56900000000,
+          57100000000,
+          57200000000
+        ]
+      }
+    ],
+    "browser_errors": [],
+    "cleanup": {
+      "sim-06f5997aeb974c1f94bad515e57f2031": {
+        "state": "FINISHED",
+        "cleanup": "COMPLETE"
+      }
+    },
+    "camera_process_cleanup": {
+      "63025": true
+    }
+  },
+  "plane-ui-final": {
+    "status": "PASS",
+    "checks": {
+      "slow reader bounded / other streams stay live": "PASS",
+      "stationary native video without SEND / control / Writer": "PASS",
+      "multiple source browser selection / readonly": "PASS",
+      "independent Gazebo pixel and capture stamp match": "PASS"
+    },
+    "camera_catalogs": [
+      {
+        "target": "simulation-1d402a0db02b44ba9fea09539d81f256",
+        "observed_at_ns": 5923574542300,
+        "cameras": [
+          {
+            "camera_id": "camera-c73b71252b7a7943cb6c9eae7b60da8d",
+            "slot": "front_camera",
+            "binding": {
+              "target": "simulation-1d402a0db02b44ba9fea09539d81f256",
+              "vehicle_id": "vehicle-09dd19b73a2942218314a9e0c5298bdd",
+              "world": "vaf_sim_acbcb3eb50e34e61b3a1bf5ea55d3605",
+              "session": "sim-acbcb3eb50e34e61b3a1bf5ea55d3605",
+              "epoch": "0f0298cfe19aa9b350847e99e6e6b02fc221c9156c06e4490d64a56a2f739aab"
+            },
+            "kind": "gazebo",
+            "source": "/vaf/camera/vaf_sim_acbcb3eb50e34e61b3a1bf5ea55d3605/vaf_vehicle_09dd19b73a2942218314a9e0c5298bdd/front_camera/image",
+            "sequence": 438,
+            "frames": 438,
+            "width": 640,
+            "height": 480,
+            "source_width": 1024,
+            "source_height": 768,
+            "fps": 9.669702021586817,
+            "configured_fps": 10,
+            "dropped": 465,
+            "received_utc_ns": 1793684282028447651,
+            "captured_ns": 46950000000,
+            "capture_clock": "gazebo-simulation",
+            "received_ns": 5923468594034,
+            "encoded_ns": 5923472551705,
+            "clock_sim_ns": 46962000000,
+            "clock_host_ns": 5923469541089,
+            "capture_time": "Gazebo image header; not host wall time",
+            "frame": "camera_optical",
+            "spatial_calibration": "unverified",
+            "error": null,
+            "age_ns": 106112860,
+            "online": true,
+            "reason": null,
+            "worker_pid": 88411,
+            "state": "ONLINE"
+          },
+          {
+            "camera_id": "camera-815f206b9d27f6a6fa39ed4a67bc3720",
+            "slot": "down_camera",
+            "binding": {
+              "target": "simulation-1d402a0db02b44ba9fea09539d81f256",
+              "vehicle_id": "vehicle-09dd19b73a2942218314a9e0c5298bdd",
+              "world": "vaf_sim_acbcb3eb50e34e61b3a1bf5ea55d3605",
+              "session": "sim-acbcb3eb50e34e61b3a1bf5ea55d3605",
+              "epoch": "0f0298cfe19aa9b350847e99e6e6b02fc221c9156c06e4490d64a56a2f739aab"
+            },
+            "kind": "gazebo",
+            "source": "/vaf/camera/vaf_sim_acbcb3eb50e34e61b3a1bf5ea55d3605/vaf_vehicle_09dd19b73a2942218314a9e0c5298bdd/down_camera/image",
+            "sequence": 439,
+            "frames": 439,
+            "width": 640,
+            "height": 480,
+            "source_width": 1024,
+            "source_height": 768,
+            "fps": 9.672295810640417,
+            "configured_fps": 10,
+            "dropped": 465,
+            "received_utc_ns": 1793684282090431895,
+            "captured_ns": 47000000000,
+            "capture_clock": "gazebo-simulation",
+            "received_ns": 5923530606234,
+            "encoded_ns": 5923560347118,
+            "clock_sim_ns": 47050000000,
+            "clock_host_ns": 5923557540156,
+            "capture_time": "Gazebo image header; not host wall time",
+            "frame": "camera_optical",
+            "spatial_calibration": "unverified",
+            "error": null,
+            "age_ns": 44187552,
+            "online": true,
+            "reason": null,
+            "worker_pid": 88412,
+            "state": "ONLINE"
+          }
+        ]
+      }
+    ],
+    "streams": [
+      {
+        "phase": "stationary-0",
+        "target": "simulation-1d402a0db02b44ba9fea09539d81f256",
+        "camera_id": "camera-c73b71252b7a7943cb6c9eae7b60da8d",
+        "frames": 138,
+        "fps": 9.634665834857909,
+        "source_to_web_ms_median": 39.589422,
+        "source_to_web_ms_p95": 61.676587,
+        "web_transfer_ms_median": 0.168352,
+        "unique_jpegs": 1,
+        "error": null
+      },
+      {
+        "phase": "stationary-1",
+        "target": "simulation-1d402a0db02b44ba9fea09539d81f256",
+        "camera_id": "camera-815f206b9d27f6a6fa39ed4a67bc3720",
+        "frames": 139,
+        "fps": 9.649449522031981,
+        "source_to_web_ms_median": 37.25671,
+        "source_to_web_ms_p95": 63.336926,
+        "web_transfer_ms_median": 0.09096,
+        "unique_jpegs": 1,
+        "error": null
+      }
+    ],
+    "resource_samples": [
+      [
+        {
+          "pid": 87744,
+          "component": "web-test-host",
+          "at_ns": 5923591598998,
+          "cpu_ticks": 306,
+          "rss_bytes": 61419520
+        },
+        {
+          "pid": 88232,
+          "component": "world:gazebo",
+          "at_ns": 5923591714261,
+          "cpu_ticks": 6854,
+          "rss_bytes": 833392640
+        },
+        {
+          "pid": 88298,
+          "component": "vehicle-09dd19b73a2942218314a9e0c5298bdd:sitl",
+          "at_ns": 5923591762877,
+          "cpu_ticks": 381,
+          "rss_bytes": 8515584
+        },
+        {
+          "pid": 88408,
+          "component": "vehicle-09dd19b73a2942218314a9e0c5298bdd:framework-worker",
+          "at_ns": 5923591795145,
+          "cpu_ticks": 513,
+          "rss_bytes": 32956416
+        },
+        {
+          "pid": 88411,
+          "component": "vehicle-09dd19b73a2942218314a9e0c5298bdd:camera-front_camera",
+          "at_ns": 5923591843354,
+          "cpu_ticks": 1135,
+          "rss_bytes": 81215488
+        },
+        {
+          "pid": 88412,
+          "component": "vehicle-09dd19b73a2942218314a9e0c5298bdd:camera-down_camera",
+          "at_ns": 5923591886389,
+          "cpu_ticks": 1121,
+          "rss_bytes": 79044608
+        }
+      ],
+      [
+        {
+          "pid": 87744,
+          "component": "web-test-host",
+          "at_ns": 5931621336644,
+          "cpu_ticks": 389,
+          "rss_bytes": 61681664
+        },
+        {
+          "pid": 88232,
+          "component": "world:gazebo",
+          "at_ns": 5931621452938,
+          "cpu_ticks": 8067,
+          "rss_bytes": 833392640
+        },
+        {
+          "pid": 88298,
+          "component": "vehicle-09dd19b73a2942218314a9e0c5298bdd:sitl",
+          "at_ns": 5931621506492,
+          "cpu_ticks": 449,
+          "rss_bytes": 8515584
+        },
+        {
+          "pid": 88408,
+          "component": "vehicle-09dd19b73a2942218314a9e0c5298bdd:framework-worker",
+          "at_ns": 5931621538341,
+          "cpu_ticks": 603,
+          "rss_bytes": 33087488
+        },
+        {
+          "pid": 88411,
+          "component": "vehicle-09dd19b73a2942218314a9e0c5298bdd:camera-front_camera",
+          "at_ns": 5931621576188,
+          "cpu_ticks": 1311,
+          "rss_bytes": 81137664
+        },
+        {
+          "pid": 88412,
+          "component": "vehicle-09dd19b73a2942218314a9e0c5298bdd:camera-down_camera",
+          "at_ns": 5931621613498,
+          "cpu_ticks": 1298,
+          "rss_bytes": 81039360
+        }
+      ]
+    ],
+    "slow_client": {
+      "received_frames": 5,
+      "error": null,
+      "global_stream_limit": 4,
+      "send_buffer_bytes": 65536,
+      "write_timeout_s": 0.5
+    },
+    "native_image_match": [
+      {
+        "topic": "/vaf/camera/vaf_sim_acbcb3eb50e34e61b3a1bf5ea55d3605/vaf_vehicle_09dd19b73a2942218314a9e0c5298bdd/front_camera/image",
+        "matches": 29,
+        "capture_stamps": [
+          55100000000,
+          55150000000,
+          55250000000,
+          55350000000,
+          55450000000,
+          55550000000,
+          55700000000,
+          55800000000,
+          55900000000,
+          56000000000,
+          56100000000,
+          56200000000,
+          56300000000,
+          56400000000,
+          56500000000,
+          56600000000,
+          56700000000,
+          56800000000,
+          56900000000,
+          57000000000,
+          57100000000,
+          57250000000,
+          57350000000,
+          57450000000,
+          57550000000,
+          57650000000,
+          57750000000,
+          57850000000,
+          57950000000
+        ]
+      },
+      {
+        "topic": "/vaf/camera/vaf_sim_acbcb3eb50e34e61b3a1bf5ea55d3605/vaf_vehicle_09dd19b73a2942218314a9e0c5298bdd/down_camera/image",
+        "matches": 28,
+        "capture_stamps": [
+          58150000000,
+          58250000000,
+          58350000000,
+          58450000000,
+          58550000000,
+          58650000000,
+          58750000000,
+          58850000000,
+          58950000000,
+          59050000000,
+          59150000000,
+          59250000000,
+          59350000000,
+          59450000000,
+          59550000000,
+          59700000000,
+          59800000000,
+          59900000000,
+          60000000000,
+          60100000000,
+          60200000000,
+          60300000000,
+          60400000000,
+          60500000000,
+          60600000000,
+          60700000000,
+          60800000000,
+          60900000000
+        ]
+      }
+    ],
+    "browser_errors": [],
+    "cleanup": {
+      "sim-acbcb3eb50e34e61b3a1bf5ea55d3605": {
+        "state": "FINISHED",
+        "cleanup": "COMPLETE"
+      }
+    },
+    "camera_process_cleanup": {
+      "88411": true,
+      "88412": true
+    }
+  },
+  "unit_tests": {
+    "count": 982,
+    "seconds": 138.48,
+    "status": "PASS"
+  },
+  "wheel": {
+    "status": "PASS",
+    "sha256": "3a84a43fae7da9b15a57bbabf166d081b23522bfa9fbdd1252ff99cdb3a3167d",
+    "bytes": 945890,
+    "source_bytes_match": true,
+    "installed_outside_checkout": true,
+    "versioned_sensor_recipe_present": true,
+    "optional_capture_dependencies_not_imported": true
+  },
+  "control_center": {
+    "status": "PASS",
+    "checks": {
+      "actual Center password login / live MJPEG / no SEND": "PASS",
+      "Web shutdown / actual systemd cgroup camera SITL Gazebo cleanup": "PASS"
+    },
+    "center": {
+      "session_id": "center-91804b787057430c9fbc320ae6fac2ca",
+      "pid": 86810,
+      "cgroup": "/user.slice/user-1000.slice/user@1000.service/app.slice/vaf-control-center-353f69b3fec44ac5.service",
+      "unit": "vaf-control-center-353f69b3fec44ac5.service",
+      "deployment_send": false
+    },
+    "camera": {
+      "camera_id": "camera-57d51cb9a0bdb1b9c5b7aea511ebde08",
+      "slot": "preview_front",
+      "binding": {
+        "target": "simulation-d7a028c16abf46c49b79fe0b9d2f5997",
+        "vehicle_id": "vehicle-dd1343bf13c84cea86f8d53000a4cf24",
+        "world": "vaf_sim_e0d7643b00664d17b478a982cac4b313",
+        "session": "sim-e0d7643b00664d17b478a982cac4b313",
+        "epoch": "ffcd3ce5ea7eed36de5d0f7c9eecfff42f980ffb4c7f9977e1a981ad7379a79c"
+      },
+      "kind": "gazebo",
+      "source": "/vaf/camera/vaf_sim_e0d7643b00664d17b478a982cac4b313/vaf_vehicle_dd1343bf13c84cea86f8d53000a4cf24/preview_front/image",
+      "sequence": 6,
+      "frames": 6,
+      "width": 640,
+      "height": 480,
+      "source_width": 640,
+      "source_height": 480,
+      "fps": 10.671076672644155,
+      "configured_fps": 10,
+      "dropped": 0,
+      "received_utc_ns": 1793684213187756753,
+      "captured_ns": 2300000000,
+      "capture_clock": "gazebo-simulation",
+      "received_ns": 5854627990306,
+      "encoded_ns": 5854680206624,
+      "clock_sim_ns": 2354000000,
+      "clock_host_ns": 5854678535444,
+      "capture_time": "Gazebo image header; not host wall time",
+      "frame": "camera_optical",
+      "spatial_calibration": "unverified",
+      "error": null,
+      "age_ns": 163179857,
+      "online": true,
+      "reason": null,
+      "worker_pid": 87349,
+      "state": "ONLINE"
+    },
+    "readonly_writer": {
+      "target_system": 41,
+      "attempts": 0,
+      "recent": []
+    },
+    "snapshot": {
+      "headers": {
+        "Server": "BaseHTTP/0.6 Python/3.12.3",
+        "Date": "Tue, 03 Nov 2026 05:36:54 GMT",
+        "Content-Type": "image/jpeg",
+        "Content-Length": "8809",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Referrer-Policy": "no-referrer",
+        "Content-Security-Policy": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'",
+        "X-Camera-ID": "camera-57d51cb9a0bdb1b9c5b7aea511ebde08",
+        "X-Camera-Target": "simulation-d7a028c16abf46c49b79fe0b9d2f5997",
+        "X-Camera-Epoch": "ffcd3ce5ea7eed36de5d0f7c9eecfff42f980ffb4c7f9977e1a981ad7379a79c",
+        "X-Frame-Sequence": "19",
+        "X-Capture-Ns": "3700000000",
+        "X-Capture-Clock": "gazebo-simulation",
+        "X-Source-Received-Ns": "5856027970338",
+        "X-Web-Sent-Ns": "5856151991736"
+      },
+      "web_received_ns": 5856152185714,
+      "sha256": "115c16c179738d919bfb7cafa5c37142dbf33e97b87c21ae8d3d0c6e1c5d5a0d"
+    },
+    "processes_before": [
+      {
+        "pid": 86810,
+        "ppid": 1305,
+        "state": "S",
+        "start_ticks": "584209",
+        "command": "/home/level6/vehicle-autonomy-framework/.venv/bin/python -m vehicle_autonomy.app.control_center.backend --run-dir /home/level6/vehicle-autonomy-framework/artifacts/camera-preview-20261103/center-final/private-runtime/sessions/control-center/cc-02bfeb5e53724506afca5f430b175ee8 --root /home/level6/vehicle-autonomy-framework --parent-pid 86806 --parent-ticks 584204 --port 38591 ",
+        "rss_bytes": 47046656,
+        "cpu_seconds": 0.91
+      },
+      {
+        "pid": 87209,
+        "ppid": 86810,
+        "state": "S",
+        "start_ticks": "584861",
+        "command": "gz sim -s -r --headless-rendering -v3 /home/level6/vehicle-autonomy-framework/artifacts/camera-preview-20261103/center-final/private-runtime/sessions/control-center/cc-02bfeb5e53724506afca5f430b175ee8/application/simulation/sim-e0d7643b00664d17b478a982cac4b313/scenario.sdf               ",
+        "rss_bytes": 765763584,
+        "cpu_seconds": 3.79
+      },
+      {
+        "pid": 87260,
+        "ppid": 86810,
+        "state": "S",
+        "start_ticks": "585102",
+        "command": "/home/level6/.local/share/vehicle-autonomy/workspace-layout-20261030/software/ardupilot/build/sitl/bin/ardurover --model JSON --speedup 1 --home=-35.363262,149.165237,584.0,90.0 --defaults /home/level6/vehicle-autonomy-framework/artifacts/camera-preview-20261103/center-final/private-runtime/sessions/control-center/cc-02bfeb5e53724506afca5f430b175ee8/application/simulation/sim-e0d7643b00664d17b478a982cac4b313/vehicle-dd1343bf13c84cea86f8d53000a4cf24/defaults-0-rover.parm,/home/level6/vehicle-autonomy-framework/artifacts/camera-preview-20261103/center-final/private-runtime/sessions/control-center/cc-02bfeb5e53724506afca5f430b175ee8/application/simulation/sim-e0d7643b00664d17b478a982cac4b313/ve",
+        "rss_bytes": 8257536,
+        "cpu_seconds": 0.27
+      },
+      {
+        "pid": 87345,
+        "ppid": 86810,
+        "state": "S",
+        "start_ticks": "585374",
+        "command": "/home/level6/vehicle-autonomy-framework/.venv/bin/python -m vehicle_autonomy.app.simulation.driver_worker /home/level6/vehicle-autonomy-framework/artifacts/camera-preview-20261103/center-final/private-runtime/sessions/control-center/cc-02bfeb5e53724506afca5f430b175ee8/application/simulation/sim-e0d7643b00664d17b478a982cac4b313/vehicle-dd1343bf13c84cea86f8d53000a4cf24/framework-worker.json 19 ",
+        "rss_bytes": 32047104,
+        "cpu_seconds": 0.39
+      },
+      {
+        "pid": 87349,
+        "ppid": 86810,
+        "state": "S",
+        "start_ticks": "585390",
+        "command": "/home/level6/vehicle-autonomy-framework/.venv/bin/python -m vehicle_autonomy.world.sensors.camera.live --config-json {\"kind\": \"gazebo\", \"topic\": \"/vaf/camera/vaf_sim_e0d7643b00664d17b478a982cac4b313/vaf_vehicle_dd1343bf13c84cea86f8d53000a4cf24/preview_front/image\", \"world\": \"vaf_sim_e0d7643b00664d17b478a982cac4b313\", \"fps\": 10} --output /home/level6/vehicle-autonomy-framework/artifacts/camera-preview-20261103/center-final/private-runtime/sessions/control-center/cc-02bfeb5e53724506afca5f430b175ee8/application/simulation/sim-e0d7643b00664d17b478a982cac4b313/vehicle-dd1343bf13c84cea86f8d53000a4cf24/camera-preview_front ",
+        "rss_bytes": 68333568,
+        "cpu_seconds": 2.59
+      }
+    ],
+    "browser_errors": [],
+    "cleanup": {
+      "state": "STOPPED",
+      "simulation": "COMPLETE",
+      "remaining_processes": [],
+      "os_audit": {
+        "service_result": "success",
+        "exit_code": "exited",
+        "exit_status": "0",
+        "remaining_owned_processes": [],
+        "credential_errors": [],
+        "finished_at": 1793684223.6611943
+      }
+    }
+  },
+  "examples-plane": {
+    "passed": true,
+    "kind": "plane",
+    "missions": [
+      {
+        "mission_id": "Example_StateSurvey",
+        "state": "SUCCEEDED",
+        "error": null,
+        "release_safe": true,
+        "command_evidence_count": 0,
+        "checkpoints": [
+          {
+            "name": "GetVehicleState",
+            "position": [
+              0.006028330975594345,
+              8.675003631236723e-09,
+              0.18133912911938024
+            ]
+          },
+          {
+            "name": "GetVehicleState",
+            "position": [
+              0.006028330975594345,
+              8.675003631236723e-09,
+              0.18133912911938024
+            ]
+          },
+          {
+            "name": "GetVehicleState",
+            "position": [
+              0.006028330975594345,
+              8.675003631236723e-09,
+              0.18133912911938024
+            ]
+          }
+        ],
+        "run_id": "mission-run:27dde9cafaaf440caaf8596dceae8157",
+        "vehicle_command_write_attempts": 0
+      },
+      {
+        "mission_id": "Example_DisarmedBranch",
+        "state": "SUCCEEDED",
+        "error": null,
+        "release_safe": true,
+        "command_evidence_count": 0,
+        "checkpoints": [
+          {
+            "name": "GetVehicleState",
+            "position": [
+              0.006028330975594345,
+              8.675003631236723e-09,
+              0.18133912911938024
+            ]
+          }
+        ],
+        "run_id": "mission-run:7c3a05baf2d1472b8d8c60d706872c38",
+        "vehicle_command_write_attempts": 0
+      },
+      {
+        "mission_id": "Example_Runway_Inspection",
+        "state": "SUCCEEDED",
+        "error": null,
+        "release_safe": true,
+        "command_evidence_count": 8,
+        "checkpoints": [
+          {
+            "name": "GetVehicleState",
+            "position": [
+              0.006028330975594345,
+              8.675003631236723e-09,
+              0.18133912911938024
+            ]
+          },
+          {
+            "name": "SetMode",
+            "position": [
+              0.006028330975594345,
+              8.675003631236723e-09,
+              0.18133912911938024
+            ]
+          },
+          {
+            "name": "Arm",
+            "position": [
+              0.006028330975594345,
+              8.675003631236723e-09,
+              0.18133912911938024
+            ]
+          },
+          {
+            "name": "Takeoff",
+            "position": [
+              268.4668067028438,
+              74.17166443398224,
+              49.26280965713835
+            ]
+          },
+          {
+            "name": "SetGuidedTarget",
+            "position": [
+              316.104805127288,
+              91.4410700980582,
+              47.993739558204254
+            ]
+          },
+          {
+            "name": "Loiter",
+            "position": [
+              186.48257645188036,
+              276.00220099263385,
+              49.94360171346242
+            ]
+          },
+          {
+            "name": "RTL",
+            "position": [
+              267.1457178766206,
+              246.5529068332162,
+              49.80861697480903
+            ]
+          },
+          {
+            "name": "AutoLand",
+            "position": [
+              30.547611882455463,
+              -0.015042207076615,
+              0.11855092562067082
+            ]
+          }
+        ],
+        "run_id": "mission-run:fae6b6ffc1cb4eb09f13e8e40eb5fe80",
+        "physical": {
+          "home_error_m": 30.546117011114305,
+          "speed_mps": 0.001078084526348352,
+          "height_m": -0.0631961964595641
+        }
+      }
+    ],
+    "assembly": "Control Center isolated signed Driver",
+    "cleanup": "COMPLETE"
+  },
+  "examples-rover": {
+    "passed": true,
+    "kind": "rover",
+    "missions": [
+      {
+        "mission_id": "Example_StateSurvey",
+        "state": "SUCCEEDED",
+        "error": null,
+        "release_safe": true,
+        "command_evidence_count": 0,
+        "checkpoints": [
+          {
+            "name": "GetVehicleState",
+            "position": [
+              -3.6428530677162075e-12,
+              4.594819567259533e-16,
+              -4.569306044643895e-11
+            ]
+          },
+          {
+            "name": "GetVehicleState",
+            "position": [
+              -3.6428530677162075e-12,
+              4.594819567259533e-16,
+              -4.569306044643895e-11
+            ]
+          },
+          {
+            "name": "GetVehicleState",
+            "position": [
+              -3.6428530677162075e-12,
+              4.594819567259533e-16,
+              -4.569306044643895e-11
+            ]
+          }
+        ],
+        "run_id": "mission-run:664b82f68ab544ef88ca0fedd5d0005c",
+        "vehicle_command_write_attempts": 0
+      },
+      {
+        "mission_id": "Example_DisarmedBranch",
+        "state": "SUCCEEDED",
+        "error": null,
+        "release_safe": true,
+        "command_evidence_count": 0,
+        "checkpoints": [
+          {
+            "name": "GetVehicleState",
+            "position": [
+              -3.6428530677162075e-12,
+              4.594819567259533e-16,
+              -4.569306044643895e-11
+            ]
+          }
+        ],
+        "run_id": "mission-run:be110aa27f9447d8b967ce342aa98e87",
+        "vehicle_command_write_attempts": 0
+      },
+      {
+        "mission_id": "Example_Ground_Patrol",
+        "state": "SUCCEEDED",
+        "error": null,
+        "release_safe": true,
+        "command_evidence_count": 30,
+        "checkpoints": [
+          {
+            "name": "GetVehicleState",
+            "position": [
+              -3.6428530677162075e-12,
+              4.594819567259533e-16,
+              -4.569306044643895e-11
+            ]
+          },
+          {
+            "name": "SetMode",
+            "position": [
+              -3.6428530677162075e-12,
+              4.594819567259533e-16,
+              -4.569306044643895e-11
+            ]
+          },
+          {
+            "name": "Arm",
+            "position": [
+              -3.6428530677162075e-12,
+              4.594819567259533e-16,
+              -4.569306044643895e-11
+            ]
+          },
+          {
+            "name": "Goto",
+            "position": [
+              0.6526230073837809,
+              -6.310619905077558e-08,
+              -4.559076116628091e-09
+            ]
+          },
+          {
+            "name": "SetMode",
+            "position": [
+              0.6561536499989199,
+              -6.869649474425323e-08,
+              -4.559075006405067e-09
+            ]
+          },
+          {
+            "name": "Goto",
+            "position": [
+              1.7115125444331787,
+              2.33524354451645e-06,
+              -4.5590818065210925e-09
+            ]
+          },
+          {
+            "name": "SetMode",
+            "position": [
+              1.718017310090069,
+              2.3607113748956493e-06,
+              -4.559079697097346e-09
+            ]
+          },
+          {
+            "name": "Goto",
+            "position": [
+              2.6748519717929673,
+              1.7145898811332263e-05,
+              -4.559082056321273e-09
+            ]
+          },
+          {
+            "name": "Stop",
+            "position": [
+              2.689598508906874,
+              1.750208193135412e-05,
+              -4.5590772546066916e-09
+            ]
+          },
+          {
+            "name": "Disarm",
+            "position": [
+              2.693621462686768,
+              1.759232921106329e-05,
+              -4.559075894583486e-09
+            ]
+          },
+          {
+            "name": "GetVehicleState",
+            "position": [
+              2.6944790225839728,
+              1.76109401959049e-05,
+              -4.559075644783306e-09
+            ]
+          }
+        ],
+        "run_id": "mission-run:4a7d1a4afd3c48cea85516272b28c305",
+        "physical": {
+          "home_error_m": 2.694909276387288,
+          "speed_mps": 0.001831272047346377,
+          "height_m": -4.5133824733145644e-09
+        }
+      }
+    ],
+    "assembly": "Control Center isolated signed Driver",
+    "cleanup": "COMPLETE"
+  },
+  "examples-copter": {
+    "passed": true,
+    "kind": "copter",
+    "missions": [
+      {
+        "mission_id": "Example_StateSurvey",
+        "state": "SUCCEEDED",
+        "error": null,
+        "release_safe": true,
+        "command_evidence_count": 0,
+        "checkpoints": [
+          {
+            "name": "GetVehicleState",
+            "position": [
+              2.5759345159132107e-10,
+              3.94231695203623e-12,
+              0.19499942681532334
+            ]
+          },
+          {
+            "name": "GetVehicleState",
+            "position": [
+              2.5759345159132107e-10,
+              3.94231695203623e-12,
+              0.19499942681532334
+            ]
+          },
+          {
+            "name": "GetVehicleState",
+            "position": [
+              2.5759345159132107e-10,
+              3.94231695203623e-12,
+              0.19499942681532334
+            ]
+          }
+        ],
+        "run_id": "mission-run:77b2d3ceeba6422ebcaf658ce43c83fe",
+        "vehicle_command_write_attempts": 0
+      },
+      {
+        "mission_id": "Example_DisarmedBranch",
+        "state": "SUCCEEDED",
+        "error": null,
+        "release_safe": true,
+        "command_evidence_count": 0,
+        "checkpoints": [
+          {
+            "name": "GetVehicleState",
+            "position": [
+              2.5759345159132107e-10,
+              3.94231695203623e-12,
+              0.19499942681532334
+            ]
+          }
+        ],
+        "run_id": "mission-run:a782cbecf22a48bcbef49a858086a973",
+        "vehicle_command_write_attempts": 0
+      },
+      {
+        "mission_id": "Example_Air_HoverLand",
+        "state": "SUCCEEDED",
+        "error": null,
+        "release_safe": true,
+        "command_evidence_count": 4,
+        "checkpoints": [
+          {
+            "name": "GetVehicleState",
+            "position": [
+              2.5759345159132107e-10,
+              3.94231695203623e-12,
+              0.19499942681532334
+            ]
+          },
+          {
+            "name": "SetMode",
+            "position": [
+              2.5759345159132107e-10,
+              3.94231695203623e-12,
+              0.19499942681532334
+            ]
+          },
+          {
+            "name": "Arm",
+            "position": [
+              2.5759345159132107e-10,
+              3.94231695203623e-12,
+              0.19499942681532334
+            ]
+          },
+          {
+            "name": "Takeoff",
+            "position": [
+              0.002327290006358124,
+              0.004881995697084122,
+              1.6905799829090593
+            ]
+          },
+          {
+            "name": "Land",
+            "position": [
+              0.0025539790052583836,
+              0.006078746608047232,
+              0.19499994679303573
+            ]
+          },
+          {
+            "name": "GetVehicleState",
+            "position": [
+              0.0025539790052583836,
+              0.006078746608047232,
+              0.19499994679303573
+            ]
+          }
+        ],
+        "run_id": "mission-run:b250593ee90944338eac21c20bf3b6dd",
+        "physical": {
+          "home_error_m": 0.006593479181770514,
+          "speed_mps": 0.0,
+          "height_m": 5.199777123876537e-07
+        }
+      },
+      {
+        "mission_id": "Example_Air_SurveyReturn",
+        "state": "SUCCEEDED",
+        "error": null,
+        "release_safe": true,
+        "command_evidence_count": 18,
+        "checkpoints": [
+          {
+            "name": "GetVehicleState",
+            "position": [
+              0.0025539790052583836,
+              0.006078746608047232,
+              0.19499994679303573
+            ]
+          },
+          {
+            "name": "SetMode",
+            "position": [
+              0.0025539790052583836,
+              0.006078746608047232,
+              0.19499994679303573
+            ]
+          },
+          {
+            "name": "Arm",
+            "position": [
+              0.0025539790052583836,
+              0.006078746608047232,
+              0.19499994679303573
+            ]
+          },
+          {
+            "name": "Takeoff",
+            "position": [
+              0.005155940973420622,
+              0.0024609073810387626,
+              1.690490452410204
+            ]
+          },
+          {
+            "name": "Goto",
+            "position": [
+              0.9844107910932264,
+              -0.006782869183568341,
+              1.4928263664401835
+            ]
+          },
+          {
+            "name": "Goto",
+            "position": [
+              1.0138402257264767,
+              0.9677712161607661,
+              1.499264591408771
+            ]
+          },
+          {
+            "name": "ReturnHome",
+            "position": [
+              0.002378830685744999,
+              0.0027881118628760946,
+              0.1949995535497638
+            ]
+          },
+          {
+            "name": "GetVehicleState",
+            "position": [
+              0.002378830685744999,
+              0.0027881118628760946,
+              0.1949995535497638
+            ]
+          }
+        ],
+        "run_id": "mission-run:8f231be0c2b649c09096f4bc73466dd6",
+        "physical": {
+          "home_error_m": 0.003665024139596742,
+          "speed_mps": 0.0,
+          "height_m": 1.267344404698445e-07
+        }
+      }
+    ],
+    "assembly": "Control Center isolated signed Driver",
+    "cleanup": "COMPLETE"
+  },
+  "browser_frame_isolation": {
+    "status": "PASS",
+    "kind": "finite recorded software browser fixture, not native motion",
+    "new_decoded_RGB": [
+      28,
+      80,
+      181,
+      255
+    ],
+    "old_node_destroyed": true,
+    "browser_errors": []
+  },
+  "control_browser_regression": {
+    "passed": true,
+    "source": "Actual browser/HTTP SEND switch tests with explicit state/Action fixtures.\n\nNo physical vehicle or SITL command is emitted. Action fixtures advance the\ndisplayed state so real UI eligibility and server reservation checks are tested.\n",
+    "one_send_on_for_mode_arm_takeoff_two_held_inputs_and_land": true,
+    "three_types": true,
+    "one_velocity_action_across_release_hold_and_resume": true,
+    "neutral_heartbeats_keep_same_session": true,
+    "rapid_input_keeps_session": true,
+    "explicit_off_exits": true,
+    "independent_watchdog_exits": true,
+    "real_browser_blur_exits": true,
+    "no_auto_restart": true,
+    "stream_timeout_s": 60,
+    "no_per_action_dialog_or_checkbox": true,
+    "off_disables_commands": true,
+    "no_action_from_toggle": true,
+    "zero_vehicle_writes": true,
+    "javascript_errors": []
+  }
+}

@@ -1,0 +1,12 @@
+[
+  {
+    "path": "/dev/video0",
+    "name": "Chicony USB2.0 Camera: Chicony",
+    "capture_verified": false
+  },
+  {
+    "path": "/dev/video1",
+    "name": "Chicony USB2.0 Camera: Chicony",
+    "capture_verified": false
+  }
+]

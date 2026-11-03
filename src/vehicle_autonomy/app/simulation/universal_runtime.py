@@ -64,6 +64,8 @@ class VehicleInstance:
         self.entity_requested = False
         self.closed = False
         self.error = None
+        self.camera_sources = {}
+        self.camera_assembly = None
 
     def view(self):
         p = self.prepared or {}
@@ -76,7 +78,7 @@ class VehicleInstance:
             ground_truth=self.owner._truths.get(self.id),
             parameter_readback=None if self.session is None else self.session.manifest.get('fixed_parameters_readback'),
             sensor_activation={'imu':'Gazebo Imu system','gps':'Gazebo NavSat system',
-                'rendering':'NOT_TESTED: rendering sensors retain fixed model configuration; no camera pipeline admission'})
+                'rendering':{'assembly':self.camera_assembly, 'cameras':{k:v.health() for k,v in self.camera_sources.items()}}})
         if self.driver:
             info, world = self.driver.read_view()
             from vehicle_autonomy.contracts.core.serialization import to_json_value
@@ -91,6 +93,8 @@ class VehicleInstance:
         entity = 'vaf_' + self.id.replace('-', '_')
         p = self.prepared = o.library.prepare(self.vehicle,self.directory,entity_name=entity,
             instance=self.lease.instance,system_id=self.lease.system_id)
+        from .camera_assembly import assemble
+        self.camera_assembly = assemble(o.root, self.directory, p, o.world)
         self.model = SimpleNamespace(name=entity, system_id=self.lease.system_id,
             instance=self.lease.instance, fdm_port=self.lease.fdm_port, binary=p['binary'])
         env = dict(o.session.env)
@@ -153,6 +157,11 @@ class VehicleInstance:
             seed=o.seed,allow_send=o.allow_send)
         self.proof=self.driver.ownership
         self.link=self.driver.link
+        from vehicle_autonomy.world.sensors.camera.live import CameraSource
+        for camera in self.camera_assembly['cameras']:
+            self.camera_sources[camera['slot']] = CameraSource(dict(kind='gazebo', topic=camera['topic'], world=o.world, fps=10),
+                owner=self.session, name='camera-'+camera['slot'])
+        self.session.manifest['camera_assembly'] = self.camera_assembly
         self.session.manifest['ready']=True
         self.session.save()
         self.state='STARTING'
@@ -171,6 +180,9 @@ class VehicleInstance:
             try:self.driver.close()
             except Exception as exc:driver_errors.append('driver: '+str(exc))
         elif self.proof:self.proof.close()
+        for source in self.camera_sources.values():
+            try:source.close()
+            except Exception as exc:errors.append("camera: "+str(exc))
         # Lock-step physics waits on this SITL: remove the model while its FDM
         # is still answering. Killing SITL first would freeze the other models.
         if self.entity_requested and not self.removed:
@@ -244,9 +256,11 @@ class LocalRuntime(WorldMetrics):
         world.set('name',self.world)
         for filename,name in [('gz-sim-physics-system','Physics'),('gz-sim-imu-system','Imu'),
                 ('gz-sim-navsat-system','NavSat'),('gz-sim-user-commands-system','UserCommands'),
-                ('gz-sim-scene-broadcaster-system','SceneBroadcaster')]:
+                ('gz-sim-scene-broadcaster-system','SceneBroadcaster'),('gz-sim-sensors-system','Sensors')]:
             if world.find(f"plugin[@name='gz::sim::systems::{name}']") is None:
                 ET.SubElement(world,'plugin',filename=filename,name='gz::sim::systems::'+name)
+        sensors=world.find("plugin[@name='gz::sim::systems::Sensors']")
+        if sensors.find('render_engine') is None:ET.SubElement(sensors,'render_engine').text='ogre2'
         tree.write(world_path,encoding='utf-8',xml_declaration=True)
         env=self._base_env()
         # Fixed resource roots are independent of the selected World. Dynamic

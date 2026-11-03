@@ -35,6 +35,8 @@ class MissionControl(ActionLab):
         self.journal = None
         self.studio = None
         self.simulation_manager = None
+        from vehicle_autonomy.world.sensors.camera.manager import CameraSourceManager
+        self.cameras=CameraSourceManager(self._camera_binding_valid)
         from .operator_control import OperatorControls
         self.operator_controls=OperatorControls(self)
         from vehicle_autonomy.app.visualization.goals import PendingGoals
@@ -67,6 +69,18 @@ class MissionControl(ActionLab):
             if self.journal:self.journal.close()
             # A failed assembly never closes a caller's already-owned Driver.
             raise
+
+    def _camera_binding_valid(self, binding):
+        if self._closing or binding['target'] in getattr(self,'_retired_simulation_targets',set()):return False
+        manager=self.simulation_manager
+        if manager and any(binding['target'] in r.get('retiring_targets',()) for r in tuple(manager.records.values())):return False
+        identity=self.deployment_identities.get(binding['target'])
+        if identity is None:return False
+        import hashlib,json
+        epoch=hashlib.sha256(json.dumps(identity,sort_keys=True,separators=(',', ':')).encode()).hexdigest()
+        metadata=getattr(self,'_simulation_instances',{}).get(binding['target'],{})
+        return (epoch==binding['epoch'] and metadata.get('vehicle_id')==binding['vehicle_id']
+            and metadata.get('world')==binding['world'] and metadata.get('simulation_session')==binding['session'])
 
     def _fence_all(self):
         for a in self.runtime.views():
@@ -509,6 +523,8 @@ class MissionControl(ActionLab):
         if self.simulation_manager:
             try:self.simulation_manager.close()
             except Exception as exc:simulation_error=exc
+        try:self.cameras.close()
+        except Exception as exc:simulation_error=simulation_error or exc
         if self.missions:
             with self._control_lock:
                 for m in self.missions.views():
@@ -523,6 +539,8 @@ class MissionControl(ActionLab):
 class MissionControlServer(ActionLabServer):
     def __init__(self, address, service, token, audit_path):
         super().__init__(address, service, token, audit_path)
+        from threading import BoundedSemaphore
+        self.camera_slots=BoundedSemaphore(4)
         self.RequestHandlerClass = MissionControlHandler
 
 
@@ -534,6 +552,8 @@ class MissionControlHandler(ActionLabHandler):
 
     def do_GET(self):
         if self.auth_get():return
+        from .camera_http import get as camera_get
+        if camera_get(self):return
         from vehicle_autonomy.app.visualization.http import get
         if get(self):return
         if urlsplit(self.path).path=='/ws/telemetry':
@@ -560,6 +580,8 @@ class MissionControlHandler(ActionLabHandler):
             '/mission-ui.css':('mission-ui.css','text/css'),
             '/mission-studio.js':('mission-studio.js','application/javascript'),
             '/manual-control.js':('manual-control.js','application/javascript'),
+            '/camera-preview.js':('camera-preview.js','application/javascript'),
+            '/camera-preview.css':('camera-preview.css','text/css'),
             '/vehicle-control.css':('vehicle-control.css','text/css'),
             '/visualization-ui.js':('visualization-ui.js','application/javascript'),
             '/mission-api.js':('mission-api.js','application/javascript')}
