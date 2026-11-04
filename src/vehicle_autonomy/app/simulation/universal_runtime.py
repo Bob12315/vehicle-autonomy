@@ -164,6 +164,13 @@ class VehicleInstance:
         for camera in self.camera_assembly['cameras']:
             self.camera_sources[camera['slot']] = CameraSource(dict(kind='gazebo', topic=camera['topic'], world=o.world, fps=10),
                 owner=self.session, name='camera-'+camera['slot'])
+        if self.vehicle=='copter_rescue':
+            from vehicle_autonomy.world.sensors.camera.processed import DetectionPreviewSource
+            profile=json.loads((o.root/'configs/perception/rescue_2026_pt.json').read_text())
+            original=self.camera_sources['gimbal-camera']
+            self.camera_sources['yolo']=DetectionPreviewSource(self.directory/'rescue-inference',original,
+                self.driver.snapshot,lambda:self.driver.info().get('rescue_perception'),
+                model_sha256=profile['model_sha256'],source=f'/vaf/camera/{o.world}/{entity}/gimbal-camera/image')
         self.session.manifest['camera_assembly'] = self.camera_assembly
         self.session.manifest['ready']=True
         self.session.save()

@@ -14,6 +14,7 @@ from vehicle_autonomy.world.sensors.camera.packet import decode,MAX_PACKET
 from .ultralytics_pt import PtDetector
 from .rescue_geometry import project
 from .landing_marker import detect_h,overlap
+from .preview import annotated_packet
 
 
 def main():
@@ -42,6 +43,7 @@ def main():
             image=cv2.imdecode(np.frombuffer(jpeg,np.uint8),cv2.IMREAD_COLOR)
             if image is None or image.shape[:2]!=(480,640):raise ValueError('calibrated image size mismatch')
             current=Pose3(Vector3(*pose['position']),Quaternion(*pose['orientation']))
+            began=time.monotonic_ns()
             neural=detector.detect(image);markers=detect_h(image)
             detected=[(d,'pt') for d in neural if not any(overlap(d.xyxy,m.xyxy)>.4 for m in markers)]
             detected.extend((d,'h_marker') for d in markers)
@@ -65,6 +67,16 @@ def main():
             atomic_json(root/'health.json',dict(error=None,published_ns=ended,captured_ns=capture,
                 inference_ns=ended-now,object_count=len(values),backend='ultralytics_pt'))
             last=seq
+            try:
+                preview=annotated_packet(image,meta,detected,detector.names,epoch=epoch,
+                    world_generation=pose['world_generation'],model_sha256=c['model_sha256'],
+                    captured_host_ns=capture,started_ns=began,completed_ns=ended)
+                from vehicle_autonomy.world.sensors.camera.live import atomic
+                atomic(root/'preview.packet',preview)
+            except (OSError,ValueError,TypeError) as exc:
+                # An optional display fault cannot change the adopted
+                # inference result or stop the perception producer.
+                atomic_json(root/'preview-health.json',dict(error=str(exc),published_ns=time.monotonic_ns()))
         except (OSError,ValueError,KeyError,TypeError) as exc:
             atomic_json(root/'health.json',dict(error=str(exc),published_ns=time.monotonic_ns()))
             time.sleep(.05)

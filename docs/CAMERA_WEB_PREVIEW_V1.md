@@ -3,6 +3,35 @@
 日期：2026-11-03。原始验收目录：`artifacts/camera-preview-20261103/`。
 本功能只读图像，不取得 Operator 控制权，不开启 SEND，也不创建车辆命令端口。
 
+## YOLO 画面扩展（2026-11-05）
+
+车辆控制页的“摄像头来源”改为“画面来源”。明确启动的 `copter_rescue` 实例提供
+原始下视画面与“YOLO 识别画面”两个选项，普通车辆继续显示已有来源。新来源复用
+同一 PT 工作进程、同一输入帧和该次检测结果，不增加推理进程。绿色框为 PT 的
+类别/置信度，青色 `H marker` 框为独立的黄底 H 几何检测器。顶部计数仅统计 PT，
+耗时覆盖本帧 PT 与 H 检测；面板的“相机 FPS”仍是原始采集速率。
+
+`world/perception/vision/preview.py` 在副本上绘制并编码 JPEG，工作进程在发布原
+感知结果之后原子发布 `preview.packet`。绘制失败不会丢弃已发布的感知结果。
+`world/sensors/camera/processed.py` 只读该包，校验原相机、推理进程存活、模型
+摘要、World generation 和固定 detector epoch，保留原相机 sequence、capture clock、
+capture/receive 时间。原捕获年龄超过 1 秒不显示；新编码不会刷新旧帧的有效期。
+即使像素目标不能投影为 WorldObject，也可显示本次真实像素检测框。
+
+新来源沿用同一实例注册、认证、MJPEG、截图和退出机制，没有新增控制权限或 Writer。
+适配器 close 仅退役视图，原相机和推理进程仍由原车辆 Owner 清理。
+
+原生只读验收：`python -m tests.simulation.yolo_preview artifacts/new-yolo-preview`。
+本机证据 `artifacts/yolo-preview-native-20261105-r2/result.json`：真实 CUADC 相机/PT、
+连续新帧、真实 Chromium 登录及原始/YOLO 切换、截图、断流清屏/拒绝旧截图、恢复和
+COMPLETE 清理均通过；双 SEND 关闭、无 Lease、Writer attempts 为 0。
+地面图像在该轮为 0 个目标。真实 PT 对原数据集图片的正例框显示另见
+`artifacts/yolo-positive-model-validation/`，不作为本轮飞行检测证据。
+全量单元回归 1002 项通过（140.169 秒）；原控制台 JavaScript 行为检查与
+画面脚本语法检查通过。新增 6 项单元检查覆盖同帧框绘制、输入不变、原时间保留、
+过期与来源栅栏、工作进程/相机失效及只退役视图的清理边界。
+下文 2026-11-03 的原始验收结论仍按当时范围保留。
+
 ## 审计结论
 
 | 原有位置 | 实际能力与问题 | 本次处理 |

@@ -11,6 +11,13 @@
 3. 在 Mission Studio 模板库复制 `Rescue_2026_FullAuto`，选择本次上线的车辆实例。
 4. 校验、发布，确认实例绑定后显式开启任务 SEND 运行。模板不会自动执行。
 
+查看识别画面：进入“车辆控制”，选择本次 `copter_rescue` 实例，在“画面来源”
+中选择“YOLO 识别画面”；也可切回“原始摄像头画面 · gimbal-camera”。只看画面
+无需开启 SEND 或运行 Mission。已有仿真实例需重启后加载新增来源。
+绿色框标注 PT 的类别和置信度，青色 `H marker` 框来自下述独立 H 检测器；
+顶部显示 PT 检测数量与本帧推理耗时。地面停放时相机贴近 H 标记，可能没有检测框；
+画面不使用缓存检测结果补框。全屏和截图沿用原预览按钮。
+
 本机 `environments/tools.local.toml` 已配置 `vision_python`、`rescue_model`。
 其他机器应复制环境模板后填写自己的路径，不能提交本机配置。权重位于仓库外，
 SHA256 必须与 `configs/perception/rescue_2026_pt.json` 一致。该配置可选 `cpu`

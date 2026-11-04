@@ -140,7 +140,7 @@ class RescueRuntime:
         age=None if self.latest_capture is None else self.runtime.clock().monotonic_ns-self.latest_capture
         online=self.process.poll() is None and age is not None and 0<=age<=1_000_000_000 and self.last_error is None
         return dict(backend='ultralytics_pt',model_sha256=self.digest,online=online,
-            capture_age_ns=age,object_count=self.latest_count,error=self.last_error)
+            worker_alive=self.process.poll() is None,capture_age_ns=age,object_count=self.latest_count,error=self.last_error)
     def close(self):
         try:
             if self.process.poll() is None:

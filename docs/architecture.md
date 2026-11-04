@@ -2,6 +2,15 @@
 
 ## Explicit CUADC2026 rescue simulation and local PT perception (2026-11-05)
 
+Vehicle Control's display-source selector includes an annotated YOLO view for
+owned `copter_rescue` instances. The existing PT worker renders its exact input
+and detections after publishing perception; a read-only camera adapter preserves
+original capture freshness, model/World/detector identity and instance retirement.
+Existing authenticated MJPEG and snapshot routes supply the view without SEND,
+Lease, another inference process or a command port. PT and geometric H detections
+retain separate visible labels. Native browser coverage is recorded in the
+[camera preview report](CAMERA_WEB_PREVIEW_V1.md).
+
 The independently registered CUADC2026 scene retains the supplied field geometry
 without an embedded vehicle. A SHA-locked `copter_rescue` definition selects its
 own bounded profile, fixed home spawn, fixed downward camera and two detachable
