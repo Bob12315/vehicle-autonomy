@@ -47,6 +47,7 @@ class VehicleInstance:
         self.owner = owner
         self.specification = deepcopy(specification)
         self.vehicle = specification['kind']
+        self.family = owner.library.get(self.vehicle)['family']
         self.id = 'vehicle-' + uuid4().hex
         self.slot_id = specification['slot_id']
         self.directory = owner.directory / self.id
@@ -100,13 +101,15 @@ class VehicleInstance:
         env = dict(o.session.env)
         # All resource folders are fixed vehicle-library snapshots prepared
         # before Gazebo launch. No live World/model source mutation is needed.
-        manifest = dict(framework_runtime=True,kind=self.vehicle,world=o.world,partition=o.partition,
+        manifest = dict(framework_runtime=True,kind=self.family,world=o.world,partition=o.partition,
             model=entity,instance=self.lease.instance,system_id=self.lease.system_id,
             ports={'tcp':self.lease.tcp_port},fdm_port=self.lease.fdm_port,
             binary_path=str(p['binary']),binary_sha256=hashlib.sha256(Path(p['binary']).read_bytes()).hexdigest(),
             processes=[dict(next(r for r in o.session.manifest['processes'] if r['name']=='gazebo'),borrowed_world_dependency=True)],
             automatic_motion=False,deployment_send=o.allow_send,started_at=stamp(),ready=False,
             fixed_vehicle={key:p[key] for key in ('version','fingerprint','model_hash','parameters_hash','sensor_hash')})
+        if self.vehicle == 'copter_rescue':
+            manifest['rescue_2026'] = dict(definition_id=self.vehicle, fingerprint=p['fingerprint'])
         self.session = VehicleSession(self.directory,env,manifest,o.session)
         self.session.qgc_monitor_port=o.qgc_monitor_port
         if cancelled(): raise InterruptedError('vehicle start cancelled')
@@ -141,19 +144,19 @@ class VehicleInstance:
         self.stages['sitl_running']=True
         o.notify(self)
         self.session.provision_receive_signing('')
-        if self.vehicle=='rover':
+        if self.family=='rover':
             self.session.verify_parameters(dict(RTL_SPEED=.5,WP_SPEED=.5,WP_RADIUS=.2,
                 WP_PIVOT_ANGLE=45,WP_PIVOT_RATE=30),'rover_parameter_readback')
         expected={'rover':dict(RTL_SPEED=.5,WP_SPEED=.5,WP_RADIUS=.2),
             'copter':dict(RTL_ALT_M=2,RTL_ALT_FINAL_M=0,MAV1_POSITION=10,MAV1_EXTRA1=10),
             'plane':dict(TKOFF_ALT=50,TKOFF_DIST=300,WP_LOITER_RAD=80,RTL_ALTITUDE=50,
-                FENCE_ENABLE=1,FENCE_RADIUS=2000,FENCE_ALT_MAX=150)}[self.vehicle]
+                FENCE_ENABLE=1,FENCE_RADIUS=2000,FENCE_ALT_MAX=150)}[self.family]
         self.session.verify_parameters(expected,'fixed_parameters_readback')
         self.session.verify_parameters({'SERIAL0_BAUD':115.},'phase5_clock_uart_baud')
         from vehicle_autonomy.app.bootstrap.simulation_profile import SimulationProfile
         from .driver_worker import ProcessVehicleDriver
         profile=replace(SimulationProfile.load(p['profile_path']),port=self.session.port,vehicle_id=self.target)
-        self.driver=ProcessVehicleDriver(self.target,profile,self.session,model_kind=self.vehicle,
+        self.driver=ProcessVehicleDriver(self.target,profile,self.session,model_kind=self.family,
             seed=o.seed,allow_send=o.allow_send)
         self.proof=self.driver.ownership
         self.link=self.driver.link

@@ -3,7 +3,7 @@
 由真实注册函数和独立展示目录自动生成：
 `python -m vehicle_autonomy.app.mission_designer.action_catalog_report --output docs/MISSION_ACTION_CATALOG_ZH_CN.md`
 
-源代码中有 42 个明确身份的类型化动作。此表是多个显式装配入口的并集，不是当前后端已经注册或可执行的清单。
+源代码中有 52 个明确身份的类型化动作。此表是多个显式装配入口的并集，不是当前后端已经注册或可执行的清单。
 审计只提取契约，不启动动作、ROS、外部进程或车辆连接。历史单一安装包布局与安全边界保持不变。
 具体页面只展示当前 Registry 中的真实条目；能否配置由实际车型、能力和 Provider 绑定计算，执行仍重新校验控制权、双发送门与安全策略。
 没有独立注册的舵机、相机触发或真实视觉检测动作，不能因分类存在就声称具备该能力。软件演示明确标注为软件记录。
@@ -33,6 +33,16 @@
 | `Loiter` | 固定翼盘旋保持 | Fixed-wing loiter | 安全与状态 | plane |
 | `NavigateToPose` | 原生导航到位姿 | Navigate to pose with Nav2 | 外部能力 | rover |
 | `RTL` | 原生返航 | Native return to launch | 运动与导航 | copter, plane, rover |
+| `Rescue.AlignDescend` | 对准并下降 | Align and descend | 运动与导航 | copter |
+| `Rescue.CaptureReconView` | 采集侦察区目标 | Capture recon view | 感知与识别 | copter |
+| `Rescue.CaptureView` | 采集投放区目标 | Capture drop view | 感知与识别 | copter |
+| `Rescue.ConfirmTarget` | 重新确认锁定目标 | Reconfirm selected target | 感知与识别 | copter |
+| `Rescue.FuseViews` | 整理观测目标 | Deduplicate observed targets | 数据与计算 | copter |
+| `Rescue.Goto` | 救援航点飞行 | Rescue waypoint | 运动与导航 | copter |
+| `Rescue.LandingTarget` | 获取降落 H 标记 | Acquire landing marker | 感知与识别 | copter |
+| `Rescue.ReleasePayload` | 请求双通道仿真投放 | Request simulated payload release | 设备与执行器 | copter |
+| `Rescue.SelectDropTargets` | 选择救援投放目标 | Select rescue targets | 数据与计算 | copter |
+| `Rescue.Takeoff` | 救援起飞 | Rescue takeoff | 车辆基础控制 | copter |
 | `ReturnHome` | 返回起点 | Return home | 运动与导航 | copter, rover |
 | `SetGuidedTarget` | 设置固定翼导航目标 | Set fixed-wing guided target | 运动与导航 | plane |
 | `SetMode` | 切换模式 | Switch mode | 车辆基础控制 | copter, plane, rover |
@@ -72,6 +82,7 @@
 
 | 原始字段 | 中文名称 | 原始单位 | 中文说明 |
 | --- | --- | --- | --- |
+| `alignment_confirmed` | 对准已确认 | — | 独立救援仿真 Action 的显式参数；由原有准入、安全和新鲜观测校验。 |
 | `allow_reverse` | 允许倒车 | — | 必须明确允许且受车辆运动学模型限制，不会自动启用倒车。 |
 | `allowed_sources` | 允许的目标来源 | — | 只接受这些来源前缀产生的新鲜目标；保留原始字符串。 |
 | `altitude_amsl_m` | 目标海拔高度 | m AMSL | 相对平均海平面的绝对海拔；固定翼准入还检查相对起点的 20～140 米范围。 |
@@ -82,12 +93,18 @@
 | `bbox_area_px` | 像素框面积 | px² | 像素面积，仅作诊断，不能替代物理尺寸排序。 |
 | `binding` | 坐标变换绑定 | — | 显式平面变换、误差界限和原点；不自动推断地图变换。 |
 | `capabilities` | 模型能力 | — | 模型声明的能力列表，不授予新的控制权限。 |
+| `captured_ns` | 原始采样时刻 | ns | 独立救援仿真 Action 的显式参数；由原有准入、安全和新鲜观测校验。 |
+| `channel` | 投放通道编号 | — | 独立救援仿真 Action 的显式参数；由原有准入、安全和新鲜观测校验。 |
+| `clock_domain` | 采样时钟域 | — | 独立救援仿真 Action 的显式参数；由原有准入、安全和新鲜观测校验。 |
+| `cluster_radius_m` | 目标去重半径 | m | 独立救援仿真 Action 的显式参数；由原有准入、安全和新鲜观测校验。 |
+| `confidence` | 识别置信度 | — | 独立救援仿真 Action 的显式参数；由原有准入、安全和新鲜观测校验。 |
 | `confirmed` | 确认结果 | — | 原始结果字段，保留生产者声明和原始数据值。 |
 | `context` | 执行上下文 | — | 原始结果字段，保留生产者声明和原始数据值。 |
 | `count` | 目标数量 | — | 原始结果字段，保留生产者声明和原始数据值。 |
 | `cross_track_m` | 横向误差界限 | m | 规划绑定允许的横向误差界限。 |
 | `current_target` | 当前目标 | — | 原始结果字段，保留生产者声明和原始数据值。 |
 | `custom_mode_id` | 原生模式编号 | — | 必须与已审计飞控模式名称一致的数字编号。 |
+| `descend_speed_mps` | 最大下降速度 | m/s | 独立救援仿真 Action 的显式参数；由原有准入、安全和新鲜观测校验。 |
 | `detections` | 检测记录列表 | — | 由声明的软件场景产生的目标记录，不是实时视觉检测结果。 |
 | `duration_ns` | 持续时间 | ns | 编辑器显示秒，保存为整数纳秒；不得超过执行超时。 |
 | `duration_s` | 持续时间 | s | 有限等待或机动时长；不表示无限期执行。 |
@@ -95,14 +112,17 @@
 | `environment` | 环境版本引用 | — | 必须引用当前已绑定的环境及其代际；不能自行拼接为有效授权。 |
 | `far_m` | 区域远端距离 | — | 原始结果字段，保留生产者声明和原始数据值。 |
 | `file_sha256` | 路径文件摘要 | — | 已校验路径文件的 SHA-256 摘要，不是任意文件路径。 |
+| `final_settle_time_s` | 最终稳定时间 | s | 独立救援仿真 Action 的显式参数；由原有准入、安全和新鲜观测校验。 |
 | `footprint_radius_m` | 足迹半径 | m | 合格车辆模型的平面足迹半径。 |
 | `frame` | 控制坐标系 | — | odom 表示里程计东北天；base_link 表示车体前左上；其他坐标需显式绑定。 |
 | `frame_epoch` | 坐标系代际 | — | 路径使用的明确坐标系代际，必须与运行时一致。 |
 | `generation_id` | 代际标识 | — | 防止跨会话复用资源的原始代际标识。 |
 | `height_m` | 目标高度 | m | 多旋翼为当前起飞参考的相对爬升高度；固定翼使用独立已审计跑道高度。 |
+| `hold_pwm` | 源任务保持值 | PWM | 独立救援仿真 Action 的显式参数；由原有准入、安全和新鲜观测校验。 |
 | `home` | 起点参考 | — | 原始结果字段，保留生产者声明和原始数据值。 |
 | `id` | 标识 | — | 原始对象标识，不做翻译或重命名。 |
 | `kind` | 机动类型 | — | 有限行驶、到访、转向、绕圈或等待；不是车辆类型。 |
+| `label` | 目标类别 | — | 独立救援仿真 Action 的显式参数；由原有准入、安全和新鲜观测校验。 |
 | `latitude_deg` | 目标纬度 | ° | WGS84 纬度，不是局部位置坐标。 |
 | `longitude_deg` | 目标经度 | ° | WGS84 经度，不是局部位置坐标。 |
 | `lose_on_confirmation` | 确认时模拟丢失 | — | 软件演示分支；不修改真实传感器。 |
@@ -111,6 +131,7 @@
 | `max_x` | 区域最大 X | m | 父区域坐标系内的最大 X 边界。 |
 | `max_y` | 区域最大 Y | m | 父区域坐标系内的最大 Y 边界。 |
 | `max_yaw_rate_rps` | 最大偏航角速度 | rad/s | 车辆模型声明的最大偏航角速度。 |
+| `min_confidence` | 最低观测置信度 | — | 独立救援仿真 Action 的显式参数；由原有准入、安全和新鲜观测校验。 |
 | `min_x` | 区域最小 X | m | 父区域坐标系内的最小 X 边界。 |
 | `min_y` | 区域最小 Y | m | 父区域坐标系内的最小 Y 边界。 |
 | `mission_status` | 任务状态 | — | 原始结果字段，保留生产者声明和原始数据值。 |
@@ -121,6 +142,8 @@
 | `name` | 名称 | — | 程序或资源的原始名称，输入值保持不变。 |
 | `native_mode` | 原生模式名称 | — | 诊断契约中请求的飞控原生模式名称。 |
 | `near_m` | 区域近端距离 | — | 原始结果字段，保留生产者声明和原始数据值。 |
+| `objects` | 已定位目标集合 | — | 独立救援仿真 Action 的显式参数；由原有准入、安全和新鲜观测校验。 |
+| `observation_id` | 原始观测标识 | — | 独立救援仿真 Action 的显式参数；由原有准入、安全和新鲜观测校验。 |
 | `operation_status` | 操作状态 | — | 原始结果字段，保留生产者声明和原始数据值。 |
 | `path` | 机动路径 | — | 已批准的有限路径，场景机动要求 2～4096 个位姿。 |
 | `path_clearance_m` | 路径净空 | m | 经过验证的路径与障碍之间的净空。 |
@@ -133,10 +156,13 @@
 | `physical_size_source` | 物理尺寸来源 | — | 物理尺寸的原始来源说明，用于可信筛选。 |
 | `poses` | 路径位姿序列 | — | 经过资格检查并绑定到里程计坐标的路径位姿。 |
 | `position` | 目标位置 | — | 保留父对象声明的坐标系、单位和参考原点。 |
+| `producer_id` | 观测来源标识 | — | 独立救援仿真 Action 的显式参数；由原有准入、安全和新鲜观测校验。 |
 | `radius_m` | 绕圈半径 | m | 合格绕圈动作使用 1.5～3 米半径。 |
 | `read_only` | 只读结果 | — | 原始结果字段，保留生产者声明和原始数据值。 |
 | `reference_point` | 车辆参考点 | — | 车辆几何与规划共同采用的参考点。 |
 | `region` | 目标搜索区域 | — | 明确的里程计矩形区域，包含边界及坐标系。 |
+| `release_pwm` | 源任务释放值 | PWM | 独立救援仿真 Action 的显式参数；由原有准入、安全和新鲜观测校验。 |
+| `release_target_ey` | 源虚拟相机纵向对准偏移 | — | 独立救援仿真 Action 的显式参数；由原有准入、安全和新鲜观测校验。 |
 | `remaining` | 剩余任务数量 | — | 软件库存剩余数量；模拟操作完成才递减。 |
 | `request_id` | 路径请求标识 | — | 路径规划请求的原始标识，用于校验来源。 |
 | `resource_id` | 资源标识 | — | 当前注册资源的原始标识。 |
@@ -144,6 +170,8 @@
 | `revision` | 修订号 | — | 资源修订号，不能替代代际。 |
 | `scores` | 目标评分表 | — | 目标类别和正整数评分，不使用像素面积代替物理尺寸。 |
 | `selected_targets` | 已选目标 | — | 原始结果字段，保留生产者声明和原始数据值。 |
+| `servo_outputs` | 已映射的投放通道 | — | 独立救援仿真 Action 的显式参数；由原有准入、安全和新鲜观测校验。 |
+| `settle_s` | 到达稳定时间 | s | 独立救援仿真 Action 的显式参数；由原有准入、安全和新鲜观测校验。 |
 | `simulate_target_loss` | 模拟目标丢失 | — | 仅影响软件演示中目标确认的结果。 |
 | `simulated_payload_slot` | 模拟任务槽位 | — | 软件计数槽位，不对应真实物理通道。 |
 | `simulation` | 软件仿真标记 | — | 原始结果字段，保留生产者声明和原始数据值。 |
@@ -155,9 +183,14 @@
 | `status` | 结果状态 | — | 原始结果字段，保留生产者声明和原始数据值。 |
 | `stop_turn` | 停车转向 | — | 在原动作支持的条件下使用停车转向策略，不绕过车辆几何约束。 |
 | `target` | 目标 | — | 按动作契约输入已解析位置或带来源的软件目标对象，不能仅凭名称执行。 |
+| `target_acquisition_timeout_s` | 停止下降后的目标重获期限 | s | 独立救援仿真 Action 的显式参数；由原有准入、安全和新鲜观测校验。 |
+| `target_altitude_m` | 下降目标高度 | m | 独立救援仿真 Action 的显式参数；由原有准入、安全和新鲜观测校验。 |
+| `target_count` | 最多投放目标数 | — | 独立救援仿真 Action 的显式参数；由原有准入、安全和新鲜观测校验。 |
 | `target_id` | 目标标识 | — | 原始结果字段，保留生产者声明和原始数据值。 |
 | `task_result` | 任务结果 | — | 原始结果字段，保留生产者声明和原始数据值。 |
 | `timeout_ns` | 执行超时时间 | ns | 编辑器显示秒，保存为整数纳秒；必须满足动作自身期限约束。 |
+| `tolerance_xy_m` | 水平到达容差 | m | 独立救援仿真 Action 的显式参数；由原有准入、安全和新鲜观测校验。 |
+| `tolerance_z_m` | 高度到达容差 | m | 独立救援仿真 Action 的显式参数；由原有准入、安全和新鲜观测校验。 |
 | `turn_rad` | 机动转角 | rad | 有限转角；场景机动不超过正负三圈。 |
 | `valid` | 记录有效 | — | 表示当前输入记录是否满足其生产者声明，不授予车辆控制权。 |
 | `vehicle_kind` | 车辆类型 | — | 基础目标契约支持地面车和多旋翼；起飞和降落仅多旋翼。 |
@@ -166,6 +199,7 @@
 | `vy_mps` | Y 方向速度 | m/s | 里程计坐标为向北；车体坐标为向左，由坐标系参数决定。 |
 | `vz_mps` | Z 方向速度 | m/s | 里程计及车体约定均为向上。 |
 | `world` | 世界状态快照 | — | 原始结果字段，保留生产者声明和原始数据值。 |
+| `world_generation` | 世界代际 | — | 独立救援仿真 Action 的显式参数；由原有准入、安全和新鲜观测校验。 |
 | `x` | X 分量 | — | 采用父对象定义的单位与坐标系，不隐式进行坐标变换。 |
 | `x_m` | X 方向目标位置 | m | 普通前往目标使用里程计东向坐标；原生导航使用已绑定地图的 X 坐标。 |
 | `y` | Y 分量 | — | 采用父对象定义的单位与坐标系，不隐式进行坐标变换。 |
@@ -715,6 +749,1165 @@ null
 ```
 
 输出字段与原契约完全一致，用户变量及引用路径不重命名。
+
+### `Rescue.AlignDescend@1.0.0` — 对准并下降
+
+读取锁定视觉目标，在对准窗口内下降；丢失时立即请求零速度并限时重获，超时失败，退出经过原有停止屏障。
+
+- 实现：`vehicle_autonomy.actions.composite.rescue.AlignFactory`；参数类型：`vehicle_autonomy.actions.composite.rescue`。
+- 主分类：`navigation`；支持车型：copter。原始 Registry 车型字段：`['copter']`（空列表不代表已验证全部车型）。
+- 生命周期：`typed_only`；所需能力：`['rescue_flight', 'rescue_vision']`。
+- 依赖及限制：原有执行上下文、能力与安全检查；不随界面分类自动装配。
+- 当前可用性：取决于运行部署，源代码审计不打开连接也不认定就绪。仅显式仿真装配，实机未验收。
+- 输入参数原始 Schema（中文说明见前表；此处保留程序字段及单位）：
+
+```json
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "target_id": {
+          "type": "string"
+        },
+        "producer_id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "x_m": {
+          "type": "number"
+        },
+        "y_m": {
+          "type": "number"
+        },
+        "z_m": {
+          "type": "number"
+        },
+        "confidence": {
+          "type": "number"
+        },
+        "captured_ns": {
+          "type": "integer"
+        },
+        "clock_domain": {
+          "type": "string"
+        },
+        "world_generation": {
+          "type": "string"
+        },
+        "observation_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "target_id",
+        "producer_id",
+        "label",
+        "x_m",
+        "y_m",
+        "z_m",
+        "confidence",
+        "captured_ns",
+        "clock_domain",
+        "world_generation",
+        "observation_id"
+      ]
+    },
+    "target_altitude_m": {
+      "type": "number",
+      "minimum": 0.3,
+      "maximum": 2.5,
+      "default": 1.1
+    },
+    "descend_speed_mps": {
+      "type": "number",
+      "minimum": 0.05,
+      "maximum": 0.2,
+      "default": 0.2
+    },
+    "release_target_ey": {
+      "type": "number",
+      "minimum": -0.3,
+      "maximum": 0.3,
+      "default": 0.0
+    },
+    "final_settle_time_s": {
+      "type": "number",
+      "minimum": 0.3,
+      "maximum": 2,
+      "default": 0.3
+    },
+    "target_acquisition_timeout_s": {
+      "type": "number",
+      "minimum": 0.5,
+      "maximum": 5,
+      "default": 3.0
+    }
+  },
+  "required": [
+    "target"
+  ]
+}
+```
+
+- 输出结果原始 Schema：
+
+```json
+{
+  "additionalProperties": false,
+  "properties": {
+    "alignment_confirmed": {
+      "type": "boolean"
+    },
+    "target_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "alignment_confirmed",
+    "target_id"
+  ],
+  "type": "object"
+}
+```
+
+输出字段与原契约完全一致，用户变量及引用路径不重命名。
+
+### `Rescue.CaptureReconView@1.0.0` — 采集侦察区目标
+
+读取 56/59 米区域的新鲜 PT 目标观测，用于任务结果记录。
+
+- 实现：`vehicle_autonomy.actions.composite.rescue.QueryFactory`；参数类型：`vehicle_autonomy.actions.composite.rescue`。
+- 主分类：`perception`；支持车型：copter。原始 Registry 车型字段：`['copter']`（空列表不代表已验证全部车型）。
+- 生命周期：`typed_only`；所需能力：`['rescue_vision']`。
+- 依赖及限制：原有执行上下文、能力与安全检查；不随界面分类自动装配。
+- 当前可用性：取决于运行部署，源代码审计不打开连接也不认定就绪。仅显式仿真装配，实机未验收。
+- 输入参数原始 Schema（中文说明见前表；此处保留程序字段及单位）：
+
+```json
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "min_confidence": {
+      "type": "number",
+      "minimum": 0.3,
+      "maximum": 1,
+      "default": 0.3
+    }
+  },
+  "required": []
+}
+```
+
+- 输出结果原始 Schema：
+
+```json
+{
+  "additionalProperties": false,
+  "properties": {
+    "objects": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "captured_ns": {
+            "type": "integer"
+          },
+          "clock_domain": {
+            "type": "string"
+          },
+          "confidence": {
+            "type": "number"
+          },
+          "label": {
+            "type": "string"
+          },
+          "observation_id": {
+            "type": "string"
+          },
+          "producer_id": {
+            "type": "string"
+          },
+          "target_id": {
+            "type": "string"
+          },
+          "world_generation": {
+            "type": "string"
+          },
+          "x_m": {
+            "type": "number"
+          },
+          "y_m": {
+            "type": "number"
+          },
+          "z_m": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "target_id",
+          "producer_id",
+          "label",
+          "x_m",
+          "y_m",
+          "z_m",
+          "confidence",
+          "captured_ns",
+          "clock_domain",
+          "world_generation",
+          "observation_id"
+        ],
+        "type": "object"
+      },
+      "maxItems": 128,
+      "type": "array"
+    }
+  },
+  "required": [
+    "objects"
+  ],
+  "type": "object"
+}
+```
+
+输出字段与原契约完全一致，用户变量及引用路径不重命名。
+
+### `Rescue.CaptureView@1.0.0` — 采集投放区目标
+
+读取本机 PT 识别器发布的新鲜已定位桶观测；不使用地图真值标签。
+
+- 实现：`vehicle_autonomy.actions.composite.rescue.QueryFactory`；参数类型：`vehicle_autonomy.actions.composite.rescue`。
+- 主分类：`perception`；支持车型：copter。原始 Registry 车型字段：`['copter']`（空列表不代表已验证全部车型）。
+- 生命周期：`typed_only`；所需能力：`['rescue_vision']`。
+- 依赖及限制：原有执行上下文、能力与安全检查；不随界面分类自动装配。
+- 当前可用性：取决于运行部署，源代码审计不打开连接也不认定就绪。仅显式仿真装配，实机未验收。
+- 输入参数原始 Schema（中文说明见前表；此处保留程序字段及单位）：
+
+```json
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "min_confidence": {
+      "type": "number",
+      "minimum": 0.3,
+      "maximum": 1,
+      "default": 0.3
+    }
+  },
+  "required": []
+}
+```
+
+- 输出结果原始 Schema：
+
+```json
+{
+  "additionalProperties": false,
+  "properties": {
+    "objects": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "captured_ns": {
+            "type": "integer"
+          },
+          "clock_domain": {
+            "type": "string"
+          },
+          "confidence": {
+            "type": "number"
+          },
+          "label": {
+            "type": "string"
+          },
+          "observation_id": {
+            "type": "string"
+          },
+          "producer_id": {
+            "type": "string"
+          },
+          "target_id": {
+            "type": "string"
+          },
+          "world_generation": {
+            "type": "string"
+          },
+          "x_m": {
+            "type": "number"
+          },
+          "y_m": {
+            "type": "number"
+          },
+          "z_m": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "target_id",
+          "producer_id",
+          "label",
+          "x_m",
+          "y_m",
+          "z_m",
+          "confidence",
+          "captured_ns",
+          "clock_domain",
+          "world_generation",
+          "observation_id"
+        ],
+        "type": "object"
+      },
+      "maxItems": 128,
+      "type": "array"
+    }
+  },
+  "required": [
+    "objects"
+  ],
+  "type": "object"
+}
+```
+
+输出字段与原契约完全一致，用户变量及引用路径不重命名。
+
+### `Rescue.ConfirmTarget@1.0.0` — 重新确认锁定目标
+
+接近后仅在同一来源、同一类别、原位置附近唯一新鲜观测匹配时重新确认；缺失或歧义时失败。
+
+- 实现：`vehicle_autonomy.actions.composite.rescue.QueryFactory`；参数类型：`vehicle_autonomy.actions.composite.rescue`。
+- 主分类：`perception`；支持车型：copter。原始 Registry 车型字段：`['copter']`（空列表不代表已验证全部车型）。
+- 生命周期：`typed_only`；所需能力：`['rescue_vision']`。
+- 依赖及限制：原有执行上下文、能力与安全检查；不随界面分类自动装配。
+- 当前可用性：取决于运行部署，源代码审计不打开连接也不认定就绪。仅显式仿真装配，实机未验收。
+- 输入参数原始 Schema（中文说明见前表；此处保留程序字段及单位）：
+
+```json
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "target_id": {
+          "type": "string"
+        },
+        "producer_id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "x_m": {
+          "type": "number"
+        },
+        "y_m": {
+          "type": "number"
+        },
+        "z_m": {
+          "type": "number"
+        },
+        "confidence": {
+          "type": "number"
+        },
+        "captured_ns": {
+          "type": "integer"
+        },
+        "clock_domain": {
+          "type": "string"
+        },
+        "world_generation": {
+          "type": "string"
+        },
+        "observation_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "target_id",
+        "producer_id",
+        "label",
+        "x_m",
+        "y_m",
+        "z_m",
+        "confidence",
+        "captured_ns",
+        "clock_domain",
+        "world_generation",
+        "observation_id"
+      ]
+    }
+  },
+  "required": [
+    "target"
+  ]
+}
+```
+
+- 输出结果原始 Schema：
+
+```json
+{
+  "additionalProperties": false,
+  "properties": {
+    "target": {
+      "additionalProperties": false,
+      "properties": {
+        "captured_ns": {
+          "type": "integer"
+        },
+        "clock_domain": {
+          "type": "string"
+        },
+        "confidence": {
+          "type": "number"
+        },
+        "label": {
+          "type": "string"
+        },
+        "observation_id": {
+          "type": "string"
+        },
+        "producer_id": {
+          "type": "string"
+        },
+        "target_id": {
+          "type": "string"
+        },
+        "world_generation": {
+          "type": "string"
+        },
+        "x_m": {
+          "type": "number"
+        },
+        "y_m": {
+          "type": "number"
+        },
+        "z_m": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "target_id",
+        "producer_id",
+        "label",
+        "x_m",
+        "y_m",
+        "z_m",
+        "confidence",
+        "captured_ns",
+        "clock_domain",
+        "world_generation",
+        "observation_id"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "target"
+  ],
+  "type": "object"
+}
+```
+
+输出字段与原契约完全一致，用户变量及引用路径不重命名。
+
+### `Rescue.FuseViews@1.0.0` — 整理观测目标
+
+去重已经定位的新鲜目标；不声称完成 GPS 三角定位。
+
+- 实现：`vehicle_autonomy.actions.composite.rescue.QueryFactory`；参数类型：`vehicle_autonomy.actions.composite.rescue`。
+- 主分类：`data`；支持车型：copter。原始 Registry 车型字段：`['copter']`（空列表不代表已验证全部车型）。
+- 生命周期：`typed_only`；所需能力：`['rescue_vision']`。
+- 依赖及限制：原有执行上下文、能力与安全检查；不随界面分类自动装配。
+- 当前可用性：取决于运行部署，源代码审计不打开连接也不认定就绪。仅显式仿真装配，实机未验收。
+- 输入参数原始 Schema（中文说明见前表；此处保留程序字段及单位）：
+
+```json
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "objects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "target_id": {
+            "type": "string"
+          },
+          "producer_id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "x_m": {
+            "type": "number"
+          },
+          "y_m": {
+            "type": "number"
+          },
+          "z_m": {
+            "type": "number"
+          },
+          "confidence": {
+            "type": "number"
+          },
+          "captured_ns": {
+            "type": "integer"
+          },
+          "clock_domain": {
+            "type": "string"
+          },
+          "world_generation": {
+            "type": "string"
+          },
+          "observation_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "target_id",
+          "producer_id",
+          "label",
+          "x_m",
+          "y_m",
+          "z_m",
+          "confidence",
+          "captured_ns",
+          "clock_domain",
+          "world_generation",
+          "observation_id"
+        ]
+      }
+    },
+    "cluster_radius_m": {
+      "type": "number",
+      "minimum": 0.1,
+      "maximum": 1,
+      "default": 0.65
+    }
+  },
+  "required": [
+    "objects"
+  ]
+}
+```
+
+- 输出结果原始 Schema：
+
+```json
+{
+  "additionalProperties": false,
+  "properties": {
+    "objects": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "captured_ns": {
+            "type": "integer"
+          },
+          "clock_domain": {
+            "type": "string"
+          },
+          "confidence": {
+            "type": "number"
+          },
+          "label": {
+            "type": "string"
+          },
+          "observation_id": {
+            "type": "string"
+          },
+          "producer_id": {
+            "type": "string"
+          },
+          "target_id": {
+            "type": "string"
+          },
+          "world_generation": {
+            "type": "string"
+          },
+          "x_m": {
+            "type": "number"
+          },
+          "y_m": {
+            "type": "number"
+          },
+          "z_m": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "target_id",
+          "producer_id",
+          "label",
+          "x_m",
+          "y_m",
+          "z_m",
+          "confidence",
+          "captured_ns",
+          "clock_domain",
+          "world_generation",
+          "observation_id"
+        ],
+        "type": "object"
+      },
+      "maxItems": 128,
+      "type": "array"
+    }
+  },
+  "required": [
+    "objects"
+  ],
+  "type": "object"
+}
+```
+
+输出字段与原契约完全一致，用户变量及引用路径不重命名。
+
+### `Rescue.Goto@1.0.0` — 救援航点飞行
+
+在明确绑定的救援 ENU 场地内限速飞行，等待到达、低速稳定和退出停止确认。
+
+- 实现：`vehicle_autonomy.actions.copter.rescue.FlightFactory`；参数类型：`vehicle_autonomy.actions.copter.rescue`。
+- 主分类：`navigation`；支持车型：copter。原始 Registry 车型字段：`['copter']`（空列表不代表已验证全部车型）。
+- 生命周期：`typed_only`；所需能力：`['rescue_flight']`。
+- 依赖及限制：原有执行上下文、能力与安全检查；不随界面分类自动装配。
+- 当前可用性：取决于运行部署，源代码审计不打开连接也不认定就绪。仅显式仿真装配，实机未验收。
+- 输入参数原始 Schema（中文说明见前表；此处保留程序字段及单位）：
+
+```json
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "x_m": {
+      "type": "number",
+      "minimum": -5,
+      "maximum": 5
+    },
+    "y_m": {
+      "type": "number",
+      "minimum": -2,
+      "maximum": 62
+    },
+    "z_m": {
+      "type": "number",
+      "minimum": 0.3,
+      "maximum": 5,
+      "default": 3.0
+    },
+    "speed_mps": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "maximum": 2,
+      "default": 1.0
+    },
+    "tolerance_xy_m": {
+      "type": "number",
+      "minimum": 0.1,
+      "maximum": 0.7,
+      "default": 0.3
+    },
+    "tolerance_z_m": {
+      "type": "number",
+      "minimum": 0.1,
+      "maximum": 0.5,
+      "default": 0.3
+    },
+    "settle_s": {
+      "type": "number",
+      "minimum": 0.3,
+      "maximum": 3,
+      "default": 1.0
+    }
+  },
+  "required": [
+    "x_m",
+    "y_m"
+  ]
+}
+```
+
+- 输出结果原始 Schema：
+
+```json
+{
+  "additionalProperties": false,
+  "properties": {
+    "physical_goal_observed": {
+      "const": true
+    }
+  },
+  "required": [
+    "physical_goal_observed"
+  ],
+  "type": "object"
+}
+```
+
+输出字段与原契约完全一致，用户变量及引用路径不重命名。
+
+### `Rescue.LandingTarget@1.0.0` — 获取降落 H 标记
+
+要求起降区内存在新鲜已定位 H 观测；缺失时失败。
+
+- 实现：`vehicle_autonomy.actions.composite.rescue.QueryFactory`；参数类型：`vehicle_autonomy.actions.composite.rescue`。
+- 主分类：`perception`；支持车型：copter。原始 Registry 车型字段：`['copter']`（空列表不代表已验证全部车型）。
+- 生命周期：`typed_only`；所需能力：`['rescue_vision']`。
+- 依赖及限制：原有执行上下文、能力与安全检查；不随界面分类自动装配。
+- 当前可用性：取决于运行部署，源代码审计不打开连接也不认定就绪。仅显式仿真装配，实机未验收。
+- 输入参数原始 Schema（中文说明见前表；此处保留程序字段及单位）：
+
+```json
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "min_confidence": {
+      "type": "number",
+      "minimum": 0.3,
+      "maximum": 1,
+      "default": 0.3
+    }
+  },
+  "required": []
+}
+```
+
+- 输出结果原始 Schema：
+
+```json
+{
+  "additionalProperties": false,
+  "properties": {
+    "target": {
+      "additionalProperties": false,
+      "properties": {
+        "captured_ns": {
+          "type": "integer"
+        },
+        "clock_domain": {
+          "type": "string"
+        },
+        "confidence": {
+          "type": "number"
+        },
+        "label": {
+          "type": "string"
+        },
+        "observation_id": {
+          "type": "string"
+        },
+        "producer_id": {
+          "type": "string"
+        },
+        "target_id": {
+          "type": "string"
+        },
+        "world_generation": {
+          "type": "string"
+        },
+        "x_m": {
+          "type": "number"
+        },
+        "y_m": {
+          "type": "number"
+        },
+        "z_m": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "target_id",
+        "producer_id",
+        "label",
+        "x_m",
+        "y_m",
+        "z_m",
+        "confidence",
+        "captured_ns",
+        "clock_domain",
+        "world_generation",
+        "observation_id"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "target"
+  ],
+  "type": "object"
+}
+```
+
+输出字段与原契约完全一致，用户变量及引用路径不重命名。
+
+### `Rescue.ReleasePayload@1.0.0` — 请求双通道仿真投放
+
+仅将明确的 8/9 通道配置映射至 Gazebo 双瓶脱离；不发送实机 PWM 或新增 MAVLink 写入通路。
+
+- 实现：`vehicle_autonomy.actions.composite.rescue.ReleaseFactory`；参数类型：`vehicle_autonomy.actions.composite.rescue`。
+- 主分类：`actuation`；支持车型：copter。原始 Registry 车型字段：`['copter']`（空列表不代表已验证全部车型）。
+- 生命周期：`typed_only`；所需能力：`['rescue_payload']`。
+- 依赖及限制：原有执行上下文、能力与安全检查；不随界面分类自动装配。
+- 当前可用性：取决于运行部署，源代码审计不打开连接也不认定就绪。仅显式仿真装配，实机未验收。
+- 输入参数原始 Schema（中文说明见前表；此处保留程序字段及单位）：
+
+```json
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "target_id": {
+          "type": "string"
+        },
+        "producer_id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "x_m": {
+          "type": "number"
+        },
+        "y_m": {
+          "type": "number"
+        },
+        "z_m": {
+          "type": "number"
+        },
+        "confidence": {
+          "type": "number"
+        },
+        "captured_ns": {
+          "type": "integer"
+        },
+        "clock_domain": {
+          "type": "string"
+        },
+        "world_generation": {
+          "type": "string"
+        },
+        "observation_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "target_id",
+        "producer_id",
+        "label",
+        "x_m",
+        "y_m",
+        "z_m",
+        "confidence",
+        "captured_ns",
+        "clock_domain",
+        "world_generation",
+        "observation_id"
+      ]
+    },
+    "servo_outputs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "channel": {
+            "type": "integer"
+          },
+          "release_pwm": {
+            "type": "integer"
+          },
+          "hold_pwm": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "channel",
+          "release_pwm",
+          "hold_pwm"
+        ]
+      },
+      "minItems": 1,
+      "maxItems": 2
+    },
+    "alignment_confirmed": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "target",
+    "servo_outputs"
+  ]
+}
+```
+
+- 输出结果原始 Schema：
+
+```json
+{
+  "additionalProperties": false,
+  "properties": {
+    "release_observed": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "release_observed"
+  ],
+  "type": "object"
+}
+```
+
+输出字段与原契约完全一致，用户变量及引用路径不重命名。
+
+### `Rescue.SelectDropTargets@1.0.0` — 选择救援投放目标
+
+最多选择两个已观测目标；一个桶接收双载荷，两个桶各接收一个。
+
+- 实现：`vehicle_autonomy.actions.composite.rescue.QueryFactory`；参数类型：`vehicle_autonomy.actions.composite.rescue`。
+- 主分类：`data`；支持车型：copter。原始 Registry 车型字段：`['copter']`（空列表不代表已验证全部车型）。
+- 生命周期：`typed_only`；所需能力：`['rescue_vision']`。
+- 依赖及限制：原有执行上下文、能力与安全检查；不随界面分类自动装配。
+- 当前可用性：取决于运行部署，源代码审计不打开连接也不认定就绪。仅显式仿真装配，实机未验收。
+- 输入参数原始 Schema（中文说明见前表；此处保留程序字段及单位）：
+
+```json
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "objects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "target_id": {
+            "type": "string"
+          },
+          "producer_id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "x_m": {
+            "type": "number"
+          },
+          "y_m": {
+            "type": "number"
+          },
+          "z_m": {
+            "type": "number"
+          },
+          "confidence": {
+            "type": "number"
+          },
+          "captured_ns": {
+            "type": "integer"
+          },
+          "clock_domain": {
+            "type": "string"
+          },
+          "world_generation": {
+            "type": "string"
+          },
+          "observation_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "target_id",
+          "producer_id",
+          "label",
+          "x_m",
+          "y_m",
+          "z_m",
+          "confidence",
+          "captured_ns",
+          "clock_domain",
+          "world_generation",
+          "observation_id"
+        ]
+      }
+    },
+    "target_count": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 2,
+      "default": 2
+    }
+  },
+  "required": [
+    "objects"
+  ]
+}
+```
+
+- 输出结果原始 Schema：
+
+```json
+{
+  "additionalProperties": false,
+  "properties": {
+    "count": {
+      "type": "integer"
+    },
+    "targets": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "release_target_ey": {
+            "type": "number"
+          },
+          "servo_outputs": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "channel": {
+                  "type": "integer"
+                },
+                "hold_pwm": {
+                  "type": "integer"
+                },
+                "release_pwm": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "channel",
+                "release_pwm",
+                "hold_pwm"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "target": {
+            "additionalProperties": false,
+            "properties": {
+              "captured_ns": {
+                "type": "integer"
+              },
+              "clock_domain": {
+                "type": "string"
+              },
+              "confidence": {
+                "type": "number"
+              },
+              "label": {
+                "type": "string"
+              },
+              "observation_id": {
+                "type": "string"
+              },
+              "producer_id": {
+                "type": "string"
+              },
+              "target_id": {
+                "type": "string"
+              },
+              "world_generation": {
+                "type": "string"
+              },
+              "x_m": {
+                "type": "number"
+              },
+              "y_m": {
+                "type": "number"
+              },
+              "z_m": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "target_id",
+              "producer_id",
+              "label",
+              "x_m",
+              "y_m",
+              "z_m",
+              "confidence",
+              "captured_ns",
+              "clock_domain",
+              "world_generation",
+              "observation_id"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "target",
+          "servo_outputs",
+          "release_target_ey"
+        ],
+        "type": "object"
+      },
+      "maxItems": 2,
+      "type": "array"
+    }
+  },
+  "required": [
+    "targets",
+    "count"
+  ],
+  "type": "object"
+}
+```
+
+输出字段与原契约完全一致，用户变量及引用路径不重命名。
+
+### `Rescue.Takeoff@1.0.0` — 救援起飞
+
+独立救援仿真配置内起飞至 4.5 米；仍须经过原有发送门和物理高度确认。
+
+- 实现：`vehicle_autonomy.actions.copter.rescue.FlightFactory`；参数类型：`vehicle_autonomy.actions.copter.rescue`。
+- 主分类：`vehicle`；支持车型：copter。原始 Registry 车型字段：`['copter']`（空列表不代表已验证全部车型）。
+- 生命周期：`typed_only`；所需能力：`['rescue_flight']`。
+- 依赖及限制：原有执行上下文、能力与安全检查；不随界面分类自动装配。
+- 当前可用性：取决于运行部署，源代码审计不打开连接也不认定就绪。仅显式仿真装配，实机未验收。
+- 输入参数原始 Schema（中文说明见前表；此处保留程序字段及单位）：
+
+```json
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "height_m": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "maximum": 5,
+      "default": 4.5
+    }
+  },
+  "required": []
+}
+```
+
+- 输出结果原始 Schema：
+
+```json
+null
+```
+
+未声明输出 Schema 时保留为 `null`，不会伪造结构；实际诊断结果不能因此成为可绑定的类型化数据。
 
 ### `ReturnHome@1.0.0` — 返回起点
 

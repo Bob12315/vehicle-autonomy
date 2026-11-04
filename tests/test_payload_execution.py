@@ -7,7 +7,7 @@ from vehicle_autonomy.contracts.core.quality import QualityState
 from vehicle_autonomy.contracts.core.stamped import Stamped
 from vehicle_autonomy.contracts.effects.payload import ReleasePayloadEffect,PayloadEffectEnvelope
 from vehicle_autonomy.engine.control.control_authority import ControlAuthority,ControlLease
-from vehicle_autonomy.engine.control.payload_execution import PayloadExecution,PayloadSafetyPolicy
+from vehicle_autonomy.engine.control.payload_execution import PayloadExecution,PayloadSafetyPolicy,PayloadMutationUnconfirmed
 from vehicle_autonomy.actions.devices.simulation_payload import SimPayloadPort
 from vehicle_autonomy.world.model.models import WorldObject
 from tests import test_basic_actions as helpers
@@ -36,6 +36,30 @@ class PayloadExecutionTests(unittest.TestCase):
         self.execution.tick(self.later());self.assertEqual(self.execution.status('effect')['phase'],'COMPLETED')
         other=replace(self.envelope,effect_id='second');self.execution.dispatch(other,self.now);self.execution.tick(self.now)
         self.assertEqual(self.execution.status('second')['phase'],'REJECTED');self.assertEqual(len(self.port.released),1)
+    def test_uncertain_device_publication_remains_unknown_without_replay(self):
+        def uncertain(*_):raise PayloadMutationUnconfirmed('publication uncertain')
+        self.port.release=uncertain
+        self.execution.dispatch(self.envelope,self.now);self.execution.tick(self.now)
+        self.assertEqual(self.execution.status('effect')['phase'],'UNKNOWN')
+        self.execution.dispatch(self.envelope,self.now);self.execution.tick(self.later())
+        self.assertEqual(self.execution.status('effect')['phase'],'UNKNOWN')
+    def test_exact_observation_ledger_handles_newer_fact_without_bypassing_latest_state(self):
+        original=self.world.objects[0]
+        self.reader.value=replace(self.world,objects=(replace(original,source_observation_id='newer'),))
+        self.assertEqual(self.execution.dispatch(self.envelope,self.now)['reason'],'payload_observation_identity_mismatch')
+        execution=PayloadExecution(self.authority,self.port,PayloadSafetyPolicy(('sim.objects:',)),self.reader,
+            observation_validator=lambda effect,now:effect==self.envelope.effect and now==self.now)
+        self.assertEqual(execution.dispatch(self.envelope,self.now)['phase'],'ACCEPTED')
+        # Proving the old original identity must not substitute for a current
+        # target or restore permission revoked after queue admission.
+        self.reader.value=replace(self.world,objects=())
+        execution.tick(self.now)
+        self.assertEqual(execution.status('effect')['phase'],'REJECTED');self.assertFalse(self.port.commands)
+        self.reader.value=replace(self.world,objects=(replace(original,source_observation_id='newer'),))
+        second=replace(self.envelope,effect_id='second')
+        self.assertEqual(execution.dispatch(second,self.now)['phase'],'ACCEPTED')
+        self.authority.set_action_send(False);execution.tick(self.now)
+        self.assertEqual(execution.status('second')['phase'],'REJECTED');self.assertFalse(self.port.commands)
     def test_final_fence_cancel_and_unsafe_target(self):
         for change in ('send','lease','session','target','cancel'):
             with self.subTest(change=change):

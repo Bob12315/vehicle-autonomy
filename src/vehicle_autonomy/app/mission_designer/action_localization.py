@@ -73,6 +73,20 @@ for _name, _category, _zh in [
     ACTION_TEXT['basic.'+_name] = (_category, _zh+'（基础契约）', 'Basic '+_name.replace('_',' '),
         '早期有限仿真动作契约。需要显式环境版本、车型和合格定位；目标须预先解析，不能与同名独立动作互换。')
 
+for _name, _category, _zh, _en, _description in [
+    ('Takeoff','vehicle','救援起飞','Rescue takeoff','独立救援仿真配置内起飞至 4.5 米；仍须经过原有发送门和物理高度确认。'),
+    ('Goto','navigation','救援航点飞行','Rescue waypoint','在明确绑定的救援 ENU 场地内限速飞行，等待到达、低速稳定和退出停止确认。'),
+    ('CaptureView','perception','采集投放区目标','Capture drop view','读取本机 PT 识别器发布的新鲜已定位桶观测；不使用地图真值标签。'),
+    ('CaptureReconView','perception','采集侦察区目标','Capture recon view','读取 56/59 米区域的新鲜 PT 目标观测，用于任务结果记录。'),
+    ('LandingTarget','perception','获取降落 H 标记','Acquire landing marker','要求起降区内存在新鲜已定位 H 观测；缺失时失败。'),
+    ('FuseViews','data','整理观测目标','Deduplicate observed targets','去重已经定位的新鲜目标；不声称完成 GPS 三角定位。'),
+    ('SelectDropTargets','data','选择救援投放目标','Select rescue targets','最多选择两个已观测目标；一个桶接收双载荷，两个桶各接收一个。'),
+    ('ConfirmTarget','perception','重新确认锁定目标','Reconfirm selected target','接近后仅在同一来源、同一类别、原位置附近唯一新鲜观测匹配时重新确认；缺失或歧义时失败。'),
+    ('AlignDescend','navigation','对准并下降','Align and descend','读取锁定视觉目标，在对准窗口内下降；丢失时立即请求零速度并限时重获，超时失败，退出经过原有停止屏障。'),
+    ('ReleasePayload','actuation','请求双通道仿真投放','Request simulated payload release','仅将明确的 8/9 通道配置映射至 Gazebo 双瓶脱离；不发送实机 PWM 或新增 MAVLink 写入通路。'),
+]:
+    ACTION_TEXT['Rescue.'+_name]=(_category,_zh,_en,_description)
+
 # Label, explanation, physical unit. Unknown fields keep their schema text/key.
 PARAMETERS = {}
 def parameter(key, label, help, unit=''):
@@ -238,3 +252,19 @@ def catalog_entry(registry, metadata):
     item=deepcopy(metadata)
     item['presentation']=presentation(item,override=getattr(registry.resolve_typed(item['name'],item['version']).factory,'ui_metadata',None))
     return item
+
+# Rescue fields retain the exact registered schema keys.
+for _key,_zh,_unit in [
+    ('objects','已定位目标集合',''),('target_id','锁定目标标识',''),('producer_id','观测来源标识',''),
+    ('label','目标类别',''),('confidence','识别置信度',''),('captured_ns','原始采样时刻','ns'),
+    ('clock_domain','采样时钟域',''),('world_generation','世界代际',''),('observation_id','原始观测标识',''),
+    ('servo_outputs','已映射的投放通道',''),('channel','投放通道编号',''),('release_pwm','源任务释放值','PWM'),
+    ('hold_pwm','源任务保持值','PWM'),('release_target_ey','源虚拟相机纵向对准偏移',''),
+    ('target_altitude_m','下降目标高度','m'),('descend_speed_mps','最大下降速度','m/s'),
+    ('final_settle_time_s','最终稳定时间','s'),('alignment_confirmed','对准已确认',''),
+    ('target_acquisition_timeout_s','停止下降后的目标重获期限','s'),
+    ('min_confidence','最低观测置信度',''),('cluster_radius_m','目标去重半径','m'),
+    ('target_count','最多投放目标数',''),('tolerance_xy_m','水平到达容差','m'),
+    ('tolerance_z_m','高度到达容差','m'),('settle_s','到达稳定时间','s'),
+]:
+    if _key not in PARAMETERS:parameter(_key,_zh,'独立救援仿真 Action 的显式参数；由原有准入、安全和新鲜观测校验。',_unit)

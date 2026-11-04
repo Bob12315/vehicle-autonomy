@@ -117,3 +117,5 @@ def register_standard(registry):
     add('RTL',Empty,RtlFactory(),kind=ActionKind.GOAL,cap='rtl',effects=(ModeEffect,),timeout=45,max_timeout=45,
         timeouts={'plane':{'default_timeout_ns':20_000_000_000,'max_timeout_ns':30_000_000_000}},
         success='Plane: native RTL mode adoption, not arrival or landing. Rover/Copter: physical ReturnHome goal.')
+    from vehicle_autonomy.actions.composite.rescue import register_rescue
+    register_rescue(registry)

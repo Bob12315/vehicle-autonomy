@@ -1805,6 +1805,40 @@
         "clear_height_m": 3,
         "surface": "runway"
       }
+    },
+    "CUADC2026": {
+      "audit": "generated-flat-primitives-v1",
+      "allowed_families": [
+        "copter"
+      ],
+      "blocked_reasons": {
+        "rover": "Rescue ground pairing not reviewed",
+        "plane": "No runway admission",
+        "vtol": "No qualified VTOL profile"
+      },
+      "regions": [
+        {
+          "id": "takeoff-carpet",
+          "bounds": [
+            -1.5,
+            1.5,
+            -1.5,
+            1.5
+          ],
+          "families": [
+            "copter"
+          ]
+        }
+      ],
+      "presets": [
+        {
+          "id": "home",
+          "name": "起降区（朝向场地 +Y）",
+          "x": 0,
+          "y": 0,
+          "heading_deg": 90
+        }
+      ]
     }
   }
 }

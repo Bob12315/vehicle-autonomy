@@ -1,0 +1,45 @@
+[environment]
+schema = 1
+id = "environment:cuadc2026-rescue-v1"
+frame = "odom"
+units = "m"
+origin = [-35.363262, 149.165237, 584.0]
+origin_source = "configured speed-one SITL local ENU origin; owned launcher home"
+home = "HOME"
+home_source = "explicit training profile home in odom; rebind per session"
+
+[geofence]
+name = "rescue_fence"
+frame = "odom"
+min_x = -5.0
+max_x = 5.0
+min_y = -2.0
+max_y = 62.0
+
+[[regions]]
+name = "search"
+frame = "odom"
+min_x = -4.0
+max_x = 4.0
+min_y = 30.0
+max_y = 35.0
+
+[[points]]
+name = "HOME"
+frame = "odom"
+position = [0.0, 0.0, 0.0]
+
+[[points]]
+name = "A"
+frame = "odom"
+position = [2.0, 1.0, 1.5]
+
+[[points]]
+name = "B"
+frame = "odom"
+position = [-1.0, 1.5, 1.5]
+
+[[points]]
+name = "HOME_AIR"
+frame = "odom"
+position = [0.0, 0.0, 1.5]

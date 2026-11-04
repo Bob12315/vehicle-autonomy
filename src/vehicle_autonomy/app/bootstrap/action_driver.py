@@ -19,6 +19,7 @@ from vehicle_autonomy.contracts.action_ports import ActionAdmissionRejected
 from vehicle_autonomy.contracts.core.geometry import Pose3,Quaternion,Vector3
 from vehicle_autonomy.contracts.decision import EffectPhase,EffectResult
 from vehicle_autonomy.contracts.effects.vehicle import ArmEffect,ModeEffect,FixedWingTargetEffect,TakeoffEffect,LandEffect,StopMotionEffect,TwistTargetEffect
+from vehicle_autonomy.contracts.effects.payload import PayloadEffectEnvelope
 from vehicle_autonomy.world.environment.resources import Environment
 
 
@@ -48,6 +49,7 @@ class VehicleActionDriver:
         self._queue=Queue(maxsize=128);self._lock=RLock();self._stop=Event();self._ready=Event()
         self._world=None;self._scope=None;self._effects={};self._results={};self._command_feedback={};self._effect_sessions={};self._requested_scopes=set();self._cancelled=set();self._guards={};self._home=None
         self._info={};self._fault=None;self._recovery=None
+        self._rescue=None
         self._thread=Thread(target=self._run,name='action-owner-'+target,daemon=True);self._thread.start()
         if not self._ready.wait(5):raise TimeoutError('vehicle owner startup timed out')
         if self._fault:raise RuntimeError(self._fault)
@@ -73,23 +75,37 @@ class VehicleActionDriver:
                 deployment_send=self.allow_send,lease_active=bool(self._runtime.authority.lease is not None
                     and self._runtime.authority.lease.expires_at.elapsed_ns_since(self.clock())>0),
                 scope=self._scope,fault=self._fault,capabilities=sorted(self.context().capabilities))
+            if getattr(self,'_rescue',None) is not None:self._info['rescue_perception']=self._rescue.health()
             for identifier,items in self._effects.items():
                 retained={str(env.effect_id) for env in items[-16:]}
                 cached={key:value for key,value in self._command_feedback.get(identifier,{}).items() if key in retained}
                 self._command_feedback[identifier]=cached
                 for env in items[-16:]:
-                    value=self._runtime.effect_status(str(env.effect_id))
+                    value=self._effect_status(env)
                     if value is not None:
                         cached[str(env.effect_id)]=dict(effect_type=type(env.effect).__name__,**deepcopy(value))
                 self._results[identifier]=tuple(EffectResult(str(env.effect_id),identifier,
                     EffectPhase((status or {}).get('phase','REQUESTED')),(status or {}).get('command_id'),
                     self._effect_sessions.get(str(env.effect_id)),(status or {}).get('reason')) for env in items
-                    for status in [self._runtime.effect_status(str(env.effect_id))])
+                    for status in [self._effect_status(env)])
+
+    def _effect_status(self,envelope):
+        if isinstance(envelope,PayloadEffectEnvelope):
+            return None if self._rescue is None else self._rescue.execution.status(str(envelope.effect_id))
+        return self._runtime.effect_status(str(envelope.effect_id))
 
     def _bind(self):
         if self.profile.kind!='plane':
-            env=Environment.load(resource_root()/f'simulation/environments/{self.profile.kind}.toml').bind(self._runtime.world_epoch)
+            rescue=bool(self.ownership.manifest.get('rescue_2026'))
+            name='copter_rescue' if rescue else self.profile.kind
+            env=Environment.load(resource_root()/f'simulation/environments/{name}.toml')
+            if rescue:env.check_safety(self.profile.safety)
+            env=env.bind(self._runtime.world_epoch)
             self._runtime.set_environment(env.reference)
+            if rescue:
+                from vehicle_autonomy.app.bootstrap.rescue_runtime import RescueRuntime
+                if self._rescue is not None:raise RuntimeError('rescue reconnect requires a new owned sensor epoch')
+                self._rescue=RescueRuntime(self._runtime,self.ownership)
 
     def _run(self):
         try:
@@ -106,6 +122,7 @@ class VehicleActionDriver:
                         try:future.set_result(function())
                         except Exception as exc:future.set_exception(exc)
                 if self._runtime.connected:
+                    if self._rescue is not None:self._rescue.poll()
                     result=self._runtime.cycle()
                     if result.fault:self._fault=result.fault
                 self._publish()
@@ -115,6 +132,9 @@ class VehicleActionDriver:
         finally:
             try:self._runtime.shutdown()
             except Exception:self._fault='shutdown outcome UNCONFIRMED'
+            if self._rescue is not None:
+                try:self._rescue.close()
+                except Exception:self._fault='rescue worker shutdown UNCONFIRMED'
             self._publish()
             while not self._queue.empty():
                 future,_=self._queue.get_nowait()
@@ -130,6 +150,7 @@ class VehicleActionDriver:
 
     def context(self):
         caps=capabilities(self.profile.kind)
+        if getattr(self,'_rescue',None) is not None:caps=caps|{'rescue_flight','rescue_vision','rescue_payload'}
         if 'RTL' not in self.profile.mode_ids:caps=caps-{'return_home','rtl'}
         return ActionContext(self.target,self.profile.kind,frozenset(caps),True,
             getattr(self,'_home',None),{'mode_ids':self.profile.mode_ids,
@@ -216,7 +237,10 @@ class VehicleActionDriver:
                 recovery=(isinstance(effect,ModeEffect) and effect.native_mode=={'rover':'HOLD','copter':'LOITER','plane':'LOITER'}[self.profile.kind])
                 if not (isinstance(effect,StopMotionEffect) or zero or recovery):
                     raise RuntimeError('exit ingress permits only stopping/recovery effects')
-            result=self._runtime.dispatch_envelope(envelope)
+            if isinstance(envelope,PayloadEffectEnvelope):
+                if self._rescue is None:raise RuntimeError('explicit payload Execution unavailable')
+                result=self._rescue.execution.dispatch(envelope,self.clock())
+            else:result=self._runtime.dispatch_envelope(envelope)
             self._effect_sessions[str(envelope.effect_id)]=self._runtime.session_id
             # Publish one stable post-cycle cut. Exposing a transient ACCEPTED
             # replacement before its mandatory writer cycle would repeatedly
@@ -229,7 +253,9 @@ class VehicleActionDriver:
         with self._lock:self._cancelled.add(identifier)
         if identifier not in self._requested_scopes:return  # Query never occupies the vehicle task queue.
         def fence():
-            if self._scope==identifier:self._runtime.cancel_pending_requests()
+            if self._scope==identifier:
+                self._runtime.cancel_pending_requests()
+                if self._rescue is not None:self._rescue.execution.cancel(identifier)
         self._task(fence)
 
     def finish_scope(self,identifier,*,succeeded):

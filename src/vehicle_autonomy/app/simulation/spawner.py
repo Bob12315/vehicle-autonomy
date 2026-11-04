@@ -46,7 +46,7 @@ def bind_model(source: Path, destination: Path, *, entity_name: str, instance: i
     model.set('name', entity_name)
     topics = {}
     for element in model.iter():
-        if element.tag in ('topic', 'cmd_topic', 'command_topic', 'state_topic'):
+        if element.tag in ('topic', 'cmd_topic', 'command_topic', 'state_topic', 'detach_topic', 'output_topic'):
             value = (element.text or '').strip()
             if value.startswith('/'):
                 topics[value] = '/' + entity_name + value

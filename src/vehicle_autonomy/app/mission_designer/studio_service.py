@@ -22,6 +22,13 @@ class StudioService:
             data=self.library.snapshot()
             context=driver.context()
             if not context.owned_simulation:continue
+            if context.target_kind == 'copter' and 'Rescue_2026_FullAuto' not in data['templates']:
+                try:self.service.registry.resolve_typed('Rescue.AlignDescend')
+                except ValueError:pass
+                else:
+                    from vehicle_autonomy.app.scenarios.cuadc.rescue import template
+                    self.library.template('Rescue_2026_FullAuto',template(target))
+                    data=self.library.snapshot()
             from .mission_examples import examples
             for definition in examples(target,context.target_kind):
                 identifier=definition['mission_id']

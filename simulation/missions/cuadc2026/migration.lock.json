@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "source": "User-specified CUADC 2026 workspace; copied scene/model data only; no legacy Python imported",
+  "files": {
+    "simulation/worlds/cuadc2026_rescue.sdf": "ba57aae4b9ed40bcc8234c2b0b6753a290f051c80c0524064d902ea79f3ab63c",
+    "simulation/missions/cuadc2026/rescue_2026_source.json": "d762138f26555ce00dc9ef3bba6ad53fa7c0726465ce3c7221fd451cde06b2cf",
+    "simulation/models/cuadc2026_field/model.sdf": "075e1d8d1bc89086b0bff2a7fa337b82d33567bd9ad5ffa88fc5002d63612fe0",
+    "simulation/models/cuadc2026_field/model.config": "ee50f272c515e4d3145af9812281c837bb3855c4a7633b6bba47eef8ede97e69",
+    "simulation/models/iris_cuadc2026_fixed_down_camera/model.sdf": "464558df109d27adf36785eeb6dc8f052d78f7c950cd2bb70044bcd6e0110387",
+    "simulation/models/iris_cuadc2026_fixed_down_camera/model.config": "34bf18987ddb6cec6127412bac48e7250fc3a408ed4f674453fecee28929b350",
+    "simulation/models/gimbal_cuadc2026_fixed_down/model.sdf": "cf23093ff9f65d35a7635409c523706635c31375d1bbbb10a0ee6029638d2eeb",
+    "simulation/models/gimbal_cuadc2026_fixed_down/model.config": "5d2a465736331487ebb7526aa0e41f089591ef7a138671d5f9ab01727d66dc6e",
+    "simulation/models/cuadc2026_water_bottle/model.sdf": "fa45cb131f85dcc71e20acae3fe2d40706118fd96e38e88ff3c326014b3d5334",
+    "simulation/models/cuadc2026_water_bottle/model.config": "ee4ad7b2ff85c93c1b333aebb87ca404642d5e03de6c4374faf37ff004d6b00d"
+  },
+  "limitations": [
+    "Original world embeds vehicle. Framework scene assembly removes embedded vehicle and axes; vehicle library owns vehicle instances.",
+    "Source field infinite collision plane becomes a finite 160 x 160 m flat box for spawn audit; markings and target geometry retained.",
+    "Source vehicle remains an unqualified optional model; standard vehicle inputs and locks unchanged.",
+    "Source ownership/licenses not inferred; upstream Iris meshes remain external."
+  ],
+  "adapted_files": {
+    "simulation/models/gimbal_cuadc2026_fixed_down/model.sdf": "68fa02d8ea41be480af0ce1bbab698ba368173dfbeaacda4b1eaeadeab0a7f0b"
+  },
+  "external_meshes": {
+    "plugin:models/gimbal_small_3d/meshes/base_plate.dae": "a657c60d7a35202d67c450a11211d757d423fbce4e03df8e14d03e69702a2b5b",
+    "plugin:models/gimbal_small_3d/meshes/roll_arm.dae": "66cd656cf30ef7f8cfae383433c2524269a6da55067116f5df980327510b3721",
+    "plugin:models/gimbal_small_3d/meshes/camera_enclosure.dae": "0ca4024657bd4308f741b5200db75c04c6d4b8eb5dc213fcb718bc1ae0185809",
+    "plugin:models/gimbal_small_3d/meshes/yaw_arm.dae": "139726d4d8e43bcd1778538d684e2edcab6812f262fdd0835c2a7c7947006ed5"
+  },
+  "derived_files": {
+    "simulation/worlds/cuadc2026_rescue_scene.sdf": "d85c30d6a1d40807031ff828529b00345d0bf7172e3fd7cd427a961a9b623e9b"
+  },
+  "original_rknn_reference": {
+    "filename": "gazebo_dataset-fp16.rknn",
+    "sha256": "2ddc8a11ebd82f3e2ae413dbae73a0748d08f205518b028f2e20f059d244ef0f",
+    "bytes": 7646326,
+    "runtime_verified": false
+  },
+  "active_detector": {
+    "profile": "configs/perception/rescue_2026_pt.json",
+    "format": "pt",
+    "model_sha256": "f89ed69dd7639cc40689c4af3d97bdb6335c72c2e15aa86f056da52e61cbc4e4",
+    "rknn_required": false
+  }
+}

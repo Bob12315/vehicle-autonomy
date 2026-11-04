@@ -12,10 +12,13 @@ class PayloadSafetyPolicy:
     max_vehicle_age_ns:int=3_000_000_000
     max_alignment_m:float=.3
     max_speed_mps:float=.15
+    min_release_height_m:float=1.
+    max_release_height_m:float=2.
 
     def __post_init__(self):
         if not self.allowed_producer_prefixes or any(not p for p in self.allowed_producer_prefixes):raise ValueError('explicit payload sources required')
         if any(type(v) is not int or v<=0 for v in (self.max_target_age_ns,self.max_vehicle_age_ns)) or any(not math.isfinite(v) or v<=0 for v in (self.max_alignment_m,self.max_speed_mps)):raise ValueError('invalid payload Safety')
+        if not 0 < self.min_release_height_m < self.max_release_height_m or not all(math.isfinite(v) for v in (self.min_release_height_m,self.max_release_height_m)):raise ValueError('explicit payload height range required')
 
     def reason(self,envelope,world,now):
         effect=envelope.effect
@@ -33,14 +36,16 @@ class PayloadSafetyPolicy:
         except ValueError:return 'payload_clock_mismatch'
         target_pose=target.position.value;p=loc.pose.value.position;v=loc.twist.value.linear
         if math.dist((target_pose.x,target_pose.y,target_pose.z),(effect.target_position.x,effect.target_position.y,effect.target_position.z))>.1:return 'payload_target_moved'
-        if math.hypot(p.x-target_pose.x,p.y-target_pose.y)>self.max_alignment_m or not 1<=p.z-target_pose.z<=2:return 'payload_not_aligned'
+        if math.hypot(p.x-target_pose.x,p.y-target_pose.y)>self.max_alignment_m or not self.min_release_height_m<=p.z-target_pose.z<=self.max_release_height_m:return 'payload_not_aligned'
         if math.sqrt(v.x*v.x+v.y*v.y+v.z*v.z)>self.max_speed_mps or abs(loc.twist.value.angular.z)>.15:return 'payload_motion_unsafe'
         return None
 
 class PayloadExecution:
-    def __init__(self,authority,port,safety,world_reader):
+    def __init__(self,authority,port,safety,world_reader,*,observation_validator=None):
         if not isinstance(safety,PayloadSafetyPolicy):raise TypeError('explicit payload SafetyPolicy required')
         self.authority=authority;self.port=port;self.safety=safety;self.world=world_reader
+        if observation_validator is not None and not callable(observation_validator):raise TypeError('read-only observation validator required')
+        self.observation_validator=observation_validator
         self.envelopes={};self.results={};self.pending={};self.awaiting={}
     def _result(self,key,phase,reason=None):
         self.results[key]={'phase':phase,'reason':reason,'command_id':'payload:'+key}
@@ -50,7 +55,15 @@ class PayloadExecution:
         except ValueError:return 'payload_clock_mismatch'
         if admission:
             world=self.world.snapshot()
-            if world is None or not any(o.object_id==envelope.effect.target_id and str(o.source_observation_id)==envelope.effect.target_observation_id for o in world.objects):return 'payload_observation_identity_mismatch'
+            known=world is not None and any(o.object_id==envelope.effect.target_id and str(o.source_observation_id)==envelope.effect.target_observation_id for o in world.objects)
+            # A high-rate producer may publish a newer fact between Action
+            # tick and queue admission. An explicitly injected immutable fact
+            # ledger can prove the exact original identity; latest-state
+            # freshness, movement and every authorization fence still apply.
+            if not known and self.observation_validator is not None:
+                try:known=self.observation_validator(envelope.effect,now) is True
+                except Exception:known=False
+            if not known:return 'payload_observation_identity_mismatch'
         return self.authority.admission_reason(envelope.run_id,envelope.action_instance_id,now) or self.safety.reason(envelope,self.world.snapshot(),now)
     def dispatch(self,envelope,now):
         if not isinstance(envelope,PayloadEffectEnvelope):raise TypeError('PayloadExecution only accepts payload envelopes')
@@ -78,6 +91,7 @@ class PayloadExecution:
                 if reason:self._result(key,'REJECTED',reason)
                 else:
                     try:self.port.release(envelope,now)
+                    except PayloadMutationUnconfirmed as exc:self._result(key,'UNKNOWN',str(exc))
                     except (ValueError,RuntimeError) as exc:self._result(key,'REJECTED',str(exc))
                     else:self._result(key,'ACKNOWLEDGED');self.awaiting[key]=now
                 self.pending.pop(key)
@@ -89,3 +103,7 @@ class PayloadExecution:
             if found:self._result(key,'COMPLETED');self.awaiting.pop(key)
             elif now.elapsed_ns_since(envelope.deadline)>=0:self._result(key,'UNKNOWN','payload_observation_deadline');self.awaiting.pop(key)
     def status(self,key):return self.results.get(key)
+
+
+class PayloadMutationUnconfirmed(RuntimeError):
+    """A device write may have occurred; it must never be classified rejected."""

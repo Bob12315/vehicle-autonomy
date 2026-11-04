@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "model_id": "cuadc2026-gazebo-yolo11n-pt",
+  "model_sha256": "f89ed69dd7639cc40689c4af3d97bdb6335c72c2e15aa86f056da52e61cbc4e4",
+  "model_host_key": "rescue_model",
+  "python_host_key": "vision_python",
+  "classes": [
+    "bucket",
+    "H"
+  ],
+  "imgsz": 640,
+  "device": "0",
+  "confidence": 0.3,
+  "iou": 0.45,
+  "training": {
+    "architecture": "yolo11n",
+    "ultralytics": "8.3.163",
+    "epochs": 150,
+    "batch": 8,
+    "patience": 50,
+    "workers": 2,
+    "torch": "2.5.0+cu118",
+    "python": "3.10.21",
+    "pretrained_sha256": "0ebbc80d4a7680d14987a577cd21342b65ecfd94632bd9a8da63ae6417644ee1",
+    "training_script_sha256": "d5e33283a63261ac6323a35476783fca3fbab55422bb190aa84e6cfeff3b2d11",
+    "dataset_manifest_sha256": "12ccaad68beb61ffe8a52b194f2a29e977585f01126b49206ec29b765f45d408",
+    "train_images": 375,
+    "val_images": 140,
+    "checkpoint_metrics": {
+      "metrics/precision(B)": 0.97613,
+      "metrics/recall(B)": 0.97808,
+      "metrics/mAP50(B)": 0.99069,
+      "metrics/mAP50-95(B)": 0.84589,
+      "val/box_loss": 0.68382,
+      "val/cls_loss": 0.33139,
+      "val/dfl_loss": 0.89442,
+      "fitness": 0.86037
+    }
+  },
+  "marker_backend": "yellow_disc_h_shape_v1"
+}

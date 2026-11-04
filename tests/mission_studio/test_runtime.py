@@ -12,6 +12,26 @@ class StudioRuntimeTests(unittest.TestCase):
         self.h.registry.register_typed(replace(entry.spec,version='1.0.1',retryable=True,skippable=True,runtime_mutable_parameters=('count',),
             output_schema={'type':'object','properties':{'count':{'type':'integer'}},'required':['count']}),entry.factory)
     def start(self,d,**kw):return self.h.engine.start(d,**kw)['id']
+    def test_declared_plan_validity_survives_wait_without_retiming_default_facts(self):
+        from tests.action_system.test_runtime import Parameters,Factory
+        from vehicle_autonomy.contracts.decision import ActionSpec
+        output={'type':'object','properties':{'count':{'type':'integer'}},'required':['count']}
+        for index,validity in enumerate((3_000_000_000,180_000_000_000)):
+            name='plan'+str(index)
+            self.h.registry.register_typed(ActionSpec(name,Parameters,output_schema=output,
+                output_max_age_ns=validity,external_lifecycle='typed_only'),Factory())
+            d=definition(nodes=[node('start','Start'),node('plan','Action',action_type=name),
+                node('travel','Wait',parameters={'duration_s':5.}),
+                node('consume','Action',action_type='ok',input_bindings={'count':{'ref':'node.plan.output.count'}}),node('end','End')],
+                edges=[edge(a,b) for a,b in zip(['start','plan','travel','consume'],['plan','travel','consume','end'])])
+            d['version']='1.0.'+str(index)
+            identifier=self.start(d);self.h.ticks(180);view=self.h.engine.view(identifier)
+            self.assertEqual(view['state'],'UNKNOWN' if index==0 else 'SUCCEEDED',view['error'])
+            if index:
+                execution=next(e for e in view['studio']['executions'] if e['node_id']=='consume')
+                fact=execution['inputs']['count']
+                self.assertGreater(self.h.clock().monotonic_ns-fact['observed_at']['monotonic_ns'],5_000_000_000)
+                self.assertEqual(fact['valid_for_ns'],validity)
     def test_real_existing_executor_runs_compiled_sequence_and_typed_bindings(self):
         d=definition(blackboard={'value':dict(schema={'type':'integer'},default=3),'result':dict(schema={'type':'integer'},default=0)})
         d['nodes'][1].update(input_bindings={'count':{'ref':'mission.value'}},output_bindings={'count':{'ref':'mission.result'}})

@@ -65,7 +65,7 @@ class StudioState:
         if 'execution_scope' not in n.details:
             meta=self.engine.actions.registry.metadata(spec['action'],spec['action_version'],vehicle_kind=self.engine.actions.drivers[self.run.spec['target']].context().target_kind)
             definitions=dict(inputs=dict(schema=meta['parameters'],readonly=True,max_age_s=self.run.spec['timeout_s']))
-            if meta['output'] is not None:definitions['output']=dict(schema=meta['output'],readonly=True,max_age_s=3)
+            if meta['output'] is not None:definitions['output']=dict(schema=meta['output'],readonly=True,max_age_s=meta['output_max_age_s'])
             scope=self.board.create('node',self.context(key),definitions,now);n.details['execution_scope']=scope
             original=None
             if samples:
@@ -79,7 +79,8 @@ class StudioState:
         spec=self.run.nodes[key];n=self.run.runs[key];value=a.get('result');stamp=a.get('result_at')
         if value is not None and stamp is None:raise ValueError('Action result has no original timestamp')
         observed=now if stamp is None else timestamp(stamp)
-        data=BlackboardValue(value,observed,3_000_000_000,source=a['id'])
+        validity=self.engine.actions.registry.resolve_typed(spec['action'],spec['action_version']).spec.output_max_age_ns
+        data=BlackboardValue(value,observed,validity,source=a['id'])
         logical=spec['source_node_id'];scope=self.context(key)
         self.board.output(scope,logical,value,now,a['id'],original=data)
         node_scope=n.details.get('execution_scope')

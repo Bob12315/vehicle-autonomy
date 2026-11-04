@@ -63,6 +63,8 @@ GUI、RViz2、QGC 按需打开。关闭控制台只清理本次自有进程；�
 
 ## 使用入口与验证
 
+- [CUADC 2026 地图、救援 Mission 模板与本机 PT 识别](docs/RESCUE_2026_LOCAL_PT.md)：专用仿真车辆、桶识别、对准下降和受控双载荷。
+
 - [车载摄像头预览 V1](docs/CAMERA_WEB_PREVIEW_V1.md)：认证 MJPEG、实例隔离、真实 Gazebo 图像及验收边界。
 
 - [连续驾驶与多实例任务绑定](docs/CONTROL_AND_MISSION_BINDING_REPORT.md)：接口、根因及真实仿真验收记录。

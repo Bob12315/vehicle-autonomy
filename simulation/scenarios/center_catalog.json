@@ -2415,6 +2415,76 @@
           "default": 1
         }
       }
+    },
+    {
+      "id": "CUADC2026",
+      "name": "CUADC 2026 救援赛场",
+      "category": "copter",
+      "vehicles": [
+        "copter"
+      ],
+      "world_id": "cuadc2026_rescue",
+      "scenario_id": "CUADC2026",
+      "layout": "cuadc2026",
+      "source": "repository:simulation/worlds/cuadc2026_rescue_scene.sdf",
+      "version": "1.0.0",
+      "license": "User-provided custom scene; upstream assets retain their own notices",
+      "description": "原救援地图：起降区、32.5 米投放区、56/59 米侦察区。保留桶和标线几何；车辆独立装配。",
+      "extent_m": [
+        160,
+        160
+      ],
+      "spawn": [
+        0,
+        0,
+        0.195,
+        0,
+        0,
+        1.5707963267948966
+      ],
+      "targets": [
+        {
+          "name": "DROP_CENTER",
+          "position": [
+            0,
+            32.5,
+            5
+          ]
+        },
+        {
+          "name": "RECON_ENTRY",
+          "position": [
+            -3,
+            56,
+            4
+          ]
+        }
+      ],
+      "recommended_tests": [
+        "world smoke",
+        "camera preview",
+        "rescue template admission"
+      ],
+      "limitations": [
+        "地图加载及出生点准入不代表完整救援飞行验收。",
+        "标准 Copter 只能执行原有范围；完整任务需要独立救援 profile、感知和载荷 Provider。",
+        "RKNN 与投放效果需在具备对应运行环境时单独验收。"
+      ],
+      "verification": {
+        "L1": "NOT_TESTED",
+        "L2": "NOT_TESTED",
+        "L3": "NOT_TESTED",
+        "L4": "NOT_TESTED",
+        "L5": "NOT_TESTED",
+        "L6": "NOT_TESTED"
+      },
+      "installed": true,
+      "download_status": "BUILTIN",
+      "compatibility_status": "NOT_TESTED",
+      "sensor_support": [
+        "IMU/NavSat systems; fixed downward camera requires explicit vehicle assembly"
+      ],
+      "parameter_schema": {}
     }
   ]
 }

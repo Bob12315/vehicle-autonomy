@@ -69,7 +69,7 @@ class ActionRegistry:
             if field not in schema['properties']:raise ValueError('override for unknown Action parameter')
             schema['properties'][field].update(updates)
         return dict(name=s.name,version=s.version,description=s.description,kind=s.kind.value,
-            parameters=schema,output=to_json_value(s.output_schema),vehicle_types=sorted(s.vehicle_types),
+            parameters=schema,output=to_json_value(s.output_schema),output_max_age_s=s.output_max_age_ns/1e9,vehicle_types=sorted(s.vehicle_types),
             required_capabilities=sorted(s.required_capabilities),required_state=list(s.required_state),
             resources=[dict(name=r.name,mode=r.mode.value,conflict_group=r.conflict_group) for r in s.resources],
             default_timeout_s=times.get('default_timeout_ns',s.default_timeout_ns)/1e9,

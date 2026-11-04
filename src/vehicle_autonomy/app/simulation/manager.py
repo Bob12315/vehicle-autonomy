@@ -104,6 +104,7 @@ class SimulationManager:
             fields(item,('kind','spawn','slot_id'),('kind',))
             kind=item['kind']
             if type(kind) is not str:raise ValueError('registered vehicle kind required')
+            if kind=='copter_rescue' and scene_id!='CUADC2026':raise ValueError('rescue model requires the CUADC2026 scene')
             definition=self.vehicle_registry.get(kind)
             if definition['status']!='READY':raise ValueError('BLOCKED: '+str(definition.get('reason')))
             slot=item.get('slot_id','slot-'+str(index+1))
@@ -114,6 +115,9 @@ class SimulationManager:
             if type(spawn) is dict and set(spawn)=={'preset_id'}:spawn={'id':spawn['preset_id']}
             spawn=self.world_spawns.validate(scene_id,definition,spawn,peers=[{k:p[k] for k in ('spawn','definition')} for p in occupied],
                 parameters=parameters,seed=seed)
+            if kind=='copter_rescue' and any(abs(spawn[key]-expected)>1e-6 for key,expected in
+                    (('x',0.),('y',0.),('z',.195),('heading_deg',90.))):
+                raise ValueError('rescue optical calibration requires the fixed home spawn at (0,0,0.195), heading 90')
             bounds=SimulationProfile.load(definition['profile_path']).safety
             if not (bounds.min_x_m<=spawn['x']<=bounds.max_x_m and bounds.min_y_m<=spawn['y']<=bounds.max_y_m):
                 raise ValueError('BLOCKED: spawn is outside the unchanged Framework vehicle profile geofence')
@@ -407,16 +411,17 @@ class SimulationManager:
 
     def catalog(self):
         result=[]
-        definitions={kind:self.vehicle_registry.get(kind) for kind in ('rover','copter','plane','vtol')}
+        definitions={kind:self.vehicle_registry.get(kind) for kind in self.vehicle_registry.catalog['vehicles']}
         for entry in self.registry.list_scenes():
             item=deepcopy(entry)
             spawn_info=self.world_spawns.describe(item['id'])
             item['spawn_info']=spawn_info
             ready=item.get('ready',True) and HostEnvironment(self.root).available('gazebo')
             support={'none':dict(available=ready,reason='仅加载 Gazebo World')}
-            for kind in ('rover','copter','plane','vtol'):
-                definition=definitions[kind]
-                admission=spawn_info['vehicle_support'][kind]
+            for kind,definition in definitions.items():
+                admission=spawn_info['vehicle_support'][definition['family']]
+                if kind=='copter_rescue' and item['id']!='CUADC2026':
+                    admission=dict(available=False,reason='救援配置只用于 CUADC2026 赛场')
                 support[kind]=dict(available=ready and admission['available'] and definition['status']=='READY',
                     reason=admission['reason'] if not admission['available'] else definition.get('reason'),
                     acceptance='NOT_TESTED: geometric admission is not native motion acceptance')
@@ -434,7 +439,7 @@ class SimulationManager:
         raw=payload.get('vehicles')
         if raw is None:
             kind=payload.get('vehicle','none')
-            if kind not in ('none','rover','copter','plane','vtol'):
+            if type(kind) is not str or (kind != 'none' and kind not in self.vehicle_registry.catalog['vehicles']):
                 raise ValueError('unsupported simulation vehicle')
             raw=[] if kind=='none' else [dict(kind=kind,spawn=payload.get('spawn'))]
         if type(raw) is not list or len(raw)>4:

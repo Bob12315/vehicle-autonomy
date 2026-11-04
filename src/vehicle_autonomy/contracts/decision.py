@@ -85,8 +85,14 @@ class ActionSpec:
     retryable: bool = False
     skippable: bool = False
     runtime_mutable_parameters: tuple[str, ...] = ()
+    # Result facts default to three seconds. A trusted Action may explicitly
+    # declare a longer-lived immutable plan/reference; embedded sensor capture
+    # times and live Execution safety checks are never extended by this field.
+    output_max_age_ns: int = 3_000_000_000
 
     def __post_init__(self) -> None:
+        if type(self.output_max_age_ns) is not int or not 0 < self.output_max_age_ns <= 3_600_000_000_000:
+            raise ValueError('bounded explicit Action result validity required')
         if type(self.retryable) is not bool or type(self.skippable) is not bool:raise TypeError('explicit retry/skip contracts required')
         if type(self.runtime_mutable_parameters) is not tuple or any(type(v) is not str for v in self.runtime_mutable_parameters):raise TypeError('immutable declared runtime parameters required')
         if not isinstance(self.name, str) or not self.name.strip():

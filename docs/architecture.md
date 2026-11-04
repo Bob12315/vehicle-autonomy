@@ -1,5 +1,29 @@
 # V1 framework boundary
 
+## Explicit CUADC2026 rescue simulation and local PT perception (2026-11-05)
+
+The independently registered CUADC2026 scene retains the supplied field geometry
+without an embedded vehicle. A SHA-locked `copter_rescue` definition selects its
+own bounded profile, fixed home spawn, fixed downward camera and two detachable
+bottles. Ordinary vehicle profiles and hardware permissions are unchanged.
+
+The optional owned worker runs checksum-pinned local YOLO11n PT inference outside
+the vehicle owner environment. The source dataset's white-on-black H differs from
+the scene's yellow-disc H, so an explicitly separate pixel geometry producer
+supplies the latter. Both preserve original camera capture facts and require a
+bounded fresh telemetry cut; no scene truth labels enter control. Actions read
+immutable WorldObjects and emit existing typed requests through Execution.
+
+The schema-2 rescue template uses the existing Studio publication/instance-binding
+and Mission scheduler. Explicit result validity permits bounded immutable target
+references across travel while current visual observations still expire after one
+second. Existing Action results retain their three-second default. Independent
+PayloadExecution verifies the exact original observation, latest state and final
+authorization fences, then requires an observed Gazebo detach transition. No PWM
+or second MAVLink writer is introduced; uncertain publication remains UNKNOWN.
+Exact native coverage, source differences and limits are recorded in the
+[rescue implementation report](RESCUE_2026_LOCAL_PT.md).
+
 ## Read-only camera preview (2026-11-03)
 
 The unified Vehicle Control page reads authenticated MJPEG from a bounded camera

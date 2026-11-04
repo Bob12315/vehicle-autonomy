@@ -166,7 +166,8 @@ class VehicleRegistry:
         if kind not in self.catalog['vehicles']:
             raise ValueError('Unknown registered simulation vehicle: ' + str(kind))
         entry = self.catalog['vehicles'][kind]
-        result = dict(entry, id=kind, kind=kind, family=kind, status='BLOCKED', reason=entry.get('reason'),
+        family = entry.get('family', kind)
+        result = dict(entry, id=kind, kind=family, family=family, status='BLOCKED', reason=entry.get('reason'),
                       physics={}, sensors=[], actuators=[], fingerprint=None, model_hash=None,
                       parameters_hash=None, sensor_hash=None, source_files={})
         result.pop('locks', None)
@@ -176,8 +177,8 @@ class VehicleRegistry:
         result['resource_paths'] = []
         result['plugin_paths'] = [str(self.plugin_root / 'build')]
         result['plugin_root'] = str(self.plugin_root)
-        result['twin_root'] = str(self.twin_root) if kind == 'plane' else None
-        if kind == 'vtol':
+        result['twin_root'] = str(self.twin_root) if family == 'plane' else None
+        if family == 'vtol':
             return result
         try:
             model = Path(result['model_path'])
@@ -190,7 +191,7 @@ class VehicleRegistry:
             inputs = {self._reference(Path(p)): Path(p) for p in [result['binary'], result['profile_path'], *result['parameters']]}
             requirements = [self.plugin_root / 'build/libArduPilotPlugin.so',
                             self.plugin_root / 'src/ArduPilotPlugin.cc', self.plugin_root / 'CMakeLists.txt']
-            if kind == 'plane':
+            if family == 'plane':
                 requirements += [self.twin_root / 'plugins/TwinPayload.cc', self.twin_root / 'plugins/CMakeLists.txt']
                 result['plugin_paths'].insert(0, str(self.twin_root / 'plugins/build'))
                 result['payload_source'] = str(self.twin_root / 'plugins')

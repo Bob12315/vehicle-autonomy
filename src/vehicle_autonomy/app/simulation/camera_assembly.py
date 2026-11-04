@@ -22,7 +22,15 @@ def assemble(root, directory, prepared, world):
     before = sha(path)
 
     def visit(path, scope=()):
-        if not path.is_relative_to(directory) or path in visited:
+        if not path.is_relative_to(directory):
+            raise ValueError('camera assembly requires unique owned model copies')
+        if path in visited:
+            # A vehicle may include the same sensor-free leaf model twice
+            # (the two rescue bottles). Camera-bearing or recursive models
+            # still require distinct copies so topic scoping stays unambiguous.
+            repeated=ET.parse(path).find('model')
+            if repeated is not None and not repeated.findall('include') and not repeated.findall('.//sensor'):
+                return
             raise ValueError('camera assembly requires unique owned model copies')
         visited.add(path)
         tree = ET.parse(path); model = tree.find('model')

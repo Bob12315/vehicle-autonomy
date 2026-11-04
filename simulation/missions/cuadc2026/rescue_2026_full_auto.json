@@ -1,0 +1,843 @@
+{
+  "schema_version": 2,
+  "mission_id": "Rescue_2026_FullAuto",
+  "revision": 0,
+  "version": "1.0.0",
+  "name": "CUADC 2026 全自主救援 · 本机 PT",
+  "target": "",
+  "supported_vehicles": [
+    "copter"
+  ],
+  "nodes": [
+    {
+      "node_id": "start",
+      "type": "Start"
+    },
+    {
+      "node_id": "settle_estimator",
+      "type": "Wait",
+      "parameters": {
+        "duration_s": 45.0
+      }
+    },
+    {
+      "node_id": "guided",
+      "type": "Action",
+      "action_type": "SetMode",
+      "action_contract_version": "1.0.0",
+      "parameters": {
+        "mode": "GUIDED"
+      },
+      "input_bindings": {}
+    },
+    {
+      "node_id": "arm",
+      "type": "Action",
+      "action_type": "Arm",
+      "action_contract_version": "1.0.0",
+      "parameters": {},
+      "input_bindings": {}
+    },
+    {
+      "node_id": "takeoff_4_5m",
+      "type": "Action",
+      "action_type": "Rescue.Takeoff",
+      "action_contract_version": "1.0.0",
+      "parameters": {
+        "height_m": 4.5
+      },
+      "input_bindings": {}
+    },
+    {
+      "node_id": "goto_drop_center_5m",
+      "type": "Action",
+      "action_type": "Rescue.Goto",
+      "action_contract_version": "1.0.0",
+      "parameters": {
+        "x_m": 0.0,
+        "y_m": 32.5,
+        "z_m": 5.0,
+        "speed_mps": 2.0
+      },
+      "input_bindings": {}
+    },
+    {
+      "node_id": "drop_scan_capture",
+      "type": "Action",
+      "action_type": "Rescue.CaptureView",
+      "action_contract_version": "1.0.0",
+      "parameters": {},
+      "input_bindings": {}
+    },
+    {
+      "node_id": "drop_scan_fuse",
+      "type": "Action",
+      "action_type": "Rescue.FuseViews",
+      "action_contract_version": "1.0.0",
+      "parameters": {},
+      "input_bindings": {
+        "objects": {
+          "ref": "node.drop_scan_capture.output.objects"
+        }
+      }
+    },
+    {
+      "node_id": "select_gps_drop_targets",
+      "type": "Action",
+      "action_type": "Rescue.SelectDropTargets",
+      "action_contract_version": "1.0.0",
+      "parameters": {},
+      "input_bindings": {
+        "objects": {
+          "ref": "node.drop_scan_fuse.output.objects"
+        }
+      },
+      "output_bindings": {
+        "targets": {
+          "ref": "mission.drop_targets"
+        }
+      }
+    },
+    {
+      "node_id": "drop_loop",
+      "type": "ForEach",
+      "execution_policy": {
+        "collection": {
+          "ref": "mission.drop_targets"
+        },
+        "max_iterations": 2,
+        "on_item_failure": "abort"
+      }
+    },
+    {
+      "node_id": "drop_approach",
+      "type": "Action",
+      "action_type": "Rescue.Goto",
+      "action_contract_version": "1.0.0",
+      "parameters": {
+        "z_m": 3.0,
+        "speed_mps": 1.0,
+        "tolerance_xy_m": 0.25
+      },
+      "input_bindings": {
+        "x_m": {
+          "ref": "loop.current_item.target.x_m"
+        },
+        "y_m": {
+          "ref": "loop.current_item.target.y_m"
+        }
+      }
+    },
+    {
+      "node_id": "drop_confirm",
+      "type": "Action",
+      "action_type": "Rescue.ConfirmTarget",
+      "action_contract_version": "1.0.0",
+      "parameters": {},
+      "input_bindings": {
+        "target": {
+          "ref": "loop.current_item.target"
+        }
+      }
+    },
+    {
+      "node_id": "drop_align",
+      "type": "Action",
+      "action_type": "Rescue.AlignDescend",
+      "action_contract_version": "1.0.0",
+      "parameters": {},
+      "input_bindings": {
+        "target": {
+          "ref": "node.drop_confirm.output.target"
+        },
+        "release_target_ey": {
+          "ref": "loop.current_item.release_target_ey"
+        }
+      }
+    },
+    {
+      "node_id": "drop_release",
+      "type": "Action",
+      "action_type": "Rescue.ReleasePayload",
+      "action_contract_version": "1.0.0",
+      "parameters": {},
+      "input_bindings": {
+        "target": {
+          "ref": "node.drop_confirm.output.target"
+        },
+        "servo_outputs": {
+          "ref": "loop.current_item.servo_outputs"
+        },
+        "alignment_confirmed": {
+          "ref": "node.drop_align.output.alignment_confirmed"
+        }
+      }
+    },
+    {
+      "node_id": "drop_climb",
+      "type": "Action",
+      "action_type": "Rescue.Goto",
+      "action_contract_version": "1.0.0",
+      "parameters": {
+        "z_m": 2.5,
+        "speed_mps": 1.0,
+        "tolerance_z_m": 0.1
+      },
+      "input_bindings": {
+        "x_m": {
+          "ref": "loop.current_item.target.x_m"
+        },
+        "y_m": {
+          "ref": "loop.current_item.target.y_m"
+        }
+      }
+    },
+    {
+      "node_id": "goto_recon_entry_4m",
+      "type": "Action",
+      "action_type": "Rescue.Goto",
+      "action_contract_version": "1.0.0",
+      "parameters": {
+        "x_m": -3.0,
+        "y_m": 56.0,
+        "z_m": 4.0,
+        "speed_mps": 2.0
+      },
+      "input_bindings": {}
+    },
+    {
+      "node_id": "recon_scan_goto_1",
+      "type": "Action",
+      "action_type": "Rescue.Goto",
+      "action_contract_version": "1.0.0",
+      "parameters": {
+        "x_m": -3.0,
+        "y_m": 56.0,
+        "z_m": 3.0,
+        "speed_mps": 0.2,
+        "tolerance_xy_m": 0.4
+      },
+      "input_bindings": {}
+    },
+    {
+      "node_id": "recon_capture_1",
+      "type": "Action",
+      "action_type": "Rescue.CaptureReconView",
+      "action_contract_version": "1.0.0",
+      "parameters": {},
+      "input_bindings": {},
+      "output_bindings": {
+        "objects": {
+          "ref": "mission.recon_views",
+          "mode": "append"
+        }
+      }
+    },
+    {
+      "node_id": "recon_scan_goto_2",
+      "type": "Action",
+      "action_type": "Rescue.Goto",
+      "action_contract_version": "1.0.0",
+      "parameters": {
+        "x_m": 0.0,
+        "y_m": 56.0,
+        "z_m": 3.0,
+        "speed_mps": 0.2,
+        "tolerance_xy_m": 0.4
+      },
+      "input_bindings": {}
+    },
+    {
+      "node_id": "recon_capture_2",
+      "type": "Action",
+      "action_type": "Rescue.CaptureReconView",
+      "action_contract_version": "1.0.0",
+      "parameters": {},
+      "input_bindings": {},
+      "output_bindings": {
+        "objects": {
+          "ref": "mission.recon_views",
+          "mode": "append"
+        }
+      }
+    },
+    {
+      "node_id": "recon_scan_goto_3",
+      "type": "Action",
+      "action_type": "Rescue.Goto",
+      "action_contract_version": "1.0.0",
+      "parameters": {
+        "x_m": 3.0,
+        "y_m": 56.0,
+        "z_m": 3.0,
+        "speed_mps": 0.2,
+        "tolerance_xy_m": 0.4
+      },
+      "input_bindings": {}
+    },
+    {
+      "node_id": "recon_capture_3",
+      "type": "Action",
+      "action_type": "Rescue.CaptureReconView",
+      "action_contract_version": "1.0.0",
+      "parameters": {},
+      "input_bindings": {},
+      "output_bindings": {
+        "objects": {
+          "ref": "mission.recon_views",
+          "mode": "append"
+        }
+      }
+    },
+    {
+      "node_id": "recon_scan_goto_4",
+      "type": "Action",
+      "action_type": "Rescue.Goto",
+      "action_contract_version": "1.0.0",
+      "parameters": {
+        "x_m": 3.0,
+        "y_m": 59.0,
+        "z_m": 3.0,
+        "speed_mps": 0.2,
+        "tolerance_xy_m": 0.4
+      },
+      "input_bindings": {}
+    },
+    {
+      "node_id": "recon_capture_4",
+      "type": "Action",
+      "action_type": "Rescue.CaptureReconView",
+      "action_contract_version": "1.0.0",
+      "parameters": {},
+      "input_bindings": {},
+      "output_bindings": {
+        "objects": {
+          "ref": "mission.recon_views",
+          "mode": "append"
+        }
+      }
+    },
+    {
+      "node_id": "recon_scan_goto_5",
+      "type": "Action",
+      "action_type": "Rescue.Goto",
+      "action_contract_version": "1.0.0",
+      "parameters": {
+        "x_m": 0.0,
+        "y_m": 59.0,
+        "z_m": 3.0,
+        "speed_mps": 0.2,
+        "tolerance_xy_m": 0.4
+      },
+      "input_bindings": {}
+    },
+    {
+      "node_id": "recon_capture_5",
+      "type": "Action",
+      "action_type": "Rescue.CaptureReconView",
+      "action_contract_version": "1.0.0",
+      "parameters": {},
+      "input_bindings": {},
+      "output_bindings": {
+        "objects": {
+          "ref": "mission.recon_views",
+          "mode": "append"
+        }
+      }
+    },
+    {
+      "node_id": "recon_scan_goto_6",
+      "type": "Action",
+      "action_type": "Rescue.Goto",
+      "action_contract_version": "1.0.0",
+      "parameters": {
+        "x_m": -3.0,
+        "y_m": 59.0,
+        "z_m": 3.0,
+        "speed_mps": 0.2,
+        "tolerance_xy_m": 0.4
+      },
+      "input_bindings": {}
+    },
+    {
+      "node_id": "recon_capture_6",
+      "type": "Action",
+      "action_type": "Rescue.CaptureReconView",
+      "action_contract_version": "1.0.0",
+      "parameters": {},
+      "input_bindings": {},
+      "output_bindings": {
+        "objects": {
+          "ref": "mission.recon_views",
+          "mode": "append"
+        }
+      }
+    },
+    {
+      "node_id": "return_home_gps",
+      "type": "Action",
+      "action_type": "Rescue.Goto",
+      "action_contract_version": "1.0.0",
+      "parameters": {
+        "x_m": 0.0,
+        "y_m": 0.0,
+        "z_m": 4.0,
+        "speed_mps": 2.0
+      },
+      "input_bindings": {}
+    },
+    {
+      "node_id": "descend_home_2_5m",
+      "type": "Action",
+      "action_type": "Rescue.Goto",
+      "action_contract_version": "1.0.0",
+      "parameters": {
+        "x_m": 0.0,
+        "y_m": 0.0,
+        "z_m": 2.5,
+        "speed_mps": 2.0,
+        "tolerance_z_m": 0.25
+      },
+      "input_bindings": {}
+    },
+    {
+      "node_id": "landing_marker",
+      "type": "Action",
+      "action_type": "Rescue.LandingTarget",
+      "action_contract_version": "1.0.0",
+      "parameters": {},
+      "input_bindings": {}
+    },
+    {
+      "node_id": "final_land_align",
+      "type": "Action",
+      "action_type": "Rescue.AlignDescend",
+      "action_contract_version": "1.0.0",
+      "parameters": {
+        "target_altitude_m": 0.3,
+        "final_settle_time_s": 0.5
+      },
+      "input_bindings": {
+        "target": {
+          "ref": "node.landing_marker.output.target"
+        }
+      }
+    },
+    {
+      "node_id": "land_home",
+      "type": "Action",
+      "action_type": "Land",
+      "action_contract_version": "1.0.0",
+      "parameters": {},
+      "input_bindings": {}
+    },
+    {
+      "node_id": "end",
+      "type": "End"
+    }
+  ],
+  "edges": [
+    {
+      "edge_id": "e_start_next_settle_estimator",
+      "source": "start",
+      "target": "settle_estimator",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_settle_estimator_next_guided",
+      "source": "settle_estimator",
+      "target": "guided",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_guided_next_arm",
+      "source": "guided",
+      "target": "arm",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_arm_next_takeoff_4_5m",
+      "source": "arm",
+      "target": "takeoff_4_5m",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_takeoff_4_5m_next_goto_drop_center_5m",
+      "source": "takeoff_4_5m",
+      "target": "goto_drop_center_5m",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_goto_drop_center_5m_next_drop_scan_capture",
+      "source": "goto_drop_center_5m",
+      "target": "drop_scan_capture",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_drop_scan_capture_next_drop_scan_fuse",
+      "source": "drop_scan_capture",
+      "target": "drop_scan_fuse",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_drop_scan_fuse_next_select_gps_drop_targets",
+      "source": "drop_scan_fuse",
+      "target": "select_gps_drop_targets",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_select_gps_drop_targets_next_drop_loop",
+      "source": "select_gps_drop_targets",
+      "target": "drop_loop",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_drop_loop_body_drop_approach",
+      "source": "drop_loop",
+      "target": "drop_approach",
+      "port": "body"
+    },
+    {
+      "edge_id": "e_drop_approach_next_drop_confirm",
+      "source": "drop_approach",
+      "target": "drop_confirm",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_drop_confirm_next_drop_align",
+      "source": "drop_confirm",
+      "target": "drop_align",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_drop_align_next_drop_release",
+      "source": "drop_align",
+      "target": "drop_release",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_drop_release_next_drop_climb",
+      "source": "drop_release",
+      "target": "drop_climb",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_drop_loop_next_goto_recon_entry_4m",
+      "source": "drop_loop",
+      "target": "goto_recon_entry_4m",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_goto_recon_entry_4m_next_recon_scan_goto_1",
+      "source": "goto_recon_entry_4m",
+      "target": "recon_scan_goto_1",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_recon_scan_goto_1_next_recon_capture_1",
+      "source": "recon_scan_goto_1",
+      "target": "recon_capture_1",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_recon_capture_1_next_recon_scan_goto_2",
+      "source": "recon_capture_1",
+      "target": "recon_scan_goto_2",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_recon_scan_goto_2_next_recon_capture_2",
+      "source": "recon_scan_goto_2",
+      "target": "recon_capture_2",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_recon_capture_2_next_recon_scan_goto_3",
+      "source": "recon_capture_2",
+      "target": "recon_scan_goto_3",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_recon_scan_goto_3_next_recon_capture_3",
+      "source": "recon_scan_goto_3",
+      "target": "recon_capture_3",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_recon_capture_3_next_recon_scan_goto_4",
+      "source": "recon_capture_3",
+      "target": "recon_scan_goto_4",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_recon_scan_goto_4_next_recon_capture_4",
+      "source": "recon_scan_goto_4",
+      "target": "recon_capture_4",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_recon_capture_4_next_recon_scan_goto_5",
+      "source": "recon_capture_4",
+      "target": "recon_scan_goto_5",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_recon_scan_goto_5_next_recon_capture_5",
+      "source": "recon_scan_goto_5",
+      "target": "recon_capture_5",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_recon_capture_5_next_recon_scan_goto_6",
+      "source": "recon_capture_5",
+      "target": "recon_scan_goto_6",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_recon_scan_goto_6_next_recon_capture_6",
+      "source": "recon_scan_goto_6",
+      "target": "recon_capture_6",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_recon_capture_6_next_return_home_gps",
+      "source": "recon_capture_6",
+      "target": "return_home_gps",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_return_home_gps_next_descend_home_2_5m",
+      "source": "return_home_gps",
+      "target": "descend_home_2_5m",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_descend_home_2_5m_next_landing_marker",
+      "source": "descend_home_2_5m",
+      "target": "landing_marker",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_landing_marker_next_final_land_align",
+      "source": "landing_marker",
+      "target": "final_land_align",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_final_land_align_next_land_home",
+      "source": "final_land_align",
+      "target": "land_home",
+      "port": "next"
+    },
+    {
+      "edge_id": "e_land_home_next_end",
+      "source": "land_home",
+      "target": "end",
+      "port": "next"
+    }
+  ],
+  "metadata": {
+    "tags": [
+      "simulation",
+      "standard-example"
+    ],
+    "description": "4.5 米起飞、5 米投放区采样、最多两目标对准投放、六点侦察、返航 H 标记对准降落。",
+    "source_recipe": "simulation/missions/cuadc2026/rescue_2026_source.json",
+    "scene_id": "CUADC2026",
+    "simulation_only": true,
+    "requires_send": true,
+    "required_capabilities": [
+      "rescue_flight",
+      "rescue_vision",
+      "rescue_payload"
+    ],
+    "detector_classes": [
+      "bucket",
+      "H"
+    ],
+    "detector_backend": "ultralytics_pt",
+    "coordinate_convention": "Explicit odom ENU, field +Y; heading ENU pi/2. No implicit GPS/map transform.",
+    "servo_mapping": {
+      "8": {
+        "payload": "payload_1",
+        "release_pwm": 1800,
+        "hold_pwm": 1370
+      },
+      "9": {
+        "payload": "payload_2",
+        "release_pwm": 1835,
+        "hold_pwm": 1335
+      }
+    },
+    "migration_changes": [
+      "Source change_speed steps become bounded per-leg velocity limits (2, 1 and 0.2 m/s).",
+      "A single observed bucket receives both payloads; two buckets receive one each.",
+      "No unobserved fallback-center release. No continue-on-failure or success-on-alignment-timeout.",
+      "FuseViews deduplicates fresh already-localized observations; it does not claim GPS triangulation.",
+      "Original virtual-camera ey offsets retained as declared projection parameters; physical calibration requires separate validation."
+    ]
+  },
+  "blackboard": {
+    "drop_targets": {
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "target": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "target_id": {
+                  "type": "string"
+                },
+                "producer_id": {
+                  "type": "string"
+                },
+                "label": {
+                  "type": "string"
+                },
+                "x_m": {
+                  "type": "number"
+                },
+                "y_m": {
+                  "type": "number"
+                },
+                "z_m": {
+                  "type": "number"
+                },
+                "confidence": {
+                  "type": "number"
+                },
+                "captured_ns": {
+                  "type": "integer"
+                },
+                "clock_domain": {
+                  "type": "string"
+                },
+                "world_generation": {
+                  "type": "string"
+                },
+                "observation_id": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "target_id",
+                "producer_id",
+                "label",
+                "x_m",
+                "y_m",
+                "z_m",
+                "confidence",
+                "captured_ns",
+                "clock_domain",
+                "world_generation",
+                "observation_id"
+              ]
+            },
+            "servo_outputs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "channel": {
+                    "type": "integer"
+                  },
+                  "release_pwm": {
+                    "type": "integer"
+                  },
+                  "hold_pwm": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "channel",
+                  "release_pwm",
+                  "hold_pwm"
+                ]
+              }
+            },
+            "release_target_ey": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "target",
+            "servo_outputs",
+            "release_target_ey"
+          ]
+        }
+      },
+      "max_age_s": 180,
+      "default": []
+    },
+    "recon_views": {
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "target_id": {
+                "type": "string"
+              },
+              "producer_id": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string"
+              },
+              "x_m": {
+                "type": "number"
+              },
+              "y_m": {
+                "type": "number"
+              },
+              "z_m": {
+                "type": "number"
+              },
+              "confidence": {
+                "type": "number"
+              },
+              "captured_ns": {
+                "type": "integer"
+              },
+              "clock_domain": {
+                "type": "string"
+              },
+              "world_generation": {
+                "type": "string"
+              },
+              "observation_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "target_id",
+              "producer_id",
+              "label",
+              "x_m",
+              "y_m",
+              "z_m",
+              "confidence",
+              "captured_ns",
+              "clock_domain",
+              "world_generation",
+              "observation_id"
+            ]
+          }
+        }
+      },
+      "max_age_s": 120,
+      "default": []
+    }
+  },
+  "execution_policy": {
+    "timeout_s": 1800
+  }
+}

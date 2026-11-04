@@ -49,9 +49,9 @@ where = ["src"]
 "share/vehicle-autonomy/configs" = ["configs/control-center.json", "configs/llm.server-tunnel.json", "configs/rs16-scan.json", "configs/sitl.toml", "configs/sitl_arm.toml"]
 "share/vehicle-autonomy/configs/deployment" = ["configs/deployment/hardware-controlled.json", "configs/deployment/hardware-readonly.json", "configs/deployment/simulation.json"]
 "share/vehicle-autonomy/configs/rviz" = ["configs/rviz/navigation-readonly.rviz", "configs/rviz/rs16-readonly.rviz", "configs/rviz/rover-visualization.rviz", "configs/rviz/copter-visualization.rviz", "configs/rviz/plane-visualization.rviz"]
-"share/vehicle-autonomy/docs" = ["docs/HARDWARE_READY_AUDIT.md"]
+"share/vehicle-autonomy/docs" = ["docs/HARDWARE_READY_AUDIT.md", "docs/RESCUE_2026_LOCAL_PT.md", "docs/RESCUE_2026_ACCEPTANCE.json"]
 "share/vehicle-autonomy/scripts" = ["scripts/with_ros2.sh", "scripts/with_ros2_humble.sh"]
-"share/vehicle-autonomy/simulation/environments" = ["simulation/environments/copter.toml", "simulation/environments/rover.toml", "simulation/environments/yard.toml"]
+"share/vehicle-autonomy/simulation/environments" = ["simulation/environments/copter.toml", "simulation/environments/rover.toml", "simulation/environments/yard.toml", "simulation/environments/copter_rescue.toml"]
 "share/vehicle-autonomy/simulation/mapping" = ["simulation/mapping/slam_toolbox.yaml"]
 "share/vehicle-autonomy/simulation/missions" = ["simulation/missions/copter.toml", "simulation/missions/rover.toml", "simulation/missions/copter.json", "simulation/missions/rover.json", "simulation/missions/plane.json"]
 "share/vehicle-autonomy/simulation/missions/examples" = ["simulation/missions/examples/01_state_survey.json", "simulation/missions/examples/02_disarmed_branch.json", "simulation/missions/examples/03_ground_patrol.json", "simulation/missions/examples/04_air_hover_land.json", "simulation/missions/examples/05_air_survey_return.json", "simulation/missions/examples/06_runway_inspection.json", "simulation/missions/examples/README.md"]
@@ -61,12 +61,24 @@ where = ["src"]
 "share/vehicle-autonomy/simulation/params" = ["simulation/params/compact_rover_navigation.parm", "simulation/params/copter_telemetry.parm", "simulation/params/rover_navigation.parm", "simulation/params/rover_telemetry.parm", "simulation/params/plane_telemetry.parm", "simulation/params/rover_phase2_rtl.parm", "simulation/params/twin_plane_control.parm"]
 "share/vehicle-autonomy/simulation/planning" = ["simulation/planning/recorded_map.json"]
 "share/vehicle-autonomy/simulation/planning/maps" = ["simulation/planning/maps/e0e7a625e27ed2ac86b9621543cd9fd934af395b04431efd884e63f71af34081.json"]
-"share/vehicle-autonomy/simulation/profiles" = ["simulation/profiles/compact_rover.toml", "simulation/profiles/copter.toml", "simulation/profiles/rover.toml", "simulation/profiles/rover_yard.toml", "simulation/profiles/plane.toml", "simulation/profiles/rover_phase2.toml"]
+"share/vehicle-autonomy/simulation/profiles" = ["simulation/profiles/compact_rover.toml", "simulation/profiles/copter.toml", "simulation/profiles/rover.toml", "simulation/profiles/rover_yard.toml", "simulation/profiles/plane.toml", "simulation/profiles/rover_phase2.toml", "simulation/profiles/copter_rescue.toml"]
 "share/vehicle-autonomy/simulation/scenarios" = ["simulation/scenarios/acceptance-v1.json", "simulation/scenarios/center_catalog.json", "simulation/scenarios/assets.lock.json", "simulation/scenarios/world_spawns.json"]
 "share/vehicle-autonomy/simulation/world_registry" = ["simulation/world_registry/catalog.yaml", "simulation/world_registry/sitl_models_files.txt"]
 "share/vehicle-autonomy/simulation/scenes" = ["simulation/scenes/yard.json"]
-"share/vehicle-autonomy/simulation/worlds" = ["simulation/worlds/rover_runway.sdf", "simulation/worlds/plane_runway.sdf"]
+"share/vehicle-autonomy/simulation/worlds" = ["simulation/worlds/rover_runway.sdf", "simulation/worlds/plane_runway.sdf", "simulation/worlds/cuadc2026_rescue.sdf", "simulation/worlds/cuadc2026_rescue_scene.sdf"]
 
 "share/vehicle-autonomy/simulation/vehicles" = ["simulation/vehicles/catalog.json", "simulation/vehicles/vtol-audit.json"]
 
 "share/vehicle-autonomy/simulation/sensors" = ["simulation/sensors/rover-front-v1.sdf"]
+
+"share/vehicle-autonomy/simulation/missions/cuadc2026" = ["simulation/missions/cuadc2026/migration.lock.json", "simulation/missions/cuadc2026/rescue_2026_full_auto.json", "simulation/missions/cuadc2026/rescue_2026_source.json", "simulation/missions/cuadc2026/README.md"]
+
+"share/vehicle-autonomy/simulation/models/cuadc2026_field" = ["simulation/models/cuadc2026_field/model.config", "simulation/models/cuadc2026_field/model.sdf", "simulation/models/cuadc2026_field/UPSTREAM_NOTICE.md"]
+
+"share/vehicle-autonomy/simulation/models/cuadc2026_water_bottle" = ["simulation/models/cuadc2026_water_bottle/model.config", "simulation/models/cuadc2026_water_bottle/model.sdf"]
+
+"share/vehicle-autonomy/simulation/models/gimbal_cuadc2026_fixed_down" = ["simulation/models/gimbal_cuadc2026_fixed_down/model.config", "simulation/models/gimbal_cuadc2026_fixed_down/model.sdf"]
+
+"share/vehicle-autonomy/simulation/models/iris_cuadc2026_fixed_down_camera" = ["simulation/models/iris_cuadc2026_fixed_down_camera/model.config", "simulation/models/iris_cuadc2026_fixed_down_camera/model.sdf"]
+
+"share/vehicle-autonomy/configs/perception" = ["configs/perception/rescue_2026_pt.json"]

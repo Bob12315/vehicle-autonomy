@@ -1,0 +1,73 @@
+{
+  "date": "2026-11-05",
+  "scope": "owned loopback CUADC2026 simulation, local PT bucket model and separate pixel H marker",
+  "model_sha256": "f89ed69dd7639cc40689c4af3d97bdb6335c72c2e15aa86f056da52e61cbc4e4",
+  "unit_tests": {
+    "command": "python -m unittest discover -s tests -v",
+    "passed": 995,
+    "failed": 0
+  },
+  "focused_tests": {
+    "passed": 47,
+    "failed": 0
+  },
+  "world_smoke": {
+    "status": "PASS",
+    "simulated_seconds": 8.064
+  },
+  "local_pt_inference": {
+    "cpu": "PASS",
+    "gpu_0": "PASS",
+    "recorded_validation_images": 3
+  },
+  "readonly_camera_inference": "PASS",
+  "landing_acceptance": "PASS",
+  "full_mission": {
+    "status": "PASS",
+    "mission_state": "SUCCEEDED",
+    "release_safe": true,
+    "compiled_nodes": 66,
+    "actions": 35,
+    "all_actions_succeeded": true,
+    "recon_views": 6,
+    "releases": [
+      {
+        "channels": [
+          8
+        ],
+        "state": "SUCCEEDED",
+        "phases": [
+          "COMPLETED"
+        ]
+      },
+      {
+        "channels": [
+          9
+        ],
+        "state": "SUCCEEDED",
+        "phases": [
+          "COMPLETED"
+        ]
+      }
+    ],
+    "artifact": "artifacts/rescue-2026-native-flight-20261105-r7"
+  },
+  "cleanup": {
+    "state": "FINISHED",
+    "result": "COMPLETE",
+    "credentials_removed": true,
+    "ports_released": true,
+    "entity_removed": true
+  },
+  "final_independent_gazebo_position": {
+    "x": -0.006213968054984764,
+    "y": 0.005577812391473283,
+    "z": 0.19499978701495407
+  },
+  "final_armed": false,
+  "limits": [
+    "No bucket impact/hit-rate validation",
+    "No hardware control or physical camera calibration qualification",
+    "No RKNN/server inference or extra MAVLink writer"
+  ]
+}

@@ -90,7 +90,17 @@ class SceneRegistry:
     def generate(self, scene_id, output_path, *, seed=0, parameters=None):
         scene=self.get(scene_id)
         self.validate(scene_id,seed=seed,parameters=parameters)
-        if scene_id in self._scenes:return generate_world(scene,output_path,seed=seed,parameters=parameters)
+        if scene_id in self._scenes:
+            if scene.get('layout') == 'cuadc2026':
+                # A versioned, vehicle-free derivative of the supplied rescue
+                # field. Keep this out of the procedural random-world builder.
+                tree = ET.parse(self.root/'simulation/worlds/cuadc2026_rescue_scene.sdf')
+                tree.find('world').set('name', 'vaf_'+scene_id.lower())
+                destination = Path(output_path)
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                tree.write(destination, encoding='utf-8', xml_declaration=True)
+                return destination
+            return generate_world(scene,output_path,seed=seed,parameters=parameters)
         if scene_id.startswith('U_'):
             path=self.assets.world_path(scene_id[2:]);context=self.assets.dependency_context()
         else:
