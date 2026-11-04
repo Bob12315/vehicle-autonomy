@@ -41,7 +41,9 @@ class RescueTests(unittest.TestCase):
         migrated=world.find("model[@name='cuadc2026_field']")
         for name in ['drop_bucket_1','drop_bucket_2','drop_bucket_3','recon_target_5']:
             a=source.find("link[@name='"+name+"']");b=migrated.find("link[@name='"+name+"']")
-            self.assertIsNotNone(a,name);self.assertEqual(ET.tostring(a),ET.tostring(b))
+            self.assertIsNotNone(a,name)
+            self.assertEqual(ET.canonicalize(ET.tostring(a,encoding='unicode'),strip_text=True),
+                ET.canonicalize(ET.tostring(b,encoding='unicode'),strip_text=True))
         r=WorldSpawnRegistry();definition=dict(id='fixture',family='copter',radius=.5,clearance_z=.195,height=.4)
         self.assertEqual(r.validate('CUADC2026',definition)['heading_deg'],90)
         with self.assertRaises(ValueError):r.validate('CUADC2026',definition,{'x':0,'y':32.5,'z':.195,'heading_deg':90})

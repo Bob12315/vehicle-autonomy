@@ -20,7 +20,8 @@
     "Source ownership/licenses not inferred; upstream Iris meshes remain external."
   ],
   "adapted_files": {
-    "simulation/models/gimbal_cuadc2026_fixed_down/model.sdf": "68fa02d8ea41be480af0ce1bbab698ba368173dfbeaacda4b1eaeadeab0a7f0b"
+    "simulation/models/gimbal_cuadc2026_fixed_down/model.sdf": "70993650cb39865ac979078cce5182a58ab2878bc93e5f0f6871691cd3e212a8",
+    "simulation/models/iris_cuadc2026_fixed_down_camera/model.sdf": "cc15c8c38eadb313a7df2e23c66c79de39087c7936f39882a15eea66a5735784"
   },
   "external_meshes": {
     "plugin:models/gimbal_small_3d/meshes/base_plate.dae": "a657c60d7a35202d67c450a11211d757d423fbce4e03df8e14d03e69702a2b5b",
@@ -29,7 +30,7 @@
     "plugin:models/gimbal_small_3d/meshes/yaw_arm.dae": "139726d4d8e43bcd1778538d684e2edcab6812f262fdd0835c2a7c7947006ed5"
   },
   "derived_files": {
-    "simulation/worlds/cuadc2026_rescue_scene.sdf": "d85c30d6a1d40807031ff828529b00345d0bf7172e3fd7cd427a961a9b623e9b"
+    "simulation/worlds/cuadc2026_rescue_scene.sdf": "2fea59ce67f72147627bde5a0430637476734535269713c993f5c8822d45e1d3"
   },
   "original_rknn_reference": {
     "filename": "gazebo_dataset-fp16.rknn",
