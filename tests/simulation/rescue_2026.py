@@ -10,10 +10,10 @@ from vehicle_autonomy.app.scenarios.cuadc.rescue import template
 from vehicle_autonomy.contracts.core.serialization import to_json_value
 
 
-def run(directory,*,flight=False,landing_only=False):
+def run(directory,*,flight=False,landing_only=False,record_comparison=False):
     directory=Path(directory).resolve();directory.mkdir(mode=0o700,parents=True,exist_ok=False)
     result={'status':'FAIL','flight_requested':flight};app=MissionControl({},directory/'application',simulation_allow_send=flight)
-    identifier=None
+    identifier=None;recorder=None
     try:
         manager=app.simulation_manager
         record=manager.create(dict(scene_id='CUADC2026',vehicles=[dict(kind='copter_rescue')],parameters={}))
@@ -52,6 +52,10 @@ def run(directory,*,flight=False,landing_only=False):
         compiled=app.studio.compile(definition)
         result['compiled_nodes']=len(compiled.to_dict()['nodes'])
         if flight:
+            if record_comparison:
+                from vehicle_autonomy.app.simulation.comparison_recording import CameraComparisonRecorder
+                recorder=CameraComparisonRecorder(directory/'camera-comparison',child.camera_sources['gimbal-camera'],
+                    child.camera_sources['stabilized'],binding=dict(target=child.target,world=owner.world,session=identifier))
             from vehicle_autonomy.app.bootstrap.mission_binding import live_instance
             with app._control_lock:
                 item=app.studio.library.save(definition,0)
@@ -67,6 +71,7 @@ def run(directory,*,flight=False,landing_only=False):
                 current=dict(state=view['state'],actions=app.runtime.views(),
                     pose=None if world is None or world.localization is None else to_json_value(world.localization.pose),
                     objects=[] if world is None else to_json_value(world.objects))
+                if recorder:recorder.update_phase(view['state'],current['actions'])
                 from vehicle_autonomy.world.mapping.grid import atomic_json
                 atomic_json(directory/'latest.json',current)
                 preview=child.camera_sources['yolo']
@@ -100,6 +105,11 @@ def run(directory,*,flight=False,landing_only=False):
         result['error']=type(exc).__name__+': '+str(exc);traceback.print_exc()
     finally:
         result['actions']=app.runtime.views()
+        if recorder:
+            try:
+                time.sleep(.5)
+                result['camera_recording']=recorder.close()
+            except Exception as exc:result.update(status='FAIL',recording_error=str(exc))
         try:app.close()
         except Exception as exc:result['status']='FAIL';result['cleanup_error']=str(exc)
         (directory/'result.json').write_text(json.dumps(result,ensure_ascii=False,indent=2,default=str)+'\n')
@@ -108,5 +118,6 @@ def run(directory,*,flight=False,landing_only=False):
 
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser();p.add_argument('directory',type=Path);p.add_argument('--flight',action='store_true');p.add_argument('--landing-only',action='store_true');args=p.parse_args()
-    raise SystemExit(0 if run(args.directory,flight=args.flight,landing_only=args.landing_only)['status']=='PASS' else 1)
+    p=argparse.ArgumentParser();p.add_argument('directory',type=Path);p.add_argument('--flight',action='store_true');p.add_argument('--landing-only',action='store_true');p.add_argument('--record-camera-comparison',action='store_true');args=p.parse_args()
+    if args.record_camera_comparison and not args.flight:p.error('comparison recording requires the explicit owned simulation --flight run')
+    raise SystemExit(0 if run(args.directory,flight=args.flight,landing_only=args.landing_only,record_comparison=args.record_camera_comparison)['status']=='PASS' else 1)

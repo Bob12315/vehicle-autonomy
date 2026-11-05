@@ -73,12 +73,30 @@ domain 固定。源时间回退或会话变化要求新的自有传感器实例�
 python -m unittest discover -s tests -v
 python -m tests.simulation.yolo_preview artifacts/new-nadir-preview
 python -m tests.simulation.rescue_2026 artifacts/new-nadir-rescue --flight
+python -m tests.simulation.rescue_2026 artifacts/new-nadir-recording --flight --record-camera-comparison
 ```
 
 最后一个入口仅对新建的自有 loopback 仿真授权任务 SEND。
 单元测试验证组合倾斜/转向时原始与虚拟像素射线的世界交点一致、航向跨 ±π 插值、
 原图不变、有效区域、源时钟/会话及失效清理。实际原生结果独立记录，不能用这些
 软件几何夹具代替飞行验收。
+
+显式 `--record-camera-comparison` 在完整任务开始前启动只读观察器，保存原始 JPEG、
+实际发布的增稳 JPEG、原捕获时间、任务阶段及逐帧索引。两侧必须具有相同 source、
+sequence、capture clock、capture ns 和原始 receive ns；不匹配会使录制失败。
+观察器只关闭自己的线程和文件，不启动推理、不改变感知输入，也不关闭车辆相机。
+导出位于该次测试目录的 `camera-comparison/`，不作为正常启动的软件输入。
+视频可在仿真结束后离线合成，避免编码负载影响控制；缺少增稳输出的原帧须明确
+标为不可用，不能用旧增稳图像冒充。这是同次飞行的处理前后对比，不是两次独立
+开关增稳后的任务成功率比较。
+
+2026-11-05 完整录制位于 `artifacts/rescue-video-comparison-20261105-r1/`：
+35 个 Action 全部成功，原始 3395 帧、严格同帧配对的增稳输出 2920 帧，
+录制无错误，自有仿真清理 COMPLETE。导出的 `rescue-nadir-comparison-full.mp4`
+为 1280×640 H.264，349.1 秒，保持完整仿真捕获时间线并追加 3 秒完成卡；
+`rescue-nadir-comparison-4x.mp4` 为约 87.27 秒的四倍速预览。
+无合格增稳输出的时刻明确标注，背景仅显示变暗的同帧原图，不用旧增稳帧补齐。
+两份文件均已完整解码检查，录制扩展全量回归为 1022 项通过 / 145.668 秒。
 
 ## 本机结果（2026-11-05）
 
