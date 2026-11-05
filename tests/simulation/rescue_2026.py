@@ -60,7 +60,7 @@ def run(directory,*,flight=False,landing_only=False):
                 started=app.studio.handle('studio-b.run.start',dict(publication=definition['mission_id']+'@1.0.0',
                     definition_hash=publication['definition_hash'],binding=live_instance(app,child.target),allow_send=True))
             result['mission_start']=started
-            until=time.monotonic()+1500
+            until=time.monotonic()+1500;preview_frames=[];saved=set()
             while time.monotonic()<until:
                 view=app.missions.view(started['id'])
                 world=driver.snapshot()
@@ -69,11 +69,32 @@ def run(directory,*,flight=False,landing_only=False):
                     objects=[] if world is None else to_json_value(world.objects))
                 from vehicle_autonomy.world.mapping.grid import atomic_json
                 atomic_json(directory/'latest.json',current)
+                preview=child.camera_sources['yolo']
+                if preview.health()['online']:
+                    try:metadata,jpeg=preview.packet()
+                    except (OSError,ValueError):pass
+                    else:
+                        if not preview_frames or preview_frames[-1]['sequence']!=metadata['sequence']:
+                            preview_frames.append(metadata)
+                            # Use the actual drop-region view as bucket image
+                            # evidence; the model can mislabel the small home H.
+                            labels={d['label'] for d in metadata['detections']
+                                if d['label']=='bucket' and metadata['rectification']['origin_enu'][1]>25
+                                or d['label']=='H' and d['detector']=='h_marker'}
+                            for label in labels:
+                                if label not in saved:
+                                    (directory/('annotated-'+label+'.jpg')).write_bytes(jpeg);saved.add(label)
+                            atomic_json(directory/'nadir-frames.json',preview_frames)
                 if view['state'] in ('SUCCEEDED','FAILED','UNKNOWN','CANCELLED','TIMED_OUT'):
                     result['mission']=view;break
                 time.sleep(.5)
             else:raise TimeoutError('rescue mission native deadline')
             if result['mission']['state']!='SUCCEEDED':raise AssertionError('native mission '+result['mission']['state']+': '+str(result['mission'].get('error')))
+            result['nadir_preview']=dict(frames=len(preview_frames),labels=sorted(saved),
+                reference_ids=sorted({f['rectification']['reference_id'] for f in preview_frames}),
+                minimum_attitude_rate_hz=min(f['rectification']['attitude_rate_hz'] for f in preview_frames),
+                minimum_valid_fraction=min(f['rectification']['valid_fraction'] for f in preview_frames))
+            assert {'bucket','H'}<=saved and len(result['nadir_preview']['reference_ids'])==1,result['nadir_preview']
         result['status']='PASS'
     except Exception as exc:
         result['error']=type(exc).__name__+': '+str(exc);traceback.print_exc()

@@ -2,7 +2,7 @@
 from vehicle_autonomy.world.sensors.camera.packet import encode
 
 
-def annotated_packet(image,metadata,detections,names,*,epoch,world_generation,model_sha256,captured_host_ns,started_ns,completed_ns):
+def annotated_packet(image,metadata,detections,names,*,epoch,world_generation,model_sha256,captured_host_ns,started_ns,completed_ns,rectification=None):
     import cv2
     frame=image.copy();objects=[]
     for detection,backend in detections:
@@ -17,7 +17,7 @@ def annotated_packet(image,metadata,detections,names,*,epoch,world_generation,mo
         cv2.putText(frame,title,(max(0,left),baseline),cv2.FONT_HERSHEY_SIMPLEX,.5,color,1,cv2.LINE_AA)
         objects.append(dict(label=label,confidence=detection.confidence,detector=backend,xyxy=list(detection.xyxy)))
     cv2.rectangle(frame,(0,0),(frame.shape[1]-1,28),(25,30,35),-1)
-    banner='YOLO | '+str(sum(backend=='pt' for _,backend in detections))+' detections'
+    banner=('YOLO NADIR' if rectification else 'YOLO')+' | '+str(sum(backend=='pt' for _,backend in detections))+' detections'
     banner+=' | '+str(round((completed_ns-started_ns)/1e6))+' ms'
     cv2.putText(frame,banner,(8,20),cv2.FONT_HERSHEY_SIMPLEX,.5,(240,245,240),1,cv2.LINE_AA)
     ok,jpeg=cv2.imencode('.jpg',frame,[cv2.IMWRITE_JPEG_QUALITY,85])
@@ -27,5 +27,8 @@ def annotated_packet(image,metadata,detections,names,*,epoch,world_generation,mo
         inference_started_ns=started_ns,inference_completed_ns=completed_ns,
         model_sha256=model_sha256,detector_epoch=epoch,world_generation=world_generation,
         detections=objects,frame_role='annotated_inference')
+    if rectification:
+        header.update(display_name='YOLO 识别画面（增稳）',image_domain='virtual_nadir',rectification=rectification,
+            original_frame=metadata.get('frame'),frame='virtual_nadir_optical',spatial_calibration=rectification['calibration_id'])
     # received_ns remains the original camera receipt, never the new JPEG time.
     return encode(header,jpeg.tobytes())

@@ -78,5 +78,21 @@ class YoloPreviewTests(unittest.TestCase):
         self.assertFalse(self.source.health()['online']);self.assertFalse(self.raw.closed)
         with self.assertRaises(ValueError):self.source.packet()
 
+    def test_virtual_domain_reference_and_live_synchronization_are_required(self):
+        self.source=DetectionPreviewSource(self.directory.name,self.raw,lambda:self.world,lambda:self.worker,
+            model_sha256='pinned-model',source='owned-camera-topic',image_domain='virtual_nadir')
+        self.worker['stabilization']=dict(valid=True,reference_id='reference')
+        self.header.update(image_domain='virtual_nadir',rectification=dict(valid=True,reference_id='reference'))
+        self.write();self.assertTrue(self.source.health()['online'])
+        self.worker['stabilization']['valid']=False
+        with self.assertRaises(ValueError):self.source.packet()
+        self.worker['stabilization']['valid']=True;self.header['image_domain']='raw';self.write()
+        with self.assertRaises(ValueError):self.source.packet()
+        self.header['image_domain']='virtual_nadir';self.header['rectification']['reference_id']='changed';self.write()
+        with self.assertRaises(ValueError):self.source.packet()
+        self.header['rectification']=[];self.write()
+        self.assertFalse(self.source.health()['online'])
+        with self.assertRaises(ValueError):self.source.packet()
+
 
 if __name__=='__main__':unittest.main()

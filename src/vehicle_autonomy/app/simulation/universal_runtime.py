@@ -170,7 +170,12 @@ class VehicleInstance:
             original=self.camera_sources['gimbal-camera']
             self.camera_sources['yolo']=DetectionPreviewSource(self.directory/'rescue-inference',original,
                 self.driver.snapshot,lambda:self.driver.info().get('rescue_perception'),
-                model_sha256=profile['model_sha256'],source=f'/vaf/camera/{o.world}/{entity}/gimbal-camera/image')
+                model_sha256=profile['model_sha256'],source=f'/vaf/camera/{o.world}/{entity}/gimbal-camera/image',
+                display_name='YOLO 识别画面（增稳）',image_domain='virtual_nadir')
+            self.camera_sources['stabilized']=DetectionPreviewSource(self.directory/'rescue-inference',original,
+                self.driver.snapshot,lambda:self.driver.info().get('rescue_perception'),
+                model_sha256=profile['model_sha256'],source=f'/vaf/camera/{o.world}/{entity}/gimbal-camera/image',
+                kind='stabilized',filename='stabilized.packet',display_name='增稳画面',image_domain='virtual_nadir')
         self.session.manifest['camera_assembly'] = self.camera_assembly
         self.session.manifest['ready']=True
         self.session.save()

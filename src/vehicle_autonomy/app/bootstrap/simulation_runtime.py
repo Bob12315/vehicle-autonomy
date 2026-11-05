@@ -157,6 +157,10 @@ class SimulationRuntime:
         """Read-only normalized AP diagnostics, available with SEND disabled."""
         return None if self._session is None else self._session.telemetry_snapshot(self.clock())
 
+    def motion_history(self):
+        """Read every qualified source sample, including batches in one RX poll."""
+        return None if self._session is None else self._session.motion_history()
+
     def link_snapshot(self):
         return None if self._session is None else self._session.link_snapshot(self.clock())
 

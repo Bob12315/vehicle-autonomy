@@ -12,6 +12,13 @@
   "device": "0",
   "confidence": 0.3,
   "iou": 0.45,
+  "virtual_nadir": {
+    "calibration_id": "cuadc2026-fixed-down-v1",
+    "yaw_reference_mode": "lock_on_start",
+    "max_sample_distance_ms": 125,
+    "max_bracket_span_ms": 150,
+    "min_attitude_rate_hz": 8
+  },
   "training": {
     "architecture": "yolo11n",
     "ultralytics": "8.3.163",

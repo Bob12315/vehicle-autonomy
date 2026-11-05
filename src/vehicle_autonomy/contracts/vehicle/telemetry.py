@@ -12,6 +12,7 @@ from vehicle_autonomy.contracts.core.geometry import GeoPoint, Quaternion, Vecto
 from vehicle_autonomy.contracts.core.primitives import LinkSessionId
 from vehicle_autonomy.contracts.core.quality import QualityState
 from vehicle_autonomy.contracts.core.time import TimePoint
+from vehicle_autonomy.contracts.core.stamped import Stamped
 
 
 class TelemetryAvailability(str, Enum):
@@ -121,3 +122,11 @@ class VehicleTelemetrySnapshot:
 
     def field(self, message_type: str) -> TelemetryField:
         return next(item for item in self.fields if item.message_type == message_type)
+
+
+@dataclass(frozen=True,slots=True)
+class MotionTelemetryHistory:
+    """Qualified original source samples; no publication-time pose synthesis."""
+    link_session_id: LinkSessionId
+    positions: tuple[Stamped[Vector3], ...]
+    attitudes: tuple[Stamped[Quaternion], ...]

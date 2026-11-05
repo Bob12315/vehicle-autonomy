@@ -113,3 +113,24 @@ class Phase1TelemetryTests(unittest.TestCase):
         fresh = self.adapter('session-b').telemetry_snapshot(at(20))
         self.assertEqual(fresh.link_session_id, 'session-b')
         self.assertTrue(all(f.availability is A.MISSING for f in fresh.fields))
+
+    def test_motion_history_keeps_each_qualified_sample_in_a_receive_batch(self):
+        state=self.adapter()
+        for i in range(132):
+            stamp=10+i*2
+            state.ingest(Message('ATTITUDE',roll=0.,pitch=0.,yaw=i*.001,rollspeed=0.,pitchspeed=0.,yawspeed=0.),
+                captured_at=at(stamp),received_at=at(stamp+1))
+            state.ingest(Message('LOCAL_POSITION_NED',x=float(i),y=2.,z=-3.,vx=0.,vy=0.,vz=0.),
+                captured_at=at(stamp),received_at=at(stamp+1))
+        history=state.motion_history()
+        self.assertEqual(history.link_session_id,'session-a')
+        self.assertEqual(len(history.positions),128);self.assertEqual(len(history.attitudes),128)
+        self.assertEqual(history.positions[0].captured_at,at(18))
+        self.assertEqual(history.positions[-1].value.y,131.)
+        self.assertFalse(state.ingest(Message('ATTITUDE',roll=1.,pitch=1.,yaw=1.,rollspeed=0.,pitchspeed=0.,yawspeed=0.),
+            captured_at=at(272),received_at=at(280)))
+        self.assertEqual(state.motion_history(),history)
+        # Publishing/querying cannot append synthesized attitude samples.
+        state.publish(at(281));state.telemetry_snapshot(at(282))
+        self.assertEqual(state.motion_history(),history)
+        self.assertFalse(self.adapter('new-session').motion_history().attitudes)

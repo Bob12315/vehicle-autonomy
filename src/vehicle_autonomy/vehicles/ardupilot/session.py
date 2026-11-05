@@ -284,6 +284,9 @@ class ArduPilotSession:
         """Current diagnostic ages; never refreshes the control state timestamp."""
         return None if self._state is None else self._state.telemetry_snapshot(at_time)
 
+    def motion_history(self):
+        return None if self._state is None else self._state.motion_history()
+
     def link_snapshot(self, at_time: TimePoint):
         return None if self._state is None else self._state.link_snapshot(at_time)
 

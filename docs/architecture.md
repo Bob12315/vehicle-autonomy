@@ -2,6 +2,16 @@
 
 ## Explicit CUADC2026 rescue simulation and local PT perception (2026-11-05)
 
+The fixed-down rescue camera now has an owned virtual-nadir processing stage in
+`world.sensors.camera`. Qualified source position/attitude histories bracket each
+original image capture, using linear/SLERP interpolation without extrapolation.
+The existing inference worker renders stabilized and annotated views with a fixed
+initial yaw reference. Detection projection uses virtual optical orientation and
+the real translated camera center; body tilt is not applied twice. Synchronization
+faults invalidate prior observations and payload evidence. This is a vehicle-scoped
+sensor service, not a newly implemented CameraStabilize Action or physical gimbal.
+Calibration, timing and native limits are in the [virtual camera guide](VIRTUAL_NADIR_CAMERA.md).
+
 Vehicle Control's display-source selector includes an annotated YOLO view for
 owned `copter_rescue` instances. The existing PT worker renders its exact input
 and detections after publishing perception; a read-only camera adapter preserves

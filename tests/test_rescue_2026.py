@@ -110,12 +110,14 @@ class RescueTests(unittest.TestCase):
     def test_detector_exchange_rejects_retiming_wrong_epoch_and_bad_pixel_geometry(self):
         from copy import deepcopy
         from vehicle_autonomy.app.bootstrap.rescue_runtime import validate_result
-        value=dict(schema=1,worker_epoch='a'*32,world_generation='world',camera_source='/owned/camera',sequence=1,
+        value=dict(schema=2,worker_epoch='a'*32,world_generation='world',camera_source='/owned/camera',sequence=1,
+            image_domain='virtual_nadir',calibration_id='cuadc2026-fixed-down-v1',reference_id='d'*32,
             captured_ns=1_000_000_000,received_ns=1_100_000_000,model_sha256='b'*64,backend='ultralytics_pt',marker_backend='yellow_disc_h_shape_v1',error=None,
             objects=[dict(id='target-1',label='bucket',position=[0.,32.5,.105],confidence=.9,xyxy=[310.,230.,330.,250.],detector='pt')])
         arguments=dict(digest='b'*64,topic='/owned/camera',generation='world',now_ns=1_200_000_000)
         self.assertEqual(len(validate_result(value,**arguments)),1)
-        for changes in ({'captured_ns':2_000_000_000},{'world_generation':'other'},{'camera_source':'/other'},{'model_sha256':'c'*64},{'sequence':True}):
+        for changes in ({'captured_ns':2_000_000_000},{'world_generation':'other'},{'camera_source':'/other'},{'model_sha256':'c'*64},{'sequence':True},
+                {'image_domain':'raw'},{'calibration_id':'physical-camera'},{'reference_id':''}):
             with self.assertRaises(ValueError):validate_result(dict(value,**changes),**arguments)
         bad=deepcopy(value);bad['objects'][0]['xyxy'][2]=999.
         with self.assertRaises(ValueError):validate_result(bad,**arguments)
@@ -150,3 +152,27 @@ class RescueTests(unittest.TestCase):
         cv2.rectangle(near,(60,0),(160,479),(15,15,15),-1);cv2.rectangle(near,(480,0),(580,479),(15,15,15),-1)
         cv2.rectangle(near,(60,190),(580,290),(15,15,15),-1)
         self.assertEqual(len(detect_h(near)),1)
+
+    def test_sync_fault_invalidates_existing_world_observations_without_retiming(self):
+        from collections import deque
+        from vehicle_autonomy.app.bootstrap.rescue_runtime import RescueRuntime
+        from vehicle_autonomy.contracts.sensor import Observation,DetectedObject
+        from vehicle_autonomy.world.sensors.camera.motion import MotionHistory
+        now=self.world.published_at
+        observed=Observation('obs',self.world.schema_version,'vision.pt:test',1,now,now,QualityState.VALID,
+            DetectedObject('target-1','bucket',Vector3(0,32.5,.105),.9),'odom')
+        published=[];runtime=RescueRuntime.__new__(RescueRuntime)
+        with tempfile.TemporaryDirectory() as directory:
+            runtime.root=Path(directory)
+            (runtime.root/'health.json').write_text(json.dumps(dict(published_ns=now.monotonic_ns,rectification_valid=False,error='attitude gap')))
+            runtime.runtime=SimpleNamespace(world_snapshot=lambda:self.world,clock=lambda:now,telemetry_snapshot=lambda:None,motion_history=lambda:None,
+                ingest_observation=published.append)
+            runtime.motion=MotionHistory();runtime.active={('vision.pt:test','target-1'):observed}
+            runtime.observations=deque([(observed,self.world.version.generation_id,self.world.environment)])
+            runtime.sequence=1;runtime.stabilization=dict(valid=True)
+            runtime.port=SimpleNamespace(poll=lambda _:());runtime.execution=SimpleNamespace(tick=lambda _:None)
+            runtime.poll()
+        self.assertEqual(len(published),1);self.assertEqual(published[0].quality,QualityState.INVALID)
+        self.assertEqual(published[0].captured_at,observed.captured_at)
+        self.assertEqual(published[0].data,observed.data);self.assertGreater(published[0].sequence,observed.sequence)
+        self.assertFalse(runtime.observations);self.assertFalse(runtime.active);self.assertFalse(runtime.stabilization['valid'])

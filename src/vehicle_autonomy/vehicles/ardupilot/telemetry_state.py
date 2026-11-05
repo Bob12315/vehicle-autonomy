@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from threading import Lock
+from collections import deque
 
 from vehicle_autonomy.contracts.core.geometry import FrameId, GeoPoint, Pose3, Quaternion, Twist3, Vector3
 from vehicle_autonomy.contracts.core.primitives import LinkSessionId, ResourceVersion, SchemaVersion, VehicleId
@@ -73,6 +74,7 @@ class ArduPilotTelemetryState:
                                         source_system=source_system, source_component=source_component,
                                         max_age_ns=max_field_age_ns, frame_id=str(self._frame))
         self._source_captures: dict[str, TimePoint] = {}
+        self._positions=deque(maxlen=128);self._attitudes=deque(maxlen=128)
 
     def ingest(self, message: object, *, captured_at: TimePoint, received_at: TimePoint) -> bool:
         if not isinstance(captured_at, TimePoint) or not isinstance(received_at, TimePoint):
@@ -109,12 +111,14 @@ class ArduPilotTelemetryState:
                     _ned_to_enu(fact.velocity_north_mps, fact.velocity_east_mps, fact.velocity_down_mps),
                     captured_at,
                 )
+                self._positions.append(Stamped(self._frame,captured_at,self._position[0]))
             elif isinstance(fact, AttitudeFrdNed):
                 self._attitude = (
                     _euler_frd_ned_to_flu_enu(fact.roll_rad, fact.pitch_rad, fact.yaw_rad),
                     Vector3(fact.roll_rate_rad_s, -fact.pitch_rate_rad_s, -fact.yaw_rate_rad_s),
                     captured_at,
                 )
+                self._attitudes.append(Stamped(self._frame,captured_at,self._attitude[0]))
             elif isinstance(fact, GlobalPositionInt):
                 self._global = (GeoPoint(fact.latitude_e7 / 1e7, fact.longitude_e7 / 1e7,
                                          fact.altitude_mm / 1000), captured_at)
@@ -152,6 +156,11 @@ class ArduPilotTelemetryState:
     def telemetry_snapshot(self, at_time: TimePoint):
         with self._lock:
             return self._monitor.publish(at_time)
+
+    def motion_history(self):
+        from vehicle_autonomy.contracts.vehicle.telemetry import MotionTelemetryHistory
+        with self._lock:
+            return MotionTelemetryHistory(self._link_session,tuple(self._positions),tuple(self._attitudes))
 
     def local_reference(self):
         """No geodetic origin is retained by the generic LOCAL_POSITION_NED adapter."""

@@ -18,7 +18,7 @@
    const b=health.binding;$('camera-identity').textContent=`${health.camera_id} · target ${b.target} · ${b.world} / ${b.session} · epoch ${b.epoch}`;
    $('camera-state').textContent=health.online?'实时 · '+(health.kind==='recording'?'录像来源':'在线'):health.state+' · '+(health.reason||'不可用');
    const age=health.age_ns===null?'未知':(health.age_ns/1e6).toFixed(0)+' ms';
-   $('camera-health').textContent=`第 ${health.sequence||'—'} 帧 · 接收 ${health.received_utc_ns?new Date(health.received_utc_ns/1e6).toLocaleTimeString():'未知'} · ${health.width||'—'} × ${health.height||'—'} · ${health.kind==='yolo'?'相机 ':''}${(health.fps||0).toFixed(1)} FPS · 延迟（主机帧年龄）${age}`;
+   $('camera-health').textContent=`第 ${health.sequence||'—'} 帧 · 接收 ${health.received_utc_ns?new Date(health.received_utc_ns/1e6).toLocaleTimeString():'未知'} · ${health.width||'—'} × ${health.height||'—'} · ${['yolo','stabilized'].includes(health.kind)?'相机 ':''}${(health.fps||0).toFixed(1)} FPS · 延迟（主机帧年龄）${age}`;
    $('camera-source-info').textContent=(health.source||'')+' · '+(health.capture_clock||'采样时间未知');
    if(health.online){if(streaming&&performance.now()-streamStarted>55000)clear('更新视频连接');start();}else clear('画面不可用：'+(health.reason||'数据过期'));
   }catch(e){if(expected===target&&version===generation){health=null;clear('无法获取视频：'+e.message);$('camera-state').textContent='连接失败';}}

@@ -9,16 +9,21 @@ from vehicle_autonomy.contracts.core.geometry import Vector3
 from vehicle_autonomy.world.transform.tree import rotate_vector
 
 
-def project(detection,pose,label,width=640,height=480):
+def project(detection,pose,label,width=640,height=480,*,virtual_camera=None):
     if (width,height)!=(640,480) or label not in ('bucket','H'):raise ValueError('fixed rescue optical calibration required')
     x0,y0,x1,y1=detection.xyxy
     if not 0<=x0<x1<=width or not 0<=y0<y1<=height:raise ValueError('box outside calibrated image')
     fx=width/(2*math.tan(1.0));fy=fx
     u=(x0+x1)/2;v=(y0+y1)/2
     q=pose.orientation;p=pose.position
-    offset=rotate_vector(q,Vector3(0,-.01,-.124923))
-    origin=Vector3(p.x+offset.x,p.y+offset.y,p.z+offset.z)
-    ray=rotate_vector(q,Vector3(-(v-height/2)/fy,-(u-width/2)/fx,-1))
+    if virtual_camera is None:
+        offset=rotate_vector(q,Vector3(0,-.01,-.124923))
+        origin=Vector3(p.x+offset.x,p.y+offset.y,p.z+offset.z)
+        ray=rotate_vector(q,Vector3(-(v-height/2)/fy,-(u-width/2)/fx,-1))
+    else:
+        # Rectified pixels use virtual optical orientation, but retain the real
+        # camera's translated optical center. Do not rotate them by body tilt again.
+        origin=virtual_camera.origin;ray=virtual_camera.ray(u,v)
     # AP local odom is zero at the base's 0.195 m ground spawn. Express the
     # supplied 0.30 m tube rim / ground H plane in that same odom frame.
     plane=(.3 if label=='bucket' else 0)-.195

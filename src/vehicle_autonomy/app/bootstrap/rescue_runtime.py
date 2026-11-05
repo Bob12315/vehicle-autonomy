@@ -18,14 +18,18 @@ from vehicle_autonomy.contracts.core.geometry import Vector3
 from vehicle_autonomy.contracts.sensor import Observation,DetectedObject
 from vehicle_autonomy.engine.control.payload_execution import PayloadExecution,PayloadSafetyPolicy
 from vehicle_autonomy.world.mapping.grid import atomic_json
+from vehicle_autonomy.world.sensors.camera.motion import MotionHistory
+from vehicle_autonomy.world.sensors.camera.virtual_nadir import CALIBRATION_ID,validate_config
 
 
 def validate_result(value,*,digest,topic,generation,now_ns):
-    fields={'schema','worker_epoch','world_generation','camera_source','sequence','captured_ns','received_ns','model_sha256','backend','marker_backend','objects','error'}
-    if type(value) is not dict or set(value)!=fields or type(value['schema']) is not int or value['schema']!=1:
+    fields={'schema','worker_epoch','world_generation','camera_source','sequence','captured_ns','received_ns','model_sha256','backend','marker_backend','objects','error','image_domain','calibration_id','reference_id'}
+    if type(value) is not dict or set(value)!=fields or type(value['schema']) is not int or value['schema']!=2:
         raise ValueError('strict rescue detection envelope required')
     if (value['model_sha256']!=digest or value['camera_source']!=topic or value['world_generation']!=generation
             or value['backend']!='ultralytics_pt' or value['marker_backend']!='yellow_disc_h_shape_v1' or value['error'] is not None
+            or value['image_domain']!='virtual_nadir' or value['calibration_id']!=CALIBRATION_ID
+            or not isinstance(value['reference_id'],str) or re.fullmatch('[0-9a-f]{32}',value['reference_id']) is None
             or not isinstance(value['worker_epoch'],str) or re.fullmatch('[0-9a-f]{32}',value['worker_epoch']) is None):
         raise ValueError('rescue detector provenance mismatch')
     if (any(type(value[k]) is not int for k in ('sequence','captured_ns','received_ns')) or value['sequence']<1
@@ -65,17 +69,19 @@ class RescueRuntime:
         profile=json.loads((resource_root()/'configs/perception/rescue_2026_pt.json').read_text())
         if profile['schema']!=1 or profile['classes']!=['bucket','H'] or profile['imgsz']!=640 or profile['marker_backend']!='yellow_disc_h_shape_v1':
             raise ValueError('reviewed bucket/H 640-pixel detector profile required')
+        nadir=validate_config(profile['virtual_nadir'])
         host=HostEnvironment();python=host.path('vision_python');model=host.path('rescue_model')
         if python is None or not python.is_file() or model is None or not model.is_file():raise ValueError('configure local vision_python and rescue_model through HostEnvironment')
         host.verify(model);self.digest=hashlib.sha256(model.read_bytes()).hexdigest()
         if self.digest!=profile['model_sha256']:raise ValueError('rescue model differs from the trained versioned detector profile')
         self.root=ownership.path.parent/'rescue-inference';self.root.mkdir(mode=0o700)
         self.runtime=runtime;self.ownership=ownership;self.last=0;self.sequence=0;self.worker_epoch=None;self.last_pose=0
-        self.observations=deque(maxlen=256)
+        self.observations=deque(maxlen=256);self.motion=MotionHistory();self.active={};self.reference_id=None
+        self.stabilization=dict(valid=False,reason='waiting for synchronized camera motion')
         self.latest_capture=None;self.latest_count=0;self.last_error='waiting for PT inference'
         self.topic=f'/vaf/camera/{ownership.world}/{ownership.model}/gimbal-camera/image'
         self.config=dict(model_path=str(model),model_sha256=self.digest,device=profile['device'],confidence=profile['confidence'],iou=profile['iou'],camera_topic=self.topic,
-            camera_packet=str(ownership.path.parent/'camera-gimbal-camera/latest.packet'))
+            camera_packet=str(ownership.path.parent/'camera-gimbal-camera/latest.packet'),virtual_nadir=nadir)
         atomic_json(self.root/'config.json',self.config)
         env=host.process_environment();env['PYTHONPATH']=str(Path(package_file).resolve().parent.parent)
         env['YOLO_CONFIG_DIR']=str(self.root/'ultralytics')
@@ -90,6 +96,7 @@ class RescueRuntime:
             max_alignment_m=.3,max_speed_mps=.08,min_release_height_m=.5,max_release_height_m=1.5),runtime._world,
             observation_validator=self.known_observation)
     def known_observation(self,effect,now):
+        if not self.stabilization.get('valid') or self.last_error is not None:return False
         world=self.runtime.world_snapshot()
         if world is None or world.environment!=effect.environment:return False
         for observation,generation,environment in self.observations:
@@ -103,22 +110,31 @@ class RescueRuntime:
     def poll(self):
         world=self.runtime.world_snapshot();now=self.runtime.clock()
         if world is None:return
-        loc=world.localization
-        if (loc is not None and loc.quality is QualityState.VALID and world.vehicle is not None
-                and world.vehicle.health.quality is QualityState.VALID
-                and 0<=now.elapsed_ns_since(loc.pose.captured_at)<=1_000_000_000
-                and now.monotonic_ns-self.last_pose>=100_000_000):
-            p=loc.pose.value.position;q=loc.pose.value.orientation
-            atomic_json(self.root/'pose.json',dict(published_ns=now.monotonic_ns,captured_ns=loc.pose.captured_at.monotonic_ns,
-                world_generation=str(world.version.generation_id),position=[p.x,p.y,p.z],orientation=[q.x,q.y,q.z,q.w]))
-            self.last_pose=now.monotonic_ns
+        synchronized=False
         try:
+            telemetry=self.runtime.telemetry_snapshot()
+            if telemetry is not None and world.vehicle is not None and world.vehicle.health.quality is QualityState.VALID:
+                if self.motion.update(telemetry,world.version.generation_id,now.monotonic_ns,source_history=self.runtime.motion_history()):
+                    atomic_json(self.root/'pose.json',self.motion.envelope(now.monotonic_ns))
+            with (self.root/'health.json').open('rb') as stream:health=json.loads(stream.read(8193))
+            now=self.runtime.clock()
+            if type(health) is not dict:raise ValueError('invalid virtual camera health')
+            if (not 0<=now.monotonic_ns-health['published_ns']<=500_000_000
+                    or health.get('rectification_valid') is not True):
+                raise ValueError('virtual camera unavailable: '+str(health.get('error','stale motion'))[:120])
+            self.stabilization=dict(health.get('stabilization',{}),valid=True,reason=None)
+            synchronized=True
             path=self.root/'detections.json'
             with path.open('rb') as stream:raw=stream.read(65537)
             if len(raw)>65536:raise ValueError('detection result budget')
             d=json.loads(raw)
+            now=self.runtime.clock()
             if self.process.poll() is not None:raise ValueError('rescue detector stopped')
             entries=validate_result(d,digest=self.digest,topic=self.topic,generation=str(world.version.generation_id),now_ns=now.monotonic_ns)
+            if health.get('worker_epoch')!=d['worker_epoch'] or health.get('reference_id')!=d['reference_id']:
+                raise ValueError('rectification and inference identities differ')
+            if self.reference_id is not None and self.reference_id!=d['reference_id']:raise ValueError('virtual camera reference changed')
+            self.reference_id=d['reference_id']
             self.latest_capture=d['captured_ns'];self.latest_count=len(entries);self.last_error=None
             if self.worker_epoch is not None and self.worker_epoch!=d['worker_epoch']:raise ValueError('rescue detector epoch changed')
             self.worker_epoch=d['worker_epoch']
@@ -131,16 +147,26 @@ class RescueRuntime:
                         DetectedObject(item['id'],item['label'],point,item['confidence']),'odom')
                     self.runtime.ingest_observation(observation)
                     self.observations.append((observation,world.version.generation_id,world.environment))
+                    self.active[(producer,item['id'])]=observation
                 self.last=d['sequence']
         except (OSError,ValueError,KeyError,TypeError) as exc:
             self.last_error=(type(exc).__name__+': '+str(exc))[:180]
+            if not synchronized:self.stabilization=dict(valid=False,reason=self.last_error)
+            self.observations.clear()
+            for observation in self.active.values():
+                self.sequence+=1
+                self.runtime.ingest_observation(replace(observation,observation_id=str(observation.producer_id)+':'+str(self.sequence),
+                    sequence=self.sequence,received_at=now,quality=QualityState.INVALID))
+            self.active.clear()
+        self.active={k:v for k,v in self.active.items() if 0<=now.elapsed_ns_since(v.captured_at)<=1_000_000_000}
         for observation in self.port.poll(now):self.runtime.ingest_observation(observation)
         self.execution.tick(now)
     def health(self):
         age=None if self.latest_capture is None else self.runtime.clock().monotonic_ns-self.latest_capture
         online=self.process.poll() is None and age is not None and 0<=age<=1_000_000_000 and self.last_error is None
         return dict(backend='ultralytics_pt',model_sha256=self.digest,online=online,
-            worker_alive=self.process.poll() is None,capture_age_ns=age,object_count=self.latest_count,error=self.last_error)
+            worker_alive=self.process.poll() is None,capture_age_ns=age,object_count=self.latest_count,error=self.last_error,
+            image_domain='virtual_nadir',stabilization=self.stabilization)
     def close(self):
         try:
             if self.process.poll() is None:

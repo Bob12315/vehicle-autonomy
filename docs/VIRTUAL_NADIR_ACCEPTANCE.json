@@ -1,0 +1,84 @@
+{
+  "date": "2026-11-05",
+  "scope": "Owned CUADC2026 copter_rescue Gazebo/SITL, fixed-down camera and local PT only",
+  "source_reference_sha256": {
+    "cuadc2026/yolo_app/virtual_nadir.py": "6b41c49159f9a73e7ca4ac589bad2998a807d4c584e40de807024faaa7ea1a3c",
+    "cuadc2026/yolo_app/attitude_history.py": "c167ad6b3ccc2630f2dfb94c8746d957064b861b4640df322f0f8623787e0a64"
+  },
+  "implementation": {
+    "scope": "vehicle-owned sensor service",
+    "new_camera_stabilize_action": false,
+    "new_inference_process": false,
+    "new_vehicle_writer": false,
+    "physical_gimbal": false
+  },
+  "unit_tests": {
+    "status": "PASS",
+    "count": 1019,
+    "seconds": 148.722,
+    "log": "artifacts/nadir-preview-native-20261105-r3/unittest.log"
+  },
+  "browser": {
+    "status": "PASS",
+    "evidence": "artifacts/nadir-preview-native-20261105-r3/result.json",
+    "checks": {
+      "actual PT, original capture provenance, advancing annotated frames": "PASS",
+      "browser raw/stabilized/YOLO selection and annotated snapshot": "PASS",
+      "capture outage clears view, refuses snapshots, fresh recovery": "PASS",
+      "read-only, no SEND/Lease/vehicle writes": "PASS"
+    },
+    "snapshot_http_codes": [
+      200
+    ],
+    "writer_attempts": 0,
+    "cleanup": "COMPLETE"
+  },
+  "full_mission": {
+    "status": "PASS",
+    "evidence": "artifacts/nadir-rescue-flight-20261105-r4/result.json",
+    "state": "SUCCEEDED",
+    "release_safe": true,
+    "actions": 35,
+    "all_actions_succeeded": true,
+    "observed_releases": 2,
+    "recon_views": 6,
+    "cleanup": "COMPLETE"
+  },
+  "virtual_frames": {
+    "count": 583,
+    "reference_ids": [
+      "a3198a2343ac43d8ace62033460ce32a"
+    ],
+    "minimum_admitted_attitude_hz": 8.259727784440498,
+    "minimum_valid_fraction": 0.733828125,
+    "max_abs_roll_deg": 6.77518372422697,
+    "max_abs_pitch_deg": 16.264764199310925,
+    "rectify_ms_median": 3.363733,
+    "rectify_ms_p95": 5.159334,
+    "fault_transitions_including_warmup": 55
+  },
+  "retained_failures": [
+    {
+      "evidence": "artifacts/nadir-rescue-flight-20261105-r1/result.json",
+      "reason": "AlignDescend target lost; unconditional identity reset on synchronization rejection"
+    },
+    {
+      "evidence": "artifacts/nadir-rescue-flight-20261105-r2/result.json",
+      "reason": "AlignDescend target lost; complete RX history alone did not remove transient timing gaps"
+    },
+    {
+      "evidence": "artifacts/nadir-rescue-flight-20261105-r3/result.json",
+      "reason": "AlignDescend target lost; two-second candidate lifetime was shorter than the existing reacquisition window"
+    },
+    {
+      "evidence": "artifacts/nadir-preview-native-20261105-r2/result.json",
+      "reason": "Browser snapshot download timeout; that iteration did not complete screenshot acceptance"
+    }
+  ],
+  "limits": [
+    "TIMESYNC source capture timestamps are causal lower bounds, not calibrated physical exposure/IMU synchronization",
+    "Temporary synchronization rejection remains fail closed; this is not an uninterrupted-video or hard-real-time guarantee",
+    "PT may misclassify a small yellow home H as bucket; mission drop-region filtering and separate H geometry producer remain necessary",
+    "No hardware, USB-camera calibration, physical gimbal or high-angular-rate flight qualification"
+  ]
+}
