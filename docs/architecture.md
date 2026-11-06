@@ -1,5 +1,18 @@
 # V1 framework boundary
 
+## Rescue mission parameter revision (2026-11-06)
+
+The version 1.1.0 rescue template uses 10/5/1 m/s horizontal waypoint limits,
+explicit +1/-0.5 virtual-camera ey offsets and four reconnaissance corners.
+Only the owned rescue profile admits the higher motion limit. Alignment, vertical
+climb/descent and stopping remain bounded independently. The typed payload effect
+keeps its actual observed target and carries a separate horizontal ENU aim offset.
+Payload Execution checks that offset against an explicit policy bound (zero by
+default), then checks alignment about the declared aim while retaining original
+target movement, provenance, age, authorization and final mutation fences.
+Old Studio templates, drafts and publications remain intact; the revision installs
+under `Rescue_2026_FullAuto@1.1.0`. See the [task list](RESCUE_2026_TASK_LIST.md).
+
 ## Explicit CUADC2026 rescue simulation and local PT perception (2026-11-05)
 
 The fixed-down rescue camera has an owned virtual-nadir processing stage in

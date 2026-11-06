@@ -19,6 +19,7 @@ from .rescue_geometry import project
 from .landing_marker import detect_h,overlap
 from .preview import annotated_packet
 from .association import TargetAssociator
+from .rescue_bucket import has_bucket_surface
 
 
 def main():
@@ -67,7 +68,12 @@ def main():
                 rectification=dict(captured.rectification,**camera.metadata(),position_valid=True,position_bracket_ns=list(bracket))
                 image=captured.frame.image;began=time.monotonic_ns()
                 neural=detector.detect(image);markers=detect_h(image)
-                detected=[(d,'pt') for d in neural if not any(overlap(d.xyxy,m.xyxy)>.4 for m in markers)]
+                detected=[]
+                for d in neural:
+                    if any(overlap(d.xyxy,m.xyxy)>.4 for m in markers):continue
+                    if detector.names[d.class_id]=='bucket' and not has_bucket_surface(image,d):
+                        stats['bucket_surface_rejected']+=1;continue
+                    detected.append((d,'pt'))
                 detected.extend((d,'h_marker') for d in markers)
                 detected=[(d,backend) for d,backend in detected if captured.frame.accepts(d.xyxy)]
                 ended=time.monotonic_ns();values=[];projected=[]

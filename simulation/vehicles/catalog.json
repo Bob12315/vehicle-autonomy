@@ -144,7 +144,7 @@
       ]
     },
     "copter_rescue": {
-      "version": "rescue-2026-1.1.0",
+      "version": "rescue-2026-1.2.0",
       "model_name": "iris_cuadc2026_fixed_down_camera",
       "model_path": "root:simulation/models/iris_cuadc2026_fixed_down_camera/model.sdf",
       "profile_path": "root:simulation/profiles/copter_rescue.toml",
@@ -179,7 +179,7 @@
         "root:simulation/models/cuadc2026_water_bottle/model.config": "ee4ad7b2ff85c93c1b333aebb87ca404642d5e03de6c4374faf37ff004d6b00d",
         "root:simulation/models/cuadc2026_water_bottle/model.sdf": "fa45cb131f85dcc71e20acae3fe2d40706118fd96e38e88ff3c326014b3d5334",
         "ardupilot:build/sitl/bin/arducopter": "04497f6682095c319520fe9deb79367a959de6c05cb1d85a3b114e8f837ab878",
-        "root:simulation/profiles/copter_rescue.toml": "4cf58da914286a4468004bd834b61557adee0cf3d0ade2cdc2d857946bd55052",
+        "root:simulation/profiles/copter_rescue.toml": "b702a33a39dfaabc5560549edd5041fe65be4e5202f1950e975dd07179db4dc4",
         "ardupilot:Tools/autotest/default_params/copter.parm": "5e01345b45d1c6190b28bece5638bbdd4cf1cce35e05bbbf480ab24d2b51aa0e",
         "ardupilot:Tools/autotest/default_params/gazebo-iris.parm": "4aee140cbb29b967e4519e4c84c4b389a2172c30e542f36b4fba4c118b4d4750",
         "root:simulation/params/copter_telemetry.parm": "d4ac5ffcf683655239c4b6484ec0d990679ddbaf4a9766cd819f7982a2554e88",

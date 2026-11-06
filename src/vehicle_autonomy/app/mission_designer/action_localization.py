@@ -260,6 +260,8 @@ for _key,_zh,_unit in [
     ('clock_domain','采样时钟域',''),('world_generation','世界代际',''),('observation_id','原始观测标识',''),
     ('servo_outputs','已映射的投放通道',''),('channel','投放通道编号',''),('release_pwm','源任务释放值','PWM'),
     ('hold_pwm','源任务保持值','PWM'),('release_target_ey','源虚拟相机纵向对准偏移',''),
+    ('first_release_target_ey','第一次投放画面纵向偏移',''),
+    ('second_release_target_ey','第二次投放画面纵向偏移',''),
     ('target_altitude_m','下降目标高度','m'),('descend_speed_mps','最大下降速度','m/s'),
     ('final_settle_time_s','最终稳定时间','s'),('alignment_confirmed','对准已确认',''),
     ('target_acquisition_timeout_s','停止下降后的目标重获期限','s'),

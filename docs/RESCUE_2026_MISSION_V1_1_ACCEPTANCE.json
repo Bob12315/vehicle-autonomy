@@ -1,0 +1,113 @@
+{
+  "date": "2026-11-06",
+  "scope": "Owned CUADC2026 copter_rescue Gazebo/SITL with local PT; no physical hardware claim",
+  "template_version": "1.1.0",
+  "template_key": "Rescue_2026_FullAuto@1.1.0",
+  "changes": {
+    "horizontal_waypoint_limits_mps": {
+      "previous": [
+        2,
+        1,
+        0.2
+      ],
+      "current": [
+        10,
+        5,
+        1
+      ]
+    },
+    "release_target_ey": [
+      1.0,
+      -0.5
+    ],
+    "recon_corners_enu_m": [
+      [
+        -3.0,
+        56.0,
+        3.0
+      ],
+      [
+        3.0,
+        56.0,
+        3.0
+      ],
+      [
+        3.0,
+        59.0,
+        3.0
+      ],
+      [
+        -3.0,
+        59.0,
+        3.0
+      ]
+    ],
+    "alignment_descent_mps": 0.2,
+    "vertical_waypoint_cap_mps": 0.3
+  },
+  "safety": {
+    "actual_target_preserved": true,
+    "default_nonzero_aim_offset_rejected": true,
+    "rescue_horizontal_aim_bound_m": 0.6,
+    "alignment_error_m": 0.3,
+    "vertical_aim_offset_rejected": true,
+    "release_max_speed_mps": 0.08,
+    "original_send_lease_ttl_session_generation_and_final_fences_preserved": true,
+    "old_templates_drafts_and_publications_preserved": true
+  },
+  "unit_tests": {
+    "status": "PASS",
+    "count": 1036,
+    "seconds": 143.093,
+    "log": "artifacts/rescue-mission-revision-unittest-r3.log",
+    "focused_count": 39,
+    "focused_log": "artifacts/rescue-mission-revision-focused-r3.log"
+  },
+  "native": {
+    "status": "PASS",
+    "mission_state": "SUCCEEDED",
+    "actions": 31,
+    "compiled_nodes": 58,
+    "all_actions_succeeded": true,
+    "observed_releases": 2,
+    "recon_views": 4,
+    "release_safe": true,
+    "cleanup": "COMPLETE",
+    "maximum_measured_horizontal_speed_mps": 9.888552261560697,
+    "evidence": "artifacts/rescue-mission-v1_1-20261106-r3/result.json",
+    "perception_counters": {
+      "rejected": 1,
+      "reason:inference deadline exceeded": 1,
+      "processed": 2673,
+      "bucket_surface_rejected": 105
+    }
+  },
+  "pixel_postcondition": {
+    "scope": "PT bucket candidates for the pinned rescue scene only",
+    "minimum_surface_fraction": 0.12,
+    "maximum_hsv_saturation": 95,
+    "minimum_hsv_value": 90,
+    "reads_scene_truth": false,
+    "merges_ambiguous_tracks": false,
+    "model_weights_changed": false,
+    "real_frame_replay_cases": [
+      "off-centre bucket accepted",
+      "ground lettering rejected",
+      "small overhead open bucket accepted"
+    ]
+  },
+  "retained_earlier_runs": [
+    {
+      "evidence": "artifacts/rescue-mission-v1_1-20261106-r1/latest.json",
+      "state": "REJECTED",
+      "reason": "floor lettering reported as a second bucket; fresh target guard blocked release",
+      "cleanup": "COMPLETE"
+    },
+    {
+      "evidence": "artifacts/rescue-mission-v1_1-20261106-r2/result.json",
+      "state": "FAILED",
+      "reason": "first surface gate rejected tinted small bucket rim; corrected using actual frame replay",
+      "cleanup": "COMPLETE"
+    }
+  ]
+}

@@ -113,6 +113,7 @@
 | `far_m` | 区域远端距离 | — | 原始结果字段，保留生产者声明和原始数据值。 |
 | `file_sha256` | 路径文件摘要 | — | 已校验路径文件的 SHA-256 摘要，不是任意文件路径。 |
 | `final_settle_time_s` | 最终稳定时间 | s | 独立救援仿真 Action 的显式参数；由原有准入、安全和新鲜观测校验。 |
+| `first_release_target_ey` | 第一次投放画面纵向偏移 | — | 独立救援仿真 Action 的显式参数；由原有准入、安全和新鲜观测校验。 |
 | `footprint_radius_m` | 足迹半径 | m | 合格车辆模型的平面足迹半径。 |
 | `frame` | 控制坐标系 | — | odom 表示里程计东北天；base_link 表示车体前左上；其他坐标需显式绑定。 |
 | `frame_epoch` | 坐标系代际 | — | 路径使用的明确坐标系代际，必须与运行时一致。 |
@@ -169,6 +170,7 @@
 | `result` | 动作结果 | — | 原始结果字段，保留生产者声明和原始数据值。 |
 | `revision` | 修订号 | — | 资源修订号，不能替代代际。 |
 | `scores` | 目标评分表 | — | 目标类别和正整数评分，不使用像素面积代替物理尺寸。 |
+| `second_release_target_ey` | 第二次投放画面纵向偏移 | — | 独立救援仿真 Action 的显式参数；由原有准入、安全和新鲜观测校验。 |
 | `selected_targets` | 已选目标 | — | 原始结果字段，保留生产者声明和原始数据值。 |
 | `servo_outputs` | 已映射的投放通道 | — | 独立救援仿真 Action 的显式参数；由原有准入、安全和新鲜观测校验。 |
 | `settle_s` | 到达稳定时间 | s | 独立救援仿真 Action 的显式参数；由原有准入、安全和新鲜观测校验。 |
@@ -832,8 +834,8 @@ null
     },
     "release_target_ey": {
       "type": "number",
-      "minimum": -0.3,
-      "maximum": 0.3,
+      "minimum": -1,
+      "maximum": 1,
       "default": 0.0
     },
     "final_settle_time_s": {
@@ -1410,7 +1412,7 @@ null
     "speed_mps": {
       "type": "number",
       "exclusiveMinimum": 0,
-      "maximum": 2,
+      "maximum": 10,
       "default": 1.0
     },
     "tolerance_xy_m": {
@@ -1649,6 +1651,12 @@ null
     "alignment_confirmed": {
       "type": "boolean",
       "default": false
+    },
+    "release_target_ey": {
+      "type": "number",
+      "minimum": -1,
+      "maximum": 1,
+      "default": 0.0
     }
   },
   "required": [
@@ -1753,6 +1761,18 @@ null
       "minimum": 1,
       "maximum": 2,
       "default": 2
+    },
+    "first_release_target_ey": {
+      "type": "number",
+      "minimum": -1,
+      "maximum": 1,
+      "default": 0.3
+    },
+    "second_release_target_ey": {
+      "type": "number",
+      "minimum": -1,
+      "maximum": 1,
+      "default": -0.05
     }
   },
   "required": [

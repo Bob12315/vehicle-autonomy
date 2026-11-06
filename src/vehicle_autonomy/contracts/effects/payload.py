@@ -7,6 +7,11 @@ from vehicle_autonomy.contracts.world.models import ResourceReference
 
 @dataclass(frozen=True,slots=True)
 class ReleasePayloadEffect:
+    """Observed target remains unchanged; aim_offset is metres in its ENU frame.
+
+    A nonzero horizontal aim requires an explicitly configured payload policy.
+    It never replaces target provenance or represents an observed target shift.
+    """
     payload_id: str
     target_id: str
     producer_id: str
@@ -14,10 +19,12 @@ class ReleasePayloadEffect:
     target_position: Vector3
     target_captured_at: TimePoint
     environment: ResourceReference
+    aim_offset: Vector3 = Vector3(0,0,0)
 
     def __post_init__(self):
         if any(not isinstance(getattr(self,n),str) or not getattr(self,n).strip() for n in ('payload_id','target_id','producer_id','target_observation_id')):raise ValueError('payload and target provenance required')
         if not isinstance(self.target_position,Vector3) or not isinstance(self.target_captured_at,TimePoint) or not isinstance(self.environment,ResourceReference):raise TypeError('typed target geometry/time/environment required')
+        if not isinstance(self.aim_offset,Vector3):raise TypeError('typed payload aim offset required')
 
 @dataclass(frozen=True,slots=True)
 class PayloadEffectEnvelope:

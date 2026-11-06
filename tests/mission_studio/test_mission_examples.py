@@ -101,3 +101,17 @@ class MissionExampleTests(unittest.TestCase):
                 self.assertFalse(studio.library.snapshot()['templates'])
             finally:
                 studio.close()
+
+    def test_new_rescue_template_preserves_old_templates_and_user_drafts(self):
+        from vehicle_autonomy.app.scenarios.cuadc.rescue import template
+        service=SimpleNamespace(drivers={},registry=self.registry(),studio_demo=False)
+        with tempfile.TemporaryDirectory() as folder:
+            studio=StudioService(service,Path(folder)/'library');self.addCleanup(studio.close)
+            old=template();old['version']='1.0.0';old['name']='保留旧模板'
+            saved=studio.library.template('Rescue_2026_FullAuto',old)
+            draft=studio.library.save(old,0)
+            service.drivers['v']=self.driver('copter');studio.install_examples()
+            data=studio.library.snapshot()
+            self.assertEqual(data['templates']['Rescue_2026_FullAuto'],saved)
+            self.assertEqual(data['drafts'][old['mission_id']],draft)
+            self.assertEqual(data['templates']['Rescue_2026_FullAuto@1.1.0']['definition']['version'],'1.1.0')

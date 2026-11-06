@@ -93,7 +93,7 @@ class RescueRuntime:
         except BaseException:
             self.port.close();self.log.close();raise
         self.execution=PayloadExecution(runtime.authority,self.port,PayloadSafetyPolicy(('vision.pt:',),allowed_labels=('bucket',),
-            max_alignment_m=.3,max_speed_mps=.08,min_release_height_m=.5,max_release_height_m=1.5),runtime._world,
+            max_alignment_m=.3,max_speed_mps=.08,min_release_height_m=.5,max_release_height_m=1.5,max_aim_offset_m=.6),runtime._world,
             observation_validator=self.known_observation)
     def known_observation(self,effect,now):
         if not self.stabilization.get('valid') or self.last_error is not None:return False

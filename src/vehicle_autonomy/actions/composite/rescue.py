@@ -68,6 +68,8 @@ class FuseParameters:
 class SelectParameters:
     objects: tuple[Target, ...]
     target_count: int = field(default=2, metadata={'minimum':1, 'maximum':2})
+    first_release_target_ey: float = field(default=.3, metadata={'minimum':-1,'maximum':1})
+    second_release_target_ey: float = field(default=-.05, metadata={'minimum':-1,'maximum':1})
 
 
 @dataclass(frozen=True, slots=True)
@@ -80,7 +82,7 @@ class AlignParameters:
     target: Target
     target_altitude_m: float = field(default=1.1, metadata={'minimum':.3,'maximum':2.5})
     descend_speed_mps: float = field(default=.2, metadata={'minimum':.05,'maximum':.2})
-    release_target_ey: float = field(default=0., metadata={'minimum':-.3,'maximum':.3})
+    release_target_ey: float = field(default=0., metadata={'minimum':-1,'maximum':1})
     final_settle_time_s: float = field(default=.3, metadata={'minimum':.3,'maximum':2})
     target_acquisition_timeout_s: float = field(default=3., metadata={'minimum':.5,'maximum':5})
 
@@ -90,6 +92,7 @@ class ReleaseParameters:
     target: Target
     servo_outputs: tuple[ServoOutput, ...] = field(metadata={'minItems':1,'maxItems':2})
     alignment_confirmed: bool = False
+    release_target_ey: float = field(default=0., metadata={'minimum':-1,'maximum':1})
 
 
 def object_schema(properties):
@@ -177,7 +180,8 @@ class QueryInstance:
             selected=unique[:self.p.target_count]
             if not selected:return ActionDecision(ActionOutcome.FAILED,error='rescue_no_observed_drop_target')
             first=ServoOutput(8,1800,1370);second=ServoOutput(9,1835,1335)
-            drops=[DropTarget(t,(first,second) if len(selected)==1 else ((first,) if i==0 else (second,)),.3 if i==0 else -.05) for i,t in enumerate(selected)]
+            drops=[DropTarget(t,(first,second) if len(selected)==1 else ((first,) if i==0 else (second,)),
+                self.p.first_release_target_ey if i==0 else self.p.second_release_target_ey) for i,t in enumerate(selected)]
             result={'targets':to_json_value(tuple(drops)),'count':len(drops)}
         else:result={'objects':to_json_value(tuple(unique[:128]))}
         return ActionDecision(ActionOutcome.SUCCEEDED,result=result)
@@ -191,6 +195,11 @@ class AlignFactory(FlightFactory):
         if current_target(world,p.target) is None:raise ValueError('fresh locked visual target required')
     def start_with_context(self,p,world,ctx):
         self.validate_context(p,world,ctx);return AlignInstance(p,world)
+
+
+def release_aim_offset(ey,height):
+    # Declared virtual-camera projection, not a physical calibration claim.
+    return Vector3(0,ey*max(.05,height)*math.tan(math.radians(131.870643)/2)*.21,0)
 
 
 class AlignInstance(MotionInstance):
@@ -211,7 +220,7 @@ class AlignInstance(MotionInstance):
         t=obj.position.value;height=max(.05,position.z-t.z)
         # Source recipe offset is kept explicitly. This is the declared virtual
         # camera projection (not a claim of physical camera calibration).
-        offset=p.release_target_ey*height*math.tan(math.radians(131.870643)/2)*.21
+        offset=release_aim_offset(p.release_target_ey,height).y
         dx=t.x-position.x;dy=t.y+offset-position.y
         horizontal=math.hypot(dx,dy);dz=p.target_altitude_m-position.z
         final=abs(dz)<=.1
@@ -243,7 +252,8 @@ class ReleaseInstance:
         if obj is None:return ActionDecision(ActionOutcome.FAILED,error='rescue_release_target_lost')
         if not self.requested:
             self.requested=True;self.boundary=len(results)
-            return ActionDecision(ActionOutcome.RUNNING,tuple(ReleasePayloadEffect('payload_'+str(s.channel-7),str(obj.object_id),str(obj.producer_id),str(obj.source_observation_id),obj.position.value,obj.position.captured_at,world.environment) for s in self.p.servo_outputs))
+            offset=release_aim_offset(self.p.release_target_ey,world.localization.pose.value.position.z-obj.position.value.z)
+            return ActionDecision(ActionOutcome.RUNNING,tuple(ReleasePayloadEffect('payload_'+str(s.channel-7),str(obj.object_id),str(obj.producer_id),str(obj.source_observation_id),obj.position.value,obj.position.captured_at,world.environment,offset) for s in self.p.servo_outputs))
         feedback=results[self.boundary:]
         if any(r.phase in (EffectPhase.REJECTED,EffectPhase.UNKNOWN,EffectPhase.CANCELLED) for r in feedback):
             return ActionDecision(ActionOutcome.FAILED,error='rescue_payload_unconfirmed')

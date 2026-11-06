@@ -2,7 +2,7 @@
   "schema_version": 2,
   "mission_id": "Rescue_2026_FullAuto",
   "revision": 0,
-  "version": "1.0.0",
+  "version": "1.1.0",
   "name": "CUADC 2026 全自主救援 · 本机 PT",
   "target": "",
   "supported_vehicles": [
@@ -57,7 +57,7 @@
         "x_m": 0.0,
         "y_m": 32.5,
         "z_m": 5.0,
-        "speed_mps": 2.0
+        "speed_mps": 10.0
       },
       "input_bindings": {}
     },
@@ -86,7 +86,10 @@
       "type": "Action",
       "action_type": "Rescue.SelectDropTargets",
       "action_contract_version": "1.0.0",
-      "parameters": {},
+      "parameters": {
+        "first_release_target_ey": 1.0,
+        "second_release_target_ey": -0.5
+      },
       "input_bindings": {
         "objects": {
           "ref": "node.drop_scan_fuse.output.objects"
@@ -116,7 +119,7 @@
       "action_contract_version": "1.0.0",
       "parameters": {
         "z_m": 3.0,
-        "speed_mps": 1.0,
+        "speed_mps": 5.0,
         "tolerance_xy_m": 0.25
       },
       "input_bindings": {
@@ -170,6 +173,9 @@
         },
         "alignment_confirmed": {
           "ref": "node.drop_align.output.alignment_confirmed"
+        },
+        "release_target_ey": {
+          "ref": "loop.current_item.release_target_ey"
         }
       }
     },
@@ -180,7 +186,7 @@
       "action_contract_version": "1.0.0",
       "parameters": {
         "z_m": 2.5,
-        "speed_mps": 1.0,
+        "speed_mps": 5.0,
         "tolerance_z_m": 0.1
       },
       "input_bindings": {
@@ -201,7 +207,7 @@
         "x_m": -3.0,
         "y_m": 56.0,
         "z_m": 4.0,
-        "speed_mps": 2.0
+        "speed_mps": 10.0
       },
       "input_bindings": {}
     },
@@ -214,7 +220,7 @@
         "x_m": -3.0,
         "y_m": 56.0,
         "z_m": 3.0,
-        "speed_mps": 0.2,
+        "speed_mps": 1.0,
         "tolerance_xy_m": 0.4
       },
       "input_bindings": {}
@@ -239,10 +245,10 @@
       "action_type": "Rescue.Goto",
       "action_contract_version": "1.0.0",
       "parameters": {
-        "x_m": 0.0,
+        "x_m": 3.0,
         "y_m": 56.0,
         "z_m": 3.0,
-        "speed_mps": 0.2,
+        "speed_mps": 1.0,
         "tolerance_xy_m": 0.4
       },
       "input_bindings": {}
@@ -268,9 +274,9 @@
       "action_contract_version": "1.0.0",
       "parameters": {
         "x_m": 3.0,
-        "y_m": 56.0,
+        "y_m": 59.0,
         "z_m": 3.0,
-        "speed_mps": 0.2,
+        "speed_mps": 1.0,
         "tolerance_xy_m": 0.4
       },
       "input_bindings": {}
@@ -295,72 +301,16 @@
       "action_type": "Rescue.Goto",
       "action_contract_version": "1.0.0",
       "parameters": {
-        "x_m": 3.0,
+        "x_m": -3.0,
         "y_m": 59.0,
         "z_m": 3.0,
-        "speed_mps": 0.2,
+        "speed_mps": 1.0,
         "tolerance_xy_m": 0.4
       },
       "input_bindings": {}
     },
     {
       "node_id": "recon_capture_4",
-      "type": "Action",
-      "action_type": "Rescue.CaptureReconView",
-      "action_contract_version": "1.0.0",
-      "parameters": {},
-      "input_bindings": {},
-      "output_bindings": {
-        "objects": {
-          "ref": "mission.recon_views",
-          "mode": "append"
-        }
-      }
-    },
-    {
-      "node_id": "recon_scan_goto_5",
-      "type": "Action",
-      "action_type": "Rescue.Goto",
-      "action_contract_version": "1.0.0",
-      "parameters": {
-        "x_m": 0.0,
-        "y_m": 59.0,
-        "z_m": 3.0,
-        "speed_mps": 0.2,
-        "tolerance_xy_m": 0.4
-      },
-      "input_bindings": {}
-    },
-    {
-      "node_id": "recon_capture_5",
-      "type": "Action",
-      "action_type": "Rescue.CaptureReconView",
-      "action_contract_version": "1.0.0",
-      "parameters": {},
-      "input_bindings": {},
-      "output_bindings": {
-        "objects": {
-          "ref": "mission.recon_views",
-          "mode": "append"
-        }
-      }
-    },
-    {
-      "node_id": "recon_scan_goto_6",
-      "type": "Action",
-      "action_type": "Rescue.Goto",
-      "action_contract_version": "1.0.0",
-      "parameters": {
-        "x_m": -3.0,
-        "y_m": 59.0,
-        "z_m": 3.0,
-        "speed_mps": 0.2,
-        "tolerance_xy_m": 0.4
-      },
-      "input_bindings": {}
-    },
-    {
-      "node_id": "recon_capture_6",
       "type": "Action",
       "action_type": "Rescue.CaptureReconView",
       "action_contract_version": "1.0.0",
@@ -382,7 +332,7 @@
         "x_m": 0.0,
         "y_m": 0.0,
         "z_m": 4.0,
-        "speed_mps": 2.0
+        "speed_mps": 10.0
       },
       "input_bindings": {}
     },
@@ -395,7 +345,7 @@
         "x_m": 0.0,
         "y_m": 0.0,
         "z_m": 2.5,
-        "speed_mps": 2.0,
+        "speed_mps": 10.0,
         "tolerance_z_m": 0.25
       },
       "input_bindings": {}
@@ -576,32 +526,8 @@
       "port": "next"
     },
     {
-      "edge_id": "e_recon_capture_4_next_recon_scan_goto_5",
+      "edge_id": "e_recon_capture_4_next_return_home_gps",
       "source": "recon_capture_4",
-      "target": "recon_scan_goto_5",
-      "port": "next"
-    },
-    {
-      "edge_id": "e_recon_scan_goto_5_next_recon_capture_5",
-      "source": "recon_scan_goto_5",
-      "target": "recon_capture_5",
-      "port": "next"
-    },
-    {
-      "edge_id": "e_recon_capture_5_next_recon_scan_goto_6",
-      "source": "recon_capture_5",
-      "target": "recon_scan_goto_6",
-      "port": "next"
-    },
-    {
-      "edge_id": "e_recon_scan_goto_6_next_recon_capture_6",
-      "source": "recon_scan_goto_6",
-      "target": "recon_capture_6",
-      "port": "next"
-    },
-    {
-      "edge_id": "e_recon_capture_6_next_return_home_gps",
-      "source": "recon_capture_6",
       "target": "return_home_gps",
       "port": "next"
     },
@@ -641,7 +567,7 @@
       "simulation",
       "standard-example"
     ],
-    "description": "4.5 米起飞、5 米投放区采样、最多两目标对准投放、六点侦察、返航 H 标记对准降落。",
+    "description": "4.5 米起飞、5 米投放区采样、航点速度五倍、投放画面偏移 +1/-0.5、四角侦察、返航 H 标记对准降落。",
     "source_recipe": "simulation/missions/cuadc2026/rescue_2026_source.json",
     "scene_id": "CUADC2026",
     "simulation_only": true,
@@ -670,11 +596,12 @@
       }
     },
     "migration_changes": [
-      "Source change_speed steps become bounded per-leg velocity limits (2, 1 and 0.2 m/s).",
+      "User revision: per-leg horizontal velocity limits increased fivefold to 10, 5 and 1 m/s; vertical and alignment descent limits retained.",
       "A single observed bucket receives both payloads; two buckets receive one each.",
       "No unobserved fallback-center release. No continue-on-failure or success-on-alignment-timeout.",
       "FuseViews deduplicates fresh already-localized observations; it does not claim GPS triangulation.",
-      "Original virtual-camera ey offsets retained as declared projection parameters; physical calibration requires separate validation."
+      "User revision: virtual-camera ey offsets +1/-0.5 are explicit selection and release parameters, not metres; physical calibration requires separate validation.",
+      "User revision: reconnaissance retains the four original corners and removes the two midpoint stops."
     ]
   },
   "blackboard": {

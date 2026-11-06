@@ -14,11 +14,13 @@ class PayloadSafetyPolicy:
     max_speed_mps:float=.15
     min_release_height_m:float=1.
     max_release_height_m:float=2.
+    max_aim_offset_m:float=0.
 
     def __post_init__(self):
         if not self.allowed_producer_prefixes or any(not p for p in self.allowed_producer_prefixes):raise ValueError('explicit payload sources required')
         if any(type(v) is not int or v<=0 for v in (self.max_target_age_ns,self.max_vehicle_age_ns)) or any(not math.isfinite(v) or v<=0 for v in (self.max_alignment_m,self.max_speed_mps)):raise ValueError('invalid payload Safety')
         if not 0 < self.min_release_height_m < self.max_release_height_m or not all(math.isfinite(v) for v in (self.min_release_height_m,self.max_release_height_m)):raise ValueError('explicit payload height range required')
+        if not math.isfinite(self.max_aim_offset_m) or self.max_aim_offset_m<0:raise ValueError('invalid payload aim offset bound')
 
     def reason(self,envelope,world,now):
         effect=envelope.effect
@@ -36,7 +38,9 @@ class PayloadSafetyPolicy:
         except ValueError:return 'payload_clock_mismatch'
         target_pose=target.position.value;p=loc.pose.value.position;v=loc.twist.value.linear
         if math.dist((target_pose.x,target_pose.y,target_pose.z),(effect.target_position.x,effect.target_position.y,effect.target_position.z))>.1:return 'payload_target_moved'
-        if math.hypot(p.x-target_pose.x,p.y-target_pose.y)>self.max_alignment_m or not self.min_release_height_m<=p.z-target_pose.z<=self.max_release_height_m:return 'payload_not_aligned'
+        offset=effect.aim_offset
+        if offset.z!=0 or math.hypot(offset.x,offset.y)>self.max_aim_offset_m:return 'payload_aim_offset_not_allowed'
+        if math.hypot(p.x-target_pose.x-offset.x,p.y-target_pose.y-offset.y)>self.max_alignment_m or not self.min_release_height_m<=p.z-target_pose.z<=self.max_release_height_m:return 'payload_not_aligned'
         if math.sqrt(v.x*v.x+v.y*v.y+v.z*v.z)>self.max_speed_mps or abs(loc.twist.value.angular.z)>.15:return 'payload_motion_unsafe'
         return None
 

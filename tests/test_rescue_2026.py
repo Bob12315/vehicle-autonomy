@@ -55,8 +55,13 @@ class RescueTests(unittest.TestCase):
         with self.assertRaises(ValueError):validate(definition,r,{'v':SimpleNamespace(context=lambda:normal)})
         nodes={n['node_id']:n for n in definition['nodes']}
         self.assertEqual(nodes['takeoff_4_5m']['parameters']['height_m'],4.5)
-        self.assertEqual(nodes['recon_scan_goto_6']['parameters']['y_m'],59)
-        self.assertEqual(nodes['recon_scan_goto_6']['parameters']['speed_mps'],.2)
+        recon=[n['parameters'] for n in definition['nodes'] if n['node_id'].startswith('recon_scan_goto_')]
+        self.assertEqual([(p['x_m'],p['y_m'],p['z_m']) for p in recon],[(-3,56,3),(3,56,3),(3,59,3),(-3,59,3)])
+        self.assertTrue(all(p['speed_mps']==1 for p in recon))
+        self.assertEqual(nodes['goto_drop_center_5m']['parameters']['speed_mps'],10)
+        self.assertEqual(nodes['drop_approach']['parameters']['speed_mps'],5)
+        self.assertEqual(nodes['select_gps_drop_targets']['parameters'],dict(first_release_target_ey=1.,second_release_target_ey=-.5))
+        self.assertEqual(nodes['drop_release']['input_bindings']['release_target_ey'],{'ref':'loop.current_item.release_target_ey'})
         self.assertEqual(json.loads((resource_root()/'simulation/missions/cuadc2026/rescue_2026_full_auto.json').read_text()),template())
     def test_rescue_calibration_rejects_other_spawns_before_starting_a_vehicle(self):
         from vehicle_autonomy.app.simulation.manager import SimulationManager
@@ -75,6 +80,40 @@ class RescueTests(unittest.TestCase):
         for obj in (replace(self.obj,producer_id='oracle'),replace(self.obj,quality=QualityState.DEGRADED)):
             value=QueryInstance('CaptureView',CaptureParameters(),self.world).tick(replace(self.world,objects=(obj,)))
             self.assertFalse(value.result['objects'])
+    def test_configured_drop_offsets_reach_release_without_rewriting_the_observed_target(self):
+        from vehicle_autonomy.actions.composite.rescue import ReleaseInstance,release_aim_offset
+        other=replace(self.obj,object_id='vision.pt:test:bucket2',confidence=.8,
+            position=replace(self.obj.position,value=Vector3(2,32.5,.105)))
+        world=replace(self.world,objects=(self.obj,other))
+        selected=QueryInstance('SelectDropTargets',SelectParameters((self.target,encode_target(world,other)),
+            first_release_target_ey=1.,second_release_target_ey=-.5),world).tick(world)
+        self.assertEqual([d['release_target_ey'] for d in selected.result['targets']],[1.,-.5])
+        for ey in (1.,-.5):
+            effect=ReleaseInstance(ReleaseParameters(self.target,(ServoOutput(8,1800,1370),),True,ey),world).tick(world).effects[0]
+            self.assertEqual(effect.target_position,self.obj.position.value)
+            self.assertEqual(effect.aim_offset,release_aim_offset(ey,3.-.105))
+
+    def test_faster_waypoints_are_not_silently_clamped_to_the_old_two_mps_limit(self):
+        from vehicle_autonomy.actions.copter.rescue import GotoInstance,GotoParameters,MotionInstance
+        world=self.h.sample(.1,Vector3(0,0,3))
+        effect=GotoInstance(GotoParameters(0,32.5,5,10),world).tick(world).effects[0]
+        v=effect.target_twist.linear;speed=math.sqrt(v.x*v.x+v.y*v.y+v.z*v.z)
+        self.assertGreater(speed,9);self.assertLessEqual(speed,10)
+        self.assertEqual(MotionInstance(world).speed_limit_mps,1.99)
+
+    def test_rescue_bucket_surface_rejects_ground_letters_without_merging_ambiguous_boxes(self):
+        import cv2,numpy as np
+        from vehicle_autonomy.world.perception.vision.rescue_bucket import has_bucket_surface
+        image=np.full((100,100,3),(75,145,155),np.uint8)
+        cv2.putText(image,'500',(10,60),cv2.FONT_HERSHEY_SIMPLEX,1,(15,15,15),2)
+        candidate=PixelDetection(0,.6,(5,20,90,80))
+        self.assertFalse(has_bucket_surface(image,candidate))
+        cv2.ellipse(image,(50,50),(20,25),0,0,360,(170,170,170),-1)
+        self.assertTrue(has_bucket_surface(image,candidate))
+        self.assertFalse(has_bucket_surface(image,PixelDetection(0,.9,(-20,-20,-10,-10))))
+        image[:]=(75,145,155)
+        cv2.circle(image,(50,50),5,(90,130,140),1)
+        self.assertTrue(has_bucket_surface(image,PixelDetection(0,.4,(44,44,57,57))))
     def test_alignment_loss_fails_and_exit_requests_existing_stop_barrier(self):
         action=AlignInstance(AlignParameters(self.target),self.world)
         decision=action.tick(self.world);self.assertEqual(decision.outcome,ActionOutcome.RUNNING)

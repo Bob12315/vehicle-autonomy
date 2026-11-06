@@ -73,6 +73,27 @@ class PayloadExecutionTests(unittest.TestCase):
                 self.execution.tick(self.later());self.assertFalse(self.port.released)
                 self.assertIn(self.execution.status('effect')['phase'],('REJECTED','CANCELLED'))
                 self.h.tearDown()
+    def test_explicit_bounded_aim_offset_keeps_real_target_and_final_alignment_fence(self):
+        effect=replace(self.envelope.effect,aim_offset=Vector3(0,.45,0))
+        envelope=replace(self.envelope,effect=effect)
+        self.assertEqual(self.execution.dispatch(envelope,self.now)['reason'],'payload_aim_offset_not_allowed')
+        policy=PayloadSafetyPolicy(('sim.objects:',),max_aim_offset_m=.6)
+        execution=PayloadExecution(self.authority,self.port,policy,self.reader)
+        loc=self.world.localization
+        def at(y):
+            return replace(self.world,localization=replace(loc,pose=replace(loc.pose,
+                value=replace(loc.pose.value,position=Vector3(2,y,1.5)))))
+        self.reader.value=at(1.45)
+        self.assertEqual(execution.dispatch(envelope,self.now)['phase'],'ACCEPTED')
+        self.assertEqual(envelope.effect.target_position,self.world.objects[0].position.value)
+        forged=replace(envelope,effect=replace(effect,target_position=Vector3(2,1.45,.05)))
+        self.assertEqual(policy.reason(forged,self.reader.value,self.now),'payload_target_moved')
+        for offset in (Vector3(0,.61,0),Vector3(0,0,.1)):
+            self.assertEqual(policy.reason(replace(envelope,effect=replace(effect,aim_offset=offset)),self.reader.value,self.now),'payload_aim_offset_not_allowed')
+        self.reader.value=at(2.)
+        execution.tick(self.now)
+        self.assertEqual(execution.status('effect')['reason'],'payload_not_aligned')
+        self.assertFalse(self.port.commands)
     def test_rejection_staleness_alignment_and_untrusted_sources(self):
         cases=[replace(self.world,objects=()),self.h.sample(.1,Vector3(0,0,1.5)),replace(self.world,environment=None),replace(self.world,objects=(replace(self.world.objects[0],position=Stamped('map',self.now,Vector3(2,1,.05))),))]
         for world in cases:

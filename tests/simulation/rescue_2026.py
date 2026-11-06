@@ -61,7 +61,7 @@ def run(directory,*,flight=False,landing_only=False,record_comparison=False):
                 item=app.studio.library.save(definition,0)
                 compiled=app.studio.compile(item['definition'])
                 publication=app.studio.library.publish(definition['mission_id'],item['definition']['revision'],compiled)
-                started=app.studio.handle('studio-b.run.start',dict(publication=definition['mission_id']+'@1.0.0',
+                started=app.studio.handle('studio-b.run.start',dict(publication=definition['mission_id']+'@'+definition['version'],
                     definition_hash=publication['definition_hash'],binding=live_instance(app,child.target),allow_send=True))
             result['mission_start']=started
             until=time.monotonic()+1500;preview_frames=[];saved=set()
@@ -90,7 +90,7 @@ def run(directory,*,flight=False,landing_only=False,record_comparison=False):
                                 if label not in saved:
                                     (directory/('annotated-'+label+'.jpg')).write_bytes(jpeg);saved.add(label)
                             atomic_json(directory/'nadir-frames.json',preview_frames)
-                if view['state'] in ('SUCCEEDED','FAILED','UNKNOWN','CANCELLED','TIMED_OUT'):
+                if view['state'] in ('SUCCEEDED','FAILED','REJECTED','UNKNOWN','CANCELLED','TIMED_OUT'):
                     result['mission']=view;break
                 time.sleep(.5)
             else:raise TimeoutError('rescue mission native deadline')

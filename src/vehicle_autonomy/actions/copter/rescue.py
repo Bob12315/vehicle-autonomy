@@ -24,7 +24,7 @@ class GotoParameters:
     x_m: float = field(metadata={'minimum':-5, 'maximum':5})
     y_m: float = field(metadata={'minimum':-2, 'maximum':62})
     z_m: float = field(default=3., metadata={'minimum':.3, 'maximum':5})
-    speed_mps: float = field(default=1., metadata={'exclusiveMinimum':0, 'maximum':2})
+    speed_mps: float = field(default=1., metadata={'exclusiveMinimum':0, 'maximum':10})
     tolerance_xy_m: float = field(default=.3, metadata={'minimum':.1, 'maximum':.7})
     tolerance_z_m: float = field(default=.3, metadata={'minimum':.1, 'maximum':.5})
     settle_s: float = field(default=1., metadata={'minimum':.3, 'maximum':3})
@@ -79,7 +79,7 @@ class FlightFactory(ContextFactory):
 
 
 class MotionInstance:
-    def __init__(self, world):
+    def __init__(self, world, *, speed_limit_mps=1.99):
         self.environment = world.environment
         self.generation = world.version.generation_id
         self.started = world.published_at
@@ -87,6 +87,7 @@ class MotionInstance:
         self.stream = self.stopper.stream
         self.stable = None
         self.refresh = 0
+        self.speed_limit_mps = speed_limit_mps
 
     def request(self, world, velocity, yaw_rate=0.):
         now = world.published_at.monotonic_ns
@@ -94,7 +95,8 @@ class MotionInstance:
         self.refresh = now + 200_000_000
         self.stopper.touched = True
         length=math.sqrt(velocity.x**2+velocity.y**2+velocity.z**2)
-        if length>1.99:velocity=Vector3(*(v*1.99/length for v in (velocity.x,velocity.y,velocity.z)))
+        if length>self.speed_limit_mps:
+            velocity=Vector3(*(v*self.speed_limit_mps/length for v in (velocity.x,velocity.y,velocity.z)))
         return ActionDecision(ActionOutcome.RUNNING, (TwistTargetEffect('odom',
             Twist3(velocity, Vector3(0, 0, yaw_rate)), self.stream),))
 
@@ -120,7 +122,7 @@ class MotionInstance:
 
 class GotoInstance(MotionInstance):
     def __init__(self, p, world):
-        super().__init__(world); self.p = p
+        super().__init__(world,speed_limit_mps=9.99); self.p = p
 
     def tick_with_results(self, world, results):
         error = self.error(world, results)

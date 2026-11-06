@@ -8,7 +8,7 @@
 
 1. 重启 `./control-center`，在仿真中心选择 `CUADC2026`。
 2. 车辆选择“CUADC 救援多旋翼 · 下视相机与双载荷”，出生点选择 `home` 后启动。
-3. 在 Mission Studio 模板库复制 `Rescue_2026_FullAuto`，选择本次上线的车辆实例。
+3. 在 Mission Studio 模板库复制 `Rescue_2026_FullAuto` **1.1.0**（模板键 `Rescue_2026_FullAuto@1.1.0`），选择本次上线的车辆实例。
 4. 校验、发布，确认实例绑定后显式开启任务 SEND 运行。模板不会自动执行。
 
 查看识别画面：进入“车辆控制”，选择本次 `copter_rescue` 实例，在“画面来源”
@@ -77,14 +77,35 @@ H 结果使用 `vision.marker:` 来源，与 `vision.pt:` 分开；不把桶预�
 模板文件为 `simulation/missions/cuadc2026/rescue_2026_full_auto.json`，采用当前
 schema 2 Graph、ForEach、Blackboard、实例绑定和发布机制。原始任务仅用于参数核对。
 
+2026-11-06 的 1.1.0 完整复测：58 个编译节点、31 个 Action 全成功、两次 observed
+release、四次侦察采样和 H 对准降落，release_safe=true，清理 COMPLETE。
+全量 1036 项测试通过；详情见[新版验收记录](RESCUE_2026_MISSION_V1_1_ACCEPTANCE.json)。
+
 流程：估计器稳定等待 → GUIDED/Arm → 4.5 米起飞 → 5 米投放区观测、去重、选桶
-→ 最多两次接近、目标重新确认、对准下降、投放、爬升 → 六点侦察
+→ 最多两次接近、目标重新确认、对准下降、投放、爬升 → 四角侦察
 → 返航 4 米／下降 2.5 米 → H 对准下降 → 原生 Land。
 
 新增 `Rescue.Takeoff`、`Goto`、`CaptureView`、`FuseViews`、`SelectDropTargets`、
 `ConfirmTarget`、`AlignDescend`、`ReleasePayload`、`CaptureReconView`、`LandingTarget`。
-原速度切换落实为每航段 2、1、0.2 m/s 的水平速度限制。帧为明确的 odom ENU，
+1.1.0 按用户要求把每航段水平速度上限从 2、1、0.2 提高为 10、5、1 m/s。
+接近终点仍按距离减速，垂直航点速度上限仍为 0.3 m/s，对准下降仍为 0.2 m/s，
+起飞和低速投放条件不变。帧为明确的 odom ENU，
 场地前方为 +Y，不做隐式 GPS/map 坐标转换。
+
+新版[可编辑任务清单](RESCUE_2026_TASK_LIST.md) 列出各阶段、坐标和参数。
+两次 `release_target_ey` 分别为 +1、−0.5，是无单位画面偏移，不是米。
+选桶 Action 显式接收两个参数，循环把同一值传给对准与投放。投放 Effect 保留真实
+目标位置与原始观测，另带 ENU 水平 `aim_offset`。Execution 仍检查目标位移、新鲜度、
+速度、授权及对指定瞄准点的 0.3 米误差；只有救援自有仿真允许最大 0.6 米水平瞄准
+偏移，其他 PayloadSafetyPolicy 默认拒绝非零偏移，垂直偏移一律拒绝。
+侦察保留 (-3,56)、(3,56)、(3,59)、(-3,59) 四角，删除两条边的中点停车。
+旧模板、草稿、已发布版本和历史运行保留；新版以独立版本模板键提供。
+
+偏移 +1 的实际近距画面暴露了 PT 把桶旁地面文字也报成桶的情况。救援工作进程
+新增仅针对本场景中性灰桶的图像后校验：候选框中至少 12% 像素须满足 HSV 饱和度
+≤95、亮度 ≥90；该检查在目标关联前执行，不合并相近框，也不复用歧义身份。
+它读取本帧像素，不读取 Gazebo 真值或场地目标标签；其他场景、不同颜色桶和实机
+不在验证范围内。PT 权重及其校验值保持不变。YOLO 预览显示经过后校验的候选。
 
 主要兼容调整：
 
