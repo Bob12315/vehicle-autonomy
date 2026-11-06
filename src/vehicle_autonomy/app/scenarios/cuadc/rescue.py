@@ -37,7 +37,7 @@ def template(target=''):
     last='drop_loop'
     go('goto_recon_entry_4m',-3.,56.,4.)
     for i,(x,y) in enumerate(((-3.,56.),(3.,56.),(3.,59.),(-3.,59.)),1):
-        go('recon_scan_goto_'+str(i),x,y,3.,1.,tolerance_xy_m=.4)
+        go('recon_scan_goto_'+str(i),x,y,3.,5.,tolerance_xy_m=.4)
         action('recon_capture_'+str(i),'Rescue.CaptureReconView',output_bindings={'objects':{'ref':'mission.recon_views','mode':'append'}})
     go('return_home_gps',0.,0.,4.)
     go('descend_home_2_5m',0.,0.,2.5,tolerance_z_m=.25)
@@ -49,14 +49,14 @@ def template(target=''):
     definition=mission('Rescue_2026_FullAuto','CUADC 2026 全自主救援 · 本机 PT',target,'copter',nodes,edges,
         blackboard={'drop_targets':variable({'type':'array','items':DROP},[]),
             'recon_views':variable({'type':'array','items':{'type':'array','items':TARGET}},[])},execution_policy={'timeout_s':1800})
-    definition['version']='1.1.0'
-    definition['metadata'].update(description='4.5 米起飞、5 米投放区采样、航点速度五倍、投放画面偏移 +1/-0.5、四角侦察、返航 H 标记对准降落。',
+    definition['version']='1.1.1'
+    definition['metadata'].update(description='4.5 米起飞、5 米投放区采样、投放画面偏移 +1/-0.5、四角侦察航点 5 m/s、返航 H 标记对准降落。',
         source_recipe='simulation/missions/cuadc2026/rescue_2026_source.json',scene_id='CUADC2026',
         simulation_only=True,requires_send=True,required_capabilities=['rescue_flight','rescue_vision','rescue_payload'],
         detector_classes=['bucket','H'],detector_backend='ultralytics_pt',
         coordinate_convention='Explicit odom ENU, field +Y; heading ENU pi/2. No implicit GPS/map transform.',
         servo_mapping={'8':{'payload':'payload_1','release_pwm':1800,'hold_pwm':1370},'9':{'payload':'payload_2','release_pwm':1835,'hold_pwm':1335}},
-        migration_changes=['User revision: per-leg horizontal velocity limits increased fivefold to 10, 5 and 1 m/s; vertical and alignment descent limits retained.',
+        migration_changes=['User revision: transit horizontal velocity limit 10 m/s; drop approach/climb and all four reconnaissance waypoints 5 m/s; vertical and alignment descent limits retained.',
             'A single observed bucket receives both payloads; two buckets receive one each.',
             'No unobserved fallback-center release. No continue-on-failure or success-on-alignment-timeout.',
             'FuseViews deduplicates fresh already-localized observations; it does not claim GPS triangulation.',

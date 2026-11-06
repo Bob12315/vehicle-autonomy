@@ -1,0 +1,84 @@
+{
+  "date": "2026-11-06",
+  "scope": "Single owned CUADC2026 copter_rescue Gazebo/SITL full mission, local PT and same-exposure raw/stabilized recording",
+  "template_version": "1.1.1",
+  "template_key": "Rescue_2026_FullAuto@1.1.1",
+  "reconnaissance": [
+    {
+      "x_m": -3.0,
+      "y_m": 56.0,
+      "z_m": 3.0,
+      "speed_mps": 5.0
+    },
+    {
+      "x_m": 3.0,
+      "y_m": 56.0,
+      "z_m": 3.0,
+      "speed_mps": 5.0
+    },
+    {
+      "x_m": 3.0,
+      "y_m": 59.0,
+      "z_m": 3.0,
+      "speed_mps": 5.0
+    },
+    {
+      "x_m": -3.0,
+      "y_m": 59.0,
+      "z_m": 3.0,
+      "speed_mps": 5.0
+    }
+  ],
+  "mission": {
+    "status": "PASS",
+    "state": "SUCCEEDED",
+    "actions": 31,
+    "all_actions_succeeded": true,
+    "observed_releases": 2,
+    "release_ey": [
+      1.0,
+      -0.5
+    ],
+    "recon_captures": 4,
+    "release_safe": true,
+    "cleanup": "COMPLETE",
+    "evidence": "artifacts/rescue-recon5-video-20261106-r1/result.json"
+  },
+  "unit_tests": {
+    "status": "PASS",
+    "count": 1036,
+    "seconds": 143.991,
+    "log": "artifacts/rescue-recon5-unittest.log",
+    "focused_count": 22,
+    "focused_log": "artifacts/rescue-recon5-focused.log"
+  },
+  "recording": {
+    "raw_frames": 2594,
+    "paired_frames": 2594,
+    "error": null,
+    "evidence": "artifacts/rescue-recon5-video-20261106-r1/camera-comparison/recording.json"
+  },
+  "video": {
+    "full": "artifacts/rescue-recon5-video-20261106-r1/rescue-nadir-comparison-full.mp4",
+    "accelerated": "artifacts/rescue-recon5-video-20261106-r1/rescue-nadir-comparison-4x.mp4",
+    "duration_s": 266.0,
+    "accelerated_duration_s": 66.5,
+    "width": 1280,
+    "height": 640,
+    "format": "H.264 / yuv420p",
+    "explicit_unavailable_frames": 0,
+    "source_capture_gap_frames": 0,
+    "complete_decode": "PASS",
+    "preview_inspected": true,
+    "sha256": {
+      "rescue-nadir-comparison-full.mp4": "cfe3b27563d1d461c293ee112512fe026be3c030534df6a781a7a6eba2ebbc37",
+      "rescue-nadir-comparison-4x.mp4": "5cef36f64ed24c83e41b959513c1b693fed58e2567697ed7c93fa239a23708f4"
+    }
+  },
+  "limits": [
+    "5 m/s is a configured waypoint speed limit; approach slows with distance and capture still requires arrival and stopping.",
+    "Comparison is the same-flight original and actual stabilized output, not separate missions with stabilization enabled/disabled.",
+    "Full capture timeline retained, with an additional 3-second completion card.",
+    "Only the four reconnaissance speed parameters and the template version changed; previous drafts and publications preserved."
+  ]
+}

@@ -57,7 +57,7 @@ class RescueTests(unittest.TestCase):
         self.assertEqual(nodes['takeoff_4_5m']['parameters']['height_m'],4.5)
         recon=[n['parameters'] for n in definition['nodes'] if n['node_id'].startswith('recon_scan_goto_')]
         self.assertEqual([(p['x_m'],p['y_m'],p['z_m']) for p in recon],[(-3,56,3),(3,56,3),(3,59,3),(-3,59,3)])
-        self.assertTrue(all(p['speed_mps']==1 for p in recon))
+        self.assertTrue(all(p['speed_mps']==5 for p in recon))
         self.assertEqual(nodes['goto_drop_center_5m']['parameters']['speed_mps'],10)
         self.assertEqual(nodes['drop_approach']['parameters']['speed_mps'],5)
         self.assertEqual(nodes['select_gps_drop_targets']['parameters'],dict(first_release_target_ey=1.,second_release_target_ey=-.5))

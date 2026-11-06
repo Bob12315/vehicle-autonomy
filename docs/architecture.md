@@ -2,6 +2,10 @@
 
 ## Rescue mission parameter revision (2026-11-06)
 
+The follow-up 1.1.1 template sets all four reconnaissance waypoint speed limits
+to 5 m/s and installs as `Rescue_2026_FullAuto@1.1.1`. Other 1.1.0 mission settings
+and the original stop-before-capture behavior remain in place.
+
 The version 1.1.0 rescue template uses 10/5/1 m/s horizontal waypoint limits,
 explicit +1/-0.5 virtual-camera ey offsets and four reconnaissance corners.
 Only the owned rescue profile admits the higher motion limit. Alignment, vertical

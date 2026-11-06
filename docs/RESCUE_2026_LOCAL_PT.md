@@ -8,7 +8,7 @@
 
 1. 重启 `./control-center`，在仿真中心选择 `CUADC2026`。
 2. 车辆选择“CUADC 救援多旋翼 · 下视相机与双载荷”，出生点选择 `home` 后启动。
-3. 在 Mission Studio 模板库复制 `Rescue_2026_FullAuto` **1.1.0**（模板键 `Rescue_2026_FullAuto@1.1.0`），选择本次上线的车辆实例。
+3. 在 Mission Studio 模板库复制 `Rescue_2026_FullAuto` **1.1.1**（模板键 `Rescue_2026_FullAuto@1.1.1`），选择本次上线的车辆实例。
 4. 校验、发布，确认实例绑定后显式开启任务 SEND 运行。模板不会自动执行。
 
 查看识别画面：进入“车辆控制”，选择本次 `copter_rescue` 实例，在“画面来源”
@@ -73,6 +73,13 @@ H 结果使用 `vision.marker:` 来源，与 `vision.pt:` 分开；不把桶预�
 实例，验证集指标不能代替实际场景的识别验收。
 
 ## Mission 与 Action
+
+当前 1.1.1 按用户后续要求，将四个侦察航点的水平速度上限全部改为 5 m/s。
+其他航段、四角坐标、两次 +1/−0.5 画面偏移和停稳拍摄条件沿用 1.1.0。
+1.1.1 使用独立模板键，保留旧模板、草稿与已发布版本。
+本轮完整任务和录像通过，31 个 Action 全成功、四次侦察拍摄；1036 项回归通过。
+同帧对比录像完整 266 秒、四倍速 66.5 秒，2594 对原图/增稳图无缺失。
+详见[侦察 5 m/s 验收与录像](RESCUE_2026_RECON5_ACCEPTANCE.json)。
 
 模板文件为 `simulation/missions/cuadc2026/rescue_2026_full_auto.json`，采用当前
 schema 2 Graph、ForEach、Blackboard、实例绑定和发布机制。原始任务仅用于参数核对。
