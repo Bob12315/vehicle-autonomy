@@ -4,7 +4,7 @@ Adapted from CUADC VirtualNadirRectifier: same rotational homography, bounded
 valid mask and locked yaw, using the current fixed-down Gazebo calibration.
 OpenCV camera axes are right/down/forward; no gimbal or vehicle commands exist.
 """
-from dataclasses import dataclass
+from dataclasses import dataclass,replace
 import math
 from uuid import uuid4
 
@@ -12,6 +12,7 @@ from vehicle_autonomy.contracts.core.geometry import Vector3
 from vehicle_autonomy.world.transform.tree import rotate_vector
 
 CALIBRATION_ID='cuadc2026-fixed-down-v1'
+CAMERA_OFFSET=Vector3(0,-.01,-.124923)
 
 
 def validate_config(value):
@@ -34,7 +35,7 @@ def rotation(q):
 
 @dataclass(frozen=True)
 class VirtualCamera:
-    origin: Vector3
+    origin: Vector3 | None
     rotation_enu_camera: object
     k: object
     reference_id: str
@@ -47,8 +48,12 @@ class VirtualCamera:
 
     def metadata(self):
         return dict(calibration_id=CALIBRATION_ID,reference_id=self.reference_id,yaw_ref_rad=self.yaw_ref_rad,
-            origin_enu=[self.origin.x,self.origin.y,self.origin.z],k=self.k.tolist(),
+            origin_enu=None if self.origin is None else [self.origin.x,self.origin.y,self.origin.z],k=self.k.tolist(),
             rotation_enu_camera=self.rotation_enu_camera.tolist())
+
+    def with_pose(self,pose):
+        offset=rotate_vector(pose.orientation,CAMERA_OFFSET);p=pose.position
+        return replace(self,origin=Vector3(p.x+offset.x,p.y+offset.y,p.z+offset.z))
 
 
 @dataclass(frozen=True)
@@ -77,15 +82,22 @@ class VirtualNadir:
         f=self.width/(2*math.tan(1.0))
         self.k=np.array(((f,0,320),(0,f,240),(0,0,1.)),dtype=np.float64)
         self.mount=np.array(((0.,-1,0),(-1.,0,0),(0,0,-1.)))
-        self.offset=Vector3(0,-.01,-.124923)
+        self.offset=CAMERA_OFFSET
         self.key=None;self.yaw_ref=None;self.reference_id=uuid4().hex
 
     def rectify(self,image,match):
+        frame=self._rectify(image,match.pose.orientation,match.key)
+        return replace(frame,camera=frame.camera.with_pose(match.pose))
+
+    def rectify_attitude(self,image,match):
+        return self._rectify(image,match.orientation,match.key)
+
+    def _rectify(self,image,orientation,key):
         import cv2,numpy as np
         if image.shape!=(self.height,self.width,3) or image.dtype!=np.uint8:
             raise ValueError('fixed-down calibrated uint8 BGR image required')
-        if self.key is not None and match.key!=self.key:raise ValueError('virtual camera motion epoch changed')
-        self.key=match.key;r=rotation(match.pose.orientation)
+        if self.key is not None and key!=self.key:raise ValueError('virtual camera motion epoch changed')
+        self.key=key;r=rotation(orientation)
         # Invert only a bounded downward view; large tilts cannot recover a
         # missing nadir field of view and must not enter target control.
         if (r@self.mount)[2,2]>-.5:raise ValueError('camera tilt exceeds virtual nadir bound')
@@ -99,6 +111,5 @@ class VirtualNadir:
         mask=cv2.warpPerspective(np.full((self.height,self.width),255,np.uint8),h,(self.width,self.height),
             flags=cv2.INTER_NEAREST,borderMode=cv2.BORDER_CONSTANT)
         if np.count_nonzero(mask)/mask.size<.35:raise ValueError('insufficient virtual camera field of view')
-        offset=rotate_vector(match.pose.orientation,self.offset);p=match.pose.position
-        camera=VirtualCamera(Vector3(p.x+offset.x,p.y+offset.y,p.z+offset.z),virtual,self.k,self.reference_id,self.yaw_ref)
+        camera=VirtualCamera(None,virtual,self.k,self.reference_id,self.yaw_ref)
         return RectifiedFrame(frame,mask,camera,h)

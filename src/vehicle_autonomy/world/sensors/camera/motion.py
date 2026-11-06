@@ -62,34 +62,54 @@ class MotionMatch:
     position_bracket_ns: tuple
 
 
-def match_motion(value,capture_ns,now_ns,*,expected_key=None,max_distance_ns=125_000_000,
-                 max_span_ns=150_000_000,min_attitude_rate_hz=8.):
+@dataclass(frozen=True)
+class AttitudeMatch:
+    orientation: Quaternion
+    key: tuple
+    attitude_rate_hz: float
+    attitude_bracket_ns: tuple
+
+
+def _context(value,capture_ns,now_ns,expected_key):
     if (type(value) is not dict or value.get('schema')!=1 or type(value.get('published_ns')) is not int
             or not 0<=now_ns-value['published_ns']<=500_000_000
             or not 0<=now_ns-capture_ns<=500_000_000):raise ValueError('camera motion publication/capture stale')
     key=tuple(value.get(k) for k in ('world_generation','link_session_id','clock_domain_id'))
     if any(not isinstance(k,str) or not k for k in key) or expected_key is not None and key!=expected_key:
         raise ValueError('camera motion provenance changed')
-    def bracket(name,length):
-        rows=value.get(name)
-        if type(rows) is not list or not 2<=len(rows)<=128:raise ValueError(name+' history warming up')
-        previous=-1
-        for row in rows:
-            if (type(row) is not list or len(row)!=length or type(row[0]) is not int
-                    or not previous<row[0]<=value['published_ns']
-                    or any(type(n) not in (int,float) or not math.isfinite(n) for n in row[1:])):
-                raise ValueError('invalid camera '+name+' history')
-            previous=row[0]
-        before=next((r for r in reversed(rows) if r[0]<=capture_ns),None)
-        after=next((r for r in rows if r[0]>=capture_ns),None)
-        if before is None:raise ValueError(name+' starts after original image capture')
-        if after is None:raise MotionPending(name+' waiting for capture bracket')
-        if (max(capture_ns-before[0],after[0]-capture_ns)>max_distance_ns
-                or after[0]-before[0]>max_span_ns):raise ValueError(name+' interpolation gap too wide')
-        ratio=0. if before[0]==after[0] else (capture_ns-before[0])/(after[0]-before[0])
-        return rows,before,after,ratio
-    positions,p0,p1,t=bracket('positions',4)
-    attitudes,q0,q1,u=bracket('attitudes',5)
+    return key
+
+
+def _bracket(value,name,length,capture_ns,max_distance_ns,max_span_ns):
+    rows=value.get(name)
+    if type(rows) is not list or not 2<=len(rows)<=128:raise ValueError(name+' history warming up')
+    previous=-1
+    for row in rows:
+        if (type(row) is not list or len(row)!=length or type(row[0]) is not int
+                or not previous<row[0]<=value['published_ns']
+                or any(type(n) not in (int,float) or not math.isfinite(n) for n in row[1:])):
+            raise ValueError('invalid camera '+name+' history')
+        previous=row[0]
+    before=next((r for r in reversed(rows) if r[0]<=capture_ns),None)
+    after=next((r for r in rows if r[0]>=capture_ns),None)
+    if before is None:raise ValueError(name+' starts after original image capture')
+    if after is None:raise MotionPending(name+' waiting for capture bracket')
+    if (max(capture_ns-before[0],after[0]-capture_ns)>max_distance_ns
+            or after[0]-before[0]>max_span_ns):raise ValueError(name+' interpolation gap too wide')
+    ratio=0. if before[0]==after[0] else (capture_ns-before[0])/(after[0]-before[0])
+    return rows,before,after,ratio
+
+
+def match_position(value,capture_ns,now_ns,*,expected_key=None,max_distance_ns=125_000_000,max_span_ns=150_000_000):
+    _context(value,capture_ns,now_ns,expected_key)
+    _,p0,p1,t=_bracket(value,'positions',4,capture_ns,max_distance_ns,max_span_ns)
+    return Vector3(*(x+t*(y-x) for x,y in zip(p0[1:],p1[1:]))),(p0[0],p1[0])
+
+
+def match_attitude(value,capture_ns,now_ns,*,expected_key=None,max_distance_ns=125_000_000,
+                   max_span_ns=150_000_000,min_attitude_rate_hz=8.):
+    key=_context(value,capture_ns,now_ns,expected_key)
+    attitudes,q0,q1,u=_bracket(value,'attitudes',5,capture_ns,max_distance_ns,max_span_ns)
     recent=[r for r in attitudes if 0<=q1[0]-r[0]<=1_000_000_000]
     if len(recent)<4:raise ValueError('attitude rate warming up')
     rate=(len(recent)-1)*1e9/(recent[-1][0]-recent[0][0])
@@ -102,5 +122,12 @@ def match_motion(value,capture_ns,now_ns,*,expected_key=None,max_distance_ns=125
         angle=math.acos(min(1.,dot));denominator=math.sin(angle)
         weights=(math.sin((1-u)*angle)/denominator,math.sin(u*angle)/denominator)
     q=[weights[0]*x+weights[1]*y for x,y in zip(av,bv)];norm=math.sqrt(sum(x*x for x in q))
-    pose=Pose3(Vector3(*(x+t*(y-x) for x,y in zip(p0[1:],p1[1:]))),Quaternion(*(x/norm for x in q)))
-    return MotionMatch(pose,key,rate,(q0[0],q1[0]),(p0[0],p1[0]))
+    return AttitudeMatch(Quaternion(*(x/norm for x in q)),key,rate,(q0[0],q1[0]))
+
+
+def match_motion(value,capture_ns,now_ns,*,expected_key=None,max_distance_ns=125_000_000,
+                 max_span_ns=150_000_000,min_attitude_rate_hz=8.):
+    arguments=dict(expected_key=expected_key,max_distance_ns=max_distance_ns,max_span_ns=max_span_ns)
+    attitude=match_attitude(value,capture_ns,now_ns,min_attitude_rate_hz=min_attitude_rate_hz,**arguments)
+    position,bracket=match_position(value,capture_ns,now_ns,**arguments)
+    return MotionMatch(Pose3(position,attitude.orientation),attitude.key,attitude.attitude_rate_hz,attitude.attitude_bracket_ns,bracket)

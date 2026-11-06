@@ -151,6 +151,7 @@ class VehicleInstance:
             'copter':dict(RTL_ALT_M=2,RTL_ALT_FINAL_M=0,MAV1_POSITION=10,MAV1_EXTRA1=10),
             'plane':dict(TKOFF_ALT=50,TKOFF_DIST=300,WP_LOITER_RAD=80,RTL_ALTITUDE=50,
                 FENCE_ENABLE=1,FENCE_RADIUS=2000,FENCE_ALT_MAX=150)}[self.family]
+        if self.vehicle=='copter_rescue':expected.update(MAV1_POSITION=20,MAV1_EXTRA1=30)
         self.session.verify_parameters(expected,'fixed_parameters_readback')
         self.session.verify_parameters({'SERIAL0_BAUD':115.},'phase5_clock_uart_baud')
         from vehicle_autonomy.app.bootstrap.simulation_profile import SimulationProfile

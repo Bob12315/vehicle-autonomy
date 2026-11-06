@@ -34,7 +34,7 @@ class CameraComparisonRecorder:
         self.stop=Event();self.lock=Lock();self.phase={'mission_state':'PREPARING','action':None,'completed':0}
         self.events=[];self.started_ns=time.monotonic_ns();self.error=None;self.closed=False
         self.raw_count=0;self.paired_count=0;self.unpaired_count=0;self.cache=OrderedDict()
-        self.last_raw=-1;self.last_processed=-1
+        self.last_raw=-1;self.last_processed=-1;self.first_raw=None;self.seen=set();self.recovered_raw=0
         self.raw_log=(self.directory/'raw.jsonl').open('w')
         self.processed_log=(self.directory/'stabilized.jsonl').open('w')
         self.thread=Thread(target=self._run,name='camera-comparison-observer',daemon=True);self.thread.start()
@@ -48,6 +48,32 @@ class CameraComparisonRecorder:
             if phase!=self.phase:
                 self.phase=phase;self.events.append(dict(at_ns=time.monotonic_ns(),**phase))
 
+    def _save_raw(self,metadata,jpeg):
+        seq=metadata['sequence']
+        if seq in self.seen:return
+        if self.raw_count>=self.max_frames:raise ValueError('explicit camera recording frame budget exceeded')
+        if metadata.get('capture_clock')!='gazebo-simulation':raise ValueError('explicit simulation capture clock required')
+        with self.lock:phase=dict(self.phase)
+        filename='raw/'+str(seq).zfill(9)+'.jpg'
+        (self.directory/filename).write_bytes(jpeg)
+        row=dict(observed_ns=time.monotonic_ns(),filename=filename,metadata=metadata,phase=phase)
+        self.raw_log.write(json.dumps(row,separators=(',',':'))+'\n');self.raw_log.flush()
+        self.seen.add(seq);self.cache[seq]=metadata
+        while len(self.cache)>64:self.cache.popitem(last=False)
+        self.raw_count+=1
+
+    def _save_pair(self,metadata,jpeg):
+        seq=metadata['sequence'];original=self.cache.get(seq)
+        if original is None:
+            if seq<self.last_raw:self.unpaired_count+=1;self.last_processed=seq
+            return
+        if not same_capture(original,metadata):raise ValueError('processed camera does not match the recorded original exposure')
+        filename='stabilized/'+str(seq).zfill(9)+'.jpg'
+        (self.directory/filename).write_bytes(jpeg)
+        row=dict(observed_ns=time.monotonic_ns(),filename=filename,metadata=metadata)
+        self.processed_log.write(json.dumps(row,separators=(',',':'))+'\n');self.processed_log.flush()
+        self.paired_count+=1;self.last_processed=seq
+
     def _run(self):
         try:
             while not self.stop.is_set():
@@ -57,31 +83,24 @@ class CameraComparisonRecorder:
                     seq=metadata['sequence']
                     if seq<self.last_raw:raise ValueError('recorded original camera sequence regressed')
                     if seq>self.last_raw:
-                        if self.raw_count>=self.max_frames:raise ValueError('explicit camera recording frame budget exceeded')
-                        if metadata.get('capture_clock')!='gazebo-simulation':raise ValueError('explicit simulation capture clock required')
-                        with self.lock:phase=dict(self.phase)
-                        filename='raw/'+str(seq).zfill(9)+'.jpg'
-                        (self.directory/filename).write_bytes(jpeg)
-                        row=dict(observed_ns=time.monotonic_ns(),filename=filename,metadata=metadata,phase=phase)
-                        self.raw_log.write(json.dumps(row,separators=(',',':'))+'\n');self.raw_log.flush()
-                        self.cache[seq]=metadata
-                        while len(self.cache)>64:self.cache.popitem(last=False)
-                        self.raw_count+=1;self.last_raw=seq
+                        self._save_raw(metadata,jpeg);self.last_raw=seq
+                        if self.first_raw is None:self.first_raw=seq;self.last_processed=seq-1
+                history=getattr(self.processed,'recording_pairs',None)
+                if history is not None and self.first_raw is not None:
+                    try:pairs=history(self.last_processed)
+                    except (OSError,ValueError):pairs=[]
+                    for original,raw,metadata,jpeg in pairs:
+                        seq=metadata['sequence']
+                        if seq<=self.last_processed or seq<self.first_raw:continue
+                        if seq not in self.seen:self.recovered_raw+=1
+                        self._save_raw(original,raw);self._save_pair(metadata,jpeg)
+                    self.stop.wait(.01);continue
                 try:metadata,jpeg=self.processed.packet()
                 except (OSError,ValueError):pass
                 else:
                     seq=metadata['sequence']
                     if seq>self.last_processed:
-                        original=self.cache.get(seq)
-                        if original is not None and same_capture(original,metadata):
-                            filename='stabilized/'+str(seq).zfill(9)+'.jpg'
-                            (self.directory/filename).write_bytes(jpeg)
-                            row=dict(observed_ns=time.monotonic_ns(),filename=filename,metadata=metadata)
-                            self.processed_log.write(json.dumps(row,separators=(',',':'))+'\n');self.processed_log.flush()
-                            self.paired_count+=1;self.last_processed=seq
-                        elif original is not None:
-                            raise ValueError('processed camera does not match the recorded original exposure')
-                        elif seq<self.last_raw:self.unpaired_count+=1;self.last_processed=seq
+                        self._save_pair(metadata,jpeg)
                 self.stop.wait(.01)
         except Exception as exc:
             self.error=type(exc).__name__+': '+str(exc)
@@ -93,6 +112,7 @@ class CameraComparisonRecorder:
         self.raw_log.close();self.processed_log.close();self.closed=True
         report=dict(schema=1,binding=self.binding,started_ns=self.started_ns,ended_ns=time.monotonic_ns(),
             raw_frames=self.raw_count,paired_frames=self.paired_count,unpaired_processed_frames=self.unpaired_count,
+            raw_recovered_from_bounded_history=self.recovered_raw,
             error=self.error,events=self.events,comparison='same-flight same-exposure original versus actual virtual-nadir output',
             missing_processed_policy='explicit unavailable panel; no old transform or image is substituted')
         (self.directory/'recording.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')

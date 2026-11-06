@@ -2,15 +2,25 @@
 
 ## Explicit CUADC2026 rescue simulation and local PT perception (2026-11-05)
 
-The fixed-down rescue camera now has an owned virtual-nadir processing stage in
-`world.sensors.camera`. Qualified source position/attitude histories bracket each
-original image capture, using linear/SLERP interpolation without extrapolation.
-The existing inference worker renders stabilized and annotated views with a fixed
-initial yaw reference. Detection projection uses virtual optical orientation and
+The fixed-down rescue camera has an owned virtual-nadir processing stage in
+`world.sensors.camera`. An attitude-only producer thread in the existing PT worker
+renders the stabilized view independently of position and inference, with a fixed
+initial yaw reference. Its bounded queue retains original captures while waiting
+for real attitude brackets; it never extrapolates. Image-only metadata has no world
+origin. Detection projection additionally requires qualified position brackets,
+using linear/SLERP interpolation, virtual optical orientation and
 the real translated camera center; body tilt is not applied twice. Synchronization
 faults invalidate prior observations and payload evidence. This is a vehicle-scoped
 sensor service, not a newly implemented CameraStabilize Action or physical gimbal.
 Calibration, timing and native limits are in the [virtual camera guide](VIRTUAL_NADIR_CAMERA.md).
+
+The 2026-11-06 optimization raises only the rescue simulation's configured position
+and attitude telemetry rates to 20/30 Hz. Camera host time uses a causal lower bound
+from actual prior Gazebo world-clock publications, without assuming 1x simulation
+speed or substituting receipt time for exposure. Original timestamps, provenance,
+source age limits and control gates remain authoritative. A 64-slot export ring
+recovers short preview publication bursts for explicit comparison recording only;
+it does not supply World observations or HTTP playback of old frames.
 
 Vehicle Control's display-source selector includes an annotated YOLO view for
 owned `copter_rescue` instances. The existing PT worker renders its exact input

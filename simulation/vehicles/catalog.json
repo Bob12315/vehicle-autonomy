@@ -144,7 +144,7 @@
       ]
     },
     "copter_rescue": {
-      "version": "rescue-2026-1.0.0",
+      "version": "rescue-2026-1.1.0",
       "model_name": "iris_cuadc2026_fixed_down_camera",
       "model_path": "root:simulation/models/iris_cuadc2026_fixed_down_camera/model.sdf",
       "profile_path": "root:simulation/profiles/copter_rescue.toml",
@@ -152,7 +152,8 @@
       "parameters": [
         "ardupilot:Tools/autotest/default_params/copter.parm",
         "ardupilot:Tools/autotest/default_params/gazebo-iris.parm",
-        "root:simulation/params/copter_telemetry.parm"
+        "root:simulation/params/copter_telemetry.parm",
+        "root:simulation/params/copter_rescue_vision.parm"
       ],
       "clearance_z": 0.195,
       "radius": 0.65,
@@ -184,7 +185,8 @@
         "root:simulation/params/copter_telemetry.parm": "d4ac5ffcf683655239c4b6484ec0d990679ddbaf4a9766cd819f7982a2554e88",
         "plugin:build/libArduPilotPlugin.so": "3fa3870925bdba87f66bd931325388442cf9037bdd57dd04a557e253d64a778d",
         "plugin:src/ArduPilotPlugin.cc": "e00c3fc98e2ef8e37c9fb6a537c4f6fb599b1e8e3f90885d4916eaa04baac868",
-        "plugin:CMakeLists.txt": "8362907b82bb36adf8d22f4ba0a1defa31cabcbdf2168a955f3f932eeed41875"
+        "plugin:CMakeLists.txt": "8362907b82bb36adf8d22f4ba0a1defa31cabcbdf2168a955f3f932eeed41875",
+        "root:simulation/params/copter_rescue_vision.parm": "922b32ebff706ae77d61f0585d664764a9275fc0664a900bb0e65e9ac58c468f"
       },
       "family": "copter"
     }

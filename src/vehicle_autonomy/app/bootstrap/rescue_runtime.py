@@ -110,7 +110,14 @@ class RescueRuntime:
     def poll(self):
         world=self.runtime.world_snapshot();now=self.runtime.clock()
         if world is None:return
-        synchronized=False
+        # Display health belongs to the attitude-only producer. Neither a
+        # position rejection nor cold/slow inference can invalidate its pixels.
+        try:
+            with (self.root/'stabilization-health.json').open('rb') as stream:display=json.loads(stream.read(8193))
+            if (not isinstance(display,dict) or not 0<=now.monotonic_ns-display['published_ns']<=500_000_000
+                    or display.get('rectification_valid') is not True):raise ValueError('attitude-only preview unavailable')
+            self.stabilization=dict(display['stabilization'],valid=True,reason=None)
+        except (OSError,ValueError,KeyError,TypeError) as exc:self.stabilization=dict(valid=False,reason=str(exc))
         try:
             telemetry=self.runtime.telemetry_snapshot()
             if telemetry is not None and world.vehicle is not None and world.vehicle.health.quality is QualityState.VALID:
@@ -122,8 +129,6 @@ class RescueRuntime:
             if (not 0<=now.monotonic_ns-health['published_ns']<=500_000_000
                     or health.get('rectification_valid') is not True):
                 raise ValueError('virtual camera unavailable: '+str(health.get('error','stale motion'))[:120])
-            self.stabilization=dict(health.get('stabilization',{}),valid=True,reason=None)
-            synchronized=True
             path=self.root/'detections.json'
             with path.open('rb') as stream:raw=stream.read(65537)
             if len(raw)>65536:raise ValueError('detection result budget')
@@ -151,7 +156,6 @@ class RescueRuntime:
                 self.last=d['sequence']
         except (OSError,ValueError,KeyError,TypeError) as exc:
             self.last_error=(type(exc).__name__+': '+str(exc))[:180]
-            if not synchronized:self.stabilization=dict(valid=False,reason=self.last_error)
             self.observations.clear()
             for observation in self.active.values():
                 self.sequence+=1

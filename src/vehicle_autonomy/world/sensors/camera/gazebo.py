@@ -20,6 +20,17 @@ def fresh_capture(pair, captured, now):
                 and -100_000_000 <= pair[0]-captured <= 750_000_000)
 
 
+def capture_lower_bound(history,captured,received):
+    """Use a real prior clock publication; never extrapolate simulation at 1x.
+
+    The original image receipt is only a causal upper bound/filter. It is never
+    returned as a substitute sensor timestamp. Missing correlation stays None.
+    """
+    candidates=[host for sim,host in history if 0<=captured-sim<=100_000_000
+        and 0<=received-host<=500_000_000]
+    return max(candidates) if candidates else None
+
+
 def capture(config, directory):
     import cv2
     import numpy as np
@@ -35,6 +46,7 @@ def capture(config, directory):
     last_capture = None
     fault = None
     latest_clock = None
+    clock_history = deque(maxlen=1024)
     received_times = deque(maxlen=30)
 
     def clock(message):
@@ -45,7 +57,9 @@ def capture(config, directory):
         sim = message.sim.sec*1_000_000_000 + message.sim.nsec
         try: pair = clock_pair(sim, system, time.monotonic_ns(), time.time_ns())
         except ValueError: return
-        with lock: latest_clock = pair
+        with lock:
+            if not clock_history or pair[0]>clock_history[-1][0] and pair[1]>clock_history[-1][1]:
+                clock_history.append(pair);latest_clock=pair
 
     def ingest(message):
         nonlocal pending, dropped, fault, last_capture
@@ -76,6 +90,7 @@ def capture(config, directory):
                 item, pending = pending, None
                 error = fault
                 pair = latest_clock
+                history = tuple(clock_history)
             if error:
                 atomic(directory/'health.json', json.dumps(dict(error=error)).encode())
                 continue
@@ -107,6 +122,8 @@ def capture(config, directory):
                 fps=fps, configured_fps=config['fps'], dropped=dropped,
                 received_utc_ns=received_utc, captured_ns=captured, capture_clock='gazebo-simulation', received_ns=received,
                 encoded_ns=time.monotonic_ns(), clock_sim_ns=pair[0], clock_host_ns=pair[1], capture_time='Gazebo image header; not host wall time',
+                capture_host_lower_ns=capture_lower_bound(history,captured,received),
+                capture_host_time_basis='gazebo_clock_causal_lower_bound',
                 frame='camera_optical', spatial_calibration='unverified', error=None)
             atomic(directory/'latest.packet', encode(metadata, jpeg.tobytes()))
             atomic(directory/'health.json', json.dumps(metadata).encode())

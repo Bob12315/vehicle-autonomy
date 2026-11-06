@@ -51,5 +51,28 @@ class ComparisonRecordingTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError,'does not match'):recorder.close()
         self.assertEqual((raw.close_count,derived.close_count),(0,0))
 
+    def test_short_history_recovers_a_pair_missed_by_latest_only_polling(self):
+        import threading
+        original,processed=self.metadata();raw,derived=Camera(original),Camera(processed)
+        available=threading.Event()
+        def history(after):
+            if not available.is_set():return []
+            result=[]
+            for sequence in (3,4,5):
+                if sequence>after:
+                    result.append((dict(original,sequence=sequence),b'\xff\xd8raw',dict(processed,sequence=sequence),b'\xff\xd8stable'))
+            return result
+        derived.recording_pairs=history
+        with TemporaryDirectory() as folder:
+            recorder=CameraComparisonRecorder(Path(folder)/'export',raw,derived,binding={'target':'test'})
+            try:
+                end=time.monotonic()+2
+                while recorder.raw_count<1 and time.monotonic()<end:time.sleep(.01)
+                available.set();raw.metadata=dict(original,sequence=5)
+                while recorder.paired_count<3 and time.monotonic()<end:time.sleep(.01)
+            finally:report=recorder.close()
+            self.assertEqual((report['raw_frames'],report['paired_frames']),(3,3))
+            self.assertGreaterEqual(report['raw_recovered_from_bounded_history'],1)
+
 
 if __name__=='__main__':unittest.main()

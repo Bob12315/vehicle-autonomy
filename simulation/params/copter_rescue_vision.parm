@@ -1,0 +1,5 @@
+# Rescue-only telemetry cadence for image/attitude bracketing.
+# Ordinary Copter parameters and all vehicle safety settings stay in their
+# original files. Framework startup verifies these values by readback.
+MAV1_POSITION 20
+MAV1_EXTRA1 30

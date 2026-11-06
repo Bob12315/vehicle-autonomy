@@ -29,6 +29,10 @@ class DetectionPreviewSource:
         if self.image_domain and (type(stabilization) is not dict or stabilization.get('valid') is not True):
             raise ValueError('增稳不可用：姿态尚未同步')
         with self.path.open('rb') as stream:metadata,jpeg=decode(stream.read(MAX_PACKET+1))
+        return self._validate(metadata,jpeg,health)
+
+    def _validate(self,metadata,jpeg,health):
+        stabilization=health.get('stabilization',{})
         now=time.monotonic_ns();world=self.world_reader()
         if (world is None or metadata.get('world_generation')!=str(world.version.generation_id)
                 or metadata.get('kind')!=self.kind or metadata.get('source')!=self.source
@@ -54,6 +58,33 @@ class DetectionPreviewSource:
         if self.epoch is not None and self.epoch!=epoch:raise ValueError('processed frame inference epoch changed')
         self.epoch=epoch
         return metadata,jpeg
+
+    def recording_pairs(self,after_sequence):
+        """Fresh bounded export copies, never used by HTTP or World ingestion.
+
+        Read the producer's 64 slots to recover short publication bursts rather
+        than pretending the latest-only preview contains every captured frame.
+        All original age, live owner, model, reference and generation fences
+        still apply. Retirement cannot expose an old ring.
+        """
+        with self.lock:
+            if self.kind!='stabilized':return []
+            latest,_=self._packet();end=latest['sequence'];result=[]
+            health=self.health_reader()
+            for sequence in range(max(after_sequence+1,end-63),end+1):
+                slot=self.path.parent/'stabilized-history'/format(sequence%64,'02d')
+                try:
+                    with (slot/'stabilized.packet').open('rb') as stream:metadata,jpeg=decode(stream.read(MAX_PACKET+1))
+                    if metadata['sequence']!=sequence:continue
+                    self._validate(metadata,jpeg,health)
+                    with (slot/'raw.packet').open('rb') as stream:original,raw=decode(stream.read(MAX_PACKET+1))
+                except (OSError,ValueError,KeyError,TypeError):continue
+                if (original['sequence']!=sequence or metadata['source']!=original.get('source')
+                        or metadata['captured_ns']!=original.get('captured_ns')
+                        or metadata['capture_clock']!=original.get('capture_clock')
+                        or metadata['original_received_ns']!=original['received_ns']):continue
+                result.append((original,raw,metadata,jpeg))
+            return result
 
     def packet(self):
         with self.lock:return self._packet()

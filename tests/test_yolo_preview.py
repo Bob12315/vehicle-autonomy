@@ -94,5 +94,25 @@ class YoloPreviewTests(unittest.TestCase):
         self.assertFalse(self.source.health()['online'])
         with self.assertRaises(ValueError):self.source.packet()
 
+    def test_export_ring_recovers_bursts_but_not_stale_or_retired_frames(self):
+        self.source=DetectionPreviewSource(self.directory.name,self.raw,lambda:self.world,lambda:self.worker,
+            model_sha256='pinned-model',source='owned-camera-topic',kind='stabilized',
+            filename='stabilized.packet',image_domain='virtual_nadir')
+        self.worker['stabilization']=dict(valid=True,reference_id='reference')
+        self.header.update(kind='stabilized',image_domain='virtual_nadir',rectification=dict(valid=True,reference_id='reference'))
+        self.source.path.write_bytes(encode(self.header,JPEG))
+        for sequence in (6,7):
+            slot=Path(self.directory.name)/'stabilized-history'/format(sequence%64,'02d');slot.mkdir(parents=True)
+            original=dict(self.metadata,sequence=sequence)
+            (slot/'raw.packet').write_bytes(encode(original,JPEG))
+            (slot/'stabilized.packet').write_bytes(encode(dict(self.header,sequence=sequence),JPEG))
+        pairs=self.source.recording_pairs(5)
+        self.assertEqual([p[0]['sequence'] for p in pairs],[6,7])
+        stale=dict(self.header,sequence=6,captured_host_ns=time.monotonic_ns()-2_000_000_000)
+        slot=Path(self.directory.name)/'stabilized-history/06/stabilized.packet';slot.write_bytes(encode(stale,JPEG))
+        self.assertEqual([p[0]['sequence'] for p in self.source.recording_pairs(5)],[7])
+        self.source.close()
+        with self.assertRaises(ValueError):self.source.recording_pairs(5)
+
 
 if __name__=='__main__':unittest.main()

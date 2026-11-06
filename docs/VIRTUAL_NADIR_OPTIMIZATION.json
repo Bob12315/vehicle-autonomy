@@ -1,0 +1,107 @@
+{
+  "date": "2026-11-06",
+  "scope": "Owned CUADC2026 copter_rescue Gazebo/SITL and checksum-pinned local PT only",
+  "implementation": {
+    "independent_attitude_producer_thread": true,
+    "new_inference_process": false,
+    "position_required_for_projection": true,
+    "image_only_origin": null,
+    "pending_frames": 8,
+    "pending_age_ms": 400,
+    "inference_queue_frames": 4,
+    "export_history_slots": 64,
+    "export_original_age_ms": 1000,
+    "rescue_position_hz": 20,
+    "rescue_attitude_hz": 30,
+    "admission_minimum_attitude_hz": 8,
+    "maximum_bracket_ms": 150,
+    "maximum_sample_distance_ms": 125,
+    "camera_clock": "real prior world-clock publication causal lower bound; no 1x extrapolation or receipt-time substitution",
+    "dual_send_lease_ttl_generation_fences_preserved": true
+  },
+  "comparison": {
+    "baseline_evidence": "artifacts/rescue-video-comparison-20261105-r1/camera-comparison/recording.json",
+    "baseline_raw": 3395,
+    "baseline_paired": 2920,
+    "baseline_missing_percent": 13.991163475699558,
+    "optimized_evidence": "artifacts/nadir-optimized-video-20261106-r2/camera-comparison/recording.json",
+    "optimized_raw": 3360,
+    "optimized_paired": 3359,
+    "optimized_missing_percent": 0.02976190476190476,
+    "running_phase_raw": 3348,
+    "running_phase_missing": 0,
+    "missing": [
+      {
+        "sequence": 3409,
+        "phase": "SUCCEEDED",
+        "completed": 35
+      }
+    ],
+    "interpretation": "single measured full-flight recording; one final unprocessed frame after mission success at recording shutdown; not a universal zero-drop guarantee"
+  },
+  "full_mission": {
+    "status": "PASS",
+    "state": "SUCCEEDED",
+    "actions": 35,
+    "all_actions_succeeded": true,
+    "observed_releases": 2,
+    "recon_views": 6,
+    "release_safe": true,
+    "cleanup": "COMPLETE",
+    "evidence": "artifacts/nadir-optimized-video-20261106-r2/result.json"
+  },
+  "performance": {
+    "rectify_median_ms": 3.766611,
+    "rectify_p95_ms": 5.684729,
+    "producer_counters": {
+      "capture_sequence_gaps": 6,
+      "received": 3409,
+      "capture_expired": 1,
+      "attitude_wait_polls": 13676,
+      "produced": 3408,
+      "inference_queue_overflow": 33
+    },
+    "perception_counters": {
+      "rejected": 3,
+      "reason:inference input expired": 1,
+      "reason:inference deadline exceeded": 1,
+      "processed": 3372,
+      "reason:positions interpolation gap too wide": 1
+    },
+    "limits": "measured on this host only; source age unchanged; failed position or inference still invalidates control observations"
+  },
+  "browser": {
+    "status": "PASS",
+    "checks": {
+      "actual PT, original capture provenance, advancing annotated frames": "PASS",
+      "browser raw/stabilized/YOLO selection and annotated snapshot": "PASS",
+      "capture outage clears view, refuses snapshots, fresh recovery": "PASS",
+      "read-only, no SEND/Lease/vehicle writes": "PASS"
+    },
+    "snapshot_codes": [
+      200
+    ],
+    "writer_attempts": 0,
+    "cleanup": "COMPLETE",
+    "evidence": "artifacts/nadir-optimized-preview-20261106-r2/result.json"
+  },
+  "video": {
+    "status": "PASS",
+    "full": "artifacts/nadir-optimized-video-20261106-r2/rescue-nadir-comparison-full.mp4",
+    "accelerated": "artifacts/nadir-optimized-video-20261106-r2/rescue-nadir-comparison-4x.mp4",
+    "duration_s": 343.6,
+    "accelerated_duration_s": 85.9,
+    "explicit_unavailable_frames": 1,
+    "source_capture_gap_frames": 0,
+    "complete_decode": "PASS",
+    "preview_inspected": true
+  },
+  "unit_tests": {
+    "status": "PASS",
+    "count": 1031,
+    "seconds": 134.755,
+    "log": "artifacts/nadir-optimization-unittest-final.log",
+    "focused_count": 58,
+    "focused_log": "artifacts/nadir-optimization-focused.log"
+  }
+}

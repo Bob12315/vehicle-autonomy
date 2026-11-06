@@ -154,6 +154,12 @@ class RescueTests(unittest.TestCase):
         self.assertEqual(len(detect_h(near)),1)
 
     def test_sync_fault_invalidates_existing_world_observations_without_retiming(self):
+        self._assert_sync_fault(display_valid=False)
+
+    def test_position_or_inference_fault_preserves_fresh_display_but_invalidates_control(self):
+        self._assert_sync_fault(display_valid=True)
+
+    def _assert_sync_fault(self,*,display_valid):
         from collections import deque
         from vehicle_autonomy.app.bootstrap.rescue_runtime import RescueRuntime
         from vehicle_autonomy.contracts.sensor import Observation,DetectedObject
@@ -164,7 +170,10 @@ class RescueTests(unittest.TestCase):
         published=[];runtime=RescueRuntime.__new__(RescueRuntime)
         with tempfile.TemporaryDirectory() as directory:
             runtime.root=Path(directory)
-            (runtime.root/'health.json').write_text(json.dumps(dict(published_ns=now.monotonic_ns,rectification_valid=False,error='attitude gap')))
+            (runtime.root/'health.json').write_text(json.dumps(dict(published_ns=now.monotonic_ns,rectification_valid=False,error='position gap')))
+            if display_valid:
+                (runtime.root/'stabilization-health.json').write_text(json.dumps(dict(published_ns=now.monotonic_ns,
+                    rectification_valid=True,stabilization=dict(reference_id='reference'))))
             runtime.runtime=SimpleNamespace(world_snapshot=lambda:self.world,clock=lambda:now,telemetry_snapshot=lambda:None,motion_history=lambda:None,
                 ingest_observation=published.append)
             runtime.motion=MotionHistory();runtime.active={('vision.pt:test','target-1'):observed}
@@ -175,4 +184,6 @@ class RescueTests(unittest.TestCase):
         self.assertEqual(len(published),1);self.assertEqual(published[0].quality,QualityState.INVALID)
         self.assertEqual(published[0].captured_at,observed.captured_at)
         self.assertEqual(published[0].data,observed.data);self.assertGreater(published[0].sequence,observed.sequence)
-        self.assertFalse(runtime.observations);self.assertFalse(runtime.active);self.assertFalse(runtime.stabilization['valid'])
+        self.assertFalse(runtime.observations);self.assertFalse(runtime.active)
+        self.assertEqual(runtime.stabilization['valid'],display_valid)
+        self.assertIsNotNone(runtime.last_error)
