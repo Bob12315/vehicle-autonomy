@@ -2,7 +2,7 @@
   "schema_version": 2,
   "mission_id": "Rescue_2026_FullAuto",
   "revision": 0,
-  "version": "1.1.1",
+  "version": "1.1.2",
   "name": "CUADC 2026 全自主救援 · 本机 PT",
   "target": "",
   "supported_vehicles": [
@@ -87,8 +87,8 @@
       "action_type": "Rescue.SelectDropTargets",
       "action_contract_version": "1.0.0",
       "parameters": {
-        "first_release_target_ey": 1.0,
-        "second_release_target_ey": -0.5
+        "first_release_target_ey": -0.5,
+        "second_release_target_ey": 0.5
       },
       "input_bindings": {
         "objects": {
@@ -567,7 +567,7 @@
       "simulation",
       "standard-example"
     ],
-    "description": "4.5 米起飞、5 米投放区采样、投放画面偏移 +1/-0.5、四角侦察航点 5 m/s、返航 H 标记对准降落。",
+    "description": "4.5 米起飞、5 米投放区采样、投放画面偏移 -0.5/+0.5、四角侦察航点 5 m/s、返航 H 标记对准降落。",
     "source_recipe": "simulation/missions/cuadc2026/rescue_2026_source.json",
     "scene_id": "CUADC2026",
     "simulation_only": true,
@@ -600,7 +600,7 @@
       "A single observed bucket receives both payloads; two buckets receive one each.",
       "No unobserved fallback-center release. No continue-on-failure or success-on-alignment-timeout.",
       "FuseViews deduplicates fresh already-localized observations; it does not claim GPS triangulation.",
-      "User revision: virtual-camera ey offsets +1/-0.5 are explicit selection and release parameters, not metres; physical calibration requires separate validation.",
+      "User revision: first/second virtual-camera ey offsets -0.5/+0.5 are explicit selection and release parameters, not metres; physical calibration requires separate validation.",
       "User revision: reconnaissance retains the four original corners and removes the two midpoint stops."
     ]
   },

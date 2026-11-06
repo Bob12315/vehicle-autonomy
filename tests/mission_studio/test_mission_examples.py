@@ -114,4 +114,4 @@ class MissionExampleTests(unittest.TestCase):
             data=studio.library.snapshot()
             self.assertEqual(data['templates']['Rescue_2026_FullAuto'],saved)
             self.assertEqual(data['drafts'][old['mission_id']],draft)
-            self.assertEqual(data['templates']['Rescue_2026_FullAuto@1.1.1']['definition']['version'],'1.1.1')
+            self.assertEqual(data['templates']['Rescue_2026_FullAuto@1.1.2']['definition']['version'],'1.1.2')

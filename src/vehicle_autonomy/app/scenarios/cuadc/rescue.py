@@ -20,7 +20,7 @@ def template(target=''):
     go('goto_drop_center_5m',0.,32.5,5.)
     action('drop_scan_capture','Rescue.CaptureView')
     action('drop_scan_fuse','Rescue.FuseViews',bindings={'objects':{'ref':'node.drop_scan_capture.output.objects'}})
-    action('select_gps_drop_targets','Rescue.SelectDropTargets',{'first_release_target_ey':1.,'second_release_target_ey':-.5},bindings={'objects':{'ref':'node.drop_scan_fuse.output.objects'}},
+    action('select_gps_drop_targets','Rescue.SelectDropTargets',{'first_release_target_ey':-.5,'second_release_target_ey':.5},bindings={'objects':{'ref':'node.drop_scan_fuse.output.objects'}},
         output_bindings={'targets':{'ref':'mission.drop_targets'}})
     nodes.append(node('drop_loop','ForEach',execution_policy={'collection':{'ref':'mission.drop_targets'},'max_iterations':2,'on_item_failure':'abort'}))
     edges.append(edge(last,'drop_loop'));last='drop_loop'
@@ -49,8 +49,8 @@ def template(target=''):
     definition=mission('Rescue_2026_FullAuto','CUADC 2026 全自主救援 · 本机 PT',target,'copter',nodes,edges,
         blackboard={'drop_targets':variable({'type':'array','items':DROP},[]),
             'recon_views':variable({'type':'array','items':{'type':'array','items':TARGET}},[])},execution_policy={'timeout_s':1800})
-    definition['version']='1.1.1'
-    definition['metadata'].update(description='4.5 米起飞、5 米投放区采样、投放画面偏移 +1/-0.5、四角侦察航点 5 m/s、返航 H 标记对准降落。',
+    definition['version']='1.1.2'
+    definition['metadata'].update(description='4.5 米起飞、5 米投放区采样、投放画面偏移 -0.5/+0.5、四角侦察航点 5 m/s、返航 H 标记对准降落。',
         source_recipe='simulation/missions/cuadc2026/rescue_2026_source.json',scene_id='CUADC2026',
         simulation_only=True,requires_send=True,required_capabilities=['rescue_flight','rescue_vision','rescue_payload'],
         detector_classes=['bucket','H'],detector_backend='ultralytics_pt',
@@ -60,7 +60,7 @@ def template(target=''):
             'A single observed bucket receives both payloads; two buckets receive one each.',
             'No unobserved fallback-center release. No continue-on-failure or success-on-alignment-timeout.',
             'FuseViews deduplicates fresh already-localized observations; it does not claim GPS triangulation.',
-            'User revision: virtual-camera ey offsets +1/-0.5 are explicit selection and release parameters, not metres; physical calibration requires separate validation.',
+            'User revision: first/second virtual-camera ey offsets -0.5/+0.5 are explicit selection and release parameters, not metres; physical calibration requires separate validation.',
             'User revision: reconnaissance retains the four original corners and removes the two midpoint stops.'])
     definition['blackboard']['drop_targets']['max_age_s']=180
     return definition

@@ -60,7 +60,7 @@ class RescueTests(unittest.TestCase):
         self.assertTrue(all(p['speed_mps']==5 for p in recon))
         self.assertEqual(nodes['goto_drop_center_5m']['parameters']['speed_mps'],10)
         self.assertEqual(nodes['drop_approach']['parameters']['speed_mps'],5)
-        self.assertEqual(nodes['select_gps_drop_targets']['parameters'],dict(first_release_target_ey=1.,second_release_target_ey=-.5))
+        self.assertEqual(nodes['select_gps_drop_targets']['parameters'],dict(first_release_target_ey=-.5,second_release_target_ey=.5))
         self.assertEqual(nodes['drop_release']['input_bindings']['release_target_ey'],{'ref':'loop.current_item.release_target_ey'})
         self.assertEqual(json.loads((resource_root()/'simulation/missions/cuadc2026/rescue_2026_full_auto.json').read_text()),template())
     def test_rescue_calibration_rejects_other_spawns_before_starting_a_vehicle(self):
@@ -86,9 +86,9 @@ class RescueTests(unittest.TestCase):
             position=replace(self.obj.position,value=Vector3(2,32.5,.105)))
         world=replace(self.world,objects=(self.obj,other))
         selected=QueryInstance('SelectDropTargets',SelectParameters((self.target,encode_target(world,other)),
-            first_release_target_ey=1.,second_release_target_ey=-.5),world).tick(world)
-        self.assertEqual([d['release_target_ey'] for d in selected.result['targets']],[1.,-.5])
-        for ey in (1.,-.5):
+            first_release_target_ey=-.5,second_release_target_ey=.5),world).tick(world)
+        self.assertEqual([d['release_target_ey'] for d in selected.result['targets']],[-.5,.5])
+        for ey in (-.5,.5):
             effect=ReleaseInstance(ReleaseParameters(self.target,(ServoOutput(8,1800,1370),),True,ey),world).tick(world).effects[0]
             self.assertEqual(effect.target_position,self.obj.position.value)
             self.assertEqual(effect.aim_offset,release_aim_offset(ey,3.-.105))

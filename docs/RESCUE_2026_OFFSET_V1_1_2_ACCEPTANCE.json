@@ -1,0 +1,45 @@
+{
+  "date": "2026-11-06",
+  "scope": "Owned CUADC2026 copter_rescue Gazebo/SITL and local PT only; no new video recorded",
+  "template_version": "1.1.2",
+  "template_key": "Rescue_2026_FullAuto@1.1.2",
+  "release_target_ey": [
+    -0.5,
+    0.5
+  ],
+  "unit": "dimensionless virtual-camera ey",
+  "alignment_and_release_offsets_identical": true,
+  "reconnaissance_speed_mps": 5,
+  "unit_tests": {
+    "status": "PASS",
+    "count": 1036,
+    "seconds": 141.278,
+    "log": "artifacts/rescue-offsets-v1_1_2-unittest.log",
+    "focused_count": 22,
+    "focused_log": "artifacts/rescue-offsets-v1_1_2-focused.log"
+  },
+  "native": {
+    "status": "PASS",
+    "state": "SUCCEEDED",
+    "actions": 31,
+    "all_actions_succeeded": true,
+    "observed_releases": 2,
+    "recon_captures": 4,
+    "release_safe": true,
+    "cleanup": "COMPLETE",
+    "evidence": "artifacts/rescue-offsets-v1_1_2-20261106-r2/result.json"
+  },
+  "retained_earlier_run": {
+    "evidence": "artifacts/rescue-offsets-v1_1_2-20261106-r1/result.json",
+    "status": "FAIL",
+    "failed_action": "Rescue.FuseViews",
+    "reason": "rescue_capture_expired_or_target_lost",
+    "release_executed": false,
+    "cleanup": "COMPLETE"
+  },
+  "unchanged": [
+    "All speed/waypoint/altitude settings from 1.1.1",
+    "Original target freshness, alignment, source and authorization gates",
+    "Old templates, drafts, publications and videos"
+  ]
+}

@@ -22,7 +22,7 @@ class StudioService:
             data=self.library.snapshot()
             context=driver.context()
             if not context.owned_simulation:continue
-            rescue_template_id='Rescue_2026_FullAuto@1.1.1'
+            rescue_template_id='Rescue_2026_FullAuto@1.1.2'
             if context.target_kind == 'copter' and rescue_template_id not in data['templates']:
                 try:self.service.registry.resolve_typed('Rescue.AlignDescend')
                 except ValueError:pass

@@ -2,6 +2,11 @@
 
 ## Rescue mission parameter revision (2026-11-06)
 
+The current 1.1.2 template sets the first/second virtual-camera ey offsets to
+-0.5/+0.5 and installs as `Rescue_2026_FullAuto@1.1.2`. The four reconnaissance
+waypoints retain their 5 m/s limits. Alignment and release consume the same
+per-target offset; existing safety policies and stopping conditions are unchanged.
+
 The follow-up 1.1.1 template sets all four reconnaissance waypoint speed limits
 to 5 m/s and installs as `Rescue_2026_FullAuto@1.1.1`. Other 1.1.0 mission settings
 and the original stop-before-capture behavior remain in place.
