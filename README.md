@@ -63,6 +63,8 @@ GUI、RViz2、QGC 按需打开。关闭控制台只清理本次自有进程；�
 
 ## 使用入口与验证
 
+- [MID-360 纯仿真接入与 RViz2](docs/MID360_SIMULATION_GOAL1.md)：普通 Rover/Copter 的显式近似雷达组件、录制回放与工具管理；[本轮验收](docs/MID360_GOAL1_ACCEPTANCE.md)已通过两车型实际运动、Gazebo/RViz2、录制回放、控制台及生命周期检查。仍非真实 Livox 非重复扫描，未验证 FAST-LIO2。
+
 - [CUADC 2026 地图、救援 Mission 模板与本机 PT 识别](docs/RESCUE_2026_LOCAL_PT.md)：专用仿真车辆、桶识别、对准下降和受控双载荷。
 
 - [车载摄像头预览 V1](docs/CAMERA_WEB_PREVIEW_V1.md)：认证 MJPEG、实例隔离、真实 Gazebo 图像及验收边界。

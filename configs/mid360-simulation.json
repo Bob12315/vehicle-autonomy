@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "backend": "gazebo-gpu-lidar-uniform-snapshot-v1",
+  "mounts": {
+    "rover": {"scope": [], "link": "base_link", "xyz_rpy": [0, 0, 0.22, 0, 0, 0]},
+    "copter": {"scope": ["iris_with_standoffs"], "link": "base_link", "xyz_rpy": [0, 0, 0.16, 0, 0, 0]}
+  },
+  "limitations": [
+    "Uniform 720x28 simultaneous rays at 10 Hz; not a non-repetitive Livox scan.",
+    "All per-point offsets are zero: the entire rendered scan is one snapshot. No invented motion distortion or timing.",
+    "40 m fixed range, Gaussian 2 cm noise; no reflectivity-dependent range, weather, interference or multiple returns.",
+    "IMU uses SI acceleration at the approximate lidar origin, not the physical MID-360 internal IMU lever arm/noise model.",
+    "Sensor housing is visual only; vehicle mass, inertia and actuator configuration are unchanged.",
+    "Gazebo geometry truth TF and schematic vehicle model are visualization-only; never localization or control input."
+  ]
+}

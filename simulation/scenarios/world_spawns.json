@@ -1839,6 +1839,83 @@
           "heading_deg": 90
         }
       ]
+    },
+    "L01": {
+      "audit": "generated-flat-primitives-v1",
+      "allowed_families": [
+        "rover",
+        "copter"
+      ],
+      "blocked_reasons": {
+        "vtol": "BLOCKED: no qualified VTOL vehicle model/control profile",
+        "plane": "BLOCKED: no audited conventional-plane runway corridor"
+      },
+      "regions": [
+        {
+          "id": "central-ground",
+          "bounds": [
+            -4,
+            4,
+            -9,
+            9
+          ],
+          "families": [
+            "rover",
+            "copter"
+          ]
+        }
+      ],
+      "presets": [
+        {
+          "id": "center",
+          "name": "中心",
+          "x": 0,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "north",
+          "name": "北侧 3 米",
+          "x": 0,
+          "y": 3,
+          "heading_deg": 0
+        },
+        {
+          "id": "south",
+          "name": "南侧 3 米",
+          "x": 0,
+          "y": -3,
+          "heading_deg": 0
+        },
+        {
+          "id": "east",
+          "name": "东侧 3 米",
+          "x": 3,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "west",
+          "name": "西侧 3 米",
+          "x": -3,
+          "y": 0,
+          "heading_deg": 0
+        },
+        {
+          "id": "north-far",
+          "name": "北侧 6 米",
+          "x": 0,
+          "y": 6,
+          "heading_deg": 0
+        },
+        {
+          "id": "south-far",
+          "name": "南侧 6 米",
+          "x": 0,
+          "y": -6,
+          "heading_deg": 0
+        }
+      ]
     }
   }
 }

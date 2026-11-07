@@ -40,6 +40,8 @@ def main():
         source=directory/'visualization-source.json'
         atomic(source,dict(schema=1,url=f'http://127.0.0.1:{args.port}',token_file=str(feed),use_sim_time=False))
         app=MissionControl({},directory/'application',simulation_allow_send=args.allow_send)
+        from vehicle_autonomy.app.simulation.mid360_tools import recover_center_recordings
+        recover_center_recordings(app.simulation_manager)
         tools=ToolService(directory/'remote-tools');app.tool_service=tools
         server=MissionControlServer(('127.0.0.1',args.port),app,token,directory/'http-audit.jsonl');server.visualization_token=load_token(feed)
         server.password_auth=load_password(state['password_file'])

@@ -64,6 +64,7 @@ class SimulationManager:
         self.lock=RLock()
         self.records={}
         self.owners={}
+        self.mid360_services={}
         self._asset_leases={}
         self._owners_closed=set()
         self.threads={}
@@ -93,6 +94,16 @@ class SimulationManager:
                     record['history'].append(dict(state='FAILED',at=stamp(),reason='backend restart'))
                 self.records[identifier]=record
                 self._save(record)
+                # Only saved bag metadata is restored. Old ROS processes,
+                # writers and domains remain UNKNOWN and are never adopted.
+                from .mid360_tools import Mid360Tools
+                for vehicle in record.get('vehicles',[]):
+                    vehicle_id=vehicle.get('id','')
+                    if not re.fullmatch(r'vehicle-[0-9a-f]{32}',vehicle_id):continue
+                    source=path.parent/vehicle_id/'mid360/source.json'
+                    if source.is_file() and not source.is_symlink():
+                        try:self.mid360_services[vehicle_id]=(identifier,Mid360Tools.archive(self.root,source,vehicle.get('target')))
+                        except (OSError,ValueError,KeyError,TypeError):pass
             except (OSError,ValueError,KeyError,TypeError):
                 continue
 
@@ -101,9 +112,15 @@ class SimulationManager:
         occupied=list(peers)
         slots={peer.get('slot_id') for peer in peers}
         for index,item in enumerate(raw):
-            fields(item,('kind','spawn','slot_id'),('kind',))
+            fields(item,('kind','spawn','slot_id','sensors'),('kind',))
             kind=item['kind']
             if type(kind) is not str:raise ValueError('registered vehicle kind required')
+            sensors=item.get('sensors',{})
+            fields(sensors,('mid360',))
+            if 'mid360' in sensors and type(sensors['mid360']) is not bool:
+                raise ValueError('MID-360 selection requires an explicit boolean')
+            if sensors.get('mid360') and kind not in ('rover','copter'):
+                raise ValueError('MID-360 simulation supports only ordinary Rover/Copter')
             if kind=='copter_rescue' and scene_id!='CUADC2026':raise ValueError('rescue model requires the CUADC2026 scene')
             definition=self.vehicle_registry.get(kind)
             if definition['status']!='READY':raise ValueError('BLOCKED: '+str(definition.get('reason')))
@@ -126,6 +143,7 @@ class SimulationManager:
             if kind!='plane' and (geo['latitude_deg'],geo['longitude_deg'],geo['elevation'])!=(-35.363262,149.165237,584.):
                 raise ValueError('BLOCKED: World origin differs from the fixed Framework environment binding')
             spec=dict(kind=kind,slot_id=slot,spawn=spawn)
+            if sensors:spec['sensors']=deepcopy(sensors)
             result.append(spec)
             occupied.append(dict(spawn=spawn,definition=definition,slot_id=slot))
         return result
@@ -134,6 +152,8 @@ class SimulationManager:
         if not hasattr(owner,'vehicles'):return
         vehicles=[]
         for child in tuple(owner.vehicles.values()):
+            if getattr(child,'mid360',None):
+                self.mid360_services[child.id]=(record['id'],child.mid360)
             ready=self._vehicle_ready(child)
             child.stages['framework_controlled']=ready
             if ready and child.stages['plugin_connected']:child.state='RUNNING'
@@ -285,7 +305,7 @@ class SimulationManager:
             spawns=payload.get('spawns',{})
             if type(spawns) is not dict or set(spawns)-{c.slot_id for c in self.owners[record['id']].vehicles.values()}:
                 raise ValueError('spawns must map existing slot IDs')
-            vehicles=[dict(kind=c.vehicle,slot_id=c.slot_id,spawn=spawns.get(c.slot_id,{'id':c.spawn['preset_id']}) if c.spawn.get('preset_id') else spawns.get(c.slot_id,{k:c.spawn[k] for k in ('x','y','z','heading_deg')}))
+            vehicles=[dict(kind=c.vehicle,slot_id=c.slot_id,**({'sensors':getattr(c,'specification',{})['sensors']} if getattr(c,'specification',{}).get('sensors') else {}),spawn=spawns.get(c.slot_id,{'id':c.spawn['preset_id']}) if c.spawn.get('preset_id') else spawns.get(c.slot_id,{k:c.spawn[k] for k in ('x','y','z','heading_deg')}))
                 for c in self.owners[record['id']].vehicles.values()]
             destination=dict(scene_id=payload['scene_id'],vehicles=vehicles,
                 parameters=payload.get('parameters',{}),seed=payload.get('seed',record['configuration']['seed']))
@@ -397,6 +417,14 @@ class SimulationManager:
             finally:
                 # Neither a journal/report failure nor a broken cancellation
                 # callback can suppress process and credential reclamation.
+                # Removed vehicles can reopen recording playback while this
+                # World is live. They no longer occur in owner.vehicles, but
+                # their tools still belong to this World's shutdown boundary.
+                active=getattr(owner,'vehicles',{})
+                for vehicle_id,(world_id,sensor) in tuple(self.mid360_services.items()):
+                    if world_id==identifier and vehicle_id not in active:
+                        try:sensor.close()
+                        except Exception as exc:errors.append('retired MID-360 close: '+type(exc).__name__+': '+str(exc))
                 try:
                     owner.close()
                     self._owners_closed.add(identifier)
@@ -871,6 +899,22 @@ class SimulationManager:
         return record
 
     def handle(self, operation, payload):
+        if operation=='simulation.mid360':
+            fields(payload,('id','vehicle_id','action','source','bag_id'),('id','vehicle_id','action'))
+            if any(type(payload[k]) is not str or len(payload[k])>100 for k in ('id','vehicle_id','action')):
+                raise ValueError('bounded MID-360 session, vehicle and operation required')
+            # Only already owned sensor instances are addressed. Browser inputs
+            # never select executables, source transports, domains or bag paths.
+            with self.lock:
+                if self.closed:raise ValueError('simulation manager is closing')
+                binding=self.mid360_services.get(payload['vehicle_id'])
+                if binding is None or binding[0]!=payload['id']:
+                    raise ValueError('MID-360 does not belong to this World/vehicle')
+                record=self._get(payload['id'])
+                if record['state'] in ('STOPPING','PREPARING','STARTING'):
+                    raise ValueError('World lifecycle operation in progress')
+                sensor=binding[1]
+            return sensor.handle(payload['action'],bag_id=payload.get('bag_id'),source=payload.get('source','live'))
         if operation=='simulation.vehicles':
             fields(payload,())
             return self.vehicle_registry.list_vehicles()
@@ -1059,6 +1103,9 @@ class SimulationManager:
             thread.join(40)
             if thread.is_alive():
                 errors.append('asset:'+identifier)
+        for identifier,(_,sensor) in tuple(self.mid360_services.items()):
+            try:sensor.close()
+            except Exception as exc:errors.append('MID-360 '+identifier+': '+str(exc))
         for record in tuple(self.records.values()):
             if record.get('persistence_errors'):
                 with self.lock:

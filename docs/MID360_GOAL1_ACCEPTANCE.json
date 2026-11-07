@@ -1,0 +1,141 @@
+{
+  "schema": 2,
+  "status": "PASS",
+  "date": "2026-11-07",
+  "base_commit": "44933be459ecb63864bc0660f30e1a19b129af49",
+  "inherited_commit": "e093ddd270d11ab9dc016ab3f686b18a67b682f0",
+  "branch": "codex/mid360-goal1-acceptance",
+  "commit_manifest": "artifacts/mid360-goal1-20261107-resume/delivery.json",
+  "checks": {
+    "environment": {
+      "status": "PASS",
+      "evidence": "artifacts/mid360-goal1-20261107-resume/environment.json"
+    },
+    "editable_install": {
+      "status": "PASS",
+      "evidence": "artifacts/mid360-goal1-20261107-resume/install.log"
+    },
+    "full_unittest": {
+      "status": "PASS",
+      "count": 1054,
+      "evidence": "artifacts/mid360-goal1-20261107-resume/unittest-final.log"
+    },
+    "targeted_regression": {
+      "status": "PASS",
+      "count": 50,
+      "evidence": "artifacts/mid360-goal1-20261107-resume/targeted-final.log"
+    },
+    "native": {
+      "status": "PASS",
+      "checks": {
+        "rover_cloud_tf_imu": "PASS",
+        "copter_cloud_tf_imu": "PASS",
+        "rover_motion": "PASS",
+        "copter_motion": "PASS",
+        "gazebo_gui": "PASS",
+        "rover_rviz_gui": "PASS",
+        "copter_rviz_gui": "PASS",
+        "rover_record_replay": "PASS",
+        "copter_record_replay": "PASS",
+        "rover_fault_recovery": "PASS",
+        "copter_fault_recovery": "PASS",
+        "worker_exit_cleanup": "PASS",
+        "simulation_cleanup": "PASS",
+        "camera_regression": "PASS",
+        "rs16_native_regression": "PASS",
+        "disabled_mid360_regression": "PASS",
+        "multi_instance_isolation": "PASS",
+        "single_instance_stop": "PASS",
+        "retired_recording_replay": "PASS",
+        "backend_recording_recovery": "PASS",
+        "rover_rviz_reopen": "PASS",
+        "copter_rviz_reopen": "PASS",
+        "rover_moving_cloud_tf": "PASS",
+        "copter_moving_cloud_tf": "PASS",
+        "process_port_cleanup": "PASS"
+      },
+      "evidence": "artifacts/mid360-native-20261107-r12/result.json"
+    },
+    "center": {
+      "status": "PASS",
+      "checks": {
+        "rover_UI_selection_live_rviz_reopen_record": "PASS",
+        "copter_UI_selection_live_rviz_reopen_record": "PASS",
+        "stopped_world_UI_replay": "PASS",
+        "normal_backend_cleanup": "PASS",
+        "fresh_backend_UI_recording_recovery": "PASS",
+        "abnormal_backend_cgroup_cleanup": "PASS",
+        "crash_restart_finalized_recording_recovery": "PASS",
+        "final_cleanup": "PASS"
+      },
+      "evidence": "artifacts/mid360-center-20261107-r2/result.json"
+    },
+    "post_cleanup": {
+      "status": "PASS",
+      "processes": 29,
+      "ports": 10,
+      "evidence": "artifacts/mid360-native-20261107-r12/post-cleanup-audit.json"
+    },
+    "gui": {
+      "status": "PASS",
+      "evidence": "artifacts/mid360-goal1-20261107-resume/visual-review.json"
+    },
+    "sdf": {
+      "status": "PASS",
+      "evidence": "artifacts/mid360-native-20261107-r12/sdf-checks.json"
+    }
+  },
+  "recordings": [
+    {
+      "kind": "rover",
+      "source": "artifacts/mid360-native-20261107-r12/native/application/simulation/sim-de3008de35844e23b303831f65e2266f/vehicle-fdf4d6baad024783b228cee4128599ec/mid360/source.json",
+      "bag": {
+        "id": "bag-5c58ca1c59824178ade9686fe911e53a",
+        "path": "artifacts/mid360-native-20261107-r12/native/application/simulation/sim-de3008de35844e23b303831f65e2266f/vehicle-fdf4d6baad024783b228cee4128599ec/mid360/bags/bag-5c58ca1c59824178ade9686fe911e53a",
+        "source": "gazebo-live",
+        "complete": true,
+        "message_counts": {
+          "/clock": 7055,
+          "/vaf/vaf_vehicle_fdf4d6baad024783b228cee4128599ec/sensors/mid360/imu": 4839,
+          "/vaf/vaf_vehicle_fdf4d6baad024783b228cee4128599ec/sensors/mid360/points": 241,
+          "/vaf/vaf_vehicle_fdf4d6baad024783b228cee4128599ec/sensors/mid360/robot_description": 46,
+          "/vaf/vaf_vehicle_fdf4d6baad024783b228cee4128599ec/sensors/mid360/status": 174,
+          "/vaf/vaf_vehicle_fdf4d6baad024783b228cee4128599ec/sensors/mid360/tf": 2614,
+          "/vaf/vaf_vehicle_fdf4d6baad024783b228cee4128599ec/sensors/mid360/tf_static": 46,
+          "/vaf/vaf_vehicle_fdf4d6baad024783b228cee4128599ec/sensors/mid360/trajectory": 232
+        }
+      }
+    },
+    {
+      "kind": "copter",
+      "source": "artifacts/mid360-native-20261107-r12/native/application/simulation/sim-de3008de35844e23b303831f65e2266f/vehicle-096d62bab85a4ffa80ce9b4aedccba2d/mid360/source.json",
+      "bag": {
+        "id": "bag-d0fc63fc6b754414b3fdf57501ae84b5",
+        "path": "artifacts/mid360-native-20261107-r12/native/application/simulation/sim-de3008de35844e23b303831f65e2266f/vehicle-096d62bab85a4ffa80ce9b4aedccba2d/mid360/bags/bag-d0fc63fc6b754414b3fdf57501ae84b5",
+        "source": "gazebo-live",
+        "complete": true,
+        "message_counts": {
+          "/clock": 7033,
+          "/vaf/vaf_vehicle_096d62bab85a4ffa80ce9b4aedccba2d/sensors/mid360/imu": 7465,
+          "/vaf/vaf_vehicle_096d62bab85a4ffa80ce9b4aedccba2d/sensors/mid360/points": 368,
+          "/vaf/vaf_vehicle_096d62bab85a4ffa80ce9b4aedccba2d/sensors/mid360/robot_description": 53,
+          "/vaf/vaf_vehicle_096d62bab85a4ffa80ce9b4aedccba2d/sensors/mid360/status": 191,
+          "/vaf/vaf_vehicle_096d62bab85a4ffa80ce9b4aedccba2d/sensors/mid360/tf": 3064,
+          "/vaf/vaf_vehicle_096d62bab85a4ffa80ce9b4aedccba2d/sensors/mid360/tf_static": 53,
+          "/vaf/vaf_vehicle_096d62bab85a4ffa80ce9b4aedccba2d/sensors/mid360/trajectory": 355
+        }
+      }
+    }
+  ],
+  "out_of_scope": {
+    "physical_mid360": "NOT TESTED: prohibited by scope",
+    "livox_non_repetitive_scan": "NOT TESTED: uniform snapshot approximation only",
+    "FAST_LIO2": "NOT TESTED: not implemented or qualified",
+    "SLAM_Nav2": "NOT TESTED: outside goal"
+  },
+  "hardware_connections": false,
+  "slam_implemented": false,
+  "pushed": false,
+  "merged": false,
+  "previous_failures_retained": true
+}
