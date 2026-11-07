@@ -1,0 +1,76 @@
+Panels:
+  - Class: rviz_common/Displays
+    Name: Displays
+  - Class: rviz_common/Views
+    Name: Views
+Visualization Manager:
+  Class: ""
+  Global Options:
+    Background Color: 24; 29; 38
+    Fixed Frame: __WORLD__
+    Frame Rate: 30
+  Displays:
+    - Class: rviz_default_plugins/Grid
+      Name: Gazebo world ENU
+      Enabled: true
+      Cell Size: 1
+      Plane Cell Count: 80
+    - Class: rviz_default_plugins/PointCloud2
+      Name: MID-360 __SOURCE__ uniform snapshot approximation
+      Enabled: true
+      Topic:
+        Value: __NS__/points
+        Reliability Policy: Best Effort
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Depth: 5
+      Position Transformer: XYZ
+      Color Transformer: AxisColor
+      Axis: Z
+      Use Fixed Frame: true
+      Style: Points
+      Size (Pixels): 3
+      Decay Time: 0.3
+    - Class: rviz_default_plugins/RobotModel
+      Name: Schematic vehicle and actual sensor mount
+      Enabled: true
+      Description Source: Topic
+      Description Topic:
+        Value: __NS__/robot_description
+        Reliability Policy: Reliable
+        Durability Policy: Transient Local
+        Depth: 1
+      TF Prefix: ""
+      Visual Enabled: true
+      Collision Enabled: false
+    - Class: rviz_default_plugins/TF
+      Name: Gazebo truth and mounted sensor TF
+      Enabled: true
+      Show Names: true
+      Show Axes: true
+      Show Arrows: true
+    - Class: rviz_default_plugins/Path
+      Name: Gazebo model trajectory (visualization truth)
+      Enabled: true
+      Topic:
+        Value: __NS__/trajectory
+        Reliability Policy: Reliable
+        Durability Policy: Volatile
+        Depth: 5
+      Line Style: Lines
+      Line Width: 0.03
+      Color: 255; 190; 70
+  Tools:
+    - Class: rviz_default_plugins/MoveCamera
+    - Class: rviz_default_plugins/Select
+    - Class: rviz_default_plugins/FocusCamera
+  Views:
+    Current:
+      Class: rviz_default_plugins/Orbit
+      Distance: 18
+      Pitch: 0.65
+      Yaw: 0.6
+      Target Frame: __BASE__
+Window Geometry:
+  Width: 1280
+  Height: 800

@@ -13,7 +13,7 @@ import xml.etree.ElementTree as ET
 def sha(path): return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
-def assemble(root, directory, prepared, world):
+def assemble(root, directory, prepared, world, *, disable_zoom=False):
     directory = Path(directory).resolve()
     path = Path(prepared['model_path']).resolve()
     entity = prepared['entity_name']
@@ -52,7 +52,10 @@ def assemble(root, directory, prepared, world):
                 # preview subscribes to Gazebo Image, never an unscoped port.
                 removed = []
                 for plugin in list(sensor.findall('plugin')):
-                    if plugin.get('name') == 'GstCameraPlugin':
+                    # Legacy zoom initializes from the first rendered sensor;
+                    # a GPU LiDAR can precede its camera and expose its empty
+                    # camera-name race. MID-360 uses fixed-FOV preview only.
+                    if plugin.get('name') == 'GstCameraPlugin' or (disable_zoom and plugin.get('name')=='CameraZoomPlugin'):
                         removed.append(plugin.get('name')); sensor.remove(plugin)
                 cameras.append(dict(slot=slot, topic=topic, original_topic=original_topic,
                     parent_link=link.get('name'), model_scope=list(scope), removed_plugins=removed,

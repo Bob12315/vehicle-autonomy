@@ -2485,6 +2485,108 @@
         "IMU/NavSat systems; fixed downward camera requires explicit vehicle assembly"
       ],
       "parameter_schema": {}
+    },
+    {
+      "id": "L01",
+      "name": "MID-360 几何检查场",
+      "category": "rover",
+      "vehicles": [
+        "rover",
+        "copter"
+      ],
+      "world_id": "mid360-geometry",
+      "scenario_id": "L01",
+      "layout": "mid360_audit",
+      "source": "repository:simulation/scenarios/center_catalog.json",
+      "version": "1",
+      "license": "Repository-authored procedural SDF; no third-party mesh assets",
+      "description": "复用原生几何场景生成器：墙壁、立柱、建筑及 1/3/7 米障碍物；仅用于雷达数据和显示检查，不包含建图。",
+      "extent_m": [
+        120,
+        120
+      ],
+      "spawn": [
+        0,
+        0,
+        0.3,
+        0,
+        0,
+        0
+      ],
+      "targets": [
+        {
+          "name": "A",
+          "position": [
+            10,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "B",
+          "position": [
+            20,
+            10,
+            0
+          ]
+        }
+      ],
+      "recommended_tests": [
+        "MID-360 points/IMU/TF",
+        "RViz2",
+        "rosbag2"
+      ],
+      "limitations": [
+        "程序化工程测试几何，不等同高精度实景；车辆、任务和感知能力需分别验收。",
+        "独立 World 不内置飞控或车辆；候选车型并非已通过 SITL 的组合。",
+        "MID-360 和运动/GUI 的实际验收分别记录；本登记不授予 SEND。"
+      ],
+      "verification": {
+        "L1": "NOT_TESTED",
+        "L2": "NOT_TESTED",
+        "L3": "NOT_TESTED",
+        "L4": "NOT_TESTED",
+        "L5": "NOT_TESTED",
+        "L6": "NOT_TESTED"
+      },
+      "installed": true,
+      "download_status": "BUILTIN",
+      "compatibility_status": "NOT_TESTED",
+      "sensor_support": [
+        "Opt-in mid360-approx-v1; real Gazebo gpu_lidar geometry, not Livox non-repetitive scanning"
+      ],
+      "parameter_schema": {
+        "obstacle_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 80,
+          "default": 0
+        },
+        "wind_speed": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 20,
+          "default": 0
+        },
+        "wind_direction": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180,
+          "default": 0
+        },
+        "light_intensity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.8
+        },
+        "friction": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 3,
+          "default": 1
+        }
+      }
     }
   ]
 }

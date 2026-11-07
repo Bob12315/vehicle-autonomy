@@ -1,5 +1,27 @@
 # V1 framework boundary
 
+## Explicit MID-360 simulation approximation (2026-11-07)
+
+Ordinary Rover/Copter instances can opt into a shared native Gazebo GPU LiDAR
+recipe and ideal IMU in their owned model copies. An optional ROS worker keeps
+original simulation acquisition stamps and publishes a uniform snapshot cloud,
+SI IMU, actual Gazebo truth TF and clearly schematic vehicle visuals. All point
+offsets are zero; this is not Livox non-repetitive scanning or qualified FAST-LIO
+input. No geometry truth enters vehicle localization or control.
+
+Existing LocalTools supervision owns sensor, RViz and rosbag processes; isolated
+live/replay domains, explicit source labels and quarantined uncertain leases
+prevent silently adopting old sources. The authenticated simulation console
+selects this component and manages its tools without a vehicle command port.
+Core contracts, dual SEND, SafetyPolicy, Lease and the sole writer are unchanged.
+Native Gazebo/SITL motion, ROS acquisition-time TF, actual Gazebo/RViz windows,
+record/replay, browser controls, multi-instance isolation and failure cleanup
+have passed local simulation acceptance. Finalized recordings are discoverable
+across fresh Control Center run directories without adopting old processes or
+vehicle authority. World shutdown also closes playback reopened by removed
+vehicles. See the [acceptance report](MID360_GOAL1_ACCEPTANCE.md) for raw evidence,
+the RS16 replay-only regression scope, and the model's physical limitations.
+
 ## Rescue mission parameter revision (2026-11-06)
 
 The current 1.1.2 template sets the first/second virtual-camera ey offsets to

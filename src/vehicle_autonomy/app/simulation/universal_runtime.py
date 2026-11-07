@@ -67,6 +67,8 @@ class VehicleInstance:
         self.error = None
         self.camera_sources = {}
         self.camera_assembly = None
+        self.mid360 = None
+        self.mid360_assembly = None
 
     def view(self):
         p = self.prepared or {}
@@ -79,7 +81,8 @@ class VehicleInstance:
             ground_truth=self.owner._truths.get(self.id),
             parameter_readback=None if self.session is None else self.session.manifest.get('fixed_parameters_readback'),
             sensor_activation={'imu':'Gazebo Imu system','gps':'Gazebo NavSat system',
-                'rendering':{'assembly':self.camera_assembly, 'cameras':{k:v.health() for k,v in self.camera_sources.items()}}})
+                'rendering':{'assembly':self.camera_assembly, 'cameras':{k:v.health() for k,v in self.camera_sources.items()}},
+                'mid360':self.mid360.snapshot() if self.mid360 else {'enabled':False}})
         if self.driver:
             info, world = self.driver.read_view()
             from vehicle_autonomy.contracts.core.serialization import to_json_value
@@ -95,7 +98,11 @@ class VehicleInstance:
         p = self.prepared = o.library.prepare(self.vehicle,self.directory,entity_name=entity,
             instance=self.lease.instance,system_id=self.lease.system_id)
         from .camera_assembly import assemble
-        self.camera_assembly = assemble(o.root, self.directory, p, o.world)
+        self.camera_assembly = assemble(o.root, self.directory, p, o.world,
+            disable_zoom=bool(self.specification.get('sensors',{}).get('mid360')))
+        if self.specification.get('sensors', {}).get('mid360'):
+            from .mid360_assembly import assemble as assemble_mid360
+            self.mid360_assembly = assemble_mid360(o.root, self.directory, p, o.world)
         self.model = SimpleNamespace(name=entity, system_id=self.lease.system_id,
             instance=self.lease.instance, fdm_port=self.lease.fdm_port, binary=p['binary'])
         env = dict(o.session.env)
@@ -178,6 +185,11 @@ class VehicleInstance:
                 model_sha256=profile['model_sha256'],source=f'/vaf/camera/{o.world}/{entity}/gimbal-camera/image',
                 kind='stabilized',filename='stabilized.packet',display_name='增稳画面',image_domain='virtual_nadir')
         self.session.manifest['camera_assembly'] = self.camera_assembly
+        if self.mid360_assembly:
+            from .mid360_tools import Mid360Tools
+            self.mid360 = Mid360Tools(self, self.mid360_assembly)
+            self.mid360.start()
+            self.session.manifest['mid360_assembly'] = self.mid360_assembly
         self.session.manifest['ready']=True
         self.session.save()
         self.state='STARTING'
@@ -196,6 +208,10 @@ class VehicleInstance:
             try:self.driver.close()
             except Exception as exc:driver_errors.append('driver: '+str(exc))
         elif self.proof:self.proof.close()
+        if self.mid360:
+            # Retain World/SITL ownership if any sensor/tool descendant cannot
+            # be confirmed gone; never release ports/domains beneath it.
+            self.mid360.close()
         for source in self.camera_sources.values():
             try:source.close()
             except Exception as exc:errors.append("camera: "+str(exc))

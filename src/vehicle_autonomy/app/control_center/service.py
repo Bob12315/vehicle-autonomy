@@ -111,6 +111,10 @@ class ControlCenter:
         temporary.replace(path)
 
     def _wait_stop(self,tool_id):
+        binding=self.bindings.get(tool_id,{})
+        if tool_id=='rviz2' and binding.get('mid360_vehicle'):
+            entry=self.application.simulation_manager.mid360_services.get(binding['mid360_vehicle'])
+            if entry:entry[1].handle('rviz_stop')
         with self.tools.lock:
             record=self.tools.instances.get(tool_id)
             if record and record['process'].poll() is None:self.tools._stop(record)
@@ -125,11 +129,25 @@ class ControlCenter:
         tool_id=payload.get('tool_id');action=payload['action']
         if action=='stop_all':
             for key in ('rviz2','visualization-bridge','qgroundcontrol','gazebo-gui'):self._wait_stop(key)
+            for _,sensor in tuple(self.application.simulation_manager.mid360_services.values()):sensor.handle('rviz_stop')
             return
         if action in ('stop','restart'):
             self._wait_stop(tool_id)
             if tool_id=='rviz2':self._wait_stop('visualization-bridge')
             if action=='stop':return
+        if tool_id=='rviz2' and payload.get('target'):
+            manager=self.application.simulation_manager
+            matching=[(vehicle_id,world_id,sensor) for vehicle_id,(world_id,sensor) in tuple(manager.mid360_services.items())
+                      if sensor.child.target==payload['target'] and not sensor.live_closed]
+            if matching:
+                vehicle_id,world_id,sensor=matching[0]
+                if payload.get('world_id') and payload['world_id']!=world_id:raise ValueError('MID-360 target belongs to another World')
+                self._wait_stop('rviz2');self._wait_stop('visualization-bridge')
+                sensor.handle('rviz_start')
+                self.bindings['rviz2']=dict(target=payload['target'],world_id=world_id,
+                    mid360_vehicle=vehicle_id,source='gazebo-live',note='MID-360 原生点云；Gazebo 真值 TF，仅用于仿真显示。')
+                self._save_registry()
+                return
         with self.tools.lock:
             current=self.tools.instances.get(tool_id)
             if current and current['process'].poll() is None:
@@ -150,7 +168,10 @@ class ControlCenter:
         if operation=='center.logs':
             object_fields(payload,('tool_id',))
             if payload['tool_id'] not in self.tools.registry:raise ValueError('未注册的工具。')
-            with self.tools.lock:record=self.tools.instances.get(payload['tool_id']);path=record.get('log_path') if record else None
+            owner=self._tool_owner(payload['tool_id'])
+            if owner:
+                with owner.lock:record=owner.instances.get(payload['tool_id']);path=record.get('log_path') if record else None
+            else:path=None
             if not path or not Path(path).exists():return dict(text='暂无日志。',path=path)
             with Path(path).open('rb') as source:source.seek(max(0,Path(path).stat().st_size-32768));text=source.read(32768).decode(errors='replace')
             return dict(text=text,path=path)
@@ -191,7 +212,10 @@ class ControlCenter:
                     if key=='rviz2' and binding.get('target'):
                         driver=self.application.drivers.get(binding['target'])
                         if not driver or not driver.info().get('connected'):
+                            mid=self.application.simulation_manager.mid360_services.get(binding.get('mid360_vehicle'))
+                            if mid and mid[1].rviz_source=='replay':continue
                             self._wait_stop(key);self._wait_stop('visualization-bridge')
+                            self.bindings.pop(key,None)
                     if key=='rviz2':
                         with self.tools.lock:record=self.tools.instances.get(key)
                         if record and record['process'].poll() is not None:self._wait_stop('visualization-bridge')
@@ -203,6 +227,16 @@ class ControlCenter:
         for value in tools:
             key=value['manifest']['id']
             if key=='visualization-bridge':continue
+            binding=self.bindings.get(key,{})
+            if key=='rviz2' and binding.get('mid360_vehicle'):
+                entry=self.application.simulation_manager.mid360_services.get(binding['mid360_vehicle'])
+                sensor_tools=entry[1].tools if entry else None
+                if sensor_tools:
+                    with sensor_tools.lock:
+                        owned=sensor_tools.instances.get('rviz2')
+                        value['instance']=sensor_tools._view(owned) if owned else None
+                        if owned:markers[key]=owned['ownership_marker']
+                else:value['instance']=None
             record=value['instance'];value['binding']=deepcopy(self.bindings.get(key,{}))
             value['executable']=self.host['tools'][key]['executable'];value['desktop']=self.host['desktop']
             if record:
@@ -220,12 +254,22 @@ class ControlCenter:
             desktop=self.host['desktop'],ros_error=self.host['ros_error'],error=self.error,
             log_directory=str(self.directory),registry_path=str(self.directory/'tool-registry.json'))
 
+    def _tool_owner(self,tool_id):
+        binding=self.bindings.get(tool_id,{})
+        if tool_id=='rviz2' and binding.get('mid360_vehicle'):
+            entry=self.application.simulation_manager.mid360_services.get(binding['mid360_vehicle'])
+            return entry[1].tools if entry else None
+        return self.tools
+
     def summary(self):
         """Cheap projection for existing control pages; no OS/ROS probes here."""
-        with self.tools.lock:
-            record=self.tools.instances.get('rviz2')
-            ready=bool(record and record['ready'])
-            state='STOPPED' if record is None else record['state']
+        owner=self._tool_owner('rviz2')
+        ready=False;state='STOPPED'
+        if owner:
+            with owner.lock:
+                record=owner.instances.get('rviz2')
+                ready=bool(record and record['ready'])
+                state='STOPPED' if record is None else record['state']
         with self.lock:operation=deepcopy(self.operation)
         return dict(session_id=self.session_id,rviz2_available=bool(self.host['tools']['rviz2']['installed']
             and not self.host['ros_error'] and self.host['desktop']['available'] and not self.stop.is_set()),

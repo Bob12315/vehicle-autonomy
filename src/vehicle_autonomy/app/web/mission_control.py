@@ -397,6 +397,8 @@ class MissionControl(ActionLab):
     def handle_authenticated(self, operation, payload, *, principal, control_token, sessions):
         if principal!='api' and not sessions.alive(principal):raise ValueError('browser session expired before operation')
         center=getattr(self,'control_center',None)
+        if center is not None and center.stop.is_set() and operation=='simulation.mid360' and payload.get('action') not in ('status','rviz_stop','record_stop','replay_stop','sensor_stop'):
+            raise ValueError('控制中心正在退出，不能启动 MID-360 工具。')
         if center is not None and center.stop.is_set() and operation in (
                 'simulation.create','simulation.start','simulation.switch','simulation.add_vehicle',
                 'mission.start','run','manual.action','manual.start','operator.acquire','visualization.open'):
@@ -565,6 +567,7 @@ class MissionControlHandler(ActionLabHandler):
             '/center':('control-center.html','text/html; charset=utf-8'),
             '/control-center.js':('control-center.js','application/javascript'),
             '/simulation-center.js':('simulation-center.js','application/javascript'),
+            '/mid360-ui.js':('mid360-ui.js','application/javascript'),
             '/simulation-center.css':('simulation-center.css','text/css'),
             '/studio':('studio-b.html','text/html; charset=utf-8'),
             '/studio/legacy':('mission-studio.html','text/html; charset=utf-8'),
@@ -630,7 +633,7 @@ class MissionControlHandler(ActionLabHandler):
         '/api/workspaces/retry':'workspace.retry','/api/workspaces/reconcile':'workspace.reconcile',
         '/api/control/takeover':'control.takeover','/api/control/reestablish':'control.reestablish'})
     post_routes.update({'/api/simulation/'+op:'simulation.'+op for op in (
-        'create','start','stop','pause','resume','reset','switch','add_vehicle','remove_vehicle','report','logs','test','fault','install','uninstall','asset_status')})
+        'create','start','stop','pause','resume','reset','switch','add_vehicle','remove_vehicle','report','logs','test','fault','mid360','install','uninstall','asset_status')})
     post_routes.update({'/api/control/acquire':'operator.acquire','/api/control/renew':'operator.renew',
         '/api/control/release':'operator.release','/api/control/request-takeover':'operator.takeover'})
     post_routes.update({'/api/visualization/open':'visualization.open','/api/visualization/candidates':'visualization.propose',
