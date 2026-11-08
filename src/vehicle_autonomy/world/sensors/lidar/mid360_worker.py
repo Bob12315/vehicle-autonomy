@@ -227,6 +227,9 @@ def robot_description(c):
     def visual(xyz, shape):
         return f'<visual><origin xyz="{xyz}"/><geometry>{shape}</geometry><material name="blue"><color rgba="0.15 0.5 0.8 1"/></material></visual>'
     body = visual('0 0 0','<box size="0.72 0.42 0.16"/>') if c['kind']=='rover' else visual('0 0 0','<box size="0.5 0.05 0.04"/>')+visual('0 0 0','<box size="0.05 0.5 0.04"/>')
+    if c.get('vehicle_model')=='wildthumper':
+        from .wildthumper_description import schematic
+        body=schematic()
     xyz, rpy = ' '.join(map(str,c['mount'][:3])), ' '.join(map(str,c['mount'][3:]))
     return (f'<robot name="mid360_simulation_schematic"><link name="{base}">{body}</link>'
             f'<link name="{lidar}">'+visual('0 0 0','<cylinder radius="0.0325" length="0.06"/>')+'</link>'

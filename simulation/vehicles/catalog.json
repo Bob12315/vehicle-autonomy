@@ -3,9 +3,9 @@
   "scope": "owned localhost Gazebo / SITL only; READY describes locked inputs, not control acceptance",
   "vehicles": {
     "rover": {
-      "version": "1.0.0",
-      "model_name": "target_rover",
-      "model_path": "root:simulation/models/target_rover/model.sdf",
+      "version": "wildthumper-1.0.0",
+      "model_name": "wildthumper",
+      "model_path": "sitl_models:Gazebo/models/wildthumper/model.sdf",
       "profile_path": "root:simulation/profiles/rover_phase2.toml",
       "binary": "ardupilot:build/sitl/bin/ardurover",
       "parameters": [
@@ -14,14 +14,41 @@
         "root:simulation/params/rover_telemetry.parm",
         "root:simulation/params/rover_phase2_rtl.parm"
       ],
-      "clearance_z": 0,
+      "clearance_z": 0.15,
       "radius": 0.72,
       "height": 0.5,
-      "compatibility": "World spawn/terrain/runway compatibility requires separate admission and native acceptance.",
+      "compatibility": "Official Wild Thumper 6WD; Framework source locks and owned camera/MID-360 assembly. Native movement acceptance is recorded separately.",
       "locks": {
-        "root:simulation/models/target_rover/model.config": "c5c97c0f63c9731b394d9ce119e7f34403523a2f2fbaaa2c14391b0e340c9246",
-        "root:simulation/models/target_rover/model.sdf": "1308b16b3d50142e50ffd6296d892be070ab006c4d9ebef8d5d08283e8ae50b0",
-        "root:simulation/models/target_rover/navigation.sdf": "e1c17c52b5c1a0329448425b91f7f42b82083212a700e9225ca576018c374a9c",
+        "sitl_models:Gazebo/models/wildthumper/materials/textures/black_metal/black_metal_diffuse.jpg": "5262ef80d68aa74dd3f130427614817be7fc0463d700d673f3060244fb764048",
+        "sitl_models:Gazebo/models/wildthumper/materials/textures/black_metal/black_metal_metallic.jpg": "843102638fa0a5bf897888868877efab8ccdc4cb84a48e57bdb52bfb30f5e714",
+        "sitl_models:Gazebo/models/wildthumper/materials/textures/black_metal/black_metal_normal.jpg": "77a7713ca1b6fc86690d3e74206c5fe435d7260dccebe7c87c91e62ca8c0f93d",
+        "sitl_models:Gazebo/models/wildthumper/materials/textures/black_metal/black_metal_roughness.jpg": "908b22c5c8f427f14584fc0aebca06c7a2884b16e4d4be1ac78e60bf5266f6ce",
+        "sitl_models:Gazebo/models/wildthumper/materials/textures/red_metal/red_metal_diffuse.jpg": "ca1521ab1e7a440233755d73a72b622213860bb9533dd1088fa2d6c2a5800525",
+        "sitl_models:Gazebo/models/wildthumper/materials/textures/red_metal/red_metal_metallic.jpg": "a87b5789e7c078bfad6f78fc1f076d55c482aa32c148c4ef4188ec22c5f0083a",
+        "sitl_models:Gazebo/models/wildthumper/materials/textures/red_metal/red_metal_normal.jpg": "a3d82824f6527473b0532fe0c85313f8184014e8c26e624674ec709f8b5b3a3b",
+        "sitl_models:Gazebo/models/wildthumper/materials/textures/red_metal/red_metal_roughness.jpg": "75ad54db2ad9db8ffb3c1c7b3c71861a5ba415545d0072e75b3e41c5c0334417",
+        "sitl_models:Gazebo/models/wildthumper/materials/textures/rubber_01/rubber_01_diffuse.jpg": "9ef3a4e7b759e3b26b4821e3c322b7b0b27d93b39386934bf91203bcad347e7c",
+        "sitl_models:Gazebo/models/wildthumper/materials/textures/rubber_01/rubber_01_normal.jpg": "a97a7967df848d3798106d69afb3c9f4c73df410dea2c626c137c5280111c75e",
+        "sitl_models:Gazebo/models/wildthumper/materials/textures/rubber_01/rubber_01_roughness.jpg": "c83337f6c327575511b114c5f5ef94715ae4dd92e6dcc4b51a1e60cd4e084ea2",
+        "sitl_models:Gazebo/models/wildthumper/materials/textures/silver_metal/silver_metal_diffuse.jpg": "a02d46eed3917810adb1e19cdc9560831f30db0d02afadb80183ea8eb7367636",
+        "sitl_models:Gazebo/models/wildthumper/materials/textures/silver_metal/silver_metal_metallic.jpg": "a87b5789e7c078bfad6f78fc1f076d55c482aa32c148c4ef4188ec22c5f0083a",
+        "sitl_models:Gazebo/models/wildthumper/materials/textures/silver_metal/silver_metal_normal.jpg": "a3d82824f6527473b0532fe0c85313f8184014e8c26e624674ec709f8b5b3a3b",
+        "sitl_models:Gazebo/models/wildthumper/materials/textures/silver_metal/silver_metal_roughness.jpg": "75ad54db2ad9db8ffb3c1c7b3c71861a5ba415545d0072e75b3e41c5c0334417",
+        "sitl_models:Gazebo/models/wildthumper/meshes/bases/left_motor_asm.dae": "d0296c046f37f10ffb2c35fafc1b04dd162b5d16bc5d603c0a49f83c869d061f",
+        "sitl_models:Gazebo/models/wildthumper/meshes/bases/right_motor_asm.dae": "efb239e8881abc17ab949dedc0a46d433ad59cceb0fa09b6df42147da6c09b58",
+        "sitl_models:Gazebo/models/wildthumper/meshes/bases/small_chassis_with_frame_connector.dae": "91b4e3e201bea6db0d4a917802dde65d229ac134c6b83bd1d909c8f6b41702f0",
+        "sitl_models:Gazebo/models/wildthumper/meshes/bases/top_chassis.dae": "5a650e8ee8def517b7ad47bb1048ef262a878b761af2c0d1d1f94549477eeef0",
+        "sitl_models:Gazebo/models/wildthumper/meshes/bases/top_chassis_with_standoffs.dae": "d79137ce08f5c39b7b7a92ce450a916414766d27819fa02584c4b2ec5425616c",
+        "sitl_models:Gazebo/models/wildthumper/meshes/bases/wheel_chassis_long.dae": "a46f5d4d6b30bb1987116717e18d6b86ef5c5c4bb671dc5cc8036698fd464518",
+        "sitl_models:Gazebo/models/wildthumper/meshes/bases/wheel_chassis_short.dae": "662ff0aed043dfd5c8944119757eaed23250bd79b6ac097b6595188f6a29ca04",
+        "sitl_models:Gazebo/models/wildthumper/meshes/wheels/left_wheel_adapter.dae": "fc6b14c5499a1befb796deb1ebe7443e352ef4990cf7e3a172acf2791fd639cc",
+        "sitl_models:Gazebo/models/wildthumper/meshes/wheels/left_wheel_rim.dae": "cb3a9fa4b04da77b2acf769f234f72a60d9d08d06936e02553b14da55b800154",
+        "sitl_models:Gazebo/models/wildthumper/meshes/wheels/left_wheel_tyre.dae": "b4ffc68d48ebdace23c9b38d76d2683144133a37975413eeb1773009f954a246",
+        "sitl_models:Gazebo/models/wildthumper/meshes/wheels/right_wheel_adapter.dae": "17a34cff2f3e08162b50ce2cab6707c61830adc172937c584a12555e498579de",
+        "sitl_models:Gazebo/models/wildthumper/meshes/wheels/right_wheel_rim.dae": "7467d0f186b7335f071dcbc75358438da74e507c062fc82e4c26e8612ad2b4f7",
+        "sitl_models:Gazebo/models/wildthumper/meshes/wheels/right_wheel_tyre.dae": "60cb50834835af7a823fd8be658e30a845cfe0fb49c7e60beda7ee5cae5552e4",
+        "sitl_models:Gazebo/models/wildthumper/model.config": "6cb111b472367e2aeb3e2d89a50cd398fa3f59b048c3968e910c74d4f3f69884",
+        "sitl_models:Gazebo/models/wildthumper/model.sdf": "cc531190969fd3feafb6f28c7da0f4cfcd11df8e91bb15dd2ef089467bfa60f4",
         "ardupilot:build/sitl/bin/ardurover": "437d2226018c648eeeaedb40ef09739f828319e68a083e41f866c577186c5bd5",
         "root:simulation/profiles/rover_phase2.toml": "128b41393106b2943be2b1d5d0415f78858c4d6192f2dd3d1a9ee71a03d92f0d",
         "ardupilot:Tools/autotest/default_params/rover.parm": "6479879d3e625854a6c32cb4d3fe231bab81d935e07904eac8a411fd6f971bc4",
@@ -195,6 +222,12 @@
     "ardupilot_commit": "b5fbe26515eddb9277e1b5e7a4fcf3f37cf449a6",
     "ardupilot_gazebo_commit": "3ec51428fd43deb7b71137192ba16394b450d78e",
     "plugin_abi": "gz-sim8/gz-transport13/gz-msgs10/sdformat14; binary hash is locked",
-    "twin_cessna": "Existing local twin-fixedwing model and payload source, all files SHA locked; no asset redistribution license claimed"
+    "twin_cessna": "Existing local twin-fixedwing model and payload source, all files SHA locked; no asset redistribution license claimed",
+    "wildthumper": {
+      "repository": "https://github.com/ArduPilot/SITL_Models",
+      "commit": "25bc38ed8c6c0345840159a8cbc0b02781d52f3c",
+      "model": "Gazebo/models/wildthumper",
+      "visual_credit": "Wild Thumper 6WD Chassis by Pamir (GrabCAD), as credited upstream; external assets are not redistributed in this repository."
+    }
   }
 }

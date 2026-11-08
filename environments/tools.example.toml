@@ -10,6 +10,7 @@ rviz2 = ""
 [paths]
 ardupilot_root = ""
 gazebo_plugin_root = ""
+sitl_models_root = ""
 fixedwing_root = ""
 ros2_root = ""
 ros2_setup = ""

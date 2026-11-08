@@ -16,6 +16,9 @@ ROS 2 和第三方大型模型使用仓库外的本机安装，不复制进源�
 
 `vehicle-autonomy-environment check` 输出路径、安装检查和校验结果，不启动软件。
 缺少可选软件不表示主程序不能运行；相关功能必须单独检查就绪状态。
+普通 Rover 的官方外部模型使用 `paths.sitl_models_root`，或环境覆盖
+`VAF_SITL_MODELS_ROOT`；目录应包含 `Gazebo/models/wildthumper`。版本和文件锁见
+`simulation/vehicles/catalog.json`，准备方式见 [WildThumper](../docs/WILDTHUMPER_ROVER.md)。
 `scripts/with_ros2.sh COMMAND...` 使用同一索引，ROS 仅进入显式工作进程。
 
 `runtime/state` 是持久状态，`runtime/sessions` 是有归属的运行会话，

@@ -29,6 +29,7 @@ class VehicleSpawnerTest(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         base = Path(self.temp.name)
         self.root, self.ap, self.plugin, self.twin = [base / p for p in ('repo', 'ap', 'plugin', 'twin')]
+        self.sitl = base / 'external-sitl-models'
         self.catalog = {'schema_version': 1, 'vehicles': {}}
         self.write(self.root / 'simulation/models/fixture/model.sdf', MODEL)
         self.write(self.plugin / 'models/camera/model.sdf', CAMERA)
@@ -59,7 +60,28 @@ class VehicleSpawnerTest(unittest.TestCase):
         self.write(self.root / 'simulation/vehicles/catalog.json', json.dumps(self.catalog))
 
     def registry(self):
-        return VehicleRegistry(self.root, ardupilot_root=self.ap, plugin_root=self.plugin, twin_root=self.twin)
+        return VehicleRegistry(self.root, ardupilot_root=self.ap, plugin_root=self.plugin, twin_root=self.twin, sitl_models_root=self.sitl)
+
+    def test_external_sitl_model_is_locked_and_copied_without_source_mutation(self):
+        source=self.sitl/'Gazebo/models/wildthumper/model.sdf'
+        self.write(source,MODEL)
+        entry=self.catalog['vehicles']['rover']
+        entry.update(model_name='wildthumper',model_path='sitl_models:Gazebo/models/wildthumper/model.sdf',locks={})
+        self.save_catalog();entry['locks']=self.registry().get('rover')['source_files'];self.save_catalog()
+        self.assertEqual(self.registry().get('rover')['status'],'READY')
+        output=self.registry().prepare('rover',Path(self.temp.name)/'official-owned',entity_name='official_40',instance=40,system_id=41)
+        self.assertEqual(source.read_text(),MODEL)
+        self.assertEqual(ET.parse(output['model_path']).find('model').get('name'),'official_40')
+        self.assertIn('sitl_models:Gazebo/models/wildthumper/model.sdf',output['source_files'])
+        with self.assertRaises(ValueError):
+            self.registry().prepare('rover',self.sitl/'unsafe-output',entity_name='official_41',instance=41,system_id=42)
+        source.write_text(MODEL.replace('<mass>2</mass>','<mass>3</mass>'))
+        self.assertEqual(self.registry().get('rover')['status'],'BLOCKED')
+
+    def test_missing_external_model_is_blocked_without_blocking_other_definitions(self):
+        self.catalog['vehicles']['rover']['model_path']='sitl_models:Gazebo/models/missing/model.sdf';self.save_catalog()
+        self.assertEqual(self.registry().get('rover')['status'],'BLOCKED')
+        self.assertEqual(len(self.registry().list_vehicles()),2)
 
     def test_ready_is_json_source_inventory_including_nested_sensor_extrinsics(self):
         result = self.registry().get('rover')

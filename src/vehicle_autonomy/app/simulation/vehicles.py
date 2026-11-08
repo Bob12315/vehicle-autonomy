@@ -41,14 +41,15 @@ def _pose(element):
 
 
 class VehicleRegistry:
-    def __init__(self, root=None, *, ardupilot_root=None, plugin_root=None, twin_root=None):
+    def __init__(self, root=None, *, ardupilot_root=None, plugin_root=None, twin_root=None, sitl_models_root=None):
         self.root = Path(root or resource_root()).resolve()
         host = HostEnvironment(self.root)
         self.ardupilot_root = host.path('ardupilot_root', ardupilot_root)
         self.plugin_root = host.path('gazebo_plugin_root', plugin_root)
         self.twin_root = host.path('fixedwing_root', twin_root)
+        self.sitl_models_root = host.path('sitl_models_root', sitl_models_root)
         self.roots = {'root': self.root, 'ardupilot': self.ardupilot_root,
-                      'plugin': self.plugin_root, 'twin': self.twin_root}
+                      'plugin': self.plugin_root, 'twin': self.twin_root, 'sitl_models': self.sitl_models_root}
         self.catalog = json.loads((self.root / 'simulation/vehicles/catalog.json').read_text())
 
     def _path(self, reference):
@@ -66,7 +67,8 @@ class VehicleRegistry:
         raise ValueError('Vehicle resource outside configured roots: ' + str(path))
 
     def _model_dependencies(self, model):
-        roots = [self.root / 'simulation/models', self.plugin_root / 'models', self.twin_root / 'models']
+        roots = [self.root / 'simulation/models', self.plugin_root / 'models', self.twin_root / 'models',
+                 self.sitl_models_root / 'Gazebo/models']
         directories, files, parsed, visiting = set(), {}, {}, set()
 
         def visit(path):
@@ -222,7 +224,7 @@ class VehicleRegistry:
         # Reject reuse before copying or writing any source inputs.
         if directory.exists() and any(directory.iterdir()):
             raise ValueError('Vehicle preparation requires a new empty owned directory')
-        for root in (self.ardupilot_root, self.plugin_root, self.twin_root,
+        for root in (self.ardupilot_root, self.plugin_root, self.twin_root, self.sitl_models_root,
                      self.root / 'simulation/models', self.root / 'simulation/vehicles'):
             if directory.is_relative_to(root):
                 raise ValueError('Vehicle output cannot modify a source resource tree')

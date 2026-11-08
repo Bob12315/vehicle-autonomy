@@ -65,7 +65,7 @@ where = ["src"]
 "share/vehicle-autonomy/simulation/scenarios" = ["simulation/scenarios/acceptance-v1.json", "simulation/scenarios/center_catalog.json", "simulation/scenarios/assets.lock.json", "simulation/scenarios/world_spawns.json"]
 "share/vehicle-autonomy/simulation/world_registry" = ["simulation/world_registry/catalog.yaml", "simulation/world_registry/sitl_models_files.txt"]
 "share/vehicle-autonomy/simulation/scenes" = ["simulation/scenes/yard.json"]
-"share/vehicle-autonomy/simulation/worlds" = ["simulation/worlds/rover_runway.sdf", "simulation/worlds/plane_runway.sdf", "simulation/worlds/cuadc2026_rescue.sdf", "simulation/worlds/cuadc2026_rescue_scene.sdf"]
+"share/vehicle-autonomy/simulation/worlds" = ["simulation/worlds/wildthumper_runway.sdf", "simulation/worlds/rover_runway.sdf", "simulation/worlds/plane_runway.sdf", "simulation/worlds/cuadc2026_rescue.sdf", "simulation/worlds/cuadc2026_rescue_scene.sdf"]
 
 "share/vehicle-autonomy/simulation/vehicles" = ["simulation/vehicles/catalog.json", "simulation/vehicles/vtol-audit.json"]
 

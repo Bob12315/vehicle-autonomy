@@ -10,11 +10,13 @@
 
 | 入口 | 模型 | Web 控制页 | 系统 ID |
 |---|---|---|---:|
-| 汽车 | `target_rover` | http://127.0.0.1:8780/control | 1 |
+| 汽车 | 官方 `wildthumper` 六轮车 | http://127.0.0.1:8780/control | 1 |
 | 多旋翼 | `iris_with_gimbal` | http://127.0.0.1:8781/control | 2 |
 | 固定翼 | `~/twin-fixedwing` 的 `twin_cessna` | http://127.0.0.1:8782/control | 3 |
 
 每个脚本启动自己的 Gazebo、ArduPilot SITL 和当前 Phase 4 Mission Control。
+普通 Rover 已使用固定版本的官方 WildThumper；外部模型安装和验收范围见
+[模型更换记录](../WILDTHUMPER_ROVER.md)。旧前驱/脚轮模型仅保留给原有显式测试夹具。
 Phase 5 不接入；不会自动解锁、起飞或启动任务。固定翼仍只读使用外部双发模型、
 跑道、相机和载荷插件；只在本次目录增加遥测与原生围栏参数，保持双电机原有
 1000–2000 PWM 标定和空速设置，不修改 `~/twin-fixedwing` 原文件。

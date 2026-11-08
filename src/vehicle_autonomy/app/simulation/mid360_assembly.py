@@ -76,9 +76,16 @@ def assemble(root, directory, prepared, world):
     ET.SubElement(cylinder, 'radius').text = '0.0325'
     ET.SubElement(cylinder, 'length').text = '0.06'
     ET.SubElement(ET.SubElement(housing, 'material'), 'diffuse').text = '0.25 0.25 0.28 1'
+    if prepared.get('model_name')=='wildthumper':
+        # Visual bracket only: preserve upstream mass, collision and dynamics.
+        support=ET.SubElement(link,'visual',name='mid360_mount_support')
+        ET.SubElement(support,'pose').text='0 0 0.1085 0 0 0'
+        stand=ET.SubElement(ET.SubElement(support,'geometry'),'cylinder')
+        ET.SubElement(stand,'radius').text='0.009';ET.SubElement(stand,'length').text='0.163'
+        ET.SubElement(ET.SubElement(support,'material'),'diffuse').text='0.35 0.35 0.38 1'
     before = digest(path)
     tree.write(path, encoding='utf-8', xml_declaration=True)
-    result = dict(schema=1, id='mid360-approx', version='1.0.0', kind=kind,
+    result = dict(schema=1, id='mid360-approx', version='1.0.0', kind=kind, vehicle_model=prepared.get('model_name'),
         backend=config['backend'], source='gazebo-live', world=world, entity=entity,
         namespace=namespace, body_scope=chain, body_link=mount['link'],
         model_to_body=offsets, mount=deepcopy(mount['xyz_rpy']),

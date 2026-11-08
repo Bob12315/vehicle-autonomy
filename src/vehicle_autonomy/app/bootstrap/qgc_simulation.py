@@ -66,12 +66,13 @@ def resolve_model(root, kind, ardupilot, plugin_root, twin_root):
         parameters = (defaults / 'copter.parm', defaults / 'gazebo-iris.parm',
                       root / 'simulation/params/copter_telemetry.parm')
     else:
-        name = 'target_rover'
-        model = root / 'simulation/models/target_rover/model.sdf'
-        world = root / 'simulation/worlds/rover_runway.sdf'
-        parameters = (defaults / 'rover.parm', defaults / 'rover-skid.parm',
-                      root / 'simulation/params/rover_telemetry.parm',
-                      root / 'simulation/params/rover_phase2_rtl.parm')
+        from vehicle_autonomy.app.simulation.vehicles import VehicleRegistry
+        definition=VehicleRegistry(root,ardupilot_root=ardupilot,plugin_root=plugin_root,twin_root=twin_root).get('rover')
+        if definition['status']!='READY':raise ValueError(definition['reason'])
+        name = definition['model_name']
+        model = Path(definition['model_path'])
+        world = root / 'simulation/worlds/wildthumper_runway.sdf'
+        parameters = tuple(map(Path,definition['parameters']))
     binary = ardupilot / 'build/sitl/bin' / {
         'rover': 'ardurover', 'copter': 'arducopter', 'plane': 'arduplane'}[kind]
     return Model(kind, name, binary, model, world, parameters, plugin_root,
@@ -146,6 +147,7 @@ def environment(root, model, partition):
     env = dict(HostEnvironment(root).process_environment(), GZ_IP='127.0.0.1', GZ_PARTITION=partition)
     resources = [root / 'simulation/models', model.plugin_root / 'models',
                  model.plugin_root / 'worlds']
+    if model.kind=='rover':resources.insert(0,HostEnvironment(root).path('sitl_models_root')/'Gazebo/models')
     plugins = [model.plugin_root / 'build']
     if model.twin_root:
         resources[:0] = [model.twin_root / 'models', model.twin_root / 'worlds']

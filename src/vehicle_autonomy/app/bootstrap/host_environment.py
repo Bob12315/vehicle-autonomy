@@ -22,13 +22,13 @@ except ModuleNotFoundError:
 PATH_KEYS = {'ardupilot_root', 'gazebo_plugin_root', 'fixedwing_root', 'asset_cache',
              'legacy_assets', 'ros2_root', 'ros2_setup', 'ros2_workspace',
              'ros2_humble_root', 'runtime_root', 'vision_assets',
-             'slam_boundary_library', 'native_source_receiver', 'vision_python', 'rescue_model'}
+             'slam_boundary_library', 'native_source_receiver', 'vision_python', 'rescue_model', 'sitl_models_root'}
 EXECUTABLES = {'gazebo': 'gz', 'rviz2': 'rviz2', 'qgroundcontrol': 'QGroundControl'}
 VARIABLES = {'ardupilot_root': 'VAF_ARDUPILOT_ROOT', 'gazebo_plugin_root': 'VAF_GAZEBO_PLUGIN_ROOT',
              'fixedwing_root': 'VAF_FIXEDWING_ROOT', 'asset_cache': 'VAF_SIM_ASSET_CACHE',
              'legacy_assets': 'VAF_SIM_LEGACY_ASSETS', 'ros2_root': 'VAF_ROS2_ROOT',
              'ros2_humble_root': 'VAF_ROS2_HUMBLE_ROOT', 'runtime_root': 'VAF_RUNTIME_ROOT',
-             'slam_boundary_library': 'VAF_SLAM_BOUNDARY_LIBRARY'}
+             'slam_boundary_library': 'VAF_SLAM_BOUNDARY_LIBRARY', 'sitl_models_root': 'VAF_SITL_MODELS_ROOT'}
 
 
 def _absolute(value, label):
@@ -85,7 +85,8 @@ class HostEnvironment:
                     'legacy_assets': data/'world-assets', 'ros2_root': data/'ros2-jazzy/root',
                     'ros2_humble_root': home/'vehicle-autonomy/ros2-humble/root', 'runtime_root': runtime,
                     'vision_assets': data/'vision-assets', 'slam_boundary_library': data/'native/libvaf_slam_boundary.so',
-                    'native_source_receiver': data/'native/vaf_native_source_receiver'}
+                    'native_source_receiver': data/'native/vaf_native_source_receiver',
+                    'sitl_models_root': data/'software/ardupilot-sitl-models'}
         return defaults.get(key)
 
     def executable(self, key, explicit=None):
