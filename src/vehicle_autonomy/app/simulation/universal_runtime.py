@@ -68,6 +68,7 @@ class VehicleInstance:
         self.camera_sources = {}
         self.camera_assembly = None
         self.mid360 = None
+        self.mid360_pending_lease = None
         self.mid360_assembly = None
 
     def view(self):
@@ -102,7 +103,15 @@ class VehicleInstance:
             disable_zoom=bool(self.specification.get('sensors',{}).get('mid360')))
         if self.specification.get('sensors', {}).get('mid360'):
             from .mid360_assembly import assemble as assemble_mid360
-            self.mid360_assembly = assemble_mid360(o.root, self.directory, p, o.world)
+            timed=self.specification.get('sensors',{}).get('mid360_lio',False)
+            if timed:
+                from .mid360_tools import DomainLease,Mid360Tools
+                self.mid360_pending_lease=DomainLease(o.root)
+            self.mid360_assembly = assemble_mid360(o.root, self.directory, p, o.world,
+                timed_domain=self.mid360_pending_lease.domain if timed else None)
+            if timed:
+                self.mid360=Mid360Tools(self,self.mid360_assembly,live_lease=self.mid360_pending_lease)
+                self.mid360_pending_lease=None
         self.model = SimpleNamespace(name=entity, system_id=self.lease.system_id,
             instance=self.lease.instance, fdm_port=self.lease.fdm_port, binary=p['binary'])
         env = dict(o.session.env)
@@ -187,7 +196,7 @@ class VehicleInstance:
         self.session.manifest['camera_assembly'] = self.camera_assembly
         if self.mid360_assembly:
             from .mid360_tools import Mid360Tools
-            self.mid360 = Mid360Tools(self, self.mid360_assembly)
+            if self.mid360 is None:self.mid360 = Mid360Tools(self, self.mid360_assembly)
             self.mid360.start()
             self.session.manifest['mid360_assembly'] = self.mid360_assembly
         self.session.manifest['ready']=True
@@ -212,6 +221,8 @@ class VehicleInstance:
             # Retain World/SITL ownership if any sensor/tool descendant cannot
             # be confirmed gone; never release ports/domains beneath it.
             self.mid360.close()
+        if self.mid360_pending_lease:
+            self.mid360_pending_lease.close();self.mid360_pending_lease=None
         for source in self.camera_sources.values():
             try:source.close()
             except Exception as exc:errors.append("camera: "+str(exc))
@@ -278,6 +289,7 @@ class LocalRuntime(WorldMetrics):
         self._world_stopping=False
         self._library_resources=[]
         self._truths={}
+        self._timed_mid360_leases={}
 
     @synchronized
     def start(self,world_path,cancelled=lambda:False):
@@ -295,6 +307,10 @@ class LocalRuntime(WorldMetrics):
         if sensors.find('render_engine') is None:ET.SubElement(sensors,'render_engine').text='ogre2'
         tree.write(world_path,encoding='utf-8',xml_declaration=True)
         env=self._base_env()
+        if any(s.get('sensors',{}).get('mid360_lio') for s in self.specifications):
+            from vehicle_autonomy.app.bootstrap.mid360_slam_environment import server_environment
+            env=server_environment(self.root,env)
+            env['VAF_TIMED_MID360']='1'
         # Fixed resource roots are independent of the selected World. Dynamic
         # additions use the same immutable library and never restart peers.
         for definition in self.library.list_vehicles():
@@ -324,6 +340,8 @@ class LocalRuntime(WorldMetrics):
 
     @synchronized
     def add(self,specification,cancelled=lambda:False):
+        if specification.get('sensors',{}).get('mid360_lio') and self.session.env.get('VAF_TIMED_MID360')!='1':
+            raise ValueError('create a World with the timed MID-360 option before adding LIO vehicles')
         child=VehicleInstance(self,specification)
         self.vehicles[child.id]=child
         self.notify(child)
@@ -418,11 +436,12 @@ class LocalRuntime(WorldMetrics):
     @synchronized
     def close(self):
         errors=[]
+        server_closed=False
         for child in tuple(self.vehicles.values()):
             try:child.close(world_ending=True)
             except Exception as exc:errors.append(str(exc))
         if self.session:
-            try:self.session.close()
+            try:self.session.close();server_closed=True
             except Exception as exc:errors.append(str(exc))
         # If Gazebo was stalled by a failed FDM peer, its termination releases
         # the dependency before retrying owned children. No foreign PID adopts.
@@ -430,4 +449,8 @@ class LocalRuntime(WorldMetrics):
             if not child.closed:
                 try:child.close(world_ending=True)
                 except Exception as exc:errors.append(str(exc))
+        if server_closed:
+            leases=getattr(self,'_timed_mid360_leases',{})
+            for lease in leases.values():lease.close()
+            leases.clear()
         if errors:raise RuntimeError('owned cleanup incomplete: '+'; '.join(errors))

@@ -46,9 +46,9 @@ where = ["src"]
 "share/vehicle-autonomy/environments" = ["environments/tools.example.toml", "environments/README.md"]
 "share/vehicle-autonomy/configs/tools" = ["configs/tools/lab.sdf"]
 "share/vehicle-autonomy/simulation/phase5" = ["simulation/phase5/slam_mapping.yaml", "simulation/phase5/nav2_rover.yaml", "simulation/phase5/navigate_rover.xml"]
-"share/vehicle-autonomy/configs" = ["configs/mid360-simulation.json", "configs/control-center.json", "configs/llm.server-tunnel.json", "configs/rs16-scan.json", "configs/sitl.toml", "configs/sitl_arm.toml"]
+"share/vehicle-autonomy/configs" = ["configs/mid360-map.json", "configs/mid360-fast-lio.json", "configs/mid360-fast-lio-copter.json", "configs/mid360-slam-acceptance.json", "configs/mid360-simulation.json", "configs/control-center.json", "configs/llm.server-tunnel.json", "configs/rs16-scan.json", "configs/sitl.toml", "configs/sitl_arm.toml"]
 "share/vehicle-autonomy/configs/deployment" = ["configs/deployment/hardware-controlled.json", "configs/deployment/hardware-readonly.json", "configs/deployment/simulation.json"]
-"share/vehicle-autonomy/configs/rviz" = ["configs/rviz/mid360-visualization.rviz", "configs/rviz/navigation-readonly.rviz", "configs/rviz/rs16-readonly.rviz", "configs/rviz/rover-visualization.rviz", "configs/rviz/copter-visualization.rviz", "configs/rviz/plane-visualization.rviz"]
+"share/vehicle-autonomy/configs/rviz" = ["configs/rviz/mid360-slam.rviz", "configs/rviz/mid360-loaded-map.rviz", "configs/rviz/mid360-visualization.rviz", "configs/rviz/navigation-readonly.rviz", "configs/rviz/rs16-readonly.rviz", "configs/rviz/rover-visualization.rviz", "configs/rviz/copter-visualization.rviz", "configs/rviz/plane-visualization.rviz"]
 "share/vehicle-autonomy/docs" = ["docs/HARDWARE_READY_AUDIT.md", "docs/RESCUE_2026_LOCAL_PT.md", "docs/RESCUE_2026_ACCEPTANCE.json"]
 "share/vehicle-autonomy/scripts" = ["scripts/with_ros2.sh", "scripts/with_ros2_humble.sh"]
 "share/vehicle-autonomy/simulation/environments" = ["simulation/environments/copter.toml", "simulation/environments/rover.toml", "simulation/environments/yard.toml", "simulation/environments/copter_rescue.toml"]
@@ -69,7 +69,7 @@ where = ["src"]
 
 "share/vehicle-autonomy/simulation/vehicles" = ["simulation/vehicles/catalog.json", "simulation/vehicles/vtol-audit.json"]
 
-"share/vehicle-autonomy/simulation/sensors" = ["simulation/sensors/mid360-approx-v1.sdf", "simulation/sensors/rover-front-v1.sdf"]
+"share/vehicle-autonomy/simulation/sensors" = ["simulation/sensors/mid360-sliced-v1.sdf", "simulation/sensors/mid360-approx-v1.sdf", "simulation/sensors/rover-front-v1.sdf"]
 
 "share/vehicle-autonomy/simulation/missions/cuadc2026" = ["simulation/missions/cuadc2026/migration.lock.json", "simulation/missions/cuadc2026/rescue_2026_full_auto.json", "simulation/missions/cuadc2026/rescue_2026_source.json", "simulation/missions/cuadc2026/README.md"]
 
@@ -82,3 +82,8 @@ where = ["src"]
 "share/vehicle-autonomy/simulation/models/iris_cuadc2026_fixed_down_camera" = ["simulation/models/iris_cuadc2026_fixed_down_camera/model.config", "simulation/models/iris_cuadc2026_fixed_down_camera/model.sdf"]
 
 "share/vehicle-autonomy/configs/perception" = ["configs/perception/rescue_2026_pt.json"]
+
+"share/vehicle-autonomy/simulation/dependencies" = ["simulation/dependencies/mid360-slam.lock.json", "simulation/dependencies/ubuntu-noble-build.lock.json", "simulation/dependencies/python-slam.constraints.txt"]
+"share/vehicle-autonomy/simulation/dependencies/patches" = ["simulation/dependencies/patches/fast-lio-jazzy-build.patch", "simulation/dependencies/patches/livox-gz-sim-domain-context.patch", "simulation/dependencies/patches/sc-pgo-build.patch", "simulation/dependencies/patches/relocalization-io.patch"]
+
+"share/vehicle-autonomy/simulation/dependencies/livox-interfaces" = ["simulation/dependencies/livox-interfaces/CMakeLists.txt", "simulation/dependencies/livox-interfaces/package.xml"]

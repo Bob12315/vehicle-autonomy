@@ -103,16 +103,17 @@ class DomainLease:
 
 
 class Mid360Tools:
-    def __init__(self, child, assembly, *, archive=False):
+    def __init__(self, child, assembly, *, archive=False,live_lease=None):
         self.child = child
         self.root, self.directory = child.owner.root, child.directory/'mid360'
         self.directory.mkdir(mode=0o700,exist_ok=archive)
         self.config = deepcopy(assembly)
+        if not archive:self.config['scene_id']=getattr(child.owner,'scene_id',None)
         self.config_path = self.directory/'source.json'
         if not archive:self.config_path.write_text(json.dumps(self.config, indent=2)+'\n')
         self.lock = RLock()
         self.tools = None
-        self.leases = {}
+        self.leases = {'live':live_lease} if live_lease else {}
         self.contexts = {}
         self.bags = {}
         self.recording = None
@@ -123,6 +124,7 @@ class Mid360Tools:
         self.monitor_stop = Event()
         self.monitor = None
         self.source_fault_handled = False
+        self.slam = None
 
     @classmethod
     def archive(cls, root, source, target):
@@ -150,6 +152,10 @@ class Mid360Tools:
         if self.tools is not None:
             return
         ros = ros_environment(self.root, configuration(self.root))
+        if self.config['backend']=='livox-gz-sliced-pattern-v1':
+            from vehicle_autonomy.app.bootstrap.mid360_slam_environment import ros_environment as slam_environment
+            ros=slam_environment(self.root)
+            ros.update(OMP_THREAD_LIMIT='2',OMP_NUM_THREADS='2',OPENBLAS_NUM_THREADS='1',MKL_NUM_THREADS='1')
         env = dict(ros, GZ_PARTITION=self.child.owner.partition, GZ_IP='127.0.0.1',
                    ROS_AUTOMATIC_DISCOVERY_RANGE='LOCALHOST', ROS_LOCALHOST_ONLY='1')
         # The supervisor receives an explicit environment. Keep the real HOME
@@ -183,7 +189,7 @@ class Mid360Tools:
         # A lost clock publisher can freeze RViz's simulated-time decay. Close
         # the dependent viewer/recorder on worker exit, never leave an old cloud
         # displayed as if it were live. No automatic source restart or SEND.
-        while not self.monitor_stop.wait(.25):
+        while not self.monitor_stop.wait(.1):
             if not self.lock.acquire(blocking=False):continue
             try:
                 tools=self.tools
@@ -194,6 +200,7 @@ class Mid360Tools:
                     replay=tools.instances.get('replay')
                     replay_failed=replay and replay['process'].poll() is not None and not replay['stopping']
                 if failed and not self.source_fault_handled:
+                    if self.slam and self.slam.source=='live':self.slam.stop()
                     self.error='sensor worker exited; live dependent tools stopped'
                     self._finish_record()
                     if self.rviz_source=='live':
@@ -202,12 +209,14 @@ class Mid360Tools:
                 if replay_failed and self.rviz_source=='replay':
                     self._stop('rviz2');self.rviz_source=None
                     self.error='replay worker exited; replay viewer stopped'
+                if replay_failed and self.slam and self.slam.source=='replay':self.slam.stop()
+                if self.slam:self.slam.supervise()
             except Exception as exc:self.error='dependency cleanup UNCONFIRMED: '+str(exc)
             finally:self.lock.release()
 
     def _ctx(self, source):
         if source not in self.contexts:
-            lease = DomainLease(self.root)
+            lease = self.leases.get(source) or DomainLease(self.root)
             self.leases[source] = lease
             self.contexts[source] = dict(vehicle_id=self.child.id, vehicle_type=self.config['kind'],
                 environment='simulation', ros_namespace=self.config['namespace'],
@@ -272,8 +281,10 @@ class Mid360Tools:
         for topic in ('points','imu','tf','tf_static','robot_description','trajectory','status'):
             retained = topic in ('tf_static','robot_description')
             reliability = 'best_effort' if topic in ('points','imu') else 'reliable'
+            if topic=='imu' and self.config['backend']=='livox-gz-sliced-pattern-v1':reliability='reliable'
             text += f'{ns}/{topic}:\n  history: keep_last\n  depth: 100\n  reliability: {reliability}\n  durability: '+('transient_local' if retained else 'volatile')+'\n'
         text += '/clock:\n  history: keep_last\n  depth: 100\n  reliability: reliable\n  durability: volatile\n'
+        if self.config.get('capture_topic'):text+=self.config['capture_topic']+':\n  history: keep_last\n  depth: 100\n  reliability: reliable\n  durability: volatile\n'
         path.write_text(text)
         return path
 
@@ -282,13 +293,14 @@ class Mid360Tools:
             raise ValueError('registered recording id required')
         if source not in ('live','replay'):
             raise ValueError('source must be live or replay')
-        if action not in ('status','record_start','record_stop','replay_start','replay_stop',
-                          'rviz_start','rviz_stop','fault_on','fault_off','sensor_stop','sensor_start'):
+        if action not in ('status','record_start','record_stop','replay_start','replay_once','replay_stop',
+                          'rviz_start','rviz_stop','fault_on','fault_off','cloud_fault_on','cloud_fault_off',
+                          'imu_fault_on','imu_fault_off','clock_pause_on','clock_pause_off','clock_back_once','clock_reset_once','sensor_stop','sensor_start'):
             raise ValueError('unregistered MID-360 tool operation')
         with self.lock:
             if action == 'status':
                 return self.snapshot()
-            if action in ('record_start','fault_on','fault_off','sensor_start') and self.live_closed:
+            if (action in ('record_start','fault_on','fault_off','sensor_start') or action.startswith(('cloud_fault_','imu_fault_','clock_'))) and self.live_closed:
                 raise ValueError('live World retired; recordings may be replayed only')
             if action == 'record_start':
                 if not self.online():
@@ -302,6 +314,8 @@ class Mid360Tools:
                 path.parent.mkdir(mode=0o700, exist_ok=True)
                 ns = self.config['namespace']
                 topics = [ns+'/'+v for v in ('points','imu','tf','tf_static','robot_description','trajectory','status')]+['/clock']
+                if self.config['backend']=='livox-gz-sliced-pattern-v1':topics.append(ns+'/custom')
+                if self.config.get('capture_topic'):topics.append(self.config['capture_topic'])
                 self._launch('record',['ros2','bag','record','--storage','sqlite3','--use-sim-time',
                     '--qos-profile-overrides-path',str(self._qos()),'-o',str(path),*topics])
                 self.bags[identity] = dict(id=identity,path=str(path),source='gazebo-live',complete=False)
@@ -309,16 +323,17 @@ class Mid360Tools:
                 atomic(self.directory/'recordings.json',self.bags)
             elif action == 'record_stop':
                 self._finish_record()
-            elif action == 'replay_start':
+            elif action in ('replay_start','replay_once'):
                 if bag_id not in self.bags or not self.bags[bag_id]['complete']:
                     raise ValueError('select a finalized owned recording id')
                 self._stop('replay')
                 self._ensure()
                 self._launch('replay',[sys.executable,'-u','-m',
                     'vehicle_autonomy.world.sensors.lidar.mid360_replay','--config',str(self.config_path),
-                    '--bag',self.bags[bag_id]['path'],'--qos',str(self._qos())], 'replay')
+                    '--bag',self.bags[bag_id]['path'],'--qos',str(self._qos()),*(['--once'] if action=='replay_once' else [])], 'replay')
                 self.replay = bag_id
             elif action == 'replay_stop':
+                if self.slam and self.slam.source=='replay':self.slam.stop()
                 if self.rviz_source == 'replay':
                     self._stop('rviz2')
                 self._stop('replay')
@@ -353,7 +368,17 @@ class Mid360Tools:
                 (self.directory/'fault').touch()
             elif action == 'fault_off':
                 (self.directory/'fault').unlink(missing_ok=True)
+            elif action.startswith(('cloud_fault_','imu_fault_')):
+                topic,_,change=action.partition('_fault_');path=self.directory/('fault-'+topic)
+                if change=='on':path.touch(mode=0o600)
+                else:path.unlink(missing_ok=True)
+            elif action.startswith('clock_'):
+                if action=='clock_pause_off':(self.directory/'fault-clock-pause').unlink(missing_ok=True)
+                else:
+                    marker={'clock_pause_on':'pause','clock_back_once':'back','clock_reset_once':'reset'}[action]
+                    (self.directory/('fault-clock-'+marker)).touch(mode=0o600)
             elif action == 'sensor_stop':
+                if self.slam and self.slam.source=='live':self.slam.stop()
                 self._finish_record()
                 if self.rviz_source == 'live':
                     self._stop('rviz2')
@@ -378,6 +403,8 @@ class Mid360Tools:
                 bag['error']=str(exc)
             required=[self.config['namespace']+'/'+v for v in
                 ('points','imu','tf','tf_static','robot_description','trajectory','status')]+['/clock']
+            if self.config['backend']=='livox-gz-sliced-pattern-v1':required.append(self.config['namespace']+'/custom')
+            if self.config.get('capture_topic'):required.append(self.config['capture_topic'])
             bag['message_counts']=counts
             bag['complete']=(path/'metadata.yaml').is_file() and all(counts.get(t,0)>0 for t in required)
             self.recording = None
@@ -411,13 +438,18 @@ class Mid360Tools:
         self.monitor_stop.set()
         with self.lock:
             self.live_closed = True
+            if self.slam:self.slam.stop()
             self._finish_record()
             if self.tools:
                 self.tools.close()  # existing supervisor verifies descendant cleanup
                 self.tools.store.close()
                 self.tools = None
-            for lease in self.leases.values():
-                lease.close()
+            for source,lease in self.leases.items():
+                if source=='live' and self.config['backend']=='livox-gz-sliced-pattern-v1':
+                    # The raw sensor's DDS Context belongs to Gazebo, outside
+                    # LocalTools. Keep its domain fenced until that World exits.
+                    self.child.owner._timed_mid360_leases[self.child.id]=lease
+                else:lease.close()
             self.leases.clear()
             self.contexts.clear()
             self.replay = self.rviz_source = None

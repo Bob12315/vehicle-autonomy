@@ -21,6 +21,7 @@ class TruthSample:
     y_m: float
     z_m: float
     yaw_rad: float
+    quaternion_xyzw: tuple[float,float,float,float] = (0.,0.,0.,1.)
 
 
 class GazeboTruthOracle:
@@ -53,7 +54,7 @@ class GazeboTruthOracle:
         yaw = math.atan2(2 * (q.w * q.z + q.x * q.y),
                          1 - 2 * (q.y * q.y + q.z * q.z))
         sample = TruthSample(self.model, received, sim_ns,
-                             target.position.x, target.position.y, target.position.z, yaw)
+                             target.position.x, target.position.y, target.position.z, yaw,(q.x,q.y,q.z,q.w))
         with self._condition:
             if self._samples and sim_ns < self._samples[-1].simulation_ns:
                 self._error = "Gazebo simulation time regressed"

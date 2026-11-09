@@ -22,7 +22,7 @@ except ModuleNotFoundError:
 PATH_KEYS = {'ardupilot_root', 'gazebo_plugin_root', 'fixedwing_root', 'asset_cache',
              'legacy_assets', 'ros2_root', 'ros2_setup', 'ros2_workspace',
              'ros2_humble_root', 'runtime_root', 'vision_assets',
-             'slam_boundary_library', 'native_source_receiver', 'vision_python', 'rescue_model', 'sitl_models_root'}
+             'slam_boundary_library', 'native_source_receiver', 'vision_python', 'rescue_model', 'mid360_slam_root', 'sitl_models_root'}
 EXECUTABLES = {'gazebo': 'gz', 'rviz2': 'rviz2', 'qgroundcontrol': 'QGroundControl'}
 VARIABLES = {'ardupilot_root': 'VAF_ARDUPILOT_ROOT', 'gazebo_plugin_root': 'VAF_GAZEBO_PLUGIN_ROOT',
              'fixedwing_root': 'VAF_FIXEDWING_ROOT', 'asset_cache': 'VAF_SIM_ASSET_CACHE',

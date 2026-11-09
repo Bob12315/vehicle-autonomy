@@ -1,0 +1,157 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index aea8aac..4e756a4 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -16,12 +16,9 @@ find_package(sensor_msgs REQUIRED)
+ find_package(geometry_msgs REQUIRED)
+ find_package(nav_msgs REQUIRED)
+ find_package(std_msgs REQUIRED)
+-find_package(cv_bridge REQUIRED)
+ find_package(tf2 REQUIRED)
+ find_package(tf2_ros REQUIRED)
+-find_package(PCL REQUIRED)
+-find_package(OpenCV REQUIRED)
+-find_package(Ceres REQUIRED)
++find_package(PCL REQUIRED COMPONENTS common io filters kdtree search registration)
+ find_package(OpenMP REQUIRED)
+ find_package(GTSAM REQUIRED QUIET)
+ find_package(pcl_conversions REQUIRED)
+@@ -31,8 +28,6 @@ find_package(pcl_msgs REQUIRED)   # usually needed alongside
+ include_directories(
+   include
+   ${PCL_INCLUDE_DIRS}
+-  ${CERES_INCLUDE_DIRS}
+-  ${OpenCV_INCLUDE_DIRS}
+   ${GTSAM_INCLUDE_DIR}
+ )
+ 
+@@ -43,7 +38,6 @@ add_executable(alaserPGO
+ 
+ # Use ament_target_dependencies for ROS2 packages (handles includes, links, and definitions)
+ ament_target_dependencies(alaserPGO
+-  cv_bridge
+   geometry_msgs
+   nav_msgs
+   pcl_conversions
+@@ -65,7 +59,6 @@ target_compile_options(alaserPGO
+ )
+ target_link_libraries(alaserPGO
+   ${PCL_LIBRARIES}
+-  ${CERES_LIBRARIES}
+   OpenMP::OpenMP_CXX
+   gtsam
+ )
+diff --git a/include/scancontext/Scancontext.h b/include/scancontext/Scancontext.h
+index 8691fe4..859f9a5 100644
+--- a/include/scancontext/Scancontext.h
++++ b/include/scancontext/Scancontext.h
+@@ -15,10 +15,6 @@
+ 
+ #include <Eigen/Dense>
+ 
+-#include <opencv2/opencv.hpp>
+-#include <opencv2/core/eigen.hpp>
+-#include <opencv2/highgui/highgui.hpp>
+-#include <cv_bridge/cv_bridge.h>
+ 
+ #include <pcl/point_cloud.h>
+ #include <pcl/point_types.h>
+diff --git a/src/laserPosegraphOptimization.cpp b/src/laserPosegraphOptimization.cpp
+index 10ce312..a980f8b 100644
+--- a/src/laserPosegraphOptimization.cpp
++++ b/src/laserPosegraphOptimization.cpp
+@@ -45,6 +45,7 @@
+ #include <geometry_msgs/msg/transform_stamped.hpp>
+ #include <nav_msgs/msg/odometry.hpp>
+ #include <nav_msgs/msg/path.hpp>
++#include <std_msgs/msg/string.hpp>
+ #include <sensor_msgs/msg/nav_sat_fix.hpp>
+ #include <sensor_msgs/msg/point_cloud2.hpp>
+ 
+@@ -106,6 +107,10 @@ std::vector<Pose6D> keyframePoses;
+ std::vector<Pose6D> keyframePosesUpdated;
+ std::vector<double> keyframeTimes;
+ int recentIdxUpdated = 0;
++std::atomic<uint64_t> accepted_loop_constraints{0};
++std::atomic<uint64_t> applied_loop_constraints{0};
++std::atomic<uint64_t> optimizer_revision{0};
++rclcpp::Publisher<std_msgs::msg::String>::SharedPtr pubVafStatus;
+ 
+ gtsam::NonlinearFactorGraph gtSAMgraph;
+ bool gtSAMgraphMade = false;
+@@ -387,6 +392,12 @@ void pubPath(void)
+   }
+   pubOdomAftPGO->publish(odomAftPGO);  // Last pose
+   pubPathAftPGO->publish(pathAftPGO);  // Poses
++  std_msgs::msg::String status;
++  status.data = "{\"optimizer_revision\":" + std::to_string(optimizer_revision.load()) +
++    ",\"applied_loop_constraints\":" + std::to_string(applied_loop_constraints.load()) +
++    ",\"keyframes\":" + std::to_string(pathAftPGO.poses.size()) +
++    ",\"capture_ros_ns\":" + std::to_string(rclcpp::Time(odomAftPGO.header.stamp).nanoseconds()) + "}";
++  pubVafStatus->publish(status);
+ 
+   geometry_msgs::msg::TransformStamped transformStamped;
+   transformStamped.header.stamp = odomAftPGO.header.stamp;
+@@ -445,6 +456,8 @@ void runISAM2opt(void)
+ 
+   isamCurrentEstimate = isam->calculateEstimate();
+   updatePoses();
++  applied_loop_constraints.store(accepted_loop_constraints.load());
++  optimizer_revision.fetch_add(1);
+ }
+ 
+ pcl::PointCloud<PointType>::Ptr transformPointCloud(
+@@ -809,6 +822,13 @@ void performSCLoopClosure(void)
+     return;
+   }
+ 
++  // Each keyframe is admitted once. Timer ticks must not enqueue identical
++  // ICP constraints repeatedly while the vehicle is stationary.
++  static int last_checked_keyframe = -1;
++  const int current_keyframe = static_cast<int>(keyframePoses.size()) - 1;
++  if (current_keyframe == last_checked_keyframe) { return; }
++  last_checked_keyframe = current_keyframe;
++
+   auto detectResult =
+     scManager.detectLoopClosureID();    // first: nn index, second: yaw diff
+   int SCclosestHistoryFrameID = detectResult.first;
+@@ -865,6 +885,7 @@ void process_icp(void)
+         gtSAMgraph.add(
+           gtsam::BetweenFactor<gtsam::Pose3>(
+             prev_node_idx, curr_node_idx, relative_pose, robustLoopNoise));
++        accepted_loop_constraints.fetch_add(1);
+         // runISAM2opt();
+         mtxPosegraph.unlock();
+       }
+@@ -910,6 +931,7 @@ void process_isam()
+ 
+ void pubMap(void)
+ {
++  double last_map_capture = 0.;
+   int SKIP_FRAMES = 2;  // sparse map visulalization to save computations
+   int counter = 0;
+ 
+@@ -923,6 +945,7 @@ void pubMap(void)
+       *laserCloudMapPGO += *local2global(
+         keyframeLaserClouds[node_idx],
+         keyframePosesUpdated[node_idx]);
++      last_map_capture = keyframeTimes.at(node_idx);
+     }
+     counter++;
+   }
+@@ -934,6 +957,7 @@ void pubMap(void)
+   sensor_msgs::msg::PointCloud2 laserCloudMapPGOMsg;
+   pcl::toROSMsg(*laserCloudMapPGO, laserCloudMapPGOMsg);
+   laserCloudMapPGOMsg.header.frame_id = "map";
++  laserCloudMapPGOMsg.header.stamp = rclcpp::Time(static_cast<int64_t>(last_map_capture * 1e9));
+   pubMapAftPGO->publish(laserCloudMapPGOMsg);
+ }
+ 
+@@ -1036,6 +1060,7 @@ int main(int argc, char ** argv)
+     "/gps/fix", 100,
+     gpsHandler);
+ 
++  pubVafStatus = nh->create_publisher<std_msgs::msg::String>("/vaf_pgo_status", 10);
+   pubOdomAftPGO = nh->create_publisher<nav_msgs::msg::Odometry>(
+     "/aft_pgo_odom", rclcpp::QoS(100));
+   pubOdomRepubVerifier = nh->create_publisher<nav_msgs::msg::Odometry>(

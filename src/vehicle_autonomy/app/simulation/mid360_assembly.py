@@ -24,7 +24,7 @@ def _pose(element):
     return values
 
 
-def assemble(root, directory, prepared, world):
+def assemble(root, directory, prepared, world, *, timed_domain=None):
     root, directory = Path(root), Path(directory).resolve()
     kind = prepared['kind']
     config_path = root/'configs/mid360-simulation.json'
@@ -58,18 +58,38 @@ def assemble(root, directory, prepared, world):
         raise ValueError('audited MID-360 body link missing or already assembled')
     offsets = [a+b for a, b in zip(offsets, _pose(model)[:3])]
     offsets = [a+b for a, b in zip(offsets, _pose(link)[:3])]
-    recipe = root/'simulation/sensors/mid360-approx-v1.sdf'
+    recipe = root/('simulation/sensors/mid360-approx-v1.sdf' if timed_domain is None else 'simulation/sensors/mid360-sliced-v1.sdf')
     sensor = ET.parse(recipe).getroot()
     ET.SubElement(sensor, 'pose').text = ' '.join(map(str, mount['xyz_rpy']))
     ET.SubElement(sensor, 'topic').text = namespace + '/gz_scan'
     ET.SubElement(sensor, 'gz_frame_id').text = entity + '/mid360'
+    dependency=None
+    if timed_domain is not None:
+        if type(timed_domain) is not int or not 120<=timed_domain<200:raise ValueError('owned ROS domain required')
+        from vehicle_autonomy.app.bootstrap.mid360_slam_environment import checked
+        base,library,dependency=checked(root,'sensor')
+        plugin=sensor.find('plugin');plugin.set('filename',str(library))
+        for key,value in dict(pattern=base/'ws/install/share/livox_gz_sim/scan_patterns/mid360.csv',
+            ros_domain_id=timed_domain,topic=namespace+'/raw_custom',frame_id=entity+'/mid360').items():
+            ET.SubElement(plugin,key).text=str(value)
     link.append(sensor)
     imu = ET.SubElement(link, 'sensor', name='mid360_imu', type='imu')
-    ET.SubElement(imu, 'pose').text = ' '.join(map(str, mount['xyz_rpy']))
+    imu_pose=list(mount['xyz_rpy'])
+    if timed_domain is not None:imu_pose[:3]=[a+b for a,b in zip(imu_pose[:3],[.011,.02329,-.04412])]
+    ET.SubElement(imu, 'pose').text = ' '.join(map(str, imu_pose))
     ET.SubElement(imu, 'always_on').text = 'true'
     ET.SubElement(imu, 'update_rate').text = '200'
     ET.SubElement(imu, 'topic').text = namespace + '/gz_imu'
-    ET.SubElement(imu, 'imu')
+    imu_settings=ET.SubElement(imu, 'imu')
+    if timed_domain is not None:
+        for group,stddev in (('angular_velocity',7.9e-4),('linear_acceleration',9.8e-3)):
+            axes=ET.SubElement(imu_settings,group)
+            for axis in ('x','y','z'):
+                noise=ET.SubElement(ET.SubElement(axes,axis),'noise',type='gaussian')
+                ET.SubElement(noise,'mean').text='0';ET.SubElement(noise,'stddev').text=str(stddev)
+        plugin=ET.SubElement(imu,'plugin',filename=str(library),name='livox_gz_sim::LivoxImu')
+        for key,value in dict(topic=namespace+'/raw_imu_g',frame_id=entity+'/mid360',ros_domain_id=timed_domain).items():
+            ET.SubElement(plugin,key).text=str(value)
     housing = ET.SubElement(link, 'visual', name='mid360_housing')
     ET.SubElement(housing, 'pose').text = ' '.join(map(str, mount['xyz_rpy']))
     cylinder = ET.SubElement(ET.SubElement(housing, 'geometry'), 'cylinder')
@@ -95,6 +115,15 @@ def assemble(root, directory, prepared, world):
         modified_file=str(path.relative_to(directory)), before_sha256=before, after_sha256=digest(path),
         recipe_sha256=digest(recipe), config_sha256=digest(config_path),
         base_fingerprint=prepared['fingerprint'], limitations=config['limitations'])
+    if timed_domain is not None:
+        result.update(id='mid360-sliced',version='1.1.0',backend='livox-gz-sliced-pattern-v1',ros_domain_id=timed_domain,
+            imu_in_lidar=[.011,.02329,-.04412,0.,0.,0.],raw_custom=namespace+'/raw_custom',raw_imu=namespace+'/raw_imu_g',
+            raw_capture=namespace+'/raw_custom/capture',capture_topic=namespace+'/scan_timing',dependency_builds=dependency['builds'],
+            dependency_sources=dependency['sources'],limitations=[
+                'Recorded Livox ray pattern sampled from five actual Gazebo images per frame; not continuous firing.',
+                'Point time is the actual image acquisition time; within-slice motion is not simulated.',
+                '0.5 degree dense angular grid, 2 cm range noise, fixed 40 m single return.',
+                'No sensor mass or actuator changes; truth TF remains visualization-only.'])
     (directory/'mid360-assembly.json').write_text(json.dumps(result, indent=2)+'\n')
     # The separately recorded sensor assembly is not the immutable base hash.
     prepared['pre_mid360_prepared_hash'] = prepared['prepared_model_hash']

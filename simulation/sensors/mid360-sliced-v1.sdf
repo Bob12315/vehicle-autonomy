@@ -1,0 +1,11 @@
+<sensor name="mid360" type="gpu_lidar">
+  <always_on>true</always_on><visualize>false</visualize><update_rate>50</update_rate>
+  <lidar><scan>
+    <horizontal><samples>721</samples><min_angle>-3.141592653589793</min_angle><max_angle>3.141592653589793</max_angle></horizontal>
+    <vertical><samples>121</samples><min_angle>-0.1291543646475804</min_angle><max_angle>0.9145525280450287</max_angle></vertical>
+  </scan><range><min>0.1</min><max>40</max><resolution>0.001</resolution></range></lidar>
+  <plugin filename="configured-by-owned-assembly" name="livox_gz_sim::LivoxLidar">
+    <samples>20000</samples><slices>5</slices><line_count>4</line_count><xfer_format>1</xfer_format>
+    <downsample>1</downsample><range_noise>0.02</range_noise><angular_noise>0.15</angular_noise><default_reflectivity>100</default_reflectivity>
+  </plugin>
+</sensor>

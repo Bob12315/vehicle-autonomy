@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "dependencies": {
+    "fast_lio": {
+      "url": "https://github.com/Ericsii/FAST_LIO_ROS2",
+      "commit": "2fffc570a25d0df172720bac034fbdb6a13d2162",
+      "license": "GPL-2.0"
+    },
+    "ikd_tree": {
+      "url": "https://github.com/hku-mars/ikd-Tree",
+      "commit": "e2e3f4e9d3b95a9e66b1ba83dc98d4a05ed8a3c4",
+      "license": "GPL-2.0"
+    },
+    "livox_gz_sim": {
+      "url": "https://github.com/mathaimp/livox_gz_sim",
+      "commit": "3f06f1ac4d3f6854f7275ca9aa097484791a1abd",
+      "license": "MIT"
+    },
+    "livox_messages": {
+      "url": "https://github.com/Livox-SDK/livox_ros_driver2",
+      "commit": "21445540f0d100dc86a7e6df312dd70bbdb4afdf",
+      "license": "MIT",
+      "scope": "Only unmodified CustomMsg/CustomPoint interfaces; no SDK or hardware driver build"
+    },
+    "pcl_conversions": {
+      "url": "https://github.com/ros-perception/perception_pcl",
+      "commit": "c5e7e72d20cbbc164e9d940f75ae2a6ae5bbf41a",
+      "license": "BSD-3-Clause"
+    },
+    "pcl_msgs": {
+      "url": "https://github.com/ros-perception/pcl_msgs",
+      "commit": "8a925a7c4626df52dba7ccc5bda5900d63678880",
+      "license": "BSD-3-Clause"
+    },
+    "gtsam": {
+      "url": "https://github.com/borglab/gtsam",
+      "commit": "4f66a491ffc83cf092d0d818b11dc35135521612",
+      "license": "BSD-2-Clause (bundled components have additional notices)"
+    },
+    "sc_pgo": {
+      "url": "https://github.com/taehun-kmu/SC_PGO",
+      "commit": "a95c8456bf971f9cefc9f566ec49099c6a294465",
+      "license": "BSD-3-Clause"
+    },
+    "relocalization": {
+      "url": "https://github.com/Smart-Wheelchair-RRC/FAST_LIO_LOCALIZATION2",
+      "commit": "f04974907c8da976dd0495b272d18ac4c534d41f",
+      "license": "GPL-2.0"
+    }
+  },
+  "patches": [
+    "patches/livox-gz-sim-domain-context.patch",
+    "patches/fast-lio-jazzy-build.patch",
+    "patches/sc-pgo-build.patch",
+    "patches/relocalization-io.patch"
+  ],
+  "python_distributions": {
+    "open3d": {
+      "version": "0.19.0",
+      "license": "MIT"
+    }
+  }
+}

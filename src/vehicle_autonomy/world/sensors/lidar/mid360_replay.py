@@ -12,6 +12,7 @@ def main():
     p.add_argument('--config', type=Path, required=True)
     p.add_argument('--bag', type=Path, required=True)
     p.add_argument('--qos', type=Path, required=True)
+    p.add_argument('--once', action='store_true')
     a = p.parse_args()
     config = json.loads(a.config.read_text())
     ns = config['namespace']
@@ -44,7 +45,7 @@ def main():
     node.create_subscription(Clock,'/clock',receive('clock'),10)
     # Same owned process group: the Tool supervisor reaps the CLI and any ROS
     # descendants even if this wrapper crashes. No daemon or ROS CLI discovery.
-    process = subprocess.Popen(['ros2','bag','play',str(a.bag),'--loop',
+    process = subprocess.Popen(['ros2','bag','play',str(a.bag),*([] if a.once else ['--loop']),
         '--qos-profile-overrides-path',str(a.qos),'--remap',ns+'/status:='+ns+'/recorded_status'])
     try:
         last_status = 0.

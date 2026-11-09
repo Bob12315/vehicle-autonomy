@@ -1,0 +1,6 @@
+{
+  "resolution": 0.15,
+  "max_points": 500000,
+  "radius": 80.0,
+  "min_observations": 3
+}

@@ -1,0 +1,164 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 36b2107..df7a05c 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -10,6 +10,7 @@ find_package(ament_cmake REQUIRED)
+ find_package(ament_index_cpp REQUIRED)
+ find_package(rclcpp REQUIRED)
+ find_package(sensor_msgs REQUIRED)
++find_package(std_msgs REQUIRED)
+ find_package(livox_ros_driver2 REQUIRED)
+ find_package(gz_sim_vendor REQUIRED)
+ find_package(gz_transport_vendor REQUIRED)
+@@ -25,6 +26,7 @@ target_link_libraries(${PROJECT_NAME}
+   ament_index_cpp::ament_index_cpp
+   rclcpp::rclcpp
+   ${sensor_msgs_TARGETS}
++  ${std_msgs_TARGETS}
+   ${livox_ros_driver2_TARGETS}
+   gz-sim8::gz-sim8
+   gz-transport13::gz-transport13
+diff --git a/package.xml b/package.xml
+index 3a5007a..c59d9fe 100644
+--- a/package.xml
++++ b/package.xml
+@@ -12,6 +12,7 @@
+   <depend>ament_index_cpp</depend>
+   <depend>rclcpp</depend>
+   <depend>sensor_msgs</depend>
++  <depend>std_msgs</depend>
+   <depend>livox_ros_driver2</depend>
+   <depend>gz_sim_vendor</depend>
+   <depend>gz_transport_vendor</depend>
+diff --git a/src/livox_imu.cpp b/src/livox_imu.cpp
+index 1d1d91c..fc95be8 100644
+--- a/src/livox_imu.cpp
++++ b/src/livox_imu.cpp
+@@ -59,15 +59,17 @@ public:
+       return;
+     }
+ 
+-    if (!rclcpp::ok()) {
+-      rclcpp::init(0, nullptr);
+-    }
++    rclcpp::InitOptions init;
++    init.set_domain_id(static_cast<size_t>(get("ros_domain_id", 120)));
++    context_ = std::make_shared<rclcpp::Context>();
++    context_->init(0, nullptr, init);
+     auto name_c = ecm.Component<gz::sim::components::Name>(entity);
+     std::string name = name_c ? name_c->Data() : "livox_imu";
+-    node_ = std::make_shared<rclcpp::Node>("livox_sim_" + name);
++    node_ = std::make_shared<rclcpp::Node>("livox_sim_" + name,
++      rclcpp::NodeOptions().context(context_).parameter_overrides({rclcpp::Parameter("use_sim_time", true)}));
+     pub_ = node_->create_publisher<sensor_msgs::msg::Imu>(
+       topic,
+-      rclcpp::SensorDataQoS().keep_last(50).reliable());
++      rclcpp::SensorDataQoS().keep_last(400).reliable());
+ 
+     if (!gz_node_.Subscribe(gz_topic, &LivoxImu::OnImu, this)) {
+       gzerr << "livox_gz_sim::LivoxImu: cannot subscribe to [" << gz_topic << "]\n";
+@@ -98,6 +100,7 @@ private:
+   }
+ 
+   std::string frame_id_;
++  rclcpp::Context::SharedPtr context_;
+   rclcpp::Node::SharedPtr node_;
+   rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr pub_;
+   gz::transport::Node gz_node_;  // last: unsubscribes before the state above goes away
+diff --git a/src/livox_lidar.cpp b/src/livox_lidar.cpp
+index f05c75d..dd02220 100644
+--- a/src/livox_lidar.cpp
++++ b/src/livox_lidar.cpp
+@@ -67,6 +67,8 @@
+ #include <fstream>
+ #include <memory>
+ #include <mutex>
++#include <sstream>
++#include <std_msgs/msg/string.hpp>
+ #include <random>
+ #include <string>
+ #include <vector>
+@@ -153,15 +155,18 @@ public:
+       return;
+     }
+ 
+-    if (!rclcpp::ok()) {
+-      rclcpp::init(0, nullptr);
+-    }
++    rclcpp::InitOptions init;
++    init.set_domain_id(static_cast<size_t>(get("ros_domain_id", 120)));
++    context_ = std::make_shared<rclcpp::Context>();
++    context_->init(0, nullptr, init);
+     auto name_c = ecm.Component<gz::sim::components::Name>(entity);
+     std::string name = name_c ? name_c->Data() : "livox";
+-    node_ = std::make_shared<rclcpp::Node>("livox_sim_" + name);
++    node_ = std::make_shared<rclcpp::Node>("livox_sim_" + name,
++      rclcpp::NodeOptions().context(context_).parameter_overrides({rclcpp::Parameter("use_sim_time", true)}));
+     auto qos = rclcpp::SensorDataQoS().keep_last(5).reliable();
+     if (xfer_format_ == 1) {
+       custom_pub_ = node_->create_publisher<livox_ros_driver2::msg::CustomMsg>(topic, qos);
++      capture_pub_ = node_->create_publisher<std_msgs::msg::String>(topic + "/capture", qos);
+     } else {
+       cloud_pub_ = node_->create_publisher<sensor_msgs::msg::PointCloud2>(topic, qos);
+     }
+@@ -242,9 +247,13 @@ private:
+     last_ns_ = stamp_ns;
+     if (slice_ == 0) {
+       frame_.clear();
++      capture_times_.clear();
++      capture_counts_.clear();
+       frame_.reserve(samples_ / downsample_ + 1);
+       frame_ns_ = stamp_ns;
+     }
++    capture_times_.push_back(stamp_ns);
++    const size_t slice_start_size = frame_.size();
+     // this image's share of the frame's rays, k0..k1; downsample keeps every n-th of the frame
+     const int k0 = static_cast<int>(int64_t(samples_) * slice_ / slices_);
+     const int k1 = static_cast<int>(int64_t(samples_) * (slice_ + 1) / slices_);
+@@ -308,6 +317,7 @@ private:
+       p.timestamp = static_cast<double>(stamp_ns);  // when this image was taken
+       frame_.push_back(p);
+     }
++    capture_counts_.push_back(frame_.size() - slice_start_size);
+     if (++slice_ < slices_) {
+       return;
+     }
+@@ -376,10 +386,30 @@ private:
+       m.points.push_back(q);
+     }
+     custom_pub_->publish(std::move(m));
++    // Record actual image acquisitions, including images with no returns.
++    // Never add a point or infer an unobserved acquisition time.
++    std::ostringstream payload;
++    payload << "{\"timebase_ns\":" << base_ns << ",\"capture_times_ns\":[";
++    for (size_t i = 0; i < capture_times_.size(); ++i) {
++      if (i) payload << ',';
++      payload << capture_times_[i];
++    }
++    payload << "],\"return_counts\":[";
++    for (size_t i = 0; i < capture_counts_.size(); ++i) {
++      if (i) payload << ',';
++      payload << capture_counts_[i];
++    }
++    payload << "],\"points\":" << pts.size() << "}";
++    std_msgs::msg::String observed;
++    observed.data = payload.str();
++    capture_pub_->publish(observed);
+   }
+ 
+   std::vector<PatternRay> rays_;
+   size_t next_ = 0;
++  std::vector<int64_t> capture_times_;
++  std::vector<size_t> capture_counts_;
++  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr capture_pub_;
+   std::vector<LivoxPoint> frame_;  // the frame being collected, slice_ of slices_ images in
+   int slice_ = 0, slices_ = 1;
+   int64_t frame_ns_ = 0;           // its first image's time: header stamp and CustomMsg timebase
+@@ -393,6 +423,7 @@ private:
+   std::uniform_real_distribution<double> uniform_{0.0, 1.0};
+   std::string frame_id_;
+   std::mutex mutex_;
++  rclcpp::Context::SharedPtr context_;
+   rclcpp::Node::SharedPtr node_;
+   rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr cloud_pub_;
+   rclcpp::Publisher<livox_ros_driver2::msg::CustomMsg>::SharedPtr custom_pub_;

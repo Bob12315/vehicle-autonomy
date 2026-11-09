@@ -65,7 +65,9 @@ GUI、RViz2、QGC 按需打开。关闭控制台只清理本次自有进程；�
 
 - [官方 WildThumper 六轮 Rover](docs/WILDTHUMPER_ROVER.md)：普通地面车的模型来源、安装、控制和本机仿真更换验收。
 
-- [MID-360 纯仿真接入与 RViz2](docs/MID360_SIMULATION_GOAL1.md)：普通 Rover/Copter 的显式近似雷达组件、录制回放与工具管理；[本轮验收](docs/MID360_GOAL1_ACCEPTANCE.md)已通过两车型实际运动、Gazebo/RViz2、录制回放、控制台及生命周期检查。仍非真实 Livox 非重复扫描，未验证 FAST-LIO2。
+- [MID-360 纯仿真接入与 RViz2](docs/MID360_SIMULATION_GOAL1.md)：普通 Rover/Copter 的显式近似雷达组件、录制回放与工具管理；[目标一验收](docs/MID360_GOAL1_ACCEPTANCE.md)已通过两车型实际运动、Gazebo/RViz2、录制回放、控制台及生命周期检查。均匀快照模式不能用于 FAST-LIO2 去畸变验收。
+
+- [MID-360 三维建图与只读定位](docs/MID360_SLAM_GOAL2.md)：显式逐切片输入、共用 FAST-LIO2、PCD 地图管理、独立回环/有初值地图匹配和标准只读 World；实际通过范围及剩余问题以[目标二验收报告](docs/MID360_SLAM_GOAL2_ACCEPTANCE.md)为准，不改变原车辆控制定位。
 
 - [CUADC 2026 地图、救援 Mission 模板与本机 PT 识别](docs/RESCUE_2026_LOCAL_PT.md)：专用仿真车辆、桶识别、对准下降和受控双载荷。
 

@@ -107,7 +107,7 @@ def generate_world(scene, output_path, *, seed=0, parameters=None):
             for j,y in enumerate((-16,0,16)): box(world,f'rack_{i}_{j}',(x,y,2,0,0,0),(2,10,4),color='.2 .35 .7 1')
         box(world,'roof',(0,0,12,0,0,0),(50,50,.2))
         for i,y in enumerate((-25,25)):box(world,'wall_'+str(i),(0,y,6,0,0,0),(50,.3,12))
-    elif layout=='mid360_audit':
+    elif layout in ('mid360_audit','mid360_loop_audit'):
         # Reuse the primitive-world/ground/spawn machinery. All targets have
         # matching real visual/collision geometry; never publish a test cloud.
         box(world,'lidar_wall',(12,0,3,0,0,0),(.3,24,6))
@@ -116,6 +116,8 @@ def generate_world(scene, output_path, *, seed=0, parameters=None):
             box(world,'lidar_column_'+str(i),(x,y,height/2,0,0,0),(.4,height),shape='cylinder')
         for i,height in enumerate((1,3,7)):
             box(world,'lidar_block_'+str(i),(-10+i*4,-10,height/2,0,0,0),(1.5,1.5,height))
+        if layout=='mid360_loop_audit':
+            box(world,'lidar_inner_column',(2,0,1,0,0,0),(.4,2),shape='cylinder')
     elif layout in ('urban','village'):
         for i,x in enumerate((-35,-20,20,35)):
             for j,y in enumerate((-30,-12,12,30)):

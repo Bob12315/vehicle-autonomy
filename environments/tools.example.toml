@@ -23,6 +23,7 @@ vision_assets = ""
 vision_python = ""
 rescue_model = ""
 slam_boundary_library = ""
+mid360_slam_root = ""
 native_source_receiver = ""
 # runtime_root = "/absolute/private/runtime"
 

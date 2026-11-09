@@ -1,0 +1,188 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index e091f3a..4d3f4af 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -9,13 +9,13 @@ endif()
+  ADD_COMPILE_OPTIONS(-std=c++17) 
+  set(CMAKE_CXX_FLAGS "-std=c++17 -O3") 
+   
+- add_definitions(-DROOT_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/\") 
++ add_definitions(-DROOT_DIR=\"./\") 
+   
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fexceptions") 
+  set(CMAKE_CXX_STANDARD 17) 
+ set(CMAKE_CXX_STANDARD_REQUIRED ON)
+ set(CMAKE_CXX_EXTENSIONS OFF)
+-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -pthread -std=c++0x -std=c++14 -fexceptions")
++set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -fexceptions")
+ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+ 
+ message("Current CPU archtecture: ${CMAKE_SYSTEM_PROCESSOR}")
+@@ -50,6 +50,7 @@ find_path(MATPLOTLIB_CPP_INCLUDE_DIRS "matplotlibcpp.h")
+ # ROS dependencies
+ find_package(ament_cmake REQUIRED)
+ find_package(rclcpp REQUIRED)
++find_package(tf2_ros REQUIRED)
+ find_package(rclcpp_components REQUIRED)
+ find_package(geometry_msgs REQUIRED)
+ find_package(nav_msgs REQUIRED)
+@@ -57,12 +58,12 @@ find_package(sensor_msgs REQUIRED)
+ find_package(std_msgs REQUIRED)
+ find_package(std_srvs REQUIRED)
+ find_package(visualization_msgs REQUIRED)
+-find_package(pcl_ros REQUIRED)
+ find_package(pcl_conversions REQUIRED)
+ find_package(livox_ros_driver2 REQUIRED)
+ find_package(rosidl_default_generators REQUIRED)
+ 
+ set(dependencies
++  tf2_ros
+   rclcpp
+   rclcpp_components
+   geometry_msgs
+@@ -71,14 +72,13 @@ set(dependencies
+   std_msgs
+   std_srvs
+   visualization_msgs
+-  pcl_ros
+   pcl_conversions
+   livox_ros_driver2
+ )
+ 
+ # Thirdparty libraries
+ find_package(Eigen3 REQUIRED)
+-find_package(PCL REQUIRED COMPONENTS common io)
++find_package(PCL REQUIRED COMPONENTS common io filters kdtree search)
+ 
+ message(Eigen: ${EIGEN3_INCLUDE_DIR})
+ message(STATUS "PCL: ${PCL_INCLUDE_DIRS}")
+diff --git a/package.xml b/package.xml
+index 8c39e18..03d15f9 100644
+--- a/package.xml
++++ b/package.xml
+@@ -25,7 +25,6 @@
+   <depend>sensor_msgs</depend>
+   <depend>common_interfaces</depend>
+   <depend>tf2</depend>
+-  <depend>pcl_ros</depend>
+   <depend>pcl_conversions</depend>
+   <depend>livox_ros_driver2</depend>
+ 
+diff --git a/src/laserMapping.cpp b/src/laserMapping.cpp
+index d441261..b73af18 100644
+--- a/src/laserMapping.cpp
++++ b/src/laserMapping.cpp
+@@ -34,6 +34,9 @@
+ // POSSIBILITY OF SUCH DAMAGE.
+ #include <omp.h>
+ #include <mutex>
++#include <sstream>
++#include <set>
++#include <std_msgs/msg/string.hpp>
+ #include <math.h>
+ #include <thread>
+ #include <fstream>
+@@ -306,6 +309,8 @@ void standard_pcl_cbk(const sensor_msgs::msg::PointCloud2::UniquePtr msg)
+     sig_buffer.notify_all();
+ }
+ 
++std::deque<int64_t> vaf_received_imu_times;
++
+ double timediff_lidar_wrt_imu = 0.0;
+ bool   timediff_set_flg = false;
+ void livox_pcl_cbk(const livox_ros_driver2::msg::CustomMsg::UniquePtr msg) 
+@@ -371,6 +376,9 @@ void imu_cbk(const sensor_msgs::msg::Imu::UniquePtr msg_in)
+         imu_buffer.clear();
+     }
+ 
++    // Read-only observation of the algorithm's actual input, before integration.
++    vaf_received_imu_times.push_back(int64_t(msg_in->header.stamp.sec) * 1000000000 + msg_in->header.stamp.nanosec);
++    if (vaf_received_imu_times.size() > 5000) vaf_received_imu_times.pop_front();
+     last_timestamp_imu = timestamp;
+ 
+     imu_buffer.push_back(msg);
+@@ -434,6 +442,44 @@ bool sync_packages(MeasureGroup &meas)
+     return true;
+ }
+ 
++// Original received IMU stamps only. No estimator state, sensor values,
++// time offsets, interpolation, or optimization mathematics are changed.
++void vaf_publish_input_timing(const MeasureGroup & meas,
++    const rclcpp::Publisher<std_msgs::msg::String>::SharedPtr & publisher)
++{
++    const auto begin_msg = get_ros_time(meas.lidar_beg_time);
++    const auto end_msg = get_ros_time(meas.lidar_end_time);
++    const int64_t begin = begin_msg.nanoseconds();
++    const int64_t end = end_msg.nanoseconds();
++    std::ostringstream payload;
++    payload << "{\"source_begin_ns\":" << begin << ",\"source_end_ns\":" << end << ",\"imu_capture_times_ns\":[";
++    bool first = true;
++    {
++        std::lock_guard<std::mutex> guard(mtx_buffer);
++        for (const int64_t stamp : vaf_received_imu_times) {
++            if (stamp < begin - 20000000 || stamp > end + 20000000) continue;
++            if (!first) payload << ',';
++            payload << stamp;
++            first = false;
++        }
++    }
++    payload << "],\"point_capture_times_ns\":[";
++    std::set<int64_t> point_times;
++    for (const auto & point : meas.lidar->points) {
++        point_times.insert(begin + static_cast<int64_t>(std::llround(point.curvature * 1000000.0)));
++    }
++    first = true;
++    for (const int64_t stamp : point_times) {
++        if (!first) payload << ',';
++        payload << stamp;
++        first = false;
++    }
++    payload << "],\"retained_points\":" << meas.lidar->points.size() << "}";
++    std_msgs::msg::String message;
++    message.data = payload.str();
++    publisher->publish(message);
++}
++
+ int process_increments = 0;
+ void map_incremental()
+ {
+@@ -926,12 +972,13 @@ public:
+         {
+             sub_pcl_pc_ = this->create_subscription<sensor_msgs::msg::PointCloud2>(lid_topic, rclcpp::SensorDataQoS(), standard_pcl_cbk);
+         }
+-        sub_imu_ = this->create_subscription<sensor_msgs::msg::Imu>(imu_topic, 10, imu_cbk);
++        sub_imu_ = this->create_subscription<sensor_msgs::msg::Imu>(imu_topic, 400, imu_cbk);
+         pubLaserCloudFull_ = this->create_publisher<sensor_msgs::msg::PointCloud2>("/cloud_registered", 20);
+         pubLaserCloudFull_body_ = this->create_publisher<sensor_msgs::msg::PointCloud2>("/cloud_registered_body", 20);
+         pubLaserCloudEffect_ = this->create_publisher<sensor_msgs::msg::PointCloud2>("/cloud_effected", 20);
+         pubLaserCloudMap_ = this->create_publisher<sensor_msgs::msg::PointCloud2>("/Laser_map", 20);
+         pubOdomAftMapped_ = this->create_publisher<nav_msgs::msg::Odometry>("/Odometry", 20);
++        pubInputTiming_ = this->create_publisher<std_msgs::msg::String>("/vaf_input_timing", 40);
+         pubPath_ = this->create_publisher<nav_msgs::msg::Path>("/path", 20);
+         tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
+ 
+@@ -1028,7 +1075,7 @@ private:
+             feats_down_world->resize(feats_down_size);
+ 
+             V3D ext_euler = SO3ToEuler(state_point.offset_R_L_I);
+-            fout_pre<<setw(20)<<Measures.lidar_beg_time - first_lidar_time<<" "<<euler_cur.transpose()<<" "<< state_point.pos.transpose()<<" "<<ext_euler.transpose() << " "<<state_point.offset_T_L_I.transpose()<< " " << state_point.vel.transpose() \
++            if (runtime_pos_log) fout_pre<<setw(20)<<Measures.lidar_beg_time - first_lidar_time<<" "<<euler_cur.transpose()<<" "<< state_point.pos.transpose()<<" "<<ext_euler.transpose() << " "<<state_point.offset_T_L_I.transpose()<< " " << state_point.vel.transpose() \
+             <<" "<<state_point.bg.transpose()<<" "<<state_point.ba.transpose()<<" "<<state_point.grav<< endl;
+ 
+             if(0) // If you need to see map point, change to "if(1)"
+@@ -1062,6 +1109,7 @@ private:
+ 
+             /******* Publish odometry *******/
+             publish_odometry(pubOdomAftMapped_, tf_broadcaster_);
++            vaf_publish_input_timing(Measures, pubInputTiming_);
+ 
+             /*** add the feature points to map kdtree ***/
+             t3 = omp_get_wtime();
+@@ -1134,6 +1182,7 @@ private:
+     rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pubLaserCloudEffect_;
+     rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pubLaserCloudMap_;
+     rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr pubOdomAftMapped_;
++    rclcpp::Publisher<std_msgs::msg::String>::SharedPtr pubInputTiming_;
+     rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr pubPath_;
+     rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr sub_imu_;
+     rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr sub_pcl_pc_;

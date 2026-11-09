@@ -116,9 +116,10 @@ class SimulationManager:
             kind=item['kind']
             if type(kind) is not str:raise ValueError('registered vehicle kind required')
             sensors=item.get('sensors',{})
-            fields(sensors,('mid360',))
-            if 'mid360' in sensors and type(sensors['mid360']) is not bool:
+            fields(sensors,('mid360','mid360_lio'))
+            if any(type(v) is not bool for v in sensors.values()):
                 raise ValueError('MID-360 selection requires an explicit boolean')
+            if sensors.get('mid360_lio') and not sensors.get('mid360'):raise ValueError('LIO timing requires MID-360')
             if sensors.get('mid360') and kind not in ('rover','copter'):
                 raise ValueError('MID-360 simulation supports only ordinary Rover/Copter')
             if kind=='copter_rescue' and scene_id!='CUADC2026':raise ValueError('rescue model requires the CUADC2026 scene')
@@ -265,6 +266,7 @@ class SimulationManager:
                     if truth is None:raise ValueError('live Gazebo peer position required before spawn')
                     peers.append(dict(spawn=truth['position'],definition=self.vehicle_registry.get(peer.vehicle),slot_id=peer.slot_id))
                 specification=self._specifications(record['scene_id'],[dict(kind=specification['kind'],slot_id=specification['slot_id'],
+                    **({'sensors':deepcopy(specification['sensors'])} if specification.get('sensors') else {}),
                     spawn={k:specification['spawn'][k] for k in ('x','y','z','heading_deg')})],
                     record['configuration']['parameters'],record['configuration']['seed'],peers=peers)[0]
                 child=owner.add(specification,self.stops[identifier].is_set)
@@ -899,8 +901,9 @@ class SimulationManager:
         return record
 
     def handle(self, operation, payload):
-        if operation=='simulation.mid360':
-            fields(payload,('id','vehicle_id','action','source','bag_id'),('id','vehicle_id','action'))
+        if operation in ('simulation.mid360','simulation.slam'):
+            fields(payload,('id','vehicle_id','action','source','bag_id') if operation=='simulation.mid360' else
+                ('id','vehicle_id','action','source','map_id','name','seed'),('id','vehicle_id','action'))
             if any(type(payload[k]) is not str or len(payload[k])>100 for k in ('id','vehicle_id','action')):
                 raise ValueError('bounded MID-360 session, vehicle and operation required')
             # Only already owned sensor instances are addressed. Browser inputs
@@ -914,6 +917,11 @@ class SimulationManager:
                 if record['state'] in ('STOPPING','PREPARING','STARTING'):
                     raise ValueError('World lifecycle operation in progress')
                 sensor=binding[1]
+            if operation=='simulation.slam':
+                from .mid360_slam import Mid360Slam
+                with sensor.lock:
+                    if sensor.slam is None:sensor.slam=Mid360Slam(sensor)
+                    return sensor.slam.handle(payload)
             return sensor.handle(payload['action'],bag_id=payload.get('bag_id'),source=payload.get('source','live'))
         if operation=='simulation.vehicles':
             fields(payload,())

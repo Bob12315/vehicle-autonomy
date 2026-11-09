@@ -29,6 +29,7 @@ class Native:
         self.thread = Thread(target=self.server.serve_forever, kwargs={'poll_interval': .1}, daemon=True)
         self.thread.start()
         self.base = 'http://127.0.0.1:'+str(self.server.server_address[1])
+        (self.path/'http-endpoint.json').write_text(json.dumps(dict(base_url=self.base,pid=os.getpid()))+'\n')
         self.requests = (self.path/'requests.jsonl').open('w')
         self.raw = (self.path/'truth-writer.jsonl').open('w')
         self.oracles = {}; self.stop = Event(); self.samples = []

@@ -1,0 +1,431 @@
+{
+  "schema": 1,
+  "status": "FAIL",
+  "date": "2026-11-09",
+  "branch": "codex/mid360-goal2-wildthumper",
+  "base_commit": "bd0bd33789eef27b2805f767a09cb36e89a0e231",
+  "commit_manifest": "artifacts/mid360-goal2-20261108/pause-delivery-20261109.json",
+  "checks": {
+    "three_repeats_per_vehicle": {
+      "status": "PASS",
+      "evidence": "artifacts/mid360-goal2-20261108/accepted-repetitions.json",
+      "current_version_validation": "NOT TESTED",
+      "note": "Six accepted native runs predate later display-trajectory throttling and precise CPU-clock instrumentation; final-version repetition campaign pending."
+    },
+    "rover_pgo": {
+      "status": "PASS",
+      "evidence": "artifacts/mid360-goal2-20261108/pgo-rover-r4/slam-result.json"
+    },
+    "copter_pgo": {
+      "status": "PASS",
+      "evidence": "artifacts/mid360-goal2-20261108/pgo-copter-r1/slam-result.json"
+    },
+    "rover_relocalization": {
+      "status": "PASS",
+      "evidence": "artifacts/mid360-goal2-20261108/relocalization-rover-r2/relocalization-result.json"
+    },
+    "copter_relocalization": {
+      "status": "PASS",
+      "evidence": "artifacts/mid360-goal2-20261108/relocalization-copter-r1/relocalization-result.json"
+    },
+    "saved_map_fresh_view": {
+      "status": "PASS",
+      "evidence": "artifacts/mid360-goal2-20261108/saved-map-r2/result.json"
+    },
+    "gui_visual_review": {
+      "status": "NOT TESTED",
+      "evidence": "artifacts/mid360-goal2-20261108/gui-review.json"
+    },
+    "faults_and_isolation": {
+      "status": "PASS",
+      "evidence": "artifacts/mid360-goal2-20261108/faults-r1/fault-result.json"
+    },
+    "control_center_slam": {
+      "status": "FAIL",
+      "evidence": "artifacts/mid360-goal2-20261108/center-r1/result.json"
+    },
+    "goal_one_native_regression": {
+      "status": "NOT TESTED",
+      "evidence": "artifacts/mid360-goal2-20261108/regression-r1/result.json"
+    },
+    "final_process_audit": {
+      "status": "NOT TESTED",
+      "evidence": "artifacts/mid360-goal2-20261108/final-audit.json"
+    },
+    "package": {
+      "status": "NOT TESTED",
+      "evidence": "artifacts/mid360-goal2-20261108/wheel/audit.json",
+      "reason": "Earlier wheel audit passed its resources, but wheel predates latest UI changes; final rebuild/audit pending."
+    },
+    "full_unittest": {
+      "status": "NOT TESTED",
+      "count": null,
+      "evidence": "artifacts/mid360-goal2-20261108/unittest-final.log"
+    }
+  },
+  "repetitions": [
+    {
+      "kind": "rover",
+      "repetition": 1,
+      "path": "artifacts/mid360-goal2-20261108/repeats-r1/rover-1/slam-result.json",
+      "status": "PASS",
+      "metrics": {
+        "pairs": 1424,
+        "alignment": "first valid pose only; no trajectory fit",
+        "truth_origin": "Gazebo model pose plus audited fixed model-to-body offset",
+        "model_to_body": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ate_rmse_m": 0.08744728190612806,
+        "rpe_1s_translation_rmse_m": 0.006986658155793827,
+        "attitude_rmse_deg": 0.17293370510650566,
+        "return_drift_m": 0.09703160077824259,
+        "truth_distance_m": 7.315031619800363,
+        "alignment_quaternion": [
+          -0.001194608977166264,
+          -9.555060570766656e-05,
+          -0.00018505183392299334,
+          0.9999992647673759
+        ],
+        "alignment_translation": [
+          0.008600453391025217,
+          0.01773590789417312,
+          0.2742954714517115
+        ],
+        "geometry_residual_p95_m": 0.15123062505494586,
+        "landmark_groups": {
+          "ground": 40527,
+          "wall": 12307,
+          "building": 15125,
+          "block0": 316,
+          "block1": 833,
+          "block2": 1835,
+          "column0": 237,
+          "column1": 576,
+          "column2": 374
+        },
+        "matching_landmark_groups": 9,
+        "points": 72530,
+        "oracle": "analytic surfaces of the checked MID-360 static Gazebo fixtures; judge only"
+      },
+      "runtime": {
+        "max_rss_mib": 164.296875,
+        "max_cpu_percent": 95.02907200599341,
+        "max_latency_host_s": 0.36720538399999997,
+        "pipeline_max_rss_mib": 356.5625,
+        "pipeline_max_cpu_percent": 238.77583209406532
+      },
+      "algorithm_config_sha256": "5627b30c51bb9a9b417fe202c6a139c553a43df1ef850e873cd3cd0a96a423a6",
+      "recipe_sha256": "5a36a7a7742c095c7f653bce27ef883dfe3c7fd59f07db823a3b5150c1c86270",
+      "frame_epoch": "f64163e32a0d445482f4752ebfec09ad"
+    },
+    {
+      "kind": "rover",
+      "repetition": 2,
+      "path": "artifacts/mid360-goal2-20261108/repeats-r1/rover-2/slam-result.json",
+      "status": "PASS",
+      "metrics": {
+        "pairs": 1374,
+        "alignment": "first valid pose only; no trajectory fit",
+        "truth_origin": "Gazebo model pose plus audited fixed model-to-body offset",
+        "model_to_body": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ate_rmse_m": 0.08709777124735833,
+        "rpe_1s_translation_rmse_m": 0.006863437943794742,
+        "attitude_rmse_deg": 0.1618313767811298,
+        "return_drift_m": 0.09687835461809746,
+        "truth_distance_m": 7.309204773604077,
+        "alignment_quaternion": [
+          -0.001003682208369462,
+          -9.221983157647143e-05,
+          -0.00016371688237285835,
+          0.999999478657019
+        ],
+        "alignment_translation": [
+          0.007225124433254018,
+          0.013781492490505176,
+          0.27977260631573386
+        ],
+        "geometry_residual_p95_m": 0.1515695008466618,
+        "landmark_groups": {
+          "ground": 40788,
+          "wall": 12361,
+          "building": 14785,
+          "block0": 316,
+          "block1": 869,
+          "block2": 1825,
+          "column0": 226,
+          "column1": 551,
+          "column2": 362
+        },
+        "matching_landmark_groups": 9,
+        "points": 72494,
+        "oracle": "analytic surfaces of the checked MID-360 static Gazebo fixtures; judge only"
+      },
+      "runtime": {
+        "max_rss_mib": 162.640625,
+        "max_cpu_percent": 66.10065743902189,
+        "max_latency_host_s": 0.19967074299999998,
+        "pipeline_max_rss_mib": 351.35546875,
+        "pipeline_max_cpu_percent": 197.00411760532268
+      },
+      "algorithm_config_sha256": "5627b30c51bb9a9b417fe202c6a139c553a43df1ef850e873cd3cd0a96a423a6",
+      "recipe_sha256": "5a36a7a7742c095c7f653bce27ef883dfe3c7fd59f07db823a3b5150c1c86270",
+      "frame_epoch": "75b2e42c814d47268acde2c8e30900b1"
+    },
+    {
+      "kind": "rover",
+      "repetition": 3,
+      "path": "artifacts/mid360-goal2-20261108/repeats-r1/rover-3/slam-result.json",
+      "status": "PASS",
+      "metrics": {
+        "pairs": 1380,
+        "alignment": "first valid pose only; no trajectory fit",
+        "truth_origin": "Gazebo model pose plus audited fixed model-to-body offset",
+        "model_to_body": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ate_rmse_m": 0.09233972928144231,
+        "rpe_1s_translation_rmse_m": 0.006504187247535513,
+        "attitude_rmse_deg": 0.10664508029017196,
+        "return_drift_m": 0.10092370244793332,
+        "truth_distance_m": 7.369991872858712,
+        "alignment_quaternion": [
+          -0.0004425186202344294,
+          0.0004841395125438791,
+          -8.675156863368915e-05,
+          0.9999997811301603
+        ],
+        "alignment_translation": [
+          0.0036155951615169553,
+          0.02129491176431923,
+          0.2718381411252306
+        ],
+        "geometry_residual_p95_m": 0.15210181287520755,
+        "landmark_groups": {
+          "ground": 40489,
+          "wall": 11944,
+          "building": 14972,
+          "block0": 307,
+          "block1": 825,
+          "block2": 1759,
+          "column0": 217,
+          "column1": 579,
+          "column2": 372
+        },
+        "matching_landmark_groups": 9,
+        "points": 71717,
+        "oracle": "analytic surfaces of the checked MID-360 static Gazebo fixtures; judge only"
+      },
+      "runtime": {
+        "max_rss_mib": 164.796875,
+        "max_cpu_percent": 72.53361763988335,
+        "max_latency_host_s": 0.10760889,
+        "pipeline_max_rss_mib": 354.66796875,
+        "pipeline_max_cpu_percent": 193.86410429519847
+      },
+      "algorithm_config_sha256": "5627b30c51bb9a9b417fe202c6a139c553a43df1ef850e873cd3cd0a96a423a6",
+      "recipe_sha256": "5a36a7a7742c095c7f653bce27ef883dfe3c7fd59f07db823a3b5150c1c86270",
+      "frame_epoch": "93656cda98d34c3ea9d735351bf19c1b"
+    },
+    {
+      "kind": "copter",
+      "repetition": 1,
+      "path": "artifacts/mid360-goal2-20261108/copter-gui-r3/slam-result.json",
+      "status": "PASS",
+      "metrics": {
+        "pairs": 1129,
+        "alignment": "first valid pose only; no trajectory fit",
+        "truth_origin": "Gazebo model pose plus audited fixed model-to-body offset",
+        "model_to_body": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ate_rmse_m": 0.02728432897327425,
+        "rpe_1s_translation_rmse_m": 0.01315856231980307,
+        "attitude_rmse_deg": 0.12894286289938758,
+        "return_drift_m": 0.04028908242359313,
+        "truth_distance_m": 14.319511583759176,
+        "alignment_quaternion": [
+          0.001030489470637547,
+          0.00023524591673980378,
+          3.660445403636168e-06,
+          0.9999994413685493
+        ],
+        "alignment_translation": [
+          0.007493960526809059,
+          0.02595263203156296,
+          0.31152057195121863
+        ],
+        "geometry_residual_p95_m": 0.11866279377049718,
+        "landmark_groups": {
+          "ground": 58553,
+          "wall": 13133,
+          "building": 14002,
+          "block0": 372,
+          "block1": 876,
+          "block2": 1525,
+          "column0": 211,
+          "column1": 555,
+          "column2": 309
+        },
+        "matching_landmark_groups": 9,
+        "points": 90068,
+        "oracle": "analytic surfaces of the checked MID-360 static Gazebo fixtures; judge only"
+      },
+      "runtime": {
+        "max_rss_mib": 206.890625,
+        "max_cpu_percent": 105.83852345405359,
+        "max_latency_host_s": 0.314635059,
+        "pipeline_max_rss_mib": 440.8125,
+        "pipeline_max_cpu_percent": 253.55400181052693
+      },
+      "algorithm_config_sha256": "4a177b33950bebc82348a79b54c0606782c1d2dd720ecb8af646a0ad893014da",
+      "recipe_sha256": "5a36a7a7742c095c7f653bce27ef883dfe3c7fd59f07db823a3b5150c1c86270",
+      "frame_epoch": "b21f356354a6458dadff0da27abfbb79"
+    },
+    {
+      "kind": "copter",
+      "repetition": 2,
+      "path": "artifacts/mid360-goal2-20261108/repeats-r1/copter-2/slam-result.json",
+      "status": "PASS",
+      "metrics": {
+        "pairs": 1178,
+        "alignment": "first valid pose only; no trajectory fit",
+        "truth_origin": "Gazebo model pose plus audited fixed model-to-body offset",
+        "model_to_body": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ate_rmse_m": 0.03678159922918554,
+        "rpe_1s_translation_rmse_m": 0.023877574499073632,
+        "attitude_rmse_deg": 0.1075139872569052,
+        "return_drift_m": 0.01750890688766938,
+        "truth_distance_m": 14.248185799097246,
+        "alignment_quaternion": [
+          -0.0001415249847146539,
+          -0.0002783291145964633,
+          0.00021189839538448597,
+          0.9999999288013238
+        ],
+        "alignment_translation": [
+          0.007159067431562996,
+          0.023888613514961386,
+          0.31543141319939993
+        ],
+        "geometry_residual_p95_m": 0.0995115286199374,
+        "landmark_groups": {
+          "ground": 65903,
+          "wall": 13121,
+          "building": 14339,
+          "block0": 378,
+          "block1": 877,
+          "block2": 1554,
+          "column0": 243,
+          "column1": 537,
+          "column2": 286
+        },
+        "matching_landmark_groups": 9,
+        "points": 97747,
+        "oracle": "analytic surfaces of the checked MID-360 static Gazebo fixtures; judge only"
+      },
+      "runtime": {
+        "max_rss_mib": 213.4375,
+        "max_cpu_percent": 77.61515559336178,
+        "max_latency_host_s": 0.118768913,
+        "pipeline_max_rss_mib": 451.6875,
+        "pipeline_max_cpu_percent": 203.9368791049866
+      },
+      "algorithm_config_sha256": "4a177b33950bebc82348a79b54c0606782c1d2dd720ecb8af646a0ad893014da",
+      "recipe_sha256": "5a36a7a7742c095c7f653bce27ef883dfe3c7fd59f07db823a3b5150c1c86270",
+      "frame_epoch": "8c0a6ec700a945dd8a77259f9467ec09"
+    },
+    {
+      "kind": "copter",
+      "repetition": 3,
+      "path": "artifacts/mid360-goal2-20261108/repeats-r1/copter-3/slam-result.json",
+      "status": "PASS",
+      "metrics": {
+        "pairs": 1166,
+        "alignment": "first valid pose only; no trajectory fit",
+        "truth_origin": "Gazebo model pose plus audited fixed model-to-body offset",
+        "model_to_body": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ate_rmse_m": 0.03555171948701864,
+        "rpe_1s_translation_rmse_m": 0.020986167222590217,
+        "attitude_rmse_deg": 0.08195612436448745,
+        "return_drift_m": 0.023479647598149703,
+        "truth_distance_m": 14.22863605023954,
+        "alignment_quaternion": [
+          -0.0002145984496986242,
+          -7.1849207141946e-05,
+          0.00017160157085201628,
+          0.9999999596690481
+        ],
+        "alignment_translation": [
+          0.01210458301467702,
+          0.020780349170178455,
+          0.3228576550103322
+        ],
+        "geometry_residual_p95_m": 0.1040620583385576,
+        "landmark_groups": {
+          "ground": 60434,
+          "wall": 13137,
+          "building": 13867,
+          "block0": 381,
+          "block1": 892,
+          "block2": 1531,
+          "column0": 231,
+          "column1": 524,
+          "column2": 323
+        },
+        "matching_landmark_groups": 9,
+        "points": 91907,
+        "oracle": "analytic surfaces of the checked MID-360 static Gazebo fixtures; judge only"
+      },
+      "runtime": {
+        "max_rss_mib": 205.01171875,
+        "max_cpu_percent": 110.68415138962571,
+        "max_latency_host_s": 0.536335628,
+        "pipeline_max_rss_mib": 441.05078125,
+        "pipeline_max_cpu_percent": 236.9997254237976
+      },
+      "algorithm_config_sha256": "4a177b33950bebc82348a79b54c0606782c1d2dd720ecb8af646a0ad893014da",
+      "recipe_sha256": "5a36a7a7742c095c7f653bce27ef883dfe3c7fd59f07db823a3b5150c1c86270",
+      "frame_epoch": "7bc757ac8ca44d6f8cdf37273d717ea2"
+    }
+  ],
+  "limits_file": "configs/mid360-slam-acceptance.json",
+  "old_vehicle_evidence": "artifacts/mid360-goal2-20261107; not reused as WildThumper qualification",
+  "development_status": "PAUSED",
+  "goal_complete": false,
+  "checkpoint_reason": "User requested pause, local Git checkpoint and GitHub branch push; no merge.",
+  "pending": [
+    "Repair and retest control-center stopped-world replay SLAM RViz timeout; backend restart and crash-recovery stages not reached.",
+    "Repeat final source version three times per vehicle with precise CPU clocks.",
+    "Run fresh original MID-360/RS16/camera/disabled-sensor regression.",
+    "Run full unittest suite for the final stage.",
+    "Rebuild and audit wheel after latest UI edits.",
+    "Complete final DDS/process/port and screenshot review."
+  ],
+  "latest_passed_runs": {
+    "rover_pgo": "pgo-rover-r4/slam-result.json",
+    "copter_pgo": "pgo-copter-r1/slam-result.json",
+    "rover_relocalization": "relocalization-rover-r2/relocalization-result.json",
+    "copter_relocalization": "relocalization-copter-r1/relocalization-result.json",
+    "faults_48_checks": "faults-r1/fault-result.json",
+    "saved_map_independent_views": "saved-map-r2/result.json"
+  }
+}

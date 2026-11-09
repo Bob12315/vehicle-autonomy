@@ -1,5 +1,37 @@
 # V1 framework boundary
 
+## Optional simulation LIO and 3D map resources (2026-11-07)
+
+An explicit timed MID-360 option adds a pinned external Gazebo sensor worker
+and FAST-LIO2, shared by ordinary Rover/Copter. Five actual GPU captures retain
+their source times; renderer capture events also record zero-return slices.
+The old simultaneous uniform viewing backend remains separate. This is a
+discrete scan approximation, not a physical Livox driver or continuous firing.
+
+Application simulation ownership configures and supervises the external
+processes through existing LocalTools. ROS and Open3D imports stay inside
+explicit workers. The world mapping worker verifies original point/IMU time
+coverage, publisher authority and frame epoch before exporting local poses and
+bounded voxel maps. It alone owns the display TF chain; truth TF remains in a
+separate visualization topic. Optional SC-PGO publishes historical optimization
+results without TF authority. Pinned ICP map matching requires an operator rough
+seed; only admitted capture-time matches add a saved-map parent transform.
+
+LioWorldSource turns the bounded exchange into existing LocalizationEstimate,
+WorldModel and read-only WorldSnapshot, with covariance absent and quality
+DEGRADED. Its World does not replace Driver localization, issue vehicle effects
+or inject ArduPilot EKF inputs. Map resource revisions retain actual capture age;
+PCD/metadata persist under RuntimePaths.state, with content and provenance
+checks. Runtime workers/logs use owned sessions, and artifacts remain test output.
+Core contracts, dual SEND, SafetyPolicy, Lease/TTL, generation fences and the
+sole vehicle writer are unchanged. No Nav2 or 3D navigation is introduced.
+
+See [operation and limits](MID360_SLAM_GOAL2.md), [pinned dependencies and I/O
+patches](MID360_SLAM_DEPENDENCIES.md) and the [actual acceptance report](MID360_SLAM_GOAL2_ACCEPTANCE.md).
+Individual map viewing, LIO, loop optimization and new-session localization
+must be assessed independently; interfaces and build certificates are not runtime
+acceptance evidence.
+
 ## Explicit MID-360 simulation approximation (2026-11-07)
 
 Ordinary Rover/Copter instances can opt into a shared native Gazebo GPU LiDAR

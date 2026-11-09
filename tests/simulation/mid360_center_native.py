@@ -14,7 +14,7 @@ from vehicle_autonomy.app.control_center.supervisor import service_state,unit_na
 from vehicle_autonomy.app.web.passwords import set_password
 
 
-def run(directory):
+def run(directory,*,slam=False):
     from playwright.sync_api import sync_playwright,expect
     from tests.browser_auth import login
     from tests.visualization.desktop import goal
@@ -69,7 +69,30 @@ def run(directory):
     def finalized(page,sid,vid):
         button(page,'record_stop')
         state=wait(lambda:(s if not (s:=mid(sid,vid))['recording'] and any(b['complete'] for b in s['bags']) else None),30)
-        bag=next(b for b in reversed(state['bags']) if b['complete']);assert len(bag['message_counts'])>=8,bag;return bag
+        bag=next(b for b in reversed(state['bags']) if b['complete']);assert len(bag['message_counts'])>=(10 if slam else 8),bag;return bag
+    def slam_ui(page,sid,vid,label,*,save=False):
+        expect(page.locator('#slam-panel')).to_be_visible(timeout=20000)
+        page.locator('[data-slam="start"]').click()
+        status=lambda:api('/api/simulation/slam',dict(id=sid,vehicle_id=vid,action='status'))
+        wait(lambda:status()['online'],70)
+        page.locator('[data-slam="rviz_start"]').click()
+        view=wait(lambda:(s if (s:=mid(sid,vid))['tools'].get('slam-rviz',{}).get('ready') else None),100)
+        goal(view['tools']['slam-rviz']['pid'],capture=directory/(label+'-slam.png'),select=False)
+        assert page.locator('#slam-panel canvas').count()==0
+        if save:
+            page.locator('[data-slam="pause"]').click();wait(lambda:status()['state']['map']['paused'],10)
+            page.locator('[data-slam="resume"]').click();wait(lambda:not status()['state']['map']['paused'],10)
+            page.locator('#slam-map-name').fill(label+' UI map')
+            with page.expect_response(lambda r:'/api/simulation/slam' in r.url and r.request.method=='POST' and r.request.post_data_json.get('action')=='save') as saved:
+                page.locator('[data-slam="save"]').click()
+            response=saved.value.json();assert response['ok'],response
+            identity=response['result']['id'];page.locator('#slam-map-id').select_option(identity)
+            page.locator('[data-slam="load"]').click();page.locator('[data-slam="loaded_rviz_start"]').click()
+            view=wait(lambda:(s if (s:=mid(sid,vid))['tools'].get('slam-rviz',{}).get('ready') and s['tools']['slam-rviz']['context']['ros_domain_id']!=s['domains'].get('live') else None),100)
+            goal(view['tools']['slam-rviz']['pid'],capture=directory/(label+'-saved-map.png'),select=False)
+        page.locator('#slam-panel').screenshot(path=str(directory/(label+'-slam-web.png')))
+        report['checks'][label+'_SLAM_UI_actual_view']='PASS'
+        return status()
     def audit(before,abnormal=False):
         launcher.wait(135);log.close()
         path=Path(current['run_dir']);state=json.loads((path/'state.json').read_text());cleanup=json.loads((path/'os-cleanup.json').read_text())
@@ -93,6 +116,7 @@ def run(directory):
                 page=browser.new_page(viewport=dict(width=1520,height=1100));errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
                 login(page,f'http://127.0.0.1:{port}',password,'/simulation')
                 page.locator('[data-scene="L01"]').click();page.locator('#config-vehicle').select_option('rover');page.locator('#enable-mid360').check()
+                if slam:page.locator('#enable-mid360-lio').check()
                 page.locator('#add-config-vehicle').click();page.locator('#vehicle-instances fieldset label select').first.select_option('copter')
                 with page.expect_response(lambda r:'/api/simulation/create' in r.url and r.request.method=='POST') as created:page.locator('#create-session').click()
                 response=created.value.json();assert response['ok'],response;sid=response['result']['id']
@@ -115,9 +139,22 @@ def run(directory):
                 for v in vehicles:
                     vid=v['id'];kind=v['kind'];page.locator('#current-vehicle').select_option(vid)
                     expect(page.locator('#mid360-panel')).to_be_visible();button(page,'record_start');wait(lambda:mid(sid,vid)['recording'],15)
+                    start_scan=mid(sid,vid)['health'].get('sequence',0)
                     first=rviz(page,sid,vid,kind+'-center-live');button(page,'rviz_stop');wait(lambda:not mid(sid,vid)['tools']['rviz2']['process_running'],20)
                     second=rviz(page,sid,vid,kind+'-center-reopened');assert first!=second and mid(sid,vid)['online']
-                    button(page,'rviz_stop');bags[vid]=finalized(page,sid,vid)
+                    button(page,'rviz_stop')
+                    if slam:
+                        slam_ui(page,sid,vid,kind+'-live',save=True)
+                        page.locator('[data-slam="stop"]').click();wait(lambda:not api('/api/simulation/slam',dict(id=sid,vehicle_id=vid,action='status'))['running'],30)
+                        # Single-pass playback needs an actual acquisition
+                        # interval long enough for raw-view + LIO/GUI startup.
+                        # Count real 10 Hz captures; wall sleeps cannot prove
+                        # duration when the renderer runs below real time.
+                        wait(lambda:mid(sid,vid)['health'].get('sequence',0)-start_scan>=500,180)
+                    bags[vid]=finalized(page,sid,vid)
+                    if slam:
+                        ns=mid(sid,vid)['namespace']
+                        assert bags[vid]['message_counts'].get(ns+'/custom',0)>=450,bags[vid]
                     page.locator('#mid360-panel').screenshot(path=str(directory/(kind+'-web-panel.png')))
                     report['checks'][kind+'_UI_selection_live_rviz_reopen_record']='PASS'
                 report['bags']=bags
@@ -128,8 +165,9 @@ def run(directory):
                 page.locator('[data-operation="stop"]').click();wait(lambda:api('/api/simulation/report',dict(id=sid))['cleanup']=='COMPLETE',100)
                 for v in vehicles:assert mid(sid,v['id'])['live_closed'] and not mid(sid,v['id'])['online']
                 rover=next(v for v in vehicles if v['kind']=='rover');vid=rover['id']
-                page.locator('#current-vehicle').select_option(vid);page.locator('#mid360-source').select_option('replay');button(page,'replay_start')
+                page.locator('#current-vehicle').select_option(vid);page.locator('#mid360-source').select_option('replay');button(page,'replay_once' if slam else 'replay_start')
                 wait(lambda:mid(sid,vid)['replay_source']=='rosbag2',20);observe(sid,vid,'stopped-world-replay');rviz(page,sid,vid,'stopped-world-replay')
+                if slam:assert slam_ui(page,sid,vid,'stopped-world-replay')['source']=='replay'
                 report['checks']['stopped_world_UI_replay']='PASS'
                 before=api('/api/center/state')['processes'];page.goto(f'http://127.0.0.1:{port}/center');expect(page.locator('#shutdown')).to_be_enabled();page.locator('#shutdown').click();audit(before)
                 report['checks']['normal_backend_cleanup']='PASS'
@@ -137,10 +175,11 @@ def run(directory):
                 launch();login(page,f'http://127.0.0.1:{port}',password,'/simulation')
                 page.locator('[data-tab="sessions"]').click();page.locator('[data-session="'+sid+'"]').click();page.locator('#current-vehicle').select_option(vid)
                 assert mid(sid,vid)['live_closed'] and not mid(sid,vid)['tools']
-                page.locator('#mid360-source').select_option('replay');button(page,'replay_start');observe(sid,vid,'restarted-backend-replay');rviz(page,sid,vid,'restarted-backend-replay')
+                page.locator('#mid360-source').select_option('replay');button(page,'replay_once' if slam else 'replay_start');observe(sid,vid,'restarted-backend-replay');rviz(page,sid,vid,'restarted-backend-replay')
+                if slam:assert slam_ui(page,sid,vid,'restarted-backend-replay')['source']=='replay'
                 report['checks']['fresh_backend_UI_recording_recovery']='PASS'
                 # Add another owned live simulation while the old replay runs.
-                crash=api('/api/simulation/create',dict(scene_id='L01',vehicles=[dict(kind='rover',spawn=dict(id='center'),sensors=dict(mid360=True))],parameters=dict(obstacle_count=0)))
+                crash=api('/api/simulation/create',dict(scene_id='L01',vehicles=[dict(kind='rover',spawn=dict(id='center'),sensors=dict(mid360=True,**({'mid360_lio':True} if slam else {})))],parameters=dict(obstacle_count=0)))
                 api('/api/simulation/start',dict(id=crash['id']))
                 def crash_ready():
                     s=api('/api/simulation/report',dict(id=crash['id']))
@@ -148,11 +187,22 @@ def run(directory):
                     return s if s['state']=='RUNNING' and s.get('vehicles') and s['vehicles'][0]['state']=='RUNNING' else None
                 fresh=wait(crash_ready,180);fresh_vid=fresh['vehicles'][0]['id'];wait(lambda:mid(crash['id'],fresh_vid)['online'],30)
                 mid(crash['id'],fresh_vid,'record_start');time.sleep(5)
+                if slam:
+                    api('/api/simulation/slam',dict(id=crash['id'],vehicle_id=fresh_vid,action='start'))
+                    wait(lambda:api('/api/simulation/slam',dict(id=crash['id'],vehicle_id=fresh_vid,action='status'))['online'],70)
+                    # The earlier single pass can have naturally finished
+                    # while the new World started. Create a fresh replay cut
+                    # and prove BOTH dependencies are live before SIGKILL.
+                    mid(sid,vid,'replay_once',bag_id=bags[vid]['id'])
+                    api('/api/simulation/slam',dict(id=sid,vehicle_id=vid,action='start',source='replay'))
+                    wait(lambda:api('/api/simulation/slam',dict(id=sid,vehicle_id=vid,action='status'))['online'],40)
+                    assert api('/api/simulation/slam',dict(id=crash['id'],vehicle_id=fresh_vid,action='status'))['online']
                 before=api('/api/center/state')['processes'];assert any('mid360_worker' in str(p) for p in before) and any('ros2 bag record' in str(p) for p in before)
                 os.kill(current['pid'],signal.SIGKILL);audit(before,abnormal=True)
                 report['checks']['abnormal_backend_cgroup_cleanup']='PASS'
                 launch();login(page,f'http://127.0.0.1:{port}',password,'/simulation');page.locator('[data-tab="sessions"]').click();page.locator('[data-session="'+sid+'"]').click();page.locator('#current-vehicle').select_option(vid)
-                page.locator('#mid360-source').select_option('replay');button(page,'replay_start');observe(sid,vid,'crash-recovered-replay');rviz(page,sid,vid,'crash-recovered-replay')
+                page.locator('#mid360-source').select_option('replay');button(page,'replay_once' if slam else 'replay_start');observe(sid,vid,'crash-recovered-replay');rviz(page,sid,vid,'crash-recovered-replay')
+                if slam:assert slam_ui(page,sid,vid,'crash-recovered-replay')['source']=='replay'
                 report['checks']['crash_restart_finalized_recording_recovery']='PASS'
                 report['browser_errors']=errors;assert not errors,errors
                 before=api('/api/center/state')['processes'];page.goto(f'http://127.0.0.1:{port}/center');expect(page.locator('#shutdown')).to_be_enabled();page.locator('#shutdown').click();audit(before)
@@ -170,5 +220,5 @@ def run(directory):
 
 
 if __name__=='__main__':
-    parser=argparse.ArgumentParser();parser.add_argument('--run-dir',required=True,type=Path);args=parser.parse_args()
-    raise SystemExit(0 if run(args.run_dir)['status']=='PASS' else 1)
+    parser=argparse.ArgumentParser();parser.add_argument('--run-dir',required=True,type=Path);parser.add_argument('--slam',action='store_true');args=parser.parse_args()
+    raise SystemExit(0 if run(args.run_dir,slam=args.slam)['status']=='PASS' else 1)

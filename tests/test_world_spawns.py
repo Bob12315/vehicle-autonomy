@@ -50,6 +50,19 @@ class WorldSpawnTests(unittest.TestCase):
         self.assertEqual(0, self.registry.describe('R01')['spawn_presets'][0]['x'])
         self.assertEqual(-4, self.registry.describe('R01')['constraints']['regions'][0]['bounds'][0])
 
+    def test_lio_loop_fixture_rejects_column_spawn_and_preserves_original_scene(self):
+        for family in ('rover','copter'):
+            self.assertEqual(0.,self.registry.validate('L02',DEFINITIONS[family],{'id':'center'})['x'])
+            with self.assertRaises(ValueError):
+                self.registry.validate('L02',DEFINITIONS[family],dict(x=2.,y=0.,z=DEFINITIONS[family]['clearance_z'],heading_deg=0.))
+        with tempfile.TemporaryDirectory() as tmp:
+            original=ET.parse(self.scenes.generate('L01',Path(tmp)/'original.sdf'))
+            loop=ET.parse(self.scenes.generate('L02',Path(tmp)/'loop.sdf'))
+            self.assertIsNone(original.find(".//model[@name='lidar_inner_column']"))
+            column=loop.find(".//model[@name='lidar_inner_column']")
+            self.assertIsNotNone(column.find('.//collision/geometry/cylinder'))
+            self.assertEqual('2 0 1 0 0 0',column.findtext('pose'))
+
     def test_cross_family_world_does_not_select_or_modify_vehicle(self):
         result = self.registry.validate('R04', DEFINITIONS['copter'])
         self.assertEqual(.195, result['z'])

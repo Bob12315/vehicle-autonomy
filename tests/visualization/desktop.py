@@ -55,10 +55,12 @@ def goal(pid,*,capture=None,select=True):
             cursor=parent.value
         if cursor!=window:raise RuntimeError('RViz does not own keyboard focus; no native test input sent')
         if capture:
-            # Capture only the owned client, never the user's whole desktop.
+            # Capture the visible owned-client rectangle from the composited
+            # desktop. Reading the client's redirected backing pixmap can mix
+            # stale Qt widgets with a current OpenGL child surface.
             class XImage(C.Structure):_fields_=[('width',C.c_int),('height',C.c_int),('xoffset',C.c_int),('format',C.c_int),('data',D),('byte_order',C.c_int),('bitmap_unit',C.c_int),('bitmap_bit_order',C.c_int),('bitmap_pad',C.c_int),('depth',C.c_int),('bytes_per_line',C.c_int),('bits_per_pixel',C.c_int),('red_mask',C.c_ulong),('green_mask',C.c_ulong),('blue_mask',C.c_ulong)]
             x.XGetImage.argtypes=[D,W,C.c_int,C.c_int,C.c_uint,C.c_uint,C.c_ulong,C.c_int];x.XGetImage.restype=C.POINTER(XImage);x.XDestroyImage.argtypes=[C.POINTER(XImage)]
-            pointer=x.XGetImage(display,window,0,0,width,height,C.c_ulong(-1).value,2)
+            pointer=x.XGetImage(display,root,xx.value,yy.value,width,height,C.c_ulong(-1).value,2)
             if not pointer:raise RuntimeError('owned RViz window capture unavailable')
             try:
                 value=pointer.contents

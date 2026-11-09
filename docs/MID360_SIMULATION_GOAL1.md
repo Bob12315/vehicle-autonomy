@@ -2,6 +2,8 @@
 
 当前验收结论、真实 Gazebo/ROS/RViz 截图和原始运行证据见 [目标一验收报告](MID360_GOAL1_ACCEPTANCE.md)。以下是普通 Rover/Copter 的操作流程；组件始终明确标注为均匀快照近似模型。
 
+目标二的显式逐切片输入、FAST-LIO2 和地图工具另见[三维建图说明](MID360_SLAM_GOAL2.md)。本文保留目标一均匀快照模式的范围与原验收记录，不把该模式重新标作合格 LIO 输入。
+
 ## 范围与运行环境
 
 只支持原有普通 `rover`、`copter` 的显式 MID-360 选项。默认不启用；Plane、VTOL、救援专用 Copter 不接此组件。不启动 Livox 硬件驱动、物理串口或物理雷达网络。没有新增 SLAM、定位融合、Nav2 或避障。

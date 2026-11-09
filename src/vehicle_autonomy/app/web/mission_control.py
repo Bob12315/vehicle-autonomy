@@ -397,7 +397,7 @@ class MissionControl(ActionLab):
     def handle_authenticated(self, operation, payload, *, principal, control_token, sessions):
         if principal!='api' and not sessions.alive(principal):raise ValueError('browser session expired before operation')
         center=getattr(self,'control_center',None)
-        if center is not None and center.stop.is_set() and operation=='simulation.mid360' and payload.get('action') not in ('status','rviz_stop','record_stop','replay_stop','sensor_stop'):
+        if center is not None and center.stop.is_set() and operation in ('simulation.mid360','simulation.slam') and payload.get('action') not in ('status','stop','rviz_stop','record_stop','replay_stop','sensor_stop'):
             raise ValueError('控制中心正在退出，不能启动 MID-360 工具。')
         if center is not None and center.stop.is_set() and operation in (
                 'simulation.create','simulation.start','simulation.switch','simulation.add_vehicle',
@@ -633,7 +633,7 @@ class MissionControlHandler(ActionLabHandler):
         '/api/workspaces/retry':'workspace.retry','/api/workspaces/reconcile':'workspace.reconcile',
         '/api/control/takeover':'control.takeover','/api/control/reestablish':'control.reestablish'})
     post_routes.update({'/api/simulation/'+op:'simulation.'+op for op in (
-        'create','start','stop','pause','resume','reset','switch','add_vehicle','remove_vehicle','report','logs','test','fault','mid360','install','uninstall','asset_status')})
+        'create','start','stop','pause','resume','reset','switch','add_vehicle','remove_vehicle','report','logs','test','fault','mid360','slam','install','uninstall','asset_status')})
     post_routes.update({'/api/control/acquire':'operator.acquire','/api/control/renew':'operator.renew',
         '/api/control/release':'operator.release','/api/control/request-takeover':'operator.takeover'})
     post_routes.update({'/api/visualization/open':'visualization.open','/api/visualization/candidates':'visualization.propose',

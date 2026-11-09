@@ -2587,6 +2587,108 @@
           "default": 1
         }
       }
+    },
+    {
+      "id": "L02",
+      "name": "MID-360 围栏内闭环检查场",
+      "category": "rover",
+      "vehicles": [
+        "rover",
+        "copter"
+      ],
+      "world_id": "mid360-loop-geometry",
+      "scenario_id": "L02",
+      "layout": "mid360_loop_audit",
+      "source": "repository:simulation/scenarios/center_catalog.json",
+      "version": "1",
+      "license": "Repository-authored procedural SDF; no third-party mesh assets",
+      "description": "保留 L01 外围几何，在 (2,0) 增加真实碰撞立柱；可在原 ±5 米车辆围栏内完成绕柱闭环，登记不代表验收通过。",
+      "extent_m": [
+        120,
+        120
+      ],
+      "spawn": [
+        0,
+        0,
+        0.3,
+        0,
+        0,
+        0
+      ],
+      "targets": [
+        {
+          "name": "A",
+          "position": [
+            0,
+            -2,
+            0
+          ]
+        },
+        {
+          "name": "B",
+          "position": [
+            4,
+            2,
+            0
+          ]
+        }
+      ],
+      "recommended_tests": [
+        "Timed MID-360 / FAST-LIO2",
+        "Controlled within-fence loops",
+        "SC-PGO independent qualification"
+      ],
+      "limitations": [
+        "程序化工程测试几何，不等同高精度实景；车辆、任务和感知能力需分别验收。",
+        "独立 World 不内置飞控或车辆；候选车型并非已通过 SITL 的组合。",
+        "MID-360 和运动/GUI 的实际验收分别记录；本登记不授予 SEND。"
+      ],
+      "verification": {
+        "L1": "NOT_TESTED",
+        "L2": "NOT_TESTED",
+        "L3": "NOT_TESTED",
+        "L4": "NOT_TESTED",
+        "L5": "NOT_TESTED",
+        "L6": "NOT_TESTED"
+      },
+      "installed": true,
+      "download_status": "BUILTIN",
+      "compatibility_status": "NOT_TESTED",
+      "sensor_support": [
+        "Opt-in mid360-approx-v1; real Gazebo gpu_lidar geometry, not Livox non-repetitive scanning"
+      ],
+      "parameter_schema": {
+        "obstacle_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 80,
+          "default": 0
+        },
+        "wind_speed": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 20,
+          "default": 0
+        },
+        "wind_direction": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180,
+          "default": 0
+        },
+        "light_intensity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.8
+        },
+        "friction": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 3,
+          "default": 1
+        }
+      }
     }
   ]
 }

@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "fixed_before_native_runs": true,
+  "scope": "L01, controlled loopback SITL only, no truth input to SLAM",
+  "repetitions_per_vehicle": 3,
+  "trajectory_alignment": "One initial rigid gauge alignment only; never fit the whole trajectory",
+  "rover": {"ate_rmse_m": 0.30, "rpe_1s_translation_rmse_m": 0.20, "attitude_rmse_deg": 5.0, "return_drift_m": 0.35},
+  "copter": {"ate_rmse_m": 0.30, "rpe_1s_translation_rmse_m": 0.20, "attitude_rmse_deg": 5.0, "return_drift_m": 0.35},
+  "sensor": {"minimum_distinct_capture_times_per_scan": 5, "max_imu_bracket_gap_sim_s": 0.020, "max_point_imu_time_skew_sim_s": 0.010},
+  "map": {"minimum_points": 2000, "geometry_residual_p95_m": 0.20, "minimum_matching_landmark_groups": 3},
+  "runtime": {"max_lio_rss_mib": 2048, "max_lio_cpu_percent": 300, "max_lio_delay_host_s": 1.0, "max_dropped_scan_fraction": 0.10},
+  "relocalization": {"timeout_host_s": 30, "position_error_m": 0.35, "attitude_error_deg": 5, "minimum_fitness": 0.80},
+  "faults": {"max_stale_host_s": 1.0, "clock_regression_requires_new_epoch": true, "publisher_change_requires_readmission": true}
+}

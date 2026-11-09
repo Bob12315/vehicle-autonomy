@@ -1,0 +1,21 @@
+diff --git a/fast_lio_localization/global_localization.py b/fast_lio_localization/global_localization.py
+index 32af228..767cf88 100755
+--- a/fast_lio_localization/global_localization.py
++++ b/fast_lio_localization/global_localization.py
+@@ -14,8 +14,6 @@ from sensor_msgs.msg import PointCloud2
+ from std_msgs.msg import Header
+ import numpy as np
+ import tf2_ros
+-import tf_transformations
+-import ros2_numpy
+ 
+ 
+ class FastLIOLocalization(Node):
+@@ -91,6 +89,7 @@ class FastLIOLocalization(Node):
+         o3d.pipelines.registration.TransformationEstimationPointToPoint(),
+         o3d.pipelines.registration.ICPConvergenceCriteria(max_iteration=20),
+         )
++        self.last_registration_result = result_icp  # expose existing quality result to guarded I/O
+         return result_icp.transformation, result_icp.fitness
+             
+     def inverse_se3(self, trans):

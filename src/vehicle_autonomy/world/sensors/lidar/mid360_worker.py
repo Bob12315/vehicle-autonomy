@@ -1,5 +1,6 @@
 """Explicit Gazebo→ROS simulation worker; no hardware or vehicle command ports."""
 import argparse
+from array import array
 from collections import deque
 import json
 from pathlib import Path
@@ -8,6 +9,7 @@ from threading import Lock
 import time
 
 from .mid360_data import convert, FIELDS, POINT_STEP, fresh
+from .mid360_timed_data import convert_custom,stamp_ns
 from vehicle_autonomy.world.sensors.camera.live import atomic
 from vehicle_autonomy.world.sensors.camera.gazebo import clock_pair, fresh_capture
 
@@ -25,7 +27,7 @@ def run(config, directory):
     from std_msgs.msg import String
     from tf2_msgs.msg import TFMessage
     from rosgraph_msgs.msg import Clock as RosClock
-    from gz.transport13 import Node
+    from gz.transport13 import Node,SubscribeOptions
     from gz.msgs10.clock_pb2 import Clock
     from gz.msgs10.pointcloud_packed_pb2 import PointCloudPacked
     from gz.msgs10.imu_pb2 import IMU
@@ -42,20 +44,27 @@ def run(config, directory):
     signal.signal(signal.SIGTERM, stop)
     signal.signal(signal.SIGINT, stop)
     ns = config['namespace']
+    timed=config['backend']=='livox-gz-sliced-pattern-v1'
     ros = RosNode('vaf_mid360', namespace=ns, parameter_overrides=[Parameter('use_sim_time', value=True)])
     reliable = QoSProfile(depth=10, reliability=ReliabilityPolicy.RELIABLE)
     retained = QoSProfile(depth=1, reliability=ReliabilityPolicy.RELIABLE,
                           durability=DurabilityPolicy.TRANSIENT_LOCAL)
     points = ros.create_publisher(PointCloud2, ns+'/points', qos_profile_sensor_data)
-    imu_pub = ros.create_publisher(Imu, ns+'/imu', qos_profile_sensor_data)
+    # FAST-LIO's pinned CustomMsg path requests reliable IMU. A reliable
+    # producer also serves the existing best-effort visualization subscribers.
+    imu_pub = ros.create_publisher(Imu, ns+'/imu', QoSProfile(depth=400,reliability=ReliabilityPolicy.RELIABLE)
+        if config['backend']=='livox-gz-sliced-pattern-v1' else qos_profile_sensor_data)
     clock_pub = ros.create_publisher(RosClock, '/clock', reliable)
     tf = ros.create_publisher(TFMessage, ns+'/tf', reliable)
     tf_static = ros.create_publisher(TFMessage, ns+'/tf_static', retained)
     path_pub = ros.create_publisher(RosPath, ns+'/trajectory', reliable)
     description = ros.create_publisher(String, ns+'/robot_description', retained)
     status = ros.create_publisher(String, ns+'/status', reliable)
+    if timed:
+        from livox_ros_driver2.msg import CustomMsg
+        custom_pub=ros.create_publisher(CustomMsg,ns+'/custom',reliable)
     lock = Lock()
-    queues = {k: deque(maxlen=n) for k, n in [('clock', 1), ('points', 1), ('imu', 400), ('pose', 200)]}
+    queues = {k: deque(maxlen=n) for k, n in [('clock', 1), ('points', 1), ('imu', 400), ('pose', 200),('timing',40)]}
     def receive(kind):
         def callback(message):
             with lock:
@@ -65,8 +74,17 @@ def run(config, directory):
     subscriptions = [(Clock, '/world/'+config['world']+'/clock', 'clock'),
         (PointCloudPacked, config['points_gz'], 'points'), (IMU, config['imu_gz'], 'imu'),
         (Pose_V, '/world/'+config['world']+'/pose/info', 'pose')]
+    if timed:
+        subscriptions=[s for s in subscriptions if s[2] not in ('points','imu')]
+        ros.create_subscription(CustomMsg,config['raw_custom'],receive('points'),reliable)
+        ros.create_subscription(Imu,config['raw_imu'],receive('imu'),QoSProfile(depth=400,reliability=ReliabilityPolicy.RELIABLE))
+        if config.get('raw_capture'):
+            capture_pub=ros.create_publisher(String,config['capture_topic'],reliable)
+            ros.create_subscription(String,config['raw_capture'],receive('timing'),reliable)
     for kind, topic, key in subscriptions:
-        if not transport.subscribe(kind, topic, receive(key)):
+        options=SubscribeOptions()
+        if timed and key in ('clock','pose'):options.msgs_per_sec=100 if key=='clock' else 50
+        if not transport.subscribe(kind, topic, receive(key),options):
             raise RuntimeError('Gazebo subscription failed: '+topic)
 
     def stamp(ns):
@@ -103,10 +121,12 @@ def run(config, directory):
     last_point_stamp = last_imu_stamp = last_pose_stamp = -1
     last_status = 0.
     last_static = 0.
+    last_path_publish = 0.
     sequence = imu_sequence = 0
+    raw_imu_previous=None;raw_imu_max_gap=0;published_imu_max_gap=0
     fault = None
     invalidated = False
-    details = {}
+    details = {};capture_records={}
     trajectory = RosPath()
     trajectory.header.frame_id = config['world_frame']
     try:
@@ -130,10 +150,16 @@ def run(config, directory):
                     # data/TF from two epochs or leaving old RViz caches valid.
                     raise RuntimeError('simulation clock regressed; restart sensor with a fresh domain')
                 pair = candidate
-                clock_pub.publish(RosClock(clock=stamp(value)))
+                paused=(directory/'fault-clock-pause').exists()
+                if not paused:
+                    back=directory/'fault-clock-back';reset=directory/'fault-clock-reset'
+                    if back.exists() or reset.exists():
+                        clock_pub.publish(RosClock(clock=stamp(0 if reset.exists() else max(0,value-2_000_000_000))))
+                        back.unlink(missing_ok=True);reset.unlink(missing_ok=True)
+                    else:clock_pub.publish(RosClock(clock=stamp(value)))
             timings['clock_ms']=(time.monotonic_ns()-began)/1e6;section=time.monotonic_ns()
             for message, received, _ in batch['pose']:
-                captured = message.header.stamp.sec*1_000_000_000+message.header.stamp.nsec
+                captured = stamp_ns(message)
                 target = next((p for p in message.pose if p.name == config['entity']), None)
                 if target is None or captured <= last_pose_stamp or not fresh_capture(pair, captured, now):
                     continue
@@ -151,47 +177,75 @@ def run(config, directory):
                 pose.header = t.header
                 pose.pose.position.x, pose.pose.position.y, pose.pose.position.z = coords[:3]
                 pose.pose.orientation = t.transform.rotation
-                trajectory.header = t.header
-                if not trajectory.poses or captured-(trajectory.poses[-1].header.stamp.sec*1_000_000_000+trajectory.poses[-1].header.stamp.nanosec) >= 100_000_000:
+                if not trajectory.poses or captured-(trajectory.poses[-1].header.stamp.sec*1_000_000_000+trajectory.poses[-1].header.stamp.nanosec) >= 200_000_000:
                     trajectory.poses.append(pose)
                     trajectory.poses = trajectory.poses[-2000:]
+                # This is a display history, not a sensor/control input. ROS
+                # Path serialization grows with history length; keeping its
+                # old 10 Hz publication can starve the shared cloud/IMU bridge
+                # after a few minutes. Bound display work independently of
+                # the original sensor stamps, TF and IMU/cloud rates.
+                if time.monotonic()-last_path_publish >= .5:
+                    trajectory.header = trajectory.poses[-1].header
                     path_pub.publish(trajectory)
+                    last_path_publish = time.monotonic()
             timings['pose_ms']=(time.monotonic_ns()-section)/1e6;section=time.monotonic_ns()
             injected = (directory/'fault').is_file()
+            for message,received,_ in batch['timing']:
+                from vehicle_autonomy.world.mapping.lio_timing import capture_trace
+                trace=capture_trace(json.loads(message.data));capture_records[trace['timebase_ns']]=trace
+                while len(capture_records)>40:del capture_records[next(iter(capture_records))]
+                capture_pub.publish(message)
             for message, received, _ in batch['points']:
-                captured = message.header.stamp.sec*1_000_000_000+message.header.stamp.nsec
-                if (injected or captured <= last_point_stamp or not fresh(received, now)
-                        or not fresh_capture(pair, captured, now) or not fresh(latest_pose, now)):
+                captured = stamp_ns(message)
+                # Explicit owned-simulation fault: corrupt one header while
+                # leaving the genuine payload/timebase untouched. The normal
+                # converter must reject it before any algorithm publication.
+                corrupt=directory/'fault-point-stamp'
+                if timed and corrupt.exists():
+                    corrupt.unlink();message.header.stamp=stamp(captured+2_000_000_000)
+                if (injected or (directory/'fault-cloud').exists() or captured <= last_point_stamp or not fresh(received, now)
+                        or (not timed and (not fresh_capture(pair, captured, now) or not fresh(latest_pose, now)))):
                     continue
-                data, details = convert(message)
+                data, details = convert_custom(message,config['lidar_frame']) if timed else convert(message)
                 msg = PointCloud2()
                 msg.header.frame_id, msg.header.stamp = config['lidar_frame'], stamp(captured)
                 msg.height, msg.width, msg.point_step = 1, details['points'], POINT_STEP
                 msg.row_step, msg.is_dense, msg.is_bigendian = msg.width*POINT_STEP, True, False
                 msg.fields = [PointField(name=n, offset=o, datatype=d, count=1) for n,o,d in FIELDS]
-                msg.data = data
+                msg.data = array('B',data)
                 points.publish(msg)
+                if timed:custom_pub.publish(message)
                 last_point_stamp, last_points = captured, received
                 sequence += 1
             timings['points_ms']=(time.monotonic_ns()-section)/1e6;section=time.monotonic_ns()
             for message, received, _ in batch['imu']:
-                captured = message.header.stamp.sec*1_000_000_000+message.header.stamp.nsec
-                if injected or captured <= last_imu_stamp or not fresh(received, now) or not fresh_capture(pair,captured,now):
+                captured = stamp_ns(message)
+                if raw_imu_previous is not None:raw_imu_max_gap=max(raw_imu_max_gap,captured-raw_imu_previous)
+                raw_imu_previous=captured
+                # Timed ROS sensor messages already carry their original source
+                # stamps. Do not discard real IMU samples merely because an
+                # independent display-clock callback arrives later. LIO's
+                # capture-time admission owns clock correlation and freshness.
+                if injected or (directory/'fault-imu').exists() or captured <= last_imu_stamp or not fresh(received, now) or (not timed and not fresh_capture(pair,captured,now)):
                     continue
                 msg = Imu()
                 msg.header.frame_id, msg.header.stamp = config['lidar_frame'], stamp(captured)
                 msg.orientation_covariance[0] = -1.  # no absolute heading promise
                 msg.angular_velocity.x, msg.angular_velocity.y, msg.angular_velocity.z = message.angular_velocity.x, message.angular_velocity.y, message.angular_velocity.z
-                msg.linear_acceleration.x, msg.linear_acceleration.y, msg.linear_acceleration.z = message.linear_acceleration.x, message.linear_acceleration.y, message.linear_acceleration.z
+                scale=9.80665 if timed else 1.
+                msg.linear_acceleration.x, msg.linear_acceleration.y, msg.linear_acceleration.z = [v*scale for v in (message.linear_acceleration.x,message.linear_acceleration.y,message.linear_acceleration.z)]
                 if not all(math.isfinite(v) for v in (msg.angular_velocity.x,msg.angular_velocity.y,msg.angular_velocity.z,msg.linear_acceleration.x,msg.linear_acceleration.y,msg.linear_acceleration.z)):
                     continue
                 imu_pub.publish(msg)
+                if last_imu_stamp>=0:published_imu_max_gap=max(published_imu_max_gap,captured-last_imu_stamp)
                 last_imu_stamp, last_imu = captured, received
                 imu_sequence += 1
             timings['imu_ms']=(time.monotonic_ns()-section)/1e6
             timings['loop_ms']=(time.monotonic_ns()-began)/1e6
             now=time.monotonic_ns()
-            healthy = not injected and all(fresh(v,now) for v in (last_points,last_imu,latest_pose)) and pair is not None and fresh(pair[1],now)
+            facts=(last_points,last_imu) if timed else (last_points,last_imu,latest_pose)
+            healthy = not injected and not (directory/'fault-clock-pause').exists() and all(fresh(v,now) for v in facts) and pair is not None and fresh(pair[1],now)
             fault = None if healthy else 'injected sensor interruption' if injected else 'waiting for fresh cloud, IMU, pose and clock'
             if not healthy and not invalidated:
                 clear(pair[0] if pair else 0)
@@ -209,6 +263,8 @@ def run(config, directory):
                     processing=timings,batch_sizes={k:len(v) for k,v in batch.items()},
                     cloud=details, tf_source='Gazebo geometry truth, visualization only',
                     imu_units='m/s^2 and rad/s; orientation unavailable')
+                health.update(raw_imu_max_gap_sim_ns=raw_imu_max_gap,published_imu_max_gap_sim_ns=published_imu_max_gap)
+                if timed and config.get('capture_topic'):health['capture_trace']=capture_records.get(last_point_stamp)
                 status.publish(String(data=json.dumps(health)))
                 atomic(directory/'health.json', json.dumps(health).encode())
     finally:
@@ -216,7 +272,9 @@ def run(config, directory):
             transport.unsubscribe(topic)
         clear(pair[0] if pair else 0)
         atomic(directory/'health.json', json.dumps(dict(source='gazebo-live', online=False,
-               error='sensor worker stopped', received_ns=time.monotonic_ns())).encode())
+               error='sensor worker stopped', received_ns=time.monotonic_ns(),
+               raw_imu_max_gap_sim_ns=raw_imu_max_gap,published_imu_max_gap_sim_ns=published_imu_max_gap,
+               sequence=sequence,imu_sequence=imu_sequence)).encode())
         ros.destroy_node()
         rclpy.shutdown()
 
